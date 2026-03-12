@@ -10,7 +10,7 @@
   },
   "plugins": [
     {
-      "name": "open-alva",
+      "name": "alva",
       "source": "./",
       "description": "Build and deploy agentic finance applications on the Alva platform. Access 250+ financial data sources, run cloud-side analytics, backtest trading strategies, and publish interactive playbooks.",
       "version": "1.0.0",

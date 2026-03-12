@@ -1,5 +1,5 @@
 ---
-name: open-alva
+name: alva
 description: >-
   Build and deploy agentic finance applications on the Alva platform. Access
   250+ financial data sources (crypto, equities, macro, on-chain, social), run
@@ -9,7 +9,7 @@ metadata:
   author: alva
 ---
 
-# Open Alva
+# Alva
 
 ## What is Alva
 
@@ -20,9 +20,9 @@ futures OHLCV, funding rates, company fundamentals, price targets, insider and
 senator trades, earnings estimates, CPI, GDP, Treasury rates, exchange flows,
 DeFi metrics, news feeds, social media and more!
 
-## What Open Alva Enables
+## What Alva Skills Enables
 
-The Open Alva skill connects any AI agent or IDE to the full Alva platform. With
+The Alva skill connects any AI agent or IDE to the full Alva platform. With
 it you can:
 
 - **Access financial data** -- query any of Alva's 250+ data SDKs

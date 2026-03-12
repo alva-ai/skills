@@ -1,4 +1,4 @@
-# Open Alva API Reference
+# Alva API Reference
 
 **Base URL**: `$ALVA_ENDPOINT` (defaults to `https://api-llm.prd.alva.ai`).
 

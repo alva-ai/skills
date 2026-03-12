@@ -26,4 +26,4 @@ npx skills add https://github.com/alva-ai/skills
 
 | Skill | Description |
 |-------|-------------|
-| **[open-alva](skills/open-alva/SKILL.md)** | Build and deploy agentic finance applications on the Alva platform. Access 250+ financial data sources, run cloud-side analytics, backtest trading strategies, and publish interactive playbooks. |
+| **[alva](skills/alva/SKILL.md)** | Build and deploy agentic finance applications on the Alva platform. Access 250+ financial data sources, run cloud-side analytics, backtest trading strategies, and publish interactive playbooks. |
