@@ -140,7 +140,7 @@ Row uses `align-items: baseline`, gap = 4px (`--spacing-xxs`).
 
 #### Candlestick Chart (ECharts)
 
-Follows [Chart Card](./design-widgets.md#chart-card) spec. Candlestick is a Chart Card — must use `.chart-dotted-background` + `.chart-body` wrapper per Chart Card spec. Business overrides:
+Follows [Chart Card](./references/design-widgets.md#chart-card) spec. Candlestick is a Chart Card — must use `.chart-dotted-background` + `.chart-body` wrapper per Chart Card spec. Business overrides:
 
 | Property    | Value                        |
 | ----------- | ---------------------------- |
@@ -271,7 +271,7 @@ Benchmark Attribution:  Alpha {computed}%  Beta {computed}
 
 #### Chart Spec
 
-Follows [Chart Card](./design-widgets.md#chart-card) spec. Business overrides:
+Follows [Chart Card](./references/design-widgets.md#chart-card) spec. Business overrides:
 
 | Series          | Color                  |
 | --------------- | ---------------------- |
@@ -280,7 +280,7 @@ Follows [Chart Card](./design-widgets.md#chart-card) spec. Business overrides:
 
 ### 2.3 Current Positions Table
 
-Follows [Table Card](./design-widgets.md#table-card) spec. Title-to-table gap: 16px.
+Follows [Table Card](./references/design-widgets.md#table-card) spec. Title-to-table gap: 16px.
 
 #### Columns
 
@@ -295,7 +295,7 @@ Follows [Table Card](./design-widgets.md#table-card) spec. Title-to-table gap: 1
 
 ### 2.4 Daily P&L Chart
 
-Follows [Chart Card](./design-widgets.md#chart-card) spec. Business overrides:
+Follows [Chart Card](./references/design-widgets.md#chart-card) spec. Business overrides:
 
 | Property     | Value                                                                                |
 | ------------ | ------------------------------------------------------------------------------------ |
@@ -307,7 +307,7 @@ Follows [Chart Card](./design-widgets.md#chart-card) spec. Business overrides:
 
 ### 2.5 Drawdown Chart
 
-Follows [Chart Card](./design-widgets.md#chart-card) spec. Business overrides:
+Follows [Chart Card](./references/design-widgets.md#chart-card) spec. Business overrides:
 
 | Property     | Value                                                                                |
 | ------------ | ------------------------------------------------------------------------------------ |
@@ -322,7 +322,7 @@ Follows [Chart Card](./design-widgets.md#chart-card) spec. Business overrides:
 
 ## 3. Tab: Analytics
 
-All charts follow [Chart Card](./design-widgets.md#chart-card) spec.
+All charts follow [Chart Card](./references/design-widgets.md#chart-card) spec.
 
 ### Chart Selection Logic
 
@@ -378,7 +378,7 @@ Plain text paragraph: 16px, Regular 400, `--text-n9`, line-height 26px, letter-s
 
 ### 4.3 Strategy Section
 
-Content follows [Free Text Card](./design-widgets.md#free-text-card) spec (Markdown component + `.free-text-body` padding).
+Content follows [Free Text Card](./references/design-widgets.md#free-text-card) spec (Markdown component + `.free-text-body` padding).
 
 Summarize the strategy logic and render using the **Large (default)** Markdown size (`.markdown-container` without size modifier). See [Markdown sizes](./design-components.md#markdown).
 
