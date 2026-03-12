@@ -136,419 +136,211 @@ document.querySelectorAll(".list-item").forEach((item) => {
 
 > For font specification, see [design-system.md - Typography & Font](./design-system.md#typography--font). Headings and body text use Delight; code uses JetBrains Mono.
 
-### Size Specification
+Uses [markdown-it](https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js) for automatic rendering. Write raw markdown inside `<script type="text/markdown">`, the init script parses it into standard HTML tags, and scoped CSS maps them to the Alva design spec.
 
-Sizes are controlled via container modifier classes and apply to all text elements within the container.
+### Usage
 
-| Element                  | Large (default) | Medium `.markdown-container--m` | Small `.markdown-container--s` |
-| ------------------------ | --------------- | ------------------------------- | ------------------------------ |
-| H1                       | 20px / 30px     | 18px / 28px                     | 14px / 22px                    |
-| H2                       | 20px / 30px     | 16px / 26px                     | 12px / 20px                    |
-| H3                       | 18px / 28px     | 14px / 22px                     | 12px / 20px                    |
-| H4 – H6                  | 16px / 26px     | 14px / 22px                     | 12px / 20px                    |
-| Paragraph                | 16px / 26px     | 14px / 22px                     | 12px / 20px                    |
-| Ordered / Unordered List | 16px / 26px     | 14px / 22px                     | 12px / 20px                    |
-| Inline Code              | 12px / 20px     | 12px / 20px                     | 10px / 16px                    |
-| Table Cell               | 14px / 22px     | 12px / 20px                     | 12px / 20px                    |
-| Table Padding            | 12px            | 8px                             | 8px                            |
-| Table Cell Min Height    | 180px           | 176px                           | 176px                          |
-| H1 padding-top           | 8px             | 2px                             | 2px                            |
-| H2 padding-top           | 8px             | 2px                             | 0                              |
-| H3 padding-top           | 4px             | 0                               | 0                              |
-| Container Gap            | 16px            | 8px                             | 4px                            |
-| List Gap                 | 8px             | 4px                             | 4px                            |
-| Code Padding             | 2px 8px         | 8px                             | 2px 6px                        |
+```html
+<!-- 1. Container with optional size modifier -->
+<div class="markdown-container">
+  <script type="text/markdown">
+# Heading 1
 
-```css
-/* ── Medium ── */
-.markdown-container--m .markdown-h1 {
-  font-size: 18px;
-  line-height: 28px;
-  letter-spacing: 0.18px;
-  padding-top: 2px;
-}
+Paragraph with `inline code`.
 
-.markdown-container--m .markdown-h2 {
-  font-size: 16px;
-  line-height: 26px;
-  letter-spacing: 0.16px;
-  padding-top: 2px;
-}
+- Bullet item
+- Another item
 
-.markdown-container--m .markdown-h3 {
-  font-size: 14px;
-  line-height: 22px;
-  letter-spacing: 0.14px;
-  padding-top: 0;
-}
+1. Ordered item
+2. Another item
 
-.markdown-container--m .markdown-h4,
-.markdown-container--m .markdown-h5,
-.markdown-container--m .markdown-h6 {
-  font-size: 14px;
-  line-height: 22px;
-  letter-spacing: 0.14px;
-}
+| Col A | Col B |
+| --- | --- |
+| Cell | Cell |
+  </script>
+</div>
 
-.markdown-container--m .markdown-paragraph,
-.markdown-container--m .markdown-list-number,
-.markdown-container--m .markdown-unordered-list-item {
-  font-size: 14px;
-  line-height: 22px;
-  letter-spacing: 0.14px;
-}
-.markdown-container--m .markdown-bullet {
-  height: 22px;
-}
-
-.markdown-container--m .markdown-th,
-.markdown-container--m .markdown-td {
-  font-size: 12px;
-  line-height: 20px;
-  letter-spacing: 0.12px;
-  padding: 8px;
-  min-height: 176px;
-}
-
-.markdown-container--m .markdown-ordered-list,
-.markdown-container--m .markdown-unordered-list {
-  gap: 4px;
-}
-
-.markdown-container--m .markdown-code-block {
-  padding: 8px;
-}
-.markdown-container--m {
-  gap: 8px;
-}
-
-/* ── Small ── */
-.markdown-container--s .markdown-h1 {
-  font-size: 14px;
-  line-height: 22px;
-  letter-spacing: 0.14px;
-  padding-top: 2px;
-}
-
-.markdown-container--s .markdown-h2 {
-  font-size: 12px;
-  line-height: 20px;
-  letter-spacing: 0.12px;
-  padding-top: 0;
-}
-
-.markdown-container--s .markdown-h3 {
-  font-size: 12px;
-  line-height: 20px;
-  letter-spacing: 0.12px;
-  padding-top: 0;
-}
-
-.markdown-container--s .markdown-h4,
-.markdown-container--s .markdown-h5,
-.markdown-container--s .markdown-h6 {
-  font-size: 12px;
-  line-height: 20px;
-  letter-spacing: 0.12px;
-}
-
-.markdown-container--s .markdown-paragraph,
-.markdown-container--s .markdown-list-number,
-.markdown-container--s .markdown-unordered-list-item {
-  font-size: 12px;
-  line-height: 20px;
-  letter-spacing: 0.12px;
-}
-.markdown-container--s .markdown-bullet {
-  height: 20px;
-}
-
-.markdown-container--s .markdown-code-content {
-  font-size: 10px;
-  line-height: 16px;
-}
-
-.markdown-container--s .markdown-code-block {
-  padding: 2px 6px;
-}
-
-.markdown-container--s .markdown-th,
-.markdown-container--s .markdown-td {
-  font-size: 12px;
-  line-height: 20px;
-  letter-spacing: 0.12px;
-  padding: 8px;
-  min-height: 176px;
-}
-
-.markdown-container--s .markdown-ordered-list,
-.markdown-container--s .markdown-unordered-list {
-  gap: 4px;
-}
-.markdown-container--s {
-  gap: 4px;
-}
+<!-- Size modifiers: markdown-container--m (Medium), markdown-container--s (Small) -->
 ```
 
+### Required JS (add once at page bottom)
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script>
+  const md = window.markdownit();
+  document.querySelectorAll('script[type="text/markdown"]').forEach(el => {
+    const container = el.parentElement;
+    el.remove();
+    container.insertAdjacentHTML('beforeend', md.render(el.textContent));
+  });
+</script>
+```
+
+### CSS
+
 ```css
-/* ============================================
-   1. Heading Styles (H1-H6)
-   ============================================ */
-
-.markdown-h1 {
-  font-family: "Delight";
-  font-weight: 500;
-  font-size: 20px;
-  line-height: 30px;
-  letter-spacing: 0.2px;
-  color: var(--text-n9);
-  font-style: normal;
-  padding-top: 12px;
-  margin: 0;
-  width: 100%;
-  display: flex;
-  align-items: center;
-}
-
-.markdown-h2 {
-  font-family: "Delight";
-  font-weight: 500;
-  font-size: 20px;
-  line-height: 30px;
-  letter-spacing: 0.2px;
-  color: var(--text-n9);
-  font-style: normal;
-  padding-top: 12px;
-  margin: 0;
-  width: 100%;
-  display: flex;
-  align-items: center;
-}
-
-.markdown-h3 {
-  font-family: "Delight";
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 28px;
-  letter-spacing: 0.18px;
-  color: var(--text-n9);
-  font-style: normal;
-  padding-top: 4px;
-  margin: 0;
-  width: 100%;
-  display: flex;
-  align-items: center;
-}
-
-.markdown-h4 {
-  font-family: "Delight";
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 26px;
-  letter-spacing: 0.16px;
-  color: var(--text-n9);
-  font-style: normal;
-  margin: 0;
-  width: 100%;
-  display: flex;
-  align-items: center;
-}
-
-.markdown-h5 {
-  font-family: "Delight";
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 26px;
-  letter-spacing: 0.16px;
-  color: var(--text-n9);
-  font-style: normal;
-  margin: 0;
-  width: 100%;
-  display: flex;
-  align-items: center;
-}
-
-.markdown-h6 {
-  font-family: "Delight";
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 26px;
-  letter-spacing: 0.16px;
-  color: var(--text-n9);
-  font-style: normal;
-  margin: 0;
-  width: 100%;
-  display: flex;
-  align-items: center;
-}
-
-/* ============================================
-   2. Paragraph Styles
-   ============================================ */
-
-.markdown-paragraph {
-  font-size: 16px;
-  line-height: 26px;
-  letter-spacing: 0.16px;
-  color: var(--text-n9);
-  font-style: normal;
-  white-space: pre-wrap;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-/* ============================================
-   3. List Styles
-   ============================================ */
-
-/* Ordered List */
-.markdown-ordered-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-}
-
-.markdown-ordered-list-item {
-  display: flex;
-  align-items: flex-start;
-  width: 100%;
-}
-
-.markdown-list-number {
-  font-size: 16px;
-  line-height: 26px;
-  letter-spacing: 0.16px;
-  color: var(--text-n9);
-  min-width: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-/* Unordered List */
-.markdown-unordered-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-}
-
-.markdown-unordered-list-item {
-  display: flex;
-  align-items: flex-start;
-  width: 100%;
-}
-
-.markdown-bullet {
-  width: 24px;
-  height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  position: relative;
-}
-
-.markdown-bullet::before {
-  content: "";
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background-color: var(--text-n9);
-}
-
-/* ============================================
-   4. Code Block Styles
-   ============================================ */
-
-.markdown-code-block {
-  background-color: var(--b-r02);
-  border: 1px solid var(--line-l07);
-  border-radius: 2px;
-  padding: 2px 8px;
-  display: inline-flex;
-  align-items: center;
-}
-
-.markdown-code-content {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 12px;
-  font-weight: normal;
-  line-height: 20px;
-  letter-spacing: 0.12px;
-  color: var(--text-n7);
-}
-
-/* ============================================
-   5. Table Styles
-   ============================================ */
-
-.markdown-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.markdown-th,
-.markdown-td {
-  padding: 12px;
-  min-height: 180px;
-  border-bottom: 1px solid var(--line-l07);
-  font-family: "Delight";
-  font-size: 14px;
-  line-height: 22px;
-  letter-spacing: 0.14px;
-  color: var(--text-n9);
-  text-align: left;
-}
-
-.markdown-th {
-  font-weight: 500;
-  padding-top: 0;
-}
-
-/* ============================================
-   6. Container Styles
-   ============================================ */
-
+/* ── Container ── */
 .markdown-container {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px; /* Large default */
+  gap: 16px;
+}
+.markdown-container * { box-sizing: border-box; }
+
+/* ── Headings ── */
+.markdown-container h1,
+.markdown-container h2,
+.markdown-container h3,
+.markdown-container h4,
+.markdown-container h5,
+.markdown-container h6 {
+  font-family: "Delight", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  color: var(--text-n9);
+  margin: 0;
+  width: 100%;
+}
+.markdown-container h1,
+.markdown-container h2 { font-size: 20px; line-height: 30px; letter-spacing: 0.2px; padding-top: 8px; }
+.markdown-container h3 { font-size: 18px; line-height: 28px; letter-spacing: 0.18px; padding-top: 4px; }
+.markdown-container h4,
+.markdown-container h5,
+.markdown-container h6 { font-size: 16px; line-height: 26px; letter-spacing: 0.16px; }
+
+/* ── Paragraph ── */
+.markdown-container p {
+  font-family: "Delight", "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px; line-height: 26px; letter-spacing: 0.16px;
+  color: var(--text-n9); margin: 0; white-space: pre-wrap;
 }
 
-/* ============================================
-   6. Common Styles
-   ============================================ */
-
-.markdown-container * {
-  box-sizing: border-box;
+/* ── Lists ── */
+.markdown-container ul,
+.markdown-container ol {
+  display: flex; flex-direction: column; gap: 8px;
+  list-style: none; margin: 0; padding: 0;
+}
+.markdown-container li {
+  font-family: "Delight", "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px; line-height: 26px; letter-spacing: 0.16px;
+  color: var(--text-n9);
+  display: flex; align-items: flex-start;
+}
+.markdown-container ul > li::before {
+  content: "";
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--text-n9); flex-shrink: 0;
+  margin-top: 10.5px; margin-right: 19px;
+}
+.markdown-container ol { counter-reset: md-ol; }
+.markdown-container ol > li { counter-increment: md-ol; }
+.markdown-container ol > li::before {
+  content: counter(md-ol) ".";
+  min-width: 24px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; line-height: 26px; color: var(--text-n9);
 }
 
-.markdown-divider * {
-  height: 1px;
-  background: var(--line-l07);
+/* ── Code ── */
+.markdown-container code {
+  background: var(--b-r03); border: 1px solid rgba(0,0,0,0.07);
+  border-radius: 2px; padding: 2px 8px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px; line-height: 20px; letter-spacing: 0.12px;
+  color: var(--text-n7);
+}
+.markdown-container pre {
+  background: var(--b-r03); border: 1px solid rgba(0,0,0,0.07);
+  border-radius: 2px; padding: 2px 8px; margin: 0; overflow-x: auto;
+}
+.markdown-container pre code { border: none; padding: 0; background: none; }
+
+/* ── Divider ── */
+.markdown-container hr {
+  height: 1px; background: rgba(0,0,0,0.07);
+  border: none; margin: 4px 0;
 }
 
-/* Responsive Design */
+/* ── Table ── */
+.markdown-container table { width: 100%; border-collapse: collapse; }
+.markdown-container th,
+.markdown-container td {
+  padding: 12px; min-height: 180px;
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+  font-family: "Delight", "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px; line-height: 22px; letter-spacing: 0.14px;
+  color: var(--text-n9); text-align: left;
+}
+.markdown-container th { font-weight: 500; padding-top: 0; }
+
+/* ── Link ── */
+.markdown-container a {
+  color: var(--text-n7);
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: var(--text-n5);
+  text-decoration-thickness: 8%;
+  text-underline-offset: 30%;
+  text-decoration-skip-ink: none;
+  transition: color 0.15s ease;
+}
+.markdown-container a:hover { color: var(--main-m1); text-decoration-color: var(--main-m1); }
+.markdown-container a::after {
+  content: "";
+  width: 16px; height: 16px;
+  background: currentColor;
+  mask: url("https://alva-ai-static.b-cdn.net/icons/go-l.svg") center / contain no-repeat;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+
+/* ── Medium ── */
+.markdown-container--m { gap: 8px; }
+.markdown-container--m h1 { font-size: 18px; line-height: 28px; letter-spacing: 0.18px; padding-top: 2px; }
+.markdown-container--m h2 { font-size: 16px; line-height: 26px; letter-spacing: 0.16px; padding-top: 2px; }
+.markdown-container--m h3 { font-size: 14px; line-height: 22px; letter-spacing: 0.14px; padding-top: 0; }
+.markdown-container--m h4,
+.markdown-container--m h5,
+.markdown-container--m h6 { font-size: 14px; line-height: 22px; letter-spacing: 0.14px; }
+.markdown-container--m p,
+.markdown-container--m li { font-size: 14px; line-height: 22px; letter-spacing: 0.14px; }
+.markdown-container--m ul > li::before { margin-top: 8.5px; }
+.markdown-container--m ol > li::before { font-size: 14px; line-height: 22px; }
+.markdown-container--m ul,
+.markdown-container--m ol { gap: 4px; }
+.markdown-container--m th,
+.markdown-container--m td { font-size: 12px; line-height: 20px; letter-spacing: 0.12px; padding: 8px; min-height: 176px; }
+.markdown-container--m code { padding: 8px; }
+.markdown-container--m a::after { width: 14px; height: 14px; }
+
+/* ── Small ── */
+.markdown-container--s { gap: 4px; }
+.markdown-container--s h1 { font-size: 14px; line-height: 22px; letter-spacing: 0.14px; padding-top: 2px; }
+.markdown-container--s h2 { font-size: 12px; line-height: 20px; letter-spacing: 0.12px; padding-top: 0; }
+.markdown-container--s h3 { font-size: 12px; line-height: 20px; letter-spacing: 0.12px; padding-top: 0; }
+.markdown-container--s h4,
+.markdown-container--s h5,
+.markdown-container--s h6 { font-size: 12px; line-height: 20px; letter-spacing: 0.12px; }
+.markdown-container--s p,
+.markdown-container--s li { font-size: 12px; line-height: 20px; letter-spacing: 0.12px; }
+.markdown-container--s a::after { width: 12px; height: 12px; }
+.markdown-container--s ul > li::before { margin-top: 7.5px; }
+.markdown-container--s ol > li::before { font-size: 12px; line-height: 20px; }
+.markdown-container--s ul,
+.markdown-container--s ol { gap: 4px; }
+.markdown-container--s code { font-size: 10px; line-height: 16px; padding: 2px 6px; }
+.markdown-container--s th,
+.markdown-container--s td { font-size: 12px; line-height: 20px; letter-spacing: 0.12px; padding: 8px; min-height: 176px; }
+
+/* ── Responsive ── */
 @media (max-width: 768px) {
-  .markdown-container {
-    max-width: 100%;
-    padding: 0 16px;
-  }
-
-  .markdown-table {
-    overflow-x: scroll;
-  }
+  .markdown-container { max-width: 100%; padding: 0 16px; }
+  .markdown-container table { overflow-x: scroll; }
 }
 ```
 
