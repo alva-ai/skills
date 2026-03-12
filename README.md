@@ -1,5 +1,7 @@
 # Agent Skills
 
+![Agent Skills](https://alva-ai-static.b-cdn.net/images/open-alva-github-readme.png)
+
 ## Installation
 
 ```bash
