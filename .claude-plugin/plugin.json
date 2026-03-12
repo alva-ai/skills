@@ -1,0 +1,15 @@
+{
+  "name": "open-alva",
+  "version": "1.0.0",
+  "description": "Build and deploy agentic finance applications on the Alva platform. Access 250+ financial data sources, run cloud-side analytics, backtest trading strategies, and publish interactive playbooks.",
+  "author": {
+    "name": "Alva",
+    "email": "support@alva.ai",
+    "url": "https://alva.ai"
+  },
+  "homepage": "https://alva.ai",
+  "repository": "https://github.com/alva-ai/skills",
+  "license": "MIT",
+  "keywords": ["finance", "crypto", "equities", "trading", "data", "analytics", "playbooks", "backtesting"],
+  "skills": "./skills/open-alva/"
+}
