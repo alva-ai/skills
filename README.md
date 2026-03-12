@@ -1,6 +1,6 @@
 # Alva Skills
 
-![Agent Skills](https://alva-ai-static.b-cdn.net/images/open-alva-github-readme.png)
+![Agent Skills](https://alva-ai-static.b-cdn.net/images/alva-skill-github-readme.png)
 
 > Turn your AI agent into a finance powerhouse — access 250+ data sources, build cloud-side analytics, backtest strategies, and ship live investing playbooks.
 
