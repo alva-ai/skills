@@ -441,12 +441,13 @@ released, the playbook is accessible at
 `GET /api/v1/fs/readdir?path=~/playbooks` to check existing playbook names
 before releasing.
 
-| Field     | Type   | Required | Description                                  |
-| --------- | ------ | -------- | -------------------------------------------- |
-| name      | string | yes      | URL-safe playbook name (e.g. `btc-dashboard`), must be unique per user |
-| version   | string | yes      | SemVer (e.g. `v1.0.0`)                       |
-| feeds     | array  | yes      | Feed references `[{feed_id, feed_major?}]`   |
-| changelog | string | no       | Release changelog                            |
+| Field       | Type   | Required | Description                                  |
+| ----------- | ------ | -------- | -------------------------------------------- |
+| name        | string | yes      | URL-safe playbook name (e.g. `btc-dashboard`), must be unique per user |
+| version     | string | yes      | SemVer (e.g. `v1.0.0`)                       |
+| feeds       | array  | yes      | Feed references `[{feed_id, feed_major?}]`   |
+| description | string | no       | Short description of the playbook             |
+| changelog   | string | no       | Release changelog                            |
 
 Feed reference fields:
 
@@ -460,11 +461,28 @@ POST /api/v1/release/playbook
 {
   "name": "btc-dashboard",
   "version": "v1.0.0",
+  "description": "BTC market dashboard with price, technicals, and volume",
   "feeds": [{"feed_id": 100, "feed_major": 1}],
   "changelog": "Initial release"
 }
 → {"playbook_id": 99, "version": "v1.0.0"}
 ```
+
+> **Post-release**: This API only creates DB records and uploads HTML to CDN.
+> You must also write ALFS files using the returned numeric `playbook_id` for
+> the frontend to query and render the playbook:
+>
+> 1. **Release layout**: `~/playbooks/{playbook_id}/releases/{version}/layout.html`
+>    (content: CDN URL string).
+> 2. **Draft layout**: `~/playbooks/{playbook_id}/draft/layout.html`
+>    (content: CDN URL string). Required for the frontend dashboard iframe.
+> 3. **playbook.json**: `~/playbooks/{playbook_id}/playbook.json` with `type`,
+>    `draft`, `releases`, and `latest_release` fields. The `type` field must be
+>    `"dashboard"` for data dashboards or `"strategy"` for trading strategy
+>    playbooks — this controls frontend UI routing.
+>
+> See SKILL.md Deployment Quick Reference for the exact API calls and
+> `playbook.json` schema.
 
 ---
 
