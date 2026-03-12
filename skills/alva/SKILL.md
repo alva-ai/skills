@@ -293,7 +293,7 @@ Scripts executed via `/api/v1/run` run in a V8 isolate. See
 | alfs            | `require("alfs")`            | Filesystem (uses absolute paths `/alva/home/<username>/...`)            |
 | env             | `require("env")`             | `userId`, `username`, `args` from request                                      |
 | net/http        | `require("net/http")`        | `fetch(url, init)` for async HTTP requests                         |
-| @alva/algorithm | `require("@alva/algorithm")` | Technical indicators and statistics                                |
+| @alva/algorithm | `require("@alva/algorithm")` | Statistics                                |
 | @alva/feed      | `require("@alva/feed")`      | Feed SDK for persistent data pipelines + FeedAltra trading engine  |
 | @alva/adk       | `require("@alva/adk")`       | Agent SDK for LLM requests — `agent()` for LLM agents with tool calling |
 | @test/suite     | `require("@test/suite")`     | Jest-style test framework (`describe`, `it`, `expect`, `runTests`) |
