@@ -129,9 +129,10 @@ Three phases:
    DB records, uploads HTML to CDN, and writes release files to ALFS
    automatically. Returns `playbook_id` (numeric).
 
-Once released, the playbook html will be published at
-`https://<username>.playbook.alva.ai/<playbook_name>/<version>/index.html`.
--- ready to share with the world.
+Once released, the playbook is accessible at
+`https://alva.ai/<username>/playbooks/<playbook_id>` — ready to share with the
+world. Use the `playbook_id` from the release response and the username from
+`GET /api/v1/me` to construct this URL.
 
 ---
 
@@ -590,6 +591,10 @@ POST /api/v1/draft/playbook
 POST /api/v1/release/playbook
 {"name":"btc-dashboard","version":"v1.0.0","feeds":[{"feed_id":100}]}
 → {"playbook_id":99,"version":"v1.0.0","published_url":"https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html"}
+
+# After release, output the alva.ai playbook link to the user:
+# https://alva.ai/<username>/playbooks/<playbook_id>
+# e.g. https://alva.ai/alice/playbooks/99
 ```
 
 ---
