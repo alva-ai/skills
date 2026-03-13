@@ -123,16 +123,11 @@ Three phases:
 
 1. **Write HTML to ALFS**: `POST /api/v1/fs/write` the playbook HTML to
    `~/playbooks/{name}/index.html`.
-2. **Create playbook draft**: `POST /api/v1/draft/playbook` — creates a draft version of the playbook.
-3. **Call release API**: `POST /api/v1/release/playbook` — creates DB records
-   and uploads HTML to CDN. Returns `playbook_id` (numeric).
-4. **Write ALFS files**: Using the returned numeric `playbook_id`, write
-   release files, draft files, and `playbook.json` to ALFS. See
-   [api-reference.md](references/api-reference.md) for details.
-
-The `playbook.json` **must** include a `type` field (`"dashboard"` or
-`"strategy"`) and a `draft` object. Omitting `type` causes wrong frontend
-routing; omitting `draft` causes the dashboard iframe to never load.
+2. **Create playbook draft**: `POST /api/v1/draft/playbook` — creates DB
+   records, writes draft files and `playbook.json` to ALFS automatically.
+3. **Call release API**: `POST /api/v1/release/playbook` — creates release
+   DB records, uploads HTML to CDN, and writes release files to ALFS
+   automatically. Returns `playbook_id` (numeric).
 
 Once released, the playbook is accessible at
 `https://<username>.playbook.alva.ai/playbooks/<playbook_id>/index.html`.
@@ -588,7 +583,7 @@ POST /api/v1/release/feed
 
 # 2. Create playbook draft (creates DB record + ALFS draft files automatically)
 POST /api/v1/draft/playbook
-{"name":"btc-dashboard","type":"dashboard","description":"BTC market dashboard","feeds":[{"feed_id":100}]}
+{"name":"btc-dashboard","description":"BTC market dashboard","feeds":[{"feed_id":100}]}
 → {"playbook_id":99,"playbook_version_id":200}
 
 # 3. Release playbook (reads HTML from ALFS, uploads to CDN, writes release files automatically)
