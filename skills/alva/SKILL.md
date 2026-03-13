@@ -164,6 +164,32 @@ All configuration is done via environment variables.
 | `ALVA_API_KEY`  | **yes**  | Your API key (create and manage at [alva.ai](https://alva.ai))  |
 | `ALVA_ENDPOINT` | no       | Alva API base URL. Defaults to `https://api-llm.prd.alva.ai` if not set |
 
+### First-Time Setup
+
+If `ALVA_API_KEY` is not set, **ask the user whether they already have an API
+key**. Then follow the matching path:
+
+**Path A — User already has a key:**
+
+Ask them to paste the key. Then set it up and verify on their behalf:
+
+```bash
+export ALVA_API_KEY="<the key they pasted>"
+curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" https://api-llm.prd.alva.ai/api/v1/me
+```
+
+On success (`{"id":...,"username":"..."}`), suggest persisting the key in their
+shell profile (`~/.zshrc`, `~/.bashrc`, etc.) so it's available in future
+sessions. Then ask what they want to do — offer concrete starting points like:
+build a playbook, explore financial data, backtest a trading strategy, or set up
+a data pipeline.
+
+**Path B — User does not have a key:**
+
+1. Sign up at [alva.ai](https://alva.ai) (if no account yet).
+2. Log in → Settings → API Keys → Create New Key → copy the key.
+3. Paste it back — then set up and verify (same as Path A).
+
 ### Making API Requests
 
 All API examples in this skill use HTTP notation (`METHOD /path`). Every request
@@ -566,8 +592,6 @@ POST /api/v1/release/playbook
 {"name":"btc-dashboard","version":"v1.0.0","feeds":[{"feed_id":100}]}
 → {"playbook_id":99,"version":"v1.0.0","published_url":"https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html"}
 ```
-
-The playbook will be accessible at `https://alva.ai/<username>/playbooks/<playbook_id>`.
 
 ---
 
