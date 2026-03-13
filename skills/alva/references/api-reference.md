@@ -427,27 +427,47 @@ POST /api/v1/release/feed
 
 ### Release Playbook
 
+### Create Playbook Draft
+
 ```
-POST /api/v1/release/playbook
+POST /api/v1/draft/playbook
 ```
 
-Release a playbook for public hosting. The HTML is read from ALFS at
-`~/playbooks/{name}/index.html` (written via `fs/write` before calling this
-endpoint). **Must be called after** writing the playbook HTML to ALFS. Once
-released, the playbook is accessible at
-`https://username.playbook.alva.ai/playbook-name/version/index.html`.
-
-**Name uniqueness**: The `name` must be unique within your user space. Use
-`GET /api/v1/fs/readdir?path=~/playbooks` to check existing playbook names
-before releasing.
+Create a new playbook with a draft version.
 
 | Field       | Type   | Required | Description                                  |
 | ----------- | ------ | -------- | -------------------------------------------- |
 | name        | string | yes      | URL-safe playbook name (e.g. `btc-dashboard`), must be unique per user |
-| version     | string | yes      | SemVer (e.g. `v1.0.0`)                       |
-| feeds       | array  | yes      | Feed references `[{feed_id, feed_major?}]`   |
+| type        | string | no       | `"dashboard"` or `"strategy"` (default: `"dashboard"`). Controls frontend routing |
 | description | string | no       | Short description of the playbook             |
-| changelog   | string | no       | Release changelog                            |
+| feeds       | array  | yes      | Feed references `[{feed_id, feed_major?}]`   |
+
+```
+POST /api/v1/draft/playbook
+{
+  "name": "btc-dashboard",
+  "type": "dashboard",
+  "description": "BTC market dashboard with price, technicals, and volume",
+  "feeds": [{"feed_id": 100}]
+}
+→ {"playbook_id": 99, "playbook_version_id": 200}
+```
+
+### Release Playbook
+
+```
+POST /api/v1/release/playbook
+```
+
+Release an existing playbook for public hosting. Reads the playbook HTML from
+`~/playbooks/{name}/index.html` and uploads it to CDN.
+
+| Field     | Type   | Required | Description                                  |
+| --------- | ------ | -------- | -------------------------------------------- |
+| name      | string | yes      | URL-safe playbook name (must already exist)  |
+| version   | string | yes      | SemVer (e.g. `v1.0.0`)                       |
+| feeds     | array  | yes      | Feed references `[{feed_id, feed_major?}]`   |
+| changelog | string | no       | Release changelog                            |
 
 Feed reference fields:
 
@@ -461,28 +481,11 @@ POST /api/v1/release/playbook
 {
   "name": "btc-dashboard",
   "version": "v1.0.0",
-  "description": "BTC market dashboard with price, technicals, and volume",
   "feeds": [{"feed_id": 100, "feed_major": 1}],
   "changelog": "Initial release"
 }
-→ {"playbook_id": 99, "version": "v1.0.0"}
+→ {"playbook_id": 99, "version": "v1.0.0", "published_url": "https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html"}
 ```
-
-> **Post-release**: This API only creates DB records and uploads HTML to CDN.
-> You must also write ALFS files using the returned numeric `playbook_id` for
-> the frontend to query and render the playbook:
->
-> 1. **Release layout**: `~/playbooks/{playbook_id}/releases/{version}/layout.html`
->    (content: CDN URL string).
-> 2. **Draft layout**: `~/playbooks/{playbook_id}/draft/layout.html`
->    (content: CDN URL string). Required for the frontend dashboard iframe.
-> 3. **playbook.json**: `~/playbooks/{playbook_id}/playbook.json` with `type`,
->    `draft`, `releases`, and `latest_release` fields. The `type` field must be
->    `"dashboard"` for data dashboards or `"strategy"` for trading strategy
->    playbooks — this controls frontend UI routing.
->
-> See SKILL.md Deployment Quick Reference for the exact API calls and
-> `playbook.json` schema.
 
 ---
 
