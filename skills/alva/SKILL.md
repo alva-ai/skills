@@ -163,6 +163,32 @@ All configuration is done via environment variables.
 | `ALVA_API_KEY`  | **yes**  | Your API key (create and manage at [alva.ai](https://alva.ai))  |
 | `ALVA_ENDPOINT` | no       | Alva API base URL. Defaults to `https://api-llm.prd.alva.ai` if not set |
 
+### First-Time Setup
+
+If `ALVA_API_KEY` is not set, **ask the user whether they already have an API
+key**. Then follow the matching path:
+
+**Path A — User already has a key:**
+
+Ask them to paste the key. Then set it up and verify on their behalf:
+
+```bash
+export ALVA_API_KEY="<the key they pasted>"
+curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" https://api-llm.prd.alva.ai/api/v1/me
+```
+
+On success (`{"id":...,"username":"..."}`), suggest persisting the key in their
+shell profile (`~/.zshrc`, `~/.bashrc`, etc.) so it's available in future
+sessions. Then ask what they want to do — offer concrete starting points like:
+build a playbook, explore financial data, backtest a trading strategy, or set up
+a data pipeline.
+
+**Path B — User does not have a key:**
+
+1. Sign up at [alva.ai](https://alva.ai) (if no account yet).
+2. Log in → Settings → API Keys → Create New Key → copy the key.
+3. Paste it back — then set up and verify (same as Path A).
+
 ### Making API Requests
 
 All API examples in this skill use HTTP notation (`METHOD /path`). Every request
@@ -568,6 +594,32 @@ POST /api/v1/release/playbook
 ```
 
 The playbook will be accessible at `https://username.playbook.alva.ai/{name}/{version}/index.html`.
+
+### Updating a Published Playbook
+
+Alva does not currently support re-releasing or overwriting an existing playbook.
+Once a playbook name + version is released, it is immutable.
+
+To publish an updated version of a playbook, **create a new playbook with a
+versioned name**:
+
+| Iteration | Playbook name         | URL                                          |
+| --------- | --------------------- | -------------------------------------------- |
+| First     | `btc-dashboard`       | `.../btc-dashboard/v1.0.0/index.html`        |
+| Second    | `btc-dashboard-v2`    | `.../btc-dashboard-v2/v1.0.0/index.html`     |
+| Third     | `btc-dashboard-v3`    | `.../btc-dashboard-v3/v1.0.0/index.html`     |
+
+The full workflow for an update:
+
+1. Edit the playbook HTML locally or on ALFS.
+2. Write the updated HTML to a **new** ALFS path:
+   `POST /api/v1/fs/write` → `~/playbooks/{name}-v2/index.html`
+3. Create a new draft: `POST /api/v1/draft/playbook` with the new name.
+4. Release: `POST /api/v1/release/playbook` with the new name.
+
+**Important**: When the user asks to "update" or "edit" a previously released
+playbook, do NOT attempt to re-release under the same name — it will fail.
+Always use a new versioned name (append `-v2`, `-v3`, etc.).
 
 ---
 
