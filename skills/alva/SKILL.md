@@ -55,10 +55,10 @@ symlink, chmod, grant, revoke.
 
 ### 2. JS Runtime
 
-Run JavaScript on Alva Cloud in a sandboxed V8 isolate. Code executes entirely
-on Alva's servers -- never on the user's local machine -- so the skill cannot
-access local files, environment variables, or processes. The runtime has access to
-ALFS, all 250+ SDKs, HTTP networking, LLM access, and the Feed SDK.
+Run JavaScript on Alva Cloud in a sandboxed V8 isolate. Code executed inside
+Alva's `/api/v1/run` runtime runs entirely on Alva's servers -- it cannot access
+the host machine's filesystem, environment variables, or processes. The runtime
+has access to ALFS, all 250+ SDKs, HTTP networking, LLM access, and the Feed SDK.
 
 ### 3. SDKHub
 
@@ -288,8 +288,8 @@ GET /api/v1/trading-pairs/search?q=BTC,ETH
 ## Runtime Modules Quick Reference
 
 Scripts executed via `/api/v1/run` run in a sandboxed V8 isolate on Alva's
-servers. The isolate has no access to the local machine -- no local filesystem,
-no environment variables, no shell. See
+servers -- they cannot access the host machine's filesystem, environment
+variables, or shell. Host-agent permissions still apply. See
 [jagent-runtime.md](references/jagent-runtime.md) for full details.
 
 | Module          | require()                    | Description                                                        |
