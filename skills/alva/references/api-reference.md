@@ -490,6 +490,21 @@ POST /api/v1/release/playbook
 
 Browse the 250+ SDK modules available in the runtime — covering crypto/equity/ETF market data (OHLCV, fundamentals, on-chain metrics), 60+ technical indicators (SMA, RSI, MACD, Bollinger Bands…), macro & economic series (GDP, CPI, Treasury yields), and alternative data (news, social sentiment, DeFi). All endpoints are under `/api/v1/sdk/`.
 
+### Get SDK Doc
+
+```
+GET /api/v1/sdk/doc?name={module_name}
+```
+
+| Parameter | Type   | Required | Description                                      |
+| --------- | ------ | -------- | ------------------------------------------------ |
+| name      | string | yes      | Full module name (e.g. `@arrays/crypto/ohlcv:v1.0.0`) |
+
+```
+GET /api/v1/sdk/doc?name=@arrays/crypto/ohlcv:v1.0.0
+→ {"name":"@arrays/crypto/ohlcv:v1.0.0","doc":"..."}
+```
+
 ### List SDK Partitions
 
 ```
@@ -498,22 +513,22 @@ GET /api/v1/sdk/partitions
 
 ```
 GET /api/v1/sdk/partitions
-→ {"partitions":["@arrays/crypto","@arrays/equity","@arrays/macro",...]}
+→ {"partitions":["spot_market_price_and_volume","crypto_onchain_and_derivatives",...]}
 ```
 
-### List Modules in Partition
+### Get Partition Summary
 
 ```
-GET /api/v1/sdk/partitions/:partition/modules
+GET /api/v1/sdk/partitions/:partition/summary
 ```
 
-```
-GET /api/v1/sdk/partitions/@arrays%2Fcrypto/modules
-→ {"modules":["@arrays/crypto/ohlcv:v1.0.0","@arrays/crypto/funding-rate:v1.0.0",...]}
-```
+| Parameter | Type   | Required | Description                                        |
+| --------- | ------ | -------- | -------------------------------------------------- |
+| partition | string | yes      | Partition name (URL-encoded if contains `/`)       |
 
-Note: URL-encode the partition name (e.g. `@arrays/crypto` →
-`@arrays%2Fcrypto`).
+```
+GET /api/v1/sdk/partitions/spot_market_price_and_volume/summary
+→ {"summary":"@arrays/crypto/ohlcv:v1.0.0 — Spot OHLCV for crypto\n@arrays/data/stock/ohlcv:v1.0.0 — Spot OHLCV for equities\n..."}
 
 ---
 
