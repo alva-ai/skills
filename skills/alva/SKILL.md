@@ -134,8 +134,8 @@ The `playbook.json` **must** include a `type` field (`"dashboard"` or
 `"strategy"`) and a `draft` object. Omitting `type` causes wrong frontend
 routing; omitting `draft` causes the dashboard iframe to never load.
 
-Once released, the playbook is accessible at
-`https://<username>.playbook.alva.ai/playbooks/<playbook_id>/index.html`.
+Once released, the playbook html will be published at
+`https://<username>.playbook.alva.ai/<playbook_name>/<version>/index.html`.
 -- ready to share with the world.
 
 ---
