@@ -658,9 +658,9 @@ consistent read pattern (`@last`, `@range`, etc.).
 - **Cronjob path must point to an existing script.** The deploy API validates
   the entry_path exists via filesystem stat before creating the cronjob.
 - **Playbook release requires draft first.** The full sequence is:
-  write `index.html` → write `playbook.json` → `POST /api/v1/draft/playbook` →
-  `POST /api/v1/release/playbook`. Skipping the draft step causes the release
-  to fail. Omitting `playbook.json` causes the draft to fail with NOT_FOUND.
+  write `index.html` → `POST /api/v1/draft/playbook` →
+  `POST /api/v1/release/playbook`. The draft API creates `playbook.json`
+  automatically. Skipping the draft step causes the release to fail.
 
 ---
 
