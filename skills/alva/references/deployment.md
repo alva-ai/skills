@@ -176,7 +176,7 @@ The script has full access to:
 | Max cronjobs per user | 20                    |
 | Min cron interval     | 1 minute              |
 | Execution timeout     | Same as `/api/v1/run` |
-| Heap per execution    | 64 MB                 |
+| Heap per execution    | 2 GB                  |
 
 ---
 

@@ -662,6 +662,7 @@ consistent read pattern (`@last`, `@range`, etc.).
 
 | Resource              | Limit                 |
 | --------------------- | --------------------- |
+| V8 heap per execution | 2 GB                  |
 | Write payload         | 10 MB max per request |
 | HTTP response body    | 128 MB max            |
 | Max cronjobs per user | 20                    |
