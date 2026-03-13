@@ -129,8 +129,8 @@ Three phases:
    DB records, uploads HTML to CDN, and writes release files to ALFS
    automatically. Returns `playbook_id` (numeric).
 
-Once released, the playbook is accessible at
-`https://<username>.playbook.alva.ai/playbooks/<playbook_id>/index.html`.
+Once released, the playbook html will be published at
+`https://<username>.playbook.alva.ai/<playbook_name>/<version>/index.html`.
 -- ready to share with the world.
 
 ---
