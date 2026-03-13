@@ -64,7 +64,7 @@ executes server-side -- nothing runs on your local machine.
 two-step retrieval flow:
 
 1. **Pick a partition** from the index below.
-2. **Call `GET /api/v1/sdk/partitions/:partition/modules`** to see module
+2. **Call `GET /api/v1/sdk/partitions/:partition/summary`** to see module
    summaries, then load the full doc for the chosen module.
 
 #### SDK Partition Index
