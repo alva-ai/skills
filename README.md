@@ -39,7 +39,6 @@ That's it. Your agent now has full access to the Alva platform.
 
 ## What Can You Build?
 
-
 | Use Case         | Example Prompt                                                                            |
 | ---------------- | ----------------------------------------------------------------------------------------- |
 | Stock Dashboard  | *"Build a playbook tracking AAPL with price charts, analyst targets, and insider trades"* |
@@ -47,7 +46,6 @@ That's it. Your agent now has full access to the Alva platform.
 | Trading Strategy | *"Backtest an RSI mean-reversion strategy on BTC with daily rebalancing"*                 |
 | Macro Overview   | *"Build a macro dashboard with CPI, GDP, Treasury rates, and recession probability"*      |
 | Screening Tool   | *"Screen for stocks with PE < 15, ROE > 20%, and positive insider buying"*                |
-
 
 ---
 
@@ -57,7 +55,6 @@ That's it. Your agent now has full access to the Alva platform.
 
 Unified access to crypto, equities, ETFs, macro, on-chain, and social data:
 
-
 | Category      | Highlights                                                                                                  |
 | ------------- | ----------------------------------------------------------------------------------------------------------- |
 | Crypto        | Spot & futures OHLCV, funding rates, open interest, long/short ratios, exchange flows, DeFi metrics         |
@@ -66,7 +63,6 @@ Unified access to crypto, equities, ETFs, macro, on-chain, and social data:
 | On-Chain      | MVRV, SOPR, NUPL, whale ratio, exchange inflow/outflow                                                      |
 | Social & News | Twitter/X, Reddit, YouTube, podcasts, news feeds, web search                                                |
 | Technical     | 50+ indicator calculations — RSI, MACD, Bollinger, ATR, VWAP, Ichimoku, and more                            |
-
 
 ### Compute — Cloud JavaScript Runtime
 
@@ -82,7 +78,7 @@ Event-driven backtesting with historical data and live paper trading. Define str
 
 ### Deploy & Share — Playbook Web Apps
 
-Turn your work into a hosted web app at `https://yourusername.playbook.alva.ai/playbook-name`. Built with the Alva Design System — charts, KPIs, tables, and more.
+Turn your work into a hosted web app at `https://alva.ai/<username>/playbooks/<playbook_id>`. Built with the Alva Design System — charts, KPIs, tables, and more.
 
 ---
 
@@ -112,11 +108,9 @@ Turn your work into a hosted web app at `https://yourusername.playbook.alva.ai/p
 
 ## Available Skills
 
-
 | Skill                            | Description                                                                                                                                                               |
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **[alva](skills/alva/SKILL.md)** | Full Alva platform access — data SDKs, cloud runtime, feeds, backtesting, and playbook deployment. See the [skill reference](skills/alva/SKILL.md) for detailed API docs. |
-
 
 ---
 
