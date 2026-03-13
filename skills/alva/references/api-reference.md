@@ -486,26 +486,9 @@ POST /api/v1/release/playbook
 
 ---
 
-## SDK API (Documentation Search)
+## SDK API
 
-Search and browse the 250+ SDK modules available in the runtime. All endpoints
-are under `/api/v1/sdk/`.
-
-### Search SDK Docs
-
-```
-GET /api/v1/sdk/search?q={query}&top_n={top_n}
-```
-
-| Parameter | Type   | Required | Description                               |
-| --------- | ------ | -------- | ----------------------------------------- |
-| q         | string | yes      | Fuzzy search query (module name or topic) |
-| top_n     | int    | no       | Max results (default: 5)                  |
-
-```
-GET /api/v1/sdk/search?q=crypto+ohlcv&top_n=3
-→ {"results":[{"name":"@arrays/crypto/ohlcv:v1.0.0","doc":"..."},...]}
-```
+Browse the 250+ SDK modules available in the runtime — covering crypto/equity/ETF market data (OHLCV, fundamentals, on-chain metrics), 60+ technical indicators (SMA, RSI, MACD, Bollinger Bands…), macro & economic series (GDP, CPI, Treasury yields), and alternative data (news, social sentiment, DeFi). All endpoints are under `/api/v1/sdk/`.
 
 ### List SDK Partitions
 
