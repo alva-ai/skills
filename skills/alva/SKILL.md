@@ -540,9 +540,10 @@ POST /api/v1/deploy/cronjob
 Cronjobs execute the script via the same jagent runtime as `/api/v1/run`. Max 20
 cronjobs per user. Min interval: 1 minute.
 
-After deploying a cronjob, register the feed and release the playbook for public
-hosting. The playbook HTML must already be written to ALFS at
-`~/playbooks/{name}/index.html` via `fs/write` before releasing.
+After deploying a cronjob, register the feed, create a playbook draft, then
+release the playbook for public hosting. The playbook HTML must already be
+written to ALFS at `~/playbooks/{name}/index.html` via `fs/write` before
+releasing.
 
 **Important**: Feed names and playbook names must be unique within your user
 space. Before creating a new feed or playbook, use
@@ -555,28 +556,18 @@ POST /api/v1/release/feed
 {"name":"btc-ema","version":"1.0.0","task_id":42}
 → {"feed_id":100,"name":"btc-ema","feed_major":1}
 
-# 2. Release playbook (uploads HTML to CDN, returns numeric playbook_id)
+# 2. Create playbook draft (creates DB record + ALFS draft files automatically)
+POST /api/v1/draft/playbook
+{"name":"btc-dashboard","type":"dashboard","description":"BTC market dashboard","feeds":[{"feed_id":100}]}
+→ {"playbook_id":99,"playbook_version_id":200}
+
+# 3. Release playbook (reads HTML from ALFS, uploads to CDN, writes release files automatically)
 POST /api/v1/release/playbook
-{"name":"btc-dashboard","version":"v1.0.0","description":"BTC market dashboard with price and technicals","feeds":[{"feed_id":100}]}
-→ {"playbook_id":99,"version":"v1.0.0"}
-
-# 3. Write release layout.html (CDN URL, using numeric playbook_id from step 2)
-POST /api/v1/fs/write?path=~/playbooks/99/releases/v1.0.0/layout.html&mkdir_parents=true
-Content-Type: application/octet-stream
-Body: https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html
-
-# 4. Write draft layout.html (required for frontend dashboard iframe rendering)
-POST /api/v1/fs/write?path=~/playbooks/99/draft/layout.html&mkdir_parents=true
-Content-Type: application/octet-stream
-Body: https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html
-
-# 5. Write playbook.json (must include "type" and "draft" fields)
-POST /api/v1/fs/write
-Content-Type: application/json
-{"path":"~/playbooks/99/playbook.json","data":"{\"playbook_id\":99,\"owner_uid\":\"1\",\"type\":\"dashboard\",\"name\":\"btc-dashboard\",\"created_at\":\"2026-03-12T00:00:00Z\",\"updated_at\":\"2026-03-12T00:00:00Z\",\"draft\":{\"playbook_version_id\":0,\"updated_at\":\"2026-03-12T00:00:00Z\",\"layout_path\":\"./draft/layout.html\",\"feeds_dir\":\"./draft/feeds/\",\"feeds\":[{\"feed_id\":100,\"feed_major\":1}]},\"releases\":[{\"version\":\"v1.0.0\",\"playbook_version_id\":0,\"created_at\":\"2026-03-12T00:00:00Z\",\"layout_path\":\"./releases/v1.0.0/layout.html\",\"feeds_dir\":\"./releases/v1.0.0/feeds/\",\"feeds\":[{\"feed_id\":100,\"feed_major\":1}]}],\"latest_release\":{\"version\":\"v1.0.0\",\"playbook_version_id\":0,\"created_at\":\"2026-03-12T00:00:00Z\",\"layout_path\":\"./releases/v1.0.0/layout.html\",\"feeds_dir\":\"./releases/v1.0.0/feeds/\",\"feeds\":[{\"feed_id\":100,\"feed_major\":1}]}}","mkdir_parents":true}
+{"name":"btc-dashboard","version":"v1.0.0","feeds":[{"feed_id":100}]}
+→ {"playbook_id":99,"version":"v1.0.0","published_url":"https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html"}
 ```
 
-The playbook will be accessible at `https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html`.
+The playbook will be accessible at `https://username.playbook.alva.ai/{name}/{version}/index.html`.
 
 ---
 
@@ -662,10 +653,8 @@ consistent read pattern (`@last`, `@range`, etc.).
   outputs the strategy function sees. They are independent.
 - **Cronjob path must point to an existing script.** The deploy API validates
   the entry_path exists via filesystem stat before creating the cronjob.
-- **`playbook.json` must include `type` and `draft`; draft ALFS files are
-  required.** Omitting `type` defaults to "strategy" (wrong routing for
-  dashboards). Omitting `draft` or the `draft/layout.html` file causes the
-  dashboard iframe to never load.
+- **Always create a draft before releasing.** `POST /api/v1/release/playbook`
+  requires the playbook to already exist (created via `POST /api/v1/draft/playbook`).
 
 ---
 
