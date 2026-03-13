@@ -44,19 +44,21 @@ done for you.
 
 ### 1. ALFS (Alva FileSystem)
 
-The foundation of the platform. ALFS is a globally shared filesystem with
-built-in authorization. Every user has a home directory; permissions control who
-can read and write each path. Scripts, data feeds, playbook assets, and shared
-libraries all live on ALFS.
+The foundation of the platform. ALFS is a cloud filesystem with per-user
+isolation. Every user has a private home directory; all paths are private by
+default and only accessible by the owning user. Public read access can be
+explicitly granted on specific paths via `grant`. Scripts, data feeds, playbook
+assets, and shared libraries all live on ALFS.
 
 Key operations: read, write, mkdir, stat, readdir, remove, rename, copy,
 symlink, chmod, grant, revoke.
 
 ### 2. JS Runtime
 
-Run JavaScript on Alva Cloud in a secure V8 isolate. The runtime has access to
-ALFS, all 250+ SDKs, HTTP networking, LLM access, and the Feed SDK. Everything
-executes server-side -- nothing runs on your local machine.
+Run JavaScript on Alva Cloud in a sandboxed V8 isolate. Code executes entirely
+on Alva's servers -- never on the user's local machine -- so the skill cannot
+access local files, environment variables, or processes. The runtime has access to
+ALFS, all 250+ SDKs, HTTP networking, LLM access, and the Feed SDK.
 
 ### 3. SDKHub
 
@@ -105,8 +107,8 @@ indicators, portfolio simulation, and performance analytics.
 
 Once your data analytics scripts and feeds are ready, deploy them as scheduled
 cronjobs on Alva Cloud. They run continuously on your chosen schedule (e.g.
-every hour, every day). Grant public access so anyone -- or any playbook page --
-can read the data.
+every hour, every day). All data is private by default; grant public access to
+specific paths so anyone -- or any playbook page -- can read the data.
 
 ### 6. Build the Playbook Web App
 
@@ -285,7 +287,9 @@ GET /api/v1/trading-pairs/search?q=BTC,ETH
 
 ## Runtime Modules Quick Reference
 
-Scripts executed via `/api/v1/run` run in a V8 isolate. See
+Scripts executed via `/api/v1/run` run in a sandboxed V8 isolate on Alva's
+servers. The isolate has no access to the local machine -- no local filesystem,
+no environment variables, no shell. See
 [jagent-runtime.md](references/jagent-runtime.md) for full details.
 
 | Module          | require()                    | Description                                                        |
