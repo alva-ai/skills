@@ -8,19 +8,55 @@
 
 ### 1. Install
 
+#### Claude Code
+
 ```bash
 npx skills add https://github.com/alva-ai/skills
 ```
 
+#### OpenClaw
+
+```bash
+clawhub install alva
+```
+
+Or manually copy the skill directory:
+
+```bash
+cp -r skills/alva ~/.openclaw/skills/alva
+```
+
+#### Other Agents
+
+This skill uses the [AgentSkills](https://github.com/anthropics/agent-skills) format. Any agent that supports `SKILL.md` can load it by pointing to the `skills/alva/` directory.
+
 ### 2. Configure
 
 Get an API key at [alva.ai](https://alva.ai), then add it to your agent's environment:
+
+#### Claude Code
 
 ```json
 // ~/.claude/settings.json
 {
   "env": {
     "ALVA_API_KEY": "your_api_key"
+  }
+}
+```
+
+#### OpenClaw
+
+```json
+// openclaw.json
+{
+  "skills": {
+    "entries": {
+      "alva": {
+        "enabled": true,
+        "env": { "ALVA_API_KEY": "your_api_key" }
+      }
+    }
   }
 }
 ```
