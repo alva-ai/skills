@@ -227,40 +227,41 @@ Paragraph with `inline code`.
   font-family: "Delight", "Helvetica Neue", Arial, sans-serif;
   font-size: 16px; line-height: 26px; letter-spacing: 0.16px;
   color: var(--text-n9);
-  display: flex; align-items: flex-start;
+  position: relative; padding-left: 24px;
 }
 .markdown-container ul > li::before {
   content: "";
   width: 5px; height: 5px; border-radius: 50%;
-  background: var(--text-n9); flex-shrink: 0;
-  margin-top: 10.5px; margin-right: 19px;
+  background: var(--text-n9);
+  position: absolute; left: 0; top: 10.5px;
 }
 .markdown-container ol { counter-reset: md-ol; }
 .markdown-container ol > li { counter-increment: md-ol; }
 .markdown-container ol > li::before {
   content: counter(md-ol) ".";
-  min-width: 24px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
+  position: absolute; left: 0; top: 0;
+  width: 24px; text-align: center;
   font-size: 16px; line-height: 26px; color: var(--text-n9);
 }
 
 /* ── Code ── */
+.markdown-container code,
+.markdown-container pre {
+  background: var(--b-r02); border: 1px solid var(--line-l07);
+  border-radius: 2px; font-family: "JetBrains Mono", monospace; color: var(--text-n7);
+}
 .markdown-container code {
-  background: var(--b-r03); border: 1px solid rgba(0,0,0,0.07);
-  border-radius: 2px; padding: 2px 8px;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 12px; line-height: 20px; letter-spacing: 0.12px;
-  color: var(--text-n7);
+  display: inline-block; vertical-align: middle; font-size: 12px; line-height: 20px; letter-spacing: 0.12px; padding: 2px 8px; margin: 0 4px;
 }
 .markdown-container pre {
-  background: var(--b-r03); border: 1px solid rgba(0,0,0,0.07);
-  border-radius: 2px; padding: 2px 8px; margin: 0; overflow-x: auto;
+  font-size: 14px; line-height: 22px; letter-spacing: 0.14px;
+  padding: 12px 16px; margin: 0; overflow-x: auto;
 }
-.markdown-container pre code { border: none; padding: 0; background: none; }
+.markdown-container pre code { font-size: inherit; line-height: inherit; letter-spacing: inherit; border: none; padding: 0; background: none; }
 
 /* ── Divider ── */
 .markdown-container hr {
-  height: 1px; background: rgba(0,0,0,0.07);
+  height: 1px; background: var(--line-l07);
   border: none; margin: 4px 0;
 }
 
@@ -275,6 +276,11 @@ Paragraph with `inline code`.
   color: var(--text-n9); text-align: left;
 }
 .markdown-container th { font-weight: 500; padding-top: 0; }
+.markdown-container th:first-child,
+.markdown-container td:first-child { padding-left: 0; }
+.markdown-container th:last-child,
+.markdown-container td:last-child { padding-right: 0; }
+.markdown-container td code { margin: 0; }
 
 /* ── Link ── */
 .markdown-container a {
@@ -309,13 +315,14 @@ Paragraph with `inline code`.
 .markdown-container--m h6 { font-size: 14px; line-height: 22px; letter-spacing: 0.14px; }
 .markdown-container--m p,
 .markdown-container--m li { font-size: 14px; line-height: 22px; letter-spacing: 0.14px; }
-.markdown-container--m ul > li::before { margin-top: 8.5px; }
+.markdown-container--m ul > li::before { top: 8.5px; }
 .markdown-container--m ol > li::before { font-size: 14px; line-height: 22px; }
 .markdown-container--m ul,
 .markdown-container--m ol { gap: 4px; }
 .markdown-container--m th,
 .markdown-container--m td { font-size: 12px; line-height: 20px; letter-spacing: 0.12px; padding: 8px; min-height: 176px; }
-.markdown-container--m code { padding: 8px; }
+.markdown-container--m code { padding: 1px 8px; }
+.markdown-container--m pre { font-size: 12px; line-height: 20px; letter-spacing: 0.12px; }
 .markdown-container--m a::after { width: 14px; height: 14px; }
 
 /* ── Small ── */
@@ -329,11 +336,12 @@ Paragraph with `inline code`.
 .markdown-container--s p,
 .markdown-container--s li { font-size: 12px; line-height: 20px; letter-spacing: 0.12px; }
 .markdown-container--s a::after { width: 12px; height: 12px; }
-.markdown-container--s ul > li::before { margin-top: 7.5px; }
+.markdown-container--s ul > li::before { top: 7.5px; }
 .markdown-container--s ol > li::before { font-size: 12px; line-height: 20px; }
 .markdown-container--s ul,
 .markdown-container--s ol { gap: 4px; }
 .markdown-container--s code { font-size: 10px; line-height: 16px; padding: 2px 6px; }
+.markdown-container--s pre { font-size: 10px; line-height: 16px; padding: 8px 12px; }
 .markdown-container--s th,
 .markdown-container--s td { font-size: 12px; line-height: 20px; letter-spacing: 0.12px; padding: 8px; min-height: 176px; }
 
