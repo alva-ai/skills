@@ -438,7 +438,6 @@ Create a new playbook with a draft version.
 | Field       | Type   | Required | Description                                  |
 | ----------- | ------ | -------- | -------------------------------------------- |
 | name        | string | yes      | URL-safe playbook name (e.g. `btc-dashboard`), must be unique per user |
-| type        | string | no       | `"dashboard"` or `"strategy"` (default: `"dashboard"`). Controls frontend routing |
 | description | string | no       | Short description of the playbook             |
 | feeds       | array  | yes      | Feed references `[{feed_id, feed_major?}]`   |
 
@@ -446,7 +445,6 @@ Create a new playbook with a draft version.
 POST /api/v1/draft/playbook
 {
   "name": "btc-dashboard",
-  "type": "dashboard",
   "description": "BTC market dashboard with price, technicals, and volume",
   "feeds": [{"feed_id": 100}]
 }
