@@ -35,7 +35,7 @@ it you can:
 - **Deploy trading strategies** -- backtest with the Altra trading engine and
   run continuous live paper trading.
 - **Release and share** -- turn your work into a hosted playbook web app at
-  `https://alva.ai/<username>/playbooks/<playbook_id>`, and share it with the world.
+  `https://<username>.playbook.alva.ai/<playbook-name>/<version>/index.html`, and share it with the world.
 
 In short: turn your ideas into a forever-running finance agent that gets things
 done for you.
@@ -117,23 +117,23 @@ component guidelines.
 
 ### 7. Release
 
-Three phases:
+Three steps:
 
-1. **Write HTML to ALFS**: `POST /api/v1/fs/write` the playbook HTML to
-   `~/playbooks/{name}/index.html`.
-2. **Create playbook draft**: `POST /api/v1/draft/playbook` — creates a draft version of the playbook.
-3. **Call release API**: `POST /api/v1/release/playbook` — creates DB records
-   and uploads HTML to CDN. Returns `playbook_id` (numeric).
-4. **Write ALFS files**: Using the returned numeric `playbook_id`, write
-   release files, draft files, and `playbook.json` to ALFS. See
-   [api-reference.md](references/api-reference.md) for details.
+1. **Write playbook HTML** to `~/playbooks/{name}/index.html` via
+   `POST /api/v1/fs/write`.
+2. **Create draft**: `POST /api/v1/draft/playbook` with `{name, type, feeds}`.
+   Returns `playbook_id` and `playbook_version_id`. This creates the DB record,
+   `playbook.json`, and ALFS draft files automatically. The `type` field
+   (`"dashboard"` or `"strategy"`) controls frontend routing.
+3. **Release**: `POST /api/v1/release/playbook` with `{name, version, feeds}`.
+   Reads HTML from ALFS, uploads to CDN, writes release files automatically.
+   Returns `published_url`.
 
-The `playbook.json` **must** include a `type` field (`"dashboard"` or
-`"strategy"`) and a `draft` object. Omitting `type` causes wrong frontend
-routing; omitting `draft` causes the dashboard iframe to never load.
+**Important**: Step 2 (draft) must be called before step 3 (release). The
+release API requires the playbook to already exist in the database.
 
 Once released, the playbook is accessible at
-`https://<username>.playbook.alva.ai/playbooks/<playbook_id>/index.html`.
+`https://<username>.playbook.alva.ai/<playbook-name>/<version>/index.html`
 -- ready to share with the world.
 
 ---
@@ -237,12 +237,13 @@ Public reads use absolute paths without API key.
 | POST   | `/api/v1/deploy/cronjob/:id/pause`  | Pause cronjob                     |
 | POST   | `/api/v1/deploy/cronjob/:id/resume` | Resume cronjob                    |
 
-### Release (`/api/v1/release/`)
+### Draft & Release (`/api/v1/draft/`, `/api/v1/release/`)
 
 | Method | Endpoint                    | Description                                     |
 | ------ | --------------------------- | ----------------------------------------------- |
 | POST   | `/api/v1/release/feed`      | Register feed (DB + link to cronjob task). Call after deploying cronjob. |
-| POST   | `/api/v1/release/playbook`  | Release playbook for public hosting. Call after writing playbook HTML. |
+| POST   | `/api/v1/draft/playbook`    | Create playbook draft (DB record + ALFS draft files). **Must call before release.** |
+| POST   | `/api/v1/release/playbook`  | Release playbook to CDN for public hosting. Requires draft to exist. |
 
 **Name uniqueness**: Both `name` in releaseFeed and releasePlaybook must be
 unique within your user space. Use `GET /api/v1/fs/readdir?path=~/feeds` or
@@ -541,9 +542,12 @@ POST /api/v1/deploy/cronjob
 Cronjobs execute the script via the same jagent runtime as `/api/v1/run`. Max 20
 cronjobs per user. Min interval: 1 minute.
 
-After deploying a cronjob, register the feed, create a playbook draft, then
-release the playbook for public hosting. The playbook HTML must already be
-written to ALFS at `~/playbooks/{name}/index.html` via `fs/write` before releasing.
+After deploying a cronjob, follow the full release lifecycle:
+
+1. Register the feed via `POST /api/v1/release/feed`
+2. Write playbook HTML to `~/playbooks/{name}/index.html` via `fs/write`
+3. Create a draft via `POST /api/v1/draft/playbook` (creates `playbook.json` automatically)
+4. Release via `POST /api/v1/release/playbook`
 
 **Important**: Feed names and playbook names must be unique within your user
 space. Before creating a new feed or playbook, use
@@ -567,7 +571,7 @@ POST /api/v1/release/playbook
 → {"playbook_id":99,"version":"v1.0.0","published_url":"https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html"}
 ```
 
-The playbook will be accessible at `https://alva.ai/<username>/playbooks/<playbook_id>`.
+The playbook will be accessible at `https://<username>.playbook.alva.ai/<playbook-name>/<version>/index.html`.
 
 ---
 
@@ -653,8 +657,10 @@ consistent read pattern (`@last`, `@range`, etc.).
   outputs the strategy function sees. They are independent.
 - **Cronjob path must point to an existing script.** The deploy API validates
   the entry_path exists via filesystem stat before creating the cronjob.
-- **Always create a draft before releasing.** `POST /api/v1/release/playbook`
-  requires the playbook to already exist (created via `POST /api/v1/draft/playbook`).
+- **Playbook release requires draft first.** The full sequence is:
+  write `index.html` → write `playbook.json` → `POST /api/v1/draft/playbook` →
+  `POST /api/v1/release/playbook`. Skipping the draft step causes the release
+  to fail. Omitting `playbook.json` causes the draft to fail with NOT_FOUND.
 
 ---
 
