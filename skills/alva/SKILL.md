@@ -35,7 +35,7 @@ it you can:
 - **Deploy trading strategies** -- backtest with the Altra trading engine and
   run continuous live paper trading.
 - **Release and share** -- turn your work into a hosted playbook web app at
-  `https://yourusername.playbook.alva.ai/playbook-name/version/index.html`, and share it with the world.
+  `https://alva.ai/<username>/playbooks/<playbook_id>`, and share it with the world.
 
 In short: turn your ideas into a forever-running finance agent that gets things
 done for you.
@@ -121,9 +121,10 @@ Three phases:
 
 1. **Write HTML to ALFS**: `POST /api/v1/fs/write` the playbook HTML to
    `~/playbooks/{name}/index.html`.
-2. **Call release API**: `POST /api/v1/release/playbook` — creates DB records
+2. **Create playbook draft**: `POST /api/v1/draft/playbook` — creates a draft version of the playbook.
+3. **Call release API**: `POST /api/v1/release/playbook` — creates DB records
    and uploads HTML to CDN. Returns `playbook_id` (numeric).
-3. **Write ALFS files**: Using the returned numeric `playbook_id`, write
+4. **Write ALFS files**: Using the returned numeric `playbook_id`, write
    release files, draft files, and `playbook.json` to ALFS. See
    [api-reference.md](references/api-reference.md) for details.
 
@@ -132,7 +133,7 @@ The `playbook.json` **must** include a `type` field (`"dashboard"` or
 routing; omitting `draft` causes the dashboard iframe to never load.
 
 Once released, the playbook is accessible at
-`https://yourusername.playbook.alva.ai/playbook-name/version/index.html`.
+`https://<username>.playbook.alva.ai/playbooks/<playbook_id>/index.html`.
 -- ready to share with the world.
 
 ---
@@ -542,8 +543,7 @@ cronjobs per user. Min interval: 1 minute.
 
 After deploying a cronjob, register the feed, create a playbook draft, then
 release the playbook for public hosting. The playbook HTML must already be
-written to ALFS at `~/playbooks/{name}/index.html` via `fs/write` before
-releasing.
+written to ALFS at `~/playbooks/{name}/index.html` via `fs/write` before releasing.
 
 **Important**: Feed names and playbook names must be unique within your user
 space. Before creating a new feed or playbook, use
@@ -567,7 +567,7 @@ POST /api/v1/release/playbook
 → {"playbook_id":99,"version":"v1.0.0","published_url":"https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html"}
 ```
 
-The playbook will be accessible at `https://username.playbook.alva.ai/{name}/{version}/index.html`.
+The playbook will be accessible at `https://alva.ai/<username>/playbooks/<playbook_id>`.
 
 ---
 

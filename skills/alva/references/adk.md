@@ -88,36 +88,32 @@ Single-function entry point. Runs a ReAct loop (reason → act → observe) unti
 4. If `maxTurns` exhausted → return last assistant content
 
 **Error handling:**
+
 - Unknown tool name → throws
 - Tool execution failure → throws (not swallowed)
 - LLM API errors → throws with status code and body
 
-## Example: Calculator Agent
+## Example: Multiply Tool
 
 ```javascript
 const adk = require("@alva/adk");
 
 const result = await adk.agent({
-  system: "You are a helpful assistant. Always use the calculator tool for math.",
-  prompt: "Calculate 17 * 31",
+  system: "You are a helpful assistant. Use the multiply tool for math.",
+  prompt: "What is 17 times 31?",
   tools: [
     {
       name: "calculator",
-      description: "Evaluate a math expression and return the numeric result",
+      description: "Multiply two numbers",
       parameters: {
         type: "object",
         properties: {
-          expression: {
-            type: "string",
-            description: "Math expression, e.g. '17 * 31'",
-          },
+          a: { type: "number", description: "First number" },
+          b: { type: "number", description: "Second number" },
         },
-        required: ["expression"],
+        required: ["a", "b"],
       },
-      fn: async (args) => {
-        // Your evaluation logic here
-        return { result: eval(args.expression) };
-      },
+      fn: async ({ a, b }) => ({ result: a * b }),
     },
   ],
   maxTurns: 5,
