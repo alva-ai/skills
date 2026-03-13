@@ -14,15 +14,11 @@ npx skills add https://github.com/alva-ai/skills
 
 ### 2. Configure
 
-Get an API key at [alva.ai](https://alva.ai), then add it to your agent's environment:
+Get an API key at [alva.ai](https://alva.ai), then expose it as an
+environment variable your agent can access:
 
-```json
-// ~/.claude/settings.json
-{
-  "env": {
-    "ALVA_API_KEY": "your_api_key"
-  }
-}
+```bash
+export ALVA_API_KEY="your_api_key"
 ```
 
 ### 3. Build

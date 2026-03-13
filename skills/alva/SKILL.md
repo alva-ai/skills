@@ -117,13 +117,22 @@ component guidelines.
 
 ### 7. Release
 
-Three phases:
+> **Prerequisite**: Every playbook must reference at least one **released
+> feed**. The `feeds` field in the release API is required and must be
+> non-empty — there is no "static-only" playbook path. Complete the full
+> pipeline (feed script → deploy cronjob → release feed → get `feed_id`)
+> before releasing a playbook.
 
-1. **Write HTML to ALFS**: `POST /api/v1/fs/write` the playbook HTML to
+Four phases:
+
+1. **Deploy at least one feed**: Follow steps 1-6 in "Deploying Feeds" below
+   to get a `feed_id` for each data source your playbook needs.
+2. **Write HTML to ALFS**: `POST /api/v1/fs/write` the playbook HTML to
    `~/playbooks/{name}/index.html`.
-2. **Call release API**: `POST /api/v1/release/playbook` — creates DB records
-   and uploads HTML to CDN. Returns `playbook_id` (numeric).
-3. **Write ALFS files**: Using the returned numeric `playbook_id`, write
+3. **Call release API**: `POST /api/v1/release/playbook` with the `feeds`
+   array containing your `feed_id`(s) — creates DB records and uploads HTML
+   to CDN. Returns `playbook_id` (numeric).
+4. **Write ALFS files**: Using the returned numeric `playbook_id`, write
    release files, draft files, and `playbook.json` to ALFS. See
    [api-reference.md](references/api-reference.md) for details.
 
@@ -132,8 +141,8 @@ The `playbook.json` **must** include a `type` field (`"dashboard"` or
 routing; omitting `draft` causes the dashboard iframe to never load.
 
 Once released, the playbook is accessible at
-`https://yourusername.playbook.alva.ai/playbook-name/version/index.html`.
--- ready to share with the world.
+`https://yourusername.playbook.alva.ai/playbook-name/version/index.html`
+— ready to share with the world.
 
 ---
 
@@ -241,7 +250,7 @@ Public reads use absolute paths without API key.
 | Method | Endpoint                    | Description                                     |
 | ------ | --------------------------- | ----------------------------------------------- |
 | POST   | `/api/v1/release/feed`      | Register feed (DB + link to cronjob task). Call after deploying cronjob. |
-| POST   | `/api/v1/release/playbook`  | Release playbook for public hosting. Call after writing playbook HTML. |
+| POST   | `/api/v1/release/playbook`  | Release playbook for public hosting. Call after releasing feeds and writing playbook HTML. |
 
 **Name uniqueness**: Both `name` in releaseFeed and releasePlaybook must be
 unique within your user space. Use `GET /api/v1/fs/readdir?path=~/feeds` or
@@ -662,6 +671,9 @@ consistent read pattern (`@last`, `@range`, etc.).
   outputs the strategy function sees. They are independent.
 - **Cronjob path must point to an existing script.** The deploy API validates
   the entry_path exists via filesystem stat before creating the cronjob.
+- **Playbook release requires at least one feed.** The `feeds` array in
+  `POST /api/v1/release/playbook` is required and must be non-empty.
+  You must release your feed(s) first to obtain `feed_id` values.
 - **`playbook.json` must include `type` and `draft`; draft ALFS files are
   required.** Omitting `type` defaults to "strategy" (wrong routing for
   dashboards). Omitting `draft` or the `draft/layout.html` file causes the
