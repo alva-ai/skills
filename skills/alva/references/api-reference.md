@@ -485,6 +485,10 @@ POST /api/v1/release/playbook
 → {"playbook_id": 99, "version": "v1.0.0", "published_url": "https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html"}
 ```
 
+After a successful release, output the alva.ai playbook link to the user:
+`https://alva.ai/<username>/playbooks/<playbook_id>`
+(use the `playbook_id` from the response and the username from `GET /api/v1/me`)
+
 ---
 
 ## SDK API
