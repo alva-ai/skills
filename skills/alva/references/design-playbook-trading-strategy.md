@@ -5,8 +5,9 @@
 > strictly — page structure, tab layout, module order, component references,
 > and data schema must all match exactly. Do not invent alternative layouts.
 >
-> Depends on `alva-design` skill for design tokens; this spec covers page-specific
-> structure and interactions only.
+> Use [design-system.md](./design-system.md) as the global design entry point.
+> This document only adds trading-strategy-specific page structure, interactions,
+> and UI data requirements.
 
 ---
 
@@ -106,6 +107,11 @@ Sits directly below the Tab Bar; **fields vary per tab**.
 
 Displays all tickers ever traded by the strategy.
 
+The page reads symbol-level UI data from the active item in `tradedSymbols[]`:
+summary fields render the name/price row, `candles[]` powers the candlestick
+chart, and `tradeLog[]` powers both trade markers and the Trade Log modal. This
+is a UI projection contract, not a direct dump of Altra's raw ALFS directories.
+
 #### Layout
 
 Title, Symbol Pills, selected symbol price, and chart stack vertically with gap = 16px (`--spacing-m`).
@@ -150,7 +156,10 @@ Follows [Chart Card](./design-widgets.md#chart-card) spec. Candlestick is a Char
 | barMaxWidth | 16px                         |
 | DataZoom    | `inside` + `slider` (bottom) |
 
-> **Data source note**: OHLCV candlestick data is NOT included in Altra backtest output. After running the backtest, you must separately fetch the traded symbols' OHLCV data (e.g. from exchange API or OHLCV provider) for the same date range. Do not skip the candlestick chart.
+> **Data source note**: OHLCV candlestick data is NOT included in Altra backtest
+> output. After running the backtest, separately fetch the traded symbols'
+> OHLCV data (e.g. from exchange API or OHLCV provider), then project it into
+> each symbol's `candles[]`. Do not skip the candlestick chart.
 
 #### Trade Log Markers
 
@@ -265,9 +274,14 @@ Benchmark Attribution:  Alpha {computed}%  Beta {computed}
 | Chart height     | chart-body total 280px (padding 16×2 + legend 16+8, ECharts canvas 224px)               |
 | Y-axis range     | Dynamic: min/max of all series, expanded 10% each side (data range × 120%)              |
 
-> **Benchmark** is data-driven: read from `equityCurve.benchmark.label` (e.g. "BTC" for crypto, "NASDAQ" for equities).
+> **Benchmark** is data-driven: read from `equityCurve.benchmark.label` (e.g.
+> "BTC" for crypto, "NASDAQ" for equities).
 
-> **Data source note**: Benchmark price data is NOT included in Altra backtest output. After running the backtest, you must separately fetch the benchmark asset's historical prices (e.g. from OHLCV provider) for the same date range and normalize to the initial amount. Do not skip the benchmark series.
+> **Data source note**: Benchmark price data is NOT included in Altra backtest
+> output. After running the backtest, separately fetch the benchmark asset's
+> historical prices (e.g. from an OHLCV provider), normalize them to the initial
+> amount, and project the result into
+> `overview.equityCurve.series.benchmark.data`. Do not skip the benchmark series.
 
 #### Chart Spec
 
@@ -346,7 +360,8 @@ All charts follow [Chart Card](./design-widgets.md#chart-card) spec.
 ### Requirements
 
 - Use **actual computed strategy data**, not placeholders.
-- Each chart must include: title, axis labels, legend (if applicable), and a brief interpretation.
+- Each chart must include: title, axis labels, legend (if applicable), and a
+  brief interpretation.
 
 ---
 
@@ -513,6 +528,11 @@ All text in the signal card uses `--text-n9` except the ticker link.
 
 ## 7. Data Schema (JSON)
 
+This schema is the UI-facing projection consumed by the playbook page. Build it
+from Altra outputs plus any required enrichments (for example benchmark history
+or traded-symbol OHLCV). Do not pass raw ALFS directory trees directly to the
+page.
+
 ```jsonc
 {
   // === Shared ===
@@ -530,10 +550,16 @@ All text in the signal card uses `--text-n9` except the ticker link.
       "changePct": 1.84,
       "changeAbs": 1427.46,
       "source": "Binance",
+      "candles": [
+        { "time": "2025-11-18", "open": 89200.1, "high": 91020.4, "low": 88780.3, "close": 90634.34 }
+      ],
+      "tradeLog": [
+        { "time": "2025-11-18", "side": "BUY", "price": 89880.0, "quantity": 0.8 }
+      ]
     },
-    { "symbol": "ETH" },
-    { "symbol": "SOL" },
-    { "symbol": "BNB" },
+    { "symbol": "ETH", "candles": [], "tradeLog": [] },
+    { "symbol": "SOL", "candles": [], "tradeLog": [] },
+    { "symbol": "BNB", "candles": [], "tradeLog": [] }
   ],
 
   // === Overview ===
@@ -635,6 +661,7 @@ All text in the signal card uses `--text-n9` except the ticker link.
           { "name": "Xxxxxx", "color": "#76b900", "yAxisIndex": 0, "data": [] },
         ],
         "areaFill": true,
+        "interpretation": "Explain what this chart means in one concise sentence.",
       },
       {
         "type": "multi-lines",
@@ -648,6 +675,7 @@ All text in the signal card uses `--text-n9` except the ticker link.
         ],
         "dualYAxis": { "left": "Price (USD)", "right": "Vol / Drawdown (%)" },
         "areaFill": false,
+        "interpretation": "Explain the relationship between the plotted series.",
       },
     ],
   },
@@ -738,7 +766,8 @@ All text in the signal card uses `--text-n9` except the ticker link.
 - Meta Info Bar (4 fields)
 - Performance Metrics Row (6 KPI-Sparkline cards, correct colors)
 - Equity Curve Chart (3 lines + Alpha/Beta + legend) — benchmark series requires separate price data fetch; do not skip if backtest output lacks it
-- Traded Symbols (Pills + Candlestick + Trade Markers)
+- Traded Symbols (Pills + Candlestick + Trade Markers) — uses
+  `tradedSymbols[].candles` and `tradedSymbols[].tradeLog`
 - Current Positions Table (LONG/SHORT/CASH tags + P&L coloring)
 - Daily P&L Chart (positive/negative dual-color bars)
 - Drawdown Chart (all-negative red bars)
@@ -747,6 +776,7 @@ All text in the signal card uses `--text-n9` except the ticker link.
 
 - Meta Info Bar (2 fields)
 - Charts auto-selected by data type
+- Each chart includes a short `interpretation`
 - ≥1280px: 2-column grid; <1280px: single column
 - Alva watermark bottom-left
 
