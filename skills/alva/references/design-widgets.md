@@ -190,9 +190,9 @@ classes:
 
 #### Line Break Rules
 
-**The sum of col spans for all widgets in the same row must equal exactly 8 (Web)**. Grid wraps automatically -- widgets exceeding 8 columns automatically move to the next row. Combinations that don't add up to 8 leave empty space at the end of the row and should be avoided.
+Each row's col spans must total exactly 8; shortfalls leave empty space.
 
-Common combinations overview:
+Common combinations:
 
 | Combination              | Col Spans       | Width Ratio         | Description             |
 | ------------------------ | --------------- | ------------------- | ----------------------- |
@@ -422,7 +422,7 @@ content.
    conflict.
 4. **Important**: Select colors in 'Chart & Widget Colors' based on data
    semantics; avoid duplicates. See the `/* ── Chart ── */` section in
-   [design-system.md - Color Tokens](./design-system.md#color-tokens) for the full chart color
+   [design-system.md - Design Tokens](./design-system.md#design-tokens) for the full chart color
    palette.
 
 ### Chart Rules

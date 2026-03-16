@@ -145,10 +145,7 @@ world. Use the `playbook_id` from the release response and the username from
 | [feed-sdk.md](references/feed-sdk.md)                                                 | Feed SDK guide: creating data feeds, time series, upstreams, state management     |
 | [altra-trading.md](references/altra-trading.md)                                       | Altra backtesting engine: strategies, features, signals, testing, debugging       |
 | [deployment.md](references/deployment.md)                                             | Deploying scripts as cronjobs for scheduled execution                             |
-| [design-system.md](references/design-system.md)                                       | Alva Design System: design tokens, colors, typography, font rules                 |
-| [design-widgets.md](references/design-widgets.md)                                     | Widget design: chart cards, KPI cards, table cards, feed cards, layout grid       |
-| [design-components.md](references/design-components.md)                               | Base component templates: dropdown, button, switch, modal, select, markdown       |
-| [design-playbook-trading-strategy.md](references/design-playbook-trading-strategy.md) | Trading strategy playbook guideline                                               |
+| [design-system.md](references/design-system.md)                                       | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
 | [adk.md](references/adk.md)                                                           | Agent Development Kit: `adk.agent()` API, tool calling, ReAct loop, examples      |
 
 ---

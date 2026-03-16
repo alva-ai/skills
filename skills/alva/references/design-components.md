@@ -247,17 +247,20 @@ Paragraph with `inline code`.
 /* ── Code ── */
 .markdown-container code,
 .markdown-container pre {
-  background: var(--b-r02); border: 1px solid var(--line-l07);
+  background: var(--b-r02);
   border-radius: 2px; font-family: "JetBrains Mono", monospace; color: var(--text-n7);
 }
 .markdown-container code {
-  display: inline-block; vertical-align: middle; font-size: 12px; line-height: 20px; letter-spacing: 0.12px; padding: 2px 8px; margin: 0 4px;
+  display: inline-block; vertical-align: middle;
+  box-shadow: inset 0 0 0 1px var(--line-l07);
+  font-size: 12px; line-height: 20px; letter-spacing: 0.12px; padding: 2px 8px; margin: 0 4px;
 }
 .markdown-container pre {
+  border: 1px solid var(--line-l07);
   font-size: 14px; line-height: 22px; letter-spacing: 0.14px;
   padding: 12px 16px; margin: 0; overflow-x: auto;
 }
-.markdown-container pre code { font-size: inherit; line-height: inherit; letter-spacing: inherit; border: none; padding: 0; background: none; }
+.markdown-container pre code { display: inline; vertical-align: baseline; font-size: inherit; line-height: inherit; letter-spacing: inherit; box-shadow: none; padding: 0; margin: 0; background: none; }
 
 /* ── Divider ── */
 .markdown-container hr {
