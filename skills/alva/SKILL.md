@@ -550,6 +550,112 @@ altra.setStrategy(strategyFn, {
 
 ---
 
+## ADK (Agent Development Kit) Quick Reference
+
+See [adk.md](references/adk.md) for full details.
+
+ADK is a universal agent development kit that runs inside the Jagent V8 runtime.
+Use it to build LLM-powered agents that autonomously reason, call tools, and
+produce structured output — ideal for periodic research, insight generation, and
+document analysis feeds.
+
+```javascript
+const adk = require("@alva/adk");
+
+const result = await adk.agent({
+  system: "You are a senior equity analyst...",
+  prompt: "Analyze NVDA quarterly earnings trends.",
+  tools: [/* tool definitions */],
+  maxTurns: 5,
+});
+
+log(result.content);    // Final LLM text response
+log(result.toolCalls);  // All tool invocations made
+```
+
+### When to Use ADK
+
+| Use Case | Description |
+| -------- | ----------- |
+| Periodic research feeds | Scheduled agents that fetch data, reason over it, and produce structured insights (e.g. weekly earnings analysis, daily macro commentary) |
+| Document / data analysis | Agents that read documents or datasets, extract key points, and output structured summaries |
+| Multi-source synthesis | Agents that call multiple data SDKs, cross-reference findings, and produce a unified research note |
+| Agentic data pipelines | Feed scripts where the "transform" step requires LLM reasoning (classification, sentiment, summarization) |
+
+### Core API
+
+```javascript
+const result = await adk.agent({
+  system,    // (optional) system prompt — define the agent's role and output format
+  prompt,    // user query or task description
+  tools,     // array of Tool objects the agent can invoke
+  maxTurns,  // max ReAct loop iterations (default: 10)
+});
+// result: { content: string, turns: number, toolCalls: ToolCallRecord[] }
+```
+
+### Tool Calling — What Tools Are For
+
+Tools are the agent's hands. Use them to:
+
+- **Query data**: Fetch upstream data from Alva SDKs, external HTTP APIs, or
+  ALFS files. The agent decides *which* data to retrieve based on its reasoning.
+- **Collect context**: Pull in multiple data sources (earnings, macro indicators,
+  news) so the agent can cross-reference and synthesize.
+- **Store / fetch memory**: Read and write to ALFS or `ctx.kv` to persist state
+  across runs — e.g. store a running summary, retrieve last analysis for
+  comparison, or cache intermediate results.
+
+```javascript
+// Example: tools for data query + memory
+const tools = [
+  {
+    name: "getEarnings",
+    description: "Fetch quarterly earnings for a stock symbol",
+    parameters: { type: "object", properties: { symbol: { type: "string" } }, required: ["symbol"] },
+    fn: async (args) => {
+      const { getCompanyIncomeStatements } = require("@arrays/data/stock/company/income:v1.0.0");
+      return getCompanyIncomeStatements({ symbol: args.symbol, period_type: "quarter",
+        start_time: Date.parse("2023-01-01"), end_time: Date.now(), limit: 20 }).response.metrics;
+    },
+  },
+  {
+    name: "readMemory",
+    description: "Read previous analysis from memory",
+    parameters: { type: "object", properties: { key: { type: "string" } }, required: ["key"] },
+    fn: async (args) => {
+      const alfs = require("alfs");
+      const env = require("env");
+      try {
+        return JSON.parse(await alfs.readFile(`/alva/home/${env.username}/data/memory/${args.key}.json`));
+      } catch { return null; }
+    },
+  },
+  {
+    name: "writeMemory",
+    description: "Store analysis result to memory for future runs",
+    parameters: { type: "object", properties: { key: { type: "string" }, value: { type: "object" } }, required: ["key", "value"] },
+    fn: async (args) => {
+      const alfs = require("alfs");
+      const env = require("env");
+      await alfs.writeFile(`/alva/home/${env.username}/data/memory/${args.key}.json`, JSON.stringify(args.value));
+      return { saved: true };
+    },
+  },
+];
+```
+
+### General Best Practices
+
+- **Keep tools focused**: Each tool should do one thing (fetch data, compute a
+  metric, read/write memory). Let the agent compose them.
+- **Combine with Feed SDK**: Store agent output as time series via
+  `ctx.self.ts().append()` for queryable, versioned research history.
+- **Idempotent runs**: Use `ctx.kv` to track last-processed dates, so re-runs
+  don't duplicate insights.
+
+---
+
 ## Deployment Quick Reference
 
 See [deployment.md](references/deployment.md) for full details.
