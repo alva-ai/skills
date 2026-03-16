@@ -62,8 +62,13 @@ has access to ALFS, all 250+ SDKs, HTTP networking, LLM access, and the Feed SDK
 
 ### 3. SDKHub
 
-250+ built-in financial data SDKs. To find the right SDK for a task, use the
-two-step retrieval flow:
+250+ built-in financial data SDKs for **structured data** (prices, fundamentals,
+indicators, estimates, etc.). For **unstructured data** (news, social posts,
+discussions, videos), use the [Unified Search](references/unified-search.md)
+skill instead -- it wraps the search SDKs with a 3-step pipeline (search →
+agent processing → structured output) and includes an ADK pattern for cron.
+
+To find the right structured data SDK, use the two-step retrieval flow:
 
 1. **Pick a partition** from the index below.
 2. **Call `GET /api/v1/sdk/partitions/:partition/summary`** to see module
@@ -89,8 +94,8 @@ two-step retrieval flow:
 | `etf_fundamentals` | ETF holdings breakdown. |
 | `macro_and_economics_data` | CPI, GDP, unemployment, federal funds rate, Treasury rates, PPI, consumer sentiment, VIX, TIPS, nonfarm payroll, retail sales, recession probability, etc. (20 modules) |
 | `technical_indicator_calculation_helpers` | 50+ pure calculation helpers: RSI, MACD, Bollinger Bands, ATR, VWAP, Ichimoku, Parabolic SAR, KDJ, OBV, etc. Input your own price arrays. |
-| `feed_widgets` | Social & news data feeds: news, Twitter/X, YouTube, Reddit, podcasts, web search (Brave, Grok). |
-| `ask` | General news and market articles. |
+| `feed_widgets` | Social & news data feeds and web search SDKs. For **searching** unstructured content (news, tweets, discussions, videos), read [unified-search.md](references/unified-search.md) -- it provides a 3-step pipeline (search → agent processing → structured output) with an ADK cron pattern. For **subscribing** to ongoing feeds (specific accounts, channels, subreddits), use the corresponding feed skill directly. |
+| `ask` | General news and market articles. Prefer [unified-search.md](references/unified-search.md) for topic-based searching -- it provides better source control and structured output. |
 
 You can also bring your own data by uploading files to ALFS or fetching from
 external HTTP APIs within the runtime.
@@ -146,6 +151,7 @@ world. Use the `playbook_id` from the release response and the username from
 | [altra-trading.md](references/altra-trading.md)                                       | Altra backtesting engine: strategies, features, signals, testing, debugging       |
 | [deployment.md](references/deployment.md)                                             | Deploying scripts as cronjobs for scheduled execution                             |
 | [design-system.md](references/design-system.md)                                       | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
+| [unified-search.md](references/unified-search.md)                                     | Unified Search: 3-step pipeline for searching unstructured content across sources  |
 | [adk.md](references/adk.md)                                                           | Agent Development Kit: `adk.agent()` API, tool calling, ReAct loop, examples      |
 
 ---
