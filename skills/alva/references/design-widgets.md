@@ -33,6 +33,11 @@
    `align-items: stretch`; add `flex: 1` to the widget body so shorter widgets
    fill the row height. ECharts containers need
    `height: 100%; min-height: 180px`. → [Details](#equal-height-fill)
+6. **Table column alignment requires JS `initTableTruncation`** — Columns
+   ≤ 240px get pinned `min-width` (no truncation); columns > 240px get
+   `.cell-ellipsis` (truncate + tooltip). Use `gap: 16px` on `.table-row` for
+   column spacing, `border-bottom` on `.table-row` for dividers — **not** on
+   cells. → [Details](#column-alignment--text-truncation)
 
 ---
 
@@ -162,6 +167,11 @@
 .table-row {
   display: flex;
   width: 100%;
+  gap: 16px;                          /* column spacing between cells */
+  border-bottom: 1px solid var(--line-l07); /* row divider — on the row, not cells */
+}
+.table-row:last-child {
+  border-bottom: none;
 }
 
 .table-cell {
@@ -172,6 +182,13 @@
   white-space: nowrap;
   display: flex;
   align-items: center;
+}
+
+/* Applied by JS to columns whose max content width > 240px */
+.table-cell.cell-ellipsis {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ── Free Text Card ── */
@@ -663,15 +680,15 @@ No `shadowBlur`, no `focus: 'series'`.
   <div class="table-card">
     <!-- Header row -->
     <div class="table-row table-header">
-      <div class="table-cell" style="flex:1.2;padding:0 16px 12px 0;">Symbol</div>
-      <div class="table-cell" style="flex:1;padding:0 16px 12px 16px;">Side</div>
-      <div class="table-cell" style="flex:1.2;padding:0 16px 12px 16px;">Quantity</div>
+      <div class="table-cell" style="flex:1.2">Symbol</div>
+      <div class="table-cell" style="flex:1">Side</div>
+      <div class="table-cell" style="flex:1.2">Quantity</div>
     </div>
     <!-- Body rows -->
     <div class="table-row table-body-row">
-      <div class="table-cell" style="flex:1.2;padding:12px 16px 12px 0;">AAPL</div>
-      <div class="table-cell" style="flex:1;padding:12px 16px;">LONG</div>
-      <div class="table-cell" style="flex:1.2;padding:12px 16px;">100</div>
+      <div class="table-cell" style="flex:1.2" title="AAPL">AAPL</div>
+      <div class="table-cell" style="flex:1">LONG</div>
+      <div class="table-cell" style="flex:1.2">100</div>
     </div>
   </div>
 </div>
@@ -682,25 +699,103 @@ No `shadowBlur`, no `focus: 'series'`.
 - **No background color** on table card
 - All text: **Delight Regular (400)** only, no bold
 - Row-first flex layout. **Do NOT use column-first layout.**
+- Column spacing uses `gap: 16px` on `.table-row`. **Do NOT use left/right
+  padding on cells for inter-column spacing.**
 
 | Element     | Font  | Color       |
 | ----------- | ----- | ----------- |
 | Header cell | 14px  | `--text-n7` |
 | Body cell   | 14px  | `--text-n9` |
 
-| Element     | Padding (first col) | Padding (other cols) | Border Bottom               |
-| ----------- | ------------------- | -------------------- | --------------------------- |
-| Header cell | `0 16px 12px 0`     | `0 16px 12px 16px`   | `1px solid var(--line-l07)` |
-| Body cell   | `12px 16px 12px 0`  | `12px 16px`          | `1px solid var(--line-l07)` |
+| Element     | Padding      |
+| ----------- | ------------ |
+| Header cell | `0 0 12px 0` |
+| Body cell   | `12px 0`     |
 
-Body cell additional constraints: `max-height: 180px`, `white-space: nowrap`,
-`width: 100%`.
+Row divider: `border-bottom: 1px solid var(--line-l07)` on `.table-row` (not on
+individual cells). Last row has no border. This ensures the divider spans the
+full row width and is not broken by `gap`.
+
+Body cell additional constraints: `max-height: 180px`, `width: 100%`.
+
+### Column Alignment & Text Truncation
+
+Truncation is applied **per column**, not per cell. The rule is based on the
+**widest content** across all rows in that column:
+
+| Column Max Content Width | Behavior                                                                  |
+| ------------------------ | ------------------------------------------------------------------------- |
+| **> 240px**              | Add `.cell-ellipsis` to all cells in the column → truncate with `…` + `title` tooltip |
+| **≤ 240px**              | Set `min-width` to the column's max content width → full display, no truncation        |
+
+This ensures:
+
+1. **Narrow columns** (e.g. "Side", "Kelly") show all content at the width of
+   their widest item — they never truncate.
+2. **Wide columns** (e.g. "Match", "League") truncate gracefully via
+   `.cell-ellipsis` (`min-width: 0; overflow: hidden; text-overflow: ellipsis`).
+3. **All rows in the same column share the same min-width**, so header and body
+   cells are always vertically aligned.
+4. If total column min-widths exceed the container, the table scrolls
+   horizontally via `.table-card { overflow-x: auto }`.
+
+**Required JS** — run after every table render and on `resize`:
+
+```javascript
+// Per-column truncation: measure max content width, then decide truncate or pin
+function initTableTruncation(tableEl) {
+  var rows = tableEl.querySelectorAll('.table-row');
+  if (rows.length === 0) return;
+  var colCount = rows[0].querySelectorAll('.table-cell').length;
+
+  for (var col = 0; col < colCount; col++) {
+    // 1. Reset previous state
+    rows.forEach(function (row) {
+      var cell = row.querySelectorAll('.table-cell')[col];
+      if (!cell) return;
+      cell.classList.remove('cell-ellipsis');
+      cell.style.minWidth = '';
+      cell.removeAttribute('title');
+    });
+
+    // 2. Measure max natural content width (scrollWidth) in this column
+    var maxW = 0;
+    rows.forEach(function (row) {
+      var cell = row.querySelectorAll('.table-cell')[col];
+      if (cell) maxW = Math.max(maxW, cell.scrollWidth);
+    });
+
+    // 3. Apply policy
+    if (maxW > 240) {
+      // Wide column → truncate
+      rows.forEach(function (row) {
+        var cell = row.querySelectorAll('.table-cell')[col];
+        if (!cell) return;
+        cell.classList.add('cell-ellipsis');
+        if (cell.scrollWidth > cell.clientWidth) {
+          cell.setAttribute('title', cell.textContent.trim());
+        }
+      });
+    } else {
+      // Narrow column → pin min-width to widest content
+      rows.forEach(function (row) {
+        var cell = row.querySelectorAll('.table-cell')[col];
+        if (cell) cell.style.minWidth = maxW + 'px';
+      });
+    }
+  }
+}
+```
+
+> **Timing**: Call `initTableTruncation(el)` once after populating the table,
+> and again inside `resize` event listeners. The function is idempotent — it
+> resets previous state before re-measuring.
 
 ### Responsive
 
 - `>= 960px`: Full table, no scroll
 - `< 960px`: Horizontal `overflow-x: auto`, scrollable content
-- No hover effects (static display)
+- No hover effects on rows (static display)
 
 ---
 

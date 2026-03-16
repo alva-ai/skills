@@ -40,6 +40,23 @@ The Tab Content Area switches content based on the active tab.
 
 The **top padding is intentionally 0** on `.main-wrapper` because it is owned by `.tab-bar-wrapper` (see §1.1). This ensures the 28px top gap scrolls with the sticky tab bar instead of being left behind. Left / right / bottom padding remains 28px. No content should break out of this padding.
 
+#### Mobile Override (≤ 768px)
+
+`.main-wrapper` sits inside `.playbook-container` which already provides 16px padding on mobile. To avoid double padding, **zero out** the inner wrapper's left/right/bottom padding and reduce the tab bar top padding:
+
+```css
+@media (max-width: 768px) {
+  .main-wrapper {
+    padding: 0;
+  }
+  .tab-bar-wrapper {
+    padding-top: var(--spacing-m); /* 16px */
+  }
+}
+```
+
+**Result**: Web = 28px (from `.main-wrapper`), Mweb = 16px (from `.playbook-container` only).
+
 ### Module Spacing
 
 All modules stack vertically with **24px** gap (`--spacing-xl`).
