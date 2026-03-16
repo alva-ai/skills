@@ -599,32 +599,19 @@ POST /api/v1/release/playbook
 ## Alva Design System
 
 All Alva playbook pages, dashboards, and widgets must follow the Alva Design
-System. The system defines design tokens (colors, spacing, shadows), typography
-rules, and component/widget templates.
+System. Start with [design-system.md](references/design-system.md): it is the
+single global entry point for tokens, typography, page-level layout rules, and
+the reading path to the more detailed design references.
 
-Key rules:
+Read only what you need:
 
-- **Font**: Delight (Regular 400, Medium 500). No Semibold/Bold. Font files: [Delight-Regular.ttf](https://alva-ai-static.b-cdn.net/fonts/Delight-Regular.ttf),
-  [Delight-Medium.ttf](https://alva-ai-static.b-cdn.net/fonts/Delight-Medium.ttf)
-- **Page background**: `--b0-page` (`#ffffff`)
-- **Semantic colors**: `--main-m3` (bullish/green), `--main-m4` (bearish/red),
-  `--main-m1` (Alva theme/teal)
-- **Charts**: Use ECharts. Select colors from the chart palette in
-  [design-system.md](references/design-system.md). Grey only when >= 3 series.
-- **Widgets**: No borders on widget cards. Chart cards use dotted background;
-  table card has no background; other cards use `--grey-g01`.
-- **Grid**: 8-column grid (web), 4-column grid (mobile). Column spans must sum
-  to 8 per row.
-
-**Reference documents** (read for detailed specs when building playbook web
-apps):
-
-| When                                                                    | Read                                                                          |
-| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| Design tokens, typography, font rules, general guidelines               | [design-system.md](references/design-system.md)                               |
-| Widget types, chart/KPI/table/feed cards, grid layout                   | [design-widgets.md](references/design-widgets.md)                             |
-| Component templates (button, dropdown, modal, select, switch, markdown) | [design-components.md](references/design-components.md)                       |
-| Trading strategy playbook layout, sections, and content guidelines      | [design-playbook-trading-strategy.md](references/design-playbook-trading-strategy.md) |
+- **Global rules only** → [design-system.md](references/design-system.md)
+- **Widget and chart implementation** →
+  [design-widgets.md](references/design-widgets.md)
+- **Component behavior and templates** →
+  [design-components.md](references/design-components.md)
+- **Trading strategy playbooks** →
+  [design-playbook-trading-strategy.md](references/design-playbook-trading-strategy.md)
 
 ---
 

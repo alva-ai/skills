@@ -61,7 +61,7 @@
 
 .list-item-text {
   flex: 1 0 0;
-  font-family: "Delight", "Helvetica Neue", Arial, sans-serif;
+  font-family: "Delight", -apple-system, BlinkMacSystemFont, sans-serif;
   font-style: normal;
   font-size: 14px;
   line-height: 22px;
@@ -134,7 +134,7 @@ document.querySelectorAll(".list-item").forEach((item) => {
 
 ## Markdown
 
-> For font specification, see [design-system.md - Typography & Font](./design-system.md#typography--font). Headings and body text use Delight; code uses JetBrains Mono.
+> For font specification, see [design-system.md - Typography & Font](./design-system.md#typography--font). Headings and body text use Delight with `-apple-system`, `BlinkMacSystemFont`, `sans-serif` fallbacks; code uses JetBrains Mono.
 
 Uses [markdown-it](https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js) for automatic rendering. Write raw markdown inside `<script type="text/markdown">`, the init script parses it into standard HTML tags, and scoped CSS maps them to the Alva design spec.
 
@@ -196,7 +196,7 @@ Paragraph with `inline code`.
 .markdown-container h4,
 .markdown-container h5,
 .markdown-container h6 {
-  font-family: "Delight", "Helvetica Neue", Arial, sans-serif;
+  font-family: "Delight", -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 500;
   font-style: normal;
   color: var(--text-n9);
@@ -212,7 +212,7 @@ Paragraph with `inline code`.
 
 /* ── Paragraph ── */
 .markdown-container p {
-  font-family: "Delight", "Helvetica Neue", Arial, sans-serif;
+  font-family: "Delight", -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 16px; line-height: 26px; letter-spacing: 0.16px;
   color: var(--text-n9); margin: 0; white-space: pre-wrap;
 }
@@ -224,7 +224,7 @@ Paragraph with `inline code`.
   list-style: none; margin: 0; padding: 0;
 }
 .markdown-container li {
-  font-family: "Delight", "Helvetica Neue", Arial, sans-serif;
+  font-family: "Delight", -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 16px; line-height: 26px; letter-spacing: 0.16px;
   color: var(--text-n9);
   position: relative; padding-left: 24px;
@@ -274,7 +274,7 @@ Paragraph with `inline code`.
 .markdown-container td {
   padding: 12px; min-height: 180px;
   border-bottom: 1px solid rgba(0,0,0,0.07);
-  font-family: "Delight", "Helvetica Neue", Arial, sans-serif;
+  font-family: "Delight", -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 14px; line-height: 22px; letter-spacing: 0.14px;
   color: var(--text-n9); text-align: left;
 }
@@ -404,7 +404,7 @@ The button component system contains **2 types** x **4 sizes** x **4 states** = 
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: "Delight", "Helvetica Neue", Arial, sans-serif;
+  font-family: "Delight", -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 500;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
@@ -723,7 +723,7 @@ Modal                        ← Overlay
 
 | Property         | Value                               |
 | ---------------- | ----------------------------------- |
-| Background Color | `#var(--b0-container)`              |
+| Background Color | `var(--b0-container)`               |
 | Font             | `Delight`                           |
 | Font Weight      | `400`                               |
 | Border Style     | `0.5px solid`                       |
@@ -788,7 +788,7 @@ Modal                        ← Overlay
 
 ### Click Behavior
 
-Clicking the Select container triggers the associated **Dropdown Menu** (see [Dropdown Menu](#dropdown-menu)).
+Clicking the Select container triggers the associated [Dropdown](#dropdown).
 
 - Dropdown width defaults to the same width as the Select container
 - Dropdown list item text size follows the Select size (see table below)
@@ -874,7 +874,7 @@ border through their transparent border.
   align-items: center;
 }
 .tab-item {
-  font-family: "Delight", sans-serif;
+  font-family: "Delight", -apple-system, BlinkMacSystemFont, sans-serif;
   cursor: pointer;
   transition: all 0.15s ease;
 }

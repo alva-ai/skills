@@ -400,12 +400,13 @@ Charts and tables never wrap — they always fill `width: 100%`.
 | -------------- | ---------------------- | ------------------------ |
 | KPI Card       | auto (content-driven)  | Wrap via flex-wrap       |
 | Chart Card     | 320px                  | Chart scales internally  |
-| Table Card     | auto, capped at 5600px | Scroll within table body |
+| Table Card     | auto, capped at 560px  | Scroll within table body |
 | Free Text Card | auto (content-driven)  | Scroll or truncate       |
 | Feed Card      | auto, capped at 560px  | Scroll within feed body  |
 
-**Table Card / Feed Card**: Content < 560px → auto height fits content;
-content ≥ 320px → default height 320px, body scrolls.
+**Table Card / Feed Card**: Content < 320px → auto height fits content;
+content ≥ 320px → use a 320px body with internal scroll. Do not exceed 560px
+total height.
 
 Max height for all widgets: **960px**. Apply `overflow-y: auto` to the widget
 body (not the entire card) when exceeded.
@@ -484,17 +485,17 @@ const AX = {
   axisTick: { show: false },
   axisLabel: {
     fontSize: 10,
-    color: "rgba(0,0,0,0.7)",
-    fontFamily: "'Delight',-apple-system,BlinkMacSystemFont,sans-serif",
-    margin: 8,
+    color: "var(--text-n7)",
+    fontFamily: "'Delight', -apple-system, BlinkMacSystemFont, sans-serif",
+    margin: 8, // 8px gap from label to axis line
   },
   splitLine: { show: false },
 };
 
-// Grid — always use containLabel
-grid: { top: 4, right: 4, bottom: 4, left: 4, containLabel: true }
+// Grid must use containLabel:true -- auto-calculate margin from axis labels to container edge
+const GRID = { top: 4, right: 4, bottom: 4, left: 4, containLabel: true };
 
-// Line chart xAxis — add boundaryGap:false
+// Line chart xAxis must add boundaryGap:false
 xAxis: { type: "category", data: x, boundaryGap: false, ...AX }
 ```
 
@@ -698,7 +699,7 @@ Body cell additional constraints: `max-height: 180px`, `white-space: nowrap`,
 ### Responsive
 
 - `>= 960px`: Full table, no scroll
-- `< 960px`: Horizontal `overflow: clip`, scrollable
+- `< 960px`: Horizontal `overflow-x: auto`, scrollable content
 - No hover effects (static display)
 
 ---
