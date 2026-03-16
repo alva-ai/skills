@@ -1,6 +1,10 @@
 
 # Alva Design System
 
+This file is the global entry point for Alva design rules. It summarizes the
+rules that apply everywhere and points to the more detailed widget, component,
+and trading-strategy specs when you need them.
+
 ## Design Tokens
 
 Full token definitions (colors, spacing, radius, theme) are in
@@ -14,6 +18,7 @@ exact values. Below is a quick reference for the most common categories:
 | Text | `--text-n9/n7/n5/n3/n2` | n9=primary, n7=secondary, n5=supporting |
 | Background | `--b0-page`, `--grey-g01`~`g1`, `--b-r02`~`r1` | g01 for dashboard cards |
 | Line | `--line-l05/l07/l12/l2/l3` | l07=default |
+| Shadow | `--shadow-xs/s/l` | Floating surfaces only |
 | Spacing | `--spacing-xxxs`(2) ~ `--spacing-xxxxxxl`(56) | Common: xs=8, m=16, xl=24 |
 | Radius | `--radius-ct-xs`(2) ~ `--radius-ct-l`(8) | xs=Tag, s=Card, l=Page |
 
@@ -22,7 +27,7 @@ exact values. Below is a quick reference for the most common categories:
 ### General Rules
 
 1. **The default font for Alva must be Delight**;
-2. Backup fonts: -apple-system, BlinkMacSystemFont, sans-serif;
+2. Backup fonts: `-apple-system`, `BlinkMacSystemFont`, `sans-serif`;
 
 ### Font Weight
 
@@ -51,7 +56,7 @@ text-rendering: optimizeLegibility;
 
 ## Background
 
-**The page background color must use '--b0-page'**
+**The page background color must use `--b0-page`**
 
 ## Playbook Container
 
@@ -81,5 +86,6 @@ text-rendering: optimizeLegibility;
    This spec defines the complete page structure, tab layout, module order,
    component usage, and data schema. Do not deviate from it or invent
    alternative layouts.
-4. **Only need tokens or typography** → this file has everything you need, don't
-   load references
+4. **Only need global rules** → stay in this file. Open
+   [design-tokens.css](./design-tokens.css) only when you need exact token
+   values.
