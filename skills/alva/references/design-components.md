@@ -6,9 +6,9 @@
 - [Markdown](#markdown)
 - [Button](#button)
 - [Switch](#switch)
+- [Modal](#modal)
+- [Select](#select)
 - [Tab](#tab)
-- [Tag](#tag)
-- [Tooltip](#tooltip)
 
 ---
 
@@ -969,15 +969,3 @@ border through their transparent border.
   <div class="tab-item" data-text="Tab 2">Tab 2</div>
 </div>
 ```
-
-## Input
-
-TBD
-
-## Tag
-
-TBD
-
-## Tooltip
-
-TBD

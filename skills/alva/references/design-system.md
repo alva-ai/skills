@@ -61,6 +61,15 @@ text-rendering: optimizeLegibility;
 ## Playbook Container
 
 ```css
+/* Hide all persistent scrollbars globally */
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+*::-webkit-scrollbar {
+  display: none;
+}
+
 .playbook-container {
   width: 100%;
   max-width: 2048px;

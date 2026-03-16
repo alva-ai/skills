@@ -167,6 +167,7 @@
 .table-row {
   display: flex;
   width: 100%;
+  min-width: max-content;             /* row + divider must span full scrollable width */
   gap: 16px;                          /* column spacing between cells */
   border-bottom: 1px solid var(--line-l07); /* row divider — on the row, not cells */
 }
@@ -492,17 +493,24 @@ Legend marker class by chart type:
 4. Select colors from the chart palette in
    [design-tokens.css](./design-tokens.css). Avoid duplicates.
 5. **Grey** (`--chart-grey-*`) is only allowed when chart has **≥ 3 series**.
+6. **ECharts renders on Canvas — CSS variables (`var(--xxx)`) do NOT work in
+   any ECharts option.** Always use raw hex / rgba literals. Define JS
+   constants from the token values at the top of your script and reference
+   those constants in all ECharts configs (series colors, axis labels, tooltip
+   text, markLine, etc.). CSS variables remain correct for DOM-based styles
+   (HTML class attributes, inline `style`, CSS rules).
 
 ### Axis Rules
 
 ```javascript
 // Shared axis config — must use every time a chart is generated
+// NOTE: use raw color values, NOT CSS vars — ECharts is Canvas-based
 const AX = {
   axisLine: { show: false },
   axisTick: { show: false },
   axisLabel: {
     fontSize: 10,
-    color: "var(--text-n7)",
+    color: "rgba(0,0,0,0.7)",  // --text-n7
     fontFamily: "'Delight', -apple-system, BlinkMacSystemFont, sans-serif",
     margin: 8, // 8px gap from label to axis line
   },
@@ -525,7 +533,7 @@ markLine: {
   silent: true,
   symbol: "none",
   data: [{ xAxis: 0 }], // or { yAxis: 0 }
-  lineStyle: { color: "var(--line-l3)", type: [3, 2], width: 1 },
+  lineStyle: { color: "rgba(0,0,0,0.3)", type: [3, 2], width: 1 }, // --line-l3
   label: { show: false },
 }
 ```
@@ -742,7 +750,8 @@ This ensures:
 **Required JS** — run after every table render and on `resize`:
 
 ```javascript
-// Per-column truncation: measure max content width, then decide truncate or pin
+// Per-column alignment: measure max content width, then lock narrow columns
+// to a fixed width and let wide columns share remaining space.
 function initTableTruncation(tableEl) {
   var rows = tableEl.querySelectorAll('.table-row');
   if (rows.length === 0) return;
@@ -754,7 +763,9 @@ function initTableTruncation(tableEl) {
       var cell = row.querySelectorAll('.table-cell')[col];
       if (!cell) return;
       cell.classList.remove('cell-ellipsis');
+      cell.style.flex = '';
       cell.style.minWidth = '';
+      cell.style.width = '';
       cell.removeAttribute('title');
     });
 
@@ -767,20 +778,22 @@ function initTableTruncation(tableEl) {
 
     // 3. Apply policy
     if (maxW > 240) {
-      // Wide column → truncate
+      // Wide column → share remaining space, truncate with ellipsis
       rows.forEach(function (row) {
         var cell = row.querySelectorAll('.table-cell')[col];
         if (!cell) return;
+        cell.style.flex = '1 1 0';
         cell.classList.add('cell-ellipsis');
         if (cell.scrollWidth > cell.clientWidth) {
           cell.setAttribute('title', cell.textContent.trim());
         }
       });
     } else {
-      // Narrow column → pin min-width to widest content
+      // Narrow column → lock to fixed width (no grow, no shrink)
       rows.forEach(function (row) {
         var cell = row.querySelectorAll('.table-cell')[col];
-        if (cell) cell.style.minWidth = maxW + 'px';
+        if (!cell) return;
+        cell.style.flex = '0 0 ' + maxW + 'px';
       });
     }
   }
