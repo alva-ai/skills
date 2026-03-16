@@ -169,6 +169,12 @@ Paragraph with `inline code`.
 <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
 <script>
   const md = window.markdownit();
+  const defaultRender = md.renderer.rules.link_open || function(tokens, idx, options, env, self) { return self.renderToken(tokens, idx, options); };
+  md.renderer.rules.link_open = function(tokens, idx, options, env, self) {
+    tokens[idx].attrSet('target', '_blank');
+    tokens[idx].attrSet('rel', 'noopener noreferrer');
+    return defaultRender(tokens, idx, options, env, self);
+  };
   document.querySelectorAll('script[type="text/markdown"]').forEach(el => {
     const container = el.parentElement;
     el.remove();
