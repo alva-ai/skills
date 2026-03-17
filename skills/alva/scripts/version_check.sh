@@ -71,6 +71,9 @@ if [ "$local_tag" != "$remote_tag" ]; then
 Alva skill update available.
   Installed: $local_tag
   Latest:    $remote_tag
-  Run:       npx skills add alva-ai/skills
+Update with one of:
+  npx skills update
+  clawhub update alva
+  git clone https://github.com/alva-ai/skills ./tmp/alva-skills && cp -r ./tmp/alva-skills/skills/alva/* "<skill-dir>/" && rm -rf ./tmp/alva-skills
 EOF
 fi

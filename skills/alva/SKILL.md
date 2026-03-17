@@ -23,9 +23,9 @@ bash "<this skill's directory>/scripts/version_check.sh"
 ```
 
 - **No output** → skill is up to date. Proceed normally.
-- **Output present** → display the message to the user, then run
-  `npx skills update` to apply the update. Proceed normally after the update
-  completes.
+- **Output present** → display the message to the user, then apply the update
+  using the appropriate method for how the skill was installed. Proceed normally
+  after the update completes.
 
 ### 2. API Key
 

@@ -70,7 +70,10 @@ newer version is available, your agent will display a notification:
 Alva skill update available.
   Installed: v1.0.0
   Latest:    v1.2.0
-  Run:       npx skills add alva-ai/skills
+Update with one of:
+  npx skills update
+  clawhub update alva
+  git clone https://github.com/alva-ai/skills ./tmp/alva-skills && cp -r ./tmp/alva-skills/skills/alva/* "<skill-dir>/" && rm -rf ./tmp/alva-skills
 ```
 
 The check is silent when your skill is up to date. It runs at most once every 8
