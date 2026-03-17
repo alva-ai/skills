@@ -9,6 +9,26 @@ metadata:
   author: alva
 ---
 
+## Pre-flight Version Check
+
+**On first use in each session**, run the version check script. The script is at
+`scripts/version_check.sh` inside this skill's directory. Resolve the absolute
+path from this SKILL.md file's location, then execute:
+
+```bash
+bash "<this skill's directory>/scripts/version_check.sh"
+```
+
+- **No output** → skill is up to date. Proceed normally.
+- **Output present** → display the message to the user, then run
+  `npx skills update` to apply the update. Proceed normally after the update
+  completes.
+
+The script handles network errors and throttling internally — it will not block
+or fail. Do not skip this step even if a previous session ran it recently.
+
+---
+
 # Alva
 
 ## What is Alva

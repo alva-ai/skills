@@ -3,3 +3,6 @@
 .env.*
 node_modules/
 *.log
+
+# Skill runtime version lock (created by version_check.sh)
+.skill-lock.json
