@@ -7,6 +7,7 @@ description: >-
   playbooks -- all from your AI agents.
 metadata:
   author: alva
+  version: v1.0.0
 ---
 
 ## Pre-flight
@@ -36,7 +37,6 @@ to `.alva.json`. Do not proceed until a valid key is configured. Example format:
 ```json
 {
   "api_key": "alva_...",
-  "version": "v1.0.0",
   "last_check": 0
 }
 ```

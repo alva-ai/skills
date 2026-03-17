@@ -6,6 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 REPO="alva-ai/skills"
+SKILL_MD="$SKILL_DIR/SKILL.md"
 CONFIG_FILE="$SKILL_DIR/.alva.json"
 CHECK_INTERVAL=28800 # 8 hours in seconds
 
@@ -19,16 +20,23 @@ read_field() {
   sed -n "s/.*\"${key}\": *\"\{0,1\}\([^\",}]*\)\"\{0,1\}.*/\1/p" "$CONFIG_FILE" 2>/dev/null | head -1
 }
 
-# Write version fields to .alva.json, preserving api_key
-write_version() {
-  local tag="$1"
-  local ts="$2"
+# Read version from SKILL.md frontmatter (metadata.version)
+read_local_version() {
+  if [ ! -f "$SKILL_MD" ]; then
+    echo ""
+    return
+  fi
+  sed -n 's/^[[:space:]]*version:[[:space:]]*\(.*\)/\1/p' "$SKILL_MD" 2>/dev/null | head -1
+}
+
+# Write last_check to .alva.json, preserving api_key
+write_check() {
+  local ts="$1"
   local api_key
   api_key=$(read_field "api_key")
   cat >"$CONFIG_FILE" <<EOF
 {
   "api_key": "${api_key}",
-  "version": "$tag",
   "last_check": $ts
 }
 EOF
@@ -55,15 +63,15 @@ fi
 
 now=$(date +%s 2>/dev/null || echo "0")
 
-# First run: record current tag and exit
-local_tag=$(read_field "version")
+# Read local version from SKILL.md frontmatter
+local_tag=$(read_local_version)
 if [ -z "$local_tag" ]; then
-  write_version "$remote_tag" "$now"
+  write_check "$now"
   exit 0
 fi
 
 # Update last_check timestamp
-write_version "$local_tag" "$now"
+write_check "$now"
 
 # Compare — notify only when a new release is published
 if [ "$local_tag" != "$remote_tag" ]; then
