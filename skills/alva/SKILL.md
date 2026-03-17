@@ -463,7 +463,14 @@ Every feed follows a 6-step lifecycle:
 1. **Write** -- define schema + incremental logic with `ctx.kv`
 2. **Upload** -- write script to `~/feeds/<name>/v1/src/index.js`
 3. **Test** -- `POST /api/v1/run` with `entry_path` to verify output
-4. **Grant** -- make feed public via `POST /api/v1/fs/grant`
+4. **Grant** -- make feed data publicly readable:
+   ```
+   POST /api/v1/fs/grant
+   {"path":"~/feeds/<name>","subject":"special:user:*","permission":"read"}
+   ```
+   Grant on the feed root path (not on `data/`). Subject format:
+   `special:user:*` (public), `special:user:+` (authenticated only),
+   `user:<id>` (specific user).
 5. **Deploy** -- `POST /api/v1/deploy/cronjob` for scheduled execution
 6. **Release** -- `POST /api/v1/release/feed` to register the feed in the
    database (requires the `task_id` from the deploy step)
