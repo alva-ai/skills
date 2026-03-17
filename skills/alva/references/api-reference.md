@@ -31,7 +31,8 @@ All filesystem endpoints are under `/api/v1/fs/`.
 
 - `~/data/file.json` -- home-relative, expands to
   `/alva/home/<username>/data/file.json`
-- `/alva/home/<username>/data/file.json` -- absolute path (required for public reads)
+- `/alva/home/<username>/data/file.json` -- absolute path (required for public
+  reads)
 - `~` -- your home directory
 
 ### Read File
@@ -78,9 +79,9 @@ POST /api/v1/fs/write
 {"path":"~/data/config.json","data":"{\"key\":\"value\"}","mkdir_parents":true}
 ```
 
-> **Warning**: In Mode 2, the file content field is `"data"` — **not** `"content"`.
-> An incorrect field name is silently ignored, resulting in `bytes_written: 0`
-> and an empty file. When in doubt, prefer Mode 1.
+> **Warning**: In Mode 2, the file content field is `"data"` — **not**
+> `"content"`. An incorrect field name is silently ignored, resulting in
+> `bytes_written: 0` and an empty file. When in doubt, prefer Mode 1.
 
 Response: `{"bytes_written":15}`
 
@@ -216,9 +217,10 @@ Subject values: `special:user:*` (public/anyone), `special:user:+` (any
 authenticated user), `user:<id>` (specific user).
 
 > **Note**: You cannot grant permissions directly on a Feed synth `data/` path
-> (e.g. `~/feeds/my-feed/v1/data`). This returns PERMISSION_DENIED. Grant on
-> the parent feed directory instead — the permission is inherited by all child
-> paths including the synth data mount:
+> (e.g. `~/feeds/my-feed/v1/data`). This returns PERMISSION_DENIED. Grant on the
+> parent feed directory instead — the permission is inherited by all child paths
+> including the synth data mount:
+>
 > ```
 > POST /api/v1/fs/grant
 > {"path":"~/feeds/my-feed","subject":"special:user:*","permission":"read"}
@@ -406,13 +408,13 @@ response.
 `GET /api/v1/fs/readdir?path=~/feeds` to check existing feed names before
 releasing.
 
-| Field       | Type   | Required | Description                             |
-| ----------- | ------ | -------- | --------------------------------------- |
+| Field       | Type   | Required | Description                                                  |
+| ----------- | ------ | -------- | ------------------------------------------------------------ |
 | name        | string | yes      | URL-safe feed name (e.g. `btc-ema`), must be unique per user |
-| version     | string | yes      | SemVer (e.g. `1.0.0`)                   |
-| task_id     | int64  | yes      | Cronjob task ID from deploy/cronjob     |
-| view_json   | object | no       | View configuration JSON                 |
-| description | string | no       | Feed description                        |
+| version     | string | yes      | SemVer (e.g. `1.0.0`)                                        |
+| task_id     | int64  | yes      | Cronjob task ID from deploy/cronjob                          |
+| view_json   | object | no       | View configuration JSON                                      |
+| description | string | no       | Feed description                                             |
 
 ```
 POST /api/v1/release/feed
@@ -435,11 +437,11 @@ POST /api/v1/draft/playbook
 
 Create a new playbook with a draft version.
 
-| Field       | Type   | Required | Description                                  |
-| ----------- | ------ | -------- | -------------------------------------------- |
+| Field       | Type   | Required | Description                                                            |
+| ----------- | ------ | -------- | ---------------------------------------------------------------------- |
 | name        | string | yes      | URL-safe playbook name (e.g. `btc-dashboard`), must be unique per user |
-| description | string | no       | Short description of the playbook             |
-| feeds       | array  | yes      | Feed references `[{feed_id, feed_major?}]`   |
+| description | string | no       | Short description of the playbook                                      |
+| feeds       | array  | yes      | Feed references `[{feed_id, feed_major?}]`                             |
 
 ```
 POST /api/v1/draft/playbook
@@ -460,12 +462,12 @@ POST /api/v1/release/playbook
 Release an existing playbook for public hosting. Reads the playbook HTML from
 `~/playbooks/{name}/index.html` and uploads it to CDN.
 
-| Field     | Type   | Required | Description                                  |
-| --------- | ------ | -------- | -------------------------------------------- |
-| name      | string | yes      | URL-safe playbook name (must already exist)  |
-| version   | string | yes      | SemVer (e.g. `v1.0.0`)                       |
-| feeds     | array  | yes      | Feed references `[{feed_id, feed_major?}]`   |
-| changelog | string | no       | Release changelog                            |
+| Field     | Type   | Required | Description                                 |
+| --------- | ------ | -------- | ------------------------------------------- |
+| name      | string | yes      | URL-safe playbook name (must already exist) |
+| version   | string | yes      | SemVer (e.g. `v1.0.0`)                      |
+| feeds     | array  | yes      | Feed references `[{feed_id, feed_major?}]`  |
+| changelog | string | no       | Release changelog                           |
 
 Feed reference fields:
 
@@ -491,9 +493,38 @@ After a successful release, output the alva.ai playbook link to the user:
 
 ---
 
+## Remix API
+
+Record parent-child dependency when a playbook is remixed from an existing one.
+
+### Save Remix Lineage
+
+```
+POST /api/v1/remix
+```
+
+| Field   | Type   | Required | Description                                           |
+| ------- | ------ | -------- | ----------------------------------------------------- |
+| child   | object | yes      | `{username, name}` — the new playbook (must be yours) |
+| parents | array  | yes      | `[{username, name}]` — source playbook(s)             |
+
+```
+POST /api/v1/remix
+{
+  "child": {"username": "bob", "name": "my-btc-strategy"},
+  "parents": [{"username": "alice", "name": "btc-momentum"}]
+}
+```
+
+---
+
 ## SDK API
 
-Browse the 250+ SDK modules available in the runtime — covering crypto/equity/ETF market data (OHLCV, fundamentals, on-chain metrics), 60+ technical indicators (SMA, RSI, MACD, Bollinger Bands…), macro & economic series (GDP, CPI, Treasury yields), and alternative data (news, social sentiment, DeFi). All endpoints are under `/api/v1/sdk/`.
+Browse the 250+ SDK modules available in the runtime — covering
+crypto/equity/ETF market data (OHLCV, fundamentals, on-chain metrics), 60+
+technical indicators (SMA, RSI, MACD, Bollinger Bands…), macro & economic series
+(GDP, CPI, Treasury yields), and alternative data (news, social sentiment,
+DeFi). All endpoints are under `/api/v1/sdk/`.
 
 ### Get SDK Doc
 
@@ -501,8 +532,8 @@ Browse the 250+ SDK modules available in the runtime — covering crypto/equity/
 GET /api/v1/sdk/doc?name={module_name}
 ```
 
-| Parameter | Type   | Required | Description                                      |
-| --------- | ------ | -------- | ------------------------------------------------ |
+| Parameter | Type   | Required | Description                                           |
+| --------- | ------ | -------- | ----------------------------------------------------- |
 | name      | string | yes      | Full module name (e.g. `@arrays/crypto/ohlcv:v1.0.0`) |
 
 ```
@@ -527,9 +558,9 @@ GET /api/v1/sdk/partitions
 GET /api/v1/sdk/partitions/:partition/summary
 ```
 
-| Parameter | Type   | Required | Description                                        |
-| --------- | ------ | -------- | -------------------------------------------------- |
-| partition | string | yes      | Partition name (URL-encoded if contains `/`)       |
+| Parameter | Type   | Required | Description                                  |
+| --------- | ------ | -------- | -------------------------------------------- |
+| partition | string | yes      | Partition name (URL-encoded if contains `/`) |
 
 ```
 GET /api/v1/sdk/partitions/spot_market_price_and_volume/summary
@@ -639,7 +670,9 @@ metrics, social sentiment, and general financial topics. It has access to
 real-time web data, 250+ financial data SDKs, and code execution.
 
 ```
+
 POST /v1/chat/completions
+
 ```
 
 ### Request Fields
@@ -661,9 +694,10 @@ POST /v1/chat/completions
 ### Example
 
 ```
-POST /v1/chat/completions
-Accept: text/event-stream
-{"message":"What is the current BTC funding rate?"}
+
+POST /v1/chat/completions Accept: text/event-stream {"message":"What is the
+current BTC funding rate?"}
+
 ```
 
 ---
@@ -702,13 +736,17 @@ consumers handle them directly.
 **Path anatomy**:
 
 ```
-~/feeds/my-feed/v1 / data      / metrics / prices / @last/100
-|--- feedPath ---| |mount pt| | group | |output| | query |
+
+~/feeds/my-feed/v1 / data / metrics / prices / @last/100 |--- feedPath ---|
+|mount pt| | group | |output| | query |
+
 ```
 
 ```
-GET /api/v1/fs/read?path=~/feeds/my-feed/v1/data/prices/btc/@last/100
-→ [{"date":1772658000000,"close":73309.72,"ema10":72447.65}, ...]
+
+GET /api/v1/fs/read?path=~/feeds/my-feed/v1/data/prices/btc/@last/100 →
+[{"date":1772658000000,"close":73309.72,"ema10":72447.65}, ...]
+
 ```
 
 ---
@@ -727,3 +765,4 @@ All errors return: `{"error":{"code":"...","message":"..."}}`
 | 500         | INTERNAL          | Server error                       |
 
 ---
+```
