@@ -72,8 +72,8 @@ you can:
 - **Deploy trading strategies** -- backtest with the Altra trading engine and
   run continuous live paper trading.
 - **Release and share** -- turn your work into a hosted playbook web app at
-  `https://alva.ai/<username>/playbooks/<playbook_id>`, and share it with the
-  world.
+  `https://alva.ai/u/<username>/playbooks/<playbook_name>`, and share it with
+  the world.
 - **Remix existing playbooks** -- take any published playbook as a template,
   read its feed scripts and HTML source, customize parameters/logic/UI, and
   deploy as your own new playbook.
@@ -174,9 +174,9 @@ Three phases:
    Returns `playbook_id` (numeric).
 
 Once released, the playbook is accessible at
-`https://alva.ai/<username>/playbooks/<playbook_id>` — ready to share with the
-world. Use the `playbook_id` from the release response and the username from
-`GET /api/v1/me` to construct this URL.
+`https://alva.ai/u/<username>/playbooks/<playbook_name>` — ready to share with
+the world. Use the playbook `name` and the username from `GET /api/v1/me` to
+construct this URL.
 
 ### 8. Remix (Create from Existing Playbook)
 
@@ -797,8 +797,8 @@ POST /api/v1/release/playbook
 → {"playbook_id":99,"version":"v1.0.0","published_url":"https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html"}
 
 # After release, output the alva.ai playbook link to the user:
-# https://alva.ai/<username>/playbooks/<playbook_id>
-# e.g. https://alva.ai/alice/playbooks/99
+# https://alva.ai/u/<username>/playbooks/<playbook_name>
+# e.g. https://alva.ai/u/alice/playbooks/btc-dashboard
 ```
 
 ---
