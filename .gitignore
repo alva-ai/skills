@@ -4,5 +4,5 @@
 node_modules/
 *.log
 
-# Skill runtime version lock (created by version_check.sh)
-.skill-lock.json
+# Skill runtime config (API key, version state — created by pre-flight)
+.alva.json

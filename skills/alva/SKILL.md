@@ -9,11 +9,14 @@ metadata:
   author: alva
 ---
 
-## Pre-flight Version Check
+## Pre-flight
 
-**On first use in each session**, run the version check script. The script is at
-`scripts/version_check.sh` inside this skill's directory. Resolve the absolute
-path from this SKILL.md file's location, then execute:
+**On first use in each session**, perform these checks in order:
+
+### 1. Version Check
+
+Run the version check script at `scripts/version_check.sh` inside this skill's
+directory:
 
 ```bash
 bash "<this skill's directory>/scripts/version_check.sh"
@@ -24,8 +27,22 @@ bash "<this skill's directory>/scripts/version_check.sh"
   `npx skills update` to apply the update. Proceed normally after the update
   completes.
 
-The script handles network errors and throttling internally — it will not block
-or fail. Do not skip this step even if a previous session ran it recently.
+### 2. API Key
+
+Read `.alva.json` in this skill's directory. If `api_key` is missing or empty,
+ask the user for their Alva API key (available at https://alva.ai) and write it
+to `.alva.json`. Do not proceed until a valid key is configured. Example format:
+
+```json
+{
+  "api_key": "alva_...",
+  "version": "v1.0.0",
+  "last_check": 0
+}
+```
+
+Set the `ALVA_API_KEY` environment variable from this value for all subsequent
+API calls in this session.
 
 ---
 

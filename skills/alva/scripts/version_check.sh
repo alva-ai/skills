@@ -6,33 +6,36 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 REPO="alva-ai/skills"
-LOCK_FILE="$SKILL_DIR/.skill-lock.json"
+CONFIG_FILE="$SKILL_DIR/.alva.json"
 CHECK_INTERVAL=28800 # 8 hours in seconds
 
-# Read lock file fields (portable JSON parsing without jq)
-read_lock() {
-  if [ ! -f "$LOCK_FILE" ]; then
+# Read a field from .alva.json (portable JSON parsing without jq)
+read_field() {
+  if [ ! -f "$CONFIG_FILE" ]; then
     echo ""
     return
   fi
   local key="$1"
-  sed -n "s/.*\"${key}\": *\"\{0,1\}\([^\",}]*\)\"\{0,1\}.*/\1/p" "$LOCK_FILE" 2>/dev/null | head -1
+  sed -n "s/.*\"${key}\": *\"\{0,1\}\([^\",}]*\)\"\{0,1\}.*/\1/p" "$CONFIG_FILE" 2>/dev/null | head -1
 }
 
-# Write lock file
-write_lock() {
+# Write version fields to .alva.json, preserving api_key
+write_version() {
   local tag="$1"
   local ts="$2"
-  cat >"$LOCK_FILE" <<EOF
+  local api_key
+  api_key=$(read_field "api_key")
+  cat >"$CONFIG_FILE" <<EOF
 {
-  "remote_tag": "$tag",
+  "api_key": "${api_key}",
+  "version": "$tag",
   "last_check": $ts
 }
 EOF
 }
 
 # Throttle: skip if checked recently
-last_check=$(read_lock "last_check")
+last_check=$(read_field "last_check")
 if [ -n "$last_check" ]; then
   now=$(date +%s 2>/dev/null || echo "0")
   elapsed=$((now - last_check)) 2>/dev/null || elapsed=$CHECK_INTERVAL
@@ -53,14 +56,14 @@ fi
 now=$(date +%s 2>/dev/null || echo "0")
 
 # First run: record current tag and exit
-local_tag=$(read_lock "remote_tag")
+local_tag=$(read_field "version")
 if [ -z "$local_tag" ]; then
-  write_lock "$remote_tag" "$now"
+  write_version "$remote_tag" "$now"
   exit 0
 fi
 
 # Update last_check timestamp
-write_lock "$local_tag" "$now"
+write_version "$local_tag" "$now"
 
 # Compare — notify only when a new release is published
 if [ "$local_tag" != "$remote_tag" ]; then
