@@ -74,7 +74,7 @@ text-rendering: optimizeLegibility;
   width: 100%;
   max-width: 2048px;
   margin: 0 auto;
-  padding: var(--spacing-xxl);
+  padding: var(--spacing-l) var(--spacing-xxl) var(--spacing-xxl);
 }
 
 @media (max-width: 768px) {

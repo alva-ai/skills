@@ -279,7 +279,7 @@ Paragraph with `inline code`.
 .markdown-container th,
 .markdown-container td {
   padding: 12px; min-height: 180px;
-  border-bottom: 1px solid rgba(0,0,0,0.07);
+  border-bottom: 1px solid var(--line-l07);
   font-family: "Delight", -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 14px; line-height: 22px; letter-spacing: 0.14px;
   color: var(--text-n9); text-align: left;
@@ -550,7 +550,7 @@ The button component system contains **2 types** x **4 sizes** x **4 states** = 
 
 /* Focus State */
 .btn:focus-visible {
-  outline: 2px solid #49a3a6;
+  outline: 2px solid var(--main-m1);
   outline-offset: 2px;
 }
 ```
