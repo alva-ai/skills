@@ -473,6 +473,10 @@ Legend marker class by chart type:
    No duplicates. Grey (`--chart-grey-*`) only when ≥ 3 series.
 4. **ECharts is Canvas — `var(--xxx)` does NOT work.** Use raw hex/rgba
    in all ECharts configs. CSS variables remain correct for DOM styles.
+5. **Hidden containers (tab panels, modals) report 0×0 size.** When a
+   chart becomes visible after being hidden, call `chart.resize()`.
+   The [Tab JS](./design-components.md#js-interaction-1) handles this
+   automatically for tab switches.
 
 ### Axis Rules
 
