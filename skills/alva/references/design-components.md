@@ -957,15 +957,57 @@ border through their transparent border.
 
 ```html
 <!-- Pill M -->
-<div class="tab tab-pill">
-  <div class="tab-item active" data-text="Tab 1">Tab 1</div>
-  <div class="tab-item" data-text="Tab 2">Tab 2</div>
-  <div class="tab-item" data-text="Tab 3">Tab 3</div>
+<div class="tab tab-pill" data-tab-group="demo">
+  <div class="tab-item active" data-tab="tab1" data-text="Tab 1">Tab 1</div>
+  <div class="tab-item" data-tab="tab2" data-text="Tab 2">Tab 2</div>
+  <div class="tab-item" data-tab="tab3" data-text="Tab 3">Tab 3</div>
 </div>
 
-<!-- Underline S -->
-<div class="tab tab-underline tab-s">
-  <div class="tab-item active" data-text="Tab 1">Tab 1</div>
-  <div class="tab-item" data-text="Tab 2">Tab 2</div>
-</div>
+<!-- Tab panels — data-tab-panel value must match data-tab on the trigger -->
+<div data-tab-panel="tab1" data-tab-group="demo">Panel 1</div>
+<div data-tab-panel="tab2" data-tab-group="demo" style="display:none;">Panel 2</div>
+<div data-tab-panel="tab3" data-tab-group="demo" style="display:none;">Panel 3</div>
+```
+
+### JS Interaction
+
+```js
+// Tab switching — handles active state, panel visibility, and ECharts resize.
+// Include once per page. Works for all .tab groups via data-tab-group.
+document.querySelectorAll(".tab").forEach(function (tab) {
+  tab.addEventListener("click", function (e) {
+    var item = e.target.closest(".tab-item");
+    if (!item || item.classList.contains("active")) return;
+
+    var group = tab.dataset.tabGroup;
+
+    // Update active tab
+    tab.querySelectorAll(".tab-item").forEach(function (i) {
+      i.classList.remove("active");
+    });
+    item.classList.add("active");
+
+    // Switch panels
+    var panels = group
+      ? document.querySelectorAll('[data-tab-panel][data-tab-group="' + group + '"]')
+      : [];
+    panels.forEach(function (p) {
+      p.style.display = p.dataset.tabPanel === item.dataset.tab ? "" : "none";
+    });
+
+    // Resize ECharts instances inside the newly visible panel
+    // (hidden containers report 0×0, so charts need a resize after show)
+    var active = group
+      ? document.querySelector(
+          '[data-tab-panel="' + item.dataset.tab + '"][data-tab-group="' + group + '"]'
+        )
+      : null;
+    if (active) {
+      active.querySelectorAll("[_echarts_instance_]").forEach(function (el) {
+        var inst = echarts.getInstanceByDom(el);
+        if (inst) inst.resize();
+      });
+    }
+  });
+});
 ```

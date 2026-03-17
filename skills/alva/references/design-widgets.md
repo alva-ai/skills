@@ -160,7 +160,6 @@
 .table-row {
   display: flex;
   width: 100%;
-  min-width: max-content;             /* row + divider must span full scrollable width */
   gap: 16px;                          /* column spacing between cells */
   border-bottom: 1px solid var(--line-l07); /* row divider — on the row, not cells */
   /* min-width is set by initTableAlignment JS — do NOT use CSS min-width here */
@@ -474,6 +473,10 @@ Legend marker class by chart type:
    No duplicates. Grey (`--chart-grey-*`) only when ≥ 3 series.
 4. **ECharts is Canvas — `var(--xxx)` does NOT work.** Use raw hex/rgba
    in all ECharts configs. CSS variables remain correct for DOM styles.
+5. **Hidden containers (tab panels, modals) report 0×0 size.** When a
+   chart becomes visible after being hidden, call `chart.resize()`.
+   The [Tab JS](./design-components.md#js-interaction-1) handles this
+   automatically for tab switches.
 
 ### Axis Rules
 
