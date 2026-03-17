@@ -608,7 +608,7 @@ POST /api/v1/fs/grant
 GET /api/v1/fs/read?path=/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100  (public, no auth)
 ```
 
-### Step 5: Deploy as a cronjob (optional)
+### Step 5: Deploy as a cronjob (required for live playbooks)
 
 ```
 POST /api/v1/deploy/cronjob

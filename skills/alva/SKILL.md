@@ -116,6 +116,8 @@ After your data pipelines are deployed and producing data, build the playbook's
 web interface. Create HTML5 pages that read from Alva's data gateway and
 visualize the results. Follow the Alva Design System for styling, layout, and
 component guidelines.
+Unless the user explicitly asks for a static snapshot, default to a live playbook.
+A live playbook may mix live and static sections; only widgets that need fresh data must read cronjob-backed feeds at runtime.
 
 ### 7. Release
 
@@ -128,7 +130,6 @@ Three phases:
 3. **Call release API**: `POST /api/v1/release/playbook` — creates release
    DB records, uploads HTML to CDN, and writes release files to ALFS
    automatically. Returns `playbook_id` (numeric).
-
 Once released, the playbook is accessible at
 `https://alva.ai/<username>/playbooks/<playbook_id>` — ready to share with the
 world. Use the `playbook_id` from the release response and the username from
