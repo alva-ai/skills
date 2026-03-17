@@ -160,7 +160,6 @@
 .table-row {
   display: flex;
   width: 100%;
-  min-width: max-content;             /* row + divider must span full scrollable width */
   gap: 16px;                          /* column spacing between cells */
   border-bottom: 1px solid var(--line-l07); /* row divider — on the row, not cells */
   /* min-width is set by initTableAlignment JS — do NOT use CSS min-width here */
