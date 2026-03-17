@@ -246,12 +246,20 @@ markPoint: {
 └──────────────────────────────┘
 ```
 
+```html
+<div style="display:flex;flex-direction:column;gap:4px;">
+  <div style="font-size:11px;color:var(--text-n7);letter-spacing:0.12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Label</div>
+  <div style="font-size:18px;letter-spacing:0.2px;color:var(--main-m3);">+18.4%</div>
+  <div id="sparkline-xxx" style="width:100%;height:52px;"></div>
+</div>
+```
+
 | Element         | Spec                                                                                         |
 | --------------- | -------------------------------------------------------------------------------------------- |
 | Label           | 11px, Regular 400, `--text-n7`, letter-spacing 0.12px, single-line ellipsis                  |
 | Value           | 18px, Regular 400, letter-spacing 0.2px                                                      |
 | Value Color     | Positive `--main-m3`, negative `--main-m4`                                                   |
-| Sparkline       | Mini line chart, height 52px, full-width, no axis/labels                                     |
+| Sparkline       | ECharts mini line chart, height 52px, full-width, no axis/labels/grid/tooltip                |
 | Sparkline Color | Positive `--main-m3`, negative `--main-m4`                                                   |
 | Sparkline Fill  | `areaStyle.origin: 0`, gradient 0%→15% from zero axis toward the line; both sides when mixed |
 
@@ -334,6 +342,7 @@ Follows [Chart Card](./design-widgets.md#chart-card) spec. Business overrides:
 | Positive bar | `--main-m3`                                                                          |
 | Negative bar | `--main-m4`                                                                          |
 | Chart height | 224px (incl. padding, ECharts canvas 192px)                                          |
+| Y-axis range | auto (ECharts default min/max)                                                       |
 | DataZoom     | `inside` only (no slider); enables mouse wheel zoom and drag pan when data > 90 bars |
 
 ### 2.5 Drawdown Chart
@@ -536,9 +545,9 @@ All text in the signal card uses `--text-n9` except the ticker link.
 
 | Breakpoint | Behavior                                                                  |
 | ---------- | ------------------------------------------------------------------------- |
-| ≥ 1200px   | Performance Metrics: 6 columns                                            |
-| 900–1199px | Performance Metrics: 3×2 grid                                             |
-| < 900px    | Performance Metrics: 2×3; chart height reduced                            |
+| ≥ 1200px   | Performance Metrics: 6 columns (1 row)                                    |
+| 900–1199px | Performance Metrics: 3 columns × 2 rows (3 per row)                      |
+| < 900px    | Performance Metrics: 2 columns × 3 rows; chart height reduced            |
 | < 600px    | Metrics: single column; Symbol Pills: horizontal scroll; Feed: full width |
 
 ---
