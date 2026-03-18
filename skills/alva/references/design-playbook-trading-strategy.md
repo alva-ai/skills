@@ -141,7 +141,7 @@ is a UI projection contract, not a direct dump of Altra's raw ALFS directories.
 
 Title, Symbol Pills, selected symbol price, and chart stack vertically with gap = 16px (`--spacing-m`).
 
-Title row includes a Trade Log icon on the right: `order-l.svg` 16×16px, `--text-n9`; clicking opens a [Modal](./design-components.md#modal) containing a [Table](./design-widgets.md#table-card) of trade records.
+Title row includes a Trade Log icon on the right: `https://alva-ai-static.b-cdn.net/icons/order-l.svg` 16×16px, `--text-n9`; clicking opens a [Modal](./design-components.md#modal) containing a [Table](./design-widgets.md#table-card) of trade records.
 
 #### Symbol Pills Row
 
@@ -151,7 +151,7 @@ Uses [Pill S](./design-components.md#tab) style. Each pill contains:
 
 | Element      | Spec                                                                            |
 | ------------ | ------------------------------------------------------------------------------- |
-| Ticker Logo  | 14×14px, border-radius 50%, left of text                                        |
+| Ticker Logo  | 14×14px, border-radius 50%, left of text; fallback when no image: first letter of ticker in a colored circle (`--b-r07` bg, `--text-n7` text, 10px font) |
 | Position Dot | 5×5px, border-radius 50%, `--main-m1`, right of text; only for active positions |
 
 #### Selected Symbol Price
@@ -334,7 +334,7 @@ Follows [Table Card](./design-widgets.md#table-card) spec. Title-to-table gap: 1
 | Column       | Width     | Style                                                                                             |
 | ------------ | --------- | ------------------------------------------------------------------------------------------------- |
 | Symbol       | flex: 1.2 | 13px `--text-n9`                                                                                  |
-| Side         | flex: 1   | Tag: LONG = `--main-m3` bg + white; SHORT = `--main-m4` bg + white; CASH = `--text-n3` bg + white |
+| Side         | flex: 1   | [Tag](./design-components.md#tag): LONG = `.tag-bullish`; SHORT = `.tag-bearish`; CASH = `.tag-neutral` |
 | Quantity     | flex: 1.2 | Default text                                                                                      |
 | Market Value | flex: 1.2 | Prefixed with $                                                                                   |
 | Allocation   | flex: 1.2 | Percentage                                                                                        |
@@ -374,13 +374,21 @@ All charts follow [Chart Card](./design-widgets.md#chart-card) spec.
 
 ### Chart Selection Logic
 
-| Data Type              | Chart Format         | Examples                                         |
-| ---------------------- | -------------------- | ------------------------------------------------ |
-| Time-series            | Line Chart           | Cumulative return, portfolio value, drawdown     |
-| Categorical comparison | Bar Chart            | Returns by sector, factor contribution, win rate |
-| Distribution           | Histogram / Box Plot | Return distribution, holding period distribution |
-| Relationship           | Scatter Plot         | Factor score vs future return                    |
-| Screening / ranking    | Table (Screener)     | Top stocks, factor rankings                      |
+> **Supported chart types**: Line and Bar have full specs in
+> [design-widgets.md](./design-widgets.md#chart-card) (axis, tooltip, legend,
+> colors, hover). Table has full specs in
+> [design-widgets.md](./design-widgets.md#table-card). Use these three as
+> primary chart types. Histogram, Box Plot, and Scatter Plot may be used when
+> the data clearly requires them, but they lack detailed interaction specs —
+> apply the shared Chart Card axis/tooltip/color rules and keep styling minimal.
+
+| Data Type              | Chart Format                   | Examples                                         |
+| ---------------------- | ------------------------------ | ------------------------------------------------ |
+| Time-series            | **Line Chart** (fully spec'd)  | Cumulative return, portfolio value, drawdown     |
+| Categorical comparison | **Bar Chart** (fully spec'd)   | Returns by sector, factor contribution, win rate |
+| Distribution           | Histogram / Box Plot (basic)   | Return distribution, holding period distribution |
+| Relationship           | Scatter Plot (basic)           | Factor score vs future return                    |
+| Screening / ranking    | **Table** (fully spec'd)       | Top stocks, factor rankings                      |
 
 ### Layout
 
@@ -513,11 +521,11 @@ All text in the signal card uses `--text-n9` except the ticker link.
 | Element     | Spec                                                                                                        |
 | ----------- | ----------------------------------------------------------------------------------------------------------- |
 | Row height  | 28px                                                                                                        |
-| Ticker Logo | 20×20px, border-radius: 50%, flex-shrink: 0; from `tickerLogoUrl` in data                                   |
+| Ticker Logo | 20×20px, border-radius: 50%, flex-shrink: 0; from `tickerLogoUrl` in data (optional — fallback: first letter of ticker in a colored circle, `--b-r07` bg, `--text-n7` text, 12px font) |
 | Action      | 16px, Regular 400, `--text-n9`, line-height: 26px                                                           |
 | Ticker link | 16px, Medium 500, `--main-m1`, cursor pointer, line-height: 26px                                            |
 | Detail      | 16px, `--text-n9`, line-height: 26px                                                                        |
-| Trend icon  | 14×14px, CSS mask, flex-shrink: 0; up = `bullish-l.svg` + `--main-m3`, down = `bearish-l.svg` + `--main-m4` |
+| Trend icon  | 14×14px, CSS mask, flex-shrink: 0; up = `https://alva-ai-static.b-cdn.net/icons/bullish-l.svg` + `--main-m3`, down = `https://alva-ai-static.b-cdn.net/icons/bearish-l.svg` + `--main-m4` |
 
 **Signal format variants:**
 
@@ -553,10 +561,10 @@ All text in the signal card uses `--text-n9` except the ticker link.
 
 | Breakpoint | Behavior                                                                  |
 | ---------- | ------------------------------------------------------------------------- |
-| ≥ 1200px   | Performance Metrics: 6 columns (1 row)                                    |
-| 900–1199px | Performance Metrics: 3 columns × 2 rows (3 per row)                      |
+| ≥ 1280px   | Performance Metrics: 6 columns (1 row)                                    |
+| 900–1279px | Performance Metrics: 3 columns × 2 rows (3 per row)                      |
 | < 900px    | Performance Metrics: 2 columns × 3 rows; chart height reduced            |
-| < 600px    | Metrics: single column; Symbol Pills: horizontal scroll; Feed: full width |
+| < 768px    | Metrics: single column; Symbol Pills: horizontal scroll; Feed: full width |
 
 ---
 
@@ -747,8 +755,7 @@ page.
   "feed": {
     "signals": [
       {
-        "user": { "avatar": "...", "name": "YLLYGG" },
-        "strategy": { "name": "NASDAQ Ultimate AI Trader", "icon": "📈" },
+        "strategy": { "name": "NASDAQ Ultimate AI Trader" },
         "timestamp": "11/22/2025 16:30",
         "actions": [
           {
