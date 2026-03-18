@@ -33,33 +33,30 @@ The Tab Content Area switches content based on the active tab.
 
 ### Page Container (`.main-wrapper`)
 
-| Property | Value                                                        |
-| -------- | ------------------------------------------------------------ |
-| Padding  | `0 var(--spacing-xxl) var(--spacing-xxl)` (0 top, 28px rest) |
-| Layout   | `display: flex; flex-direction: column; flex: 1`             |
+| Property | Value                                                    |
+| -------- | -------------------------------------------------------- |
+| Padding  | `0`                                                      |
+| Layout   | `display: flex; flex-direction: column; flex: 1`         |
 
-The **top padding is intentionally 0** on `.main-wrapper` because it is owned by `.tab-bar-wrapper` (see §1.1). This ensures the 28px top gap scrolls with the sticky tab bar instead of being left behind. Left / right / bottom padding remains 28px. No content should break out of this padding.
+`.main-wrapper` has **no padding of its own** — all page-edge spacing comes from the parent `.playbook-container` (28px left/right on web, 16px on mobile). The **top padding is intentionally 0** because it is owned by `.tab-bar-wrapper` (see §1.1), which ensures the 28px top gap scrolls with the sticky tab bar.
 
 #### Mobile Override (≤ 768px)
 
-`.main-wrapper` sits inside `.playbook-container` which already provides 16px padding on mobile. To avoid double padding, **zero out** the inner wrapper's left/right/bottom padding and reduce the tab bar top padding:
+Only the tab bar top padding needs to be reduced on mobile:
 
 ```css
 @media (max-width: 768px) {
-  .main-wrapper {
-    padding: 0;
-  }
   .tab-bar-wrapper {
     padding-top: var(--spacing-m); /* 16px */
   }
 }
 ```
 
-**Result**: Web = 28px (from `.main-wrapper`), Mweb = 16px (from `.playbook-container` only).
+**Result**: Web = 28px (from `.playbook-container`), Mweb = 16px (from `.playbook-container`).
 
 ### Module Spacing
 
-All modules stack vertically with **24px** gap (`--spacing-xl`).
+All modules **inside each tab panel** stack vertically with **24px** gap (`--spacing-xl`). This gap is applied between sibling modules only — do not add extra margin/padding to bridge the playbook header and the tab bar (that gap is owned by `.tab-bar-wrapper`'s `padding-top`).
 
 ### Widget Title Size
 
