@@ -67,7 +67,7 @@ bash "<this skill's directory>/scripts/version_check.sh"
 ### 2. API Key
 
 Read `.alva.json` in this skill's directory. If `api_key` is missing or empty,
-ask the user for their Alva API key (available at https://alva.ai) and write it
+ask the user for their Alva API key (available at <https://alva.ai>) and write it
 to `.alva.json`. Do not proceed until a valid key is configured. Example format:
 
 ```json
@@ -156,7 +156,7 @@ specific paths so anyone -- or any playbook page -- can read the data.
 ### 6. Build the Playbook Web App
 
 After your data pipelines are deployed and producing data, build the playbook's
-web interface. Create HTML5 pages that read from Alva's data gateway and
+web interface. Create HTML5 pages with Alva Design System that read from Alva's data gateway and
 visualize the results. Follow the Alva Design System for styling, layout, and
 component guidelines. Unless the user explicitly asks for a static snapshot,
 default to a live playbook. A live playbook may mix live and static sections;
@@ -170,6 +170,11 @@ Three phases:
    `~/playbooks/{name}/index.html`.
 2. **Create playbook draft**: `POST /api/v1/draft/playbook` — creates DB
    records, writes draft files and `playbook.json` to ALFS automatically.
+   This request must include both the URL-safe `name` and the human-readable
+   `display_name`. Use `[subject/theme] [analysis angle/strategy logic]`, put
+   the subject/theme first, and keep it within 40 characters. Avoid personal
+   markers such as `My`, `Test`, or `V2`, and generic-only titles such as
+   `Stock Dashboard` or `Trading Bot`.
 3. **Call release API**: `POST /api/v1/release/playbook` — creates release DB
    records, uploads HTML to CDN, and writes release files to ALFS automatically.
    Returns `playbook_id` (numeric).
@@ -524,10 +529,12 @@ Every feed follows a 6-step lifecycle:
 2. **Upload** -- write script to `~/feeds/<name>/v1/src/index.js`
 3. **Test** -- `POST /api/v1/run` with `entry_path` to verify output
 4. **Grant** -- make feed data publicly readable:
+
    ```
    POST /api/v1/fs/grant
    {"path":"~/feeds/<name>","subject":"special:user:*","permission":"read"}
    ```
+
    Grant on the feed root path (not on `data/`). Subject format:
    `special:user:*` (public), `special:user:+` (authenticated only), `user:<id>`
    (specific user).
@@ -789,7 +796,7 @@ POST /api/v1/release/feed
 
 # 2. Create playbook draft (creates DB record + ALFS draft files automatically)
 POST /api/v1/draft/playbook
-{"name":"btc-dashboard","description":"BTC market dashboard","feeds":[{"feed_id":100}]}
+{"name":"btc-dashboard","display_name":"BTC Trend Dashboard","description":"BTC market dashboard","feeds":[{"feed_id":100}]}
 → {"playbook_id":99,"playbook_version_id":200}
 
 # 3. Release playbook (reads HTML from ALFS, uploads to CDN, writes release files automatically)
@@ -877,6 +884,9 @@ consistent read pattern (`@last`, `@range`, etc.).
 - **Always create a draft before releasing.** `POST /api/v1/release/playbook`
   requires the playbook to already exist (created via
   `POST /api/v1/draft/playbook`).
+- **Create new playbooks from scratch unless you are doing a version update.**
+  Only version updates may refer to an existing playbook. For all other new
+  playbooks, do not read existing ones.
 
 ---
 
