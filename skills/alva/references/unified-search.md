@@ -37,6 +37,43 @@ These are called directly by code, NOT exposed as ADK tools.
 
 ---
 
+## Data Model
+
+### Internal Metadata (not in feed schema)
+
+| Field | Values | Purpose |
+| ----- | ------ | ------- |
+| `_engagement_status` | `"ok"` / `"missing"` / `"failed"` | Distinguishes "real 0 engagement" from "scrape failed" |
+| `_time_confidence` | `"exact"` / `"approx"` / `"missing"` | Controls freshness weight decay |
+| `_age_str` | string | Raw age string from Brave (e.g. "18 hours ago") for display fallback |
+
+### Per-Source Defaults
+
+| Source | `_engagement_status` | `_time_confidence` |
+| ------ | -------------------- | ------------------- |
+| Twitter | `"ok"` (GrokX provides engagement) | `"exact"` if `created_at > 0`, else `"missing"` |
+| Reddit | `"ok"/"failed"` based on enrichment | `"exact"` if `created_utc` extracted, else `"approx"` from Brave age |
+| YouTube | `"ok"/"failed"` based on enrichment | `"approx"` from Brave age, else `"missing"` |
+| News | `"missing"` (no engagement metric) | `"approx"` from Brave age, else `"missing"` |
+
+### Time Semantics
+
+Only two time fields in feed schema:
+- **`published_at`** (number, ms) — real publish time from source. 0 when unavailable.
+- **`display_time`** (string) — computed before feed write. Frontend only reads this.
+
+Display time format:
+
+| Condition | Format |
+| --------- | ------ |
+| < 1 hour | `Nm ago` |
+| < 24 hours | `Nh ago` |
+| < 7 days | `Nd ago` |
+| >= 7 days | `Mon DD` (e.g. "Mar 15") |
+| No time info but has `_age_str` | Pass through Brave age string |
+
+---
+
 ## Phase 0: Entity Context (Code)
 
 Code-maintained alias map. LLM does NOT invent aliases — it only expands
@@ -44,10 +81,10 @@ search angles.
 
 ```javascript
 const entityContext = {
-  canonical_name: "Zcash",
-  ticker: "ZEC",                    // real trading symbol only; "" for non-ticker entities
-  aliases: ["Zcash", "$ZEC", "ZCash"],
-  related_terms: ["privacy coin", "zero-knowledge"],
+  canonical_name: "NVIDIA",
+  ticker: "NVDA",                   // real trading symbol only; "" for non-ticker entities
+  aliases: ["NVIDIA", "$NVDA", "Nvidia"],
+  related_terms: ["AI chips", "GPU", "data center"],
   excludeDomains: [],               // optional: e.g. ["polymarket.com"]
 };
 ```
@@ -55,6 +92,8 @@ const entityContext = {
 ---
 
 ## Phase 1: Query Planning (LLM)
+
+<!-- normative: planner prompt constraints are verified by ZEC/BTC cases -->
 
 Single LLM call — no tools, no ReAct loop. Generates search angles per source.
 
@@ -84,21 +123,10 @@ Time window: ${timeWindow}`,
   tools: [],
   maxTurns: 1,
 });
-
-let plan;
-try {
-  plan = JSON.parse(planResult.content);
-} catch (e) {
-  plan = {};
-}
-// Validate: ensure all source arrays exist, default to empty
-const defaultSources = { twitter: [], news: [], reddit: [], youtube: [] };
-plan.sources = { ...defaultSources, ...(plan.sources || {}) };
-for (const key of Object.keys(defaultSources)) {
-  if (!Array.isArray(plan.sources[key])) plan.sources[key] = [];
-}
-plan.intent = plan.intent || userIntent;
 ```
+
+**Validation**: parse with try/catch, default all four source arrays to `[]`,
+fallback `plan.intent` to `userIntent`.
 
 ---
 
@@ -108,154 +136,75 @@ Code controls the loop: per-source, per-query, with dedup and fallback.
 
 ### Configuration
 
-```javascript
-const SEARCH_CONFIG = {
-  twitter:  { target: 15, min_unique: 5 },
-  news:     { target: 15, min_unique: 5 },
-  reddit:   { target: 15, min_unique: 3 },
-  youtube:  { target: 10, min_unique: 2 },
-};
-```
+| Source | Target | Min Unique |
+| ------ | ------ | ---------- |
+| Twitter | 15 | 5 |
+| News | 15 | 5 |
+| Reddit | 15 | 3 |
+| YouTube | 10 | 2 |
 
 ### Time Window Mapping
 
-Derive provider-specific time filters from the requested time window.
+Derive provider-specific time filters from the requested window. When a
+provider cannot represent the window exactly, use the **next wider** bucket —
+ranking handles extra recall, but missing items can't be recovered.
 
-```javascript
-function resolveTimeFilters(timeWindow) {
-  const windowMs = {
-    "24h": 86400000, "1d": 86400000, "today": 86400000,
-    "3d": 3 * 86400000, "1w": 7 * 86400000, "week": 7 * 86400000,
-    "2w": 14 * 86400000, "1m": 30 * 86400000, "month": 30 * 86400000,
-  }[timeWindow] || 7 * 86400000;
+| Window | `fromDate` | Serper `tbs` | Brave `freshness` |
+| ------ | ---------- | ------------ | ----------------- |
+| `24h` / `1d` / `today` | 1 day ago | `qdr:d` | `pd` |
+| `3d` | 3 days ago | `qdr:w` (wider) | `pw` (wider) |
+| `1w` / `week` | 7 days ago | `qdr:w` | `pw` |
+| `2w` | 14 days ago | `qdr:m` (wider) | `pm` (wider) |
+| `1m` / `month` | 30 days ago | `qdr:m` | `pm` |
 
-  // When Serper/Brave can't represent the window exactly, use the next WIDER
-  // bucket. Ranking handles the extra recall; missing items can't be recovered.
-  const serperTbs = {
-    "24h": "qdr:d", "1d": "qdr:d", "today": "qdr:d",
-    "3d": "qdr:w",  "1w": "qdr:w", "week": "qdr:w",
-    "2w": "qdr:m",  "1m": "qdr:m", "month": "qdr:m",
-  }[timeWindow] || "qdr:w";
+Default (unrecognized): 7 days / `qdr:w` / `pw`.
 
-  const braveFreshness = {
-    "24h": "pd", "1d": "pd", "today": "pd",
-    "3d": "pw",  "1w": "pw", "week": "pw",
-    "2w": "pm",  "1m": "pm", "month": "pm",
-  }[timeWindow] || "pw";
+### URL Whitelist
 
-  return { fromDate: new Date(Date.now() - windowMs).toISOString().slice(0, 10), tbs: serperTbs, freshness: braveFreshness, windowMs };
-}
+Only accept enrichable detail pages. Drop channel pages, playlists, subreddit homepages.
+
+- **YouTube**: `/watch?v=`, `/shorts/`, `youtu.be/{id}`
+- **Reddit**: `/r/{sub}/comments/`
+
+### Execution Rules
+
+```
+resolve time filters from timeWindow
+for each source in [twitter, news, reddit, youtube]:
+  queries = expandQueries(plan.sources[source], entity)
+  for each query:
+    if source.length >= target: break
+    call source-specific SDK with time filters
+    classifyResults → dedup by URL → push to bucket
+  // Brave supplement for news (first 2 queries)
+  if source == news: also search Brave
+
+if any source.length < min_unique:
+  run deterministic fallback queries (no LLM)
+
+deduplicateByTitle(reddit)  // cross-post dedup via Jaccard > 0.8
 ```
 
-### URL Filters
+**Query expansion**: start with planner queries, then append `entity.ticker`,
+`entity.canonical_name`, and all `entity.aliases` (skip empty strings).
+
+**Fallback query templates** (deterministic, per source):
+
+| Source | Templates |
+| ------ | --------- |
+| Twitter | `{each alias}`, `"${ticker}"`, `{ticker} price` |
+| News | `{each alias} news`, `{canonical_name} latest` (with `type:"news"`) |
+| Reddit | `{each alias} site:reddit.com` |
+| YouTube | `{each alias} site:youtube.com` |
+
+**Fallback preserves source-specific search mode**: news keeps `type:"news"`,
+Twitter keeps `from_date`, all keep time window filters.
+
+### classifyResults (normative)
+
+<!-- normative: SDK field mapping verified against real Serper/Brave responses -->
 
 ```javascript
-// Only accept enrichable detail pages, not channels/playlists/subreddit homepages
-function isValidYouTubeUrl(url) {
-  return /(?:youtube\.com\/watch\?v=|youtube\.com\/shorts\/|youtu\.be\/)/.test(url);
-}
-function isValidRedditUrl(url) {
-  return /reddit\.com\/r\/\w+\/comments\//.test(url);
-}
-```
-
-### Execution Loop
-
-```javascript
-const { searchGrokX } = require("@arrays/data/widget-scrap/search-grok-x:v1.0.0");
-const { getSerperSearch } = require("@arrays/data/widget-scrap/serper-search:v1.0.0");
-const { searchBrave } = require("@arrays/data/widget-scrap/search-brave:v1.0.0");
-
-function executeSearch(plan, entity, config, timeWindow) {
-  const { fromDate, tbs, freshness } = resolveTimeFilters(timeWindow);
-  const results = { twitter: [], news: [], youtube: [], reddit: [] };
-  const seenUrls = new Set();
-
-  // --- Twitter via GrokX ---
-  const twQueries = expandQueries(plan.sources.twitter, entity);
-  for (const q of twQueries) {
-    if (results.twitter.length >= config.twitter.target) break;
-    const r = searchGrokX({ query: q, from_date: fromDate, max_search_results: 15 });
-    for (const t of r.response?.data || []) {
-      if (!t.url || seenUrls.has(t.url)) continue;
-      seenUrls.add(t.url);
-      const ca = typeof t.created_at === "string" ? new Date(t.created_at).getTime() : (t.created_at || 0);
-      results.twitter.push({
-        content: t.content || "", author_name: t.author_name || "",
-        author_username: t.author_username || "", author_avatar: t.author_avatar || "",
-        published_at: ca, like_count: t.like_count || 0,
-        retweet_count: t.retweet_count || 0, reply_count: t.reply_count || 0, url: t.url,
-        _engagement_status: "ok", _time_confidence: ca > 0 ? "exact" : "missing",
-      });
-    }
-  }
-
-  // --- News via Serper + Brave ---
-  const newsQueries = expandQueries(plan.sources.news, entity);
-  for (const q of newsQueries) {
-    if (results.news.length >= config.news.target) break;
-    const r = getSerperSearch({ q, type: "news", tbs, num: 10 });
-    classifyResults(r.response?.data || [], results, seenUrls, entity);
-  }
-  for (const q of newsQueries.slice(0, 2)) {
-    if (results.news.length >= config.news.target) break;
-    const r = searchBrave({ query: q, freshness, count: 10 });
-    classifyResults(r.response?.data || [], results, seenUrls, entity);
-  }
-
-  // --- Reddit via Serper ---
-  const rdQueries = expandQueries(plan.sources.reddit, entity).map(q =>
-    q.includes("site:reddit.com") ? q : `${q} site:reddit.com`
-  );
-  for (const q of rdQueries) {
-    if (results.reddit.length >= config.reddit.target) break;
-    const r = getSerperSearch({ q, tbs, num: 10 });
-    classifyResults(r.response?.data || [], results, seenUrls, entity);
-  }
-
-  // --- YouTube via Serper ---
-  const ytQueries = expandQueries(plan.sources.youtube, entity).map(q =>
-    q.includes("site:youtube.com") ? q : `${q} site:youtube.com`
-  );
-  for (const q of ytQueries) {
-    if (results.youtube.length >= config.youtube.target) break;
-    const r = getSerperSearch({ q, tbs, num: 10 });
-    classifyResults(r.response?.data || [], results, seenUrls, entity);
-  }
-
-  // --- Fallback: if any source below min_unique ---
-  for (const [source, cfg] of Object.entries(config)) {
-    if (results[source].length < cfg.min_unique) {
-      const fallbackQs = getFallbackQueries(source, entity);
-      for (const q of fallbackQs) {
-        if (results[source].length >= cfg.min_unique) break;
-        runFallbackSearch(source, q, results, seenUrls, entity, fromDate, tbs);
-      }
-    }
-  }
-
-  // --- Reddit title-level dedup ---
-  deduplicateByTitle(results.reddit);
-
-  return results;
-}
-```
-
-### Helper Functions
-
-```javascript
-// Expand planner queries with ticker, canonical name, and all aliases
-function expandQueries(plannerQueries, entity) {
-  const expanded = [...plannerQueries];
-  for (const term of [entity.ticker, entity.canonical_name, ...entity.aliases]) {
-    if (term && !expanded.includes(term)) expanded.push(term);
-  }
-  return expanded;
-}
-
-// Classify Serper/Brave results into source buckets by URL
-// Serper fields: title, link, snippet, date (index time), source
-// Brave fields: title, url, description (may have HTML), age, date (index time), source
 function classifyResults(data, results, seenUrls, entity) {
   const excludeDomains = entity.excludeDomains || [];
   for (const item of data) {
@@ -297,63 +246,6 @@ function classifyResults(data, results, seenUrls, entity) {
     // URLs matching youtube/reddit domain but not detail page pattern are dropped
   }
 }
-
-// Deterministic fallback queries — no LLM involved
-function getFallbackQueries(source, entity) {
-  const { ticker, canonical_name, aliases } = entity;
-  const allNames = [...new Set([ticker, canonical_name, ...aliases])].filter(Boolean);
-  const base = {
-    twitter: [...allNames, ...(ticker ? [`"$${ticker}"`, `${ticker} price`] : [])],
-    news:    [...allNames.map(n => `${n} news`), `${canonical_name} latest`],
-    reddit:  allNames.map(n => `${n} site:reddit.com`),
-    youtube: allNames.map(n => `${n} site:youtube.com`),
-  };
-  return base[source] || [];
-}
-
-function runFallbackSearch(source, query, results, seenUrls, entity, fromDate, tbs) {
-  if (source === "twitter") {
-    const r = searchGrokX({ query, from_date: fromDate, max_search_results: 15 });
-    for (const t of r.response?.data || []) {
-      if (!t.url || seenUrls.has(t.url)) continue;
-      seenUrls.add(t.url);
-      const ca = typeof t.created_at === "string" ? new Date(t.created_at).getTime() : (t.created_at || 0);
-      results.twitter.push({
-        content: t.content || "", author_name: t.author_name || "",
-        author_username: t.author_username || "", author_avatar: t.author_avatar || "",
-        published_at: ca, like_count: t.like_count || 0,
-        retweet_count: t.retweet_count || 0, reply_count: t.reply_count || 0, url: t.url,
-        _engagement_status: "ok", _time_confidence: ca > 0 ? "exact" : "missing",
-      });
-    }
-  } else if (source === "news") {
-    const r = getSerperSearch({ q: query, type: "news", tbs, num: 10 });
-    classifyResults(r.response?.data || [], results, seenUrls, entity);
-  } else {
-    const r = getSerperSearch({ q: query, tbs, num: 10 });
-    classifyResults(r.response?.data || [], results, seenUrls, entity);
-  }
-}
-
-// Reddit cross-post dedup: normalize title and drop near-duplicates
-function deduplicateByTitle(items) {
-  const normalize = (s) => s.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim();
-  const wordSet = (s) => new Set(normalize(s).split(/\s+/));
-  const jaccard = (a, b) => {
-    const inter = [...a].filter(x => b.has(x)).length;
-    const union = new Set([...a, ...b]).size;
-    return union === 0 ? 0 : inter / union;
-  };
-  const seen = [];
-  for (let i = items.length - 1; i >= 0; i--) {
-    const ws = wordSet(items[i].title);
-    if (seen.some(s => jaccard(ws, s) > 0.8)) {
-      items.splice(i, 1);
-    } else {
-      seen.push(ws);
-    }
-  }
-}
 ```
 
 ---
@@ -362,7 +254,14 @@ function deduplicateByTitle(items) {
 
 Loop every Reddit/YouTube URL. Set `_engagement_status` based on result.
 
-### Reddit
+For each Reddit item: call `scrapeReddit` → write `score`, `num_comments`,
+`published_at` (from `created_utc`), update `_engagement_status` and
+`_time_confidence`. For each YouTube item: call `scrapeYouTube` → write
+`views`, `likes`, `thumbnail`, update `_engagement_status`.
+
+### scrapeReddit (normative)
+
+<!-- normative: regex patterns verified against Reddit JSON endpoint -->
 
 ```javascript
 async function scrapeReddit(url) {
@@ -383,7 +282,9 @@ async function scrapeReddit(url) {
 }
 ```
 
-### YouTube
+### scrapeYouTube (normative)
+
+<!-- normative: regex patterns for views/likes parsing -->
 
 ```javascript
 async function scrapeYouTube(url) {
@@ -415,69 +316,35 @@ function extractVideoId(url) {
 }
 ```
 
-### Enrichment Loop
-
-```javascript
-for (const r of results.reddit) {
-  const eng = await scrapeReddit(r.url);
-  r.score = eng.score;
-  r.num_comments = eng.num_comments;
-  r._engagement_status = eng.ok ? "ok" : "failed";
-  if (eng.created_utc > 0) {
-    r.published_at = eng.created_utc;
-    r._time_confidence = "exact";
-  }
-}
-
-for (const y of results.youtube) {
-  const eng = await scrapeYouTube(y.url);
-  y.views = eng.views;
-  y.likes = eng.likes;
-  y._engagement_status = eng.ok ? "ok" : "failed";
-  const vid = extractVideoId(y.url);
-  if (vid) y.thumbnail = "https://img.youtube.com/vi/" + vid + "/mqdefault.jpg";
-}
-```
-
 ---
 
 ## Phase 4: Rank (Hybrid)
 
 Two code-computed scores + two LLM-computed scores. Final formula in code.
 
-### Internal Metadata (not in feed schema)
+### LLM Scoring
 
-| Field | Values | Purpose |
-| ----- | ------ | ------- |
-| `_engagement_status` | `"ok"` / `"missing"` / `"failed"` | Distinguishes "real 0 engagement" from "scrape failed" |
-| `_time_confidence` | `"exact"` / `"approx"` / `"missing"` | Controls freshness weight decay |
+Call `adk.agent({ tools: [], maxTurns: 1 })` per source. Input: item titles +
+descriptions + URLs. Output schema:
 
-### Display Time
-
-Computed before feed write. Frontend only reads this field.
-
-```javascript
-function computeDisplayTime(publishedAt, ageStr) {
-  const now = Date.now();
-  let diffMs = 0;
-  if (publishedAt > 0) {
-    diffMs = now - publishedAt;
-  } else if (ageStr) {
-    return ageStr; // already human-readable from Brave
-  } else {
-    return "";
-  }
-  const mins = Math.floor(diffMs / 60000);
-  if (mins < 60) return `${mins}m ago`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d ago`;
-  return new Date(publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+```json
+{
+  "items": [
+    { "index": 0, "relevance": 0.0, "quality": 0.0 },
+    ...
+  ]
 }
 ```
 
-### Code Scores
+- **relevance** (0-1): how directly the item addresses the user's intent
+- **quality** (0-1): signal-to-noise ratio; prefer original analysis over reposts
+
+Use original `userIntent` for scoring, NOT `plan.intent`. Score ALL items (no
+short-circuit for small sets). On parse failure, fall back to 0.5 for both.
+
+### Scoring & Ranking (normative)
+
+<!-- normative: weights, decay factors, and engagement_status handling -->
 
 ```javascript
 // Parse Brave "age" strings ("2 days ago", "18 hours ago") into ms timestamp
@@ -503,10 +370,8 @@ function computeCodeScores(items, source, windowMs) {
   for (const item of items) {
     let ts = item.published_at || 0;
     if (!ts && item._age_str) ts = parseAge(item._age_str);
-
     if (ts > 0) {
       const raw = Math.max(0, 1 - (now - ts) / maxAge);
-      // Decay if time is approximate
       item._freshness = item._time_confidence === "approx" ? raw * 0.7 : raw;
     } else {
       item._freshness = 0.5; // unknown = neutral
@@ -526,64 +391,11 @@ function computeCodeScores(items, source, windowMs) {
       }
     }
   } else {
-    // News: no engagement metric available
-    for (const item of items) item._engagement = 0.5;
+    for (const item of items) item._engagement = 0.5; // news: no metric
   }
-
   return items;
 }
-```
 
-### LLM Scores (Strict JSON)
-
-```javascript
-async function computeLLMScores(items, source, userIntent) {
-  if (items.length === 0) return [];
-
-  const rankResult = await adk.agent({
-    system: `You are a content ranker. Score each item on two dimensions.
-Return ONLY valid JSON matching this schema — no markdown, no prose:
-{
-  "items": [
-    { "index": 0, "relevance": 0.0, "quality": 0.0 },
-    ...
-  ]
-}
-
-Scoring guide:
-- relevance (0-1): How directly does this item address the user's intent?
-- quality (0-1): Signal-to-noise ratio. Prefer original analysis over reposts, specific data over vague commentary.
-
-Score ALL items. Use the full 0-1 range.`,
-    prompt: `User intent: "${userIntent}"
-Source: ${source}
-Items: ${JSON.stringify(items.map((item, i) => ({
-      index: i,
-      title: item.title || item.content?.substring(0, 100) || "",
-      description: item.summary || item.description || "",
-      url: item.url,
-    })))}`,
-    tools: [],
-    maxTurns: 1,
-  });
-
-  try {
-    const parsed = JSON.parse(rankResult.content);
-    const scoreMap = new Map(parsed.items.map(s => [s.index, s]));
-    return items.map((item, i) => ({
-      ...item,
-      _relevance: scoreMap.get(i)?.relevance ?? 0.5,
-      _quality: scoreMap.get(i)?.quality ?? 0.5,
-    }));
-  } catch (e) {
-    return items.map(item => ({ ...item, _relevance: 0.5, _quality: 0.5 }));
-  }
-}
-```
-
-### Final Ranking
-
-```javascript
 const WEIGHTS = { freshness: 0.2, engagement: 0.4, relevance: 0.25, quality: 0.15 };
 
 function rankItems(items, topN = 10) {
@@ -596,30 +408,18 @@ function rankItems(items, topN = 10) {
   items.sort((a, b) => b._score - a._score);
   return items.slice(0, topN);
 }
-
-// Usage per source — use original userIntent, not plan.intent
-const { windowMs } = resolveTimeFilters(timeWindow);
-for (const source of ["twitter", "news", "reddit", "youtube"]) {
-  computeCodeScores(results[source], source, windowMs);
-  results[source] = await computeLLMScores(results[source], source, userIntent);
-  results[source] = rankItems(results[source], 10);
-}
-
-// Compute display_time for all items before feed write
-for (const source of ["twitter", "news", "reddit", "youtube"]) {
-  for (const item of results[source]) {
-    item.display_time = computeDisplayTime(item.published_at, item._age_str);
-  }
-}
 ```
+
+After ranking, compute `display_time` for all items before feed write.
 
 ---
 
 ## Feed Card Schemas
 
-Internal fields (`_engagement_status`, `_time_confidence`, `_age_str`, `_freshness`,
-`_engagement`, `_relevance`, `_quality`, `_score`) are NOT written to the feed.
-Only the fields listed below are persisted and exposed to frontends.
+Internal fields (`_engagement_status`, `_time_confidence`, `_age_str`,
+`_freshness`, `_engagement`, `_relevance`, `_quality`, `_score`) are NOT
+written to the feed. Only the fields below are persisted and exposed to
+frontends.
 
 ### Twitter
 
