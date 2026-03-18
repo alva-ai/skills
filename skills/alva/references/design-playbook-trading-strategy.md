@@ -38,7 +38,7 @@ The Tab Content Area switches content based on the active tab.
 | Padding  | `0`                                                      |
 | Layout   | `display: flex; flex-direction: column; flex: 1`         |
 
-`.main-wrapper` has **no padding of its own** — all page-edge spacing comes from the parent `.playbook-container` (28px left/right on web, 16px on mobile). The **top padding is intentionally 0** because it is owned by `.tab-bar-wrapper` (see §1.1), which ensures the 28px top gap scrolls with the sticky tab bar.
+`.main-wrapper` has **no padding of its own** — all page-edge spacing comes from the parent `.playbook-container` (28px left/right on web, 16px on mobile). The **top padding is intentionally 0** because it is owned by `.tab-bar-wrapper` (see §1.1), which ensures the 24px top gap scrolls with the sticky tab bar.
 
 #### Mobile Override (≤ 768px)
 
@@ -56,7 +56,18 @@ Only the tab bar top padding needs to be reduced on mobile:
 
 ### Module Spacing
 
-All modules **inside each tab panel** stack vertically with **24px** gap (`--spacing-xl`). This gap is applied between sibling modules only — do not add extra margin/padding to bridge the playbook header and the tab bar (that gap is owned by `.tab-bar-wrapper`'s `padding-top`).
+All modules **inside each tab panel** stack vertically with **24px** gap (`--spacing-xl`).
+
+```css
+.tab-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);        /* 24px between sibling modules */
+  padding-top: var(--spacing-xl); /* 24px from tab bar to first module */
+}
+```
+
+The `padding-top` on `.tab-panel` is the **only** spacing between the tab bar and the first module (e.g. Meta Info Bar). Do not add extra `margin-top` on the first child or extra `margin-bottom`/`padding-bottom` on `.tab-bar-wrapper`.
 
 ### Widget Title Size
 
@@ -71,7 +82,7 @@ All modules **inside each tab panel** stack vertically with **24px** gap (`--spa
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Items          | Overview · Analytics · Strategy · Feed                                                                                                                                                                                               |
 | Style          | [Underline M](./design-components.md#tab) — class `.tab .tab-underline`                                                                                                                                                             |
-| Position       | `.tab-bar-wrapper`: `position: sticky`, `top: 0`, `z-index: 100`, `background: var(--b0-page)`, `padding-top: var(--spacing-xxl)` (28px) — the wrapper **owns the top padding** so it travels with the sticky element; when pinned at `top: 0` the 28px gap above the tabs is preserved |
+| Position       | `.tab-bar-wrapper`: `position: sticky`, `top: 0`, `z-index: 100`, `background: var(--b0-page)`, `padding-top: var(--spacing-xl)` (24px) — the wrapper **owns the top padding** so it travels with the sticky element; when pinned at `top: 0` the 24px gap above the tabs is preserved |
 | Bottom Divider | 1px solid var(--line-l07) on `.tab-bar-wrapper`. Active indicator and container border sit on the **same line** — apply `margin-bottom: -1px` to `.tab-item` so the 2px indicator overlaps the 1px border                            |
 | URL Routing    | Each tab has a unique URL hash (`#overview`, `#analytics`, `#strategy`, `#feed`); on load, activate tab matching hash. Use `history.replaceState()` (not `window.location.hash`) to update the hash without triggering a scroll jump |
 
@@ -98,7 +109,7 @@ All modules **inside each tab panel** stack vertically with **24px** gap (`--spa
 
 ### 1.2 Meta Info Bar
 
-Sits directly below the Tab Bar; **fields vary per tab**.
+Sits directly below the Tab Bar; **fields vary per tab**. The gap between the tab bar and the meta bar is already provided by `.tab-panel`'s `padding-top` — do **not** add any `padding-top` or `margin-top` to `.meta-bar`.
 
 | Property         | Value                                                                    |
 | ---------------- | ------------------------------------------------------------------------ |

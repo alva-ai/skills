@@ -1007,6 +1007,9 @@ document.querySelectorAll(".tab").forEach(function (tab) {
         var inst = echarts.getInstanceByDom(el);
         if (inst) inst.resize();
       });
+      active.querySelectorAll(".table-card").forEach(function (el) {
+        if (typeof initTableAlignment === "function") initTableAlignment(el);
+      });
     }
   });
 });

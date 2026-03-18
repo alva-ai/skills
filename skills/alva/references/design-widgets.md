@@ -475,8 +475,9 @@ Legend marker class by chart type:
    in all ECharts configs. CSS variables remain correct for DOM styles.
 5. **Hidden containers (tab panels, modals) report 0×0 size.** When a
    chart becomes visible after being hidden, call `chart.resize()`.
-   The [Tab JS](./design-components.md#js-interaction-1) handles this
-   automatically for tab switches.
+   Likewise, `initTableAlignment` must re-run for tables that were
+   hidden. The [Tab JS](./design-components.md#js-interaction-1) handles
+   both automatically for tab switches.
 
 ### Axis Rules
 
