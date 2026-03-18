@@ -12,28 +12,32 @@ customizes them per the user's preferences, and deploys a new playbook.
 The Remix prompt arrives in this shape:
 
 ```
-Create a customized version based on this Playbook template:
+Use Alva skill to remix this Playbook(@alice/btc-momentum) into my own version:
 
-1. Keep the core strategy logic
-2. Adjust parameters to my investment preferences
-3. Add stop-loss / take-profit rules matching my risk appetite
+1. Customize it based on my preferences
+2. Deploy as a new playbook under my account
 
-Playbook Owner: alice
-Playbook Name: btc-momentum
+If I don't specify what to change, ask me what I'd like to customize.
 ```
 
-Extract two fields:
+The `@{owner}/{name}` token after "Playbook(" contains the two key fields:
 
-| Field            | Description                                  |
-| ---------------- | -------------------------------------------- |
-| `Playbook Owner` | Username of the original creator             |
-| `Playbook Name`  | Filesystem name (URL-safe slug used in ALFS) |
+| Field   | Description                                  | Extracted From        |
+| ------- | -------------------------------------------- | --------------------- |
+| `owner` | Username of the original creator             | Before the `/`        |
+| `name`  | Filesystem name (URL-safe slug used in ALFS) | After the `/`         |
+
+For the example above: owner = `alice`, name = `btc-momentum`.
 
 Together they resolve to the ALFS base path:
 
 ```
 /alva/home/{owner}/playbooks/{name}/
 ```
+
+**Behavior note**: If the user's prompt does not specify what to change (only
+the default "Customize it based on my preferences"), the agent should **ask the
+user what they'd like to customize** before proceeding.
 
 ---
 
@@ -136,12 +140,18 @@ POST /api/v1/remix
 
 ## Example
 
-Given:
+Given prompt:
 
 ```
-Playbook Owner: alice
-Playbook Name: btc-momentum
+Use Alva skill to remix this Playbook(@alice/btc-momentum) into my own version:
+
+1. Customize it based on my preferences
+2. Deploy as a new playbook under my account
+
+Add a summary section at the bottom.
 ```
+
+Extracted: owner = `alice`, name = `btc-momentum`.
 
 Agent reads:
 
