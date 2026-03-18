@@ -86,7 +86,7 @@ text-rendering: optimizeLegibility;
 
 ## Playbook Header
 
-Every playbook starts with a **Title** and **Description Card** above all other content (including tab bars). Gap between them follows widget grid (`--spacing-xl`, 24px).
+Every playbook starts with a **Title** and **Description Card** above all other content (including tab bars). Title-to-description gap is 24px (`--spacing-xl`), applied as `margin-bottom` on `.playbook-title`. **Do not add any margin to `.playbook-desc`** — the gap below it is owned by `.tab-bar-wrapper`'s `padding-top`.
 
 ```css
 /* AI-generated summary title */
@@ -95,7 +95,7 @@ Every playbook starts with a **Title** and **Description Card** above all other 
   line-height: 34px;
   font-weight: 400;
   color: var(--text-n9);
-  margin: 0;
+  margin: 0 0 var(--spacing-xl) 0; /* 24px bottom = gap to .playbook-desc */
 }
 
 /* 3–4 sentences: data sources and purpose */
