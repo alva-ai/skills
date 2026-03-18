@@ -182,10 +182,11 @@ construct this URL.
 ### 8. Remix (Create from Existing Playbook)
 
 Users can remix any published playbook to create a customized version. The Remix
-prompt includes the source playbook's owner username and playbook name. The
-agent reads the source playbook's feed scripts (strategy logic) and HTML
-(dashboard UI), customizes them per the user's request, and deploys a new
-playbook under their own namespace.
+prompt uses the format `@{owner}/{name}` to identify the source playbook — e.g.
+`Playbook(@alice/btc-momentum)`. The agent reads the source playbook's feed
+scripts (strategy logic) and HTML (dashboard UI), customizes them per the user's
+request, and deploys a new playbook under their own namespace. If the user does
+not specify what to change, the agent should ask before proceeding.
 
 See [remix-workflow.md](references/remix-workflow.md) for the full step-by-step
 guide.
