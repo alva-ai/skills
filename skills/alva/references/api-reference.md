@@ -437,16 +437,27 @@ POST /api/v1/draft/playbook
 
 Create a new playbook with a draft version.
 
-| Field       | Type   | Required | Description                                                            |
-| ----------- | ------ | -------- | ---------------------------------------------------------------------- |
-| name        | string | yes      | URL-safe playbook name (e.g. `btc-dashboard`), must be unique per user |
-| description | string | no       | Short description of the playbook                                      |
-| feeds       | array  | yes      | Feed references `[{feed_id, feed_major?}]`                             |
+Requires both a URL-safe `name` and a human-readable `display_name`.
+
+| Field        | Type   | Required | Description                                                            |
+| ------------ | ------ | -------- | ---------------------------------------------------------------------- |
+| name         | string | yes      | URL-safe playbook name (e.g. `btc-dashboard`), must be unique per user |
+| display_name | string | yes      | Human-readable playbook title, max 40 chars                            |
+| description  | string | no       | Short description of the playbook                                      |
+| feeds        | array  | yes      | Feed references `[{feed_id, feed_major?}]`                             |
+
+`display_name` conventions:
+
+- Format: `[subject/theme] [analysis angle/strategy logic]`
+- Max 40 characters
+- Avoid personal markers such as `My`, `Test`, or `V2`
+- Avoid generic-only titles such as `Stock Dashboard` or `Trading Bot`
 
 ```
 POST /api/v1/draft/playbook
 {
   "name": "btc-dashboard",
+  "display_name": "BTC Trend Dashboard",
   "description": "BTC market dashboard with price, technicals, and volume",
   "feeds": [{"feed_id": 100}]
 }
@@ -467,7 +478,7 @@ Release an existing playbook for public hosting. Reads the playbook HTML from
 | name      | string | yes      | URL-safe playbook name (must already exist) |
 | version   | string | yes      | SemVer (e.g. `v1.0.0`)                      |
 | feeds     | array  | yes      | Feed references `[{feed_id, feed_major?}]`  |
-| changelog | string | no       | Release changelog                           |
+| changelog | string | yes      | Release changelog                           |
 
 Feed reference fields:
 
@@ -576,7 +587,9 @@ under `/api/v1/playbook/`. Auth (API key or JWT) is required.
 ### Create Comment
 
 ```
+
 POST /api/v1/playbook/comment
+
 ```
 
 Create a top-level comment or a reply to an existing comment.
@@ -765,4 +778,5 @@ All errors return: `{"error":{"code":"...","message":"..."}}`
 | 500         | INTERNAL          | Server error                       |
 
 ---
+
 ```
