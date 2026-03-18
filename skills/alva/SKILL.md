@@ -190,7 +190,8 @@ Three phases:
 Once released, the playbook is accessible at
 `https://alva.ai/u/<username>/playbooks/<playbook_name>` — ready to share with
 the world. Use the playbook `name` and the username from `GET /api/v1/me` to
-construct this URL.
+construct this URL. After a successful release, post a creator's note — see
+[creators-note.md](references/creators-note.md).
 
 ### 8. Remix (Create from Existing Playbook)
 
@@ -219,6 +220,7 @@ guide.
 | [remix-workflow.md](references/remix-workflow.md)       | Remix: create a new playbook from an existing template                                                     |
 | [adk.md](references/adk.md)                             | Agent Development Kit: `adk.agent()` API, tool calling, ReAct loop, examples                               |
 | [unified-search.md](references/unified-search.md)       | Unified Search: LLM plan → code execute → enrich → hybrid rank (news, social, video)                      |
+| [creators-note.md](references/creators-note.md)         | Post-release creator's note: workflow, content guidance, API calls                                          |
 
 ---
 
