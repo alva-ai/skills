@@ -61,6 +61,24 @@ Get an API key at [alva.ai](https://alva.ai), then add it to your agent's enviro
 }
 ```
 
+### Auto-Update
+
+The Alva skill automatically checks for updates on first use each session. If a
+newer version is available, your agent will display a notification:
+
+```
+Alva skill update available.
+  Installed: v1.0.0
+  Latest:    v1.2.0
+Update with one of:
+  npx skills update
+  clawhub update alva
+  git clone https://github.com/alva-ai/skills ./tmp/alva-skills && cp -r ./tmp/alva-skills/skills/alva/* "<skill-dir>/" && rm -rf ./tmp/alva-skills
+```
+
+The check is silent when your skill is up to date. It runs at most once every 8
+hours and fails gracefully offline.
+
 ### 3. Build
 
 Ask your agent to build something:

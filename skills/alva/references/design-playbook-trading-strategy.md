@@ -33,33 +33,41 @@ The Tab Content Area switches content based on the active tab.
 
 ### Page Container (`.main-wrapper`)
 
-| Property | Value                                                        |
-| -------- | ------------------------------------------------------------ |
-| Padding  | `0 var(--spacing-xxl) var(--spacing-xxl)` (0 top, 28px rest) |
-| Layout   | `display: flex; flex-direction: column; flex: 1`             |
+| Property | Value                                                    |
+| -------- | -------------------------------------------------------- |
+| Padding  | `0`                                                      |
+| Layout   | `display: flex; flex-direction: column; flex: 1`         |
 
-The **top padding is intentionally 0** on `.main-wrapper` because it is owned by `.tab-bar-wrapper` (see §1.1). This ensures the 28px top gap scrolls with the sticky tab bar instead of being left behind. Left / right / bottom padding remains 28px. No content should break out of this padding.
+`.main-wrapper` has **no padding of its own** — all page-edge spacing comes from the parent `.playbook-container` (28px left/right on web, 16px on mobile). The **top padding is intentionally 0** because it is owned by `.tab-bar-wrapper` (see §1.1), which ensures the 24px top gap scrolls with the sticky tab bar.
 
 #### Mobile Override (≤ 768px)
 
-`.main-wrapper` sits inside `.playbook-container` which already provides 16px padding on mobile. To avoid double padding, **zero out** the inner wrapper's left/right/bottom padding and reduce the tab bar top padding:
+Only the tab bar top padding needs to be reduced on mobile:
 
 ```css
 @media (max-width: 768px) {
-  .main-wrapper {
-    padding: 0;
-  }
   .tab-bar-wrapper {
     padding-top: var(--spacing-m); /* 16px */
   }
 }
 ```
 
-**Result**: Web = 28px (from `.main-wrapper`), Mweb = 16px (from `.playbook-container` only).
+**Result**: Web = 28px (from `.playbook-container`), Mweb = 16px (from `.playbook-container`).
 
 ### Module Spacing
 
-All modules stack vertically with **24px** gap (`--spacing-xl`).
+All modules **inside each tab panel** stack vertically with **24px** gap (`--spacing-xl`).
+
+```css
+.tab-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);        /* 24px between sibling modules */
+  padding-top: var(--spacing-xl); /* 24px from tab bar to first module */
+}
+```
+
+The `padding-top` on `.tab-panel` is the **only** spacing between the tab bar and the first module (e.g. Meta Info Bar). Do not add extra `margin-top` on the first child or extra `margin-bottom`/`padding-bottom` on `.tab-bar-wrapper`.
 
 ### Widget Title Size
 
@@ -74,7 +82,7 @@ All modules stack vertically with **24px** gap (`--spacing-xl`).
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Items          | Overview · Analytics · Strategy · Feed                                                                                                                                                                                               |
 | Style          | [Underline M](./design-components.md#tab) — class `.tab .tab-underline`                                                                                                                                                             |
-| Position       | `.tab-bar-wrapper`: `position: sticky`, `top: 0`, `z-index: 100`, `background: var(--b0-page)`, `padding-top: var(--spacing-xxl)` (28px) — the wrapper **owns the top padding** so it travels with the sticky element; when pinned at `top: 0` the 28px gap above the tabs is preserved |
+| Position       | `.tab-bar-wrapper`: `position: sticky`, `top: 0`, `z-index: 100`, `background: var(--b0-page)`, `padding-top: var(--spacing-xl)` (24px) — the wrapper **owns the top padding** so it travels with the sticky element; when pinned at `top: 0` the 24px gap above the tabs is preserved |
 | Bottom Divider | 1px solid var(--line-l07) on `.tab-bar-wrapper`. Active indicator and container border sit on the **same line** — apply `margin-bottom: -1px` to `.tab-item` so the 2px indicator overlaps the 1px border                            |
 | URL Routing    | Each tab has a unique URL hash (`#overview`, `#analytics`, `#strategy`, `#feed`); on load, activate tab matching hash. Use `history.replaceState()` (not `window.location.hash`) to update the hash without triggering a scroll jump |
 
@@ -101,7 +109,7 @@ All modules stack vertically with **24px** gap (`--spacing-xl`).
 
 ### 1.2 Meta Info Bar
 
-Sits directly below the Tab Bar; **fields vary per tab**.
+Sits directly below the Tab Bar; **fields vary per tab**. The gap between the tab bar and the meta bar is already provided by `.tab-panel`'s `padding-top` — do **not** add any `padding-top` or `margin-top` to `.meta-bar`.
 
 | Property         | Value                                                                    |
 | ---------------- | ------------------------------------------------------------------------ |
@@ -246,12 +254,20 @@ markPoint: {
 └──────────────────────────────┘
 ```
 
+```html
+<div style="display:flex;flex-direction:column;gap:4px;">
+  <div style="font-size:11px;color:var(--text-n7);letter-spacing:0.12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Label</div>
+  <div style="font-size:18px;letter-spacing:0.2px;color:var(--main-m3);">+18.4%</div>
+  <div id="sparkline-xxx" style="width:100%;height:52px;"></div>
+</div>
+```
+
 | Element         | Spec                                                                                         |
 | --------------- | -------------------------------------------------------------------------------------------- |
 | Label           | 11px, Regular 400, `--text-n7`, letter-spacing 0.12px, single-line ellipsis                  |
 | Value           | 18px, Regular 400, letter-spacing 0.2px                                                      |
 | Value Color     | Positive `--main-m3`, negative `--main-m4`                                                   |
-| Sparkline       | Mini line chart, height 52px, full-width, no axis/labels                                     |
+| Sparkline       | ECharts mini line chart, height 52px, full-width, no axis/labels/grid/tooltip                |
 | Sparkline Color | Positive `--main-m3`, negative `--main-m4`                                                   |
 | Sparkline Fill  | `areaStyle.origin: 0`, gradient 0%→15% from zero axis toward the line; both sides when mixed |
 
@@ -334,6 +350,7 @@ Follows [Chart Card](./design-widgets.md#chart-card) spec. Business overrides:
 | Positive bar | `--main-m3`                                                                          |
 | Negative bar | `--main-m4`                                                                          |
 | Chart height | 224px (incl. padding, ECharts canvas 192px)                                          |
+| Y-axis range | auto (ECharts default min/max)                                                       |
 | DataZoom     | `inside` only (no slider); enables mouse wheel zoom and drag pan when data > 90 bars |
 
 ### 2.5 Drawdown Chart
@@ -536,9 +553,9 @@ All text in the signal card uses `--text-n9` except the ticker link.
 
 | Breakpoint | Behavior                                                                  |
 | ---------- | ------------------------------------------------------------------------- |
-| ≥ 1200px   | Performance Metrics: 6 columns                                            |
-| 900–1199px | Performance Metrics: 3×2 grid                                             |
-| < 900px    | Performance Metrics: 2×3; chart height reduced                            |
+| ≥ 1200px   | Performance Metrics: 6 columns (1 row)                                    |
+| 900–1199px | Performance Metrics: 3 columns × 2 rows (3 per row)                      |
+| < 900px    | Performance Metrics: 2 columns × 3 rows; chart height reduced            |
 | < 600px    | Metrics: single column; Symbol Pills: horizontal scroll; Feed: full width |
 
 ---
