@@ -89,8 +89,16 @@ two-step retrieval flow:
 | `etf_fundamentals` | ETF holdings breakdown. |
 | `macro_and_economics_data` | CPI, GDP, unemployment, federal funds rate, Treasury rates, PPI, consumer sentiment, VIX, TIPS, nonfarm payroll, retail sales, recession probability, etc. (20 modules) |
 | `technical_indicator_calculation_helpers` | 50+ pure calculation helpers: RSI, MACD, Bollinger Bands, ATR, VWAP, Ichimoku, Parabolic SAR, KDJ, OBV, etc. Input your own price arrays. |
-| `feed_widgets` | Social & news data feeds: news, Twitter/X, YouTube, Reddit, podcasts, web search (Brave, Grok). |
+| `feed_widgets` | Social & news subscription feeds: news, Twitter/X, YouTube, Reddit, podcasts. For subscribing to specific accounts/channels. |
+| `unified_search` | 4-phase pipeline (LLM plan → code execute → code enrich → hybrid rank) across Twitter, News, YouTube, Reddit. Topic-based discovery. See [unified-search.md](references/unified-search.md). |
 | `ask` | General news and market articles. |
+
+**Unstructured content routing — two paths:**
+
+| User need | Path | Example |
+| --------- | ---- | ------- |
+| Subscribe to specific accounts/channels | `feed_widgets` (subscription feeds) | "Follow @saylor on Twitter", "Subscribe to r/Bitcoin" |
+| Discover content about a topic | `unified_search` (LLM plan → code execute → code enrich → hybrid rank) | "Find hottest BTC discussions today", "What's trending about AI?" |
 
 You can also bring your own data by uploading files to ALFS or fetching from
 external HTTP APIs within the runtime.
@@ -147,6 +155,7 @@ world. Use the `playbook_id` from the release response and the username from
 | [deployment.md](references/deployment.md)                                             | Deploying scripts as cronjobs for scheduled execution                             |
 | [design-system.md](references/design-system.md)                                       | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
 | [adk.md](references/adk.md)                                                           | Agent Development Kit: `adk.agent()` API, tool calling, ReAct loop, examples      |
+| [unified-search.md](references/unified-search.md)                                     | Unified Search: LLM plan → code execute → enrich → hybrid rank (news, social, video) |
 
 ---
 
