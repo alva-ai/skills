@@ -10,9 +10,41 @@ metadata:
   version: v1.0.0
 ---
 
+# Alva
+
+## What is Alva
+
+Alva is an agentic finance platform. It provides unified access to 250+
+financial data sources spanning crypto, equities, ETFs, macroeconomic
+indicators, on-chain analytics, and social sentiment -- including spot and
+futures OHLCV, funding rates, company fundamentals, price targets, insider and
+senator trades, earnings estimates, CPI, GDP, Treasury rates, exchange flows,
+DeFi metrics, news feeds, social media and more!
+
+## What Alva Skills Enables
+
+The Alva skill connects any AI agent or IDE to the full Alva platform. With
+it you can:
+
+- **Access financial data** -- query any of Alva's 250+ data SDKs
+  programmatically, or bring your own data via HTTP API or direct upload.
+- **Run cloud-side analytics** -- write JavaScript that executes on Alva Cloud
+  in a secure runtime. No local compute, no dependencies, no infrastructure to
+  manage.
+- **Build agentic playbooks** -- create data pipelines, trading strategies, and
+  scheduled automations that run continuously on Alva Cloud.
+- **Deploy trading strategies** -- backtest with the Altra trading engine and
+  run continuous live paper trading.
+- **Release and share** -- turn your work into a hosted playbook web app at
+  `https://alva.ai/<username>/playbooks/<playbook_id>`, and share it with the world.
+
+In short: turn your ideas into a forever-running finance agent that gets things
+done for you.
+
 ## Pre-flight
 
-**On first use in each session**, perform these checks in order:
+**CRITICAL — On first use in each session**, you MUST run these checks
+before doing anything else. Do NOT skip this section:
 
 ### 1. Version Check
 
@@ -45,37 +77,6 @@ Set the `ALVA_API_KEY` environment variable from this value for all subsequent
 API calls in this session.
 
 ---
-
-# Alva
-
-## What is Alva
-
-Alva is an agentic finance platform. It provides unified access to 250+
-financial data sources spanning crypto, equities, ETFs, macroeconomic
-indicators, on-chain analytics, and social sentiment -- including spot and
-futures OHLCV, funding rates, company fundamentals, price targets, insider and
-senator trades, earnings estimates, CPI, GDP, Treasury rates, exchange flows,
-DeFi metrics, news feeds, social media and more!
-
-## What Alva Skills Enables
-
-The Alva skill connects any AI agent or IDE to the full Alva platform. With
-it you can:
-
-- **Access financial data** -- query any of Alva's 250+ data SDKs
-  programmatically, or bring your own data via HTTP API or direct upload.
-- **Run cloud-side analytics** -- write JavaScript that executes on Alva Cloud
-  in a secure runtime. No local compute, no dependencies, no infrastructure to
-  manage.
-- **Build agentic playbooks** -- create data pipelines, trading strategies, and
-  scheduled automations that run continuously on Alva Cloud.
-- **Deploy trading strategies** -- backtest with the Altra trading engine and
-  run continuous live paper trading.
-- **Release and share** -- turn your work into a hosted playbook web app at
-  `https://alva.ai/<username>/playbooks/<playbook_id>`, and share it with the world.
-
-In short: turn your ideas into a forever-running finance agent that gets things
-done for you.
 
 ## Capabilities & Common Workflows
 
