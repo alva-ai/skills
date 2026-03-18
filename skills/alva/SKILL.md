@@ -10,42 +10,6 @@ metadata:
   version: v1.0.0
 ---
 
-## Pre-flight
-
-**On first use in each session**, perform these checks in order:
-
-### 1. Version Check
-
-Run the version check script at `scripts/version_check.sh` inside this skill's
-directory:
-
-```bash
-bash "<this skill's directory>/scripts/version_check.sh"
-```
-
-- **No output** → skill is up to date. Proceed normally.
-- **Output present** → display the message to the user, then apply the update
-  using the appropriate method for how the skill was installed. Proceed normally
-  after the update completes.
-
-### 2. API Key
-
-Read `.alva.json` in this skill's directory. If `api_key` is missing or empty,
-ask the user for their Alva API key (available at https://alva.ai) and write it
-to `.alva.json`. Do not proceed until a valid key is configured. Example format:
-
-```json
-{
-  "api_key": "alva_...",
-  "last_check": 0
-}
-```
-
-Set the `ALVA_API_KEY` environment variable from this value for all subsequent
-API calls in this session.
-
----
-
 # Alva
 
 ## What is Alva
@@ -80,6 +44,43 @@ you can:
 
 In short: turn your ideas into a forever-running finance agent that gets things
 done for you.
+
+## Pre-flight
+
+**CRITICAL — On first use in each session**, you MUST run these checks
+before doing anything else. Do NOT skip this section:
+
+### 1. Version Check
+
+Run the version check script at `scripts/version_check.sh` inside this skill's
+directory:
+
+```bash
+bash "<this skill's directory>/scripts/version_check.sh"
+```
+
+- **No output** → skill is up to date. Proceed normally.
+- **Output present** → display the message to the user, then apply the update
+  using the appropriate method for how the skill was installed. Proceed normally
+  after the update completes.
+
+### 2. API Key
+
+Read `.alva.json` in this skill's directory. If `api_key` is missing or empty,
+ask the user for their Alva API key (available at https://alva.ai) and write it
+to `.alva.json`. Do not proceed until a valid key is configured. Example format:
+
+```json
+{
+  "api_key": "alva_...",
+  "last_check": 0
+}
+```
+
+Set the `ALVA_API_KEY` environment variable from this value for all subsequent
+API calls in this session.
+
+---
 
 ## Capabilities & Common Workflows
 
