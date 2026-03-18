@@ -5,6 +5,7 @@
 - [Dropdown](#dropdown)
 - [Markdown](#markdown)
 - [Button](#button)
+- [Tag](#tag)
 - [Switch](#switch)
 - [Modal](#modal)
 - [Select](#select)
@@ -274,21 +275,20 @@ Paragraph with `inline code`.
   border: none; margin: 4px 0;
 }
 
-/* ── Table ── */
-.markdown-container table { width: 100%; border-collapse: collapse; }
+/* ── Table ── follows Table Card rules (design-widgets.md) */
+.markdown-container table { width: 100%; border-collapse: separate; border-spacing: 16px 0; margin: 0 -16px; }
 .markdown-container th,
 .markdown-container td {
-  padding: 12px; min-height: 180px;
+  padding: 12px 0;
   border-bottom: 1px solid var(--line-l07);
   font-family: "Delight", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400;
   font-size: 14px; line-height: 22px; letter-spacing: 0.14px;
   color: var(--text-n9); text-align: left;
+  max-height: 180px;
 }
-.markdown-container th { font-weight: 500; padding-top: 0; }
-.markdown-container th:first-child,
-.markdown-container td:first-child { padding-left: 0; }
-.markdown-container th:last-child,
-.markdown-container td:last-child { padding-right: 0; }
+.markdown-container th { color: var(--text-n7); padding-top: 0; padding-bottom: 12px; }
+.markdown-container tr:last-child td { border-bottom: none; }
 .markdown-container td code { margin: 0; }
 
 /* ── Link ── */
@@ -425,7 +425,7 @@ The button component system contains **2 types** x **4 sizes** x **4 states** = 
 /* Primary Button */
 .btn-primary {
   background-color: var(--main-m1);
-  color: white;
+  color: var(--b-common-white);
 }
 
 .btn-primary:hover:not(.btn-disabled) {
@@ -437,7 +437,7 @@ The button component system contains **2 types** x **4 sizes** x **4 states** = 
 }
 
 .btn-primary.btn-disabled {
-  background-color: white;
+  background-color: var(--b0-container);
   color: var(--text-n2);
   cursor: not-allowed;
   border: 0.5px solid var(--line-l3);
@@ -531,7 +531,7 @@ The button component system contains **2 types** x **4 sizes** x **4 states** = 
   left: 50%;
   margin-left: -7px;
   margin-top: -7px;
-  border: 1px solid white;
+  border: 1px solid var(--b-common-white);
   border-radius: 50%;
   border-top-color: transparent;
   animation: btn-spin 0.6s linear infinite;
@@ -557,61 +557,216 @@ The button component system contains **2 types** x **4 sizes** x **4 states** = 
 
 ---
 
-## Switch
+## Tag
 
 ### 1. Overview
 
-Switch is a sliding toggle component used to represent boolean state (on/off). The system contains **3 sizes** x **4 states** = 12 combinations
+Tags are compact labels used to display status, category, or classification. The system contains **3 semantic variants** × **3 sizes** = 9 combinations, plus a neutral default.
+
+### 2. CSS
+
+```css
+.tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Delight", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400;
+  white-space: nowrap;
+  border-radius: var(--radius-ct-s);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Size — Medium */
+.tag-md {
+  height: 26px;
+  padding: 2px 8px;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+}
+
+/* Size — Small (default) */
+.tag {
+  height: 22px;
+  padding: 1px 6px;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
+}
+
+/* Size — Extra Small */
+.tag-xs {
+  height: 18px;
+  padding: 1px 6px;
+  font-size: 10px;
+  line-height: 16px;
+  letter-spacing: 0.1px;
+  border-radius: var(--radius-ct-xs);
+}
+
+/* Variant — Default */
+.tag {
+  background-color: var(--b-r05);
+  color: var(--text-n9);
+}
+
+/* Variant — Bullish (LONG) */
+.tag-bullish {
+  background-color: var(--main-m3);
+  color: var(--b-common-white);
+}
+
+/* Variant — Bearish (SHORT) */
+.tag-bearish {
+  background-color: var(--main-m4);
+  color: var(--b-common-white);
+}
+
+/* Variant — Neutral (CASH) */
+.tag-neutral {
+  background-color: var(--text-n3);
+  color: var(--b-common-white);
+}
+```
+
+### 3. HTML
+
+```html
+<!-- Bullish (LONG) / Bearish (SHORT) / Neutral (CASH) / Default -->
+<span class="tag tag-bullish">LONG</span>
+<span class="tag tag-bearish">SHORT</span>
+<span class="tag tag-neutral">CASH</span>
+<span class="tag">Label</span>
+
+<!-- Small -->
+<span class="tag tag-sm tag-bullish">LONG</span>
+
+<!-- Extra Small -->
+<span class="tag tag-xs tag-bearish">SHORT</span>
+```
 
 ---
 
-### 2. Props
+## Switch
 
-| Prop       | Type                         | Default | Description           |
-| ---------- | ---------------------------- | ------- | --------------------- |
-| `size`     | `'sm'` \| `'md'` \| `'lg'`   | `'md'`  | Switch size           |
-| `checked`  | `boolean`                    | `false` | Whether on            |
-| `disabled` | `boolean`                    | `false` | Whether disabled      |
-| `onChange` | `(checked: boolean) => void` | —       | State toggle callback |
+Sliding toggle for boolean state (on/off). **3 sizes** × **4 states** = 12 combinations. Ratio rule: thumb diameter = track height × 2/3, thumb spacing = track height × 1/6.
 
----
+### CSS
 
-### 3. Color Token
+```css
+.switch {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: background-color 0.2s ease;
+}
 
-#### Colors
+/* Track — Off */
+.switch {
+  background-color: var(--b-r1);
+}
 
-| Token       | Value            | Description                |
-| ----------- | ---------------- | -------------------------- |
-| `track-off` | `var(--b-r1)`    | Off state track background |
-| `track-on`  | `var(--main-m1)` | On state track background  |
-| `thumb`     | `#FFFFFF`        | Thumb color (fixed)        |
+/* Track — On */
+.switch.on {
+  background-color: var(--main-m1);
+}
 
-#### Sizes
+/* Thumb */
+.switch-thumb {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--b-common-white);
+  border-radius: 50%;
+  transition: left 0.2s ease;
+}
 
-| Size | Track (W x H) | Thumb Diameter | Thumb Spacing | Track Border Radius |
-| ---- | ------------- | -------------- | ------------- | ------------------- |
-| `sm` | 24 x 12 px    | 8 px           | 2 px          | 100 px              |
-| `md` | 32 x 16 px    | 10.67 px       | 2.67 px       | 1000 px             |
-| `lg` | 40 x 20 px    | 13.33 px       | 3.33 px       | 166.67 px           |
+/* Disabled */
+.switch.disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.switch.disabled:not(.on) { opacity: 0.4; }
+.switch.disabled.on { opacity: 0.3; }
 
----
+/* Size — Medium (default) */
+.switch {
+  width: 32px;
+  height: 16px;
+  border-radius: 1000px;
+}
+.switch .switch-thumb {
+  width: 10.67px;
+  height: 10.67px;
+  left: 2.67px;
+}
+.switch.on .switch-thumb {
+  left: calc(100% - 10.67px - 2.67px);
+}
 
-> **Ratio rule**: Thumb diameter = Track height x 2/3, Thumb spacing = Track height x 1/6.
+/* Size — Small */
+.switch-sm {
+  width: 24px;
+  height: 12px;
+  border-radius: 100px;
+}
+.switch-sm .switch-thumb {
+  width: 8px;
+  height: 8px;
+  left: 2px;
+}
+.switch-sm.on .switch-thumb {
+  left: calc(100% - 8px - 2px);
+}
 
-#### States and Opacity
+/* Size — Large */
+.switch-lg {
+  width: 40px;
+  height: 20px;
+  border-radius: 166.67px;
+}
+.switch-lg .switch-thumb {
+  width: 13.33px;
+  height: 13.33px;
+  left: 3.33px;
+}
+.switch-lg.on .switch-thumb {
+  left: calc(100% - 13.33px - 3.33px);
+}
+```
 
-| State          | Track Color | Thumb Position | opacity |
-| -------------- | ----------- | -------------- | ------- |
-| Off + Default  | `track-off` | Left           | `1`     |
-| Off + Disabled | `track-off` | Left           | `0.4`   |
-| On + Default   | `track-on`  | Right          | `1`     |
-| On + Disabled  | `track-on`  | Right          | `0.3`   |
+### HTML
 
-### 4. Structure
+```html
+<!-- Medium (default), off -->
+<div class="switch" role="switch" aria-checked="false">
+  <div class="switch-thumb"></div>
+</div>
 
-```text
-[Track]                  — Track container, overflow: hidden, pill-shaped border radius
-  └─ [Thumb]             — Thumb, absolutely positioned, vertically centered (top:50% + translateY(-50%))
+<!-- Medium, on -->
+<div class="switch on" role="switch" aria-checked="true">
+  <div class="switch-thumb"></div>
+</div>
+
+<!-- Small, disabled -->
+<div class="switch switch-sm disabled" role="switch" aria-checked="false" aria-disabled="true">
+  <div class="switch-thumb"></div>
+</div>
+```
+
+### JS Interaction
+
+```js
+document.querySelectorAll(".switch:not(.disabled)").forEach(function (sw) {
+  sw.addEventListener("click", function () {
+    var isOn = sw.classList.toggle("on");
+    sw.setAttribute("aria-checked", isOn);
+  });
+});
 ```
 
 ---
@@ -664,13 +819,6 @@ Modal                        ← Overlay
 | Text Color     | `var(--text-n9)`                        |
 
 ### Close Icon
-
-| Property       | Value                                                 |
-| -------------- | ----------------------------------------------------- |
-| Icon Name      | `close-l1`                                            |
-| Container Size | `18 x 18px`                                           |
-| Icon URL       | `https://alva-ai-static.b-cdn.net/icons/close-l1.svg` |
-| Fill Color     | `var(--text-n9)`                                      |
 
 **CSS**
 
@@ -725,22 +873,94 @@ Modal                        ← Overlay
 
 ## Select
 
-### Basic Information
+Clicking the Select container triggers the associated [Dropdown](#dropdown). Dropdown width defaults to the same width as the Select. Dropdown list item text size follows the Select size. Clicking again or clicking outside closes the Dropdown. Arrow icon always points down and does not rotate.
 
-| Property         | Value                               |
-| ---------------- | ----------------------------------- |
-| Background Color | `var(--b0-container)`               |
-| Font             | `Delight`                           |
-| Font Weight      | `400`                               |
-| Border Style     | `0.5px solid`                       |
-| Icon viewBox     | `0 0 20 20`                         |
-| Text Overflow    | `text-ellipsis + whitespace-nowrap` |
-
-### Arrow Icon
-
-**CSS**
+### CSS
 
 ```css
+.select {
+  display: flex;
+  align-items: center;
+  background-color: var(--b0-container);
+  cursor: pointer;
+  position: relative;
+  font-family: "Delight", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400;
+  transition: border-color 0.12s ease;
+}
+
+.select-border {
+  position: absolute;
+  inset: 0;
+  border: 0.5px solid var(--line-l3);
+  border-radius: inherit;
+  pointer-events: none;
+  transition: border-color 0.12s ease;
+}
+
+.select:hover .select-border {
+  border-color: var(--text-n9);
+}
+
+.select-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-n3);
+}
+
+/* Filled state — has a selected value */
+.select.filled .select-text {
+  color: var(--text-n9);
+}
+
+.select:hover .select-text {
+  color: var(--text-n9);
+}
+
+.select.filled .select-icon {
+  opacity: 0.2;
+}
+
+/* Size — Large */
+.select-lg {
+  height: 48px;
+  padding: 11px 16px;
+  gap: 8px;
+  border-radius: 6px;
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: 0.16px;
+}
+
+/* Size — Medium (default) */
+.select {
+  height: 40px;
+  padding: 8px 12px;
+  gap: 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+}
+
+/* Size — Small */
+.select-sm {
+  height: 28px;
+  padding: 4px 8px;
+  gap: 4px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
+}
+.select-sm .select-text {
+  width: 70px;
+  flex: none;
+}
+
+/* Arrow Icon */
 .select-icon {
   flex-shrink: 0;
   display: flex;
@@ -762,97 +982,86 @@ Modal                        ← Overlay
 }
 ```
 
-**HTML**
+### HTML Template
 
 ```html
-<!-- Large / Medium: 14x14 -->
-<div class="select-icon" style="width:14px;height:14px;">
-  <img src="https://alva-ai-static.b-cdn.net/icons/arrow-down-f2.svg" alt="" />
+<!-- Medium Select (default, placeholder state) -->
+<div class="select" data-select="demo">
+  <div class="select-border"></div>
+  <span class="select-text">Select option</span>
+  <div class="select-icon" style="width:14px;height:14px;">
+    <img src="https://alva-ai-static.b-cdn.net/icons/arrow-down-f2.svg" alt="" />
+  </div>
 </div>
 
-<!-- Small: 12x12 -->
-<div class="select-icon" style="width:12px;height:12px;">
-  <img src="https://alva-ai-static.b-cdn.net/icons/arrow-down-f2.svg" alt="" />
+<!-- Medium Select (filled state) -->
+<div class="select filled" data-select="demo">
+  <div class="select-border"></div>
+  <span class="select-text">Selected Value</span>
+  <div class="select-icon" style="width:14px;height:14px;">
+    <img src="https://alva-ai-static.b-cdn.net/icons/arrow-down-f2.svg" alt="" />
+  </div>
+</div>
+
+<!-- Associated Dropdown (hidden by default, shown on click) -->
+<div class="dropdown" style="display:none;" data-dropdown="demo">
+  <div class="dropdown-border"></div>
+  <div class="list-item" data-value="opt1">
+    <div class="list-item-inner">
+      <span class="list-item-text">Option 1</span>
+      <span class="list-item-check"></span>
+    </div>
+  </div>
+  <div class="list-item" data-value="opt2">
+    <div class="list-item-inner">
+      <span class="list-item-text">Option 2</span>
+      <span class="list-item-check"></span>
+    </div>
+  </div>
 </div>
 ```
 
-### Size Variants
+### JS Interaction
 
-| Property       | Large                | Medium               | Small                |
-| -------------- | -------------------- | -------------------- | -------------------- |
-| Height         | `48px`               | `40px`               | `28px`               |
-| Padding        | `16px / 11px`        | `12px / 8px`         | `8px / 4px`          |
-| Border Radius  | `6px`                | `4px`                | `4px`                |
-| Font Size      | `16px`               | `14px`               | `12px`               |
-| Line Height    | `26px`               | `22px`               | `20px`               |
-| Letter Spacing | `0.16px`             | `0.14px`             | `0.12px`             |
-| Gap            | `8px`                | `8px`                | `4px`                |
-| Icon Size      | `14px`               | `14px`               | `12px`               |
-| Text Width     | `flex: 1 (adaptive)` | `flex: 1 (adaptive)` | `flex: 1 (adaptive)` |
+```js
+// Select + Dropdown toggle
+document.querySelectorAll("[data-select]").forEach(function (sel) {
+  var name = sel.dataset.select;
+  var dd = document.querySelector('[data-dropdown="' + name + '"]');
+  if (!dd) return;
 
----
+  sel.addEventListener("click", function (e) {
+    e.stopPropagation();
+    var isOpen = dd.style.display !== "none";
+    dd.style.display = isOpen ? "none" : "";
+    sel.classList.toggle("open", !isOpen);
+  });
 
-### Click Behavior
+  dd.querySelectorAll(".list-item").forEach(function (item) {
+    item.addEventListener("click", function () {
+      dd.querySelectorAll(".list-item").forEach(function (i) {
+        i.classList.remove("selected");
+      });
+      item.classList.add("selected");
+      var text = item.querySelector(".list-item-text").textContent;
+      sel.querySelector(".select-text").textContent = text;
+      sel.classList.add("filled");
+      dd.style.display = "none";
+      sel.classList.remove("open");
+    });
+  });
+});
 
-Clicking the Select container triggers the associated [Dropdown](#dropdown).
-
-- Dropdown width defaults to the same width as the Select container
-- Dropdown list item text size follows the Select size (see table below)
-- Clicking again or clicking outside the area closes the Dropdown
-- Arrow icon always points down and does not rotate with toggle state
-
----
-
-### Interaction States
-
-Each size includes 3 states.
-
-#### Default
-
-- Border color: `var(--line-l3)`
-- Text color: `var(--text-n3)`
-- Arrow color: `var(--text-n2)`
-
-#### Hover
-
-- Border color: `var(--text-n9)`
-- Text color: `var(--text-n9)`
-- Arrow color: `var(--text-n9)`
-
-#### Filled
-
-- Border color: `var(--line-l3)`
-- Text color: `var(--text-n9)`
-- Icon opacity: `0.2`
-
----
-
-### Layout Structure
-
+// Close on outside click
+document.addEventListener("click", function () {
+  document.querySelectorAll("[data-dropdown]").forEach(function (dd) {
+    dd.style.display = "none";
+  });
+  document.querySelectorAll("[data-select]").forEach(function (sel) {
+    sel.classList.remove("open");
+  });
+});
 ```
-Select Container (flex, items-center)
-├── Border Overlay (absolute inset-0, pointer-events-none)
-├── Text Label (flex: 1, ellipsis overflow)
-└── Icon Wrapper (shrink-0, flex, items-center, justify-center)
-    └── Arrow Down SVG
-```
-
-- Container uses `flex + items-center` for horizontal layout
-- Border is implemented via an `absolute inset-0` overlay with `pointer-events-none`
-- Text area uses `flex: 1` for adaptive width (except Small size, which is fixed at 70px)
-- Icon area uses `shrink-0` to prevent being compressed
-
----
-
-### Dropdown List Item Text Specification
-
-The font size, line height, and letter spacing of Dropdown list items match the triggering Select size.
-
-| Property       | Large    | Medium   | Small    |
-| -------------- | -------- | -------- | -------- |
-| Font Size      | `16px`   | `14px`   | `12px`   |
-| Line Height    | `26px`   | `22px`   | `20px`   |
-| Letter Spacing | `0.16px` | `0.14px` | `0.12px` |
 
 ---
 
