@@ -452,6 +452,7 @@ Requires both a URL-safe `name` and a human-readable `display_name`.
 - Max 40 characters
 - Avoid personal markers such as `My`, `Test`, or `V2`
 - Avoid generic-only titles such as `Stock Dashboard` or `Trading Bot`
+- If the user provides `display_name`, use it and normalize any non-compliant parts
 
 ```
 POST /api/v1/draft/playbook
