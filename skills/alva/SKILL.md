@@ -7,6 +7,7 @@ description: >-
   playbooks -- all from your AI agents.
 metadata:
   author: alva
+  version: v1.0.0
 ---
 
 # Alva
@@ -22,8 +23,8 @@ DeFi metrics, news feeds, social media and more!
 
 ## What Alva Skills Enables
 
-The Alva skill connects any AI agent or IDE to the full Alva platform. With
-it you can:
+The Alva skill connects any AI agent or IDE to the full Alva platform. With it
+you can:
 
 - **Access financial data** -- query any of Alva's 250+ data SDKs
   programmatically, or bring your own data via HTTP API or direct upload.
@@ -36,9 +37,49 @@ it you can:
   run continuous live paper trading.
 - **Release and share** -- turn your work into a hosted playbook web app at
   `https://alva.ai/u/<username>/playbooks/<playbook_name>`, and share it with the world.
+- **Remix existing playbooks** -- take any published playbook as a template,
+  read its feed scripts and HTML source, customize parameters/logic/UI, and
+  deploy as your own new playbook.
 
 In short: turn your ideas into a forever-running finance agent that gets things
 done for you.
+
+## Pre-flight
+
+**CRITICAL — On first use in each session**, you MUST run these checks
+before doing anything else. Do NOT skip this section:
+
+### 1. Version Check
+
+Run the version check script at `scripts/version_check.sh` inside this skill's
+directory:
+
+```bash
+bash "<this skill's directory>/scripts/version_check.sh"
+```
+
+- **No output** → skill is up to date. Proceed normally.
+- **Output present** → display the message to the user, then apply the update
+  using the appropriate method for how the skill was installed. Proceed normally
+  after the update completes.
+
+### 2. API Key
+
+Read `.alva.json` in this skill's directory. If `api_key` is missing or empty,
+ask the user for their Alva API key (available at https://alva.ai) and write it
+to `.alva.json`. Do not proceed until a valid key is configured. Example format:
+
+```json
+{
+  "api_key": "alva_...",
+  "last_check": 0
+}
+```
+
+Set the `ALVA_API_KEY` environment variable from this value for all subsequent
+API calls in this session.
+
+---
 
 ## Capabilities & Common Workflows
 
@@ -58,7 +99,8 @@ symlink, chmod, grant, revoke.
 Run JavaScript on Alva Cloud in a sandboxed V8 isolate. Code executed inside
 Alva's `/api/v1/run` runtime runs entirely on Alva's servers -- it cannot access
 the host machine's filesystem, environment variables, or processes. The runtime
-has access to ALFS, all 250+ SDKs, HTTP networking, LLM access, and the Feed SDK.
+has access to ALFS, all 250+ SDKs, HTTP networking, LLM access, and the Feed
+SDK.
 
 ### 3. SDKHub
 
@@ -71,26 +113,26 @@ two-step retrieval flow:
 
 #### SDK Partition Index
 
-| Partition | Description |
-| --------- | ----------- |
-| `spot_market_price_and_volume` | Spot OHLCV for crypto and equities. Price bars, volume, historical candles. |
-| `crypto_futures_data` | Perpetual futures: OHLCV, funding rates, open interest, long/short ratio. |
-| `crypto_technical_metrics` | Crypto technical & on-chain indicators: MA, EMA, RSI, MACD, Bollinger, MVRV, SOPR, NUPL, whale ratio, market cap, FDV, etc. (20 modules) |
-| `crypto_exchange_flow` | Exchange inflow/outflow data for crypto assets. |
-| `crypto_fundamentals` | Crypto market fundamentals: circulating supply, max supply, market dominance. |
-| `crypto_screener` | Screen crypto assets by technical metrics over custom time ranges. |
-| `company_crypto_holdings` | Public companies' crypto token holdings (e.g. MicroStrategy BTC). |
-| `equity_fundamentals` | Stock fundamentals: income statements, balance sheets, cash flow, margins, PE, PB, ROE, ROA, EPS, market cap, dividend yield, enterprise value, etc. (31 modules) |
-| `equity_estimates_and_targets` | Analyst price targets, consensus estimates, earnings guidance. |
-| `equity_events_calendar` | Dividend calendar, stock split calendar. |
-| `equity_ownership_and_flow` | Institutional holdings, insider trades, senator trading activity. |
-| `stock_screener` | Screen stocks by sector, industry, country, exchange, IPO date, earnings date, financial & technical metrics. (9 modules) |
-| `stock_technical_metrics` | Stock technical indicators: beta, volatility, Bollinger, EMA, MA, MACD, RSI-14, VWAP, avg daily dollar volume. |
-| `etf_fundamentals` | ETF holdings breakdown. |
-| `macro_and_economics_data` | CPI, GDP, unemployment, federal funds rate, Treasury rates, PPI, consumer sentiment, VIX, TIPS, nonfarm payroll, retail sales, recession probability, etc. (20 modules) |
-| `technical_indicator_calculation_helpers` | 50+ pure calculation helpers: RSI, MACD, Bollinger Bands, ATR, VWAP, Ichimoku, Parabolic SAR, KDJ, OBV, etc. Input your own price arrays. |
-| `feed_widgets` | Social & news data feeds: news, Twitter/X, YouTube, Reddit, podcasts, web search (Brave, Grok). |
-| `ask` | General news and market articles. |
+| Partition                                 | Description                                                                                                                                                             |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `spot_market_price_and_volume`            | Spot OHLCV for crypto and equities. Price bars, volume, historical candles.                                                                                             |
+| `crypto_futures_data`                     | Perpetual futures: OHLCV, funding rates, open interest, long/short ratio.                                                                                               |
+| `crypto_technical_metrics`                | Crypto technical & on-chain indicators: MA, EMA, RSI, MACD, Bollinger, MVRV, SOPR, NUPL, whale ratio, market cap, FDV, etc. (20 modules)                                |
+| `crypto_exchange_flow`                    | Exchange inflow/outflow data for crypto assets.                                                                                                                         |
+| `crypto_fundamentals`                     | Crypto market fundamentals: circulating supply, max supply, market dominance.                                                                                           |
+| `crypto_screener`                         | Screen crypto assets by technical metrics over custom time ranges.                                                                                                      |
+| `company_crypto_holdings`                 | Public companies' crypto token holdings (e.g. MicroStrategy BTC).                                                                                                       |
+| `equity_fundamentals`                     | Stock fundamentals: income statements, balance sheets, cash flow, margins, PE, PB, ROE, ROA, EPS, market cap, dividend yield, enterprise value, etc. (31 modules)       |
+| `equity_estimates_and_targets`            | Analyst price targets, consensus estimates, earnings guidance.                                                                                                          |
+| `equity_events_calendar`                  | Dividend calendar, stock split calendar.                                                                                                                                |
+| `equity_ownership_and_flow`               | Institutional holdings, insider trades, senator trading activity.                                                                                                       |
+| `stock_screener`                          | Screen stocks by sector, industry, country, exchange, IPO date, earnings date, financial & technical metrics. (9 modules)                                               |
+| `stock_technical_metrics`                 | Stock technical indicators: beta, volatility, Bollinger, EMA, MA, MACD, RSI-14, VWAP, avg daily dollar volume.                                                          |
+| `etf_fundamentals`                        | ETF holdings breakdown.                                                                                                                                                 |
+| `macro_and_economics_data`                | CPI, GDP, unemployment, federal funds rate, Treasury rates, PPI, consumer sentiment, VIX, TIPS, nonfarm payroll, retail sales, recession probability, etc. (20 modules) |
+| `technical_indicator_calculation_helpers` | 50+ pure calculation helpers: RSI, MACD, Bollinger Bands, ATR, VWAP, Ichimoku, Parabolic SAR, KDJ, OBV, etc. Input your own price arrays.                               |
+| `feed_widgets`                            | Social & news data feeds: news, Twitter/X, YouTube, Reddit, podcasts, web search (Brave, Grok).                                                                         |
+| `ask`                                     | General news and market articles.                                                                                                                                       |
 
 You can also bring your own data by uploading files to ALFS or fetching from
 external HTTP APIs within the runtime.
@@ -115,7 +157,9 @@ specific paths so anyone -- or any playbook page -- can read the data.
 After your data pipelines are deployed and producing data, build the playbook's
 web interface. Create HTML5 pages that read from Alva's data gateway and
 visualize the results. Follow the Alva Design System for styling, layout, and
-component guidelines.
+component guidelines. Unless the user explicitly asks for a static snapshot,
+default to a live playbook. A live playbook may mix live and static sections;
+only widgets that need fresh data must read cronjob-backed feeds at runtime.
 
 ### 7. Release
 
@@ -125,28 +169,40 @@ Three phases:
    `~/playbooks/{name}/index.html`.
 2. **Create playbook draft**: `POST /api/v1/draft/playbook` — creates DB
    records, writes draft files and `playbook.json` to ALFS automatically.
-3. **Call release API**: `POST /api/v1/release/playbook` — creates release
-   DB records, uploads HTML to CDN, and writes release files to ALFS
-   automatically. Returns `playbook_id` (numeric).
+3. **Call release API**: `POST /api/v1/release/playbook` — creates release DB
+   records, uploads HTML to CDN, and writes release files to ALFS automatically.
+   Returns `playbook_id` (numeric).
 
 Once released, the playbook is accessible at
 `https://alva.ai/u/<username>/playbooks/<playbook_name>` — ready to share with
 the world. Use the playbook `name` and the username from `GET /api/v1/me` to
 construct this URL.
 
+### 8. Remix (Create from Existing Playbook)
+
+Users can remix any published playbook to create a customized version. The Remix
+prompt includes the source playbook's owner username and playbook name. The
+agent reads the source playbook's feed scripts (strategy logic) and HTML
+(dashboard UI), customizes them per the user's request, and deploys a new
+playbook under their own namespace.
+
+See [remix-workflow.md](references/remix-workflow.md) for the full step-by-step
+guide.
+
 ---
 
 **Detailed sub-documents** (read these for in-depth reference):
 
-| Document                                                                              | Contents                                                                          |
-| ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| [api-reference.md](references/api-reference.md)                                       | Full REST API reference (filesystem, run, deploy, user info, time series paths)   |
-| [jagent-runtime.md](references/jagent-runtime.md)                                     | Writing jagent scripts: module system, built-in modules, async model, constraints |
-| [feed-sdk.md](references/feed-sdk.md)                                                 | Feed SDK guide: creating data feeds, time series, upstreams, state management     |
-| [altra-trading.md](references/altra-trading.md)                                       | Altra backtesting engine: strategies, features, signals, testing, debugging       |
-| [deployment.md](references/deployment.md)                                             | Deploying scripts as cronjobs for scheduled execution                             |
-| [design-system.md](references/design-system.md)                                       | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
-| [adk.md](references/adk.md)                                                           | Agent Development Kit: `adk.agent()` API, tool calling, ReAct loop, examples      |
+| Document                                          | Contents                                                                                                   |
+| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| [api-reference.md](references/api-reference.md)   | Full REST API reference (filesystem, run, deploy, user info, time series paths)                            |
+| [jagent-runtime.md](references/jagent-runtime.md) | Writing jagent scripts: module system, built-in modules, async model, constraints                          |
+| [feed-sdk.md](references/feed-sdk.md)             | Feed SDK guide: creating data feeds, time series, upstreams, state management                              |
+| [altra-trading.md](references/altra-trading.md)   | Altra backtesting engine: strategies, features, signals, testing, debugging                                |
+| [deployment.md](references/deployment.md)         | Deploying scripts as cronjobs for scheduled execution                                                      |
+| [design-system.md](references/design-system.md)   | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
+| [remix-workflow.md](references/remix-workflow.md) | Remix: create a new playbook from an existing template                                                     |
+| [adk.md](references/adk.md)                       | Agent Development Kit: `adk.agent()` API, tool calling, ReAct loop, examples                               |
 
 ---
 
@@ -154,9 +210,9 @@ construct this URL.
 
 All configuration is done via environment variables.
 
-| Variable        | Required | Description                                                     |
-| --------------- | -------- | --------------------------------------------------------------- |
-| `ALVA_API_KEY`  | **yes**  | Your API key (create and manage at [alva.ai](https://alva.ai))  |
+| Variable        | Required | Description                                                             |
+| --------------- | -------- | ----------------------------------------------------------------------- |
+| `ALVA_API_KEY`  | **yes**  | Your API key (create and manage at [alva.ai](https://alva.ai))          |
 | `ALVA_ENDPOINT` | no       | Alva API base URL. Defaults to `https://api-llm.prd.alva.ai` if not set |
 
 ### First-Time Setup
@@ -237,8 +293,8 @@ See [api-reference.md](references/api-reference.md) for full details.
 | POST   | `/api/v1/fs/grant`                | Grant read/write access to a path                 |
 | POST   | `/api/v1/fs/revoke`               | Revoke access                                     |
 
-Paths: `~/data/file.json` (home-relative) or `/alva/home/<username>/...` (absolute).
-Public reads use absolute paths without API key.
+Paths: `~/data/file.json` (home-relative) or `/alva/home/<username>/...`
+(absolute). Public reads use absolute paths without API key.
 
 ### Run (`/api/v1/run`)
 
@@ -260,23 +316,29 @@ Public reads use absolute paths without API key.
 
 ### Release (`/api/v1/release/`)
 
-| Method | Endpoint                    | Description                                     |
-| ------ | --------------------------- | ----------------------------------------------- |
-| POST   | `/api/v1/release/feed`      | Register feed (DB + link to cronjob task). Call after deploying cronjob. |
-| POST   | `/api/v1/release/playbook`  | Release playbook for public hosting. Call after writing playbook HTML. |
+| Method | Endpoint                   | Description                                                              |
+| ------ | -------------------------- | ------------------------------------------------------------------------ |
+| POST   | `/api/v1/release/feed`     | Register feed (DB + link to cronjob task). Call after deploying cronjob. |
+| POST   | `/api/v1/release/playbook` | Release playbook for public hosting. Call after writing playbook HTML.   |
 
 **Name uniqueness**: Both `name` in releaseFeed and releasePlaybook must be
 unique within your user space. Use `GET /api/v1/fs/readdir?path=~/feeds` or
 `GET /api/v1/fs/readdir?path=~/playbooks` to check existing names before
 releasing.
 
+### Remix Lineage (`/api/v1/remix`)
+
+| Method | Endpoint        | Description                                             |
+| ------ | --------------- | ------------------------------------------------------- |
+| POST   | `/api/v1/remix` | Save parent→child playbook dependency (Remix scenarios) |
+
 ### SDK Documentation (`/api/v1/sdk/`)
 
-| Method | Endpoint                                      | Description                                      |
-| ------ | --------------------------------------------- | ------------------------------------------------ |
-| GET    | `/api/v1/sdk/doc?name={module_name}`            | Get full doc for a specific SDK module             |
-| GET    | `/api/v1/sdk/partitions`                        | List all SDK partitions                            |
-| GET    | `/api/v1/sdk/partitions/:partition/summary`     | Get one-line summaries of all modules in a partition |
+| Method | Endpoint                                    | Description                                          |
+| ------ | ------------------------------------------- | ---------------------------------------------------- |
+| GET    | `/api/v1/sdk/doc?name={module_name}`        | Get full doc for a specific SDK module               |
+| GET    | `/api/v1/sdk/partitions`                    | List all SDK partitions                              |
+| GET    | `/api/v1/sdk/partitions/:partition/summary` | Get one-line summaries of all modules in a partition |
 
 **SDK retrieval flow**: pick a partition from the index above → call
 `/partitions/:partition/summary` to see module summaries → call
@@ -312,20 +374,20 @@ servers -- they cannot access the host machine's filesystem, environment
 variables, or shell. Host-agent permissions still apply. See
 [jagent-runtime.md](references/jagent-runtime.md) for full details.
 
-| Module          | require()                    | Description                                                        |
-| --------------- | ---------------------------- | ------------------------------------------------------------------ |
+| Module          | require()                    | Description                                                             |
+| --------------- | ---------------------------- | ----------------------------------------------------------------------- |
 | alfs            | `require("alfs")`            | Filesystem (uses absolute paths `/alva/home/<username>/...`)            |
-| env             | `require("env")`             | `userId`, `username`, `args` from request                                      |
-| net/http        | `require("net/http")`        | `fetch(url, init)` for async HTTP requests                         |
-| @alva/algorithm | `require("@alva/algorithm")` | Statistics                                |
-| @alva/feed      | `require("@alva/feed")`      | Feed SDK for persistent data pipelines + FeedAltra trading engine  |
+| env             | `require("env")`             | `userId`, `username`, `args` from request                               |
+| net/http        | `require("net/http")`        | `fetch(url, init)` for async HTTP requests                              |
+| @alva/algorithm | `require("@alva/algorithm")` | Statistics                                                              |
+| @alva/feed      | `require("@alva/feed")`      | Feed SDK for persistent data pipelines + FeedAltra trading engine       |
 | @alva/adk       | `require("@alva/adk")`       | Agent SDK for LLM requests — `agent()` for LLM agents with tool calling |
-| @test/suite     | `require("@test/suite")`     | Jest-style test framework (`describe`, `it`, `expect`, `runTests`) |
+| @test/suite     | `require("@test/suite")`     | Jest-style test framework (`describe`, `it`, `expect`, `runTests`)      |
 
 **SDKHub**: 250+ data modules available via
 `require("@arrays/crypto/ohlcv:v1.0.0")` etc. Version suffix is optional
-(defaults to `v1.0.0`). To discover function signatures and response shapes,
-use the SDK doc API (`GET /api/v1/sdk/doc?name=...`).
+(defaults to `v1.0.0`). To discover function signatures and response shapes, use
+the SDK doc API (`GET /api/v1/sdk/doc?name=...`).
 
 **Key constraints**: No top-level `await` (wrap script in
 `(async () => { ... })();`). No Node.js builtins (`fs`, `path`, `http`). Module
@@ -460,7 +522,14 @@ Every feed follows a 6-step lifecycle:
 1. **Write** -- define schema + incremental logic with `ctx.kv`
 2. **Upload** -- write script to `~/feeds/<name>/v1/src/index.js`
 3. **Test** -- `POST /api/v1/run` with `entry_path` to verify output
-4. **Grant** -- make feed public via `POST /api/v1/fs/grant`
+4. **Grant** -- make feed data publicly readable:
+   ```
+   POST /api/v1/fs/grant
+   {"path":"~/feeds/<name>","subject":"special:user:*","permission":"read"}
+   ```
+   Grant on the feed root path (not on `data/`). Subject format:
+   `special:user:*` (public), `special:user:+` (authenticated only), `user:<id>`
+   (specific user).
 5. **Deploy** -- `POST /api/v1/deploy/cronjob` for scheduled execution
 6. **Release** -- `POST /api/v1/release/feed` to register the feed in the
    database (requires the `task_id` from the deploy step)
@@ -565,31 +634,33 @@ const adk = require("@alva/adk");
 const result = await adk.agent({
   system: "You are a senior equity analyst...",
   prompt: "Analyze NVDA quarterly earnings trends.",
-  tools: [/* tool definitions */],
+  tools: [
+    /* tool definitions */
+  ],
   maxTurns: 5,
 });
 
-log(result.content);    // Final LLM text response
-log(result.toolCalls);  // All tool invocations made
+log(result.content); // Final LLM text response
+log(result.toolCalls); // All tool invocations made
 ```
 
 ### When to Use ADK
 
-| Use Case | Description |
-| -------- | ----------- |
-| Periodic research feeds | Scheduled agents that fetch data, reason over it, and produce structured insights (e.g. weekly earnings analysis, daily macro commentary) |
-| Document / data analysis | Agents that read documents or datasets, extract key points, and output structured summaries |
-| Multi-source synthesis | Agents that call multiple data SDKs, cross-reference findings, and produce a unified research note |
-| Agentic data pipelines | Feed scripts where the "transform" step requires LLM reasoning (classification, sentiment, summarization) |
+| Use Case                 | Description                                                                                                                               |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Periodic research feeds  | Scheduled agents that fetch data, reason over it, and produce structured insights (e.g. weekly earnings analysis, daily macro commentary) |
+| Document / data analysis | Agents that read documents or datasets, extract key points, and output structured summaries                                               |
+| Multi-source synthesis   | Agents that call multiple data SDKs, cross-reference findings, and produce a unified research note                                        |
+| Agentic data pipelines   | Feed scripts where the "transform" step requires LLM reasoning (classification, sentiment, summarization)                                 |
 
 ### Core API
 
 ```javascript
 const result = await adk.agent({
-  system,    // (optional) system prompt — define the agent's role and output format
-  prompt,    // user query or task description
-  tools,     // array of Tool objects the agent can invoke
-  maxTurns,  // max ReAct loop iterations (default: 10)
+  system, // (optional) system prompt — define the agent's role and output format
+  prompt, // user query or task description
+  tools, // array of Tool objects the agent can invoke
+  maxTurns, // max ReAct loop iterations (default: 10)
 });
 // result: { content: string, turns: number, toolCalls: ToolCallRecord[] }
 ```
@@ -599,9 +670,9 @@ const result = await adk.agent({
 Tools are the agent's hands. Use them to:
 
 - **Query data**: Fetch upstream data from Alva SDKs, external HTTP APIs, or
-  ALFS files. The agent decides *which* data to retrieve based on its reasoning.
-- **Collect context**: Pull in multiple data sources (earnings, macro indicators,
-  news) so the agent can cross-reference and synthesize.
+  ALFS files. The agent decides _which_ data to retrieve based on its reasoning.
+- **Collect context**: Pull in multiple data sources (earnings, macro
+  indicators, news) so the agent can cross-reference and synthesize.
 - **Store / fetch memory**: Read and write to ALFS or `ctx.kv` to persist state
   across runs — e.g. store a running summary, retrieve last analysis for
   comparison, or cache intermediate results.
@@ -612,33 +683,61 @@ const tools = [
   {
     name: "getEarnings",
     description: "Fetch quarterly earnings for a stock symbol",
-    parameters: { type: "object", properties: { symbol: { type: "string" } }, required: ["symbol"] },
+    parameters: {
+      type: "object",
+      properties: { symbol: { type: "string" } },
+      required: ["symbol"],
+    },
     fn: async (args) => {
-      const { getCompanyIncomeStatements } = require("@arrays/data/stock/company/income:v1.0.0");
-      return getCompanyIncomeStatements({ symbol: args.symbol, period_type: "quarter",
-        start_time: Date.parse("2023-01-01"), end_time: Date.now(), limit: 20 }).response.metrics;
+      const {
+        getCompanyIncomeStatements,
+      } = require("@arrays/data/stock/company/income:v1.0.0");
+      return getCompanyIncomeStatements({
+        symbol: args.symbol,
+        period_type: "quarter",
+        start_time: Date.parse("2023-01-01"),
+        end_time: Date.now(),
+        limit: 20,
+      }).response.metrics;
     },
   },
   {
     name: "readMemory",
     description: "Read previous analysis from memory",
-    parameters: { type: "object", properties: { key: { type: "string" } }, required: ["key"] },
+    parameters: {
+      type: "object",
+      properties: { key: { type: "string" } },
+      required: ["key"],
+    },
     fn: async (args) => {
       const alfs = require("alfs");
       const env = require("env");
       try {
-        return JSON.parse(await alfs.readFile(`/alva/home/${env.username}/data/memory/${args.key}.json`));
-      } catch { return null; }
+        return JSON.parse(
+          await alfs.readFile(
+            `/alva/home/${env.username}/data/memory/${args.key}.json`,
+          ),
+        );
+      } catch {
+        return null;
+      }
     },
   },
   {
     name: "writeMemory",
     description: "Store analysis result to memory for future runs",
-    parameters: { type: "object", properties: { key: { type: "string" }, value: { type: "object" } }, required: ["key", "value"] },
+    parameters: {
+      type: "object",
+      properties: { key: { type: "string" }, value: { type: "object" } },
+      required: ["key", "value"],
+    },
     fn: async (args) => {
       const alfs = require("alfs");
       const env = require("env");
-      await alfs.writeFile(`/alva/home/${env.username}/data/memory/${args.key}.json`, JSON.stringify(args.value));
+      await alfs.writeFile(
+        `/alva/home/${env.username}/data/memory/${args.key}.json`,
+        JSON.stringify(args.value),
+      );
       return { saved: true };
     },
   },
@@ -672,12 +771,14 @@ cronjobs per user. Min interval: 1 minute.
 
 After deploying a cronjob, register the feed, create a playbook draft, then
 release the playbook for public hosting. The playbook HTML must already be
-written to ALFS at `~/playbooks/{name}/index.html` via `fs/write` before releasing.
+written to ALFS at `~/playbooks/{name}/index.html` via `fs/write` before
+releasing.
 
 **Important**: Feed names and playbook names must be unique within your user
 space. Before creating a new feed or playbook, use
-`GET /api/v1/fs/readdir?path=~/feeds` or `GET /api/v1/fs/readdir?path=~/playbooks`
-to check for existing names and avoid conflicts.
+`GET /api/v1/fs/readdir?path=~/feeds` or
+`GET /api/v1/fs/readdir?path=~/playbooks` to check for existing names and avoid
+conflicts.
 
 ```
 # 1. Release feed (register in DB, link to cronjob)
@@ -754,12 +855,13 @@ consistent read pattern (`@last`, `@range`, etc.).
   `~/feeds/my-feed/v1`, and the Feed SDK mounts storage at `<feedPath>/data/`.
   Don't name your group `"data"` or you'll get `data/data/...`.
 - **Public reads require absolute paths.** Unauthenticated reads must use
-  `/alva/home/<username>/...` (not `~/...`). Discover your username via `GET /api/v1/me`.
+  `/alva/home/<username>/...` (not `~/...`). Discover your username via
+  `GET /api/v1/me`.
 - **Top-level `await` is not supported.** Wrap async code in
   `(async () => { ... })();`.
 - **`require("alfs")` uses absolute paths.** Inside the V8 runtime,
-  `alfs.readFile()` needs full paths like `/alva/home/alice/...`. Get your username from
-  `require("env").username`.
+  `alfs.readFile()` needs full paths like `/alva/home/alice/...`. Get your
+  username from `require("env").username`.
 - **No Node.js builtins.** `require("fs")`, `require("path")`, `require("http")`
   do not exist. Use `require("alfs")` for files, `require("net/http")` for HTTP.
 - **Altra `run()` is async.** `FeedAltra.run()` returns a `Promise<RunResult>`.
@@ -772,7 +874,8 @@ consistent read pattern (`@last`, `@range`, etc.).
 - **Cronjob path must point to an existing script.** The deploy API validates
   the entry_path exists via filesystem stat before creating the cronjob.
 - **Always create a draft before releasing.** `POST /api/v1/release/playbook`
-  requires the playbook to already exist (created via `POST /api/v1/draft/playbook`).
+  requires the playbook to already exist (created via
+  `POST /api/v1/draft/playbook`).
 
 ---
 

@@ -17,27 +17,20 @@
 > These are the most common sources of error. Read before generating any widget
 > code.
 
-1. **Widget-internal layout must use `flex-wrap`** — KPI rows, metric groups,
-   side-by-side elements inside a widget use `display: flex; flex-wrap: wrap` +
-   `min-width`. **Never use `grid-cols-N` for widget-internal layout.** Grid is
-   only for page-level widget placement (the 8-column `.widget-grid`). →
-   [Details](#content-reflow)
-2. **No border/outline on widgets or cards** — Use background color
-   (`--grey-g01`) or dividers (`--line-l05`) for visual separation. Only Tag
-   elements may have borders. → [Details](#widget-background)
-3. **Widget dividers must not span full width** — Both ends align with content
-   padding via `my` / `mx` margin. → [Details](#divider)
-4. **Chart Card uses dotted background** — All other widgets use `--grey-g01`
-   (`#fafafa`). Table Card has no background. → [Details](#widget-background)
-5. **Same-row widgets must equal height** — `.widget-grid` uses
-   `align-items: stretch`; add `flex: 1` to the widget body so shorter widgets
-   fill the row height. ECharts containers need
-   `height: 100%; min-height: 180px`. → [Details](#equal-height-fill)
-6. **Table column alignment requires JS `initTableTruncation`** — Columns
-   ≤ 240px get pinned `min-width` (no truncation); columns > 240px get
-   `.cell-ellipsis` (truncate + tooltip). Use `gap: 16px` on `.table-row` for
-   column spacing, `border-bottom` on `.table-row` for dividers — **not** on
-   cells. → [Details](#column-alignment--text-truncation)
+1. **Widget-internal layout uses `flex-wrap`** (KPI rows, metric groups,
+   side-by-side elements). Never `grid-cols-N` — grid is only for page-level
+   `.widget-grid`. → [Details](#content-reflow)
+2. **No border/outline on widgets** — use `--grey-g01` or `--line-l05`
+   dividers. Only Tags may have borders. → [Details](#widget-background)
+3. **Dividers don't span full width** — align both ends with content padding.
+   → [Details](#divider)
+4. **Chart Card → dotted bg; Table Card → none; others → `--grey-g01`.**
+   → [Details](#widget-background)
+5. **Same-row widgets must equal height** — `.widget-body.fill` + `flex: 1`.
+   ECharts: `height:100%; min-height:180px`. → [Details](#equal-height-fill)
+6. **Table columns require JS `initTableAlignment`** — proportional widths
+   based on content, horizontal scroll when overflow. `gap:16px` on rows,
+   `border-bottom` on rows not cells. → [Details](#column-alignment)
 
 ---
 
@@ -90,7 +83,7 @@
 .alva-watermark {
   position: absolute;
   bottom: var(--spacing-m);
-  left: var(--spacing-m);
+  right: var(--spacing-m);
   opacity: 0.2;
   line-height: 0;
 }
@@ -167,9 +160,9 @@
 .table-row {
   display: flex;
   width: 100%;
-  min-width: max-content;             /* row + divider must span full scrollable width */
   gap: 16px;                          /* column spacing between cells */
   border-bottom: 1px solid var(--line-l07); /* row divider — on the row, not cells */
+  /* min-width is set by initTableAlignment JS — do NOT use CSS min-width here */
 }
 .table-row:last-child {
   border-bottom: none;
@@ -183,13 +176,6 @@
   white-space: nowrap;
   display: flex;
   align-items: center;
-}
-
-/* Applied by JS to columns whose max content width > 240px */
-.table-cell.cell-ellipsis {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 /* ── Free Text Card ── */
@@ -242,13 +228,13 @@
 .divider-v {
   width: 1px;
   flex-shrink: 0;
-  margin-block: 20px;
+  margin-block: var(--spacing-l);
   background-color: var(--line-l05);
 }
 
 .divider-h {
   height: 1px;
-  margin-inline: 20px;
+  margin-inline: var(--spacing-l);
   background-color: var(--line-l05);
 }
 
@@ -349,7 +335,7 @@
 }
 
 .section-title-sub {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-n5);
   padding-left: 8px;
   border-left: 1px solid var(--line-l07);
@@ -397,20 +383,19 @@ Each row's col spans must total exactly 8; shortfalls leave empty space.
 
 For true equal-width three columns, use `.col-thirds` (see Base CSS).
 
+### Solo Widget Rule
+
+Non-KPI widget alone on a row must use `col-8`.
+
 ### Equal-Height Fill
 
-When widgets share a row with different content heights, the shorter must fill
-the row height:
-
-1. `.widget-grid` already sets `align-items: stretch`
-2. `.widget-card` uses `flex-direction: column`
-3. Add `flex: 1` to `.widget-body` (use `.widget-body.fill`)
-4. ECharts containers: `height: 100%; min-height: 180px`
+Same-row widgets with different content heights: add `.fill` to `.widget-body`
+(`flex:1; height:0`). ECharts containers: `height:100%; min-height:180px`.
 
 ### Content Reflow
 
-Use `.widget-row` from Base CSS for widget-internal horizontal layouts.
-Charts and tables never wrap — they always fill `width: 100%`.
+Use `.widget-row` for widget-internal horizontal layouts. Charts and tables
+never wrap — always `width: 100%`.
 
 ### Widget Height
 
@@ -422,29 +407,24 @@ Charts and tables never wrap — they always fill `width: 100%`.
 | Free Text Card | auto (content-driven)  | Scroll or truncate       |
 | Feed Card      | auto, capped at 560px  | Scroll within feed body  |
 
-**Table Card / Feed Card**: Content < 320px → auto height fits content;
-content ≥ 320px → use a 320px body with internal scroll. Do not exceed 560px
-total height.
-
-Max height for all widgets: **960px**. Apply `overflow-y: auto` to the widget
-body (not the entire card) when exceeded.
+Table / Feed: content < 320px → auto; ≥ 320px → 320px body + internal scroll.
+Do not exceed 560px total height. Max for all widgets: **960px**
+(`overflow-y: auto` on widget body, not card).
 
 ### Widget Background
 
-**Do NOT add border/outline to widgets or cards.** Use background color or
-dividers for visual separation. Only Tag elements may have borders.
+No border/outline on widgets (only Tag elements may have borders). Background:
 
-| Widget Type | Background                                          |
-| ----------- | --------------------------------------------------- |
-| Chart Card  | Dotted pattern (`.chart-dotted-background`)         |
-| Table Card  | None (transparent)                                  |
-| Others      | `background-color: var(--grey-g01)` (`#fafafa`)     |
+| Widget Type | Background                                      |
+| ----------- | ----------------------------------------------- |
+| Chart Card  | `.chart-dotted-background`                      |
+| Table Card  | None (transparent)                              |
+| Others      | `var(--grey-g01)`                               |
 
 ### Divider
 
-Widget internal dividers must not span full width; both ends align with content
-padding. Use `.divider-v` / `.divider-h` from Base CSS. **Do not use**
-`border-bottom` or `border-right` for widget-internal dividers.
+Use `.divider-v` / `.divider-h` — both ends align with content padding (not
+full width). Do not use `border-bottom` / `border-right` for widget dividers.
 
 ---
 
@@ -468,7 +448,7 @@ padding. Use `.divider-v` / `.divider-h` from Base CSS. **Do not use**
       </div>
     </div>
     <!-- ECharts container -->
-    <div id="chart-xxx" style="width:100%;height:280px;"></div>
+    <div id="chart-xxx" style="width:100%;height:320px;"></div>
     <!-- Watermark: always inside chart-body, always this exact structure -->
     <div class="alva-watermark">
       <img src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg" alt="Alva" />
@@ -487,18 +467,17 @@ Legend marker class by chart type:
 
 ### Chart Rules
 
-1. Use ECharts.
-2. Legend and chart areas must not overlap.
-3. **Do NOT set** ECharts `backgroundColor` — the dotted pattern handles it.
-4. Select colors from the chart palette in
-   [design-tokens.css](./design-tokens.css). Avoid duplicates.
-5. **Grey** (`--chart-grey-*`) is only allowed when chart has **≥ 3 series**.
-6. **ECharts renders on Canvas — CSS variables (`var(--xxx)`) do NOT work in
-   any ECharts option.** Always use raw hex / rgba literals. Define JS
-   constants from the token values at the top of your script and reference
-   those constants in all ECharts configs (series colors, axis labels, tooltip
-   text, markLine, etc.). CSS variables remain correct for DOM-based styles
-   (HTML class attributes, inline `style`, CSS rules).
+1. Use ECharts. Legend and chart must not overlap.
+2. Do NOT set ECharts `backgroundColor` — dotted pattern handles it.
+3. Colors from chart palette in [design-tokens.css](./design-tokens.css).
+   No duplicates. Grey (`--chart-grey-*`) only when ≥ 3 series.
+4. **ECharts is Canvas — `var(--xxx)` does NOT work.** Use raw hex/rgba
+   in all ECharts configs. CSS variables remain correct for DOM styles.
+5. **Hidden containers (tab panels, modals) report 0×0 size.** When a
+   chart becomes visible after being hidden, call `chart.resize()`.
+   Likewise, `initTableAlignment` must re-run for tables that were
+   hidden. The [Tab JS](./design-components.md#js-interaction-1) handles
+   both automatically for tab switches.
 
 ### Axis Rules
 
@@ -533,7 +512,7 @@ markLine: {
   silent: true,
   symbol: "none",
   data: [{ xAxis: 0 }], // or { yAxis: 0 }
-  lineStyle: { color: "rgba(0,0,0,0.3)", type: [3, 2], width: 1 }, // --line-l3
+  lineStyle: { color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)", type: [3, 2], width: 1 },
   label: { show: false },
 }
 ```
@@ -667,11 +646,11 @@ No `shadowBlur`, no `focus: 'series'`.
 
 ### Color Rules
 
-| Type     | Class       | Color | Example        | Design Token |
-| -------- | ----------- | ----- | -------------- | ------------ |
-| Positive | `.positive` | Green | Return +18%    | --main-m3    |
-| Negative | `.negative` | Red   | Drawdown -12%  | --main-m4    |
-| Neutral  | `.neutral`  | Black | Volatility 22% | --text-n9    |
+| Type     | Color | Example        | Design Token |
+| -------- | ----- | -------------- | ------------ |
+| Positive | Green | Return +18%    | --main-m3    |
+| Negative | Red   | Drawdown -12%  | --main-m4    |
+| Neutral  | Black | Volatility 22% | --text-n9    |
 
 ---
 
@@ -688,15 +667,15 @@ No `shadowBlur`, no `focus: 'series'`.
   <div class="table-card">
     <!-- Header row -->
     <div class="table-row table-header">
-      <div class="table-cell" style="flex:1.2">Symbol</div>
-      <div class="table-cell" style="flex:1">Side</div>
-      <div class="table-cell" style="flex:1.2">Quantity</div>
+      <div class="table-cell">Symbol</div>
+      <div class="table-cell">Side</div>
+      <div class="table-cell">Quantity</div>
     </div>
     <!-- Body rows -->
     <div class="table-row table-body-row">
-      <div class="table-cell" style="flex:1.2" title="AAPL">AAPL</div>
-      <div class="table-cell" style="flex:1">LONG</div>
-      <div class="table-cell" style="flex:1.2">100</div>
+      <div class="table-cell">AAPL</div>
+      <div class="table-cell">LONG</div>
+      <div class="table-cell">100</div>
     </div>
   </div>
 </div>
@@ -704,111 +683,101 @@ No `shadowBlur`, no `focus: 'series'`.
 
 ### Table Rules
 
-- **No background color** on table card
-- All text: **Delight Regular (400)** only, no bold
+- No background. Delight Regular (400) only.
 - Row-first flex layout. **Do NOT use column-first layout.**
-- Column spacing uses `gap: 16px` on `.table-row`. **Do NOT use left/right
-  padding on cells for inter-column spacing.**
+- Column spacing: `gap: 16px` on `.table-row`. **Do NOT use cell padding
+  for inter-column spacing.**
+- Row divider: `border-bottom: 1px solid var(--line-l07)` on `.table-row`
+  (not cells). Last row: no border.
 
-| Element     | Font  | Color       |
-| ----------- | ----- | ----------- |
-| Header cell | 14px  | `--text-n7` |
-| Body cell   | 14px  | `--text-n9` |
+| Element | Font | Color | Padding |
+| ------- | ---- | ----- | ------- |
+| Header  | 14px | `--text-n7` | `0 0 12px 0` |
+| Body    | 14px | `--text-n9` | `12px 0` |
 
-| Element     | Padding      |
-| ----------- | ------------ |
-| Header cell | `0 0 12px 0` |
-| Body cell   | `12px 0`     |
+Body cell: `max-height: 180px`. Column widths are handled by `initTableAlignment` — do not set `width` on cells.
 
-Row divider: `border-bottom: 1px solid var(--line-l07)` on `.table-row` (not on
-individual cells). Last row has no border. This ensures the divider spans the
-full row width and is not broken by `gap`.
+### Column Alignment
 
-Body cell additional constraints: `max-height: 180px`, `width: 100%`.
+Column widths are **proportional to content** and **never narrower than the
+widest item**. Overflow triggers horizontal scroll. Do NOT use inline
+`style="flex:…"` on cells — sizing is handled by `initTableAlignment`.
 
-### Column Alignment & Text Truncation
+**4-phase algorithm**:
 
-Truncation is applied **per column**, not per cell. The rule is based on the
-**widest content** across all rows in that column:
-
-| Column Max Content Width | Behavior                                                                  |
-| ------------------------ | ------------------------------------------------------------------------- |
-| **> 240px**              | Add `.cell-ellipsis` to all cells in the column → truncate with `…` + `title` tooltip |
-| **≤ 240px**              | Set `min-width` to the column's max content width → full display, no truncation        |
-
-This ensures:
-
-1. **Narrow columns** (e.g. "Side", "Kelly") show all content at the width of
-   their widest item — they never truncate.
-2. **Wide columns** (e.g. "Match", "League") truncate gracefully via
-   `.cell-ellipsis` (`min-width: 0; overflow: hidden; text-overflow: ellipsis`).
-3. **All rows in the same column share the same min-width**, so header and body
-   cells are always vertically aligned.
-4. If total column min-widths exceed the container, the table scrolls
-   horizontally via `.table-card { overflow-x: auto }`.
+1. **Reset** — `removeAttribute('style')` on all cells, clear row `min-width`.
+2. **Measure** — `scrollWidth` per column (max across all rows).
+3. **Resolve** — `resolved = max(colWidth, colWidth/total × available)`.
+   Wide container → proportional fill. Narrow → lock at content width.
+4. **Apply** — `flex: 0 0 {resolved}px` on all cells + uniform row `min-width`.
 
 **Required JS** — run after every table render and on `resize`:
 
 ```javascript
-// Per-column alignment: measure max content width, then lock narrow columns
-// to a fixed width and let wide columns share remaining space.
-function initTableTruncation(tableEl) {
+function initTableAlignment(tableEl) {
   var rows = tableEl.querySelectorAll('.table-row');
   if (rows.length === 0) return;
   var colCount = rows[0].querySelectorAll('.table-cell').length;
 
-  for (var col = 0; col < colCount; col++) {
-    // 1. Reset previous state
-    rows.forEach(function (row) {
-      var cell = row.querySelectorAll('.table-cell')[col];
-      if (!cell) return;
-      cell.classList.remove('cell-ellipsis');
-      cell.style.flex = '';
-      cell.style.minWidth = '';
-      cell.style.width = '';
-      cell.removeAttribute('title');
-    });
+  // Phase 1: Reset — nuke all inline styles for clean measurement
+  rows.forEach(function(row) {
+    row.style.removeProperty('min-width');
+    var cells = row.querySelectorAll('.table-cell');
+    for (var i = 0; i < cells.length; i++) {
+      cells[i].removeAttribute('style');
+    }
+  });
 
-    // 2. Measure max natural content width (scrollWidth) in this column
+  // Phase 2: Measure each column's max content width
+  var colWidths = [];
+  for (var col = 0; col < colCount; col++) {
     var maxW = 0;
-    rows.forEach(function (row) {
+    rows.forEach(function(row) {
       var cell = row.querySelectorAll('.table-cell')[col];
       if (cell) maxW = Math.max(maxW, cell.scrollWidth);
     });
-
-    // 3. Apply policy
-    if (maxW > 240) {
-      // Wide column → share remaining space, truncate with ellipsis
-      rows.forEach(function (row) {
-        var cell = row.querySelectorAll('.table-cell')[col];
-        if (!cell) return;
-        cell.style.flex = '1 1 0';
-        cell.classList.add('cell-ellipsis');
-        if (cell.scrollWidth > cell.clientWidth) {
-          cell.setAttribute('title', cell.textContent.trim());
-        }
-      });
-    } else {
-      // Narrow column → lock to fixed width (no grow, no shrink)
-      rows.forEach(function (row) {
-        var cell = row.querySelectorAll('.table-cell')[col];
-        if (!cell) return;
-        cell.style.flex = '0 0 ' + maxW + 'px';
-      });
-    }
+    colWidths.push(maxW);
   }
+
+  // Phase 3: Resolve — proportional fill, min = content width
+  var totalContent = 0;
+  for (var i = 0; i < colWidths.length; i++) totalContent += colWidths[i];
+  var gapTotal = (colCount - 1) * 16;
+  var available = tableEl.clientWidth - gapTotal;
+
+  var resolved = [];
+  for (var col = 0; col < colCount; col++) {
+    var proportional = Math.round(colWidths[col] / totalContent * available);
+    resolved.push(Math.max(colWidths[col], proportional));
+  }
+
+  // Phase 4: Apply — fixed pixel widths + uniform row min-width
+  var totalWidth = gapTotal;
+  for (var col = 0; col < colCount; col++) {
+    totalWidth += resolved[col];
+    rows.forEach(function(row) {
+      var cell = row.querySelectorAll('.table-cell')[col];
+      if (!cell) return;
+      cell.style.flex = '0 0 ' + resolved[col] + 'px';
+    });
+  }
+
+  rows.forEach(function(row) {
+    row.style.minWidth = totalWidth + 'px';
+  });
 }
 ```
 
-> **Timing**: Call `initTableTruncation(el)` once after populating the table,
-> and again inside `resize` event listeners. The function is idempotent — it
-> resets previous state before re-measuring.
+> **Timing**: Call after populating the table and on `resize`. Idempotent.
+>
+> **Key**: Phase 1 uses `removeAttribute('style')` (not `style.flex=''`) because
+> browsers don't reliably clear flex longhands. Phase 4 sets explicit pixel
+> `min-width` on rows because CSS `min-width:max-content` varies per-row.
 
 ### Responsive
 
-- `>= 960px`: Full table, no scroll
-- `< 960px`: Horizontal `overflow-x: auto`, scrollable content
-- No hover effects on rows (static display)
+Horizontal scroll activates automatically via `overflow-x: auto` when columns
+exceed container. No hover effects on rows.
 
 ---
 
