@@ -499,8 +499,8 @@ POST /api/v1/release/playbook
 ```
 
 After a successful release, output the alva.ai playbook link to the user:
-`https://alva.ai/<username>/playbooks/<playbook_id>`
-(use the `playbook_id` from the response and the username from `GET /api/v1/me`)
+`https://alva.ai/u/<username>/playbooks/<playbook_name>`
+(use the playbook `name` and the username from `GET /api/v1/me`)
 
 ---
 
