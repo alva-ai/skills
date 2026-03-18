@@ -74,7 +74,7 @@ text-rendering: optimizeLegibility;
   width: 100%;
   max-width: 2048px;
   margin: 0 auto;
-  padding: var(--spacing-l) var(--spacing-xxl) var(--spacing-xxl);
+  padding: var(--spacing-m) var(--spacing-xxl) var(--spacing-xxxxl);
 }
 
 @media (max-width: 768px) {
@@ -82,6 +82,41 @@ text-rendering: optimizeLegibility;
     padding: var(--spacing-m);
   }
 }
+```
+
+## Playbook Header
+
+Every playbook starts with a **Title** and **Description Card** above all other content (including tab bars). Gap between them follows widget grid (`--spacing-xl`, 24px).
+
+```css
+/* AI-generated summary title */
+.playbook-title {
+  font-size: 24px;
+  line-height: 34px;
+  font-weight: 400;
+  color: var(--text-n9);
+  margin: 0;
+}
+
+/* 3–4 sentences: data sources and purpose */
+.playbook-desc {
+  background: var(--grey-g01);
+  padding: var(--spacing-m);
+  border-radius: var(--radius-ct-s);
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+  color: var(--text-n7);
+}
+```
+
+```html
+<h1 class="playbook-title">Strategy Performance Analysis</h1>
+<div class="playbook-desc">
+  This playbook tracks a BTC momentum strategy backtested from Jan 2024.
+  Data sourced from Binance spot via Altra ALFS. Updated every 4 hours.
+  Use the Analytics tab for detailed risk metrics.
+</div>
 ```
 
 ## Usage — Read only what you need
