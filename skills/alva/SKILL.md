@@ -535,7 +535,7 @@ and deduplication behavior.
 
 ## Deploying Feeds
 
-Every feed follows a 6-step lifecycle:
+Every feed follows a 6-step lifecycle including every newly created feed or re-created feed:
 
 1. **Write** -- define schema + incremental logic with `ctx.kv`
 2. **Upload** -- write script to `~/feeds/<name>/v1/src/index.js`
