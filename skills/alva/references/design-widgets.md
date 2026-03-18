@@ -46,6 +46,11 @@
   display: flex;
   flex-direction: column;
   position: relative;
+  overflow: visible;
+}
+
+/* Chart cards clip canvas overflow; table/feed cards must not clip scroll */
+.widget-card:has(.chart-body) {
   overflow: hidden;
 }
 
@@ -521,28 +526,41 @@ markLine: {
 
 ```javascript
 // Shared formatter factory (define once per file)
+// Uses TT_COLORS for theme-aware tooltip content
 function mkFmt(valueFn) {
   valueFn = valueFn || ((v) => v);
   return (params) => {
+    const tc = typeof TT_COLORS !== "undefined" ? TT_COLORS : { title: "rgba(0,0,0,0.7)", text: "rgba(0,0,0,0.9)" };
     const t = params[0].axisValueLabel || params[0].axisValue;
-    let s = `<div style="font-size:12px;color:rgba(0,0,0,0.7);margin-bottom:6px;">${t}</div>`;
+    let s = `<div style="font-size:12px;color:${tc.title};margin-bottom:6px;">${t}</div>`;
     params.forEach((p) => {
       s +=
         `<div style="display:flex;align-items:center;gap:6px;line-height:20px;">` +
         `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;flex-shrink:0;background:${p.color};"></span>` +
-        `<span style="color:rgba(0,0,0,0.9);">${p.seriesName}</span>` +
-        `<span style="color:rgba(0,0,0,0.9);margin-left:auto;">${valueFn(p.value, p)}</span>` +
+        `<span style="color:${tc.text};">${p.seriesName}</span>` +
+        `<span style="color:${tc.text};margin-left:auto;">${valueFn(p.value, p)}</span>` +
         `</div>`;
     });
     return s;
   };
 }
 
-// Shared tooltip config
+// Theme-aware color constants — set once per page based on data-theme
+var isDark = document.documentElement.getAttribute("data-theme") === "dark";
+
+// Shared tooltip config (theme-aware)
+var TT_COLORS = {
+  bg:       isDark ? "rgba(30,31,35,0.96)"  : "rgba(255,255,255,0.96)",
+  border:   isDark ? "rgba(255,255,255,0.08)": "rgba(0,0,0,0.08)",
+  title:    isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)",
+  text:     isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.9)",
+  pointer:  isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+};
+
 const TT = {
   trigger: "axis",
-  backgroundColor: "rgba(255,255,255,0.96)",
-  borderColor: "rgba(0,0,0,0.08)",
+  backgroundColor: TT_COLORS.bg,
+  borderColor: TT_COLORS.border,
   borderWidth: 1,
   borderRadius: 6,
   padding: 12,
@@ -550,11 +568,11 @@ const TT = {
     fontFamily: "'Delight',-apple-system,BlinkMacSystemFont,sans-serif",
     fontSize: 12,
     fontWeight: 400,
-    color: "rgba(0,0,0,0.9)",
+    color: TT_COLORS.text,
   },
   axisPointer: {
     type: "line",
-    lineStyle: { color: "rgba(0,0,0,0.1)", width: 1 },
+    lineStyle: { color: TT_COLORS.pointer, width: 1 },
   },
   extraCssText: "box-shadow:none;",
   formatter: mkFmt(),
