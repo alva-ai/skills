@@ -179,6 +179,17 @@ Once released, the playbook is accessible at
 the world. Use the playbook `name` and the username from `GET /api/v1/me` to
 construct this URL.
 
+After publishing, take a screenshot to verify the dashboard renders correctly:
+
+```
+GET /api/v1/screenshot?url=https://alva.ai/u/<username>/playbooks/<playbook_name>
+```
+
+Pass `X-Alva-Api-Key` header so the screenshot service can access authenticated
+content. Fetch the returned image URL to inspect the result visually. See
+[api-reference.md](references/api-reference.md) § Screenshot API for full
+parameter details.
+
 ### 8. Remix (Create from Existing Playbook)
 
 Users can remix any published playbook to create a customized version. The Remix
