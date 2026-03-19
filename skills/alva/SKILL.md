@@ -310,6 +310,7 @@ See [api-reference.md](references/api-reference.md) for full details.
 | POST   | `/api/v1/fs/chmod`                | Change permissions                                |
 | POST   | `/api/v1/fs/grant`                | Grant read/write access to a path                 |
 | POST   | `/api/v1/fs/revoke`               | Revoke access                                     |
+| POST   | `/api/v1/fs/ensure-home`          | Provision your home directory (self-repair, idempotent) |
 
 Paths: `~/data/file.json` (home-relative) or `/alva/home/<username>/...`
 (absolute). Public reads use absolute paths without API key.
@@ -891,6 +892,10 @@ consistent read pattern (`@last`, `@range`, etc.).
 - **Altra lookback: feature vs strategy.** Feature lookback controls how many
   bars the feature computation sees. Strategy lookback controls how many feature
   outputs the strategy function sees. They are independent.
+- **Home directory not provisioned?** If you get `PERMISSION_DENIED` on all
+  ALFS operations (including `~/`), your home directory was not created during
+  sign-up. Call `POST /api/v1/fs/ensure-home` (no body needed, uses your auth
+  token) to provision it. This is idempotent and safe to call anytime.
 - **Cronjob path must point to an existing script.** The deploy API validates
   the entry_path exists via filesystem stat before creating the cronjob.
 - **Always create a draft before releasing.** `POST /api/v1/release/playbook`
