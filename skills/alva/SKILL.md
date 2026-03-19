@@ -190,7 +190,19 @@ Three phases:
 Once released, the playbook is accessible at
 `https://alva.ai/u/<username>/playbooks/<playbook_name>` — ready to share with
 the world. Use the playbook `name` and the username from `GET /api/v1/me` to
-construct this URL.
+construct this URL. After a successful release, post a creator's note — see
+[creators-note.md](references/creators-note.md).
+
+After publishing, take a screenshot to verify the dashboard renders correctly:
+
+```
+GET /api/v1/screenshot?url=https://alva.ai/u/<username>/playbooks/<playbook_name>
+```
+
+Pass `X-Alva-Api-Key` header so the screenshot service can access authenticated
+content. Fetch the returned image URL to inspect the result visually. See
+[api-reference.md](references/api-reference.md) § Screenshot API for full
+parameter details.
 
 ### 8. Remix (Create from Existing Playbook)
 
@@ -219,6 +231,7 @@ guide.
 | [remix-workflow.md](references/remix-workflow.md)       | Remix: create a new playbook from an existing template                                                     |
 | [adk.md](references/adk.md)                             | Agent Development Kit: `adk.agent()` API, tool calling, ReAct loop, examples                               |
 | [unified-search.md](references/unified-search.md)       | Unified Search: LLM plan → code execute → enrich → hybrid rank (news, social, video)                      |
+| [creators-note.md](references/creators-note.md)         | Post-release creator's note: workflow, content guidance, API calls                                          |
 
 ---
 
@@ -533,7 +546,7 @@ and deduplication behavior.
 
 ## Deploying Feeds
 
-Every feed follows a 6-step lifecycle:
+Every feed follows a 6-step lifecycle including every newly created feed or re-created feed:
 
 1. **Write** -- define schema + incremental logic with `ctx.kv`
 2. **Upload** -- write script to `~/feeds/<name>/v1/src/index.js`
