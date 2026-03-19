@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/skills/alva/scripts/save_trace.py"
+          }
+        ]
+      }
+    ]
+  }
+}
