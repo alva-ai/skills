@@ -62,7 +62,11 @@
 
 .list-item-text {
   flex: 1 0 0;
-  font-family: "Delight", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "Delight",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   font-style: normal;
   font-size: 14px;
   line-height: 22px;
@@ -135,9 +139,16 @@ document.querySelectorAll(".list-item").forEach((item) => {
 
 ## Markdown
 
-> For font specification, see [design-system.md - Typography & Font](./design-system.md#typography--font). Headings and body text use Delight with `-apple-system`, `BlinkMacSystemFont`, `sans-serif` fallbacks; code uses JetBrains Mono.
+> For font specification, see
+> [design-system.md - Typography & Font](./design-system.md#typography--font).
+> Headings and body text use Delight with `-apple-system`, `BlinkMacSystemFont`,
+> `sans-serif` fallbacks; code uses JetBrains Mono.
 
-Uses [markdown-it](https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js) for automatic rendering. Write raw markdown inside `<script type="text/markdown">`, the init script parses it into standard HTML tags, and scoped CSS maps them to the Alva design spec.
+Uses
+[markdown-it](https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js)
+for automatic rendering. Write raw markdown inside
+`<script type="text/markdown">`, the init script parses it into standard HTML
+tags, and scoped CSS maps them to the Alva design spec.
 
 ### Usage
 
@@ -145,19 +156,19 @@ Uses [markdown-it](https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min
 <!-- 1. Container with optional size modifier -->
 <div class="markdown-container">
   <script type="text/markdown">
-# Heading 1
+    # Heading 1
 
-Paragraph with `inline code`.
+    Paragraph with `inline code`.
 
-- Bullet item
-- Another item
+    - Bullet item
+    - Another item
 
-1. Ordered item
-2. Another item
+    1. Ordered item
+    2. Another item
 
-| Col A | Col B |
-| --- | --- |
-| Cell | Cell |
+    | Col A | Col B |
+    | ----- | ----- |
+    | Cell  | Cell  |
   </script>
 </div>
 
@@ -170,16 +181,20 @@ Paragraph with `inline code`.
 <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
 <script>
   const md = window.markdownit();
-  const defaultRender = md.renderer.rules.link_open || function(tokens, idx, options, env, self) { return self.renderToken(tokens, idx, options); };
-  md.renderer.rules.link_open = function(tokens, idx, options, env, self) {
-    tokens[idx].attrSet('target', '_blank');
-    tokens[idx].attrSet('rel', 'noopener noreferrer');
+  const defaultRender =
+    md.renderer.rules.link_open ||
+    function (tokens, idx, options, env, self) {
+      return self.renderToken(tokens, idx, options);
+    };
+  md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
+    tokens[idx].attrSet("target", "_blank");
+    tokens[idx].attrSet("rel", "noopener noreferrer");
     return defaultRender(tokens, idx, options, env, self);
   };
-  document.querySelectorAll('script[type="text/markdown"]').forEach(el => {
+  document.querySelectorAll('script[type="text/markdown"]').forEach((el) => {
     const container = el.parentElement;
     el.remove();
-    container.insertAdjacentHTML('beforeend', md.render(el.textContent));
+    container.insertAdjacentHTML("beforeend", md.render(el.textContent));
   });
 </script>
 ```
@@ -194,7 +209,9 @@ Paragraph with `inline code`.
   flex-direction: column;
   gap: 16px;
 }
-.markdown-container * { box-sizing: border-box; }
+.markdown-container * {
+  box-sizing: border-box;
+}
 
 /* ── Headings ── */
 .markdown-container h1,
@@ -203,7 +220,11 @@ Paragraph with `inline code`.
 .markdown-container h4,
 .markdown-container h5,
 .markdown-container h6 {
-  font-family: "Delight", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "Delight",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   font-weight: 500;
   font-style: normal;
   color: var(--text-n9);
@@ -211,85 +232,174 @@ Paragraph with `inline code`.
   width: 100%;
 }
 .markdown-container h1,
-.markdown-container h2 { font-size: 20px; line-height: 30px; letter-spacing: 0.2px; padding-top: 8px; }
-.markdown-container h3 { font-size: 18px; line-height: 28px; letter-spacing: 0.18px; padding-top: 4px; }
+.markdown-container h2 {
+  font-size: 20px;
+  line-height: 30px;
+  letter-spacing: 0.2px;
+  padding-top: 8px;
+}
+.markdown-container h3 {
+  font-size: 18px;
+  line-height: 28px;
+  letter-spacing: 0.18px;
+  padding-top: 4px;
+}
 .markdown-container h4,
 .markdown-container h5,
-.markdown-container h6 { font-size: 16px; line-height: 26px; letter-spacing: 0.16px; }
+.markdown-container h6 {
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: 0.16px;
+}
 
 /* ── Paragraph ── */
 .markdown-container p {
-  font-family: "Delight", -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 16px; line-height: 26px; letter-spacing: 0.16px;
-  color: var(--text-n9); margin: 0; white-space: pre-wrap;
+  font-family:
+    "Delight",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: 0.16px;
+  color: var(--text-n9);
+  margin: 0;
+  white-space: pre-wrap;
 }
 
 /* ── Lists ── */
 .markdown-container ul,
 .markdown-container ol {
-  display: flex; flex-direction: column; gap: 8px;
-  list-style: none; margin: 0; padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 .markdown-container li {
-  font-family: "Delight", -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 16px; line-height: 26px; letter-spacing: 0.16px;
+  font-family:
+    "Delight",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: 0.16px;
   color: var(--text-n9);
-  position: relative; padding-left: 24px;
+  position: relative;
+  padding-left: 24px;
 }
 .markdown-container ul > li::before {
   content: "";
-  width: 5px; height: 5px; border-radius: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
   background: var(--text-n9);
-  position: absolute; left: 0; top: 10.5px;
+  position: absolute;
+  left: 0;
+  top: 10.5px;
 }
-.markdown-container ol { counter-reset: md-ol; }
-.markdown-container ol > li { counter-increment: md-ol; }
+.markdown-container ol {
+  counter-reset: md-ol;
+}
+.markdown-container ol > li {
+  counter-increment: md-ol;
+}
 .markdown-container ol > li::before {
   content: counter(md-ol) ".";
-  position: absolute; left: 0; top: 0;
-  width: 24px; text-align: center;
-  font-size: 16px; line-height: 26px; color: var(--text-n9);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 24px;
+  text-align: center;
+  font-size: 16px;
+  line-height: 26px;
+  color: var(--text-n9);
 }
 
 /* ── Code ── */
 .markdown-container code,
 .markdown-container pre {
   background: var(--b-r02);
-  border-radius: 2px; font-family: "JetBrains Mono", monospace; color: var(--text-n7);
+  border-radius: 2px;
+  font-family: "JetBrains Mono", monospace;
+  color: var(--text-n7);
 }
 .markdown-container code {
-  display: inline-block; vertical-align: middle;
+  display: inline-block;
+  vertical-align: middle;
   box-shadow: inset 0 0 0 1px var(--line-l07);
-  font-size: 12px; line-height: 20px; letter-spacing: 0.12px; padding: 2px 8px; margin: 0 4px;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
+  padding: 2px 8px;
+  margin: 0 4px;
 }
 .markdown-container pre {
   border: 1px solid var(--line-l07);
-  font-size: 14px; line-height: 22px; letter-spacing: 0.14px;
-  padding: 12px 16px; margin: 0; overflow-x: auto;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+  padding: 12px 16px;
+  margin: 0;
+  overflow-x: auto;
 }
-.markdown-container pre code { display: inline; vertical-align: baseline; font-size: inherit; line-height: inherit; letter-spacing: inherit; box-shadow: none; padding: 0; margin: 0; background: none; }
+.markdown-container pre code {
+  display: inline;
+  vertical-align: baseline;
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  background: none;
+}
 
 /* ── Divider ── */
 .markdown-container hr {
-  height: 1px; background: var(--line-l07);
-  border: none; margin: 4px 0;
+  height: 1px;
+  background: var(--line-l07);
+  border: none;
+  margin: 4px 0;
 }
 
 /* ── Table ── follows Table Card rules (design-widgets.md) */
-.markdown-container table { width: 100%; border-collapse: separate; border-spacing: 16px 0; margin: 0 -16px; }
+.markdown-container table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 16px 0;
+  margin: 0 -16px;
+}
 .markdown-container th,
 .markdown-container td {
   padding: 12px 0;
   border-bottom: 1px solid var(--line-l07);
-  font-family: "Delight", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "Delight",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   font-weight: 400;
-  font-size: 14px; line-height: 22px; letter-spacing: 0.14px;
-  color: var(--text-n9); text-align: left;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+  color: var(--text-n9);
+  text-align: left;
   max-height: 180px;
 }
-.markdown-container th { color: var(--text-n7); padding-top: 0; padding-bottom: 12px; }
-.markdown-container tr:last-child td { border-bottom: none; }
-.markdown-container td code { margin: 0; }
+.markdown-container th {
+  color: var(--text-n7);
+  padding-top: 0;
+  padding-bottom: 12px;
+}
+.markdown-container tr:last-child td {
+  border-bottom: none;
+}
+.markdown-container td code {
+  margin: 0;
+}
 
 /* ── Link ── */
 .markdown-container a {
@@ -302,12 +412,17 @@ Paragraph with `inline code`.
   text-decoration-skip-ink: none;
   transition: color 0.15s ease;
 }
-.markdown-container a:hover { color: var(--main-m1); text-decoration-color: var(--main-m1); }
+.markdown-container a:hover {
+  color: var(--main-m1);
+  text-decoration-color: var(--main-m1);
+}
 .markdown-container a::after {
   content: "";
-  width: 16px; height: 16px;
+  width: 16px;
+  height: 16px;
   background: currentColor;
-  mask: url("https://alva-ai-static.b-cdn.net/icons/go-l.svg") center / contain no-repeat;
+  mask: url("https://alva-ai-static.b-cdn.net/icons/go-l.svg") center / contain
+    no-repeat;
   display: inline-block;
   vertical-align: middle;
   margin-left: 4px;
@@ -315,49 +430,150 @@ Paragraph with `inline code`.
 }
 
 /* ── Medium ── */
-.markdown-container--m { gap: 8px; }
-.markdown-container--m h1 { font-size: 18px; line-height: 28px; letter-spacing: 0.18px; padding-top: 2px; }
-.markdown-container--m h2 { font-size: 16px; line-height: 26px; letter-spacing: 0.16px; padding-top: 2px; }
-.markdown-container--m h3 { font-size: 14px; line-height: 22px; letter-spacing: 0.14px; padding-top: 0; }
+.markdown-container--m {
+  gap: 8px;
+}
+.markdown-container--m h1 {
+  font-size: 18px;
+  line-height: 28px;
+  letter-spacing: 0.18px;
+  padding-top: 2px;
+}
+.markdown-container--m h2 {
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: 0.16px;
+  padding-top: 2px;
+}
+.markdown-container--m h3 {
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+  padding-top: 0;
+}
 .markdown-container--m h4,
 .markdown-container--m h5,
-.markdown-container--m h6 { font-size: 14px; line-height: 22px; letter-spacing: 0.14px; }
+.markdown-container--m h6 {
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+}
 .markdown-container--m p,
-.markdown-container--m li { font-size: 14px; line-height: 22px; letter-spacing: 0.14px; }
-.markdown-container--m ul > li::before { top: 8.5px; }
-.markdown-container--m ol > li::before { font-size: 14px; line-height: 22px; }
+.markdown-container--m li {
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+}
+.markdown-container--m ul > li::before {
+  top: 8.5px;
+}
+.markdown-container--m ol > li::before {
+  font-size: 14px;
+  line-height: 22px;
+}
 .markdown-container--m ul,
-.markdown-container--m ol { gap: 4px; }
+.markdown-container--m ol {
+  gap: 4px;
+}
 .markdown-container--m th,
-.markdown-container--m td { font-size: 12px; line-height: 20px; letter-spacing: 0.12px; padding: 8px; min-height: 176px; }
-.markdown-container--m code { padding: 1px 8px; }
-.markdown-container--m pre { font-size: 12px; line-height: 20px; letter-spacing: 0.12px; }
-.markdown-container--m a::after { width: 14px; height: 14px; }
+.markdown-container--m td {
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
+  padding: 8px;
+  min-height: 176px;
+}
+.markdown-container--m code {
+  padding: 1px 8px;
+}
+.markdown-container--m pre {
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
+}
+.markdown-container--m a::after {
+  width: 14px;
+  height: 14px;
+}
 
 /* ── Small ── */
-.markdown-container--s { gap: 4px; }
-.markdown-container--s h1 { font-size: 14px; line-height: 22px; letter-spacing: 0.14px; padding-top: 2px; }
-.markdown-container--s h2 { font-size: 12px; line-height: 20px; letter-spacing: 0.12px; padding-top: 0; }
-.markdown-container--s h3 { font-size: 12px; line-height: 20px; letter-spacing: 0.12px; padding-top: 0; }
+.markdown-container--s {
+  gap: 4px;
+}
+.markdown-container--s h1 {
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+  padding-top: 2px;
+}
+.markdown-container--s h2 {
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
+  padding-top: 0;
+}
+.markdown-container--s h3 {
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
+  padding-top: 0;
+}
 .markdown-container--s h4,
 .markdown-container--s h5,
-.markdown-container--s h6 { font-size: 12px; line-height: 20px; letter-spacing: 0.12px; }
+.markdown-container--s h6 {
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
+}
 .markdown-container--s p,
-.markdown-container--s li { font-size: 12px; line-height: 20px; letter-spacing: 0.12px; }
-.markdown-container--s a::after { width: 12px; height: 12px; }
-.markdown-container--s ul > li::before { top: 7.5px; }
-.markdown-container--s ol > li::before { font-size: 12px; line-height: 20px; }
+.markdown-container--s li {
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
+}
+.markdown-container--s a::after {
+  width: 12px;
+  height: 12px;
+}
+.markdown-container--s ul > li::before {
+  top: 7.5px;
+}
+.markdown-container--s ol > li::before {
+  font-size: 12px;
+  line-height: 20px;
+}
 .markdown-container--s ul,
-.markdown-container--s ol { gap: 4px; }
-.markdown-container--s code { font-size: 10px; line-height: 16px; padding: 2px 6px; }
-.markdown-container--s pre { font-size: 10px; line-height: 16px; padding: 8px 12px; }
+.markdown-container--s ol {
+  gap: 4px;
+}
+.markdown-container--s code {
+  font-size: 10px;
+  line-height: 16px;
+  padding: 2px 6px;
+}
+.markdown-container--s pre {
+  font-size: 10px;
+  line-height: 16px;
+  padding: 8px 12px;
+}
 .markdown-container--s th,
-.markdown-container--s td { font-size: 12px; line-height: 20px; letter-spacing: 0.12px; padding: 8px; min-height: 176px; }
+.markdown-container--s td {
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
+  padding: 8px;
+  min-height: 176px;
+}
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
-  .markdown-container { max-width: 100%; padding: 0 16px; }
-  .markdown-container table { overflow-x: scroll; }
+  .markdown-container {
+    max-width: 100%;
+    padding: 0 16px;
+  }
+  .markdown-container table {
+    overflow-x: scroll;
+  }
 }
 ```
 
@@ -365,7 +581,8 @@ Paragraph with `inline code`.
 
 ### 1. Overview
 
-The button component system contains **2 types** x **4 sizes** x **4 states** = 32 combinations
+The button component system contains **2 types** x **4 sizes** x **4 states** =
+32 combinations
 
 - **Primary Button**: for primary actions (submit, confirm, save)
 - **Secondary Button**: for secondary actions (cancel, back, view)
@@ -410,7 +627,11 @@ The button component system contains **2 types** x **4 sizes** x **4 states** = 
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: "Delight", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "Delight",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   font-weight: 500;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
@@ -561,21 +782,39 @@ The button component system contains **2 types** x **4 sizes** x **4 states** = 
 
 ### 1. Overview
 
-Tags are compact labels used to display status, category, or classification. The system contains **3 semantic variants** × **3 sizes** = 9 combinations, plus a neutral default.
+Tags are compact labels used to display status, category, or classification.
+They come in **3 sizes** and **2 style modes**. Colors are not predefined — the
+agent picks the appropriate `--main-mX` color token based on semantic context
+(m1 Theme, m2 Link, m3 Bullish, m4 Bearish, m5 Alert, m6 Emphasize). Every
+`--main-mX` has a matching `--main-mX-10` (10 % opacity) variant for the tinted
+style.
 
 ### 2. CSS
 
 ```css
+/* Base (default size = Small) */
 .tag {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: "Delight", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "Delight",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   font-weight: 400;
   white-space: nowrap;
   border-radius: var(--radius-ct-s);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  height: 22px;
+  padding: 1px 6px;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
+  /* Default color (no semantic meaning) */
+  background-color: var(--b-r05);
+  color: var(--text-n9);
 }
 
 /* Size — Medium */
@@ -585,15 +824,6 @@ Tags are compact labels used to display status, category, or classification. The
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
-}
-
-/* Size — Small (default) */
-.tag {
-  height: 22px;
-  padding: 1px 6px;
-  font-size: 12px;
-  line-height: 20px;
-  letter-spacing: 0.12px;
 }
 
 /* Size — Extra Small */
@@ -606,52 +836,62 @@ Tags are compact labels used to display status, category, or classification. The
   border-radius: var(--radius-ct-xs);
 }
 
-/* Variant — Default */
-.tag {
-  background-color: var(--b-r05);
-  color: var(--text-n9);
-}
-
-/* Variant — Bullish (LONG) */
-.tag-bullish {
-  background-color: var(--main-m3);
-  color: var(--b-common-white);
-}
-
-/* Variant — Bearish (SHORT) */
-.tag-bearish {
-  background-color: var(--main-m4);
-  color: var(--b-common-white);
-}
-
-/* Variant — Neutral (CASH) */
-.tag-neutral {
-  background-color: var(--text-n3);
-  color: var(--b-common-white);
-}
+/*
+ * Style — Tinted
+ * Light transparent background + colored text.
+ *   background-color: var(--main-mX-10);
+ *   color: var(--main-mX);
+ *
+ * Style — Solid
+ * Full-color background + white text.
+ *   background-color: var(--main-mX);
+ *   color: var(--b-common-white);
+ */
 ```
 
 ### 3. HTML
 
 ```html
-<!-- Bullish (LONG) / Bearish (SHORT) / Neutral (CASH) / Default -->
-<span class="tag tag-bullish">LONG</span>
-<span class="tag tag-bearish">SHORT</span>
-<span class="tag tag-neutral">CASH</span>
+<!-- Tinted — agent chooses color by meaning -->
+<span class="tag" style="background:var(--main-m3-10);color:var(--main-m3)"
+  >BULLISH</span
+>
+<span class="tag" style="background:var(--main-m4-10);color:var(--main-m4)"
+  >BEARISH</span
+>
+<span class="tag" style="background:var(--main-m5-10);color:var(--main-m5)"
+  >MODERATE</span
+>
 <span class="tag">Label</span>
 
-<!-- Small -->
-<span class="tag tag-sm tag-bullish">LONG</span>
+<!-- Solid -->
+<span class="tag" style="background:var(--main-m3);color:var(--b-common-white)"
+  >LONG</span
+>
+<span class="tag" style="background:var(--main-m4);color:var(--b-common-white)"
+  >SHORT</span
+>
 
-<!-- Extra Small -->
-<span class="tag tag-xs tag-bearish">SHORT</span>
+<!-- Sizes -->
+<span
+  class="tag tag-md"
+  style="background:var(--main-m3-10);color:var(--main-m3)"
+  >BULLISH</span
+>
+<span
+  class="tag tag-xs"
+  style="background:var(--main-m4-10);color:var(--main-m4)"
+  >BEARISH</span
+>
 ```
 
 ---
 
 ## Switch
 
-Sliding toggle for boolean state (on/off). **3 sizes** × **4 states** = 12 combinations. Ratio rule: thumb diameter = track height × 2/3, thumb spacing = track height × 1/6.
+Sliding toggle for boolean state (on/off). **3 sizes** × **4 states** = 12
+combinations. Ratio rule: thumb diameter = track height × 2/3, thumb spacing =
+track height × 1/6.
 
 ### CSS
 
@@ -690,8 +930,12 @@ Sliding toggle for boolean state (on/off). **3 sizes** × **4 states** = 12 comb
   cursor: not-allowed;
   pointer-events: none;
 }
-.switch.disabled:not(.on) { opacity: 0.4; }
-.switch.disabled.on { opacity: 0.3; }
+.switch.disabled:not(.on) {
+  opacity: 0.4;
+}
+.switch.disabled.on {
+  opacity: 0.3;
+}
 
 /* Size — Medium (default) */
 .switch {
@@ -753,7 +997,12 @@ Sliding toggle for boolean state (on/off). **3 sizes** × **4 states** = 12 comb
 </div>
 
 <!-- Small, disabled -->
-<div class="switch switch-sm disabled" role="switch" aria-checked="false" aria-disabled="true">
+<div
+  class="switch switch-sm disabled"
+  role="switch"
+  aria-checked="false"
+  aria-disabled="true"
+>
   <div class="switch-thumb"></div>
 </div>
 ```
@@ -854,14 +1103,16 @@ Modal                        ← Overlay
 | Flex     | `1 0 0` (fills remaining space) |
 | Width    | `100%`                          |
 
-> Placeholder is a reserved area; replace with actual business content (forms, lists, confirmation messages, etc.) when used.
+> Placeholder is a reserved area; replace with actual business content (forms,
+> lists, confirmation messages, etc.) when used.
 
 ### Interaction
 
 - Clicking the overlay can close the modal (configurable)
 - Clicking the close icon (x) in the top-right corner closes the modal
 - When the modal is open, background content is not scrollable
-- When modal content exceeds available height, the content area scrolls internally
+- When modal content exceeds available height, the content area scrolls
+  internally
 - Responsive: `16px` safe margin horizontally, `48px` safe margin vertically
 
 ### Responsive
@@ -873,7 +1124,10 @@ Modal                        ← Overlay
 
 ## Select
 
-Clicking the Select container triggers the associated [Dropdown](#dropdown). Dropdown width defaults to the same width as the Select. Dropdown list item text size follows the Select size. Clicking again or clicking outside closes the Dropdown. Arrow icon always points down and does not rotate.
+Clicking the Select container triggers the associated [Dropdown](#dropdown).
+Dropdown width defaults to the same width as the Select. Dropdown list item text
+size follows the Select size. Clicking again or clicking outside closes the
+Dropdown. Arrow icon always points down and does not rotate.
 
 ### CSS
 
@@ -884,7 +1138,11 @@ Clicking the Select container triggers the associated [Dropdown](#dropdown). Dro
   background-color: var(--b0-container);
   cursor: pointer;
   position: relative;
-  font-family: "Delight", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "Delight",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   font-weight: 400;
   transition: border-color 0.12s ease;
 }
@@ -990,7 +1248,10 @@ Clicking the Select container triggers the associated [Dropdown](#dropdown). Dro
   <div class="select-border"></div>
   <span class="select-text">Select option</span>
   <div class="select-icon" style="width:14px;height:14px;">
-    <img src="https://alva-ai-static.b-cdn.net/icons/arrow-down-f2.svg" alt="" />
+    <img
+      src="https://alva-ai-static.b-cdn.net/icons/arrow-down-f2.svg"
+      alt=""
+    />
   </div>
 </div>
 
@@ -999,7 +1260,10 @@ Clicking the Select container triggers the associated [Dropdown](#dropdown). Dro
   <div class="select-border"></div>
   <span class="select-text">Selected Value</span>
   <div class="select-icon" style="width:14px;height:14px;">
-    <img src="https://alva-ai-static.b-cdn.net/icons/arrow-down-f2.svg" alt="" />
+    <img
+      src="https://alva-ai-static.b-cdn.net/icons/arrow-down-f2.svg"
+      alt=""
+    />
   </div>
 </div>
 
@@ -1089,7 +1353,11 @@ border through their transparent border.
   align-items: center;
 }
 .tab-item {
-  font-family: "Delight", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:
+    "Delight",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -1174,8 +1442,12 @@ border through their transparent border.
 
 <!-- Tab panels — data-tab-panel value must match data-tab on the trigger -->
 <div data-tab-panel="tab1" data-tab-group="demo">Panel 1</div>
-<div data-tab-panel="tab2" data-tab-group="demo" style="display:none;">Panel 2</div>
-<div data-tab-panel="tab3" data-tab-group="demo" style="display:none;">Panel 3</div>
+<div data-tab-panel="tab2" data-tab-group="demo" style="display:none;">
+  Panel 2
+</div>
+<div data-tab-panel="tab3" data-tab-group="demo" style="display:none;">
+  Panel 3
+</div>
 ```
 
 ### JS Interaction
@@ -1198,7 +1470,9 @@ document.querySelectorAll(".tab").forEach(function (tab) {
 
     // Switch panels
     var panels = group
-      ? document.querySelectorAll('[data-tab-panel][data-tab-group="' + group + '"]')
+      ? document.querySelectorAll(
+          '[data-tab-panel][data-tab-group="' + group + '"]',
+        )
       : [];
     panels.forEach(function (p) {
       p.style.display = p.dataset.tabPanel === item.dataset.tab ? "" : "none";
@@ -1208,7 +1482,11 @@ document.querySelectorAll(".tab").forEach(function (tab) {
     // (hidden containers report 0×0, so charts need a resize after show)
     var active = group
       ? document.querySelector(
-          '[data-tab-panel="' + item.dataset.tab + '"][data-tab-group="' + group + '"]'
+          '[data-tab-panel="' +
+            item.dataset.tab +
+            '"][data-tab-group="' +
+            group +
+            '"]',
         )
       : null;
     if (active) {
