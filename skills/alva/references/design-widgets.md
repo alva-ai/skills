@@ -20,16 +20,16 @@
 1. **Widget-internal layout uses `flex-wrap`** (KPI rows, metric groups,
    side-by-side elements). Never `grid-cols-N` — grid is only for page-level
    `.widget-grid`. → [Details](#content-reflow)
-2. **No border/outline on widgets** — use `--grey-g01` or `--line-l05`
-   dividers. Only Tags may have borders. → [Details](#widget-background)
-3. **Dividers don't span full width** — align both ends with content padding.
-   → [Details](#divider)
-4. **Chart Card → dotted bg; Table Card → none; others → `--grey-g01`.**
-   → [Details](#widget-background)
+2. **No border/outline on widgets** — use `--grey-g01` or `--line-l05` dividers.
+   Only Tags may have borders. → [Details](#widget-background)
+3. **Dividers don't span full width** — align both ends with content padding. →
+   [Details](#divider)
+4. **Chart Card → dotted bg; Table Card → none; others → `--grey-g01`.** →
+   [Details](#widget-background)
 5. **Same-row widgets must equal height** — `.widget-body.fill` + `flex: 1`.
    ECharts: `height:100%; min-height:180px`. → [Details](#equal-height-fill)
-6. **Table columns require JS `initTableAlignment`** — proportional widths
-   based on content, horizontal scroll when overflow. `gap:16px` on rows,
+6. **Table columns require JS `initTableAlignment`** — proportional widths based
+   on content, horizontal scroll when overflow. `gap:16px` on rows,
    `border-bottom` on rows not cells. → [Details](#column-alignment)
 
 ---
@@ -165,7 +165,7 @@
 .table-row {
   display: flex;
   width: 100%;
-  gap: 16px;                          /* column spacing between cells */
+  gap: 16px; /* column spacing between cells */
   border-bottom: 1px solid var(--line-l07); /* row divider — on the row, not cells */
   /* min-width is set by initTableAlignment JS — do NOT use CSS min-width here */
 }
@@ -263,12 +263,24 @@
   align-items: stretch;
 }
 
-.col-2 { grid-column: span 2; }
-.col-3 { grid-column: span 3; }
-.col-4 { grid-column: span 4; }
-.col-5 { grid-column: span 5; }
-.col-6 { grid-column: span 6; }
-.col-8 { grid-column: span 8; }
+.col-2 {
+  grid-column: span 2;
+}
+.col-3 {
+  grid-column: span 3;
+}
+.col-4 {
+  grid-column: span 4;
+}
+.col-5 {
+  grid-column: span 5;
+}
+.col-6 {
+  grid-column: span 6;
+}
+.col-8 {
+  grid-column: span 8;
+}
 
 .col-thirds {
   grid-column: span 8;
@@ -283,8 +295,14 @@
     grid-template-columns: repeat(4, 1fr);
     gap: var(--spacing-l);
   }
-  .col-2 { grid-column: span 2; }
-  .col-3, .col-4, .col-5, .col-6, .col-8 {
+  .col-2 {
+    grid-column: span 2;
+  }
+  .col-3,
+  .col-4,
+  .col-5,
+  .col-6,
+  .col-8 {
     grid-column: span 4;
   }
   .col-thirds {
@@ -404,32 +422,32 @@ never wrap — always `width: 100%`.
 
 ### Widget Height
 
-| Widget Type    | Default Height         | Overflow Behavior        |
-| -------------- | ---------------------- | ------------------------ |
-| KPI Card       | auto (content-driven)  | Wrap via flex-wrap       |
-| Chart Card     | 320px                  | Chart scales internally  |
-| Table Card     | auto, capped at 560px  | Scroll within table body |
-| Free Text Card | auto (content-driven)  | Scroll or truncate       |
-| Feed Card      | auto, capped at 560px  | Scroll within feed body  |
+| Widget Type    | Default Height        | Overflow Behavior        |
+| -------------- | --------------------- | ------------------------ |
+| KPI Card       | auto (content-driven) | Wrap via flex-wrap       |
+| Chart Card     | 320px                 | Chart scales internally  |
+| Table Card     | auto, capped at 560px | Scroll within table body |
+| Free Text Card | auto (content-driven) | Scroll or truncate       |
+| Feed Card      | auto, capped at 560px | Scroll within feed body  |
 
-Table / Feed: content < 320px → auto; ≥ 320px → 320px body + internal scroll.
-Do not exceed 560px total height. Max for all widgets: **960px**
+Table / Feed: content < 320px → auto; ≥ 320px → 320px body + internal scroll. Do
+not exceed 560px total height. Max for all widgets: **960px**
 (`overflow-y: auto` on widget body, not card).
 
 ### Widget Background
 
 No border/outline on widgets (only Tag elements may have borders). Background:
 
-| Widget Type | Background                                      |
-| ----------- | ----------------------------------------------- |
-| Chart Card  | `.chart-dotted-background`                      |
-| Table Card  | None (transparent)                              |
-| Others      | `var(--grey-g01)`                               |
+| Widget Type | Background                 |
+| ----------- | -------------------------- |
+| Chart Card  | `.chart-dotted-background` |
+| Table Card  | None (transparent)         |
+| Others      | `var(--grey-g01)`          |
 
 ### Divider
 
-Use `.divider-v` / `.divider-h` — both ends align with content padding (not
-full width). Do not use `border-bottom` / `border-right` for widget dividers.
+Use `.divider-v` / `.divider-h` — both ends align with content padding (not full
+width). Do not use `border-bottom` / `border-right` for widget dividers.
 
 ---
 
@@ -442,7 +460,8 @@ full width). Do not use `border-bottom` / `border-right` for widget dividers.
 <div class="widget-card">
   <div class="widget-title">
     <span class="widget-title-text">Chart Title</span>
-    <span class="widget-timestamp">12:30</span>  <!-- optional -->
+    <span class="widget-timestamp">12:30</span>
+    <!-- optional -->
   </div>
   <div class="chart-body chart-dotted-background">
     <!-- optional: HTML legend (use when ECharts legend is insufficient) -->
@@ -456,7 +475,10 @@ full width). Do not use `border-bottom` / `border-right` for widget dividers.
     <div id="chart-xxx" style="width:100%;height:320px;"></div>
     <!-- Watermark: always inside chart-body, always this exact structure -->
     <div class="alva-watermark">
-      <img src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg" alt="Alva" />
+      <img
+        src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg"
+        alt="Alva"
+      />
     </div>
   </div>
 </div>
@@ -474,15 +496,15 @@ Legend marker class by chart type:
 
 1. Use ECharts. Legend and chart must not overlap.
 2. Do NOT set ECharts `backgroundColor` — dotted pattern handles it.
-3. Colors from chart palette in [design-tokens.css](./design-tokens.css).
-   No duplicates. Grey (`--chart-grey-*`) only when ≥ 3 series.
-4. **ECharts is Canvas — `var(--xxx)` does NOT work.** Use raw hex/rgba
-   in all ECharts configs. CSS variables remain correct for DOM styles.
-5. **Hidden containers (tab panels, modals) report 0×0 size.** When a
-   chart becomes visible after being hidden, call `chart.resize()`.
-   Likewise, `initTableAlignment` must re-run for tables that were
-   hidden. The [Tab JS](./design-components.md#js-interaction-1) handles
-   both automatically for tab switches.
+3. Colors from chart palette in [design-tokens.css](./design-tokens.css). No
+   duplicates. Grey (`--chart-grey-*`) only when ≥ 3 series.
+4. **ECharts is Canvas — `var(--xxx)` does NOT work.** Use raw hex/rgba in all
+   ECharts configs. CSS variables remain correct for DOM styles.
+5. **Hidden containers (tab panels, modals) report 0×0 size.** When a chart
+   becomes visible after being hidden, call `chart.resize()`. Likewise,
+   `initTableAlignment` must re-run for tables that were hidden. The
+   [Tab JS](./design-components.md#js-interaction-1) handles both automatically
+   for tab switches.
 
 ### Axis Rules
 
@@ -530,7 +552,10 @@ markLine: {
 function mkFmt(valueFn) {
   valueFn = valueFn || ((v) => v);
   return (params) => {
-    const tc = typeof TT_COLORS !== "undefined" ? TT_COLORS : { title: "rgba(0,0,0,0.7)", text: "rgba(0,0,0,0.9)" };
+    const tc =
+      typeof TT_COLORS !== "undefined"
+        ? TT_COLORS
+        : { title: "rgba(0,0,0,0.7)", text: "rgba(0,0,0,0.9)" };
     const t = params[0].axisValueLabel || params[0].axisValue;
     let s = `<div style="font-size:12px;color:${tc.title};margin-bottom:6px;">${t}</div>`;
     params.forEach((p) => {
@@ -550,11 +575,11 @@ var isDark = document.documentElement.getAttribute("data-theme") === "dark";
 
 // Shared tooltip config (theme-aware)
 var TT_COLORS = {
-  bg:       isDark ? "rgba(30,31,35,0.96)"  : "rgba(255,255,255,0.96)",
-  border:   isDark ? "rgba(255,255,255,0.08)": "rgba(0,0,0,0.08)",
-  title:    isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)",
-  text:     isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.9)",
-  pointer:  isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+  bg: isDark ? "rgba(30,31,35,0.96)" : "rgba(255,255,255,0.96)",
+  border: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)",
+  title: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)",
+  text: isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.9)",
+  pointer: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
 };
 
 const TT = {
@@ -587,11 +612,11 @@ const TT = {
 
 ### Line Chart
 
-| Property | Value |
-| -------- | ----- |
-| Line width | 1px (`lineStyle: { width: 1 }`) |
-| Smoothing | `smooth: 0.1` |
-| Area fill | Gradient 15%→0% when 1–2 lines; none when ≥ 3 lines |
+| Property   | Value                                               |
+| ---------- | --------------------------------------------------- |
+| Line width | 1px (`lineStyle: { width: 1 }`)                     |
+| Smoothing  | `smooth: 0.1`                                       |
+| Area fill  | Gradient 15%→0% when 1–2 lines; none when ≥ 3 lines |
 
 **Area fill gradient**:
 
@@ -644,13 +669,21 @@ No `shadowBlur`, no `focus: 'series'`.
   <div class="widget-title">
     <span class="widget-title-text">KPI Title</span>
   </div>
-  <div class="widget-body" style="background:var(--grey-g01);padding:var(--spacing-l);flex-direction:column;align-items:flex-start;">
+  <div
+    class="widget-body"
+    style="background:var(--grey-g01);padding:var(--spacing-l);flex-direction:column;align-items:flex-start;"
+  >
     <!-- Single KPI -->
-    <div style="font-size:11px;color:var(--text-n7);letter-spacing:0.12px;">Label</div>
+    <div style="font-size:11px;color:var(--text-n7);letter-spacing:0.12px;">
+      Label
+    </div>
     <div style="font-size:24px;color:var(--main-m3);">+18.4%</div>
     <!-- Watermark -->
     <div class="alva-watermark">
-      <img src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg" alt="Alva" />
+      <img
+        src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg"
+        alt="Alva"
+      />
     </div>
   </div>
 </div>
@@ -703,17 +736,18 @@ No `shadowBlur`, no `focus: 'series'`.
 
 - No background. Delight Regular (400) only.
 - Row-first flex layout. **Do NOT use column-first layout.**
-- Column spacing: `gap: 16px` on `.table-row`. **Do NOT use cell padding
-  for inter-column spacing.**
-- Row divider: `border-bottom: 1px solid var(--line-l07)` on `.table-row`
-  (not cells). Last row: no border.
+- Column spacing: `gap: 16px` on `.table-row`. **Do NOT use cell padding for
+  inter-column spacing.**
+- Row divider: `border-bottom: 1px solid var(--line-l07)` on `.table-row` (not
+  cells). Last row: no border.
 
-| Element | Font | Color | Padding |
-| ------- | ---- | ----- | ------- |
+| Element | Font | Color       | Padding      |
+| ------- | ---- | ----------- | ------------ |
 | Header  | 14px | `--text-n7` | `0 0 12px 0` |
-| Body    | 14px | `--text-n9` | `12px 0` |
+| Body    | 14px | `--text-n9` | `12px 0`     |
 
-Body cell: `max-height: 180px`. Column widths are handled by `initTableAlignment` — do not set `width` on cells.
+Body cell: `max-height: 180px`. Column widths are handled by
+`initTableAlignment` — do not set `width` on cells.
 
 ### Column Alignment
 
@@ -725,24 +759,24 @@ widest item**. Overflow triggers horizontal scroll. Do NOT use inline
 
 1. **Reset** — `removeAttribute('style')` on all cells, clear row `min-width`.
 2. **Measure** — `scrollWidth` per column (max across all rows).
-3. **Resolve** — `resolved = max(colWidth, colWidth/total × available)`.
-   Wide container → proportional fill. Narrow → lock at content width.
+3. **Resolve** — `resolved = max(colWidth, colWidth/total × available)`. Wide
+   container → proportional fill. Narrow → lock at content width.
 4. **Apply** — `flex: 0 0 {resolved}px` on all cells + uniform row `min-width`.
 
 **Required JS** — run after every table render and on `resize`:
 
 ```javascript
 function initTableAlignment(tableEl) {
-  var rows = tableEl.querySelectorAll('.table-row');
+  var rows = tableEl.querySelectorAll(".table-row");
   if (rows.length === 0) return;
-  var colCount = rows[0].querySelectorAll('.table-cell').length;
+  var colCount = rows[0].querySelectorAll(".table-cell").length;
 
   // Phase 1: Reset — nuke all inline styles for clean measurement
-  rows.forEach(function(row) {
-    row.style.removeProperty('min-width');
-    var cells = row.querySelectorAll('.table-cell');
+  rows.forEach(function (row) {
+    row.style.removeProperty("min-width");
+    var cells = row.querySelectorAll(".table-cell");
     for (var i = 0; i < cells.length; i++) {
-      cells[i].removeAttribute('style');
+      cells[i].removeAttribute("style");
     }
   });
 
@@ -750,8 +784,8 @@ function initTableAlignment(tableEl) {
   var colWidths = [];
   for (var col = 0; col < colCount; col++) {
     var maxW = 0;
-    rows.forEach(function(row) {
-      var cell = row.querySelectorAll('.table-cell')[col];
+    rows.forEach(function (row) {
+      var cell = row.querySelectorAll(".table-cell")[col];
       if (cell) maxW = Math.max(maxW, cell.scrollWidth);
     });
     colWidths.push(maxW);
@@ -765,7 +799,7 @@ function initTableAlignment(tableEl) {
 
   var resolved = [];
   for (var col = 0; col < colCount; col++) {
-    var proportional = Math.round(colWidths[col] / totalContent * available);
+    var proportional = Math.round((colWidths[col] / totalContent) * available);
     resolved.push(Math.max(colWidths[col], proportional));
   }
 
@@ -773,15 +807,15 @@ function initTableAlignment(tableEl) {
   var totalWidth = gapTotal;
   for (var col = 0; col < colCount; col++) {
     totalWidth += resolved[col];
-    rows.forEach(function(row) {
-      var cell = row.querySelectorAll('.table-cell')[col];
+    rows.forEach(function (row) {
+      var cell = row.querySelectorAll(".table-cell")[col];
       if (!cell) return;
-      cell.style.flex = '0 0 ' + resolved[col] + 'px';
+      cell.style.flex = "0 0 " + resolved[col] + "px";
     });
   }
 
-  rows.forEach(function(row) {
-    row.style.minWidth = totalWidth + 'px';
+  rows.forEach(function (row) {
+    row.style.minWidth = totalWidth + "px";
   });
 }
 ```
@@ -816,14 +850,17 @@ exceed container. No hover effects on rows.
       </div>
     </div>
     <div class="alva-watermark">
-      <img src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg" alt="Alva" />
+      <img
+        src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg"
+        alt="Alva"
+      />
     </div>
   </div>
 </div>
 ```
 
-Use the Markdown component from
-[design-components.md](./design-components.md) for rich text rendering.
+Use the Markdown component from [design-components.md](./design-components.md)
+for rich text rendering.
 
 ---
 
@@ -837,19 +874,26 @@ Use the Markdown component from
   <div class="widget-title">
     <span class="widget-title-text">Feed Title</span>
   </div>
-  <div class="widget-body" style="background:var(--grey-g01);flex-direction:column;align-items:stretch;">
+  <div
+    class="widget-body"
+    style="background:var(--grey-g01);flex-direction:column;align-items:stretch;"
+  >
     <div class="feed-body">
       <div class="feed-item">
         <div class="feed-item-content">
           <div><!-- headline --></div>
           <div><!-- description --></div>
         </div>
-        <img class="feed-thumb" src="thumb.jpg" alt="" />  <!-- optional -->
+        <img class="feed-thumb" src="thumb.jpg" alt="" />
+        <!-- optional -->
       </div>
       <!-- more feed-items... -->
     </div>
     <div class="alva-watermark">
-      <img src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg" alt="Alva" />
+      <img
+        src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg"
+        alt="Alva"
+      />
     </div>
   </div>
 </div>
@@ -869,14 +913,16 @@ Not a widget-card; a page-level section separator.
 ```html
 <!-- Group Title — copy this structure exactly -->
 <div class="section-title">
-  <span class="section-title-icon">🖥️</span>             <!-- optional -->
+  <span class="section-title-icon">🖥️</span>
+  <!-- optional -->
   <span class="section-title-text">Data Center (AI GPUs)</span>
-  <span class="section-title-sub">Highest Heat · Blackwell</span>  <!-- optional -->
+  <span class="section-title-sub">Highest Heat · Blackwell</span>
+  <!-- optional -->
 </div>
 ```
 
-| Property              | Specification                                             |
-| --------------------- | --------------------------------------------------------- |
-| Subtitle separator    | `·` (middle dot), one space on each side between keywords |
-| Max subtitle keywords | No more than 3                                            |
-| Row gap to next widget | Page standard `gap: 24px`                                |
+| Property               | Specification                                             |
+| ---------------------- | --------------------------------------------------------- |
+| Subtitle separator     | `·` (middle dot), one space on each side between keywords |
+| Max subtitle keywords  | No more than 3                                            |
+| Row gap to next widget | Page standard `gap: 24px`                                 |
