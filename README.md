@@ -2,7 +2,7 @@
 
 ![Agent Skills](https://alva-ai-static.b-cdn.net/images/alva-skill-github-cover.png)
 
-> Turn your AI agent into a finance powerhouse — access 250+ data sources, build cloud-side analytics, backtest strategies, and ship live investing playbooks.
+> Turn your AI agent into a finance powerhouse — access 250+ financial skills, build cloud-side analytics, backtest strategies, and ship live investing playbooks.
 
 ## Quick Start
 
@@ -76,22 +76,21 @@ Update with one of:
   git clone https://github.com/alva-ai/skills ./tmp/alva-skills && cp -r ./tmp/alva-skills/skills/alva/* "<skill-dir>/" && rm -rf ./tmp/alva-skills
 ```
 
-The check is silent when your skill is up to date. It runs at most once every 8
-hours and fails gracefully offline.
+The check is silent when your skill is up to date. It runs at most once every 8 hours and fails gracefully offline.
 
-### 3. Build
+### 3. Try It
 
-Ask your agent to build something:
+Start with a simple prompt:
 
 ```
 Build me an NVDA dashboard with insider trading data and financial metrics
 ```
 
-That's it. Your agent now has full access to the Alva platform.
+That's it. Your agent now has full access to the Alva platform. By default, the skill builds live playbooks unless you explicitly ask for a static snapshot.
 
 ---
 
-## What Can You Build?
+## Example Prompts
 
 | Use Case         | Example Prompt                                                                            |
 | ---------------- | ----------------------------------------------------------------------------------------- |
@@ -105,9 +104,9 @@ That's it. Your agent now has full access to the Alva platform.
 
 ## Platform Capabilities
 
-### Data — 250+ Financial SDKs
+### Data — 250+ Financial Skills
 
-Unified access to crypto, equities, ETFs, macro, on-chain, and social data:
+Unified access to crypto, equities, ETFs, macro, on-chain, and social data through built-in skills:
 
 | Category      | Highlights                                                                                                  |
 | ------------- | ----------------------------------------------------------------------------------------------------------- |
@@ -118,9 +117,11 @@ Unified access to crypto, equities, ETFs, macro, on-chain, and social data:
 | Social & News | Twitter/X, Reddit, YouTube, podcasts, news feeds, web search                                                |
 | Technical     | 50+ indicator calculations — RSI, MACD, Bollinger, ATR, VWAP, Ichimoku, and more                            |
 
+For unstructured content, use `feed_widgets` to subscribe to specific accounts or channels, and `unified_search` to discover content about a topic.
+
 ### Compute — Cloud JavaScript Runtime
 
-Write JavaScript that runs on Alva Cloud in a secure V8 isolate. No local dependencies, no infrastructure to manage. Full access to all SDKs, HTTP networking, and LLM APIs.
+Write JavaScript that runs on Alva Cloud in a secure V8 isolate. No local dependencies, no infrastructure to manage. Full access to built-in skills, HTTP networking, and LLM APIs.
 
 ### Pipelines — Feed SDK
 
@@ -132,39 +133,39 @@ Event-driven backtesting with historical data and live paper trading. Define str
 
 ### Deploy & Share — Playbook Web Apps
 
-Turn your work into a hosted web app at `https://alva.ai/<username>/playbooks/<playbook_id>`. Built with the Alva Design System — charts, KPIs, tables, and more.
+Turn your work into a hosted web app at `https://alva.ai/u/<username>/playbooks/<playbook_name>`. Built with the Alva Design System — charts, KPIs, tables, and more. You can also remix published playbooks and add a creator's note after release.
 
 ---
 
 ## Architecture at a Glance
 
 ```
-┌─────────────┐     ┌──────────────────────────────────────────────┐
-│   AI Agent   │───▶│              Alva Cloud                      │
-│ (Claude, etc)│    │                                              │
-└─────────────┘     │  ┌──────────┐  ┌────────┐  ┌─────────────┐   │
-                    │  │ SDKHub   │  │  ALFS  │  │  JS Runtime │   │
-                    │  │ 250+ APIs│  │  Files │  │  V8 Isolate │   │
-                    │  └────┬─────┘  └───┬────┘  └──────┬──────┘   │
-                    │       │            │               │         │
-                    │  ┌────▼────────────▼───────────────▼──────┐  │
-                    │  │           Feed SDK + Altra             │  │
-                    │  │     Data Pipelines & Backtesting       │  │
-                    │  └────────────────┬───────────────────────┘  │
-                    │                   │                          │
-                    │  ┌────────────────▼───────────────────────┐  │
-                    │  │     Cronjobs · Playbooks · Releases    │  │
-                    │  └────────────────────────────────────────┘  │
-                    └──────────────────────────────────────────────┘
+┌───────────────┐    ┌──────────────────────────────────────────────────────┐
+│   AI Agent    │───▶│                      Alva Cloud                      │
+│ (Claude, etc) │    │                                                      │
+└───────────────┘    │  ┌──────────────┐  ┌──────────┐  ┌──────────────┐    │
+                     │  │  Skill Hub   │  │   ALFS   │  │  JS Runtime  │    │
+                     │  │ 250+ Skills  │  │  Files   │  │  V8 Isolate  │    │
+                     │  └──────┬───────┘  └────┬─────┘  └──────┬───────┘    │
+                     │         │               │               │            │
+                     │  ┌──────▼────────────────▼───────────────▼───────┐   │
+                     │  │               Feed SDK + Altra                │   │
+                     │  │         Data Pipelines & Backtesting          │   │
+                     │  └───────────────────────┬───────────────────────┘   │
+                     │                          │                           │
+                     │  ┌───────────────────────▼───────────────────────┐   │
+                     │  │          Cronjobs · Playbooks · Releases      │   │
+                     │  └───────────────────────────────────────────────┘   │
+                     └──────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## Available Skills
 
-| Skill                            | Description                                                                                                                                                               |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **[alva](skills/alva/SKILL.md)** | Full Alva platform access — data SDKs, cloud runtime, feeds, backtesting, and playbook deployment. See the [skill reference](skills/alva/SKILL.md) for detailed API docs. |
+| Skill                            | Description                                                                                                                                                                 |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **[alva](skills/alva/SKILL.md)** | Full Alva platform access — data skills, cloud runtime, feeds, backtesting, and playbook deployment. See the [skill reference](skills/alva/SKILL.md) for detailed API docs. |
 
 ---
 
