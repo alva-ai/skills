@@ -133,18 +133,25 @@ two-step retrieval flow:
 | `macro_and_economics_data`                | CPI, GDP, unemployment, federal funds rate, Treasury rates, PPI, consumer sentiment, VIX, TIPS, nonfarm payroll, retail sales, recession probability, etc. (20 modules) |
 | `technical_indicator_calculation_helpers` | 50+ pure calculation helpers: RSI, MACD, Bollinger Bands, ATR, VWAP, Ichimoku, Parabolic SAR, KDJ, OBV, etc. Input your own price arrays.                               |
 | `feed_widgets`                            | Social & news subscription feeds: news, Twitter/X, YouTube, Reddit, podcasts. For subscribing to specific accounts/channels.                                             |
-| `unified_search`                          | 4-phase pipeline (LLM plan → code execute → code enrich → hybrid rank) across Twitter, News, YouTube, Reddit. Topic-based discovery. See [unified-search.md](references/unified-search.md). |
-| `ask`                                     | General news and market articles.                                                                                                                                       |
 
-**Unstructured content routing — two paths:**
-
-| User need | Path | Example |
-| --------- | ---- | ------- |
-| Subscribe to specific accounts/channels | `feed_widgets` (subscription feeds) | "Follow @saylor on Twitter", "Subscribe to r/Bitcoin" |
-| Discover content about a topic | `unified_search` (LLM plan → code execute → code enrich → hybrid rank) | "Find hottest BTC discussions today", "What's trending about AI?" |
+For unstructured content — news articles, social discussions, videos, podcasts
+— see [Content Search](#content-search) below.
 
 You can also bring your own data by uploading files to ALFS or fetching from
 external HTTP APIs within the runtime.
+
+#### Content Search
+
+Search across Twitter/X, news, Reddit, YouTube, podcasts, and general web.
+Use whenever the playbook needs content beyond structured data SDKs — from
+targeted queries ("what are people saying about NVDA earnings") to broad
+discovery ("trending crypto discussions this week"), including social
+discussions, market narratives, news coverage, sentiment, analyst commentary,
+and community reactions.
+
+Content search modules are called directly in code (not via the partition
+API). See [search.md](references/search.md) for per-source SDK usage,
+enrichment patterns, and gotchas.
 
 ### 4. Altra (Alva Trading Engine)
 
@@ -190,8 +197,7 @@ Three phases:
 Once released, the playbook is accessible at
 `https://alva.ai/u/<username>/playbooks/<playbook_name>` — ready to share with
 the world. Use the playbook `name` and the username from `GET /api/v1/me` to
-construct this URL. After a successful release, post a creator's note — see
-[creators-note.md](references/creators-note.md).
+construct this URL.
 
 ### 8. Remix (Create from Existing Playbook)
 
@@ -219,8 +225,7 @@ guide.
 | [design-system.md](references/design-system.md)         | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
 | [remix-workflow.md](references/remix-workflow.md)       | Remix: create a new playbook from an existing template                                                     |
 | [adk.md](references/adk.md)                             | Agent Development Kit: `adk.agent()` API, tool calling, ReAct loop, examples                               |
-| [unified-search.md](references/unified-search.md)       | Unified Search: LLM plan → code execute → enrich → hybrid rank (news, social, video)                      |
-| [creators-note.md](references/creators-note.md)         | Post-release creator's note: workflow, content guidance, API calls                                          |
+| [search.md](references/search.md)                       | Content search SDKs: per-source usage, enrichment patterns, and gotchas for Twitter/X, news, Reddit, YouTube, podcasts, and web |
 
 ---
 
