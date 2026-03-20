@@ -53,6 +53,14 @@ text-rendering: optimizeLegibility;
 - If the project already has a global reset or typography base class, ensure the
   above properties are included; no need to redeclare them within components.
 
+## Links
+
+**Every `<a>` tag must include `target="_blank"` and `rel="noopener noreferrer"`.**
+
+```html
+<a href="https://example.com" target="_blank" rel="noopener noreferrer">Example</a>
+```
+
 ## Background
 
 **The page background color must use `--b0-page`**
