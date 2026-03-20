@@ -675,6 +675,7 @@ GET /api/v1/sdk/partitions/:partition/summary
 ```
 GET /api/v1/sdk/partitions/spot_market_price_and_volume/summary
 → {"summary":"@arrays/crypto/ohlcv:v1.0.0 — Spot OHLCV for crypto\n@arrays/data/stock/ohlcv:v1.0.0 — Spot OHLCV for equities\n..."}
+```
 
 ---
 
@@ -686,9 +687,7 @@ under `/api/v1/playbook/`. Auth (API key or JWT) is required.
 ### Create Comment
 
 ```
-
 POST /api/v1/playbook/comment
-
 ```
 
 Create a top-level comment or a reply to an existing comment.
@@ -782,9 +781,7 @@ metrics, social sentiment, and general financial topics. It has access to
 real-time web data, 250+ financial data SDKs, and code execution.
 
 ```
-
 POST /v1/chat/completions
-
 ```
 
 ### Request Fields
@@ -806,10 +803,10 @@ POST /v1/chat/completions
 ### Example
 
 ```
+POST /v1/chat/completions
+Accept: text/event-stream
 
-POST /v1/chat/completions Accept: text/event-stream {"message":"What is the
-current BTC funding rate?"}
-
+{"message":"What is the current BTC funding rate?"}
 ```
 
 ---
