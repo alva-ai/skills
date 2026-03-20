@@ -19,6 +19,7 @@ For subscribing to specific accounts/channels, use `feed_widgets` instead.
 - **Enrich**: Not needed — GrokX returns engagement natively
 - **Signals**: `like_count`, `retweet_count`, `reply_count`, `quote_count`
 - **Fields**: `content`, `url`, `author_name`, `author_username`, `author_avatar`, `created_at` (ms — real publish time), `author_verified`, `author_followers_count`
+- **Batch queries**: GrokX is AI-powered, not keyword-matching — multiple related entities can be combined into one call (e.g. "Why are $AAPL $TSLA $NVDA moving? Explain each"). The `summary` will segment by entity automatically. Returned tweets are mixed (not per-entity); only do per-entity individual searches when the use case requires raw per-entity source content.
 - **Gotcha**: A single broad query returns mostly 0-engagement noise. Fix: (1) run 3-5 queries with different topical angles (e.g. "NVDA earnings", "NVDA AI chips", "NVDA stock price") plus entity aliases (`$NVDA`, `NVIDIA`); (2) filter results — tweets with `like_count == 0` AND `retweet_count == 0` are almost always noise; (3) `author_followers_count` and `author_verified` are strong quality signals for sorting survivors.
 
 ### News
