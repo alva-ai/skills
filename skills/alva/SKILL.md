@@ -82,6 +82,32 @@ API calls in this session.
 
 ---
 
+## Secret Manager
+
+Use Alva Secret Manager whenever a playbook or runtime script needs a
+third-party credential such as an LLM API key, search token, exchange key, or
+webhook secret.
+
+- **Preferred upload path**: ask the user to add or edit the secret in the web
+  UI at <https://alva.ai/apikey>. Assume this page is available.
+- **Do not ask the user to paste sensitive third-party secrets into chat** when
+  the web upload flow is feasible.
+- **Do not hardcode secrets** in source code, ALFS files, `.alva.json`, shell
+  snippets, or released playbook assets.
+- **Runtime access**: load secrets inside Alva Cloud code with
+  `require("secret-manager").loadPlaintext("NAME")`.
+- `loadPlaintext(name)` returns the plaintext string when present, or `null`
+  when the secret is missing for the current user.
+- If a required secret is missing, stop and tell the user exactly which secret
+  name to upload at <https://alva.ai/apikey>.
+- For agent-managed setup, inspection, or cleanup, authenticated CRUD endpoints
+  are available under `/api/v1/secrets`.
+
+Read [secret-manager.md](references/secret-manager.md) whenever the task
+involves uploading, naming, rotating, listing, or using third-party secrets.
+
+---
+
 ## Capabilities & Common Workflows
 
 ### 1. ALFS (Alva FileSystem)
@@ -237,6 +263,7 @@ guide.
 | [remix-workflow.md](references/remix-workflow.md)       | Remix: create a new playbook from an existing template                                                     |
 | [adk.md](references/adk.md)                             | Agent Development Kit: `adk.agent()` API, tool calling, ReAct loop, examples                               |
 | [search.md](references/search.md)                       | Content search SDKs: per-source usage, enrichment patterns, and gotchas for Twitter/X, news, Reddit, YouTube, podcasts, and web |
+| [secret-manager.md](references/secret-manager.md)       | Secret upload, CRUD API, and runtime usage via `require("secret-manager")`                                 |
 
 ---
 
@@ -248,6 +275,11 @@ All configuration is done via environment variables.
 | --------------- | -------- | ----------------------------------------------------------------------- |
 | `ALVA_API_KEY`  | **yes**  | Your API key (create and manage at [alva.ai](https://alva.ai))          |
 | `ALVA_ENDPOINT` | no       | Alva API base URL. Defaults to `https://api-llm.prd.alva.ai` if not set |
+
+`ALVA_API_KEY` authenticates the agent to Alva itself. Do **not** use it as a
+substitute for third-party vendor secrets. Vendor credentials belong in Alva
+Secret Manager and should be loaded at runtime via
+`require("secret-manager")`.
 
 ### First-Time Setup
 
@@ -400,6 +432,20 @@ GET /api/v1/trading-pairs/search?q=BTC,ETH
 | ------ | ------------ | ---------------------------------------- |
 | GET    | `/api/v1/me` | Get authenticated user's id and username |
 
+### Secrets (`/api/v1/secrets`)
+
+| Method | Endpoint                 | Description                                 |
+| ------ | ------------------------ | ------------------------------------------- |
+| POST   | `/api/v1/secrets`        | Create a secret                             |
+| GET    | `/api/v1/secrets`        | List secret metadata for the current user   |
+| GET    | `/api/v1/secrets/:name`  | Get the plaintext value for one secret      |
+| PUT    | `/api/v1/secrets/:name`  | Overwrite the plaintext value for one secret |
+| DELETE | `/api/v1/secrets/:name`  | Delete a secret                             |
+
+Prefer the web UI at <https://alva.ai/apikey> when the user is manually
+entering a sensitive secret. Use the API flow when the task explicitly needs
+agent-managed CRUD.
+
 ---
 
 ## Runtime Modules Quick Reference
@@ -413,6 +459,7 @@ variables, or shell. Host-agent permissions still apply. See
 | --------------- | ---------------------------- | ----------------------------------------------------------------------- |
 | alfs            | `require("alfs")`            | Filesystem (uses absolute paths `/alva/home/<username>/...`)            |
 | env             | `require("env")`             | `userId`, `username`, `args` from request                               |
+| secret-manager  | `require("secret-manager")`  | Read user-scoped third-party secrets stored in Alva Secret Manager      |
 | net/http        | `require("net/http")`        | `fetch(url, init)` for async HTTP requests                              |
 | @alva/algorithm | `require("@alva/algorithm")` | Statistics                                                              |
 | @alva/feed      | `require("@alva/feed")`      | Feed SDK for persistent data pipelines + FeedAltra trading engine       |
@@ -423,6 +470,10 @@ variables, or shell. Host-agent permissions still apply. See
 `require("@arrays/crypto/ohlcv:v1.0.0")` etc. Version suffix is optional
 (defaults to `v1.0.0`). To discover function signatures and response shapes, use
 the SDK doc API (`GET /api/v1/sdk/doc?name=...`).
+
+**Secret Manager**: use `const secret = require("secret-manager");` then
+`secret.loadPlaintext("OPENAI_API_KEY")`. This returns a string when present or
+`null` when the current user has not uploaded that secret.
 
 **Key constraints**: No top-level `await` (wrap script in
 `(async () => { ... })();`). No Node.js builtins (`fs`, `path`, `http`). Module
