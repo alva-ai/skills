@@ -887,16 +887,16 @@ Response:
 
 ```
 # Screenshot a playbook page
-GET /api/v1/screenshot?url=https://alva.ai/alice/playbooks/123
+GET /api/v1/screenshot?url=https://alva.ai/u/alice/playbooks/btc-dashboard
 
 # Screenshot a specific chart element
-GET /api/v1/screenshot?url=https://alva.ai/alice/playbooks/123&selector=.chart-container
+GET /api/v1/screenshot?url=https://alva.ai/u/alice/playbooks/btc-dashboard&selector=.chart-container
 ```
 
 ```bash
 # curl example
 curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" \
-  "$ALVA_ENDPOINT/api/v1/screenshot?url=https://alva.ai/alice/playbooks/123"
+  "$ALVA_ENDPOINT/api/v1/screenshot?url=https://alva.ai/u/alice/playbooks/btc-dashboard"
 ```
 
 ---
