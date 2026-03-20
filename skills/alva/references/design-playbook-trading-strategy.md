@@ -556,7 +556,7 @@ All text in the signal card uses `--text-n9` except the ticker link.
 | Action      | 16px, Regular 400, `--text-n9`, line-height: 26px                                                                                                                                         |
 | Ticker link | 16px, Medium 500, `--main-m1`, cursor pointer, line-height: 26px                                                                                                                          |
 | Detail      | 16px, `--text-n9`, line-height: 26px                                                                                                                                                      |
-| Trend icon  | 14×14px, CSS mask, flex-shrink: 0; up = `https://alva-ai-static.b-cdn.net/icons/bullish-l.svg` + `--main-m3`, down = `https://alva-ai-static.b-cdn.net/icons/bearish-l.svg` + `--main-m4` |
+| Trend icon  | 18×18px, CSS mask, flex-shrink: 0; up = `https://alva-ai-static.b-cdn.net/icons/bullish-l.svg` + `--main-m3`, down = `https://alva-ai-static.b-cdn.net/icons/bearish-l.svg` + `--main-m4` |
 
 **Signal format variants:**
 
