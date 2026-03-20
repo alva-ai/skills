@@ -7,7 +7,7 @@ description: >-
   playbooks -- all from your AI agents.
 metadata:
   author: alva
-  version: v1.0.0
+  version: v1.1.0
 ---
 
 # Alva
