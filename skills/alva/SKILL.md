@@ -216,6 +216,10 @@ Three phases:
    the subject/theme first, and keep it within 40 characters. Avoid personal
    markers such as `My`, `Test`, or `V2`, and generic-only titles such as
    `Stock Dashboard` or `Trading Bot`.
+
+   Good examples: `BTC Momentum RSI Strategy`, `NVDA Earnings Trend Analysis`,
+   `Crypto Fear & Greed Monitor`. Bad examples: `My BTC Bot`, `Test Dashboard
+   V2`, `Stock Tracker`.
 3. **Call release API**: `POST /api/v1/release/playbook` — creates release DB
    records, uploads HTML to CDN, and writes release files to ALFS automatically.
    Returns `playbook_id` (numeric).
@@ -603,7 +607,7 @@ and deduplication behavior.
 
 ## Deploying Feeds
 
-Every feed follows a 6-step lifecycle including every newly created feed or re-created feed:
+Every feed — whether new or recreated — follows this 6-step lifecycle:
 
 1. **Write** -- define schema + incremental logic with `ctx.kv`
 2. **Upload** -- write script to `~/feeds/<name>/v1/src/index.js`
@@ -916,7 +920,7 @@ Read only what you need:
 | ------------------------- | ------------------------------------------- |
 | `~/tasks/<name>/src/`     | Task source code                            |
 | `~/feeds/<name>/v1/src/`  | Feed script source code                     |
-| `~/feeds/<name>/v1/data/` | Feed synth mount (auto-created by Feed SDK) |
+| `~/feeds/<name>/v1/data/` | Feed synth mount — virtual directory auto-created by the Feed SDK to store time series output |
 | `~/playbooks/<name>/`     | Playbook web app assets                     |
 | `~/data/`                 | General data storage                        |
 | `~/library/`              | Shared code modules                         |
