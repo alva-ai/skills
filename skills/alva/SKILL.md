@@ -284,7 +284,7 @@ guide.
 
 **Every interaction with the Alva skill MUST be traced.** This is a hard
 requirement — do not output the final answer to the user until the trace has
-been written and finalized.
+been written to ALFS and finalized.
 
 **When planning any task, always include "Upload Interaction Trace" as the
 last step in your plan.** Whether the task is a simple data query, a full
@@ -292,19 +292,23 @@ playbook build, or anything in between, the trace step must appear in the plan
 and must execute after all other work is complete but before delivering the
 final answer.
 
+Field-level schema, `blockers` derivation, and examples: [trace-convention.md](references/trace-convention.md).
+
 Execution order:
 
 1. Complete all tool calls and gather the final answer.
-2. Write the trace file + `.meta.json` to ALFS (`~/skill-trace/`).
-3. Call `finalizeSkillTrace` GraphQL mutation to register the trace.
-4. **Only then** output the final answer to the user.
-
-Read [trace-convention.md](references/trace-convention.md) for the full trace
-file schema, `.meta.json` format, write steps, and `finalizeSkillTrace` API
-details. You MUST read this document before writing the trace.
+2. **Upload the trace (three steps per that document's Section 8, all via REST):**
+   - Generate `trace_id` (UUID v4; unique; max 128 chars; no `/` or `..`).
+   - `POST /api/v1/fs/write` the JSONL to `~/skill-trace/<trace_id>` and the
+     `.meta.json` sibling (`mkdir_parents` as needed). Populate `blockers` per
+     trace-convention.
+   - `POST /api/v1/skill-trace/finalize` with identifiers/metadata only — **no**
+     file body. **Do not** finalize if any `fs/write` failed; repeat finalize is
+     idempotent for the same `trace_id`.
+3. **Only then** output the final answer to the user.
 
 > **No trace = no answer.** If trace upload fails, retry once. If it still
-> fails, inform the user of the trace failure alongside the answer.
+> fails, inform the user of the trace failure alongside your answer.
 
 ---
 
@@ -324,7 +328,7 @@ details. You MUST read this document before writing the trace.
 | [secret-manager.md](references/secret-manager.md)       | Secret upload, CRUD API, and runtime usage via `require("secret-manager")`                                 |
 | [unified-search.md](references/unified-search.md)       | Unified Search: LLM plan → code execute → enrich → hybrid rank (news, social, video)                      |
 | [creators-note.md](references/creators-note.md)         | Post-release creator's note: workflow, content guidance, API calls                                          |
-| [trace-convention.md](references/trace-convention.md)   | Interaction trace spec: storage path, filename rule, required fields, append semantics                      |
+| [trace-convention.md](references/trace-convention.md)   | Interaction trace schema, `.meta.json` format, **`blockers` derivation rules**, write steps, and `finalizeSkillTrace` API |
 
 ---
 
