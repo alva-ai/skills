@@ -477,10 +477,10 @@ tags, and scoped CSS maps them to the Alva design spec.
 }
 .markdown-container--m th,
 .markdown-container--m td {
-  font-size: 12px;
-  line-height: 20px;
-  letter-spacing: 0.12px;
-  padding: 8px;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+  padding: 10px 8px;
   min-height: 176px;
 }
 .markdown-container--m code {
