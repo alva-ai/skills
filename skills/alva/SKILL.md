@@ -216,6 +216,12 @@ Three phases:
    the subject/theme first, and keep it within 40 characters. Avoid personal
    markers such as `My`, `Test`, or `V2`, and generic-only titles such as
    `Stock Dashboard` or `Trading Bot`.
+   **Trading symbols**: If the playbook involves specific trading assets,
+   include `"trading_symbols"` in the request — an array of base asset
+   tickers (e.g. `["BTC", "ETH"]`, `["NVDA", "AAPL"]`). The backend
+   resolves each symbol to a full trading pair object and stores the result
+   in the playbook metadata. Max 50 symbols per request. Unknown symbols
+   are silently skipped.
 3. **Call release API**: `POST /api/v1/release/playbook` — creates release DB
    records, uploads HTML to CDN, and writes release files to ALFS automatically.
    Returns `playbook_id` (numeric).
@@ -875,8 +881,9 @@ POST /api/v1/release/feed
 → {"feed_id":100,"name":"btc-ema","feed_major":1}
 
 # 2. Create playbook draft (creates DB record + ALFS draft files automatically)
+#    Include trading_symbols when the playbook involves specific assets.
 POST /api/v1/draft/playbook
-{"name":"btc-dashboard","display_name":"BTC Trend Dashboard","description":"BTC market dashboard","feeds":[{"feed_id":100}]}
+{"name":"btc-dashboard","display_name":"BTC Trend Dashboard","description":"BTC market dashboard","feeds":[{"feed_id":100}],"trading_symbols":["BTC"]}
 → {"playbook_id":99,"playbook_version_id":200}
 
 # 3. Release playbook (reads HTML from ALFS, uploads to CDN, writes release files automatically)
