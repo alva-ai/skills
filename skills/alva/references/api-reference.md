@@ -537,12 +537,13 @@ Create a new playbook with a draft version.
 
 Requires both a URL-safe `name` and a human-readable `display_name`.
 
-| Field        | Type   | Required | Description                                                            |
-| ------------ | ------ | -------- | ---------------------------------------------------------------------- |
-| name         | string | yes      | URL-safe playbook name (e.g. `btc-dashboard`), must be unique per user |
-| display_name | string | yes      | Human-readable playbook title, max 40 chars                            |
-| description  | string | no       | Short description of the playbook                                      |
-| feeds        | array  | yes      | Feed references `[{feed_id, feed_major?}]`                             |
+| Field           | Type     | Required | Description                                                                                                                  |
+| --------------- | -------- | -------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| name            | string   | yes      | URL-safe playbook name (e.g. `btc-dashboard`), must be unique per user                                                       |
+| display_name    | string   | yes      | Human-readable playbook title, max 40 chars                                                                                  |
+| description     | string   | no       | Short description of the playbook                                                                                            |
+| feeds           | array    | yes      | Feed references `[{feed_id, feed_major?}]`                                                                                   |
+| trading_symbols | string[] | no       | Base asset tickers (e.g. `["BTC","ETH"]`). Resolved server-side to full trading pairs, stored in playbook metadata. Max 50.  |
 
 `display_name` conventions:
 
@@ -558,7 +559,8 @@ POST /api/v1/draft/playbook
   "name": "btc-dashboard",
   "display_name": "BTC Trend Dashboard",
   "description": "BTC market dashboard with price, technicals, and volume",
-  "feeds": [{"feed_id": 100}]
+  "feeds": [{"feed_id": 100}],
+  "trading_symbols": ["BTC"]
 }
 → {"playbook_id": 99, "playbook_version_id": 200}
 ```
