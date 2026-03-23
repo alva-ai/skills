@@ -298,7 +298,7 @@ Ask them to paste the key. Then set it up and verify on their behalf:
 
 ```bash
 export ALVA_API_KEY="<the key they pasted>"
-curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" https://api-llm.prd.alva.ai/api/v1/me
+curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" "${ALVA_ENDPOINT:-https://api-llm.prd.alva.ai}/api/v1/me"
 ```
 
 On success (`{"id":...,"username":"..."}`), suggest persisting the key in their
