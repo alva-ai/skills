@@ -23,8 +23,8 @@ cronjobs.
 
 1. **ALFS files** -- paths ending in `.js` that don't start with `@` (e.g.
    `require("./helper.js")`) -- resolved from the filesystem on ALFS
-2. **Official/system modules** -- `alfs`, `env`, `net/http`,
-   `@alva/algorithm`, `@alva/feed`, `@alva/adk`
+2. **Official/system modules** -- `alfs`, `env`, `secret-manager`,
+   `net/http`, `@alva/algorithm`, `@alva/feed`, `@alva/adk`
 3. **SDKHub modules** -- versioned modules like
    `require("@arrays/crypto/ohlcv:v1.0.0")`
 
@@ -99,6 +99,31 @@ env.userId; // "1" (string) -- your numeric user ID
 env.username; // "alice" (string) -- your username, used in ALFS paths
 env.args; // parsed JSON from the request's "args" field
 ```
+
+### secret-manager -- Third-Party Secrets
+
+Use this built-in module for user-scoped third-party credentials that were
+uploaded to Alva Secret Manager.
+
+```javascript
+const secret = require("secret-manager");
+const braveApiKey = secret.loadPlaintext("BRAVE_API_KEY");
+
+if (!braveApiKey) {
+  throw new Error(
+    "Missing BRAVE_API_KEY. Upload it at https://alva.ai/apikey and retry.",
+  );
+}
+```
+
+Behavior:
+
+- `loadPlaintext(name)` returns the plaintext string when the secret exists
+- `loadPlaintext(name)` returns `null` when the secret is missing
+- calling it without an authenticated execution context throws an error
+- the module is read-only from JS; writes happen through the web UI or
+  `/api/v1/secrets`
+- do not log the returned value or write it into ALFS / released assets
 
 ### net/http -- HTTP Requests
 

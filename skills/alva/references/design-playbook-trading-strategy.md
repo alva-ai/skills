@@ -541,7 +541,7 @@ Displays individual trading signals from the strategy.
 <div class="feed-signal">
   <img class="signal-ticker-logo" src="{ticker_logo_url}" alt="AAPL" />
   <span class="signal-action">Increase</span>
-  <a class="signal-ticker">AAPL</a>
+  <a class="signal-ticker" target="_blank" rel="noopener noreferrer">AAPL</a>
   <span class="signal-detail">allocation 4.5% → 8.0%</span>
   <span class="signal-trend up"></span>
 </div>

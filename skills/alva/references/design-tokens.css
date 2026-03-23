@@ -6,7 +6,7 @@
 
     /* ── Semantic Brand ── */
     --main-m1: #49a3a6; /* Alva Theme */
-    --main-m1-10: #49a3a6; /* Alva Theme with transparency */
+    --main-m1-10: rgba(73, 163, 166, 0.1); /* Alva Theme with transparency */
     --main-m2: #2196f3; /* Link */
     --main-m2-10: rgba(33, 150, 243, 0.1); /* Link with transparency */
     --main-m3: #2a9b7d; /* Bullish */

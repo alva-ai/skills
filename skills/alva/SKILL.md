@@ -7,7 +7,7 @@ description: >-
   playbooks -- all from your AI agents.
 metadata:
   author: alva
-  version: v1.0.0
+  version: v1.1.0
 ---
 
 # Alva
@@ -82,6 +82,32 @@ API calls in this session.
 
 ---
 
+## Secret Manager
+
+Use Alva Secret Manager whenever a playbook or runtime script needs a
+third-party credential such as an LLM API key, search token, exchange key, or
+webhook secret.
+
+- **Preferred upload path**: ask the user to add or edit the secret in the web
+  UI at <https://alva.ai/apikey>. Assume this page is available.
+- **Do not ask the user to paste sensitive third-party secrets into chat** when
+  the web upload flow is feasible.
+- **Do not hardcode secrets** in source code, ALFS files, `.alva.json`, shell
+  snippets, or released playbook assets.
+- **Runtime access**: load secrets inside Alva Cloud code with
+  `require("secret-manager").loadPlaintext("NAME")`.
+- `loadPlaintext(name)` returns the plaintext string when present, or `null`
+  when the secret is missing for the current user.
+- If a required secret is missing, stop and tell the user exactly which secret
+  name to upload at <https://alva.ai/apikey>.
+- For agent-managed setup, inspection, or cleanup, authenticated CRUD endpoints
+  are available under `/api/v1/secrets`.
+
+Read [secret-manager.md](references/secret-manager.md) whenever the task
+involves uploading, naming, rotating, listing, or using third-party secrets.
+
+---
+
 ## Capabilities & Common Workflows
 
 ### 1. ALFS (Alva FileSystem)
@@ -133,18 +159,25 @@ two-step retrieval flow:
 | `macro_and_economics_data`                | CPI, GDP, unemployment, federal funds rate, Treasury rates, PPI, consumer sentiment, VIX, TIPS, nonfarm payroll, retail sales, recession probability, etc. (20 modules) |
 | `technical_indicator_calculation_helpers` | 50+ pure calculation helpers: RSI, MACD, Bollinger Bands, ATR, VWAP, Ichimoku, Parabolic SAR, KDJ, OBV, etc. Input your own price arrays.                               |
 | `feed_widgets`                            | Social & news subscription feeds: news, Twitter/X, YouTube, Reddit, podcasts. For subscribing to specific accounts/channels.                                             |
-| `unified_search`                          | 4-phase pipeline (LLM plan → code execute → code enrich → hybrid rank) across Twitter, News, YouTube, Reddit. Topic-based discovery. See [unified-search.md](references/unified-search.md). |
-| `ask`                                     | General news and market articles.                                                                                                                                       |
 
-**Unstructured content routing — two paths:**
-
-| User need | Path | Example |
-| --------- | ---- | ------- |
-| Subscribe to specific accounts/channels | `feed_widgets` (subscription feeds) | "Follow @saylor on Twitter", "Subscribe to r/Bitcoin" |
-| Discover content about a topic | `unified_search` (LLM plan → code execute → code enrich → hybrid rank) | "Find hottest BTC discussions today", "What's trending about AI?" |
+For unstructured content — news articles, social discussions, videos, podcasts
+— see [Content Search](#content-search) below.
 
 You can also bring your own data by uploading files to ALFS or fetching from
 external HTTP APIs within the runtime.
+
+#### Content Search
+
+Search across Twitter/X, news, Reddit, YouTube, podcasts, and general web.
+Use whenever the playbook needs content beyond structured data SDKs — from
+targeted queries ("what are people saying about NVDA earnings") to broad
+discovery ("trending crypto discussions this week"), including social
+discussions, market narratives, news coverage, sentiment, analyst commentary,
+and community reactions.
+
+Content search modules are called directly in code (not via the partition
+API). See [search.md](references/search.md) for per-source SDK usage,
+enrichment patterns, and gotchas.
 
 ### 4. Altra (Alva Trading Engine)
 
@@ -190,8 +223,7 @@ Three phases:
 Once released, the playbook is accessible at
 `https://alva.ai/u/<username>/playbooks/<playbook_name>` — ready to share with
 the world. Use the playbook `name` and the username from `GET /api/v1/me` to
-construct this URL. After a successful release, post a creator's note — see
-[creators-note.md](references/creators-note.md).
+construct this URL.
 
 After publishing, take a screenshot to verify the dashboard renders correctly:
 
@@ -230,8 +262,8 @@ guide.
 | [design-system.md](references/design-system.md)         | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
 | [remix-workflow.md](references/remix-workflow.md)       | Remix: create a new playbook from an existing template                                                     |
 | [adk.md](references/adk.md)                             | Agent Development Kit: `adk.agent()` API, tool calling, ReAct loop, examples                               |
-| [unified-search.md](references/unified-search.md)       | Unified Search: LLM plan → code execute → enrich → hybrid rank (news, social, video)                      |
-| [creators-note.md](references/creators-note.md)         | Post-release creator's note: workflow, content guidance, API calls                                          |
+| [search.md](references/search.md)                       | Content search SDKs: per-source usage, enrichment patterns, and gotchas for Twitter/X, news, Reddit, YouTube, podcasts, and web |
+| [secret-manager.md](references/secret-manager.md)       | Secret upload, CRUD API, and runtime usage via `require("secret-manager")`                                 |
 
 ---
 
@@ -243,6 +275,11 @@ All configuration is done via environment variables.
 | --------------- | -------- | ----------------------------------------------------------------------- |
 | `ALVA_API_KEY`  | **yes**  | Your API key (create and manage at [alva.ai](https://alva.ai))          |
 | `ALVA_ENDPOINT` | no       | Alva API base URL. Defaults to `https://api-llm.prd.alva.ai` if not set |
+
+`ALVA_API_KEY` authenticates the agent to Alva itself. Do **not** use it as a
+substitute for third-party vendor secrets. Vendor credentials belong in Alva
+Secret Manager and should be loaded at runtime via
+`require("secret-manager")`.
 
 ### First-Time Setup
 
@@ -321,6 +358,7 @@ See [api-reference.md](references/api-reference.md) for full details.
 | POST   | `/api/v1/fs/chmod`                | Change permissions                                |
 | POST   | `/api/v1/fs/grant`                | Grant read/write access to a path                 |
 | POST   | `/api/v1/fs/revoke`               | Revoke access                                     |
+| POST   | `/api/v1/fs/ensure-home`          | Provision your home directory (self-repair, idempotent) |
 
 Paths: `~/data/file.json` (home-relative) or `/alva/home/<username>/...`
 (absolute). Public reads use absolute paths without API key.
@@ -394,6 +432,20 @@ GET /api/v1/trading-pairs/search?q=BTC,ETH
 | ------ | ------------ | ---------------------------------------- |
 | GET    | `/api/v1/me` | Get authenticated user's id and username |
 
+### Secrets (`/api/v1/secrets`)
+
+| Method | Endpoint                 | Description                                 |
+| ------ | ------------------------ | ------------------------------------------- |
+| POST   | `/api/v1/secrets`        | Create a secret                             |
+| GET    | `/api/v1/secrets`        | List secret metadata for the current user   |
+| GET    | `/api/v1/secrets/:name`  | Get the plaintext value for one secret      |
+| PUT    | `/api/v1/secrets/:name`  | Overwrite the plaintext value for one secret |
+| DELETE | `/api/v1/secrets/:name`  | Delete a secret                             |
+
+Prefer the web UI at <https://alva.ai/apikey> when the user is manually
+entering a sensitive secret. Use the API flow when the task explicitly needs
+agent-managed CRUD.
+
 ---
 
 ## Runtime Modules Quick Reference
@@ -407,6 +459,7 @@ variables, or shell. Host-agent permissions still apply. See
 | --------------- | ---------------------------- | ----------------------------------------------------------------------- |
 | alfs            | `require("alfs")`            | Filesystem (uses absolute paths `/alva/home/<username>/...`)            |
 | env             | `require("env")`             | `userId`, `username`, `args` from request                               |
+| secret-manager  | `require("secret-manager")`  | Read user-scoped third-party secrets stored in Alva Secret Manager      |
 | net/http        | `require("net/http")`        | `fetch(url, init)` for async HTTP requests                              |
 | @alva/algorithm | `require("@alva/algorithm")` | Statistics                                                              |
 | @alva/feed      | `require("@alva/feed")`      | Feed SDK for persistent data pipelines + FeedAltra trading engine       |
@@ -417,6 +470,10 @@ variables, or shell. Host-agent permissions still apply. See
 `require("@arrays/crypto/ohlcv:v1.0.0")` etc. Version suffix is optional
 (defaults to `v1.0.0`). To discover function signatures and response shapes, use
 the SDK doc API (`GET /api/v1/sdk/doc?name=...`).
+
+**Secret Manager**: use `const secret = require("secret-manager");` then
+`secret.loadPlaintext("OPENAI_API_KEY")`. This returns a string when present or
+`null` when the current user has not uploaded that secret.
 
 **Key constraints**: No top-level `await` (wrap script in
 `(async () => { ... })();`). No Node.js builtins (`fs`, `path`, `http`). Module
@@ -902,6 +959,10 @@ consistent read pattern (`@last`, `@range`, etc.).
 - **Altra lookback: feature vs strategy.** Feature lookback controls how many
   bars the feature computation sees. Strategy lookback controls how many feature
   outputs the strategy function sees. They are independent.
+- **Home directory not provisioned?** If you get `PERMISSION_DENIED` on all
+  ALFS operations (including `~/`), your home directory was not created during
+  sign-up. Call `POST /api/v1/fs/ensure-home` (no body needed, uses your auth
+  token) to provision it. This is idempotent and safe to call anytime.
 - **Cronjob path must point to an existing script.** The deploy API validates
   the entry_path exists via filesystem stat before creating the cronjob.
 - **Always create a draft before releasing.** `POST /api/v1/release/playbook`
