@@ -475,19 +475,27 @@ dataGraph.registerRawData({
     }
 
     return {
-      data: result.response.data.map((d) => ({
-        date: d.observedAt, // MUST use observedAt for PIT safety
-        sumOpenInterest: d.sumOpenInterest,
-        sumOpenInterestValue: d.sumOpenInterestValue,
-      })),
+      data: result.response.data
+        .map((d) => ({
+          date: d.observedAt, // MUST use observedAt for PIT safety
+          sumOpenInterest: d.sumOpenInterest,
+          sumOpenInterestValue: d.sumOpenInterestValue,
+        }))
+        .sort((a, b) => a.date - b.date), // MUST be ascending
     };
   },
 });
 ```
 
-**Raw data PIT rule**: Always use `observedAt` as the `date` field. This is the
-only PIT-safe timestamp -- it represents when the data became available, not
-when the event occurred.
+**Raw data rules**:
+
+1. **Sort ascending by date.** The returned `data` array must be chronological
+   (oldest first). Some SDKs (e.g. funding rate) return newest-first — always
+   `.sort((a, b) => a.date - b.date)` before returning. Altra silently
+   mis-assigns data to ticks if the order is wrong.
+2. **Use PIT-safe timestamps.** Use `observedAt` (or the SDK's bar-close
+   timestamp) as the `date` field — this is when the data became available,
+   not when the event occurred.
 
 ---
 
