@@ -981,8 +981,11 @@ consistent read pattern (`@last`, `@range`, etc.).
   do not exist. Use `require("alfs")` for files, `require("net/http")` for HTTP.
 - **Altra `run()` is async.** `FeedAltra.run()` returns a `Promise<RunResult>`.
   Always `await` it: `const result = await altra.run(endDate);`
-- **Altra decisions happen at bar CLOSE.** Feature timestamps must use
-  `bar.endTime`, not `bar.date`. Using `bar.date` introduces look-ahead bias.
+- **Prefer Altra for backtesting.** Altra decisions happen at bar CLOSE and use
+  `bar.endTime` for signal timestamps, avoiding look-ahead bias. Do not manually
+  loop over SDK data to build backtests — use Altra's `registerRawData` for
+  external data (funding rates, OI, LSR, etc.) and let Altra handle timestamp
+  alignment.
 - **Altra lookback: feature vs strategy.** Feature lookback controls how many
   bars the feature computation sees. Strategy lookback controls how many feature
   outputs the strategy function sees. They are independent.

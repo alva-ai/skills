@@ -44,14 +44,11 @@ main.js            # Entry point (assembles everything)
 ### constants.js
 
 ```javascript
-const { FeedAltraModule } = require("@alva/feed");
-const { TIME } = FeedAltraModule;
-
 const SYMBOL = "BINANCE_SPOT_BTC_USDT";
 const STRATEGY_INTERVAL = "1d";
-const TICK = TIME.DAY;
+const TICK = 86_400_000; // 1 day in ms — must match STRATEGY_INTERVAL
 
-module.exports = { SYMBOL, STRATEGY_INTERVAL, TICK, TIME };
+module.exports = { SYMBOL, STRATEGY_INTERVAL, TICK };
 ```
 
 ### features.js
@@ -60,8 +57,7 @@ module.exports = { SYMBOL, STRATEGY_INTERVAL, TICK, TIME };
 const {
   macd,
 } = require("@alva/technical-indicators/moving-average-convergence-divergence-macd:v1.0.0");
-const { FeedAltraModule } = require("@alva/feed");
-const { num } = FeedAltraModule;
+const { num } = require("@alva/feed");
 const { SYMBOL, STRATEGY_INTERVAL, TICK } = require("./constants.js");
 
 function inRange(t, fromExclusive, toInclusive) {
@@ -227,30 +223,20 @@ altra.setStrategy(strategyFn, {
 Altra is accessed through the `FeedAltraModule` export from `@alva/feed`:
 
 ```javascript
-const { FeedAltraModule } = require("@alva/feed");
-const {
-  FeedAltra,
-  e,
-  Amount,
-  TIME,
-  num,
-  str,
-  bool,
-  obj,
-  arr,
-  fld,
-  makeDoc,
-} = FeedAltraModule;
+// Altra engine + event builder come from FeedAltraModule
+const { FeedAltraModule, num, str, bool, obj, arr, fld, makeDoc } = require("@alva/feed");
+const { FeedAltra, e } = FeedAltraModule;
 ```
 
-| Export                                    | Description                                      |
+| Export (from `FeedAltraModule`)           | Description                                      |
 | ----------------------------------------- | ------------------------------------------------ |
 | `FeedAltra`                               | Main backtesting engine class                    |
 | `e`                                       | Event trigger expression builder                 |
-| `Amount`                                  | Order amount constructors                        |
-| `TIME`                                    | Time constants (SECOND, MINUTE, HOUR, DAY, WEEK) |
 | `allocate`                                | Helper to create allocate target                 |
 | `order` / `orders`                        | Helper to create order targets                   |
+
+| Export (top-level `@alva/feed`)           | Description                                      |
+| ----------------------------------------- | ------------------------------------------------ |
 | `num`, `str`, `bool`, `obj`, `arr`, `fld` | Field type helpers (same as Feed SDK)            |
 | `makeDoc`                                 | Type document helper                             |
 
@@ -310,16 +296,16 @@ const altra = new FeedAltra(
 | `perfOptions.timezone`         | `"UTC"` for crypto/mix, `"America/New_York"` for us_stock                       |
 | `perfOptions.marketType`       | `"crypto"`, `"us_stock"`, or `"mix"` (multi-asset)                              |
 
-### TIME Constants
+### Time Constants
+
+`TIME` is not exported. Use raw millisecond values:
 
 ```javascript
-const { TIME } = FeedAltraModule;
-
-TIME.SECOND; // 1,000 ms
-TIME.MINUTE; // 60,000 ms
-TIME.HOUR; // 3,600,000 ms
-TIME.DAY; // 86,400,000 ms
-TIME.WEEK; // 604,800,000 ms
+const SECOND = 1_000;
+const MINUTE = 60_000;
+const HOUR   = 3_600_000;
+const DAY    = 86_400_000;
+const WEEK   = 604_800_000;
 ```
 
 ### Multi-Asset Strategies
@@ -664,7 +650,7 @@ Execute specific buy/sell orders with precise amounts.
   instruction: {
     type: "orders",
     orders: [
-      { symbol: "BINANCE_SPOT_BTC_USDT", side: "buy", amount: Amount.quote(100) },
+      { symbol: "BINANCE_SPOT_BTC_USDT", side: "buy", amount: { type: "quote", value: 100 } },
     ],
   },
   meta: { reason: "DCA: buying $100 of BTC" },
@@ -673,13 +659,13 @@ Execute specific buy/sell orders with precise amounts.
 
 ### Amount Types
 
-```javascript
-const { Amount } = FeedAltraModule;
+Use plain objects for order amounts:
 
-Amount.base(0.5); // 0.5 units of base asset (e.g. 0.5 BTC)
-Amount.quote(100); // $100 worth
-Amount.ofCash(0.5); // 50% of available cash (buy/short only)
-Amount.ofPosition(0.5); // 50% of current position (sell only)
+```javascript
+{ type: "base", value: 0.5 }      // 0.5 units of base asset (e.g. 0.5 BTC)
+{ type: "quote", value: 100 }     // $100 worth
+{ type: "ofCash", value: 0.5 }    // 50% of available cash (buy/short only)
+{ type: "ofPosition", value: 0.5 } // 50% of current position (sell only)
 ```
 
 ### Composite Targets
@@ -693,7 +679,7 @@ apply to the updated portfolio.
   instruction: {
     type: "allocate",
     weights: [{ symbol: SYMBOL, weight: 0.8 }],
-    orders: [{ symbol: SYMBOL, side: "buy", amount: Amount.quote(100) }],
+    orders: [{ symbol: SYMBOL, side: "buy", amount: { type: "quote", value: 100 } }],
   },
   meta: { reason: "Rebalance to 80% + DCA $100" },
 }
@@ -790,7 +776,7 @@ function strategyFn(ctx) {
 
   if (inPos) {
     const timeExit =
-      state.entry_time != null && tick - state.entry_time >= 60 * TIME.MINUTE;
+      state.entry_time != null && tick - state.entry_time >= 60 * 60_000;
     if (timeExit) {
       next = { signal: 0, entry_time: null, entry_price: null };
       target = {
@@ -812,7 +798,7 @@ function strategyFn(ctx) {
 Store `entry_time` and check `tick - entry_time >= duration`:
 
 ```javascript
-if (state.entry_time != null && tick - state.entry_time >= 7 * TIME.DAY) {
+if (state.entry_time != null && tick - state.entry_time >= 7 * 86_400_000) {
   // Exit after 7 days
 }
 ```
