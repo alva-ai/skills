@@ -428,17 +428,19 @@ releasing.
 | ------ | --------------- | ------------------------------------------------------- |
 | POST   | `/api/v1/remix` | Save parent→child playbook dependency (Remix scenarios) |
 
-### SDK Documentation (`/api/v1/sdk/`)
+### Data Skills (`/api/v1/data-skills/`)
 
-| Method | Endpoint                                    | Description                                          |
-| ------ | ------------------------------------------- | ---------------------------------------------------- |
-| GET    | `/api/v1/sdk/doc?name={module_name}`        | Get full doc for a specific SDK module               |
-| GET    | `/api/v1/sdk/partitions`                    | List all SDK partitions                              |
-| GET    | `/api/v1/sdk/partitions/:partition/summary` | Get one-line summaries of all modules in a partition |
+| Method | Endpoint                            | Description                              |
+| ------ | ----------------------------------- | ---------------------------------------- |
+| GET    | `/api/v1/data-skills`               | List all data skills (name + description)|
+| GET    | `/api/v1/data-skills/:name`         | Get full documentation for a data skill  |
 
-**SDK retrieval flow**: pick a partition from the index above → call
-`/partitions/:partition/summary` to see module summaries → call
-`/sdk/doc?name=...` to load the full doc for the chosen module.
+**Data skill retrieval flow**: pick a skill from the Data Skills Index above → call
+`/data-skills/:name` to load the full endpoint documentation.
+
+> **Legacy SDK endpoints** (`/api/v1/sdk/`) remain available for the 3 retained
+> partitions (`crypto_fundamentals`, `feed_widgets`,
+> `technical_indicator_calculation_helpers`).
 
 ### Trading Pair Search (`/api/v1/trading-pairs/`)
 
