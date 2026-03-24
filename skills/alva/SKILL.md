@@ -146,42 +146,47 @@ the host machine's filesystem, environment variables, or processes. The runtime
 has access to ALFS, all 250+ SDKs, HTTP networking, LLM access, and the Feed
 SDK.
 
-### 3. SDKHub
+### 3. Data Skills
 
-250+ built-in financial data SDKs. To find the right SDK for a task, use the
-two-step retrieval flow:
+Financial data APIs across 16 domains. To find the right API for a task:
 
-1. **Pick a partition** from the index below.
-2. **Call `GET /api/v1/sdk/partitions/:partition/summary`** to see module
-   summaries, then load the full doc for the chosen module.
+1. **Pick a data skill** from the index below.
+2. **Call `GET /api/v1/data-skills/:name`** to get the full endpoint
+   documentation for that domain.
 
-#### SDK Partition Index
+#### Data Skills Index
 
-| Partition                                 | Description                                                                                                                                                             |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `spot_market_price_and_volume`            | Spot OHLCV for crypto and equities. Price bars, volume, historical candles.                                                                                             |
-| `crypto_futures_data`                     | Perpetual futures: OHLCV, funding rates, open interest, long/short ratio.                                                                                               |
-| `crypto_technical_metrics`                | Crypto technical & on-chain indicators: MA, EMA, RSI, MACD, Bollinger, MVRV, SOPR, NUPL, whale ratio, market cap, FDV, etc. (20 modules)                                |
-| `crypto_exchange_flow`                    | Exchange inflow/outflow data for crypto assets.                                                                                                                         |
-| `crypto_fundamentals`                     | Crypto market fundamentals: circulating supply, max supply, market dominance.                                                                                           |
-| `crypto_screener`                         | Screen crypto assets by technical metrics over custom time ranges.                                                                                                      |
-| `company_crypto_holdings`                 | Public companies' crypto token holdings (e.g. MicroStrategy BTC).                                                                                                       |
-| `equity_fundamentals`                     | Stock fundamentals: income statements, balance sheets, cash flow, margins, PE, PB, ROE, ROA, EPS, market cap, dividend yield, enterprise value, etc. (31 modules)       |
-| `equity_estimates_and_targets`            | Analyst price targets, consensus estimates, earnings guidance.                                                                                                          |
-| `equity_events_calendar`                  | Dividend calendar, stock split calendar.                                                                                                                                |
-| `equity_ownership_and_flow`               | Institutional holdings, insider trades, senator trading activity.                                                                                                       |
-| `stock_screener`                          | Screen stocks by sector, industry, country, exchange, IPO date, earnings date, financial & technical metrics. (9 modules)                                               |
-| `stock_technical_metrics`                 | Stock technical indicators: beta, volatility, Bollinger, EMA, MA, MACD, RSI-14, VWAP, avg daily dollar volume.                                                          |
-| `etf_fundamentals`                        | ETF holdings breakdown.                                                                                                                                                 |
-| `macro_and_economics_data`                | CPI, GDP, unemployment, federal funds rate, Treasury rates, PPI, consumer sentiment, VIX, TIPS, nonfarm payroll, retail sales, recession probability, etc. (20 modules) |
-| `technical_indicator_calculation_helpers` | 50+ pure calculation helpers: RSI, MACD, Bollinger Bands, ATR, VWAP, Ichimoku, Parabolic SAR, KDJ, OBV, etc. Input your own price arrays.                               |
-| `feed_widgets`                            | Social & news subscription feeds: news, Twitter/X, YouTube, Reddit, podcasts. For subscribing to specific accounts/channels.                                            |
+| Domain | Skill name | Use when |
+|--------|------------|----------|
+| Spot market | `arrays-data-api-spot-market-price-and-volume` | Stock/crypto kline, OHLCV, market cap, supply, price |
+| Crypto futures | `arrays-data-api-crypto-futures-data` | Funding rate, open interest, long-short ratio |
+| Crypto metrics | `arrays-data-api-crypto-metrics-and-screener` | On-chain analytics, technical indicators, fear-greed, DeFi pools, screening |
+| Crypto exchange flow | `arrays-data-api-crypto-exchange-flow` | Exchange inflow/outflow |
+| Company crypto | `arrays-data-api-company-crypto-holdings` | Company crypto holdings and transactions |
+| Equity fundamentals | `arrays-data-api-equity-fundamentals` | Company profile, financials, shares, KPI, options |
+| Equity estimates | `arrays-data-api-equity-estimates-and-targets` | Analyst estimates, guidance, price target consensus |
+| Equity events | `arrays-data-api-equity-events` | Dividends, splits, earnings calendar, transcripts, IPO, M&A |
+| Equity ownership | `arrays-data-api-equity-ownership-and-flow` | Institutional holdings, insider trades, senate trades |
+| ETF fundamentals | `arrays-data-api-etf-fundamentals` | ETF holdings, info, sector/country weightings, fund flow |
+| Macro & economics | `arrays-data-api-macro-and-economics` | Treasury rates, economic calendar, forex, commodities, VIX |
+| Stock screener | `arrays-data-api-stock-screener` | Stock filtering by sector, valuation, financials, events |
+| Stock technical | `arrays-data-api-stock-technical-metrics` | Market metrics, darkpool, analyst ratings |
+| News | `arrays-data-api-ask` | Market news |
+| Polymarket markets | `arrays-data-api-polymarket-markets` | Prediction markets, event outcomes, Polymarket search |
+| Polymarket pricing | `arrays-data-api-polymarket-pricing` | Polymarket prices, odds, order books, spreads |
 
-For unstructured content — news articles, social discussions, videos, podcasts
-— see [Content Search](#content-search) below.
+#### Legacy SDK Modules
 
-You can also bring your own data by uploading files to ALFS or fetching from
-external HTTP APIs within the runtime.
+Some specialized modules remain available via the SDK API:
+
+| Partition | Description |
+|-----------|-------------|
+| `crypto_fundamentals` | Crypto supply, market cap, dominance (internal data source) |
+| `feed_widgets` | Social & news subscription feeds (Twitter/X, YouTube, Reddit, podcasts) |
+| `technical_indicator_calculation_helpers` | 50+ pure calculation helpers (RSI, MACD, Bollinger, etc.) |
+
+Use `GET /api/v1/sdk/partitions/:partition/summary` to see module summaries,
+then `GET /api/v1/sdk/doc?name={module_name}` for full documentation.
 
 #### Content Search
 
