@@ -82,6 +82,19 @@ API calls in this session.
 
 ---
 
+## Planning and skill trace upload (required final step)
+
+When you produce a **multi-step plan** for work that uses this skill:
+
+- The **last step MUST** be: call **`POST /api/v1/skill-trace/finalize`** to **upload the trace** (body: `question`, `blockers`, `spans`, optional `skill_name`). Do **not** make “deliver the final answer to the user” the last step and omit finalize.
+- **Do not** treat `POST /api/v1/fs/write` to `~/skill-trace/...` plus finalize as the normal path. The live platform matches backend **`skill_trace_full_reference.md`**: **single REST finalize**; the server generates `trace_id` and `createdAt`, writes ALFS, and creates the aggregate symlink.
+- **Timing:** run finalize **before** the **final user-visible** answer.
+- Field rules, Span/Blocker constraints, cURL, and errors: **[skill-trace-finalize.md](references/skill-trace-finalize.md)** (English; aligned with `skill_trace_full_reference.md`).
+
+Host-side agents should follow the same rule: **final plan step = call finalize** before the closing user-facing answer.
+
+---
+
 ## Secret Manager
 
 Use Alva Secret Manager whenever a playbook or runtime script needs a
@@ -270,6 +283,7 @@ guide.
 | [adk.md](references/adk.md)                             | Agent Development Kit: `adk.agent()` API, tool calling, ReAct loop, examples                               |
 | [search.md](references/search.md)                       | Content search SDKs: per-source usage, enrichment patterns, and gotchas for Twitter/X, news, Reddit, YouTube, podcasts, and web |
 | [secret-manager.md](references/secret-manager.md)       | Secret upload, CRUD API, and runtime usage via `require("secret-manager")`                                 |
+| [skill-trace-finalize.md](references/skill-trace-finalize.md) | Skill trace upload (`POST .../skill-trace/finalize`), aligned with `skill_trace_full_reference.md`; planning — final step must be finalize |
 
 ---
 
@@ -437,6 +451,12 @@ GET /api/v1/trading-pairs/search?q=BTC,ETH
 | Method | Endpoint     | Description                              |
 | ------ | ------------ | ---------------------------------------- |
 | GET    | `/api/v1/me` | Get authenticated user's id and username |
+
+### Skill Trace (`/api/v1/skill-trace`)
+
+| Method | Endpoint                        | Description                                                                 |
+| ------ | ------------------------------- | --------------------------------------------------------------------------- |
+| POST   | `/api/v1/skill-trace/finalize`  | Upload trace: `question`, `blockers`, `spans`, optional `skill_name`. Server assigns `trace_id` / `createdAt`. **Use this path — do not rely on `fs/write` to `~/skill-trace/` first.** See [skill-trace-finalize.md](references/skill-trace-finalize.md). |
 
 ### Secrets (`/api/v1/secrets`)
 
