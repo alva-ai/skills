@@ -43,6 +43,57 @@ Each span must include (all string fields; `input` / `output` are **JSON strings
 - `span_name`, `span_type` (e.g. `model` / `tool` / `agent` / `chain`)
 - `input`, `output`
 
+#### 3.1.1 `input` and `output`: wire format and meaning (including LLM spans)
+
+**Wire format (mandatory).** In the finalize JSON body, `input` and `output` are **always string-typed fields**. Each string must be valid **JSON** when parsed—typically you `JSON.stringify(...)` a small object or array and place that string in `input` or `output`. Empty or unknown details may use `"{}"` or `"[]"`, but prefer recording real structure when safe.
+
+**Not the same as top-level `question`.** The top-level `question` is the **user-facing task or trigger** for the whole trace (one string). Per-span `input` / `output` describe **what happened inside that span** only. A `model` span’s `input` is **not** a duplicate of `question` unless you intentionally mirror it; usually `input` is richer (full message list, system instructions, tool definitions reference, etc.).
+
+---
+
+**When `span_type` is `model` (large language model / chat completion).**
+
+Treat each `model` span as one **LLM call** (or one logical generation step, e.g. one completion in a multi-turn chain).
+
+- **`input` (JSON string)** — What the **executor sent to the model** before generation. Encode a JSON object that is faithful to the call, for example:
+  - **`messages`**: ordered chat turns (`role` + `content`) as actually passed to the API, or a lossless subset if size is limited (then document truncation in a field like `"truncated": true`).
+  - **`system`**: system / developer instructions if your stack sends them separately from `messages`.
+  - **`tools` or `tool_choice`**: names and JSON-schema summaries of tools exposed to the model (not necessarily full verbatim schema if huge—summarize and note `"schema_omitted": true`).
+  - **`model`**, **`temperature`**, **`max_tokens`**, and other **non-secret** inference parameters.
+  - **`metadata`**: run id, request id, or agent step index for correlation.
+
+  **Do not** put API keys, bearer tokens, raw cookies, or user secrets inside `input`. Redact or replace with placeholders (e.g. `"api_key": "<redacted>"`).
+
+- **`output` (JSON string)** — What the **model returned** to the executor after generation, encoded as JSON, for example:
+  - **`content`**: assistant text (final or partial if you log per chunk, merge into one span or use multiple spans).
+  - **`tool_calls`**: structured tool invocations (name, arguments) as returned by the model API.
+  - **`finish_reason`**, **`usage`** (token counts): if your provider returns them and you are allowed to store them.
+  - **`error`**: provider error payload when the call failed (still a valid `output` for observability).
+
+  If the model output is **only** free text, a minimal pattern is `{"content":"..."}`. If the model returns **structured JSON**, store it under a key such as `parsed` or merge into `content` as stringified JSON—keep one consistent shape per executor.
+
+**Multi-step ReAct / tool loops.** Use **multiple spans**: one `model` span per completion, then `tool` spans for each tool execution, then the next `model` span. Parent links (`parent_id`) should reflect the tree or linear order your agent uses.
+
+---
+
+**When `span_type` is `tool`.**
+
+- **`input`**: JSON string of **arguments** passed into the tool (SDK call, HTTP request metadata, file paths—redact secrets).
+- **`output`**: JSON string of the **tool result** (success payload, or `{"error": ...}` on failure). For large blobs, store a **summary** plus optional `size_bytes` or `hash` instead of the full body.
+
+---
+
+**When `span_type` is `agent` or `chain`.**
+
+These are often **coarse-graining** spans (whole turn, whole pipeline stage). Use `input` for a JSON summary of **intent / state entering** the stage (e.g. `{"goal":"...","constraints":[]}`) and `output` for **outcome** (e.g. `{"delivered":["path/a","path/b"],"status":"completed"}`). Nested `model` and `tool` spans should hang under this node via `parent_id` when you want a hierarchy.
+
+---
+
+**Privacy and size.**
+
+- Redact **secrets, credentials, and PII** before stringify; keep fields that are useful for debugging (endpoint name, status codes, error codes).
+- If a single string would exceed practical limits, **truncate** with explicit flags in the JSON (`truncated`, `head`, `tail`) rather than sending invalid JSON.
+
 ### 3.2 `blockers[]` entries
 
 Must include: `span_id`, `type`, `tool`, `message`, `resolved`.
