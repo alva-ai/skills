@@ -503,10 +503,12 @@ variables, or shell. Host-agent permissions still apply. See
 | @alva/adk       | `require("@alva/adk")`       | Agent SDK for LLM requests — `agent()` for LLM agents with tool calling |
 | @test/suite     | `require("@test/suite")`     | Jest-style test framework (`describe`, `it`, `expect`, `runTests`)      |
 
-**SDKHub**: 250+ data modules available via
+**Data modules**: Financial data modules available via
 `require("@arrays/crypto/ohlcv:v1.0.0")` etc. Version suffix is optional
-(defaults to `v1.0.0`). To discover function signatures and response shapes, use
-the SDK doc API (`GET /api/v1/sdk/doc?name=...`).
+(defaults to `v1.0.0`). To discover function signatures and response shapes,
+use the data skills API (`GET /api/v1/data-skills/:name`). For legacy modules
+(`crypto_fundamentals`, `feed_widgets`, `technical_indicator_calculation_helpers`),
+use `GET /api/v1/sdk/doc?name=...`.
 
 **Secret Manager**: use `const secret = require("secret-manager");` then
 `secret.loadPlaintext("OPENAI_API_KEY")`. This returns a string when present or
