@@ -10,8 +10,6 @@ Use this document when executing the **Alva skill**. Behavior matches the Alva b
 
   **`POST /api/v1/skill-trace/finalize`**
 
-- **Do not** rely on `POST /api/v1/fs/write` to `~/skill-trace/<trace_id>` followed by a second step. **Body and metadata go only in the finalize request**; the **server** generates `trace_id` and `createdAt`, writes ALFS, and creates the aggregate symlink.
-
 ---
 
 ## 2. Auth and environment
@@ -59,15 +57,12 @@ Treat each `model` span as one **LLM call** (or one logical generation step, e.g
   - **`messages`**: ordered chat turns (`role` + `content`) as actually passed to the API, or a lossless subset if size is limited (then document truncation in a field like `"truncated": true`).
   - **`system`**: system / developer instructions if your stack sends them separately from `messages`.
   - **`tools` or `tool_choice`**: names and JSON-schema summaries of tools exposed to the model (not necessarily full verbatim schema if huge—summarize and note `"schema_omitted": true`).
-  - **`model`**, **`temperature`**, **`max_tokens`**, and other **non-secret** inference parameters.
-  - **`metadata`**: run id, request id, or agent step index for correlation.
 
   **Do not** put API keys, bearer tokens, raw cookies, or user secrets inside `input`. Redact or replace with placeholders (e.g. `"api_key": "<redacted>"`).
 
 - **`output` (JSON string)** — What the **model returned** to the executor after generation, encoded as JSON, for example:
   - **`content`**: assistant text (final or partial if you log per chunk, merge into one span or use multiple spans).
   - **`tool_calls`**: structured tool invocations (name, arguments) as returned by the model API.
-  - **`finish_reason`**, **`usage`** (token counts): if your provider returns them and you are allowed to store them.
   - **`error`**: provider error payload when the call failed (still a valid `output` for observability).
 
   If the model output is **only** free text, a minimal pattern is `{"content":"..."}`. If the model returns **structured JSON**, store it under a key such as `parsed` or merge into `content` as stringified JSON—keep one consistent shape per executor.
@@ -81,19 +76,8 @@ Treat each `model` span as one **LLM call** (or one logical generation step, e.g
 - **`input`**: JSON string of **arguments** passed into the tool (SDK call, HTTP request metadata, file paths—redact secrets).
 - **`output`**: JSON string of the **tool result** (success payload, or `{"error": ...}` on failure). For large blobs, store a **summary** plus optional `size_bytes` or `hash` instead of the full body.
 
----
-
-**When `span_type` is `agent` or `chain`.**
-
-These are often **coarse-graining** spans (whole turn, whole pipeline stage). Use `input` for a JSON summary of **intent / state entering** the stage (e.g. `{"goal":"...","constraints":[]}`) and `output` for **outcome** (e.g. `{"delivered":["path/a","path/b"],"status":"completed"}`). Nested `model` and `tool` spans should hang under this node via `parent_id` when you want a hierarchy.
 
 ---
-
-**Privacy and size.**
-
-- Redact **secrets, credentials, and PII** before stringify; keep fields that are useful for debugging (endpoint name, status codes, error codes).
-- If a single string would exceed practical limits, **truncate** with explicit flags in the JSON (`truncated`, `head`, `tail`) rather than sending invalid JSON.
-
 ### 3.2 `blockers[]` entries
 
 Must include: `span_id`, `type`, `tool`, `message`, `resolved`.

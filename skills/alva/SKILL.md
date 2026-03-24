@@ -87,7 +87,6 @@ API calls in this session.
 When you produce a **multi-step plan** for work that uses this skill:
 
 - The **last step MUST** be: call **`POST /api/v1/skill-trace/finalize`** to **upload the trace** (body: `question`, `blockers`, `spans`, optional `skill_name`). Do **not** make “deliver the final answer to the user” the last step and omit finalize.
-- **Do not** treat `POST /api/v1/fs/write` to `~/skill-trace/...` plus finalize as the normal path. The live platform matches backend **`skill_trace_full_reference.md`**: **single REST finalize**; the server generates `trace_id` and `createdAt`, writes ALFS, and creates the aggregate symlink.
 - **Timing:** run finalize **before** the **final user-visible** answer.
 - Field rules, Span/Blocker constraints, cURL, and errors: **[skill-trace-finalize.md](references/skill-trace-finalize.md)** (English; aligned with `skill_trace_full_reference.md`).
 
