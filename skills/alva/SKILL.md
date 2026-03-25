@@ -151,8 +151,11 @@ SDK.
 Financial data APIs across 16 domains. To find the right API for a task:
 
 1. **Pick a data skill** from the index below.
-2. **Call `GET /api/v1/data-skills/:name`** to get the full endpoint
+2. **Call `POST /api/v1/arrays-api-key`** to get your Arrays API key (one per
+   user, auto-provisioned, returned on every call).
+3. **Call `GET /api/v1/data-skills/:name`** to get the full endpoint
    documentation for that domain.
+4. **Use the API key as `X-API-Key` header** when calling Arrays data endpoints.
 
 #### Data Skills Index
 
@@ -434,9 +437,12 @@ releasing.
 | ------ | ----------------------------------- | ---------------------------------------- |
 | GET    | `/api/v1/data-skills`               | List all data skills (name + description)|
 | GET    | `/api/v1/data-skills/:name`         | Get full documentation for a data skill  |
+| POST   | `/api/v1/arrays-api-key`            | Get or create your Arrays API key        |
 
-**Data skill retrieval flow**: pick a skill from the Data Skills Index above → call
-`/data-skills/:name` to load the full endpoint documentation.
+**Data skill retrieval flow**: call `POST /api/v1/arrays-api-key` to get your
+API key → pick a skill from the Data Skills Index above → call
+`/data-skills/:name` to load the full endpoint documentation → use the key as
+`X-API-Key` header when calling Arrays endpoints.
 
 > **Legacy SDK endpoints** (`/api/v1/sdk/`) remain available for the 3 retained
 > partitions (`crypto_fundamentals`, `feed_widgets`,
