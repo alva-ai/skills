@@ -222,7 +222,7 @@ guide.
 
 | Document                                                | Contents                                                                                                   |
 | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| [api-reference.md](references/api-reference.md)         | Full REST API reference (filesystem, run, deploy, user info, time series paths)                            |
+| [api-reference.md](references/api-reference.md)         | Full REST API reference (filesystem, run, invoke, deploy, user info, time series paths)                   |
 | [jagent-runtime.md](references/jagent-runtime.md)       | Writing jagent scripts: module system, built-in modules, async model, constraints                          |
 | [feed-sdk.md](references/feed-sdk.md)                   | Feed SDK guide: creating data feeds, time series, upstreams, state management                              |
 | [altra-trading.md](references/altra-trading.md)         | Altra backtesting engine: strategies, features, signals, testing, debugging                                |
@@ -331,6 +331,58 @@ Paths: `~/data/file.json` (home-relative) or `/alva/home/<username>/...`
 | Method | Endpoint      | Description                                                                  |
 | ------ | ------------- | ---------------------------------------------------------------------------- |
 | POST   | `/api/v1/run` | Execute JavaScript (inline `code` or `entry_path` to a script on filesystem) |
+
+`entry_path` and `working_dir` must resolve within **your own** home directory.
+Absolute paths pointing to another user's home are rejected with
+`PERMISSION_DENIED`. To execute another user's script, use the Invoke API.
+
+### Invoke (`/api/v1/invoke`)
+
+| Method | Endpoint         | Description                                          |
+| ------ | ---------------- | ---------------------------------------------------- |
+| POST   | `/api/v1/invoke` | Execute a script owned by another user on your behalf |
+
+Execute a published script under another user's ALFS home. The script runs with
+the **caller's** identity and credits — the owner only provides the code. The
+caller must have ALFS read/import permission on the script path (typically
+granted via `fs/grant`).
+
+**Authentication**: Invoke requires a JWT token (not an API key). In playbook
+pages embedded on `alva.ai`, the host page sends the viewer's JWT via
+`postMessage`. The playbook must listen for this message and attach the token
+to subsequent invoke requests.
+
+The playbook page must register a `message` event listener to receive the JWT:
+
+| Check                | Expected Value         | Description                           |
+| -------------------- | ---------------------- | ------------------------------------- |
+| `event.origin`       | `"https://alva.ai"`    | Reject messages from other origins    |
+| `event.data.type`    | `"alva-jwt-token"`     | Fixed event key — must match exactly  |
+| `event.data.token`   | `"Bearer eyJ…"`        | The JWT token to use for invoke calls |
+
+```javascript
+// Inside the playbook HTML — listen for JWT from the host page
+let jwtToken = null;
+window.addEventListener("message", (event) => {
+  if (event.origin !== "https://alva.ai") return;
+  if (event.data?.type === "alva-jwt-token" && event.data.token) {
+    jwtToken = event.data.token;
+  }
+});
+
+// Use the token when calling invoke
+async function invokeScript(owner, path, args) {
+  const resp = await fetch(`${ALVA_ENDPOINT}/api/v1/invoke`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": jwtToken,
+    },
+    body: JSON.stringify({ owner, path, args }),
+  });
+  return resp.json();
+}
+```
 
 ### Deploy (`/api/v1/deploy/`)
 

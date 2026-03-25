@@ -280,6 +280,99 @@ POST /api/v1/run
 
 ---
 
+## Invoke API (Cross-User Script Execution)
+
+Execute a script owned by another user. The script runs under the **caller's**
+identity and credits — the owner only provides the code path. The caller must
+have ALFS read/import permission on the script (typically granted via
+`fs/grant`).
+
+```
+POST /api/v1/invoke
+```
+
+### Authentication
+
+Invoke requires a **JWT token** (not an API key). In playbook pages hosted on
+`alva.ai`, the host page delivers the viewer's JWT via `postMessage`. The
+playbook must listen for this event and attach the token to invoke requests:
+
+The playbook page must register a `message` event listener to receive the JWT:
+
+| Check                | Expected Value         | Description                           |
+| -------------------- | ---------------------- | ------------------------------------- |
+| `event.origin`       | `"https://alva.ai"`    | Reject messages from other origins    |
+| `event.data.type`    | `"alva-jwt-token"`     | Fixed event key — must match exactly  |
+| `event.data.token`   | `"Bearer eyJ…"`        | The JWT token to use for invoke calls |
+
+```javascript
+let jwtToken = null;
+window.addEventListener("message", (event) => {
+  if (event.origin !== "https://alva.ai") return;
+  if (event.data?.type === "alva-jwt-token" && event.data.token) {
+    jwtToken = event.data.token;
+  }
+});
+
+async function invokeScript(owner, path, args) {
+  const resp = await fetch(`${ALVA_ENDPOINT}/api/v1/invoke`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": jwtToken,
+    },
+    body: JSON.stringify({ owner, path, args }),
+  });
+  return resp.json();
+}
+```
+
+### Request Fields
+
+| Field | Type   | Required | Description                                                   |
+| ----- | ------ | -------- | ------------------------------------------------------------- |
+| owner | string | yes      | Username of the script owner                                  |
+| path  | string | yes      | Relative path under the owner's home (no leading `/` or `~/`) |
+| args  | object | no       | JSON accessible via `require("env").args`                     |
+
+Path must be **relative** — absolute paths and path traversal (`../`) are
+rejected.
+
+### Response Fields
+
+| Field  | Type   | Description                             |
+| ------ | ------ | --------------------------------------- |
+| result | string | JSON-encoded return value               |
+| logs   | string | Captured stderr output                  |
+| stats  | object | `credits_used` (int64), `duration_ms` (int64) |
+| status | string | `"completed"` or `"failed"`             |
+| error  | string | Error message when status is `"failed"` (absent on success) |
+
+### Examples
+
+```
+# Invoke another user's script
+POST /api/v1/invoke
+{"owner":"luke","path":"feeds/debate/v1/main.js","args":{"question":"Should I buy Bitcoin?"}}
+→ {"result":"{\"answer\":\"42\"}","logs":"debug info","stats":{"credits_used":5,"duration_ms":1200},"status":"completed"}
+
+# Invoke without arguments
+POST /api/v1/invoke
+{"owner":"alice","path":"tools/summarize.js"}
+→ {"result":"\"ok\"","logs":"","stats":{"credits_used":1,"duration_ms":50},"status":"completed"}
+```
+
+### Key Differences from Run API
+
+| Aspect          | Run (`/api/v1/run`)               | Invoke (`/api/v1/invoke`)                |
+| --------------- | --------------------------------- | ---------------------------------------- |
+| Auth            | API key or JWT                    | JWT only (via `postMessage` in playbooks) |
+| Code source     | Inline code or own `entry_path`   | Another user's script path only          |
+| Path restriction | Must be within caller's own home | Relative path under owner's home         |
+| Identity/billing | Caller                           | Caller                                   |
+
+---
+
 ## Deploy API (Cronjobs)
 
 Schedule scripts as cronjobs for automated execution. All endpoints are under
