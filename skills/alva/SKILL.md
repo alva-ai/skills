@@ -695,16 +695,19 @@ POST /api/v1/run
 
 ## Altra Trading Engine Quick Reference
 
-See [altra-trading.md](references/altra-trading.md) for full details.
+**Always use Altra for backtesting.** Altra handles bar.endTime timestamps,
+data alignment, and portfolio simulation automatically. Do not manually loop
+over SDK data (e.g. `getCryptoKline`) to evaluate trading conditions — this
+leads to incorrect timestamps and look-ahead bias. Use Altra even for simple
+strategies; it supports any interval (`"1min"` to `"1w"`) and any combination
+of OHLCV + external data via `registerRawData`.
 
-Altra is a feed-based event-driven backtesting engine. A trading strategy IS a
-feed: all output data lives under a single ALFS path. Decisions execute at bar
-CLOSE.
+See [altra-trading.md](references/altra-trading.md) for full details.
 
 ```javascript
 const { createOHLCVProvider } = require("@arrays/data/ohlcv-provider:v1.0.0");
 const { FeedAltraModule } = require("@alva/feed");
-const { FeedAltra, e, Amount } = FeedAltraModule;
+const { FeedAltra, e } = FeedAltraModule;
 
 const altra = new FeedAltra(
   {
@@ -718,7 +721,7 @@ const altra = new FeedAltra(
 );
 
 const dg = altra.getDataGraph();
-dg.registerOhlcv("BINANCE_SPOT_BTC_USDT", "1d");
+dg.registerOhlcv("BINANCE_SPOT_BTC_USDT", "1d"); // any interval: "1min" to "1w"
 dg.registerFeature({ name: "rsi" /* ... */ });
 
 altra.setStrategy(strategyFn, {
@@ -985,11 +988,6 @@ consistent read pattern (`@last`, `@range`, etc.).
   do not exist. Use `require("alfs")` for files, `require("net/http")` for HTTP.
 - **Altra `run()` is async.** `FeedAltra.run()` returns a `Promise<RunResult>`.
   Always `await` it: `const result = await altra.run(endDate);`
-- **Prefer Altra for backtesting.** Altra decisions happen at bar CLOSE and use
-  `bar.endTime` for signal timestamps, avoiding look-ahead bias. Do not manually
-  loop over SDK data to build backtests — use Altra's `registerRawData` for
-  external data (funding rates, OI, LSR, etc.) and let Altra handle timestamp
-  alignment.
 - **Altra lookback: feature vs strategy.** Feature lookback controls how many
   bars the feature computation sees. Strategy lookback controls how many feature
   outputs the strategy function sees. They are independent.
