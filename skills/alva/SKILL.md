@@ -207,6 +207,24 @@ cronjobs on Alva Cloud. They run continuously on your chosen schedule (e.g.
 every hour, every day). All data is private by default; grant public access to
 specific paths so anyone -- or any playbook page -- can read the data.
 
+#### Handling the cronjob limit (max 20)
+
+If `POST /api/v1/deploy/cronjob` returns a rate-limit error (max 20 cronjobs),
+do **not** silently skip deployment and continue to release. Instead:
+
+1. **List** all cronjobs: `GET /api/v1/deploy/cronjobs`
+2. **Identify** candidates for cleanup — look for cronjobs whose feed paths no
+   longer exist on ALFS (`GET /api/v1/fs/stat`), or that belong to playbooks
+   the user is replacing with the current build.
+3. **Ask the user** which cronjobs to delete, showing the list with name, path,
+   and cron expression. If the user confirms, delete them:
+   `DELETE /api/v1/deploy/cronjob/:id`
+4. **Retry** the deploy after freeing slots.
+5. If cleanup is not possible or the user declines, **stop the release flow**
+   and inform the user that the playbook cannot be deployed with scheduled
+   updates. Do not proceed to release a playbook that claims to update on a
+   schedule when no cronjob exists.
+
 ### 6. Build the Playbook Web App
 
 After your data pipelines are deployed and producing data, build the playbook's
@@ -217,6 +235,18 @@ default to a live playbook. A live playbook may mix live and static sections;
 only widgets that need fresh data must read cronjob-backed feeds at runtime.
 
 ### 7. Release
+
+**Pre-release gate**: Before starting the release sequence, verify that all
+feeds have active cronjobs (if the playbook is intended to show live data). If
+any feed's cronjob deploy failed and was not resolved, do **not** proceed with
+release. A released playbook with no data refresh mechanism will show stale
+data and mislead users.
+
+**Metadata accuracy**: Any update-frequency text in the playbook HTML (e.g.
+"updates every 4 hours") must reflect the actual deployed cron schedule. If no
+cronjob is active, the HTML must not claim any update frequency. Hardcoded
+frequency claims that do not match the real deployment state are a release
+blocker.
 
 Three phases:
 

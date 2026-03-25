@@ -292,3 +292,8 @@ GET /api/v1/fs/read?path=/alva/home/alice/feeds/btc-hourly/v1/data/market/ohlcv/
   first, update the script file, test it, then resume.
 - **Check execution results**: Read the feed's time series data to verify the
   cronjob is producing expected output.
+- **Handle the 20-cronjob limit gracefully**: If `POST /api/v1/deploy/cronjob`
+  returns a rate-limit error, list existing cronjobs, identify unused ones
+  (orphaned feeds, replaced playbooks), ask the user before deleting, then
+  retry. Never silently skip deployment and continue to release — a playbook
+  claiming scheduled updates with no active cronjob misleads users.
