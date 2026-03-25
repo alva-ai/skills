@@ -707,7 +707,7 @@ See [altra-trading.md](references/altra-trading.md) for full details.
 ```javascript
 const { createOHLCVProvider } = require("@arrays/data/ohlcv-provider:v1.0.0");
 const { FeedAltraModule } = require("@alva/feed");
-const { FeedAltra, e } = FeedAltraModule;
+const { FeedAltra, e, Amount } = FeedAltraModule;
 
 const altra = new FeedAltra(
   {
