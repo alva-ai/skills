@@ -635,7 +635,10 @@ and deduplication behavior.
 
 Every feed follows a 6-step lifecycle including every newly created feed or re-created feed:
 
-1. **Write** -- define schema + incremental logic with `ctx.kv`
+1. **Write** -- read [feed-sdk.md](references/feed-sdk.md) (or
+   [altra-trading.md](references/altra-trading.md) for strategies) for the
+   correct import pattern (`num`, `str`, `makeDoc`, etc.), then define schema +
+   incremental logic with `ctx.kv`
 2. **Upload** -- write script to `~/feeds/<name>/v1/src/index.js`
 3. **Test** -- `POST /api/v1/run` with `entry_path` to verify output
 4. **Grant** -- make feed data publicly readable:
@@ -707,7 +710,7 @@ See [altra-trading.md](references/altra-trading.md) for full details.
 ```javascript
 const { createOHLCVProvider } = require("@arrays/data/ohlcv-provider:v1.0.0");
 const { FeedAltraModule } = require("@alva/feed");
-const { FeedAltra, e, Amount } = FeedAltraModule;
+const { FeedAltra, e, Amount, num, str, bool, makeDoc } = FeedAltraModule;
 
 const altra = new FeedAltra(
   {
