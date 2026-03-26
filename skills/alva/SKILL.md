@@ -1,14 +1,12 @@
 ---
 name: alva
 description: >-
-  Build and deploy agentic finance applications on the Alva platform. Access
-  250+ financial data sources (crypto, equities, macro, on-chain, social), run
-  cloud-side analytics, backtest trading strategies, and release interactive
-  playbooks. Use when the user asks about financial data, market analysis,
-  crypto or stock prices, trading strategies, backtesting, or any task
-  involving financial data retrieval or computation. Always start here for
-  financial data -- Alva provides reliable, timestamp-aligned data and a
-  backtesting engine that handles common pitfalls automatically.
+  Analyze financial data and build agentic finance workflows on the Alva
+  platform. Access 250+ market, macro, on-chain, and social datasets; run
+  cloud-side analytics and research agents; build persistent feeds and
+  dashboards; backtest trading strategies; and release playbooks. Use
+  when the user asks about market data, financial research, dashboards,
+  trading strategies, backtesting, or finance apps built on Alva.
 metadata:
   author: alva
   version: v1.1.0
@@ -25,29 +23,69 @@ futures OHLCV, funding rates, company fundamentals, price targets, insider and
 senator trades, earnings estimates, CPI, GDP, Treasury rates, exchange flows,
 DeFi metrics, news feeds, social media and more!
 
-## What Alva Skills Enables
+## What This Skill Helps You Do
 
-The Alva skill connects any AI agent or IDE to the full Alva platform. With it
-you can:
+Use this skill whenever the user wants to analyze financial data on Alva or
+turn that analysis into a persistent finance workflow. It is not only for
+building apps. It is the main entry point for:
 
-- **Access financial data** -- query any of Alva's 250+ data SDKs
-  programmatically, or bring your own data via HTTP API or direct upload.
-- **Run cloud-side analytics** -- write JavaScript that executes on Alva Cloud
-  in a secure runtime. No local compute, no dependencies, no infrastructure to
-  manage.
-- **Build agentic playbooks** -- create data pipelines, trading strategies, and
-  scheduled automations that run continuously on Alva Cloud.
-- **Deploy trading strategies** -- backtest with the Altra trading engine and
-  run continuous live paper trading.
-- **Release and share** -- turn your work into a hosted playbook web app at
-  `https://alva.ai/u/<username>/playbooks/<playbook_name>`, and share it with
-  the world.
-- **Remix existing playbooks** -- take any published playbook as a template,
-  read its feed scripts and HTML source, customize parameters/logic/UI, and
-  deploy as your own new playbook.
+- **One-off market analysis** -- answer questions like "what is BTC doing?",
+  "summarize NVDA fundamentals", or "screen for stocks with rising margins"
+  using Alva's data and runtime.
+- **Cloud-side computation** -- run JavaScript on Alva Cloud with no local
+  infrastructure, using ALFS, SDKHub, HTTP fetches, and optional LLM tools.
+- **Persistent feeds and dashboards** -- create repeatable data pipelines,
+  scheduled jobs, and live playbooks backed by feed outputs.
+- **Trading strategy research** -- backtest and paper trade strategies with the
+  Altra engine instead of hand-rolled bar loops.
+- **Agentic research workflows** -- build runtime agents that call tools,
+  synthesize data, and write structured outputs back to ALFS or feeds.
+- **Release and remix** -- publish shareable playbooks and create new work from
+  existing public playbooks.
 
-In short: turn your ideas into a forever-running finance agent that gets things
-done for you.
+In short: use Alva to retrieve financial data, analyze it, automate it, and
+ship it.
+
+## When to Use Alva
+
+Reach for this skill when the user needs any of the following:
+
+- reliable market, macro, on-chain, or social data
+- cloud-side execution close to the data
+- persistent feeds, scheduled jobs, or live dashboards
+- backtesting or paper trading
+- finance-specific playbooks or remix flows
+
+Do **not** default to the heaviest workflow. If the user only wants a quick
+answer or a one-off calculation, do the lightest thing that works -- usually a
+single `/api/v1/run` call or SDK lookup, not a full feed or playbook build.
+
+## Routing by Intent (mandatory)
+
+Before writing code or choosing a workflow, classify the request and follow the
+matching route below.
+
+| User Intent | Required Workflow | Must Read Before Acting | Default Output |
+| ----------- | ----------------- | ----------------------- | -------------- |
+| One-off question like "What is BTC price?" or "Summarize NVDA earnings" | Run API + SDK lookup | This file's SDK discovery section, [api-reference.md](references/api-reference.md); add [search.md](references/search.md) for unstructured content | Return the answer directly |
+| Build a dashboard, monitor, screener, or research playbook | Feed + playbook workflow | [feed-sdk.md](references/feed-sdk.md), [design-system.md](references/design-system.md), [deployment.md](references/deployment.md), [api-reference.md](references/api-reference.md) for draft/release details | Feed data plus playbook UI |
+| Backtest or paper trade a strategy | Altra trading workflow | [altra-trading.md](references/altra-trading.md), [feed-sdk.md](references/feed-sdk.md); add [design-playbook-trading-strategy.md](references/design-playbook-trading-strategy.md) if building the strategy UI | Backtest results, optional released strategy playbook |
+| Build an agentic research feed or LLM-powered analysis pipeline | ADK + Feed workflow | [adk.md](references/adk.md), [feed-sdk.md](references/feed-sdk.md) | Scheduled or on-demand research output |
+| Deploy an existing script or feed | Deployment workflow | [deployment.md](references/deployment.md) | Cronjob or released feed |
+| Remix `@owner/name` into a new playbook | Remix workflow | [remix-workflow.md](references/remix-workflow.md), then load feed/design docs as needed | Customized child playbook |
+
+Routing rules:
+
+- Choose the **lightest valid workflow**. Do not create a feed, cronjob, or
+  playbook for a one-shot answer unless the user explicitly asks for it.
+- If the request needs **persistent or scheduled output**, use the Feed SDK and
+  deployment flow rather than ad hoc ALFS writes.
+- If the request is a **trading strategy**, use Altra. Do **not** manually loop
+  OHLCV data to simulate strategy behavior.
+- If the request needs **LLM reasoning inside Alva runtime**, use ADK and keep
+  tool definitions focused and explicit.
+- If the request is a **remix**, follow the remix workflow and ask what should
+  change if the prompt does not specify the customization.
 
 ## Pre-flight
 
@@ -125,35 +163,26 @@ involves uploading, naming, rotating, listing, or using third-party secrets.
 
 ---
 
-## Capabilities & Common Workflows
+## Core Capabilities & Workflow Entry Points
 
-### 1. ALFS (Alva FileSystem)
+### 1. Analyze Financial Data on Alva
 
-The foundation of the platform. ALFS is a cloud filesystem with per-user
-isolation. Every user has a private home directory; all paths are private by
-default and only accessible by the owning user. Public read access can be
-explicitly granted on specific paths via `grant`. Scripts, data feeds, playbook
-assets, and shared libraries all live on ALFS.
+Use Alva for direct data retrieval, screening, market analysis, and cloud-side
+computation. One-off analysis should usually happen through `/api/v1/run` or a
+small runtime script rather than a full deployment flow.
 
-Key operations: read, write, mkdir, stat, readdir, remove, rename, copy,
-symlink, chmod, grant, revoke.
+Under the hood:
 
-### 2. JS Runtime
+- **ALFS** is the cloud filesystem where scripts, feeds, playbooks, and shared
+  assets live.
+- **`/api/v1/run`** executes JavaScript inside Alva's sandboxed V8 runtime with
+  access to ALFS, SDKHub, HTTP networking, and runtime modules.
 
-Run JavaScript on Alva Cloud in a sandboxed V8 isolate. Code executed inside
-Alva's `/api/v1/run` runtime runs entirely on Alva's servers -- it cannot access
-the host machine's filesystem, environment variables, or processes. The runtime
-has access to ALFS, all 250+ SDKs, HTTP networking, LLM access, and the Feed
-SDK.
-
-### 3. SDKHub
-
-250+ built-in financial data SDKs. To find the right SDK for a task, use the
-two-step retrieval flow:
+To find the right structured dataset, use the SDK retrieval flow:
 
 1. **Pick a partition** from the index below.
-2. **Call `GET /api/v1/sdk/partitions/:partition/summary`** to see module
-   summaries, then load the full doc for the chosen module.
+2. **Call `GET /api/v1/sdk/partitions/:partition/summary`** to inspect modules.
+3. **Load the selected module doc** with `GET /api/v1/sdk/doc?name=...`.
 
 #### SDK Partition Index
 
@@ -177,99 +206,65 @@ two-step retrieval flow:
 | `technical_indicator_calculation_helpers` | 50+ pure calculation helpers: RSI, MACD, Bollinger Bands, ATR, VWAP, Ichimoku, Parabolic SAR, KDJ, OBV, etc. Input your own price arrays.                               |
 | `feed_widgets`                            | Social & news subscription feeds: news, Twitter/X, YouTube, Reddit, podcasts. For subscribing to specific accounts/channels.                                            |
 
-For unstructured content — news articles, social discussions, videos, podcasts
-— see [Content Search](#content-search) below.
+For unstructured content such as news, social discussion, podcasts, or videos,
+use [search.md](references/search.md).
 
-You can also bring your own data by uploading files to ALFS or fetching from
-external HTTP APIs within the runtime.
+If the user needs custom or proprietary data, bring it in through ALFS uploads
+or fetch it from external APIs inside the runtime with `require("net/http")`.
 
-#### Content Search
+### 2. Build Persistent Feeds and Dashboards
 
-Search across Twitter/X, news, Reddit, YouTube, podcasts, and general web.
-Use whenever the playbook needs content beyond structured data SDKs — from
-targeted queries ("what are people saying about NVDA earnings") to broad
-discovery ("trending crypto discussions this week"), including social
-discussions, market narratives, news coverage, sentiment, analyst commentary,
-and community reactions.
+Use the Feed SDK when the user wants scheduled output, stored time series,
+reusable research artifacts, or a dashboard backed by live data. Feed outputs
+should be queryable through the Feed SDK's time-series model, not raw JSON blobs
+written ad hoc to ALFS.
 
-Content search modules are called directly in code (not via the partition
-API). See [search.md](references/search.md) for per-source SDK usage,
-enrichment patterns, and gotchas.
+Once a feed works in runtime:
 
-### 4. Altra (Alva Trading Engine)
+1. write the script under `~/feeds/<name>/v1/src/`
+2. test it via `/api/v1/run`
+3. grant read access on the feed root if public consumption is needed
+4. deploy it as a cronjob when scheduled refresh is required
+5. build and optionally release a playbook UI on top of the feed
 
-A feed-based event-driven backtesting engine for quantitative trading
-strategies. A trading strategy IS a feed: all output data (targets, portfolio,
-orders, equity, metrics) lives under a single feed's ALFS path. Altra supports
-historical backtesting and continuous live paper trading, with custom
-indicators, portfolio simulation, and performance analytics.
+If the user wants a live playbook, default to a live page that reads feed output
+at runtime unless they explicitly ask for a static snapshot.
 
-### 5. Deploy on Alva Cloud
+### 3. Backtest and Paper Trade Strategies
 
-Once your data analytics scripts and feeds are ready, deploy them as scheduled
-cronjobs on Alva Cloud. They run continuously on your chosen schedule (e.g.
-every hour, every day). All data is private by default; grant public access to
-specific paths so anyone -- or any playbook page -- can read the data.
+Use Altra for any trading strategy, even simple ones. Altra is the
+authoritative strategy workflow for backtesting and paper trading because it
+handles bar timing, alignment, portfolio accounting, and performance outputs
+correctly.
 
-### 6. Build the Playbook Web App
+A trading strategy is still a feed-based workflow: strategy outputs, signals,
+orders, portfolio state, and analytics all live under the strategy feed path.
+If the task includes a strategy dashboard, also follow the trading playbook UI
+spec.
 
-After your data pipelines are deployed and producing data, build the playbook's
-web interface. Create HTML5 pages with Alva Design System that read from Alva's data gateway and
-visualize the results. Follow the Alva Design System for styling, layout, and
-component guidelines. Unless the user explicitly asks for a static snapshot,
-default to a live playbook. A live playbook may mix live and static sections;
-only widgets that need fresh data must read cronjob-backed feeds at runtime.
+### 4. Build Agentic Research Workflows
 
-### 7. Release
+Use ADK when the runtime step itself needs LLM reasoning, tool calling, or
+multi-source synthesis. Typical cases include periodic research notes, document
+analysis, sentiment classification, or feeds whose transform step cannot be
+expressed as pure deterministic code.
 
-Three phases:
+Keep ADK tools narrow and explicit. Let the model compose them rather than
+building a single mega-tool.
 
-1. **Write HTML to ALFS**: `POST /api/v1/fs/write` the playbook HTML to
-   `~/playbooks/{name}/index.html`.
-2. **Create playbook draft**: `POST /api/v1/draft/playbook` — creates DB
-   records, writes draft files and `playbook.json` to ALFS automatically.
-   This request must include both the URL-safe `name` and the human-readable
-   `display_name`. Use `[subject/theme] [analysis angle/strategy logic]`, put
-   the subject/theme first, and keep it within 40 characters. Avoid personal
-   markers such as `My`, `Test`, or `V2`, and generic-only titles such as
-   `Stock Dashboard` or `Trading Bot`.
-   **Trading symbols**: If the playbook involves specific trading assets,
-   include `"trading_symbols"` in the request — an array of base asset
-   tickers (e.g. `["BTC", "ETH"]`, `["NVDA", "AAPL"]`). The backend
-   resolves each symbol to a full trading pair object and stores the result
-   in the playbook metadata. Max 50 symbols per request. Unknown symbols
-   are silently skipped.
-3. **Call release API**: `POST /api/v1/release/playbook` — creates release DB
-   records, uploads HTML to CDN, and writes release files to ALFS automatically.
-   Returns `playbook_id` (numeric).
+### 5. Release and Remix Playbooks
 
-Once released, the playbook is accessible at
-`https://alva.ai/u/<username>/playbooks/<playbook_name>` — ready to share with
-the world. Use the playbook `name` and the username from `GET /api/v1/me` to
-construct this URL.
+Use the release flow when the user wants a hosted Alva playbook. The standard
+sequence is:
 
-After publishing, take a screenshot to verify the dashboard renders correctly:
+1. write HTML to `~/playbooks/{name}/index.html`
+2. create the playbook draft
+3. release the playbook
+4. verify the published page
 
-```
-GET /api/v1/screenshot?url=https://alva.ai/u/<username>/playbooks/<playbook_name>
-```
-
-Pass `X-Alva-Api-Key` header so the screenshot service can access authenticated
-content. Fetch the returned image URL to inspect the result visually. See
-[api-reference.md](references/api-reference.md) § Screenshot API for full
-parameter details.
-
-### 8. Remix (Create from Existing Playbook)
-
-Users can remix any published playbook to create a customized version. The Remix
-prompt uses the format `@{owner}/{name}` to identify the source playbook — e.g.
-`Playbook(@alice/btc-momentum)`. The agent reads the source playbook's feed
-scripts (strategy logic) and HTML (dashboard UI), customizes them per the user's
-request, and deploys a new playbook under their own namespace. If the user does
-not specify what to change, the agent should ask before proceeding.
-
-See [remix-workflow.md](references/remix-workflow.md) for the full step-by-step
-guide.
+Use remix when the request starts from an existing public playbook such as
+`@alice/btc-momentum`. If the user does not say what should change, ask before
+proceeding.
 
 ---
 
@@ -283,6 +278,7 @@ guide.
 | [altra-trading.md](references/altra-trading.md)               | Altra backtesting engine: strategies, features, signals, testing, debugging                                                                |
 | [deployment.md](references/deployment.md)                     | Deploying scripts as cronjobs for scheduled execution                                                                                      |
 | [design-system.md](references/design-system.md)               | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs                                 |
+| [creators-note.md](references/creators-note.md)               | Post-release creator's note workflow for pinned discussion comments                                                                        |
 | [remix-workflow.md](references/remix-workflow.md)             | Remix: create a new playbook from an existing template                                                                                     |
 | [adk.md](references/adk.md)                                   | Agent Development Kit: `adk.agent()` API, tool calling, ReAct loop, examples                                                               |
 | [search.md](references/search.md)                             | Content search SDKs: per-source usage, enrichment patterns, and gotchas for Twitter/X, news, Reddit, YouTube, podcasts, and web            |
@@ -354,7 +350,7 @@ curl -s "$ALVA_ENDPOINT{path}"
 
 Retrieve your `user_id` and `username`:
 
-```
+```text
 GET /api/v1/me
 → {"id":1,"username":"alice"}
 ```
@@ -412,6 +408,12 @@ Paths: `~/data/file.json` (home-relative) or `/alva/home/<username>/...`
 | POST   | `/api/v1/release/feed`     | Register feed (DB + link to cronjob task). Call after deploying cronjob. |
 | POST   | `/api/v1/release/playbook` | Release playbook for public hosting. Call after writing playbook HTML.   |
 
+### Draft (`/api/v1/draft/`)
+
+| Method | Endpoint                 | Description                                                           |
+| ------ | ------------------------ | --------------------------------------------------------------------- |
+| POST   | `/api/v1/draft/playbook` | Create the playbook draft record before releasing the playbook HTML.  |
+
 **Name uniqueness**: Both `name` in releaseFeed and releasePlaybook must be
 unique within your user space. Use `GET /api/v1/fs/readdir?path=~/feeds` or
 `GET /api/v1/fs/readdir?path=~/playbooks` to check existing names before
@@ -445,7 +447,7 @@ Search before writing code to check which symbols/exchanges Alva supports.
 Supports exact match + prefix fuzzy search by base asset or alias.
 Comma-separated queries for multiple searches.
 
-```
+```text
 GET /api/v1/trading-pairs/search?q=BTC,ETH
 → {"trading_pairs":[{"base":"BTC","quote":"USDT","symbol":"BINANCE_PERP_BTC_USDT","exchange":"binance","type":"crypto-perp","fee_rate":0.001,...},...]}
 ```
@@ -511,417 +513,66 @@ exports are frozen.
 
 ---
 
-## Feed SDK Quick Reference
-
-See [feed-sdk.md](references/feed-sdk.md) for full details.
-
-Feeds are persistent data pipelines that store time series data, readable via
-filesystem paths.
-
-```javascript
-const { Feed, feedPath, makeDoc, num } = require("@alva/feed");
-const { getCryptoKline } = require("@arrays/crypto/ohlcv:v1.0.0");
-const { indicators } = require("@alva/algorithm");
-
-const feed = new Feed({ path: feedPath("btc-ema") });
-
-feed.def("metrics", {
-  prices: makeDoc("BTC Prices", "Close + EMA10", [num("close"), num("ema10")]),
-});
-
-(async () => {
-  await feed.run(async (ctx) => {
-    const raw = await ctx.kv.load("lastDate");
-    const lastDateMs = raw ? Number(raw) : 0;
-
-    const now = Math.floor(Date.now() / 1000);
-    const start =
-      lastDateMs > 0 ? Math.floor(lastDateMs / 1000) : now - 30 * 86400;
-
-    const bars = getCryptoKline({
-      symbol: "BTCUSDT",
-      start_time: start,
-      end_time: now,
-      interval: "1h",
-    })
-      .response.data.slice()
-      .reverse();
-    const closes = bars.map((b) => b.close);
-    const ema10 = indicators.ema(closes, { period: 10 });
-
-    const records = bars
-      .map((b, i) => ({
-        date: b.date,
-        close: b.close,
-        ema10: ema10[i] || null,
-      }))
-      .filter((r) => r.date > lastDateMs);
-
-    if (records.length > 0) {
-      await ctx.self.ts("metrics", "prices").append(records);
-      await ctx.kv.put("lastDate", String(records[records.length - 1].date));
-    }
-  });
-})();
-```
-
-Feed output is readable at: `~/feeds/btc-ema/v1/data/metrics/prices/@last/100`
-
----
-
-## Data Modeling Patterns
-
-All data produced by a feed should use `feed.def()` + `ctx.self.ts().append()`.
-Do not use `alfs.writeFile()` for feed output data.
-
-**Pattern A -- Snapshot (latest-wins)**: For data that represents current state
-(company detail, ratings, price target consensus). Use start-of-day as the date
-so re-runs overwrite.
-
-```javascript
-const today = new Date();
-today.setHours(0, 0, 0, 0);
-await ctx.self
-  .ts("info", "company")
-  .append([
-    { date: today.getTime(), name: company.name, sector: company.sector },
-  ]);
-```
-
-Read `@last/1` for current snapshot, `@last/30` for 30-day history.
-
-**Pattern B -- Event log**: For timestamped events (insider trades, news,
-senator trades). Each event uses its natural date. Same-date records are
-auto-grouped.
-
-```javascript
-const records = trades.map((t) => ({
-  date: new Date(t.transactionDate).getTime(),
-  name: t.name,
-  type: t.type,
-  shares: t.shares,
-}));
-await ctx.self.ts("activity", "insiderTrades").append(records);
-```
-
-**Pattern C -- Tabular (versioned batch)**: For data where the whole set
-refreshes each run (top holders, EPS estimates). Stamp all records with the same
-run timestamp; same-date grouping stores them as a batch.
-
-```javascript
-const now = Date.now();
-const records = holdings.map((h, i) => ({
-  date: now,
-  rank: i + 1,
-  name: h.name,
-  marketValue: h.value,
-}));
-await ctx.self.ts("research", "institutions").append(records);
-```
-
-| Data Type               | Pattern                | Date Strategy   | Read Query  |
-| ----------------------- | ---------------------- | --------------- | ----------- |
-| OHLCV, indicators       | Time series (standard) | Bar timestamp   | `@last/252` |
-| Company detail, ratings | Snapshot (A)           | Start of day    | `@last/1`   |
-| Insider trades, news    | Event log (B)          | Event timestamp | `@last/50`  |
-| Holdings, estimates     | Tabular (C)            | Run timestamp   | `@last/N`   |
-
-See [feed-sdk.md](references/feed-sdk.md) for detailed data modeling examples
-and deduplication behavior.
-
----
-
-## Deploying Feeds
-
-Every feed follows a 6-step lifecycle including every newly created feed or re-created feed:
-
-1. **Write** -- define schema + incremental logic with `ctx.kv`
-2. **Upload** -- write script to `~/feeds/<name>/v1/src/index.js`
-3. **Test** -- `POST /api/v1/run` with `entry_path` to verify output
-4. **Grant** -- make feed data publicly readable:
-
-   ```
-   POST /api/v1/fs/grant
-   {"path":"~/feeds/<name>","subject":"special:user:*","permission":"read"}
-   ```
-
-   Grant on the feed root path (not on `data/`). Subject format:
-   `special:user:*` (public), `special:user:+` (authenticated only), `user:<id>`
-   (specific user).
-5. **Deploy** -- `POST /api/v1/deploy/cronjob` for scheduled execution
-6. **Release** -- `POST /api/v1/release/feed` to register the feed in the
-   database (requires the `task_id` from the deploy step)
-
-| Data Type                     | Recommended Schedule     | Rationale                           |
-| ----------------------------- | ------------------------ | ----------------------------------- |
-| Stock OHLCV + technicals      | `0 */4 * * *` (every 4h) | Markets update during trading hours |
-| Company detail, price targets | `0 8 * * *` (daily 8am)  | Changes infrequently                |
-| Insider/senator trades        | `0 8 * * *` (daily 8am)  | SEC filings are daily               |
-| Earnings estimates            | `0 8 * * *` (daily 8am)  | Updated periodically                |
-
-See [deployment.md](references/deployment.md) for the full deployment guide and
-API reference.
-
----
-
-## Debugging Feeds
-
-### Resetting Feed Data (development only)
-
-During development, use the REST API to clear stale or incorrect data. **Do not
-use this in production.**
-
-```
-# Clear a specific time series output
-DELETE /api/v1/fs/remove?path=~/feeds/my-feed/v1/data/market/ohlcv&recursive=true
-
-# Clear an entire group (all outputs under "market")
-DELETE /api/v1/fs/remove?path=~/feeds/my-feed/v1/data/market&recursive=true
-
-# Full reset: clear ALL data + KV state (removes the data mount, re-created on next run)
-DELETE /api/v1/fs/remove?path=~/feeds/my-feed/v1/data&recursive=true
-```
-
-### Inline Debug Snippets
-
-Test SDK shapes before building a full feed:
-
-```
-POST /api/v1/run
-{"code":"const { getCryptoKline } = require(\"@arrays/crypto/ohlcv:v1.0.0\"); JSON.stringify(Object.keys(getCryptoKline({ symbol: \"BTCUSDT\", start_time: 0, end_time: 0, interval: \"1h\" })));"}
-```
-
----
-
-## Altra Trading Engine Quick Reference
-
-**Always use Altra for backtesting.** Altra handles bar.endTime timestamps,
-data alignment, and portfolio simulation automatically. Do not manually loop
-over SDK data (e.g. `getCryptoKline`) to evaluate trading conditions — this
-leads to incorrect timestamps and look-ahead bias. Use Altra even for simple
-strategies; it supports any interval (`"1min"` to `"1w"`) and any combination
-of OHLCV + external data via `registerRawData`.
-
-See [altra-trading.md](references/altra-trading.md) for full details.
-
-```javascript
-const { createOHLCVProvider } = require("@arrays/data/ohlcv-provider:v1.0.0");
-const { FeedAltraModule } = require("@alva/feed");
-const { FeedAltra, e, Amount } = FeedAltraModule;
-
-const altra = new FeedAltra(
-  {
-    path: "~/feeds/my-strategy/v1",
-    startDate: Date.parse("2025-01-01T00:00:00Z"),
-    portfolioOptions: { initialCash: 1_000_000 },
-    simOptions: { simTick: "1min", feeRate: 0.001 },
-    perfOptions: { timezone: "UTC", marketType: "crypto" },
-  },
-  createOHLCVProvider(),
-);
-
-const dg = altra.getDataGraph();
-dg.registerOhlcv("BINANCE_SPOT_BTC_USDT", "1d"); // any interval: "1min" to "1w"
-dg.registerFeature({ name: "rsi" /* ... */ });
-
-altra.setStrategy(strategyFn, {
-  trigger: { type: "events", expr: e.ohlcv("BINANCE_SPOT_BTC_USDT", "1d") },
-  inputConfig: {
-    ohlcvs: [{ id: { pair: "BINANCE_SPOT_BTC_USDT", interval: "1d" } }],
-    features: [{ id: "rsi" }],
-  },
-  initialState: {},
-});
-
-(async () => {
-  await altra.run(Date.now());
-})();
-```
-
----
-
-## ADK (Agent Development Kit) Quick Reference
-
-See [adk.md](references/adk.md) for full details.
-
-ADK is a universal agent development kit that runs inside the Jagent V8 runtime.
-Use it to build LLM-powered agents that autonomously reason, call tools, and
-produce structured output — ideal for periodic research, insight generation, and
-document analysis feeds.
-
-```javascript
-const adk = require("@alva/adk");
-
-const result = await adk.agent({
-  system: "You are a senior equity analyst...",
-  prompt: "Analyze NVDA quarterly earnings trends.",
-  tools: [
-    /* tool definitions */
-  ],
-  maxTurns: 5,
-});
-
-log(result.content); // Final LLM text response
-log(result.toolCalls); // All tool invocations made
-```
-
-### When to Use ADK
-
-| Use Case                 | Description                                                                                                                               |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Periodic research feeds  | Scheduled agents that fetch data, reason over it, and produce structured insights (e.g. weekly earnings analysis, daily macro commentary) |
-| Document / data analysis | Agents that read documents or datasets, extract key points, and output structured summaries                                               |
-| Multi-source synthesis   | Agents that call multiple data SDKs, cross-reference findings, and produce a unified research note                                        |
-| Agentic data pipelines   | Feed scripts where the "transform" step requires LLM reasoning (classification, sentiment, summarization)                                 |
-
-### Core API
-
-```javascript
-const result = await adk.agent({
-  system, // (optional) system prompt — define the agent's role and output format
-  prompt, // user query or task description
-  tools, // array of Tool objects the agent can invoke
-  maxTurns, // max ReAct loop iterations (default: 10)
-});
-// result: { content: string, turns: number, toolCalls: ToolCallRecord[] }
-```
-
-### Tool Calling — What Tools Are For
-
-Tools are the agent's hands. Use them to:
-
-- **Query data**: Fetch upstream data from Alva SDKs, external HTTP APIs, or
-  ALFS files. The agent decides _which_ data to retrieve based on its reasoning.
-- **Collect context**: Pull in multiple data sources (earnings, macro
-  indicators, news) so the agent can cross-reference and synthesize.
-- **Store / fetch memory**: Read and write to ALFS or `ctx.kv` to persist state
-  across runs — e.g. store a running summary, retrieve last analysis for
-  comparison, or cache intermediate results.
-
-```javascript
-// Example: tools for data query + memory
-const tools = [
-  {
-    name: "getEarnings",
-    description: "Fetch quarterly earnings for a stock symbol",
-    parameters: {
-      type: "object",
-      properties: { symbol: { type: "string" } },
-      required: ["symbol"],
-    },
-    fn: async (args) => {
-      const {
-        getCompanyIncomeStatements,
-      } = require("@arrays/data/stock/company/income:v1.0.0");
-      return getCompanyIncomeStatements({
-        symbol: args.symbol,
-        period_type: "quarter",
-        start_time: Date.parse("2023-01-01"),
-        end_time: Date.now(),
-        limit: 20,
-      }).response.metrics;
-    },
-  },
-  {
-    name: "readMemory",
-    description: "Read previous analysis from memory",
-    parameters: {
-      type: "object",
-      properties: { key: { type: "string" } },
-      required: ["key"],
-    },
-    fn: async (args) => {
-      const alfs = require("alfs");
-      const env = require("env");
-      try {
-        return JSON.parse(
-          await alfs.readFile(
-            `/alva/home/${env.username}/data/memory/${args.key}.json`,
-          ),
-        );
-      } catch {
-        return null;
-      }
-    },
-  },
-  {
-    name: "writeMemory",
-    description: "Store analysis result to memory for future runs",
-    parameters: {
-      type: "object",
-      properties: { key: { type: "string" }, value: { type: "object" } },
-      required: ["key", "value"],
-    },
-    fn: async (args) => {
-      const alfs = require("alfs");
-      const env = require("env");
-      await alfs.writeFile(
-        `/alva/home/${env.username}/data/memory/${args.key}.json`,
-        JSON.stringify(args.value),
-      );
-      return { saved: true };
-    },
-  },
-];
-```
-
-### General Best Practices
-
-- **Keep tools focused**: Each tool should do one thing (fetch data, compute a
-  metric, read/write memory). Let the agent compose them.
-- **Combine with Feed SDK**: Store agent output as time series via
-  `ctx.self.ts().append()` for queryable, versioned research history.
-- **Idempotent runs**: Use `ctx.kv` to track last-processed dates, so re-runs
-  don't duplicate insights.
-
----
-
-## Deployment Quick Reference
-
-See [deployment.md](references/deployment.md) for full details.
-
-Deploy feed scripts or tasks as cronjobs for scheduled execution:
-
-```
-POST /api/v1/deploy/cronjob
-{"path":"~/feeds/btc-ema/v1/src/index.js","cron_expression":"0 */4 * * *","name":"BTC EMA Update"}
-```
-
-Cronjobs execute the script via the same jagent runtime as `/api/v1/run`. Max 20
-cronjobs per user. Min interval: 1 minute.
-
-After deploying a cronjob, register the feed, create a playbook draft, then
-release the playbook for public hosting. The playbook HTML must already be
-written to ALFS at `~/playbooks/{name}/index.html` via `fs/write` before
-releasing.
-
-**Important**: Feed names and playbook names must be unique within your user
-space. Before creating a new feed or playbook, use
-`GET /api/v1/fs/readdir?path=~/feeds` or
-`GET /api/v1/fs/readdir?path=~/playbooks` to check for existing names and avoid
-conflicts.
-
-```
-# 1. Release feed (register in DB, link to cronjob)
-POST /api/v1/release/feed
-{"name":"btc-ema","version":"1.0.0","task_id":42}
-→ {"feed_id":100,"name":"btc-ema","feed_major":1}
-
-# 2. Create playbook draft (creates DB record + ALFS draft files automatically)
-#    Include trading_symbols when the playbook involves specific assets.
-POST /api/v1/draft/playbook
-{"name":"btc-dashboard","display_name":"BTC Trend Dashboard","description":"BTC market dashboard","feeds":[{"feed_id":100}],"trading_symbols":["BTC"]}
-→ {"playbook_id":99,"playbook_version_id":200}
-
-# 3. Release playbook (reads HTML from ALFS, uploads to CDN, writes release files automatically)
-POST /api/v1/release/playbook
-{"name":"btc-dashboard","version":"v1.0.0","feeds":[{"feed_id":100}]}
-→ {"playbook_id":99,"version":"v1.0.0","published_url":"https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html"}
-
-# After release, output the alva.ai playbook link to the user:
-# https://alva.ai/u/<username>/playbooks/<playbook_name>
-# e.g. https://alva.ai/u/alice/playbooks/btc-dashboard
-```
+## Workflow Guardrails
+
+### Feed Workflow Guardrails
+
+Before writing feed code, read [feed-sdk.md](references/feed-sdk.md).
+
+- Use `feedPath()` for feed base paths.
+- Define outputs with `feed.def()` and write records with
+  `ctx.self.ts(...).append()`.
+- Use `ctx.kv` for incremental watermarks and idempotent reruns.
+- Do **not** use `alfs.writeFile()` for canonical feed output data.
+- For data modeling patterns such as snapshot, event log, and batch refresh,
+  use the authoritative guidance in `feed-sdk.md`.
+
+### Deployment Guardrails
+
+Before deploying anything scheduled, read
+[deployment.md](references/deployment.md).
+
+- Standard order: write -> test -> grant -> deploy -> release.
+- Grant public read on the **feed root**, not `.../data/...`.
+- Cronjob entry paths must point to an existing script.
+- Feed and playbook names must be unique in the user's namespace.
+- Create a playbook draft before calling `POST /api/v1/release/playbook`.
+
+If a feed is only for development, it is acceptable to clear stale data with the
+filesystem remove API. Do not treat that as a production recovery flow.
+
+### Trading Strategy Guardrails
+
+Before writing strategy logic, read
+[altra-trading.md](references/altra-trading.md).
+
+- Always use Altra for backtesting and paper trading.
+- Do **not** manually loop OHLCV arrays to simulate strategy execution.
+- Treat the strategy as a feed-based workflow whose outputs live under one feed
+  path.
+
+### ADK Guardrails
+
+Before building LLM-powered runtime workflows, read [adk.md](references/adk.md).
+
+- Use ADK when the runtime step needs model reasoning or tool calling.
+- Keep tool definitions narrow, explicit, and composable.
+- Persist research history with Feed SDK outputs or ALFS only when the task
+  truly needs memory.
+
+### Release Guardrails
+
+When releasing a playbook:
+
+- write the final HTML to `~/playbooks/{name}/index.html`
+- create the draft with `POST /api/v1/draft/playbook` and a distinct `name` and
+  `display_name`
+- include `trading_symbols` when the playbook is about specific assets
+- release the playbook, then verify the published page renders correctly
+- use the Screenshot API in [api-reference.md](references/api-reference.md) when
+  you need a visual verification artifact for the published page
+- after a successful release, see [creators-note.md](references/creators-note.md)
+  if the user wants a pinned creator's note
 
 ---
 
