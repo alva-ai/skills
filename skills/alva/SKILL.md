@@ -151,11 +151,10 @@ SDK.
 Financial data APIs across 16 domains. To find the right API for a task:
 
 1. **Pick a data skill** from the index below.
-2. **Call `POST /api/v1/arrays-api-key`** to get your Arrays API key (one per
-   user, auto-provisioned, returned on every call).
-3. **Call `GET /api/v1/data-skills/:name`** to get the full endpoint
-   documentation for that domain.
-4. **Use the API key as `X-API-Key` header** when calling Arrays data endpoints.
+2. **Call `GET $ARRAYS_ENDPOINT/api/v1/skills/:name`** (public, no auth) to get
+   the full endpoint documentation for that domain.
+3. **Use `ARRAYS_API_KEY` as `X-API-Key` header** when calling Arrays data
+   endpoints.
 
 #### Data Skills Index
 
@@ -303,10 +302,12 @@ guide.
 
 All configuration is done via environment variables.
 
-| Variable        | Required | Description                                                             |
-| --------------- | -------- | ----------------------------------------------------------------------- |
-| `ALVA_API_KEY`  | **yes**  | Your API key (create and manage at [alva.ai](https://alva.ai))          |
-| `ALVA_ENDPOINT` | no       | Alva API base URL. Defaults to `https://api-llm.prd.alva.ai` if not set |
+| Variable          | Required | Description                                                              |
+| ----------------- | -------- | ------------------------------------------------------------------------ |
+| `ALVA_API_KEY`    | **yes**  | Your API key (create and manage at [alva.ai](https://alva.ai))           |
+| `ALVA_ENDPOINT`   | no       | Alva API base URL. Defaults to `https://api-llm.prd.alva.ai` if not set |
+| `ARRAYS_API_KEY`  | **yes**  | Arrays data API key, used as `X-API-Key` for data endpoints              |
+| `ARRAYS_ENDPOINT` | no       | Arrays API base URL. Defaults to `https://data-tools.prd.space.id`       |
 
 `ALVA_API_KEY` authenticates the agent to Alva itself. Do **not** use it as a
 substitute for third-party vendor secrets. Vendor credentials belong in Alva
@@ -431,18 +432,20 @@ releasing.
 | ------ | --------------- | ------------------------------------------------------- |
 | POST   | `/api/v1/remix` | Save parent→child playbook dependency (Remix scenarios) |
 
-### Data Skills (`/api/v1/data-skills/`)
+### Data Skills (Arrays backend — `$ARRAYS_ENDPOINT/api/v1/skills/`)
 
-| Method | Endpoint                            | Description                              |
-| ------ | ----------------------------------- | ---------------------------------------- |
-| GET    | `/api/v1/data-skills`               | List all data skills (name + description)|
-| GET    | `/api/v1/data-skills/:name`         | Get full documentation for a data skill  |
-| POST   | `/api/v1/arrays-api-key`            | Get or create your Arrays API key        |
+| Method | Endpoint              | Description                              |
+| ------ | --------------------- | ---------------------------------------- |
+| GET    | `/api/v1/skills`      | List all data skills (name + description)|
+| GET    | `/api/v1/skills/:name`| Get full documentation for a data skill  |
 
-**Data skill retrieval flow**: call `POST /api/v1/arrays-api-key` to get your
-API key → pick a skill from the Data Skills Index above → call
-`/data-skills/:name` to load the full endpoint documentation → use the key as
-`X-API-Key` header when calling Arrays endpoints.
+These endpoints are on the **Arrays backend** (`$ARRAYS_ENDPOINT`), not the Alva
+backend. They are public and require no authentication.
+
+**Data skill retrieval flow**: pick a skill from the Data Skills Index above →
+call `$ARRAYS_ENDPOINT/api/v1/skills/:name` to load the full endpoint
+documentation → use `ARRAYS_API_KEY` as `X-API-Key` header when calling Arrays
+data endpoints.
 
 > **Legacy SDK endpoints** (`/api/v1/sdk/`) remain available for the 3 retained
 > partitions (`crypto_fundamentals`, `feed_widgets`,
@@ -512,7 +515,8 @@ variables, or shell. Host-agent permissions still apply. See
 **Data modules**: Financial data modules available via
 `require("@arrays/crypto/ohlcv:v1.0.0")` etc. Version suffix is optional
 (defaults to `v1.0.0`). To discover function signatures and response shapes,
-use the data skills API (`GET /api/v1/data-skills/:name`). For legacy modules
+use the data skills API (`GET $ARRAYS_ENDPOINT/api/v1/skills/:name`). For
+legacy modules
 (`crypto_fundamentals`, `feed_widgets`, `technical_indicator_calculation_helpers`),
 use `GET /api/v1/sdk/doc?name=...`.
 
