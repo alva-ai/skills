@@ -211,6 +211,19 @@ cronjobs on Alva Cloud. They run continuously on your chosen schedule (e.g.
 every hour, every day). All data is private by default; grant public access to
 specific paths so anyone -- or any playbook page -- can read the data.
 
+**Push notifications for followers:** Feeds can produce actionable signals that
+get pushed to playbook followers via Telegram. When deploying a cronjob, **ask
+the user whether this feed should push notifications to followers**. If yes:
+
+1. Add a `signal/targets` output to the feed script (see
+   [feed-sdk.md](references/feed-sdk.md) Pattern D) -- write signal records
+   using the Altra target format (`{date, instruction, meta}`), where
+   `meta.reason` is the human-readable message followers will see.
+2. Set `"push_notify": true` in the `POST /api/v1/deploy/cronjob` request.
+
+The platform reads `/data/signal/targets/@last/1` after each successful
+execution and pushes the signal content to all followers with Telegram enabled.
+
 ### 6. Build the Playbook Web App
 
 After your data pipelines are deployed and producing data, build the playbook's
