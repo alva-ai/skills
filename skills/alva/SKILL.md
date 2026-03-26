@@ -450,6 +450,21 @@ GET /api/v1/trading-pairs/search?q=BTC,ETH
 → {"trading_pairs":[{"base":"BTC","quote":"USDT","symbol":"BINANCE_PERP_BTC_USDT","exchange":"binance","type":"crypto-perp","fee_rate":0.001,...},...]}
 ```
 
+**Validate search results before using them:**
+
+1. **Check the `base` field matches your query** — fuzzy search may return
+   prefix matches (e.g. `HYPE` → `HYPR`). If `base` ≠ your query term,
+   the result is a different asset. Do not use it without confirming.
+2. **Check the `type` field matches the expected asset class** — if the user
+   asks about a crypto token, verify the result has a crypto type
+   (`crypto-spot`, `crypto-perp`), not an equity type. If the types don’t
+   match, the search returned a wrong-category match.
+3. **When no exact match is found**, tell the user the specific token is not
+   in Alva’s trading pairs index rather than silently using a partial match.
+   You can still use web search to answer the question, but do not feed
+   wrong-type trading pairs into SDK calls (e.g. do not use `getStockKline`
+   for a crypto token or `getCryptoKline` for a stock).
+
 ### User Info
 
 | Method | Endpoint     | Description                              |
