@@ -248,7 +248,22 @@ Once released, the playbook is accessible at
 the world. Use the playbook `name` and the username from `GET /api/v1/me` to
 construct this URL.
 
-After publishing, take a screenshot to verify the dashboard renders correctly:
+**Post-release verification (mandatory):** After calling the release API, you
+MUST verify the release actually succeeded before reporting success to the user.
+A release API response with `playbook_id` does not guarantee the playbook is
+live — CDN propagation, missing draft, or upstream errors can cause silent
+failures.
+
+1. **Check the published URL resolves**: fetch
+   `https://alva.ai/u/<username>/playbooks/<playbook_name>` and confirm it
+   returns HTTP 200. If it returns 404 or any error, the release failed — do not
+   report success. Diagnose the issue (missing draft? missing grant?) and retry.
+2. **Verify `latestRelease` is set**: query the playbook via GraphQL and confirm
+   `latestRelease` is non-null. If null, the release did not persist.
+3. **If verification fails**: stop and inform the user that the release did not
+   succeed. Do not proceed to screenshot or share the URL.
+
+After publishing and verification passes, take a screenshot to verify the dashboard renders correctly:
 
 ```
 GET /api/v1/screenshot?url=https://alva.ai/u/<username>/playbooks/<playbook_name>
