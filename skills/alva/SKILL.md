@@ -68,21 +68,25 @@ bash "<this skill's directory>/scripts/version_check.sh"
   using the appropriate method for how the skill was installed. Proceed normally
   after the update completes.
 
-### 2. API Key
+### 2. API Keys
 
-Read `.alva.json` in this skill's directory. If `api_key` is missing or empty,
-ask the user for their Alva API key (available at <https://alva.ai>) and write it
-to `.alva.json`. Do not proceed until a valid key is configured. Example format:
+Read `.alva.json` in this skill's directory. If `api_key` or `arrays_api_key` is
+missing or empty, ask the user for the missing key(s) and write them to
+`.alva.json`. Do not proceed until both keys are configured. Example format:
 
 ```json
 {
   "api_key": "alva_...",
+  "arrays_api_key": "arr_...",
   "last_check": 0
 }
 ```
 
-Set the `ALVA_API_KEY` environment variable from this value for all subsequent
-API calls in this session.
+Set the following environment variables from these values for all subsequent
+API calls in this session:
+
+- `ALVA_API_KEY` ← `api_key`
+- `ARRAYS_API_KEY` ← `arrays_api_key`
 
 ---
 
