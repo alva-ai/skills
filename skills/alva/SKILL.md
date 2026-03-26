@@ -183,7 +183,7 @@ Financial data APIs across 16 domains. To find the right API for a task:
 
 #### Legacy SDK Modules
 
-Some specialized modules remain available via the SDK API:
+Some specialized modules remain available via the SDK API (`/api/v1/sdk/`):
 
 | Partition | Description |
 |-----------|-------------|
@@ -191,8 +191,14 @@ Some specialized modules remain available via the SDK API:
 | `feed_widgets` | Social & news subscription feeds (Twitter/X, YouTube, Reddit, podcasts) |
 | `technical_indicator_calculation_helpers` | 50+ pure calculation helpers (RSI, MACD, Bollinger, etc.) |
 
-Use `GET /api/v1/sdk/partitions/:partition/summary` to see module summaries,
-then `GET /api/v1/sdk/doc?name={module_name}` for full documentation.
+| Method | Endpoint                                    | Description                                          |
+| ------ | ------------------------------------------- | ---------------------------------------------------- |
+| GET    | `/api/v1/sdk/doc?name={module_name}`        | Get full doc for a specific SDK module               |
+| GET    | `/api/v1/sdk/partitions`                    | List all SDK partitions                              |
+| GET    | `/api/v1/sdk/partitions/:partition/summary` | Get one-line summaries of all modules in a partition |
+
+Pick a partition → call `/partitions/:partition/summary` to see module summaries
+→ call `/sdk/doc?name=...` for full documentation.
 
 #### Content Search
 
@@ -450,17 +456,6 @@ backend. They are public and require no authentication.
 call `$ARRAYS_ENDPOINT/api/v1/skills/:name` to load the full endpoint
 documentation → use `ARRAYS_API_KEY` as `X-API-Key` header when calling Arrays
 data endpoints.
-
-#### Legacy SDK Documentation (`/api/v1/sdk/`)
-
-These endpoints remain available for the 3 retained partitions
-(`crypto_fundamentals`, `feed_widgets`, `technical_indicator_calculation_helpers`).
-
-| Method | Endpoint                                    | Description                                          |
-| ------ | ------------------------------------------- | ---------------------------------------------------- |
-| GET    | `/api/v1/sdk/doc?name={module_name}`        | Get full doc for a specific SDK module               |
-| GET    | `/api/v1/sdk/partitions`                    | List all SDK partitions                              |
-| GET    | `/api/v1/sdk/partitions/:partition/summary` | Get one-line summaries of all modules in a partition |
 
 ### Trading Pair Search (`/api/v1/trading-pairs/`)
 
