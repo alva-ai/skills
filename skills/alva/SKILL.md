@@ -451,9 +451,16 @@ call `$ARRAYS_ENDPOINT/api/v1/skills/:name` to load the full endpoint
 documentation → use `ARRAYS_API_KEY` as `X-API-Key` header when calling Arrays
 data endpoints.
 
-> **Legacy SDK endpoints** (`/api/v1/sdk/`) remain available for the 3 retained
-> partitions (`crypto_fundamentals`, `feed_widgets`,
-> `technical_indicator_calculation_helpers`).
+#### Legacy SDK Documentation (`/api/v1/sdk/`)
+
+These endpoints remain available for the 3 retained partitions
+(`crypto_fundamentals`, `feed_widgets`, `technical_indicator_calculation_helpers`).
+
+| Method | Endpoint                                    | Description                                          |
+| ------ | ------------------------------------------- | ---------------------------------------------------- |
+| GET    | `/api/v1/sdk/doc?name={module_name}`        | Get full doc for a specific SDK module               |
+| GET    | `/api/v1/sdk/partitions`                    | List all SDK partitions                              |
+| GET    | `/api/v1/sdk/partitions/:partition/summary` | Get one-line summaries of all modules in a partition |
 
 ### Trading Pair Search (`/api/v1/trading-pairs/`)
 
