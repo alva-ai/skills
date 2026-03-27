@@ -297,17 +297,11 @@ following flow:
    and receive as push updates. Only ask when the playbook can produce
    meaningful, actionable, opt-in worthy updates and the user has not already
    asked to skip notification setup.
-2. **Check Telegram binding.** Once the user describes what they want to
-   subscribe to, check whether the user has linked a Telegram account:
-   - **Not bound**: tell the user they need to bind Telegram first. Provide
-     the Telegram binding link and wait for the user to confirm binding is
-     done, then re-verify before proceeding.
-   - **Bound**: proceed to the next step.
-3. **Create the push-capable feed content.** Model the user's selected updates
+2. **Create the push-capable feed content.** Model the user's selected updates
    into a `signal/targets` output and set `push_notify: true` on the cronjob
    (see **Deploy on Alva Cloud** above).
-4. **Subscribe.** Activate push delivery for the user on the selected feeds.
-5. **Release a new version.** Publish the updated playbook, then confirm to
+3. **Subscribe.** Activate push delivery for the user on the selected feeds.
+4. **Release a new version.** Publish the updated playbook, then confirm to
    the user that the subscription is active and the new version is live.
 
 If the user does not want any push content, skip this flow entirely.
