@@ -409,7 +409,7 @@ Paths: `~/data/file.json` (home-relative) or `/alva/home/<username>/...`
 
 | Method | Endpoint                   | Description                                                              |
 | ------ | -------------------------- | ------------------------------------------------------------------------ |
-| POST   | `/api/v1/release/feed`     | Register feed (DB + link to cronjob task). Call after deploying cronjob. |
+| POST   | `/api/v1/release/feed`     | Register feed (DB + link to cronjob). Call after deploying cronjob.      |
 | POST   | `/api/v1/release/playbook` | Release playbook for public hosting. Call after writing playbook HTML.   |
 
 **Name uniqueness**: Both `name` in releaseFeed and releasePlaybook must be
@@ -650,7 +650,7 @@ Every feed follows a 6-step lifecycle including every newly created feed or re-c
    (specific user).
 5. **Deploy** -- `POST /api/v1/deploy/cronjob` for scheduled execution
 6. **Release** -- `POST /api/v1/release/feed` to register the feed in the
-   database (requires the `task_id` from the deploy step)
+   database (requires the `cronjob_id` from the deploy step)
 
 | Data Type                     | Recommended Schedule     | Rationale                           |
 | ----------------------------- | ------------------------ | ----------------------------------- |
@@ -904,7 +904,7 @@ conflicts.
 ```
 # 1. Release feed (register in DB, link to cronjob)
 POST /api/v1/release/feed
-{"name":"btc-ema","version":"1.0.0","task_id":42}
+{"name":"btc-ema","version":"1.0.0","cronjob_id":42}
 → {"feed_id":100,"name":"btc-ema","feed_major":1}
 
 # 2. Create playbook draft (creates DB record + ALFS draft files automatically)

@@ -499,8 +499,8 @@ POST /api/v1/release/feed
 ```
 
 Register a feed in the database after deploying its cronjob. **Must be called
-after** `POST /api/v1/deploy/cronjob` -- the `task_id` comes from the cronjob
-response.
+after** `POST /api/v1/deploy/cronjob` -- the `cronjob_id` comes from the
+cronjob response.
 
 **Name uniqueness**: The `name` must be unique within your user space. Use
 `GET /api/v1/fs/readdir?path=~/feeds` to check existing feed names before
@@ -510,7 +510,7 @@ releasing.
 | ----------- | ------ | -------- | ------------------------------------------------------------ |
 | name        | string | yes      | URL-safe feed name (e.g. `btc-ema`), must be unique per user |
 | version     | string | yes      | SemVer (e.g. `1.0.0`)                                        |
-| task_id     | int64  | yes      | Cronjob task ID from deploy/cronjob                          |
+| cronjob_id  | int64  | yes      | Cronjob ID from deploy/cronjob response                      |
 | view_json   | object | no       | View configuration JSON                                      |
 | description | string | no       | Feed description                                             |
 
@@ -519,7 +519,7 @@ POST /api/v1/release/feed
 {
   "name": "btc-ema",
   "version": "1.0.0",
-  "task_id": 42,
+  "cronjob_id": 42,
   "description": "BTC exponential moving average"
 }
 → {"feed_id": 100, "name": "btc-ema", "feed_major": 1}
