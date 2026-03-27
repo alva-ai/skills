@@ -213,22 +213,19 @@ specific paths so anyone -- or any playbook page -- can read the data.
 
 **Push notifications for followers:** Feeds can produce actionable,
 subscription-worthy signals that get pushed to playbook followers via Telegram.
-When the workflow reaches feed creation, deployment, or immediate
-post-creation follow-up, ask the user **which parts of this playbook are worth
-subscribing to and receiving as push updates**. If the user wants certain
-content to be subscribable and pushable:
+To make a feed push-capable:
 
-1. Model those selected updates in a feed-level `signal/targets` output (see
+1. Add a `signal/targets` output to the feed script (see
    [feed-sdk.md](references/feed-sdk.md) Pattern D) and write signal records
    using the Altra target format (`{date, instruction, meta}`), where
    `meta.reason` is the human-readable message followers will see.
 2. Set `"push_notify": true` in the `POST /api/v1/deploy/cronjob` request, or
    update the existing cronjob to set `"push_notify": true`.
-3. Tell the user that push delivery applies only to followers who have already
-   enabled Telegram notifications on their side.
 
 The platform reads `/data/signal/targets/@last/1` after each successful
 execution and pushes the signal content to all eligible followers.
+
+See **Step 9** below for the full post-release subscription flow.
 
 ### 6. Build the Playbook Web App
 
@@ -290,21 +287,24 @@ not specify what to change, the agent should ask before proceeding.
 See [remix-workflow.md](references/remix-workflow.md) for the full step-by-step
 guide.
 
-### 9. Ask user about push notification
+### 9. Post-release subscription flow
 
-After a feed or playbook is successfully created, add a short follow-up when it
-fits the workflow: ask **which content in this playbook you want to
-and receiving as push updates**.
+After a playbook is **released** (Step 7 complete), check whether the playbook
+contains content worth subscribing to for push updates. If it does, run the
+following flow:
 
-Use this follow-up only when the playbook can produce meaningful, actionable,
-opt-in worthy updates for followers and the user has not already asked to skip
-notification setup.
+1. **Ask the user** which content in this playbook they want to subscribe to
+   and receive as push updates. Only ask when the playbook can produce
+   meaningful, actionable, opt-in worthy updates and the user has not already
+   asked to skip notification setup.
+2. **Create the push-capable feed content.** Model the user's selected updates
+   into a `signal/targets` output and set `push_notify: true` on the cronjob
+   (see **Deploy on Alva Cloud** above).
+3. **Subscribe.** Activate push delivery for the user on the selected feeds.
+4. **Release a new version.** Publish the updated playbook, then confirm to
+   the user that the subscription is active and the new version is live.
 
-If the user identifies content worth subscribing to, follow the push
-notification rules in **Deploy on Alva Cloud** above and map those selected
-updates into the push-capable feed output. If the user does not want any such
-content, leave the feed as a normal non-push feed and continue without further
-notification setup.
+If the user does not want any push content, skip this flow entirely.
 
 ---
 
