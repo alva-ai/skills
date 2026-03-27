@@ -498,15 +498,7 @@ GET /api/v1/trading-pairs/search?q=BTC,ETH
 
 | Method | Endpoint     | Description                              |
 | ------ | ------------ | ---------------------------------------- |
-| GET    | `/api/v1/me`              | Get user profile (includes `telegram_bound` and `telegram_bind_url`) |
-
-### Subscriptions (`/api/v1/subscriptions`)
-
-| Method | Endpoint                    | Description                                                |
-| ------ | --------------------------- | ---------------------------------------------------------- |
-| POST   | `/api/v1/subscriptions`     | Subscribe to push updates (`{playbook_id, feed_ids}`)      |
-| GET    | `/api/v1/subscriptions`     | List current user's subscriptions                          |
-| DELETE | `/api/v1/subscriptions/:id` | Remove a subscription                                      |
+| GET    | `/api/v1/me` | Get authenticated user's id and username |
 
 ### Skill Trace (`/api/v1/skill-trace`)
 
