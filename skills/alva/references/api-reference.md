@@ -397,7 +397,8 @@ POST /api/v1/deploy/cronjob
   "path": "~/feeds/btc-ema/v1/src/index.js",
   "cron_expression": "0 */4 * * *",
   "name": "BTC EMA Update",
-  "args": {"symbol": "BTC"}
+  "args": {"symbol": "BTC"},
+  "push_notify": true
 }
 ```
 
@@ -407,6 +408,10 @@ POST /api/v1/deploy/cronjob
 | cron_expression | string | yes      | Standard cron expression (min interval: 1 minute)      |
 | name            | string | yes      | Human-readable job name                                |
 | args            | object | no       | JSON passed to `require("env").args` on each execution |
+| push_notify     | bool   | no       | Enable push notifications for playbook followers       |
+
+When `push_notify` is `true`, every successful execution reads the feed's
+`/data/signal/targets/@last/1` and pushes it to playbook followers (Telegram).
 
 Response:
 
@@ -418,6 +423,7 @@ Response:
   "cron_expression": "0 */4 * * *",
   "status": "active",
   "args": { "symbol": "BTC" },
+  "push_notify": true,
   "created_at": "2026-03-04T12:00:00Z",
   "updated_at": "2026-03-04T12:00:00Z"
 }
@@ -462,11 +468,12 @@ PATCH /api/v1/deploy/cronjob/42
 {"cron_expression":"0 */2 * * *"}
 ```
 
-| Field           | Type   | Description      |
-| --------------- | ------ | ---------------- |
-| name            | string | Update job name  |
-| cron_expression | string | Update schedule  |
-| args            | object | Update arguments |
+| Field           | Type   | Description                      |
+| --------------- | ------ | -------------------------------- |
+| name            | string | Update job name                  |
+| cron_expression | string | Update schedule                  |
+| args            | object | Update arguments                 |
+| push_notify     | bool   | Enable/disable push notification |
 
 ### Delete Cronjob
 

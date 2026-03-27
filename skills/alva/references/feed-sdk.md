@@ -165,6 +165,74 @@ await feed.run(async (ctx) => {
 
 Read `@last/N` (where N >= batch size) to get the most recent batch.
 
+### Pattern D: Signal / Push Notification
+
+For feeds that produce actionable signals worth pushing to playbook followers.
+Write signal records to the **`signal`** group with a **`targets`** output --
+the resulting path `~/feeds/{name}/v{major}/data/signal/targets` is the
+convention the platform reads when notifying followers via Telegram (or other
+push channels).
+
+The target format follows the same structure used by Altra trading strategies:
+
+```javascript
+const { Feed, feedPath, makeDoc, str, num, obj, arr, fld } = require("@alva/feed");
+
+const feed = new Feed({ path: feedPath("my-signal") });
+
+feed.def("signal", {
+  targets: makeDoc("Signal Targets", "Actionable signals for followers", [
+    obj("instruction", [
+      str("type"),       // "allocate" | "orders"
+      arr("weights", [   // for type: "allocate"
+        str("symbol"),
+        num("weight"),
+      ]),
+      arr("orders", [    // for type: "orders"
+        str("symbol"),
+        str("side"),     // "buy" | "sell"
+        fld("amount", "object"),
+      ]),
+    ]),
+    obj("meta", [
+      str("reason"),     // human-readable explanation
+    ]),
+  ]),
+});
+
+await feed.run(async (ctx) => {
+  const now = Date.now();
+
+  await ctx.self.ts("signal", "targets").append([
+    {
+      date: now,
+      instruction: {
+        type: "allocate",
+        weights: [
+          { symbol: "BINANCE_SPOT_BTC_USDT", weight: 0.6 },
+          { symbol: "BINANCE_SPOT_ETH_USDT", weight: 0.4 },
+        ],
+      },
+      meta: { reason: "EMA crossover: shift to 60/40 BTC/ETH" },
+    },
+  ]);
+});
+```
+
+When this feed runs as a cronjob, the platform reads
+`/data/signal/targets/@last/1` and pushes the signal content (truncated to
+500 chars) to all playbook followers who have enabled Telegram notifications.
+
+**Key points:**
+
+- The group **must** be named `signal` and the output **must** be named
+  `targets` -- this is the path the notification system looks for.
+- Use `meta.reason` to provide a human-readable message -- this is what
+  followers see in their push notification.
+- One record per run is typical; the platform reads `@last/1`.
+- Altra strategies write to this path automatically. Use this pattern only for
+  non-Altra feeds that want to produce push-worthy signals.
+
 ### Deduplication
 
 `append()` deduplicates by `date` -- re-appending a record with an existing

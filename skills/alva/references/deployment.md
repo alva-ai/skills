@@ -41,7 +41,8 @@ POST /api/v1/deploy/cronjob
   "path": "~/feeds/btc-ema/v1/src/index.js",
   "cron_expression": "0 */4 * * *",
   "name": "BTC EMA Update",
-  "args": {"symbol": "BTC"}
+  "args": {"symbol": "BTC"},
+  "push_notify": true
 }
 ```
 
@@ -51,6 +52,12 @@ POST /api/v1/deploy/cronjob
 | cron_expression | string | yes      | Standard cron expression                               |
 | name            | string | yes      | Human-readable job name                                |
 | args            | object | no       | JSON passed to `require("env").args` on each execution |
+| push_notify     | bool   | no       | Enable push notifications for playbook followers       |
+
+When `push_notify` is `true`, every successful cronjob execution triggers a
+notification fan-out: the platform reads the feed's
+`/data/signal/targets/@last/1`, and pushes the signal content to all playbook
+followers who have enabled Telegram notifications. Defaults to `false`.
 
 The API validates that the entry_path exists on the filesystem before creating
 the cronjob.
@@ -65,6 +72,7 @@ the cronjob.
   "cron_expression": "0 */4 * * *",
   "status": "active",
   "args": { "symbol": "BTC" },
+  "push_notify": true,
   "created_at": "2026-03-04T12:00:00Z",
   "updated_at": "2026-03-04T12:00:00Z"
 }
@@ -109,7 +117,7 @@ PATCH /api/v1/deploy/cronjob/42
 {"cron_expression":"0 */2 * * *","args":{"symbol":"ETH"}}
 ```
 
-Updatable fields: `name`, `cron_expression`, `args`.
+Updatable fields: `name`, `cron_expression`, `args`, `push_notify`.
 
 ### Delete Cronjob
 
