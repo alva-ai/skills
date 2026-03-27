@@ -212,17 +212,23 @@ every hour, every day). All data is private by default; grant public access to
 specific paths so anyone -- or any playbook page -- can read the data.
 
 **Push notifications for followers:** Feeds can produce actionable signals that
-get pushed to playbook followers via Telegram. When deploying a cronjob, **ask
-the user whether this feed should push notifications to followers**. If yes:
+get pushed to playbook followers via Telegram. When the workflow reaches feed
+creation, deployment, or immediate post-creation follow-up, ask whether the
+user wants to make this feed a **push-enabled feed**. If yes:
 
 1. Add a `signal/targets` output to the feed script (see
-   [feed-sdk.md](references/feed-sdk.md) Pattern D) -- write signal records
+   [feed-sdk.md](references/feed-sdk.md) Pattern D) and write signal records
    using the Altra target format (`{date, instruction, meta}`), where
    `meta.reason` is the human-readable message followers will see.
-2. Set `"push_notify": true` in the `POST /api/v1/deploy/cronjob` request.
+2. Set `"push_notify": true` in the `POST /api/v1/deploy/cronjob` request, or
+   update the existing cronjob to set `"push_notify": true`.
+3. Tell the user that push delivery applies only to followers who have already
+   enabled Telegram notifications on their side.
+
+Do **not** guide the user to bind Telegram inside this skill.
 
 The platform reads `/data/signal/targets/@last/1` after each successful
-execution and pushes the signal content to all followers with Telegram enabled.
+execution and pushes the signal content to all eligible followers.
 
 ### 6. Build the Playbook Web App
 
@@ -283,6 +289,20 @@ not specify what to change, the agent should ask before proceeding.
 
 See [remix-workflow.md](references/remix-workflow.md) for the full step-by-step
 guide.
+
+### 9. Ask user about push notification
+
+After a feed or playbook is successfully created, add a short follow-up when it
+fits the workflow: ask whether the newly created feed should be turned into a
+**push-enabled feed**.
+
+Use this follow-up only when the feed can produce meaningful, actionable
+updates for followers and the user has not already asked to skip notification
+setup.
+
+If the user says yes, follow the push notification rules in **Deploy on Alva
+Cloud** above. If the user says no, leave the feed as a normal non-push feed
+and continue without further notification setup.
 
 ---
 
