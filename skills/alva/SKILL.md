@@ -213,29 +213,19 @@ specific paths so anyone -- or any playbook page -- can read the data.
 
 **Push notifications for followers:** Feeds can produce actionable,
 subscription-worthy signals that get pushed to playbook followers via Telegram.
-When the workflow reaches feed creation, deployment, or immediate
-post-creation follow-up, ask the user **which parts of this playbook are worth
-subscribing to and receiving as push updates**. If the user wants certain
-content to be subscribable and pushable:
+To make a feed push-capable:
 
-1. Model those selected updates in a feed-level `signal/targets` output (see
+1. Add a `signal/targets` output to the feed script (see
    [feed-sdk.md](references/feed-sdk.md) Pattern D) and write signal records
    using the Altra target format (`{date, instruction, meta}`), where
    `meta.reason` is the human-readable message followers will see.
 2. Set `"push_notify": true` in the `POST /api/v1/deploy/cronjob` request, or
    update the existing cronjob to set `"push_notify": true`.
-3. Check whether the user has bound Telegram by calling `GET /api/v1/me` and
-   inspecting the `telegram_bound` field:
-   - **`telegram_bound: true`** — create the subscription via
-     `POST /api/v1/subscriptions` with the playbook ID and selected feed IDs.
-     Confirm to the user that push notifications are now active.
-   - **`telegram_bound: false`** — show the `telegram_bind_url` from the
-     response and ask the user to complete Telegram binding first. Once the
-     user confirms binding is done, re-check `GET /api/v1/me` and then create
-     the subscription.
 
 The platform reads `/data/signal/targets/@last/1` after each successful
 execution and pushes the signal content to all eligible followers.
+
+See **Step 9** below for the full post-release subscription flow.
 
 ### 6. Build the Playbook Web App
 
@@ -297,31 +287,33 @@ not specify what to change, the agent should ask before proceeding.
 See [remix-workflow.md](references/remix-workflow.md) for the full step-by-step
 guide.
 
-### 9. Ask user about push notification subscription
+### 9. Post-release subscription flow
 
-After a feed or playbook is successfully created, add a short follow-up when it
-fits the workflow: ask **which content in this playbook is worth subscribing to
-for push updates**.
+After a playbook is **released** (Step 7 complete), check whether the playbook
+contains content worth subscribing to for push updates. If it does, run the
+following flow:
 
-Use this follow-up only when the playbook can produce meaningful, actionable,
-opt-in worthy updates and the user has not already asked to skip notification
-setup.
-
-If the user identifies content worth subscribing to:
-
-1. Model the selected updates into a push-capable feed output and set
-   `push_notify: true` on the cronjob (see **Deploy on Alva Cloud** above).
-2. Call `GET /api/v1/me` to check `telegram_bound`:
-   - **Bound** (`telegram_bound: true`): call `POST /api/v1/subscriptions`
-     with the playbook ID and selected feed IDs. Confirm to the user that
-     push notifications are active.
+1. **Ask the user** which content in this playbook they want to subscribe to
+   and receive as push updates. Only ask when the playbook can produce
+   meaningful, actionable, opt-in worthy updates and the user has not already
+   asked to skip notification setup.
+2. **Check Telegram binding.** Once the user describes what they want to
+   subscribe to, call `GET /api/v1/me` and inspect `telegram_bound`:
    - **Not bound** (`telegram_bound: false`): tell the user they need to bind
      Telegram first. Show the `telegram_bind_url` from the response as a
-     clickable link. Once the user confirms binding is done, re-check
-     `GET /api/v1/me`, then create the subscription.
+     clickable link and wait for the user to confirm binding is done. Then
+     re-check `GET /api/v1/me` to verify `telegram_bound` is now `true`.
+   - **Bound** (`telegram_bound: true`): proceed to the next step.
+3. **Create the push-capable feed content.** Model the user's selected updates
+   into a `signal/targets` output and set `push_notify: true` on the cronjob
+   (see **Deploy on Alva Cloud** above).
+4. **Subscribe.** Call `POST /api/v1/subscriptions` with the playbook ID and
+   selected feed IDs to activate push delivery for the user.
+5. **Release a new version.** Call `POST /api/v1/release/playbook` to publish
+   the updated playbook, then confirm to the user that the subscription is
+   active and the new version is live.
 
-If the user does not want any push content, leave the feed as a normal
-non-push feed and continue without further notification setup.
+If the user does not want any push content, skip this flow entirely.
 
 ---
 
