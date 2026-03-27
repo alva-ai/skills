@@ -211,13 +211,14 @@ cronjobs on Alva Cloud. They run continuously on your chosen schedule (e.g.
 every hour, every day). All data is private by default; grant public access to
 specific paths so anyone -- or any playbook page -- can read the data.
 
-**Push notifications for followers:** Feeds can produce actionable, subscription-
-worthy signals that get pushed to playbook followers via Telegram. When the
-workflow reaches feed creation, deployment, or immediate post-creation
-follow-up, ask whether the user wants to make this feed a **push-enabled
-feed** that publishes selectively subscribable updates. If yes:
+**Push notifications for followers:** Feeds can produce actionable,
+subscription-worthy signals that get pushed to playbook followers via Telegram.
+When the workflow reaches feed creation, deployment, or immediate
+post-creation follow-up, ask the user **which parts of this playbook are worth
+subscribing to and receiving as push updates**. If the user wants certain
+content to be subscribable and pushable:
 
-1. Add a `signal/targets` output to the feed script (see
+1. Model those selected updates in a feed-level `signal/targets` output (see
    [feed-sdk.md](references/feed-sdk.md) Pattern D) and write signal records
    using the Altra target format (`{date, instruction, meta}`), where
    `meta.reason` is the human-readable message followers will see.
@@ -292,16 +293,18 @@ guide.
 ### 9. Ask user about push notification
 
 After a feed or playbook is successfully created, add a short follow-up when it
-fits the workflow: ask whether the newly created feed should be turned into a
-**push-enabled feed** for selectively subscribable updates.
+fits the workflow: ask **which content in this playbook you want to
+and receiving as push updates**.
 
-Use this follow-up only when the feed can produce meaningful, actionable, opt-in
-worthy updates for followers and the user has not already asked to skip
+Use this follow-up only when the playbook can produce meaningful, actionable,
+opt-in worthy updates for followers and the user has not already asked to skip
 notification setup.
 
-If the user says yes, follow the push notification rules in **Deploy on Alva
-Cloud** above. If the user says no, leave the feed as a normal non-push feed
-and continue without further notification setup.
+If the user identifies content worth subscribing to, follow the push
+notification rules in **Deploy on Alva Cloud** above and map those selected
+updates into the push-capable feed output. If the user does not want any such
+content, leave the feed as a normal non-push feed and continue without further
+notification setup.
 
 ---
 
