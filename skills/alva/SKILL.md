@@ -224,8 +224,15 @@ content to be subscribable and pushable:
    `meta.reason` is the human-readable message followers will see.
 2. Set `"push_notify": true` in the `POST /api/v1/deploy/cronjob` request, or
    update the existing cronjob to set `"push_notify": true`.
-3. Tell the user that push delivery applies only to followers who have already
-   enabled Telegram notifications on their side.
+3. Check whether the user has bound Telegram by calling `GET /api/v1/me` and
+   inspecting the `telegram_bound` field:
+   - **`telegram_bound: true`** — create the subscription via
+     `POST /api/v1/subscriptions` with the playbook ID and selected feed IDs.
+     Confirm to the user that push notifications are now active.
+   - **`telegram_bound: false`** — show the `telegram_bind_url` from the
+     response and ask the user to complete Telegram binding first. Once the
+     user confirms binding is done, re-check `GET /api/v1/me` and then create
+     the subscription.
 
 The platform reads `/data/signal/targets/@last/1` after each successful
 execution and pushes the signal content to all eligible followers.
@@ -290,21 +297,31 @@ not specify what to change, the agent should ask before proceeding.
 See [remix-workflow.md](references/remix-workflow.md) for the full step-by-step
 guide.
 
-### 9. Ask user about push notification
+### 9. Ask user about push notification subscription
 
 After a feed or playbook is successfully created, add a short follow-up when it
-fits the workflow: ask **which content in this playbook you want to
-and receiving as push updates**.
+fits the workflow: ask **which content in this playbook is worth subscribing to
+for push updates**.
 
 Use this follow-up only when the playbook can produce meaningful, actionable,
-opt-in worthy updates for followers and the user has not already asked to skip
-notification setup.
+opt-in worthy updates and the user has not already asked to skip notification
+setup.
 
-If the user identifies content worth subscribing to, follow the push
-notification rules in **Deploy on Alva Cloud** above and map those selected
-updates into the push-capable feed output. If the user does not want any such
-content, leave the feed as a normal non-push feed and continue without further
-notification setup.
+If the user identifies content worth subscribing to:
+
+1. Model the selected updates into a push-capable feed output and set
+   `push_notify: true` on the cronjob (see **Deploy on Alva Cloud** above).
+2. Call `GET /api/v1/me` to check `telegram_bound`:
+   - **Bound** (`telegram_bound: true`): call `POST /api/v1/subscriptions`
+     with the playbook ID and selected feed IDs. Confirm to the user that
+     push notifications are active.
+   - **Not bound** (`telegram_bound: false`): tell the user they need to bind
+     Telegram first. Show the `telegram_bind_url` from the response as a
+     clickable link. Once the user confirms binding is done, re-check
+     `GET /api/v1/me`, then create the subscription.
+
+If the user does not want any push content, leave the feed as a normal
+non-push feed and continue without further notification setup.
 
 ---
 
@@ -489,7 +506,15 @@ GET /api/v1/trading-pairs/search?q=BTC,ETH
 
 | Method | Endpoint     | Description                              |
 | ------ | ------------ | ---------------------------------------- |
-| GET    | `/api/v1/me` | Get authenticated user's id and username |
+| GET    | `/api/v1/me`              | Get user profile (includes `telegram_bound` and `telegram_bind_url`) |
+
+### Subscriptions (`/api/v1/subscriptions`)
+
+| Method | Endpoint                    | Description                                                |
+| ------ | --------------------------- | ---------------------------------------------------------- |
+| POST   | `/api/v1/subscriptions`     | Subscribe to push updates (`{playbook_id, feed_ids}`)      |
+| GET    | `/api/v1/subscriptions`     | List current user's subscriptions                          |
+| DELETE | `/api/v1/subscriptions/:id` | Remove a subscription                                      |
 
 ### Skill Trace (`/api/v1/skill-trace`)
 

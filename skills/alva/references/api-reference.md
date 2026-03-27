@@ -14,11 +14,14 @@ Setup for curl templates.
 GET /api/v1/me
 ```
 
-Returns the authenticated user's id and username.
+Returns the authenticated user's profile including Telegram binding status.
 
 ```
 GET /api/v1/me
-→ {"id":1,"username":"alice"}
+→ {"id":1,"username":"alice","telegram_bound":true}
+
+# When Telegram is not bound, includes a binding link
+→ {"id":2,"username":"bob","telegram_bound":false,"telegram_bind_url":"https://t.me/AlvaBot?start=bind_abc123"}
 ```
 
 ---
@@ -609,6 +612,25 @@ POST /api/v1/release/playbook
 After a successful release, output the alva.ai playbook link to the user:
 `https://alva.ai/u/<username>/playbooks/<playbook_name>`
 (use the playbook `name` and the username from `GET /api/v1/me`)
+
+---
+
+## Subscriptions API
+
+Subscribe the current user to push updates from playbook feeds via Telegram.
+Requires `telegram_bound: true` (check via `GET /api/v1/me`).
+
+```
+POST /api/v1/subscriptions
+{"playbook_id": 99, "feed_ids": [100]}
+→ {"subscription_id": 50, "playbook_id": 99, "feed_ids": [100], "channel": "telegram"}
+
+GET /api/v1/subscriptions
+→ {"subscriptions": [{"subscription_id": 50, "playbook_id": 99, "feed_ids": [100], "channel": "telegram"}]}
+
+DELETE /api/v1/subscriptions/50
+→ {}
+```
 
 ---
 
