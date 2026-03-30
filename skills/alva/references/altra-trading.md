@@ -60,8 +60,7 @@ module.exports = { SYMBOL, STRATEGY_INTERVAL, TICK, TIME };
 const {
   macd,
 } = require("@alva/technical-indicators/moving-average-convergence-divergence-macd:v1.0.0");
-const { FeedAltraModule } = require("@alva/feed");
-const { num } = FeedAltraModule;
+const { FeedAltraModule, num } = require("@alva/feed");
 const { SYMBOL, STRATEGY_INTERVAL, TICK } = require("./constants.js");
 
 function inRange(t, fromExclusive, toInclusive) {
