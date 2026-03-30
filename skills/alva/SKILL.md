@@ -155,9 +155,12 @@ SDK.
 Financial data APIs across 16 domains. To find the right API for a task:
 
 1. **Pick a data skill** from the index below.
-2. **Call `GET $ARRAYS_ENDPOINT/api/v1/skills/:name`** (public, no auth) to get
-   the full endpoint documentation for that domain.
-3. **Use `ARRAYS_API_KEY` as `X-API-Key` header** when calling Arrays data
+2. **Fetch the skill summary**: `GET $ARRAYS_ENDPOINT/api/v1/skills/:name`
+   (public, no auth) — returns the endpoints table for that domain.
+3. **Fetch endpoint detail**: `GET $ARRAYS_ENDPOINT/api/v1/skills/:name?endpoint=<key>`
+   — use the Endpoint Key from the summary table to get full parameters,
+   response fields, and examples for that specific endpoint.
+4. **Use `ARRAYS_API_KEY` as `X-API-Key` header** when calling Arrays data
    endpoints.
 
 #### Data Skills Index
@@ -453,9 +456,10 @@ These endpoints are on the **Arrays backend** (`$ARRAYS_ENDPOINT`), not the Alva
 backend. They are public and require no authentication.
 
 **Data skill retrieval flow**: pick a skill from the Data Skills Index above →
-call `$ARRAYS_ENDPOINT/api/v1/skills/:name` to load the full endpoint
-documentation → use `ARRAYS_API_KEY` as `X-API-Key` header when calling Arrays
-data endpoints.
+call `$ARRAYS_ENDPOINT/api/v1/skills/:name` to get the endpoints summary →
+pick the endpoint you need from the summary table → call
+`$ARRAYS_ENDPOINT/api/v1/skills/:name?endpoint=<key>` to get endpoint detail →
+use `ARRAYS_API_KEY` as `X-API-Key` header when calling Arrays data endpoints.
 
 ### Trading Pair Search (`/api/v1/trading-pairs/`)
 
