@@ -396,7 +396,7 @@ POST /api/v1/deploy/cronjob
 {
   "path": "~/feeds/btc-ema/v1/src/index.js",
   "cron_expression": "0 */4 * * *",
-  "name": "BTC EMA Update",
+  "name": "btc-ema-update",
   "args": {"symbol": "BTC"},
   "push_notify": true
 }
@@ -406,7 +406,7 @@ POST /api/v1/deploy/cronjob
 | --------------- | ------ | -------- | ------------------------------------------------------ |
 | path            | string | yes      | Path to entry script (home-relative or absolute)       |
 | cron_expression | string | yes      | Standard cron expression (min interval: 1 minute)      |
-| name            | string | yes      | Human-readable job name                                |
+| name            | string | yes      | Job name (1–63 lowercase alphanumeric or hyphens, no leading/trailing hyphen) |
 | args            | object | no       | JSON passed to `require("env").args` on each execution |
 | push_notify     | bool   | no       | Enable push notifications for playbook followers       |
 
@@ -418,7 +418,7 @@ Response:
 ```json
 {
   "id": 42,
-  "name": "BTC EMA Update",
+  "name": "btc-ema-update",
   "path": "/feeds/btc-ema/v1/src/index.js",
   "cron_expression": "0 */4 * * *",
   "status": "active",
