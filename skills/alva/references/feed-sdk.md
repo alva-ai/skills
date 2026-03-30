@@ -680,7 +680,7 @@ GET /api/v1/fs/read?path=/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@
 
 ```
 POST /api/v1/deploy/cronjob
-{"path":"~/feeds/btc-ema/v1/src/index.js","cron_expression":"0 */4 * * *","name":"BTC EMA Update"}
+{"path":"~/feeds/btc-ema/v1/src/index.js","cron_expression":"0 */4 * * *","name":"btc-ema-update"}
 ```
 
 ---

@@ -919,11 +919,15 @@ Deploy feed scripts or tasks as cronjobs for scheduled execution:
 
 ```
 POST /api/v1/deploy/cronjob
-{"path":"~/feeds/btc-ema/v1/src/index.js","cron_expression":"0 */4 * * *","name":"BTC EMA Update"}
+{"path":"~/feeds/btc-ema/v1/src/index.js","cron_expression":"0 */4 * * *","name":"btc-ema-update"}
 ```
 
 Cronjobs execute the script via the same jagent runtime as `/api/v1/run`. Max 20
 cronjobs per user. Min interval: 1 minute.
+
+**Name format**: All resource names (cronjobs, feeds, playbooks) must be 1–63
+lowercase alphanumeric characters or hyphens, and cannot start or end with a
+hyphen (DNS label format). Example: `btc-ema-update`, not `BTC EMA Update`.
 
 After deploying a cronjob, register the feed, create a playbook draft, then
 release the playbook for public hosting. The playbook HTML must already be
