@@ -1,6 +1,6 @@
-# Deploy (Cronjobs)
+# Deploy Cron Job
 
-Schedule scripts as cronjobs for automated execution. All endpoints are under
+Create and manage cron jobs for scheduled execution. All endpoints are under
 `/api/v1/deploy/`.
 
 See [deployment.md](../deployment.md) for a comprehensive workflow guide.

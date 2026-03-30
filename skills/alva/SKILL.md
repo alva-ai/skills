@@ -409,7 +409,7 @@ Reference docs:
 - [Secrets](references/api/secrets.md)
 - [Filesystem](references/api/filesystem.md)
 - [Run](references/api/run.md)
-- [Deploy](references/api/deploy.md)
+- [Deploy Cronjob](references/api/deploy-cronjob.md)
 - [Release](references/api/release.md)
 - [Remix](references/api/remix.md)
 - [SDK](references/api/sdk.md)
