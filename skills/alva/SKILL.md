@@ -272,8 +272,7 @@ GET /api/v1/screenshot?url=https://alva.ai/u/<username>/playbooks/<playbook_name
 
 Pass `X-Alva-Api-Key` header so the screenshot service can access authenticated
 content. Fetch the returned image URL to inspect the result visually. See
-[api-reference.md](references/api-reference.md) § Screenshot API for full
-parameter details.
+[screenshot.md](references/api/screenshot.md) for full parameter details.
 
 ### 8. Remix (Create from Existing Playbook)
 
@@ -310,18 +309,18 @@ If the user does not want any push content, skip this flow entirely.
 
 **Detailed sub-documents** (read these for in-depth reference):
 
-| Document                                                      | Contents                                                                                                                                   |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| [api-reference.md](references/api-reference.md)               | Full REST API reference (filesystem, run, deploy, user info, time series paths)                                                            |
-| [jagent-runtime.md](references/jagent-runtime.md)             | Writing jagent scripts: module system, built-in modules, async model, constraints                                                          |
-| [feed-sdk.md](references/feed-sdk.md)                         | Feed SDK guide: creating data feeds, time series, upstreams, state management                                                              |
-| [altra-trading.md](references/altra-trading.md)               | Altra backtesting engine: strategies, features, signals, testing, debugging                                                                |
-| [deployment.md](references/deployment.md)                     | Deploying scripts as cronjobs for scheduled execution                                                                                      |
-| [design-system.md](references/design-system.md)               | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs                                 |
-| [remix-workflow.md](references/remix-workflow.md)             | Remix: create a new playbook from an existing template                                                                                     |
-| [adk.md](references/adk.md)                                   | Agent Development Kit: `adk.agent()` API, tool calling, ReAct loop, examples                                                               |
-| [search.md](references/search.md)                             | Content search SDKs: per-source usage, enrichment patterns, and gotchas for Twitter/X, news, Reddit, YouTube, podcasts, and web            |
-| [secret-manager.md](references/secret-manager.md)             | Secret upload, CRUD API, and runtime usage via `require("secret-manager")`                                                                 |
+| Document | Contents |
+| --- | --- |
+| `references/api/*.md` | Split REST API reference docs (user info, filesystem, run, deploy, release, SDK, screenshots, and errors) |
+| [jagent-runtime.md](references/jagent-runtime.md) | Writing jagent scripts: module system, built-in modules, async model, constraints |
+| [feed-sdk.md](references/feed-sdk.md) | Feed SDK guide: creating data feeds, time series, upstreams, state management |
+| [altra-trading.md](references/altra-trading.md) | Altra backtesting engine: strategies, features, signals, testing, debugging |
+| [deployment.md](references/deployment.md) | Deploying scripts as cronjobs for scheduled execution |
+| [design-system.md](references/design-system.md) | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
+| [remix-workflow.md](references/remix-workflow.md) | Remix: create a new playbook from an existing template |
+| [adk.md](references/adk.md) | Agent Development Kit: `adk.agent()` API, tool calling, ReAct loop, examples |
+| [search.md](references/search.md) | Content search SDKs: per-source usage, enrichment patterns, and gotchas for Twitter/X, news, Reddit, YouTube, podcasts, and web |
+| [secret-manager.md](references/secret-manager.md) | Secret upload, CRUD API, and runtime usage via `require("secret-manager")` |
 | [skill-trace-finalize.md](references/skill-trace-finalize.md) | Skill trace upload (`POST .../skill-trace/finalize`), aligned with `skill_trace_full_reference.md`; planning — final step must be finalize |
 
 ---
@@ -398,118 +397,30 @@ GET /api/v1/me
 
 ## Quick API Reference
 
-See [api-reference.md](references/api-reference.md) for full details.
+**Base URL**: `$ALVA_ENDPOINT` (defaults to `https://api-llm.prd.alva.ai`).
 
-### Filesystem (`/api/v1/fs/`)
+Examples use HTTP notation (`METHOD /path`). Auth (`X-Alva-Api-Key` header) is
+required on every request unless marked **(public, no auth)**. See `Setup`
+above for curl templates.
 
-| Method | Endpoint                          | Description                                             |
-| ------ | --------------------------------- | ------------------------------------------------------- |
-| GET    | `/api/v1/fs/read?path={path}`     | Read file content (raw bytes) or time series data       |
-| POST   | `/api/v1/fs/write`                | Write file (raw body or JSON with `data` field)         |
-| GET    | `/api/v1/fs/stat?path={path}`     | Get file/directory metadata                             |
-| GET    | `/api/v1/fs/readdir?path={path}`  | List directory entries                                  |
-| POST   | `/api/v1/fs/mkdir`                | Create directory (recursive)                            |
-| DELETE | `/api/v1/fs/remove?path={path}`   | Remove file or directory                                |
-| POST   | `/api/v1/fs/rename`               | Rename / move                                           |
-| POST   | `/api/v1/fs/copy`                 | Copy file                                               |
-| POST   | `/api/v1/fs/symlink`              | Create symlink                                          |
-| GET    | `/api/v1/fs/readlink?path={path}` | Read symlink target                                     |
-| POST   | `/api/v1/fs/chmod`                | Change permissions                                      |
-| POST   | `/api/v1/fs/grant`                | Grant read/write access to a path                       |
-| POST   | `/api/v1/fs/revoke`               | Revoke access                                           |
-| POST   | `/api/v1/fs/ensure-home`          | Provision your home directory (self-repair, idempotent) |
+Reference docs:
 
-Paths: `~/data/file.json` (home-relative) or `/alva/home/<username>/...`
-(absolute). Public reads use absolute paths without API key.
+- [User Info](references/api/user-info.md)
+- [Secrets](references/api/secrets.md)
+- [Filesystem](references/api/filesystem.md)
+- [Run](references/api/run.md)
+- [Deploy](references/api/deploy.md)
+- [Release](references/api/release.md)
+- [Remix](references/api/remix.md)
+- [SDK](references/api/sdk.md)
+- [Playbook Comments](references/api/playbook-comment.md)
+- [Screenshot](references/api/screenshot.md)
+- [Error Responses](references/api/error-responses.md)
 
-### Run (`/api/v1/run`)
+Additional endpoints that remain documented inline or in dedicated docs:
 
-| Method | Endpoint      | Description                                                                  |
-| ------ | ------------- | ---------------------------------------------------------------------------- |
-| POST   | `/api/v1/run` | Execute JavaScript (inline `code` or `entry_path` to a script on filesystem) |
-
-### Deploy (`/api/v1/deploy/`)
-
-| Method | Endpoint                            | Description                       |
-| ------ | ----------------------------------- | --------------------------------- |
-| POST   | `/api/v1/deploy/cronjob`            | Create a cronjob                  |
-| GET    | `/api/v1/deploy/cronjobs`           | List cronjobs (paginated)         |
-| GET    | `/api/v1/deploy/cronjob/:id`        | Get cronjob details               |
-| PATCH  | `/api/v1/deploy/cronjob/:id`        | Update cronjob (name, cron, args) |
-| DELETE | `/api/v1/deploy/cronjob/:id`        | Delete cronjob                    |
-| POST   | `/api/v1/deploy/cronjob/:id/pause`  | Pause cronjob                     |
-| POST   | `/api/v1/deploy/cronjob/:id/resume` | Resume cronjob                    |
-
-### Release (`/api/v1/release/`)
-
-| Method | Endpoint                   | Description                                                              |
-| ------ | -------------------------- | ------------------------------------------------------------------------ |
-| POST   | `/api/v1/release/feed`     | Register feed (DB + link to cronjob). Call after deploying cronjob.      |
-| POST   | `/api/v1/release/playbook` | Release playbook for public hosting. Call after writing playbook HTML.   |
-
-**Name uniqueness**: Both `name` in releaseFeed and releasePlaybook must be
-unique within your user space. Use `GET /api/v1/fs/readdir?path=~/feeds` or
-`GET /api/v1/fs/readdir?path=~/playbooks` to check existing names before
-releasing.
-
-### Remix Lineage (`/api/v1/remix`)
-
-| Method | Endpoint        | Description                                             |
-| ------ | --------------- | ------------------------------------------------------- |
-| POST   | `/api/v1/remix` | Save parent→child playbook dependency (Remix scenarios) |
-
-### SDK Documentation (`/api/v1/sdk/`)
-
-| Method | Endpoint                                    | Description                                          |
-| ------ | ------------------------------------------- | ---------------------------------------------------- |
-| GET    | `/api/v1/sdk/doc?name={module_name}`        | Get full doc for a specific SDK module               |
-| GET    | `/api/v1/sdk/partitions`                    | List all SDK partitions                              |
-| GET    | `/api/v1/sdk/partitions/:partition/summary` | Get one-line summaries of all modules in a partition |
-
-**SDK retrieval flow**: pick a partition from the index above → call
-`/partitions/:partition/summary` to see module summaries → call
-`/sdk/doc?name=...` to load the full doc for the chosen module.
-
-### Trading Pair Search (`/api/v1/trading-pairs/`)
-
-| Method | Endpoint                             | Description                                      |
-| ------ | ------------------------------------ | ------------------------------------------------ |
-| GET    | `/api/v1/trading-pairs/search?q={q}` | Search trading pairs by base asset (fuzzy match) |
-
-Search before writing code to check which symbols/exchanges Alva supports.
-Supports exact match + prefix fuzzy search by base asset or alias.
-Comma-separated queries for multiple searches.
-
-```
-GET /api/v1/trading-pairs/search?q=BTC,ETH
-→ {"trading_pairs":[{"base":"BTC","quote":"USDT","symbol":"BINANCE_PERP_BTC_USDT","exchange":"binance","type":"crypto-perp","fee_rate":0.001,...},...]}
-```
-
-### User Info
-
-| Method | Endpoint     | Description                              |
-| ------ | ------------ | ---------------------------------------- |
-| GET    | `/api/v1/me` | Get authenticated user's id and username |
-
-### Skill Trace (`/api/v1/skill-trace`)
-
-| Method | Endpoint                       | Description                                                                                                                                                                                                                                                |
-| ------ | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| POST   | `/api/v1/skill-trace/finalize` | Upload trace: `question`, `blockers`, `spans`, optional `skill_name`. Server assigns `trace_id` / `createdAt`. **Use this path — do not rely on `fs/write` to `~/skill-trace/` first.** See [skill-trace-finalize.md](references/skill-trace-finalize.md). |
-
-### Secrets (`/api/v1/secrets`)
-
-| Method | Endpoint                | Description                                  |
-| ------ | ----------------------- | -------------------------------------------- |
-| POST   | `/api/v1/secrets`       | Create a secret                              |
-| GET    | `/api/v1/secrets`       | List secret metadata for the current user    |
-| GET    | `/api/v1/secrets/:name` | Get the plaintext value for one secret       |
-| PUT    | `/api/v1/secrets/:name` | Overwrite the plaintext value for one secret |
-| DELETE | `/api/v1/secrets/:name` | Delete a secret                              |
-
-Prefer the web UI at <https://alva.ai/apikey> when the user is manually
-entering a sensitive secret. Use the API flow when the task explicitly needs
-agent-managed CRUD.
+- trading pair search: `GET /api/v1/trading-pairs/search?q={q}`
+- skill trace finalize: `POST /api/v1/skill-trace/finalize`
 
 ---
 
