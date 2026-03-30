@@ -157,9 +157,9 @@ Financial data APIs across 16 domains. To find the right API for a task:
 1. **Pick a data skill** from the index below.
 2. **Fetch the skill summary**: `GET $ARRAYS_ENDPOINT/api/v1/skills/:name`
    (public, no auth) — returns the endpoints table for that domain.
-3. **Fetch endpoint detail**: `GET $ARRAYS_ENDPOINT/api/v1/skills/:name?endpoint=<key>`
-   — use the Endpoint Key from the summary table to get full parameters,
-   response fields, and examples for that specific endpoint.
+3. **Fetch endpoint detail**: `GET $ARRAYS_ENDPOINT/api/v1/skills/:name?endpoint=<path>`
+   — use the Path value from the summary endpoints table (e.g. `company/list`,
+   `market-news`) to get full parameters, response fields, and examples.
 4. **Use `ARRAYS_API_KEY` as `X-API-Key` header** when calling Arrays data
    endpoints.
 
@@ -458,7 +458,8 @@ backend. They are public and require no authentication.
 **Data skill retrieval flow**: pick a skill from the Data Skills Index above →
 call `$ARRAYS_ENDPOINT/api/v1/skills/:name` to get the endpoints summary →
 pick the endpoint you need from the summary table → call
-`$ARRAYS_ENDPOINT/api/v1/skills/:name?endpoint=<key>` to get endpoint detail →
+`$ARRAYS_ENDPOINT/api/v1/skills/:name?endpoint=<path>` to get endpoint detail
+(use the Path value from the table, e.g. `?endpoint=company/list`) →
 use `ARRAYS_API_KEY` as `X-API-Key` header when calling Arrays data endpoints.
 
 ### Trading Pair Search (`/api/v1/trading-pairs/`)
