@@ -135,9 +135,10 @@ curl -s "$ALVA_ENDPOINT{path}"
 
 ## Communication
 
-No ALFS paths, API payloads, cronjob IDs, or internal data structures in
-user-facing responses. Say what it DOES, not how it works. These details are
-operating instructions for you, not content for the user.
+No ALFS paths, API payloads, cronjob IDs, raw function names, internal jargon,
+or implementation details in user-facing responses. Say what it DOES, not how it
+works. These details are operating instructions for you, not content for the
+user.
 
 ## Request Routing
 
