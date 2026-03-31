@@ -430,11 +430,15 @@ export ALVA_API_KEY="<the key they pasted>"
 curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" "${ALVA_ENDPOINT:-https://api-llm.prd.alva.ai}/api/v1/me"
 ```
 
-On success (`{"id":...,"username":"..."}`), suggest persisting the key in their
-shell profile (`~/.zshrc`, `~/.bashrc`, etc.) so it's available in future
-sessions. Then ask what they want to do — offer concrete starting points like:
-build a playbook, explore financial data, backtest a trading strategy, or set up
-a data pipeline.
+On success, suggest persisting the key in their shell profile so it's available
+in future sessions. Then offer starting points — lead with something that
+showcases Alva's real-time, multi-source data (the kind of answer an LLM alone
+can't give accurately):
+
+- **Try it now**: "Ask me something like 'Who's been buying NVDA insider shares
+  this month?' or 'What's the funding rate on BTC perp right now?'"
+- **Go bigger**: "Or build a live dashboard, backtest a trading strategy, or
+  set up a data pipeline that runs on autopilot."
 
 **Path B — User does not have a key:**
 
