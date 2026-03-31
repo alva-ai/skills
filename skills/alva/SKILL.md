@@ -157,9 +157,7 @@ involves uploading, naming, rotating, listing, or using third-party secrets.
 ## Request Routing
 
 Classify every user request and make sure the response covers the core
-objectives for that path. Treat the routes below as guidance, not a rigid
-checklist. Follow the user's requested scope, and avoid forcing extra steps
-that do not help satisfy the task.
+objectives for that path. Treat the routes below as guidance rather than a rigid checklist, but still cover the necessary steps for the selected path.
 
 | Request Type | Core Objectives |
 | --- | --- |
@@ -180,21 +178,6 @@ Before finishing, verify that the delivered result matches the user's actual
 goal. When a shareable playbook was part of the task, verify:
 
 - [ ] A playbook was released and a `published_url` was returned
-- [ ] A screenshot or equivalent check confirmed the rendered output looks correct
-
-### Backtest Completion
-
-After a successful Altra backtest, do not stop at raw console output unless
-that is explicitly all the user wants. The result should be organized into a
-useful deliverable that covers the user's goal, such as:
-
-1. A concise strategy evaluation with key metrics and interpretation
-2. A visualization of the backtest results (for example equity curve, metrics,
-   or trade log)
-3. A shareable playbook when the user wants a published artifact or dashboard experience
-
-A backtest is incomplete when it fails to cover the user's target outcome, not
-simply because it did not follow one specific publishing route.
 
 ---
 
@@ -211,50 +194,52 @@ playbook builds.
    Never hardcode data as inline JavaScript literals in playbook HTML.
 
 2. **Playbook HTML MUST fetch data at runtime** from feed output paths:
+
    ```javascript
    fetch('/alva/home/<user>/feeds/<name>/v1/data/<group>/<output>/@last/<n>')
      .then(r => r.json())
      .then(data => renderChart(data));
    ```
+
    Static content (labels, colors, layout config) is fine. Quantitative data is
    not — it must flow through the feed pipeline.
 
 ### Prohibited Data Sources for Charts and Tables
 
-3. **WebSearch / WebFetch results must NOT be embedded as data.** Web search is
+1. **WebSearch / WebFetch results must NOT be embedded as data.** Web search is
    only legitimate for: reading documentation, finding API endpoints for BYOD,
    understanding user requirements. Never inject web search results as static
    data literals in feed scripts or playbook HTML.
 
-4. **LLM / ADK output must NOT be presented as factual sourced data.** ADK is
+2. **LLM / ADK output must NOT be presented as factual sourced data.** ADK is
    for reasoning, classification, summarization, and synthesis of real data — not
    for generating numbers, statistics, events, or reports that claim to be from
    real sources. If ADK produces quantitative output, it must be clearly labeled
    as "AI-generated analysis".
 
-5. **Agent training knowledge must NOT fill data gaps.** If an SDK does not have
+3. **Agent training knowledge must NOT fill data gaps.** If an SDK does not have
    the requested data type, report the gap as a blocker. Do not invent data from
    your own knowledge to fill the hole.
 
 ### SDK Coverage Gaps
 
-6. **When an SDK partition lacks the requested data type, report it as a
+1. **When an SDK partition lacks the requested data type, report it as a
    blocker.** For example, if `equity_events_calendar` only has dividends/splits
    but the user wants FDA events, report this gap. Suggest BYOD alternatives
    (`require("net/http")` to a live API) if one exists. Do NOT fabricate events.
 
-7. **When >20% of requested symbols fail SDK lookup, report a data-quality
+2. **When >20% of requested symbols fail SDK lookup, report a data-quality
    blocker.** Do not silently substitute with estimated or fabricated values
    marked `live: false`.
 
 ### Description and Provenance Accuracy
 
-8. **Playbook descriptions and methodology sections must only list data sources
+1. **Playbook descriptions and methodology sections must only list data sources
    that were actually called successfully.** Do not claim "Brave Search",
    "ClinicalTrials.gov", or any other source unless the feed script actually
    fetches from it at runtime.
 
-9. **Update frequency claims must match actual deployment.** If cronjob
+2. **Update frequency claims must match actual deployment.** If cronjob
    deployment failed, do not claim "updated every N hours" in the playbook
    description. Either fix the cronjob or remove the claim.
 
@@ -843,26 +828,6 @@ Every feed follows a 6-step lifecycle including every newly created feed or re-c
 See [deployment.md](references/deployment.md) for the full deployment guide and
 API reference.
 
-### Cronjob Rate Limit Recovery
-
-When `POST /api/v1/deploy/cronjob` returns `RATE_LIMITED` (max 20 cronjobs per
-user):
-
-1. Call `GET /api/v1/deploy/cronjob?page=1` to list all active cronjobs.
-2. Identify removal candidates: feeds not referenced by any active playbook, or
-   the oldest/least-frequently-used jobs.
-3. Present candidates to the user and confirm which to delete.
-4. Delete selected cronjobs via `DELETE /api/v1/deploy/cronjob/{id}`.
-5. Retry `POST /api/v1/deploy/cronjob`.
-6. If still blocked after cleanup, do **not** release the playbook with update
-   frequency claims. Either remove the claims or inform the user that auto-updates
-   are not configured.
-
-**Static playbooks**: If the playbook is purely static (no runtime data
-fetching), do not create a daily cronjob just to satisfy the feeds validation.
-Use a one-shot test run only, or deploy with the least frequent schedule and
-warn the user about unnecessary credit consumption.
-
 ---
 
 ## Error Transparency
@@ -886,13 +851,7 @@ When an SDK module returns a Pro-only or subscription error:
 
 When the user requests data outside Alva's supported asset classes (e.g. forex
 pairs, which are not in SDKHub), state the limitation upfront rather than
-discovering it through failed searches. Suggest BYOD alternatives if a public
-API exists.
-
-**Output naming must match actual coverage.** If the user requests cross-exchange
-data but only single-exchange data is available, do not name the output group
-`crossExchange`. Name it to reflect actual coverage (e.g. `binanceFunding`) and
-inform the user of the limitation.
+discovering it through failed searches.
 
 ---
 
@@ -1180,18 +1139,3 @@ consistent read pattern (`@last`, `@range`, etc.).
 | HTTP response body    | 128 MB max            |
 | Max cronjobs per user | 20                    |
 | Min cron interval     | 1 minute              |
-
----
-
-## Error Responses
-
-All errors return: `{"error":{"code":"...","message":"..."}}`
-
-| HTTP Status | Code              | Meaning                            |
-| ----------- | ----------------- | ---------------------------------- |
-| 400         | INVALID_ARGUMENT  | Bad request or invalid path        |
-| 401         | UNAUTHENTICATED   | Missing or invalid API key         |
-| 403         | PERMISSION_DENIED | Access denied                      |
-| 404         | NOT_FOUND         | File/directory not found           |
-| 429         | RATE_LIMITED      | Rate limit / runner pool exhausted |
-| 500         | INTERNAL          | Server error                       |
