@@ -330,11 +330,14 @@ only widgets that need fresh data must read cronjob-backed feeds at runtime.
 4. **Publish directly**: Call `POST /api/v1/release/playbook` — free playbooks
    are always public. Output the public URL:
    `https://alva.ai/u/<username>/playbooks/<playbook_name>`
-5. **Upsell only on friction**: Do **not** proactively suggest upgrading. But
-   if the user explicitly asks to keep the playbook private or hits a
-   free-tier limitation during the session, respond with:
-   "Private playbooks are available on the Pro plan. You can upgrade at
-   https://alva.ai/pricing."
+5. **Upsell only on friction**: Do **not** proactively suggest upgrading.
+   But when the user's experience is degraded because of free-tier
+   limitations — wanting private playbooks, hitting the cronjob cap,
+   resource limits, or any other pro-gated feature — acknowledge the
+   limitation and offer the upgrade path:
+   "This feature is available on the Pro plan. You can upgrade at
+   https://alva.ai/pricing to [specific benefit, e.g. keep playbooks
+   private / deploy more cronjobs / ...]."
 
 Use the playbook `name` and the username from `GET /api/v1/me` to construct
 URLs.
