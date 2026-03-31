@@ -156,40 +156,45 @@ involves uploading, naming, rotating, listing, or using third-party secrets.
 
 ## Request Routing
 
-Classify every user request and execute **all** steps for that path. Do not stop
-early.
+Classify every user request and make sure the response covers the core
+objectives for that path. Treat the routes below as guidance, not a rigid
+checklist. Follow the user's requested scope, and avoid forcing extra steps
+that do not help satisfy the task.
 
-| Request Type | Detection Keywords | Required Steps (all mandatory) |
-|---|---|---|
-| **Dashboard / Playbook** | "build", "create", "dashboard", "monitor", "tracker", "playbook" | SDK doc lookup → Write feed script → Test run → Grant → Deploy cronjob → Release feed → Build HTML → Write to ALFS → Draft playbook → Release playbook → Screenshot verify |
-| **Backtest / Strategy** | "backtest", "strategy", "test trading", asset + signal keywords | SDK doc lookup → Write Altra strategy → Run backtest → **Build playbook visualizing results** → Deploy → Release → Screenshot verify |
-| **Data Query** | "what is", "show me", "get data", one-off lookup | SDK lookup → Run script → Return data to user (no playbook needed) |
-| **Remix** | "@user/playbook", "remix", "customize", "fork" | Read source playbook → Modify feed/HTML → Deploy → Release |
+| Request Type | Core Objectives |
+| --- | --- |
+| **Dashboard / Playbook** | Identify the needed data sources, validate the data flow, and produce a usable dashboard or playbook when the user wants a shareable artifact |
+| **Backtest / Strategy** | Use Altra, run the backtest correctly, and package the results in the form that best covers the user's goal (analysis, metrics, visualization, or a shareable playbook) |
+| **Data Query** | Fetch the requested data accurately and return it directly unless the user asks for a richer artifact |
+| **Remix** | Reuse the source artifact, apply the requested changes, and return an updated result that matches the requested customization |
 
 ### Completion Gate
 
-Every **Dashboard/Playbook** and **Backtest/Strategy** request **MUST** produce a
-`published_url`. Before finishing your response, verify:
+For **Dashboard/Playbook** and **Backtest/Strategy** requests, the default goal
+is to leave the user with a result they can actually use. In many cases that
+means a released playbook and a `published_url`, but do not force that path if
+the user only asked for code, analysis, debugging help, or an intermediate
+artifact.
+
+Before finishing, verify that the delivered result matches the user's actual
+goal. When a shareable playbook was part of the task, verify:
 
 - [ ] A playbook was released and a `published_url` was returned
-- [ ] A screenshot was taken to verify the dashboard renders correctly
-
-If you reach the end of your work without a `published_url`, something went
-wrong. Review which step was skipped and retry from that point. Do **not** end
-the session without a published result for these request types.
+- [ ] A screenshot or equivalent check confirmed the rendered output looks correct
 
 ### Backtest Completion
 
-After a successful Altra backtest, you are **not done**. The backtest results
-must be presented as a published playbook:
+After a successful Altra backtest, do not stop at raw console output unless
+that is explicitly all the user wants. The result should be organized into a
+useful deliverable that covers the user's goal, such as:
 
-1. Build an HTML dashboard visualizing the backtest results (equity curve,
-   performance metrics, trade log)
-2. Write the HTML to ALFS
-3. Deploy, draft, and release the playbook
-4. Return the `published_url` to the user
+1. A concise strategy evaluation with key metrics and interpretation
+2. A visualization of the backtest results (for example equity curve, metrics,
+   or trade log)
+3. A shareable playbook when the user wants a published artifact or dashboard experience
 
-A backtest without a published playbook is an incomplete task.
+A backtest is incomplete when it fails to cover the user's target outcome, not
+simply because it did not follow one specific publishing route.
 
 ---
 
@@ -929,9 +934,10 @@ leads to incorrect timestamps and look-ahead bias. Use Altra even for simple
 strategies; it supports any interval (`"1min"` to `"1w"`) and any combination
 of OHLCV + external data via `registerRawData`.
 
-**After a successful backtest, you MUST build a playbook** visualizing the
-results (equity curve, metrics, trade log), deploy it, and release it. A
-backtest that only prints results to the console is incomplete — see
+**After a successful backtest, you should package the results in a form the user
+can use.** That may be a playbook, a dashboard, or a concise analytical summary,
+depending on the request. A backtest that only prints raw console output is
+usually incomplete — see
 [Request Routing](#request-routing) above.
 
 See [altra-trading.md](references/altra-trading.md) for full details.
