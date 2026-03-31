@@ -828,6 +828,57 @@ Every feed follows a 6-step lifecycle including every newly created feed or re-c
 See [deployment.md](references/deployment.md) for the full deployment guide and
 API reference.
 
+### Cronjob Rate Limit Recovery
+
+When `POST /api/v1/deploy/cronjob` returns `RATE_LIMITED` (max 20 cronjobs per
+user):
+
+1. Call `GET /api/v1/deploy/cronjob?page=1` to list all active cronjobs.
+2. Identify removal candidates: feeds not referenced by any active playbook, or
+   the oldest/least-frequently-used jobs.
+3. Present candidates to the user and confirm which to delete.
+4. Delete selected cronjobs via `DELETE /api/v1/deploy/cronjob/{id}`.
+5. Retry `POST /api/v1/deploy/cronjob`.
+6. If still blocked after cleanup, do **not** release the playbook with update
+   frequency claims. Either remove the claims or inform the user that auto-updates
+   are not configured.
+
+**Static playbooks**: If the playbook is purely static (no runtime data
+fetching), do not create a daily cronjob just to satisfy the feeds validation.
+Use a one-shot test run only, or deploy with the least frequent schedule and
+warn the user about unnecessary credit consumption.
+
+---
+
+## Error Transparency
+
+When SDK modules fail or are unavailable, you MUST be transparent with the user.
+Do not silently fall back to inferior data sources.
+
+### Pro / Subscription-Gated SDKs
+
+When an SDK module returns a Pro-only or subscription error:
+
+1. **Inform the user** which module is unavailable and why (subscription tier).
+2. **Explain what capability is lost** (e.g. "senator trading data requires
+   Pro — this playbook won't include congressional trading activity").
+3. If falling back to an alternative source, **clearly state** what the fallback
+   is and its limitations (e.g. "Using web search as fallback — data may be
+   incomplete or unverified").
+4. Never silently substitute with LLM-fabricated data.
+
+### Coverage Limitations
+
+When the user requests data outside Alva's supported asset classes (e.g. forex
+pairs, which are not in SDKHub), state the limitation upfront rather than
+discovering it through failed searches. Suggest BYOD alternatives if a public
+API exists.
+
+**Output naming must match actual coverage.** If the user requests cross-exchange
+data but only single-exchange data is available, do not name the output group
+`crossExchange`. Name it to reflect actual coverage (e.g. `binanceFunding`) and
+inform the user of the limitation.
+
 ---
 
 ## Error Transparency
