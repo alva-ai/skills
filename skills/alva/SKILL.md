@@ -57,25 +57,6 @@ you can:
 In short: turn your ideas into a forever-running finance agent that gets things
 done for you.
 
-## Intent Routing
-
-Match the user's request to the lightest workflow that satisfies the intent.
-
-| User says something like… | Workflow | What to do |
-| --- | --- | --- |
-| "Price of BTC?", "NVDA P/E?", "CPI last quarter?" | **Quick query** | `POST /api/v1/run` with the right SDK → format answer. No feed or playbook needed. |
-| "Analyze NVDA", "Research BTC market" | **Analysis playbook** | Find SDKs → write feeds → deploy → build playbook → release. Full lifecycle. |
-| "Backtest a momentum strategy on ETH" | **Backtest** | Define Altra strategy → backtest → review metrics → optionally deploy as live paper trading. |
-| "Build a dashboard for AAPL" | **Playbook** | Design feeds → deploy → build HTML → release. Full lifecycle. |
-| "Track my crypto portfolio" | **Live tracker** | Feed with scheduled updates → playbook with live data → deploy + release. |
-| "Remix @alice/btc-momentum" | **Remix** | Read source → customize → deploy as new playbook. See [Remix](#8-remix-create-from-existing-playbook). |
-
-For **quick queries**, skip the feed/playbook machinery — a single inline
-`POST /api/v1/run` call with the relevant SDK is sufficient. For everything
-else, follow the full lifecycle below.
-
----
-
 ## Pre-flight
 
 **CRITICAL — On first use in each session**, you MUST run these checks
