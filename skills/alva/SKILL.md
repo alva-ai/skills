@@ -133,6 +133,12 @@ curl -s "$ALVA_ENDPOINT{path}"
 
 ---
 
+## Communication
+
+No ALFS paths, API payloads, cronjob IDs, or internal data structures in
+user-facing responses. Say what it DOES, not how it works. These details are
+operating instructions for you, not content for the user.
+
 ## Request Routing
 
 Classify every user request and make sure the response covers the core
@@ -141,7 +147,7 @@ objectives for that path. Treat the routes below as guidance rather than a rigid
 | Request Type | Core Objectives |
 | --- | --- |
 | **Dashboard / Playbook** | Identify the needed data sources, validate the data flow, and produce a usable dashboard or playbook when the user wants a shareable artifact |
-| **Backtest / Strategy** | Use Altra, run the backtest correctly, and package the results in the form that best covers the user's goal (analysis, metrics, visualization, or a shareable playbook) |
+| **Backtest / Strategy** | Use Altra, run the backtest correctly, and always produce a visual playbook (equity curve, trade log, metrics) alongside the text summary. Optionally deploy as live paper trading. |
 | **Data Query** | Fetch the requested data accurately and return it directly unless the user asks for a richer artifact |
 | **Remix** | Reuse the source artifact, apply the requested changes, and return an updated result that matches the requested customization |
 
