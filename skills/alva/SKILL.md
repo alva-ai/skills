@@ -353,13 +353,10 @@ web interface. Create HTML5 pages with Alva Design System that read from Alva's
 data gateway and visualize the results. Follow the Alva Design System for
 styling, layout, and component guidelines. Unless the user explicitly asks for a
 static snapshot, default to a live playbook.
-
-**Data fetching requirement**: Every chart, table, and KPI card that displays
-quantitative data MUST read from feed output paths at runtime via `fetch()`. Do
-NOT embed data as inline JavaScript arrays or objects. See
-[Content Legitimacy Rules](#content-legitimacy-rules) for the full policy. A
-live playbook may include static layout elements (labels, colors, section
-headers), but all data content must flow through the feed pipeline.
+**Data fetching requirement**: Apply the
+[Content Legitimacy Rules](#content-legitimacy-rules) when building the UI.
+All quantitative data in charts, tables, or KPI cards must come from feed
+outputs read at runtime (no inline literals for data).
 
 ### 7. Release
 
@@ -392,10 +389,10 @@ headers), but all data content must flow through the feed pipeline.
 
 #### Pro users (`subscription_tier = "pro"`)
 
-4. **Show draft link**: Output the playbook URL —
+1. **Show draft link**: Output the playbook URL —
    `https://alva.ai/u/<username>/playbooks/<playbook_name>`. The draft is
    accessible only to the creator.
-5. **Ask**: "Your playbook is ready. Would you like to publish it publicly, or
+2. **Ask**: "Your playbook is ready. Would you like to publish it publicly, or
    keep it private for now?"
    - **Publish** → call `POST /api/v1/release/playbook` → output the public
      URL.
@@ -404,16 +401,16 @@ headers), but all data content must flow through the feed pipeline.
 
 #### Free users (`subscription_tier = "free"`)
 
-4. **Publish directly**: Call `POST /api/v1/release/playbook` — free playbooks
+1. **Publish directly**: Call `POST /api/v1/release/playbook` — free playbooks
    are always public. Output the public URL:
    `https://alva.ai/u/<username>/playbooks/<playbook_name>`
-5. **Upsell only on friction**: Do **not** proactively suggest upgrading.
+2. **Upsell only on friction**: Do **not** proactively suggest upgrading.
    But when the user's experience is degraded because of free-tier
    limitations — wanting private playbooks, hitting the cronjob cap,
    resource limits, or any other pro-gated feature — acknowledge the
    limitation and offer the upgrade path:
    "This feature is available on the Pro plan. You can upgrade at
-   https://alva.ai/pricing to [specific benefit, e.g. keep playbooks
+   <https://alva.ai/pricing> to [specific benefit, e.g. keep playbooks
    private / deploy more cronjobs / ...]."
 
 Use the playbook `name` and the username from `GET /api/v1/me` to construct
@@ -426,10 +423,9 @@ Before calling `POST /api/v1/release/playbook`, verify all of the following:
 1. **Cronjobs are active**: All feeds referenced by the playbook have
    successfully deployed cronjobs. If `deploy/cronjob` returned `RATE_LIMITED`,
    see [Cronjob Rate Limit Recovery](#cronjob-rate-limit-recovery) below.
-2. **HTML fetches from feeds**: The playbook HTML contains at least one runtime
-   `fetch()` call reading from the associated feed's output path. A playbook
-   with all data as inline literals while having a deployed feed is a pipeline
-   disconnect.
+2. **HTML fetches from feeds**: The playbook HTML reads quantitative data from
+  feed output paths at runtime (not from inline literals), consistent with the
+  [Content Legitimacy Rules](#content-legitimacy-rules).
 3. **Data is fresh**: Read the latest data point from each referenced feed
    (via `@last/1`) and check its timestamp. If the latest timestamp is older
    than 2x the cron interval, warn the user that the playbook will display
@@ -476,7 +472,7 @@ Read `telegram_username` from the session (Pre-flight Step 3):
 - **Connected** (non-null) → proceed to recommend.
 - **Not connected** (null) → tell the user:
   "To receive push notifications, connect your Telegram at
-  https://alva.ai/settings. After connecting, I can set up push alerts for
+  <https://alva.ai/settings>. After connecting, I can set up push alerts for
   [specific feed description]."
   Then skip the rest of this flow. The user can return to this later.
 
@@ -733,26 +729,6 @@ Every feed follows a 6-step lifecycle including every newly created feed or re-c
 See [deployment.md](references/deployment.md) for the full deployment guide and
 API reference.
 
-### Cronjob Rate Limit Recovery
-
-When `POST /api/v1/deploy/cronjob` returns `RATE_LIMITED` (max 20 cronjobs per
-user):
-
-1. Call `GET /api/v1/deploy/cronjob?page=1` to list all active cronjobs.
-2. Identify removal candidates: feeds not referenced by any active playbook, or
-   the oldest/least-frequently-used jobs.
-3. Present candidates to the user and confirm which to delete.
-4. Delete selected cronjobs via `DELETE /api/v1/deploy/cronjob/{id}`.
-5. Retry `POST /api/v1/deploy/cronjob`.
-6. If still blocked after cleanup, do **not** release the playbook with update
-   frequency claims. Either remove the claims or inform the user that auto-updates
-   are not configured.
-
-**Static playbooks**: If the playbook is purely static (no runtime data
-fetching), do not create a daily cronjob just to satisfy the feeds validation.
-Use a one-shot test run only, or deploy with the least frequent schedule and
-warn the user about unnecessary credit consumption.
-
 ---
 
 ## Error Transparency
@@ -778,36 +754,6 @@ When the user requests data outside Alva's supported asset classes (e.g. forex
 pairs, which are not in SDKHub), state the limitation upfront rather than
 discovering it through failed searches. Suggest BYOD alternatives if a public
 API exists.
-
-**Output naming must match actual coverage.** If the user requests cross-exchange
-data but only single-exchange data is available, do not name the output group
-`crossExchange`. Name it to reflect actual coverage (e.g. `binanceFunding`) and
-inform the user of the limitation.
-
----
-
-## Error Transparency
-
-When SDK modules fail or are unavailable, you MUST be transparent with the user.
-Do not silently fall back to inferior data sources.
-
-### Pro / Subscription-Gated SDKs
-
-When an SDK module returns a Pro-only or subscription error:
-
-1. **Inform the user** which module is unavailable and why (subscription tier).
-2. **Explain what capability is lost** (e.g. "senator trading data requires
-   Pro — this playbook won't include congressional trading activity").
-3. If falling back to an alternative source, **clearly state** what the fallback
-   is and its limitations (e.g. "Using web search as fallback — data may be
-   incomplete or unverified").
-4. Never silently substitute with LLM-fabricated data.
-
-### Coverage Limitations
-
-When the user requests data outside Alva's supported asset classes (e.g. forex
-pairs, which are not in SDKHub), state the limitation upfront rather than
-discovering it through failed searches.
 
 ---
 
