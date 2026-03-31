@@ -490,6 +490,8 @@ size (`.markdown-container` without size modifier). See
 Reuses §1.3 Traded Symbols component, but without the title row — starts
 directly from Pills.
 
+> **Sort**: Newest signal first (descending by `timestamp`).
+
 > **Layout**: Same as Strategy tab — `max-width: 960px`, horizontally centered
 > (`margin: 0 auto`).
 

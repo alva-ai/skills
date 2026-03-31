@@ -10,6 +10,7 @@
 - [Modal](#modal)
 - [Select](#select)
 - [Tab](#tab)
+- [Tooltip](#tooltip)
 
 ---
 
@@ -292,13 +293,13 @@ tags, and scoped CSS maps them to the Alva design spec.
 }
 .markdown-container ul > li::before {
   content: "";
+  position: absolute;
+  left: 9.5px;
+  top: 10.5px;
   width: 5px;
   height: 5px;
   border-radius: 50%;
   background: var(--text-n9);
-  position: absolute;
-  left: 0;
-  top: 10.5px;
 }
 .markdown-container ol {
   counter-reset: md-ol;
@@ -464,12 +465,17 @@ tags, and scoped CSS maps them to the Alva design spec.
   line-height: 22px;
   letter-spacing: 0.14px;
 }
+.markdown-container--m li {
+  padding-left: 20px;
+}
 .markdown-container--m ul > li::before {
+  left: 7.5px;
   top: 8.5px;
 }
 .markdown-container--m ol > li::before {
   font-size: 14px;
   line-height: 22px;
+  width: 20px;
 }
 .markdown-container--m ul,
 .markdown-container--m ol {
@@ -535,12 +541,17 @@ tags, and scoped CSS maps them to the Alva design spec.
   width: 12px;
   height: 12px;
 }
+.markdown-container--s li {
+  padding-left: 20px;
+}
 .markdown-container--s ul > li::before {
+  left: 7.5px;
   top: 7.5px;
 }
 .markdown-container--s ol > li::before {
   font-size: 12px;
   line-height: 20px;
+  width: 20px;
 }
 .markdown-container--s ul,
 .markdown-container--s ol {
@@ -1406,7 +1417,7 @@ border through their transparent border.
   gap: 16px;
 }
 .tab-underline .tab-item {
-  padding-bottom: 6px;
+  padding-bottom: var(--spacing-xxs);
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
@@ -1500,4 +1511,82 @@ document.querySelectorAll(".tab").forEach(function (tab) {
     }
   });
 });
+```
+
+---
+
+## Tooltip
+
+2 variants: **Simple** (text only) and **Rich** (title + description).
+
+### CSS
+
+```css
+.tooltip {
+  background-color: var(--b0-container);
+  position: absolute;
+  border-radius: var(--radius-ct-m);
+  box-shadow: var(--shadow-s);
+  padding: var(--spacing-m);
+  width: fit-content;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxxs);
+}
+
+.tooltip-border {
+  position: absolute;
+  border: 0.5px solid var(--line-l2);
+  border-radius: var(--radius-ct-m);
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Simple — text only */
+.tooltip-text {
+  font-family:
+    "Delight",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+  color: var(--text-n9);
+  font-weight: 400;
+}
+
+/* Rich — title */
+.tooltip-title {
+  font-family:
+    "Delight",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: 0.16px;
+  color: var(--text-n9);
+  font-weight: 500;
+}
+
+/* Rich — description reuses .tooltip-text */
+```
+
+### HTML
+
+```html
+<!-- Simple Tooltip -->
+<div class="tooltip">
+  <div class="tooltip-border"></div>
+  <div class="tooltip-text">Tooltip description text</div>
+</div>
+
+<!-- Rich Tooltip -->
+<div class="tooltip">
+  <div class="tooltip-border"></div>
+  <div class="tooltip-title">Title</div>
+  <div class="tooltip-text">Tooltip description text</div>
+</div>
 ```
