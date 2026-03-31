@@ -285,6 +285,11 @@ two-step retrieval flow:
 2. **Call `GET /api/v1/sdk/partitions/:partition/summary`** to see module
    summaries, then load the full doc for the chosen module.
 
+**SDK doc lookup is mandatory.** Always look up SDK documentation before writing
+any feed script. Do not guess function signatures, parameter names, or response
+shapes from memory. The doc lookup ensures you use the correct module, call the
+right function, and handle the actual response format.
+
 #### SDK Partition Index
 
 | Partition                                 | Description                                                                                                                                                             |
@@ -340,6 +345,21 @@ Once your data analytics scripts and feeds are ready, deploy them as scheduled
 cronjobs on Alva Cloud. They run continuously on your chosen schedule (e.g.
 every hour, every day). All data is private by default; grant public access to
 specific paths so anyone -- or any playbook page -- can read the data.
+
+**User scope enforcement**: All write, deploy, and release operations MUST
+target only the requesting user's namespace. Before any `fs/write`,
+`draft/playbook`, or `release/playbook` call, verify the target path and
+username match the authenticated user (from `GET /api/v1/me`). If you have
+access to multiple API keys (e.g. from prior sessions), identify the requesting
+user and scope all operations to that user only. Do NOT write to or release
+playbooks under other users' namespaces unless the request explicitly asks for
+cross-user operations (e.g. remix with lineage).
+
+**Signal feeds require Altra**: Any feed that produces `signal/targets` or
+`signal/alerts` output MUST use `FeedAltra`. Manual signal construction
+(building target records without Altra) bypasses bar alignment, portfolio
+simulation, and look-ahead bias prevention. Use `FeedAltra` even for simple
+signal logic — it ensures correct timestamps and prevents forward-looking bugs.
 
 **Push notifications for followers:** Feeds can produce actionable,
 subscription-worthy signals that get pushed to playbook followers via Telegram.
@@ -429,6 +449,26 @@ headers), but all data content must flow through the feed pipeline.
 
 Use the playbook `name` and the username from `GET /api/v1/me` to construct
 URLs.
+
+#### Pre-Release Validation
+
+Before calling `POST /api/v1/release/playbook`, verify all of the following:
+
+1. **Cronjobs are active**: All feeds referenced by the playbook have
+   successfully deployed cronjobs. If `deploy/cronjob` returned `RATE_LIMITED`,
+   see [Cronjob Rate Limit Recovery](#cronjob-rate-limit-recovery) below.
+2. **HTML fetches from feeds**: The playbook HTML contains at least one runtime
+   `fetch()` call reading from the associated feed's output path. A playbook
+   with all data as inline literals while having a deployed feed is a pipeline
+   disconnect.
+3. **Data is fresh**: Read the latest data point from each referenced feed
+   (via `@last/1`) and check its timestamp. If the latest timestamp is older
+   than 2x the cron interval, warn the user that the playbook will display
+   stale data.
+4. **Description is accurate**: Update frequency claims match actual cronjob
+   status. Data source claims match actual SDK/BYOD calls in the feed script.
+5. **Target user is correct**: The playbook is being released under the
+   requesting user's namespace (see user scope enforcement above).
 
 ### 8. Remix (Create from Existing Playbook)
 
@@ -798,6 +838,57 @@ Every feed follows a 6-step lifecycle including every newly created feed or re-c
 See [deployment.md](references/deployment.md) for the full deployment guide and
 API reference.
 
+### Cronjob Rate Limit Recovery
+
+When `POST /api/v1/deploy/cronjob` returns `RATE_LIMITED` (max 20 cronjobs per
+user):
+
+1. Call `GET /api/v1/deploy/cronjob?page=1` to list all active cronjobs.
+2. Identify removal candidates: feeds not referenced by any active playbook, or
+   the oldest/least-frequently-used jobs.
+3. Present candidates to the user and confirm which to delete.
+4. Delete selected cronjobs via `DELETE /api/v1/deploy/cronjob/{id}`.
+5. Retry `POST /api/v1/deploy/cronjob`.
+6. If still blocked after cleanup, do **not** release the playbook with update
+   frequency claims. Either remove the claims or inform the user that auto-updates
+   are not configured.
+
+**Static playbooks**: If the playbook is purely static (no runtime data
+fetching), do not create a daily cronjob just to satisfy the feeds validation.
+Use a one-shot test run only, or deploy with the least frequent schedule and
+warn the user about unnecessary credit consumption.
+
+---
+
+## Error Transparency
+
+When SDK modules fail or are unavailable, you MUST be transparent with the user.
+Do not silently fall back to inferior data sources.
+
+### Pro / Subscription-Gated SDKs
+
+When an SDK module returns a Pro-only or subscription error:
+
+1. **Inform the user** which module is unavailable and why (subscription tier).
+2. **Explain what capability is lost** (e.g. "senator trading data requires
+   Pro — this playbook won't include congressional trading activity").
+3. If falling back to an alternative source, **clearly state** what the fallback
+   is and its limitations (e.g. "Using web search as fallback — data may be
+   incomplete or unverified").
+4. Never silently substitute with LLM-fabricated data.
+
+### Coverage Limitations
+
+When the user requests data outside Alva's supported asset classes (e.g. forex
+pairs, which are not in SDKHub), state the limitation upfront rather than
+discovering it through failed searches. Suggest BYOD alternatives if a public
+API exists.
+
+**Output naming must match actual coverage.** If the user requests cross-exchange
+data but only single-exchange data is available, do not name the output group
+`crossExchange`. Name it to reflect actual coverage (e.g. `binanceFunding`) and
+inform the user of the limitation.
+
 ---
 
 ## Debugging Feeds
@@ -1164,6 +1255,24 @@ consistent read pattern (`@last`, `@range`, etc.).
 - **Create new playbooks from scratch unless you are doing a version update.**
   Only version updates may refer to an existing playbook. For all other new
   playbooks, do not read existing ones.
+- **ECharts: use `type: 'time'` for date axes.** Do not pass raw epoch
+  millisecond values as category labels — users will see numbers like
+  `1773840600000` instead of dates. Use `type: 'time'` axis, which handles
+  formatting automatically, or format dates before passing to a category axis.
+- **ECharts graph: validate node/edge data.** For `type: 'graph'` series with
+  `layout: 'none'`, verify every edge `source`/`target` matches an existing
+  node `name`, no duplicate node names exist, and node names don't contain
+  special characters that break ECharts internals. Add a try/catch wrapper
+  around chart initialization with a fallback message if rendering fails.
+- **ECharts sizing: allocate sufficient height.** Heatmaps need
+  `height = max(300px, numRows * 40px)`. Primary charts on overview tabs should
+  be at least 400px tall and visually dominant over KPI cards. Do not compress
+  charts to fit everything above the fold.
+- **Separate `lastDate` watermarks per data source.** When a feed combines
+  multiple data sources with different update frequencies (e.g. ETF OHLCV +
+  VIX + CPI), use a separate `ctx.kv` key for each source's watermark (e.g.
+  `lastDate_etf`, `lastDate_vix`, `lastDate_cpi`). A shared watermark causes
+  slower-updating sources to be permanently filtered out after the first run.
 
 ---
 
