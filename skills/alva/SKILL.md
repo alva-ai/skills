@@ -154,6 +154,107 @@ involves uploading, naming, rotating, listing, or using third-party secrets.
 
 ---
 
+## Request Routing
+
+Classify every user request and execute **all** steps for that path. Do not stop
+early.
+
+| Request Type | Detection Keywords | Required Steps (all mandatory) |
+|---|---|---|
+| **Dashboard / Playbook** | "build", "create", "dashboard", "monitor", "tracker", "playbook" | SDK doc lookup → Write feed script → Test run → Grant → Deploy cronjob → Release feed → Build HTML → Write to ALFS → Draft playbook → Release playbook → Screenshot verify |
+| **Backtest / Strategy** | "backtest", "strategy", "test trading", asset + signal keywords | SDK doc lookup → Write Altra strategy → Run backtest → **Build playbook visualizing results** → Deploy → Release → Screenshot verify |
+| **Data Query** | "what is", "show me", "get data", one-off lookup | SDK lookup → Run script → Return data to user (no playbook needed) |
+| **Remix** | "@user/playbook", "remix", "customize", "fork" | Read source playbook → Modify feed/HTML → Deploy → Release |
+
+### Completion Gate
+
+Every **Dashboard/Playbook** and **Backtest/Strategy** request **MUST** produce a
+`published_url`. Before finishing your response, verify:
+
+- [ ] A playbook was released and a `published_url` was returned
+- [ ] A screenshot was taken to verify the dashboard renders correctly
+
+If you reach the end of your work without a `published_url`, something went
+wrong. Review which step was skipped and retry from that point. Do **not** end
+the session without a published result for these request types.
+
+### Backtest Completion
+
+After a successful Altra backtest, you are **not done**. The backtest results
+must be presented as a published playbook:
+
+1. Build an HTML dashboard visualizing the backtest results (equity curve,
+   performance metrics, trade log)
+2. Write the HTML to ALFS
+3. Deploy, draft, and release the playbook
+4. Return the `published_url` to the user
+
+A backtest without a published playbook is an incomplete task.
+
+---
+
+## Content Legitimacy Rules
+
+These rules are **non-negotiable**. Violations produce misleading playbooks that
+display fabricated data as if it were real. Every rule below applies to all
+playbook builds.
+
+### Data Sourcing
+
+1. **All quantitative data displayed in charts, tables, or KPI cards MUST
+   originate from Alva feeds** (SDK modules or BYOD via `require("net/http")`).
+   Never hardcode data as inline JavaScript literals in playbook HTML.
+
+2. **Playbook HTML MUST fetch data at runtime** from feed output paths:
+   ```javascript
+   fetch('/alva/home/<user>/feeds/<name>/v1/data/<group>/<output>/@last/<n>')
+     .then(r => r.json())
+     .then(data => renderChart(data));
+   ```
+   Static content (labels, colors, layout config) is fine. Quantitative data is
+   not — it must flow through the feed pipeline.
+
+### Prohibited Data Sources for Charts and Tables
+
+3. **WebSearch / WebFetch results must NOT be embedded as data.** Web search is
+   only legitimate for: reading documentation, finding API endpoints for BYOD,
+   understanding user requirements. Never inject web search results as static
+   data literals in feed scripts or playbook HTML.
+
+4. **LLM / ADK output must NOT be presented as factual sourced data.** ADK is
+   for reasoning, classification, summarization, and synthesis of real data — not
+   for generating numbers, statistics, events, or reports that claim to be from
+   real sources. If ADK produces quantitative output, it must be clearly labeled
+   as "AI-generated analysis".
+
+5. **Agent training knowledge must NOT fill data gaps.** If an SDK does not have
+   the requested data type, report the gap as a blocker. Do not invent data from
+   your own knowledge to fill the hole.
+
+### SDK Coverage Gaps
+
+6. **When an SDK partition lacks the requested data type, report it as a
+   blocker.** For example, if `equity_events_calendar` only has dividends/splits
+   but the user wants FDA events, report this gap. Suggest BYOD alternatives
+   (`require("net/http")` to a live API) if one exists. Do NOT fabricate events.
+
+7. **When >20% of requested symbols fail SDK lookup, report a data-quality
+   blocker.** Do not silently substitute with estimated or fabricated values
+   marked `live: false`.
+
+### Description and Provenance Accuracy
+
+8. **Playbook descriptions and methodology sections must only list data sources
+   that were actually called successfully.** Do not claim "Brave Search",
+   "ClinicalTrials.gov", or any other source unless the feed script actually
+   fetches from it at runtime.
+
+9. **Update frequency claims must match actual deployment.** If cronjob
+   deployment failed, do not claim "updated every N hours" in the playbook
+   description. Either fix the cronjob or remove the claim.
+
+---
+
 ## Capabilities & Common Workflows
 
 ### 1. ALFS (Alva FileSystem)
@@ -259,11 +360,17 @@ See **Step 9** below for the full post-release subscription flow.
 ### 6. Build the Playbook Web App
 
 After your data pipelines are deployed and producing data, build the playbook's
-web interface. Create HTML5 pages with Alva Design System that read from Alva's data gateway and
-visualize the results. Follow the Alva Design System for styling, layout, and
-component guidelines. Unless the user explicitly asks for a static snapshot,
-default to a live playbook. A live playbook may mix live and static sections;
-only widgets that need fresh data must read cronjob-backed feeds at runtime.
+web interface. Create HTML5 pages with Alva Design System that read from Alva's
+data gateway and visualize the results. Follow the Alva Design System for
+styling, layout, and component guidelines. Unless the user explicitly asks for a
+static snapshot, default to a live playbook.
+
+**Data fetching requirement**: Every chart, table, and KPI card that displays
+quantitative data MUST read from feed output paths at runtime via `fetch()`. Do
+NOT embed data as inline JavaScript arrays or objects. See
+[Content Legitimacy Rules](#content-legitimacy-rules) for the full policy. A
+live playbook may include static layout elements (labels, colors, section
+headers), but all data content must flow through the feed pipeline.
 
 ### 7. Release
 
@@ -731,6 +838,11 @@ leads to incorrect timestamps and look-ahead bias. Use Altra even for simple
 strategies; it supports any interval (`"1min"` to `"1w"`) and any combination
 of OHLCV + external data via `registerRawData`.
 
+**After a successful backtest, you MUST build a playbook** visualizing the
+results (equity curve, metrics, trade log), deploy it, and release it. A
+backtest that only prints results to the console is incomplete — see
+[Request Routing](#request-routing) above.
+
 See [altra-trading.md](references/altra-trading.md) for full details.
 
 ```javascript
@@ -802,6 +914,22 @@ log(result.toolCalls); // All tool invocations made
 | Document / data analysis | Agents that read documents or datasets, extract key points, and output structured summaries                                               |
 | Multi-source synthesis   | Agents that call multiple data SDKs, cross-reference findings, and produce a unified research note                                        |
 | Agentic data pipelines   | Feed scripts where the "transform" step requires LLM reasoning (classification, sentiment, summarization)                                 |
+
+### When NOT to Use ADK
+
+ADK must **never** be used to fabricate data that should come from real sources.
+Specifically:
+
+- Do NOT use ADK to generate hiring statistics, financial events, analyst
+  reports, or any quantitative data that claims to originate from a real data
+  pipeline.
+- Do NOT present ADK-generated content as if it were sourced from SDKs, APIs,
+  or databases.
+- If a data source is unavailable, report the limitation as a blocker — do not
+  use ADK as a fallback data generator.
+
+ADK output that involves reasoning over real data (sentiment classification,
+trend summarization) is fine, but must be labeled as AI-generated analysis.
 
 ### Core API
 
