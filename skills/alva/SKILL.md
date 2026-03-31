@@ -51,58 +51,85 @@ done for you.
 
 ## Pre-flight
 
-**CRITICAL — On first use in each session**, you MUST run these checks
-before doing anything else. Do NOT skip this section:
+**Run these checks on first use each session** before doing anything else.
 
 ### 1. Version Check
-
-Run the version check script at `scripts/version_check.sh` inside this skill's
-directory:
 
 ```bash
 bash "<this skill's directory>/scripts/version_check.sh"
 ```
 
-- **No output** → skill is up to date. Proceed normally.
-- **Output present** → display the message to the user, then apply the update
-  using the appropriate method for how the skill was installed. Proceed normally
-  after the update completes.
+- No output → up to date, proceed.
+- Output present → display to user, apply the update, then proceed.
 
 ### 2. API Key
 
-Read `.alva.json` in this skill's directory. If `api_key` is missing or empty,
-ask the user for their Alva API key (available at <https://alva.ai>) and write it
-to `.alva.json`. Do not proceed until a valid key is configured. Example format:
+| Variable        | Required | Description                                              |
+| --------------- | -------- | -------------------------------------------------------- |
+| `ALVA_API_KEY`  | **yes**  | Your API key ([alva.ai](https://alva.ai))                |
+| `ALVA_ENDPOINT` | no       | API base URL. Defaults to `https://api-llm.prd.alva.ai`  |
+
+Read `.alva.json` in this skill's directory. If `api_key` is present, set
+`ALVA_API_KEY` from it. If missing or empty, **ask the user whether they already
+have a key**:
+
+- **Has a key** — ask them to paste it, write it to `.alva.json`, and verify:
+
+  ```bash
+  export ALVA_API_KEY="<key>"
+  curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" "${ALVA_ENDPOINT:-https://api-llm.prd.alva.ai}/api/v1/me"
+  ```
+
+  On success, suggest persisting in their shell profile. Then offer starting
+  points:
+  - "Ask me something like 'Who's been buying NVDA insider shares this month?'"
+  - "Or build a live dashboard, backtest a strategy, or set up a data pipeline."
+
+- **No key** — sign up at [alva.ai](https://alva.ai), create a key under
+  Settings → API Keys, paste it back, then verify as above.
+
+`.alva.json` format:
 
 ```json
-{
-  "api_key": "alva_...",
-  "last_check": 0
-}
+{ "api_key": "alva_...", "last_check": 0 }
 ```
 
-Set the `ALVA_API_KEY` environment variable from this value for all subsequent
-API calls in this session.
+`ALVA_API_KEY` authenticates to Alva itself. Third-party vendor secrets belong
+in Alva Secret Manager (`require("secret-manager")`).
 
 ### 3. User Profile
 
-Call `GET /api/v1/me` and store the full response for the session:
+Call `GET /api/v1/me` and store the response:
 
 ```
 GET /api/v1/me
 → {"id":1, "subscription_tier":"free", "telegram_username":"alice_tg", "username":"alice"}
 ```
 
-Store these session variables — they determine behavior in later steps:
+Session variables:
 
-- **`username`** — needed for public URLs and ALFS absolute paths.
-- **`subscription_tier`** — `"pro"` or `"free"`. Determines the release flow
-  (Step 7): pro users can keep playbooks private, free users publish publicly.
-  If the field is absent, treat the user as `"free"`.
-- **`telegram_username`** — present when the user has connected Telegram.
-  Determines the push notification flow (Step 9): if set, the agent can
-  recommend push-enabled feeds directly; if null, guide the user to connect
-  Telegram first.
+- **`username`** — for public URLs and ALFS paths.
+- **`subscription_tier`** — `"pro"` or `"free"` (default). Determines release
+  flow (Step 7): pro can keep playbooks private.
+- **`telegram_username`** — if set, recommend push-enabled feeds; if null,
+  guide user to connect Telegram first.
+
+### Making API Requests
+
+All API examples use HTTP notation (`METHOD /path`). Every request requires
+`X-Alva-Api-Key` unless marked **(public, no auth)**.
+
+```bash
+# Authenticated
+curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" "$ALVA_ENDPOINT{path}"
+
+# Authenticated + JSON body
+curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" -H "Content-Type: application/json" \
+  "$ALVA_ENDPOINT{path}" -d '{body}'
+
+# Public read (no API key)
+curl -s "$ALVA_ENDPOINT{path}"
+```
 
 ---
 
@@ -488,80 +515,6 @@ already configured.
 | [search.md](references/search.md) | Content search SDKs: per-source usage, enrichment patterns, and gotchas for Twitter/X, news, Reddit, YouTube, podcasts, and web |
 | [secret-manager.md](references/secret-manager.md) | Secret upload, CRUD API, and runtime usage via `require("secret-manager")` |
 | [skill-trace-finalize.md](references/skill-trace-finalize.md) | Skill trace upload (`POST .../skill-trace/finalize`), aligned with `skill_trace_full_reference.md`; planning — final step must be finalize |
-
----
-
-## Setup
-
-All configuration is done via environment variables.
-
-| Variable        | Required | Description                                                             |
-| --------------- | -------- | ----------------------------------------------------------------------- |
-| `ALVA_API_KEY`  | **yes**  | Your API key (create and manage at [alva.ai](https://alva.ai))          |
-| `ALVA_ENDPOINT` | no       | Alva API base URL. Defaults to `https://api-llm.prd.alva.ai` if not set |
-
-`ALVA_API_KEY` authenticates the agent to Alva itself. Do **not** use it as a
-substitute for third-party vendor secrets. Vendor credentials belong in Alva
-Secret Manager and should be loaded at runtime via
-`require("secret-manager")`.
-
-### First-Time Setup
-
-If `ALVA_API_KEY` is not set, **ask the user whether they already have an API
-key**. Then follow the matching path:
-
-**Path A — User already has a key:**
-
-Ask them to paste the key. Then set it up and verify on their behalf:
-
-```bash
-export ALVA_API_KEY="<the key they pasted>"
-curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" "${ALVA_ENDPOINT:-https://api-llm.prd.alva.ai}/api/v1/me"
-```
-
-On success, suggest persisting the key in their shell profile so it's available
-in future sessions. Then offer starting points — lead with something that
-showcases Alva's real-time, multi-source data (the kind of answer an LLM alone
-can't give accurately):
-
-- **Try it now**: "Ask me something like 'Who's been buying NVDA insider shares
-  this month?' or 'What's the funding rate on BTC perp right now?'"
-- **Go bigger**: "Or build a live dashboard, backtest a trading strategy, or
-  set up a data pipeline that runs on autopilot."
-
-**Path B — User does not have a key:**
-
-1. Sign up at [alva.ai](https://alva.ai) (if no account yet).
-2. Log in → Settings → API Keys → Create New Key → copy the key.
-3. Paste it back — then set up and verify (same as Path A).
-
-### Making API Requests
-
-All API examples in this skill use HTTP notation (`METHOD /path`). Every request
-requires the `X-Alva-Api-Key` header unless marked **(public, no auth)**.
-
-Curl templates for reference:
-
-```bash
-# Authenticated
-curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" "$ALVA_ENDPOINT{path}"
-
-# Authenticated + JSON body
-curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" -H "Content-Type: application/json" \
-  "$ALVA_ENDPOINT{path}" -d '{body}'
-
-# Public read (no API key, absolute path)
-curl -s "$ALVA_ENDPOINT{path}"
-```
-
-### Discovering User Info
-
-Retrieve your profile (also used in Pre-flight Step 3):
-
-```
-GET /api/v1/me
-→ {"id":1, "subscription_tier":"free", "telegram_username":"alice_tg", "username":"alice"}
-```
 
 ---
 
