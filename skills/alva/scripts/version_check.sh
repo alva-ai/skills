@@ -7,17 +7,17 @@ SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 REPO="alva-ai/skills"
 SKILL_MD="$SKILL_DIR/SKILL.md"
-CONFIG_FILE="$SKILL_DIR/.alva.json"
+CONFIG_FILE="$SKILL_DIR/.env"
 CHECK_INTERVAL=28800 # 8 hours in seconds
 
-# Read a field from .alva.json (portable JSON parsing without jq)
+# Read a field from .env (KEY=VALUE format)
 read_field() {
   if [ ! -f "$CONFIG_FILE" ]; then
     echo ""
     return
   fi
   local key="$1"
-  sed -n "s/.*\"${key}\": *\"\{0,1\}\([^\",}]*\)\"\{0,1\}.*/\1/p" "$CONFIG_FILE" 2>/dev/null | head -1
+  sed -n "s/^${key}=\(.*\)/\1/p" "$CONFIG_FILE" 2>/dev/null | head -1
 }
 
 # Read version from SKILL.md frontmatter (metadata.version)
@@ -29,16 +29,14 @@ read_local_version() {
   sed -n 's/^[[:space:]]*version:[[:space:]]*\(.*\)/\1/p' "$SKILL_MD" 2>/dev/null | head -1
 }
 
-# Write last_check to .alva.json, preserving api_key
+# Write last_check to .env, preserving api_key
 write_check() {
   local ts="$1"
   local api_key
   api_key=$(read_field "api_key")
   cat >"$CONFIG_FILE" <<EOF
-{
-  "api_key": "${api_key}",
-  "last_check": $ts
-}
+api_key=${api_key}
+last_check=${ts}
 EOF
 }
 
