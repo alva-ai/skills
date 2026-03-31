@@ -114,46 +114,6 @@ Store these session variables — they determine behavior in later steps:
 
 ---
 
-## Skill trace upload
-
-For any turn that uses this skill and should be persisted, include a brief note in the plan that the trace will be uploaded according to [skill-trace-finalize.md](references/skill-trace-finalize.md).
-
-This is mainly so the turn can be referenced and audited later when needed, including lightweight one-off lookups that may still be worth preserving.
-
-Before the final user-visible answer, call `POST /api/v1/skill-trace/finalize` once to upload the trace.
-
-Keep the main skill focused on when to finalize and why it matters. The request format, field rules, span fidelity, blockers, timing details, and examples all live in [skill-trace-finalize.md](references/skill-trace-finalize.md).
-
-Host-side agents should follow the same convention and treat trace finalize as the last execution step before the closing user-facing answer.
-
----
-
-## Secret Manager
-
-Use Alva Secret Manager whenever a playbook or runtime script needs a
-third-party credential such as an LLM API key, search token, exchange key, or
-webhook secret.
-
-- **Preferred upload path**: ask the user to add or edit the secret in the web
-  UI at <https://alva.ai/apikey>. Assume this page is available.
-- **Do not ask the user to paste sensitive third-party secrets into chat** when
-  the web upload flow is feasible.
-- **Do not hardcode secrets** in source code, ALFS files, `.alva.json`, shell
-  snippets, or released playbook assets.
-- **Runtime access**: load secrets inside Alva Cloud code with
-  `require("secret-manager").loadPlaintext("NAME")`.
-- `loadPlaintext(name)` returns the plaintext string when present, or `null`
-  when the secret is missing for the current user.
-- If a required secret is missing, stop and tell the user exactly which secret
-  name to upload at <https://alva.ai/apikey>.
-- For agent-managed setup, inspection, or cleanup, authenticated CRUD endpoints
-  are available under `/api/v1/secrets`.
-
-Read [secret-manager.md](references/secret-manager.md) whenever the task
-involves uploading, naming, rotating, listing, or using third-party secrets.
-
----
-
 ## Request Routing
 
 Classify every user request and make sure the response covers the core
@@ -932,6 +892,42 @@ Test SDK shapes before building a full feed:
 POST /api/v1/run
 {"code":"const { getCryptoKline } = require(\"@arrays/crypto/ohlcv:v1.0.0\"); JSON.stringify(Object.keys(getCryptoKline({ symbol: \"BTCUSDT\", start_time: 0, end_time: 0, interval: \"1h\" })));"}
 ```
+
+---
+
+## Skill trace upload
+
+For any turn that uses this skill and should be persisted for future reference, include a brief note in the plan that the trace will be uploaded according to [skill-trace-finalize.md](references/skill-trace-finalize.md).
+
+This is mainly so the turn can be referenced and audited later when needed, including lightweight one-off lookups that may still be worth preserving.
+
+Before the final user-visible answer, call `POST /api/v1/skill-trace/finalize` once to upload the trace.
+
+---
+
+## Secret Manager
+
+Use Alva Secret Manager whenever a playbook or runtime script needs a
+third-party credential such as an LLM API key, search token, exchange key, or
+webhook secret.
+
+- **Preferred upload path**: ask the user to add or edit the secret in the web
+  UI at <https://alva.ai/apikey>. Assume this page is available.
+- **Do not ask the user to paste sensitive third-party secrets into chat** when
+  the web upload flow is feasible.
+- **Do not hardcode secrets** in source code, ALFS files, `.alva.json`, shell
+  snippets, or released playbook assets.
+- **Runtime access**: load secrets inside Alva Cloud code with
+  `require("secret-manager").loadPlaintext("NAME")`.
+- `loadPlaintext(name)` returns the plaintext string when present, or `null`
+  when the secret is missing for the current user.
+- If a required secret is missing, stop and tell the user exactly which secret
+  name to upload at <https://alva.ai/apikey>.
+- For agent-managed setup, inspection, or cleanup, authenticated CRUD endpoints
+  are available under `/api/v1/secrets`.
+
+Read [secret-manager.md](references/secret-manager.md) whenever the task
+involves uploading, naming, rotating, listing, or using third-party secrets.
 
 ---
 
