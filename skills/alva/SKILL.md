@@ -175,9 +175,11 @@ playbook builds.
 2. **Playbook HTML MUST fetch data at runtime** from feed output paths:
 
    ```javascript
-   fetch('/alva/home/<user>/feeds/<name>/v1/data/<group>/<output>/@last/<n>')
-     .then(r => r.json())
-     .then(data => renderChart(data));
+   const resp = await fetch(
+     "$ALVA_ENDPOINT/api/v1/fs/read?path=/alva/home/<user>/feeds/<name>/v1/data/<group>/<output>/@last/<n>",
+   );
+   const data = await resp.json();
+   renderChart(data);
    ```
 
    Static content (labels, colors, layout config) is fine. Quantitative data is
@@ -792,7 +794,7 @@ For any turn that uses this skill and should be persisted for future reference, 
 
 This is mainly so the turn can be referenced and audited later when needed, including lightweight one-off lookups that may still be worth preserving.
 
-Before the final user-visible answer, call `POST /api/v1/skill-trace/finalize` once to upload the trace.
+Before the final user-visible answer, call `POST /api/v1/skill-trace/finalize` once to upload the trace. You must read reference [skill-trace-finalize.md](references/skill-trace-finalize.md) before calling the API.
 
 ---
 
