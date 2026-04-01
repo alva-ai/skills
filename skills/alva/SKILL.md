@@ -151,56 +151,21 @@ user.
 
 ### Guided Planning
 
-Do NOT start building feeds, writing code, or deploying until you have presented
-a plan and the user has confirmed it. This applies to **Dashboard / Playbook**,
-**Backtest / Strategy**, and **Remix** requests. **Data Query** is the only
-route that skips planning — execute directly.
+For all routes except **Data Query**, present a plan and get user approval
+before building. Even seemingly clear requests ("build a BTC dashboard") have
+real choices — which data, timeframe, widgets — that are cheaper to resolve
+upfront than to rebuild.
 
-**Anti-pattern: "This request is clear enough to skip planning."** Even when the
-user says "build a BTC dashboard", there are real choices — which data, which
-timeframe, which widgets. A 2-minute planning conversation saves a 20-minute
-rebuild. The plan can be short for simple requests, but you MUST present it and
-get approval.
+1. **Understand intent** — Ask clarifying questions **one at a time**, prefer
+   multiple-choice. Focus on what's missing: asset, scope, output type, or
+   purpose. Skip this step if the request already specifies all of these.
+2. **Propose approaches** — Offer 2-3 concrete options with trade-offs. Lead
+   with your recommendation.
+3. **Confirm the plan** — List the specific feeds and widgets (5-8 lines, no
+   implementation details). Build only after approval.
 
-**Process:**
-
-1. **Understand intent** — Ask clarifying questions **one at a time**. Prefer
-   multiple-choice when possible (easier to answer than open-ended). Focus on
-   what's missing: asset, scope, output type, or purpose. If the request already
-   specifies all of these, skip to step 2.
-
-2. **Propose 2-3 approaches** — Once you understand the topic, propose concrete
-   options with trade-offs and your recommendation. Lead with the recommended
-   option. Example:
-
-   > I'd recommend **Option A: Earnings-focused dashboard** — quarterly income,
-   > EPS trends, analyst targets, and insider trades. Best for fundamental
-   > investors tracking NVDA.
-   >
-   > Alternative: **Option B: Full overview** — adds technicals (price + RSI +
-   > volume) and news feed. Broader but more feeds to maintain.
-   >
-   > Which direction, or something different?
-
-3. **Present the plan** — After the user picks a direction, lay out the specific
-   feeds and widgets you'll build. Keep it to 5-8 lines. List what the user will
-   see, not implementation details.
-
-   > **Plan**: NVDA Earnings Dashboard with 3 feeds:
-   > 1. Quarterly income + EPS trends (chart)
-   > 2. Analyst price targets & consensus (table)
-   > 3. Recent insider trades (event log)
-   >
-   > I'll deploy these as scheduled feeds and build a live playbook.
-   > Sound good, or would you adjust anything?
-
-4. **Build** — Only after the user approves. If the user says "just do it" or
-   "go ahead" at any point without waiting for the full process, take that as
-   permission to skip planning for the rest of the session.
-
-**For Remix**: show what you'll change from the source and confirm before
-editing. The "propose approaches" step is often unnecessary since the source
-playbook already defines the structure.
+If the user says "just do it" at any point, skip planning for the rest of the
+session.
 
 ### Completion Gate
 
