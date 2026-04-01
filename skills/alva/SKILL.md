@@ -69,11 +69,11 @@ bash "<this skill's directory>/scripts/version_check.sh"
 | `ALVA_API_KEY`  | **yes**  | Your API key ([alva.ai](https://alva.ai))                |
 | `ALVA_ENDPOINT` | no       | API base URL. Defaults to `https://api-llm.prd.alva.ai`  |
 
-Read `.alva.json` in this skill's directory. If `api_key` is present, set
+Read `.env` in this skill's directory. If `api_key` is present, set
 `ALVA_API_KEY` from it. If missing or empty, **ask the user whether they already
 have a key**:
 
-- **Has a key** — ask them to paste it, write it to `.alva.json`, and verify:
+- **Has a key** — ask them to paste it, write it to `.env`, and verify:
 
   ```bash
   export ALVA_API_KEY="<key>"
@@ -88,10 +88,10 @@ have a key**:
 - **No key** — sign up at [alva.ai](https://alva.ai), create a key under
   Settings → API Keys, paste it back, then verify as above.
 
-`.alva.json` format:
+`.env` format:
 
-```json
-{ "api_key": "alva_...", "last_check": 0 }
+```dotenv
+api_key=alva_...
 ```
 
 `ALVA_API_KEY` authenticates to Alva itself. Third-party vendor secrets belong
@@ -382,7 +382,7 @@ outputs read at runtime (no inline literals for data).
 3. **Screenshot**: Take a screenshot to verify the playbook renders correctly:
 
    ```
-   GET /api/v1/screenshot?url=https://alva.ai/u/<username>/playbooks/<playbook_name>
+   GET /api/v1/screenshot?url=$ALVA_ENDPOINT/u/<username>/playbooks/<playbook_name>
    ```
 
    Pass `X-Alva-Api-Key` header so the screenshot service can access
@@ -808,7 +808,7 @@ webhook secret.
   UI at <https://alva.ai/apikey>. Assume this page is available.
 - **Do not ask the user to paste sensitive third-party secrets into chat** when
   the web upload flow is feasible.
-- **Do not hardcode secrets** in source code, ALFS files, `.alva.json`, shell
+- **Do not hardcode secrets** in source code, ALFS files, `.env`, shell
   snippets, or released playbook assets.
 - **Runtime access**: load secrets inside Alva Cloud code with
   `require("secret-manager").loadPlaintext("NAME")`.

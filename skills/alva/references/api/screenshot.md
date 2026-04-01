@@ -8,7 +8,7 @@ GET /api/v1/screenshot?url={url}&selector={selector}
 
 | Parameter | Type   | Required | Description                                   |
 | --------- | ------ | -------- | --------------------------------------------- |
-| url       | string | yes      | Target URL (must be `alva.ai` or a subdomain) |
+| url       | string | yes      | Target URL (use `$ALVA_ENDPOINT` as the base)  |
 | selector  | string | no       | CSS selector to capture a specific element     |
 | xpath     | string | no       | XPath expression to capture a specific element |
 
@@ -25,14 +25,14 @@ Response:
 
 ```
 # Screenshot a playbook page
-GET /api/v1/screenshot?url=https://alva.ai/u/alice/playbooks/btc-dashboard
+GET /api/v1/screenshot?url=$ALVA_ENDPOINT/u/alice/playbooks/btc-dashboard
 
 # Screenshot a specific chart element
-GET /api/v1/screenshot?url=https://alva.ai/u/alice/playbooks/btc-dashboard&selector=.chart-container
+GET /api/v1/screenshot?url=$ALVA_ENDPOINT/u/alice/playbooks/btc-dashboard&selector=.chart-container
 ```
 
 ```bash
 # curl example
 curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" \
-  "$ALVA_ENDPOINT/api/v1/screenshot?url=https://alva.ai/u/alice/playbooks/btc-dashboard"
+  "$ALVA_ENDPOINT/api/v1/screenshot?url=$ALVA_ENDPOINT/u/alice/playbooks/btc-dashboard"
 ```
