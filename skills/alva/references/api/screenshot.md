@@ -1,38 +1,31 @@
 # Screenshot
 
-Capture a screenshot of any Alva page. The endpoint is under `/api/v1/`.
+Capture a screenshot of any Alva page.
 
 ```
 GET /api/v1/screenshot?url={url}&selector={selector}
 ```
 
-| Parameter | Type   | Required | Description                                   |
-| --------- | ------ | -------- | --------------------------------------------- |
-| url       | string | yes      | Target URL (use `$ALVA_ENDPOINT` as the base)  |
-| selector  | string | no       | CSS selector to capture a specific element     |
+| Parameter | Type   | Required | Description                                  |
+| --------- | ------ | -------- | -------------------------------------------- |
+| url       | string | yes      | Target URL (use `$ALVA_ENDPOINT` as the base) |
+| selector  | string | no       | CSS selector to capture a specific element    |
 | xpath     | string | no       | XPath expression to capture a specific element |
 
-Auth: pass `X-Alva-Api-Key` header so the screenshot service can render
-authenticated content (dashboards, private playbooks, etc.).
+Auth: `X-Alva-Api-Key` header (required for authenticated content).
 
-Response:
-
-```json
-{"url":"https://alva-ai-static.b-cdn.net/prd/avatar/<id>.png","urls":["..."],"type":"fullpage"}
-```
-
-## Examples
+Response: **raw image data** (`Content-Type: image/png`). Save directly
+to a file.
 
 ```
-# Screenshot a playbook page
+# Full-page screenshot
 GET /api/v1/screenshot?url=$ALVA_ENDPOINT/u/alice/playbooks/btc-dashboard
+→ (raw PNG bytes)
 
-# Screenshot a specific chart element
+# Specific element
 GET /api/v1/screenshot?url=$ALVA_ENDPOINT/u/alice/playbooks/btc-dashboard&selector=.chart-container
+→ (raw PNG bytes)
 ```
 
-```bash
-# curl example
-curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" \
-  "$ALVA_ENDPOINT/api/v1/screenshot?url=$ALVA_ENDPOINT/u/alice/playbooks/btc-dashboard"
-```
+Save to a file with `curl -s -o screenshot.png`, then view or present the path
+to the user.
