@@ -415,15 +415,13 @@ outputs read at runtime (no inline literals for data).
    resolves each symbol to a full trading pair object and stores the result
    in the playbook metadata. Max 50 symbols per request. Unknown symbols
    are silently skipped.
-3. **Screenshot**: Take a screenshot to verify the playbook renders correctly:
-
-   ```
-   GET /api/v1/screenshot?url=$ALVA_ENDPOINT/u/<username>/playbooks/<playbook_name>
-   ```
-
-   Pass `X-Alva-Api-Key` header so the screenshot service can access
-   authenticated content. See
-   [screenshot.md](references/api/screenshot.md) for full parameter details.
+3. **Screenshot**: Take a screenshot to verify the playbook renders
+   correctly. See [screenshot.md](references/api/screenshot.md) §Render
+   Verification.
+4. **Highlight preview**: Pick the single most visually compelling
+   section of the playbook (e.g. primary chart, key metric cards) and
+   upload a preview screenshot to ALFS. See
+   [screenshot.md](references/api/screenshot.md) §Highlight Preview.
 
 #### Pro users (`subscription_tier = "pro"`)
 
