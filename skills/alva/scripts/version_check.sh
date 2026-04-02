@@ -45,8 +45,9 @@ ENV=${ENV:-}
 EOF
 }
 
-# Skip version check for local/stg environments
+# Skip version check for local/stg environments (env vars and symlink already set above)
 if [ "${ENV:-}" = "local" ] || [ "${ENV:-}" = "stg" ]; then
+  write_check "${last_check:-0}"
   exit 0
 fi
 
