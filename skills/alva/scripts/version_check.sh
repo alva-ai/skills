@@ -15,6 +15,17 @@ if [ -f "$CONFIG_FILE" ]; then
   source "$CONFIG_FILE"
 fi
 
+# Ensure ALVA_ENDPOINT has a default based on ENV
+if [ -z "${ALVA_ENDPOINT:-}" ]; then
+  ALVA_ENDPOINT="https://api-llm.${ENV:-prd}.alva.ai"
+fi
+
+# Symlink to ~/.alva.env for short access
+SYMLINK="$HOME/.alva.env"
+if [ ! -L "$SYMLINK" ] || [ "$(readlink "$SYMLINK")" != "$CONFIG_FILE" ]; then
+  ln -sf "$CONFIG_FILE" "$SYMLINK"
+fi
+
 # Read version from SKILL.md frontmatter (metadata.version)
 read_local_version() {
   if [ ! -f "$SKILL_MD" ]; then
@@ -28,7 +39,7 @@ read_local_version() {
 write_check() {
   cat >"$CONFIG_FILE" <<EOF
 ALVA_API_KEY=${ALVA_API_KEY:-}
-ALVA_ENDPOINT=${ALVA_ENDPOINT:-}
+ALVA_ENDPOINT=${ALVA_ENDPOINT:-https://api-llm.${ENV:-prd}.alva.ai}
 last_check=$1
 ENV=${ENV:-}
 EOF
