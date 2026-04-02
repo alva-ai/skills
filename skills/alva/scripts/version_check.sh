@@ -10,15 +10,21 @@ SKILL_MD="$SKILL_DIR/SKILL.md"
 CONFIG_FILE="$SKILL_DIR/.env"
 CHECK_INTERVAL=28800 # 8 hours in seconds
 
-# Read a field from .env (KEY=VALUE format)
-read_field() {
-  if [ ! -f "$CONFIG_FILE" ]; then
-    echo ""
-    return
-  fi
-  local key="$1"
-  sed -n "s/^${key}=\(.*\)/\1/p" "$CONFIG_FILE" 2>/dev/null | head -1
-}
+# Load .env variables: ALVA_API_KEY, ALVA_ENDPOINT, last_check, ENV
+if [ -f "$CONFIG_FILE" ]; then
+  source "$CONFIG_FILE"
+fi
+
+# Ensure ALVA_ENDPOINT has a default based on ENV
+if [ -z "${ALVA_ENDPOINT:-}" ]; then
+  ALVA_ENDPOINT="https://api-llm.${ENV:-prd}.alva.ai"
+fi
+
+# Symlink to ~/.alva.env for short access
+SYMLINK="$HOME/.alva.env"
+if [ ! -L "$SYMLINK" ] || [ "$(readlink "$SYMLINK")" != "$CONFIG_FILE" ]; then
+  ln -sf "$CONFIG_FILE" "$SYMLINK"
+fi
 
 # Read version from SKILL.md frontmatter (metadata.version)
 read_local_version() {
@@ -29,20 +35,24 @@ read_local_version() {
   sed -n 's/^[[:space:]]*version:[[:space:]]*\(.*\)/\1/p' "$SKILL_MD" 2>/dev/null | head -1
 }
 
-# Write last_check to .env, preserving api_key
+# Write .env, preserving all fields
 write_check() {
-  local ts="$1"
-  local api_key
-  api_key=$(read_field "api_key")
   cat >"$CONFIG_FILE" <<EOF
-api_key=${api_key}
-last_check=${ts}
+ALVA_API_KEY=${ALVA_API_KEY:-}
+ALVA_ENDPOINT=${ALVA_ENDPOINT:-https://api-llm.${ENV:-prd}.alva.ai}
+last_check=$1
+ENV=${ENV:-}
 EOF
 }
 
+# Skip version check for local/stg environments (env vars and symlink already set above)
+if [ "${ENV:-}" = "local" ] || [ "${ENV:-}" = "stg" ]; then
+  write_check "${last_check:-0}"
+  exit 0
+fi
+
 # Throttle: skip if checked recently
-last_check=$(read_field "last_check")
-if [ -n "$last_check" ]; then
+if [ -n "${last_check:-}" ]; then
   now=$(date +%s 2>/dev/null || echo "0")
   elapsed=$((now - last_check)) 2>/dev/null || elapsed=$CHECK_INTERVAL
   if [ "$elapsed" -lt "$CHECK_INTERVAL" ]; then
