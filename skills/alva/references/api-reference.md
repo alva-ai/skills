@@ -630,53 +630,55 @@ POST /api/v1/remix
 
 ---
 
-## SDK API
+## Runtime Module Documentation API
 
-Browse the 250+ SDK modules available in the runtime — covering
-crypto/equity/ETF market data (OHLCV, fundamentals, on-chain metrics), 60+
-technical indicators (SMA, RSI, MACD, Bollinger Bands…), macro & economic series
-(GDP, CPI, Treasury yields), and alternative data (news, social sentiment,
-DeFi). All endpoints are under `/api/v1/sdk/`.
+Browse the built-in runtime library modules — including 50+ technical
+indicators (SMA, RSI, MACD, Bollinger Bands), crypto fundamentals, and
+feed widgets. All endpoints are under `/api/v1/sdk/`.
 
-### Get SDK Doc
+> **Note:** Financial data APIs (crypto, stock, macro, ETF) are now served
+> by Arrays — see the Data Skills section below. The `/api/v1/sdk/`
+> endpoints only cover runtime library modules.
+
+### Get Module Doc
 
 ```
 GET /api/v1/sdk/doc?name={module_name}
 ```
 
-| Parameter | Type   | Required | Description                                           |
-| --------- | ------ | -------- | ----------------------------------------------------- |
-| name      | string | yes      | Full module name (e.g. `@arrays/crypto/ohlcv:v1.0.0`) |
+| Parameter | Type   | Required | Description                                                              |
+| --------- | ------ | -------- | ------------------------------------------------------------------------ |
+| name      | string | yes      | Full module name (e.g. `@alva/technical-indicators/rsi:v1.0.0`) |
 
 ```
-GET /api/v1/sdk/doc?name=@arrays/crypto/ohlcv:v1.0.0
-→ {"name":"@arrays/crypto/ohlcv:v1.0.0","doc":"..."}
+GET /api/v1/sdk/doc?name=@alva/technical-indicators/relative-strength-index-rsi:v1.0.0
+→ {"name":"@alva/technical-indicators/relative-strength-index-rsi:v1.0.0","doc":"..."}
 ```
 
-### List SDK Partitions
-
-```
-GET /api/v1/sdk/partitions
-```
+### List Module Groups
 
 ```
 GET /api/v1/sdk/partitions
-→ {"partitions":["spot_market_price_and_volume","crypto_onchain_and_derivatives",...]}
 ```
 
-### Get Partition Summary
+```
+GET /api/v1/sdk/partitions
+→ {"partitions":["technical_indicator_calculation_helpers","crypto_fundamentals","feed_widgets"]}
+```
+
+### Get Module Group Summary
 
 ```
 GET /api/v1/sdk/partitions/:partition/summary
 ```
 
-| Parameter | Type   | Required | Description                                  |
-| --------- | ------ | -------- | -------------------------------------------- |
-| partition | string | yes      | Partition name (URL-encoded if contains `/`) |
+| Parameter | Type   | Required | Description        |
+| --------- | ------ | -------- | ------------------ |
+| partition | string | yes      | Module group name  |
 
 ```
-GET /api/v1/sdk/partitions/spot_market_price_and_volume/summary
-→ {"summary":"@arrays/crypto/ohlcv:v1.0.0 — Spot OHLCV for crypto\n@arrays/data/stock/ohlcv:v1.0.0 — Spot OHLCV for equities\n..."}
+GET /api/v1/sdk/partitions/technical_indicator_calculation_helpers/summary
+→ {"summary":"@alva/technical-indicators/relative-strength-index-rsi:v1.0.0 — RSI\n@alva/technical-indicators/macd:v1.0.0 — MACD\n..."}
 ```
 
 ---

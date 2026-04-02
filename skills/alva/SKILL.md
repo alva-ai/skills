@@ -70,23 +70,25 @@ bash "<this skill's directory>/scripts/version_check.sh"
 
 ### 2. API Keys
 
-Read `.alva.json` in this skill's directory. If `api_key` or `arrays_api_key` is
-missing or empty, ask the user for the missing key(s) and write them to
-`.alva.json`. Do not proceed until both keys are configured. Example format:
+Read `.alva.json` in this skill's directory. If `api_key` is missing or empty,
+ask the user for it and write it to `.alva.json`. Do not proceed until the key
+is configured. Example format:
 
 ```json
 {
   "api_key": "alva_...",
-  "arrays_api_key": "arr_...",
   "last_check": 0
 }
 ```
 
-Set the following environment variables from these values for all subsequent
+Set the following environment variable from this value for all subsequent
 API calls in this session:
 
 - `ALVA_API_KEY` ← `api_key`
-- `ARRAYS_API_KEY` ← `arrays_api_key`
+
+> **Note:** Arrays data API authentication is handled automatically. The
+> platform signs and manages `ARRAYS_JWT` tokens via the secret-manager —
+> no manual Arrays API key configuration is needed.
 
 ---
 
@@ -160,8 +162,9 @@ Financial data APIs across 16 domains. To find the right API for a task:
 3. **Fetch endpoint detail**: `GET $ARRAYS_ENDPOINT/api/v1/skills/:name?endpoint=<path>`
    — use the Path value from the summary endpoints table (e.g. `company/list`,
    `market-news`) to get full parameters, response fields, and examples.
-4. **Use `ARRAYS_API_KEY` as `X-API-Key` header** when calling Arrays data
-   endpoints.
+4. **Call Arrays data endpoints** with `Authorization: Bearer <ARRAYS_JWT>`.
+   In runtime code, load the token via `secret.loadPlaintext('ARRAYS_JWT')`
+   (auto-managed by the platform, no manual setup needed).
 
 #### Data Skills Index
 
@@ -184,24 +187,28 @@ Financial data APIs across 16 domains. To find the right API for a task:
 | Polymarket markets | `arrays-data-api-polymarket-markets` | Prediction markets, event outcomes, Polymarket search |
 | Polymarket pricing | `arrays-data-api-polymarket-pricing` | Polymarket prices, odds, order books, spreads |
 
-#### Legacy SDK Modules
+#### Runtime Libraries
 
-Some specialized modules remain available via the SDK API (`/api/v1/sdk/`):
+Built-in modules that run inside the jagent V8 runtime via `require()`.
+These are **not** data APIs — they are pure computation and utility
+libraries available in every script execution.
 
-| Partition | Description |
-|-----------|-------------|
+| Module group | Description |
+|--------------|-------------|
 | `crypto_fundamentals` | Crypto supply, market cap, dominance (internal data source) |
 | `feed_widgets` | Social & news subscription feeds (Twitter/X, YouTube, Reddit, podcasts) |
 | `technical_indicator_calculation_helpers` | 50+ pure calculation helpers (RSI, MACD, Bollinger, etc.) |
 
+To discover available modules and their documentation:
+
 | Method | Endpoint                                    | Description                                          |
 | ------ | ------------------------------------------- | ---------------------------------------------------- |
-| GET    | `/api/v1/sdk/doc?name={module_name}`        | Get full doc for a specific SDK module               |
-| GET    | `/api/v1/sdk/partitions`                    | List all SDK partitions                              |
-| GET    | `/api/v1/sdk/partitions/:partition/summary` | Get one-line summaries of all modules in a partition |
+| GET    | `/api/v1/sdk/doc?name={module_name}`        | Get full doc for a specific runtime module           |
+| GET    | `/api/v1/sdk/partitions`                    | List all runtime module groups                       |
+| GET    | `/api/v1/sdk/partitions/:partition/summary` | Get one-line summaries of all modules in a group     |
 
-Pick a partition → call `/partitions/:partition/summary` to see module summaries
-→ call `/sdk/doc?name=...` for full documentation.
+Pick a module group → call `/partitions/:partition/summary` to see module
+summaries → call `/sdk/doc?name=...` for full documentation.
 
 #### Content Search
 
@@ -319,13 +326,16 @@ All configuration is done via environment variables.
 | ----------------- | -------- | ------------------------------------------------------------------------ |
 | `ALVA_API_KEY`    | **yes**  | Your API key (create and manage at [alva.ai](https://alva.ai))           |
 | `ALVA_ENDPOINT`   | no       | Alva API base URL. Defaults to `https://api-llm.prd.alva.ai` if not set |
-| `ARRAYS_API_KEY`  | **yes**  | Arrays data API key, used as `X-API-Key` for data endpoints              |
 | `ARRAYS_ENDPOINT` | no       | Arrays API base URL. Defaults to `https://data-tools.prd.space.id`       |
 
 `ALVA_API_KEY` authenticates the agent to Alva itself. Do **not** use it as a
 substitute for third-party vendor secrets. Vendor credentials belong in Alva
 Secret Manager and should be loaded at runtime via
 `require("secret-manager")`.
+
+> **Arrays authentication:** `ARRAYS_JWT` is managed automatically by the
+> platform and stored in the secret-manager. Runtime code loads it via
+> `secret.loadPlaintext('ARRAYS_JWT')`. No manual key setup is needed.
 
 ### First-Time Setup
 
@@ -460,7 +470,8 @@ call `$ARRAYS_ENDPOINT/api/v1/skills/:name` to get the endpoints summary →
 pick the endpoint you need from the summary table → call
 `$ARRAYS_ENDPOINT/api/v1/skills/:name?endpoint=<path>` to get endpoint detail
 (use the Path value from the table, e.g. `?endpoint=company/list`) →
-use `ARRAYS_API_KEY` as `X-API-Key` header when calling Arrays data endpoints.
+use `Authorization: Bearer <ARRAYS_JWT>` header when calling Arrays data
+endpoints (token auto-managed via secret-manager).
 
 ### Trading Pair Search (`/api/v1/trading-pairs/`)
 
@@ -523,13 +534,11 @@ variables, or shell. Host-agent permissions still apply. See
 | @alva/adk       | `require("@alva/adk")`       | Agent SDK for LLM requests — `agent()` for LLM agents with tool calling |
 | @test/suite     | `require("@test/suite")`     | Jest-style test framework (`describe`, `it`, `expect`, `runTests`)      |
 
-**Data modules**: Financial data modules available via
-`require("@arrays/crypto/ohlcv:v1.0.0")` etc. Version suffix is optional
-(defaults to `v1.0.0`). To discover function signatures and response shapes,
-use the data skills API (`GET $ARRAYS_ENDPOINT/api/v1/skills/:name`). For
-legacy modules
-(`crypto_fundamentals`, `feed_widgets`, `technical_indicator_calculation_helpers`),
-use `GET /api/v1/sdk/doc?name=...`.
+**Runtime libraries**: Built-in computation modules available via
+`require()` (e.g. `@alva/technical-indicators/*`). To discover function
+signatures, use the runtime module doc API
+(`GET /api/v1/sdk/doc?name=...`). Module groups:
+`crypto_fundamentals`, `feed_widgets`, `technical_indicator_calculation_helpers`.
 
 **Secret Manager**: use `const secret = require("secret-manager");` then
 `secret.loadPlaintext("OPENAI_API_KEY")`. This returns a string when present or

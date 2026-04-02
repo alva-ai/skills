@@ -25,8 +25,8 @@ cronjobs.
    `require("./helper.js")`) -- resolved from the filesystem on ALFS
 2. **Official/system modules** -- `alfs`, `env`, `secret-manager`,
    `net/http`, `@alva/algorithm`, `@alva/feed`, `@alva/adk`
-3. **SDKHub modules** -- versioned modules like
-   `require("@arrays/crypto/ohlcv:v1.0.0")`
+3. **Runtime library modules** -- versioned modules like
+   `require("@alva/technical-indicators/rsi:v1.0.0")`
 
 ### Version Handling
 
@@ -225,45 +225,36 @@ requests.
 
 ---
 
-## SDKHub Modules
+## Runtime Library Modules
 
-250+ financial data modules are embedded in the runtime. They follow the
-pattern:
+Built-in computation and utility modules available via `require()` in the
+V8 runtime. These are **not** data APIs — they run locally in the isolate.
 
 ```javascript
-const { getXxx } = require("@org/namespace/module:v1.0.0");
+const { rsi } = require("@alva/technical-indicators/relative-strength-index-rsi:v1.0.0");
 ```
 
 **Naming convention**: `@org/[namespace]*/module_name:v1.0.0`
 
-- `@alva/...` -- Alva-maintained modules (indicators, data, LLM)
-- `@arrays/...` -- Data provider modules (crypto, stock, macro, ETF)
+- `@alva/technical-indicators/...` -- 50+ pure calculation helpers (RSI, MACD, Bollinger, etc.)
+- `@alva/...` -- Alva-maintained modules (algorithm, feed, adk)
 - `@test/...` -- Testing utilities
 
 **Common response pattern**:
 
 ```javascript
-const { getCryptoKline } = require("@arrays/crypto/ohlcv:v1.0.0");
-const result = getCryptoKline({
-  symbol: "BTCUSDT",
-  start_time: startTimestamp,
-  end_time: endTimestamp,
-  interval: "1h",
-});
-
-if (!result.success) {
-  throw new Error("API call failed: " + JSON.stringify(result));
-}
-
-const bars = result.response.data;
-// bars = [{date, open, high, low, close, volume, ...}, ...]
+const { getRSI } = require("@alva/technical-indicators/relative-strength-index-rsi:v1.0.0");
+const result = getRSI({ prices: closePrices, period: 14 });
 ```
 
-Most SDK functions are **synchronous** and return
-`{ success: boolean, response: { data: [...] } }`.
+Most runtime library functions are **synchronous**.
 
-To discover function signatures and response shapes, use the SDK doc API
-(`GET /api/v1/sdk/doc?name=...`).
+To discover function signatures and response shapes, use the runtime module
+doc API (`GET /api/v1/sdk/doc?name=...`).
+
+**Data APIs** (crypto, stock, macro, ETF) are now served by Arrays via HTTP
+endpoints — see the Data Skills section in SKILL.md. They are **not**
+loaded via `require()`.
 
 ---
 
