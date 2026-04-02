@@ -10,22 +10,6 @@ SKILL_MD="$SKILL_DIR/SKILL.md"
 CONFIG_FILE="$SKILL_DIR/.env"
 CHECK_INTERVAL=28800 # 8 hours in seconds
 
-# Load .env variables: ALVA_API_KEY, ALVA_ENDPOINT, last_check, ENV
-if [ -f "$CONFIG_FILE" ]; then
-  source "$CONFIG_FILE"
-fi
-
-# Ensure ALVA_ENDPOINT has a default based on ENV
-if [ -z "${ALVA_ENDPOINT:-}" ]; then
-  ALVA_ENDPOINT="https://api-llm.${ENV:-prd}.alva.ai"
-fi
-
-# Symlink to ~/.alva.env for short access
-SYMLINK="$HOME/.alva.env"
-if [ ! -L "$SYMLINK" ] || [ "$(readlink "$SYMLINK")" != "$CONFIG_FILE" ]; then
-  ln -sf "$CONFIG_FILE" "$SYMLINK"
-fi
-
 # Read version from SKILL.md frontmatter (metadata.version)
 read_local_version() {
   if [ ! -f "$SKILL_MD" ]; then
@@ -41,9 +25,37 @@ write_check() {
 ALVA_API_KEY=${ALVA_API_KEY:-}
 ALVA_ENDPOINT=${ALVA_ENDPOINT:-https://api-llm.${ENV:-prd}.alva.ai}
 last_check=$1
-ENV=${ENV:-}
+ENV=${ENV:-prd}
 EOF
 }
+
+# Load .env variables: ALVA_API_KEY, ALVA_ENDPOINT, last_check, ENV
+if [ -f "$CONFIG_FILE" ]; then
+  source "$CONFIG_FILE"
+fi
+
+# Default ENV to prd if empty
+if [ -z "${ENV:-}" ]; then
+  ENV=prd
+  _env_changed=1
+fi
+
+# Default ALVA_ENDPOINT based on ENV if empty
+if [ -z "${ALVA_ENDPOINT:-}" ]; then
+  ALVA_ENDPOINT="https://api-llm.${ENV}.alva.ai"
+  _env_changed=1
+fi
+
+# Persist defaults back to .env if anything was missing
+if [ "${_env_changed:-}" = "1" ]; then
+  write_check "${last_check:-0}"
+fi
+
+# Symlink to ~/.alva.env for short access
+SYMLINK="$HOME/.alva.env"
+if [ ! -L "$SYMLINK" ] || [ "$(readlink "$SYMLINK")" != "$CONFIG_FILE" ]; then
+  ln -sf "$CONFIG_FILE" "$SYMLINK"
+fi
 
 # Skip version check for local/stg environments (env vars and symlink already set above)
 if [ "${ENV:-}" = "local" ] || [ "${ENV:-}" = "stg" ]; then
