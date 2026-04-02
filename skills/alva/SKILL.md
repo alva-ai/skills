@@ -69,16 +69,18 @@ bash "<this skill's directory>/scripts/version_check.sh"
 | `ALVA_API_KEY`  | **yes**  | Your API key ([alva.ai](https://alva.ai))                |
 | `ALVA_ENDPOINT` | no       | API base URL. Defaults to `https://api-llm.prd.alva.ai`  |
 
-Read `.env` in this skill's directory. If `api_key` is present, set
-`ALVA_API_KEY` from it. If missing or empty, **ask the user whether they already
-have a key**:
+Source `.env` to load variables. Each Bash tool call is an isolated shell, so
+**every command that needs Alva variables must `source` first**:
 
-- **Has a key** — ask them to paste it, write it to `.env`, and verify:
+```bash
+source "<this skill's directory>/.env" && curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" "$ALVA_ENDPOINT/api/v1/me"
+```
 
-  ```bash
-  export ALVA_API_KEY="<key>"
-  curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" "${ALVA_ENDPOINT:-https://api-llm.prd.alva.ai}/api/v1/me"
-  ```
+If `ALVA_API_KEY` is missing or empty after sourcing, **ask the user whether
+they already have a key**:
+
+- **Has a key** — ask them to paste it, write it to `.env`, and verify with
+  the command above.
 
   On success, suggest persisting in their shell profile. Then offer starting
   points:
@@ -91,7 +93,10 @@ have a key**:
 `.env` format:
 
 ```dotenv
-api_key=alva_...
+ALVA_API_KEY=alva_...
+ALVA_ENDPOINT=https://api-llm.prd.alva.ai
+last_check=...
+ENV=local
 ```
 
 `ALVA_API_KEY` authenticates to Alva itself. Third-party vendor secrets belong
@@ -99,11 +104,12 @@ in Alva Secret Manager (`require("secret-manager")`).
 
 ### 3. User Profile
 
-Call `GET /api/v1/me` and store the response:
-
+```bash
+source "<this skill's directory>/.env" && curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" "$ALVA_ENDPOINT/api/v1/me"
 ```
-GET /api/v1/me
-→ {"id":1, "subscription_tier":"free", "telegram_username":"alice_tg", "username":"alice"}
+
+```json
+{"id":1, "subscription_tier":"free", "telegram_username":"alice_tg", "username":"alice"}
 ```
 
 Session variables:
@@ -119,16 +125,18 @@ Session variables:
 All API examples use HTTP notation (`METHOD /path`). Every request requires
 `X-Alva-Api-Key` unless marked **(public, no auth)**.
 
+**Every bash call must `source .env` first** since each shell is isolated.
+
 ```bash
 # Authenticated
-curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" "$ALVA_ENDPOINT{path}"
+source "<this skill's directory>/.env" && curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" "$ALVA_ENDPOINT{path}"
 
 # Authenticated + JSON body
-curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" -H "Content-Type: application/json" \
+source "<this skill's directory>/.env" && curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" -H "Content-Type: application/json" \
   "$ALVA_ENDPOINT{path}" -d '{body}'
 
 # Public read (no API key)
-curl -s "$ALVA_ENDPOINT{path}"
+curl -s "${ALVA_ENDPOINT:-https://api-llm.prd.alva.ai}{path}"
 ```
 
 ---

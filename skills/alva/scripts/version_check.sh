@@ -10,15 +10,10 @@ SKILL_MD="$SKILL_DIR/SKILL.md"
 CONFIG_FILE="$SKILL_DIR/.env"
 CHECK_INTERVAL=28800 # 8 hours in seconds
 
-# Read a field from .env (KEY=VALUE format)
-read_field() {
-  if [ ! -f "$CONFIG_FILE" ]; then
-    echo ""
-    return
-  fi
-  local key="$1"
-  sed -n "s/^${key}=\(.*\)/\1/p" "$CONFIG_FILE" 2>/dev/null | head -1
-}
+# Load .env variables: ALVA_API_KEY, ALVA_ENDPOINT, last_check, ENV
+if [ -f "$CONFIG_FILE" ]; then
+  source "$CONFIG_FILE"
+fi
 
 # Read version from SKILL.md frontmatter (metadata.version)
 read_local_version() {
@@ -29,20 +24,23 @@ read_local_version() {
   sed -n 's/^[[:space:]]*version:[[:space:]]*\(.*\)/\1/p' "$SKILL_MD" 2>/dev/null | head -1
 }
 
-# Write last_check to .env, preserving api_key
+# Write .env, preserving all fields
 write_check() {
-  local ts="$1"
-  local api_key
-  api_key=$(read_field "api_key")
   cat >"$CONFIG_FILE" <<EOF
-api_key=${api_key}
-last_check=${ts}
+ALVA_API_KEY=${ALVA_API_KEY:-}
+ALVA_ENDPOINT=${ALVA_ENDPOINT:-}
+last_check=$1
+ENV=${ENV:-}
 EOF
 }
 
+# Skip version check for local/stg environments
+if [ "${ENV:-}" = "local" ] || [ "${ENV:-}" = "stg" ]; then
+  exit 0
+fi
+
 # Throttle: skip if checked recently
-last_check=$(read_field "last_check")
-if [ -n "$last_check" ]; then
+if [ -n "${last_check:-}" ]; then
   now=$(date +%s 2>/dev/null || echo "0")
   elapsed=$((now - last_check)) 2>/dev/null || elapsed=$CHECK_INTERVAL
   if [ "$elapsed" -lt "$CHECK_INTERVAL" ]; then
