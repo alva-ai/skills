@@ -15,12 +15,15 @@ Auth: `X-Alva-Api-Key` header (required for authenticated content).
 Response: **raw image data** (`Content-Type: image/png`). Save directly
 to a file.
 
-```
-# Full-page screenshot
-GET /api/v1/screenshot?url=$ALVA_ENDPOINT/u/alice/playbooks/btc-dashboard
-→ (raw PNG bytes)
+```bash
+curl -sf -o /tmp/screenshot.png "$ALVA_ENDPOINT/api/v1/screenshot?url=..."
 ```
 
-Save to a file with `curl -sf -o screenshot.png` (`-f` fails on HTTP errors
-instead of saving the error response as the file). Check the exit code before
-reading the file.
+After saving, validate before reading:
+
+```bash
+head -c4 /tmp/screenshot.png | grep -q PNG || echo "SCREENSHOT_FAILED"
+```
+
+Only `Read` the file if it passes. A failed screenshot may save a JSON error
+as `.png` — reading it corrupts the session history.
