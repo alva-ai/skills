@@ -559,8 +559,12 @@ filesystem paths.
 
 ```javascript
 const { Feed, feedPath, makeDoc, num } = require("@alva/feed");
-const { getCryptoKline } = require("@arrays/crypto/ohlcv:v1.0.0");
+const http = require("net/http");
+const secret = require("secret-manager");
 const { indicators } = require("@alva/algorithm");
+
+const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
+const ARRAYS_BASE = "https://data-tools.prd.space.id";
 
 const feed = new Feed({ path: feedPath("btc-ema") });
 
@@ -577,14 +581,11 @@ feed.def("metrics", {
     const start =
       lastDateMs > 0 ? Math.floor(lastDateMs / 1000) : now - 30 * 86400;
 
-    const bars = getCryptoKline({
-      symbol: "BTCUSDT",
-      start_time: start,
-      end_time: now,
-      interval: "1h",
-    })
-      .response.data.slice()
-      .reverse();
+    const resp = http.syncFetch(
+      `${ARRAYS_BASE}/api/v1/crypto/ohlcv?symbol=BTCUSDT&start_time=${start}&end_time=${now}&interval=1h&limit=10000`,
+      { headers: { Authorization: "Bearer " + ARRAYS_JWT } }
+    );
+    const bars = JSON.parse(resp.text()).data.slice().reverse();
     const closes = bars.map((b) => b.close);
     const ema10 = indicators.ema(closes, { period: 10 });
 
@@ -727,7 +728,7 @@ Test SDK shapes before building a full feed:
 
 ```
 POST /api/v1/run
-{"code":"const { getCryptoKline } = require(\"@arrays/crypto/ohlcv:v1.0.0\"); JSON.stringify(Object.keys(getCryptoKline({ symbol: \"BTCUSDT\", start_time: 0, end_time: 0, interval: \"1h\" })));"}
+{"code":"const http = require('net/http'); const secret = require('secret-manager'); const jwt = secret.loadPlaintext('ARRAYS_JWT'); const r = http.syncFetch('https://data-tools.prd.space.id/api/v1/crypto/ohlcv?symbol=BTCUSDT&start_time=1735689600&end_time=1735776000&interval=1h&limit=5', {headers:{Authorization:'Bearer '+jwt}}); JSON.stringify(JSON.parse(r.text()).data[0]);"}
 ```
 
 ---
@@ -744,9 +745,12 @@ of OHLCV + external data via `registerRawData`.
 See [altra-trading.md](references/altra-trading.md) for full details.
 
 ```javascript
-const { createOHLCVProvider } = require("@arrays/data/ohlcv-provider:v1.0.0");
 const { FeedAltraModule } = require("@alva/feed");
-const { FeedAltra, e, Amount } = FeedAltraModule;
+const { FeedAltra, e, Amount, createArraysOhlcvProvider } = FeedAltraModule;
+const secret = require("secret-manager");
+
+const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
+const ohlcvProvider = createArraysOhlcvProvider({ jwt: ARRAYS_JWT });
 
 const altra = new FeedAltra(
   {
@@ -756,7 +760,7 @@ const altra = new FeedAltra(
     simOptions: { simTick: "1min", feeRate: 0.001 },
     perfOptions: { timezone: "UTC", marketType: "crypto" },
   },
-  createOHLCVProvider(),
+  ohlcvProvider,
 );
 
 const dg = altra.getDataGraph();
@@ -849,16 +853,16 @@ const tools = [
       required: ["symbol"],
     },
     fn: async (args) => {
-      const {
-        getCompanyIncomeStatements,
-      } = require("@arrays/data/stock/company/income:v1.0.0");
-      return getCompanyIncomeStatements({
-        symbol: args.symbol,
-        period_type: "quarter",
-        start_time: Date.parse("2023-01-01"),
-        end_time: Date.now(),
-        limit: 20,
-      }).response.metrics;
+      const http = require("net/http");
+      const secret = require("secret-manager");
+      const jwt = secret.loadPlaintext("ARRAYS_JWT");
+      const start = Math.floor(Date.parse("2023-01-01") / 1000);
+      const end = Math.floor(Date.now() / 1000);
+      const resp = http.syncFetch(
+        `https://data-tools.prd.space.id/api/v1/company/income-statements?symbol=${args.symbol}&period_type=quarter&start_time=${start}&end_time=${end}&limit=20`,
+        { headers: { Authorization: "Bearer " + jwt } }
+      );
+      return JSON.parse(resp.text()).data;
     },
   },
   {
