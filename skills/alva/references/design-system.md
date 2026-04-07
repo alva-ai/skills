@@ -80,7 +80,7 @@ html {
   overflow: hidden;   /* html never scrolls */
 }
 body {
-  min-height: 100%;
+  height: 100%;
   overflow-y: auto;   /* sole page-level scroll entry point */
   overflow-x: hidden;
 }
