@@ -74,10 +74,21 @@
     --spacing-xxxxxxl: 56px;
 
     /* ── Radius ── */
-    --radius-ct-xs: 2px; /* Tag */
-    --radius-ct-s: 4px; /* Small Card */
-    --radius-ct-m: 6px; /* Medium Card */
-    --radius-ct-l: 8px; /* Large Card/Page */
+    --radius-ct-xs: 2px;
+    --radius-ct-s: 4px;
+    --radius-ct-m: 6px;
+    --radius-ct-l: 8px;
+    --radius-ct-xl: 12px;
+    --radius-pop-dialog: 12px;
+    --radius-pop-action-sheets: 12px;
+    --radius-pop-dropdown: 8px;
+    --radius-pop-popover: 8px;
+    --radius-pop-toast: 8px;
+    --radius-pop-tips: 8px;
+    --radius-btn-xs: 4px;
+    --radius-btn-s: 6px;
+    --radius-btn-m: 8px;
+    --radius-btn-l: 12px;
   }
 }
 

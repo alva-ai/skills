@@ -155,6 +155,7 @@ Title row includes a Trade Log icon on the right:
 `https://alva-ai-static.b-cdn.net/icons/order-l.svg` 16×16px, `--text-n9`;
 clicking opens a [Modal](./design-components.md#modal) containing a
 [Table](./design-widgets.md#table-card) of trade records.
+Sort: newest first (descending by trade timestamp).
 
 #### Symbol Pills Row
 
