@@ -27,9 +27,9 @@
   background-color: var(--b0-container);
   display: flex;
   flex-direction: column;
-  padding: 8px 0;
+  padding: var(--spacing-xs) 0;
   position: relative;
-  border-radius: 6px;
+  border-radius: var(--radius-pop-dropdown); /* 8px */
   width: 100%;
   box-shadow: var(--shadow-s);
 }
@@ -37,7 +37,7 @@
 .dropdown-border {
   position: absolute;
   border: 0.5px solid var(--line-l2);
-  border-radius: var(--radius-ct-m);
+  border-radius: var(--radius-pop-dropdown); /* 8px */
   inset: 0;
   pointer-events: none;
 }
@@ -57,7 +57,7 @@
 .list-item-inner {
   display: flex;
   align-items: center;
-  padding: 7px 16px;
+  padding: 7px var(--spacing-m);
   gap: 8px;
 }
 
@@ -237,13 +237,13 @@ tags, and scoped CSS maps them to the Alva design spec.
   font-size: 20px;
   line-height: 30px;
   letter-spacing: 0.2px;
-  padding-top: 8px;
+  padding-top: var(--spacing-xs);
 }
 .markdown-container h3 {
   font-size: 18px;
   line-height: 28px;
   letter-spacing: 0.18px;
-  padding-top: 4px;
+  padding-top: var(--spacing-xxs);
 }
 .markdown-container h4,
 .markdown-container h5,
@@ -289,7 +289,7 @@ tags, and scoped CSS maps them to the Alva design spec.
   letter-spacing: 0.16px;
   color: var(--text-n9);
   position: relative;
-  padding-left: 24px;
+  padding-left: var(--spacing-xl);
 }
 .markdown-container ul > li::before {
   content: "";
@@ -323,7 +323,7 @@ tags, and scoped CSS maps them to the Alva design spec.
 .markdown-container code,
 .markdown-container pre {
   background: var(--b-r02);
-  border-radius: 2px;
+  border-radius: var(--radius-ct-xs); /* 2px */
   font-family: "JetBrains Mono", monospace;
   color: var(--text-n7);
 }
@@ -334,15 +334,15 @@ tags, and scoped CSS maps them to the Alva design spec.
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.12px;
-  padding: 2px 8px;
-  margin: 0 4px;
+  padding: var(--spacing-xxxs) var(--spacing-xs);
+  margin: 0 var(--spacing-xxs);
 }
 .markdown-container pre {
   border: 1px solid var(--line-l07);
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
-  padding: 12px 16px;
+  padding: var(--spacing-s) var(--spacing-m);
   margin: 0;
   overflow-x: auto;
 }
@@ -375,7 +375,7 @@ tags, and scoped CSS maps them to the Alva design spec.
 }
 .markdown-container th,
 .markdown-container td {
-  padding: 12px 0;
+  padding: var(--spacing-s) 0;
   border-bottom: 1px solid var(--line-l07);
   font-family:
     "Delight",
@@ -393,7 +393,7 @@ tags, and scoped CSS maps them to the Alva design spec.
 .markdown-container th {
   color: var(--text-n7);
   padding-top: 0;
-  padding-bottom: 12px;
+  padding-bottom: var(--spacing-s);
 }
 .markdown-container tr:last-child td {
   border-bottom: none;
@@ -438,13 +438,13 @@ tags, and scoped CSS maps them to the Alva design spec.
   font-size: 18px;
   line-height: 28px;
   letter-spacing: 0.18px;
-  padding-top: 2px;
+  padding-top: var(--spacing-xxxs);
 }
 .markdown-container--m h2 {
   font-size: 16px;
   line-height: 26px;
   letter-spacing: 0.16px;
-  padding-top: 2px;
+  padding-top: var(--spacing-xxxs);
 }
 .markdown-container--m h3 {
   font-size: 14px;
@@ -466,7 +466,7 @@ tags, and scoped CSS maps them to the Alva design spec.
   letter-spacing: 0.14px;
 }
 .markdown-container--m li {
-  padding-left: 20px;
+  padding-left: var(--spacing-l);
 }
 .markdown-container--m ul > li::before {
   left: 7.5px;
@@ -486,11 +486,11 @@ tags, and scoped CSS maps them to the Alva design spec.
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
-  padding: 10px 8px;
+  padding: 10px var(--spacing-xs);
   min-height: 176px;
 }
 .markdown-container--m code {
-  padding: 1px 8px;
+  padding: 1px var(--spacing-xs);
 }
 .markdown-container--m pre {
   font-size: 12px;
@@ -510,7 +510,7 @@ tags, and scoped CSS maps them to the Alva design spec.
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
-  padding-top: 2px;
+  padding-top: var(--spacing-xxxs);
 }
 .markdown-container--s h2 {
   font-size: 12px;
@@ -542,7 +542,7 @@ tags, and scoped CSS maps them to the Alva design spec.
   height: 12px;
 }
 .markdown-container--s li {
-  padding-left: 20px;
+  padding-left: var(--spacing-l);
 }
 .markdown-container--s ul > li::before {
   left: 7.5px;
@@ -560,19 +560,19 @@ tags, and scoped CSS maps them to the Alva design spec.
 .markdown-container--s code {
   font-size: 10px;
   line-height: 16px;
-  padding: 2px 6px;
+  padding: var(--spacing-xxxs) 6px;
 }
 .markdown-container--s pre {
   font-size: 10px;
   line-height: 16px;
-  padding: 8px 12px;
+  padding: var(--spacing-xs) var(--spacing-s);
 }
 .markdown-container--s th,
 .markdown-container--s td {
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.12px;
-  padding: 8px;
+  padding: var(--spacing-xs);
   min-height: 176px;
 }
 
@@ -580,7 +580,7 @@ tags, and scoped CSS maps them to the Alva design spec.
 @media (max-width: 768px) {
   .markdown-container {
     max-width: 100%;
-    padding: 0 16px;
+    padding: 0 var(--spacing-m);
   }
   .markdown-container table {
     overflow-x: scroll;
@@ -700,9 +700,9 @@ The button component system contains **2 types** x **4 sizes** x **4 states** =
 /* Size - Large */
 .btn-large {
   height: 48px;
-  padding: 11px 20px;
-  gap: 8px;
-  border-radius: var(--radius-ct-m); /* 6px */
+  padding: 11px var(--spacing-l);
+  gap: var(--spacing-xs);
+  border-radius: var(--radius-btn-m); /* 8px */
   font-size: 16px;
   line-height: 26px;
   letter-spacing: 0.16px;
@@ -711,9 +711,9 @@ The button component system contains **2 types** x **4 sizes** x **4 states** =
 /* Size - Medium */
 .btn-medium {
   height: 40px;
-  padding: 9px 20px;
-  gap: 8px;
-  border-radius: var(--radius-ct-m); /* 6px */
+  padding: 9px var(--spacing-l);
+  gap: var(--spacing-xs);
+  border-radius: var(--radius-btn-m); /* 8px */
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
@@ -722,9 +722,9 @@ The button component system contains **2 types** x **4 sizes** x **4 states** =
 /* Size - Small */
 .btn-small {
   height: 32px;
-  padding: 6px 16px;
+  padding: 6px var(--spacing-m);
   gap: 6px;
-  border-radius: var(--radius-ct-s); /* 4px */
+  border-radius: var(--radius-btn-s); /* 6px */
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.12px;
@@ -733,9 +733,9 @@ The button component system contains **2 types** x **4 sizes** x **4 states** =
 /* Size - Extra Small */
 .btn-extra-small {
   height: 28px;
-  padding: 4px 12px;
-  gap: 4px;
-  border-radius: var(--radius-ct-s); /* 4px */
+  padding: var(--spacing-xxs) var(--spacing-s);
+  gap: var(--spacing-xxs);
+  border-radius: var(--radius-btn-s); /* 6px */
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.12px;
@@ -831,7 +831,7 @@ style.
 /* Size — Medium */
 .tag-md {
   height: 26px;
-  padding: 2px 8px;
+  padding: var(--spacing-xxxs) var(--spacing-xs);
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
@@ -1047,8 +1047,8 @@ Modal                        ← Overlay
 | Property   | Value                                       |
 | ---------- | ------------------------------------------- |
 | Background | `var(--main-m7)`                            |
-| Padding X  | `16px`                                      |
-| Padding Y  | `48px`                                      |
+| Padding X  | `var(--spacing-m)` / `16px`                 |
+| Padding Y  | `var(--spacing-xxxxxl)` / `48px`            |
 | Layout     | `flex` / `column` / `center` / `center`     |
 | Sizing     | `100%` width & height (full-screen overlay) |
 
@@ -1060,9 +1060,9 @@ Modal                        ← Overlay
 | Max Width     | `960px`                            |
 | Width         | `100%` (constrained by max-width)  |
 | Flex          | `1 0 0` (fills available height)   |
-| Border Radius | `8px`                              |
+| Border Radius | `var(--radius-pop-dialog)` / `12px`|
 | Border        | `0.5px solid var(--line-l2)`       |
-| Padding       | `28px` (all sides)                 |
+| Padding       | `var(--spacing-xxl)` / `28px` (all sides)|
 | Gap           | `16px` (between title and content) |
 
 ### Modal Title
@@ -1195,9 +1195,9 @@ Dropdown. Arrow icon always points down and does not rotate.
 /* Size — Large */
 .select-lg {
   height: 48px;
-  padding: 11px 16px;
-  gap: 8px;
-  border-radius: 6px;
+  padding: 11px var(--spacing-m);
+  gap: var(--spacing-xs);
+  border-radius: var(--radius-btn-m); /* 8px */
   font-size: 16px;
   line-height: 26px;
   letter-spacing: 0.16px;
@@ -1206,9 +1206,9 @@ Dropdown. Arrow icon always points down and does not rotate.
 /* Size — Medium (default) */
 .select {
   height: 40px;
-  padding: 8px 12px;
-  gap: 8px;
-  border-radius: 4px;
+  padding: var(--spacing-xs) var(--spacing-s);
+  gap: var(--spacing-xs);
+  border-radius: var(--radius-btn-m); /* 8px */
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
@@ -1217,9 +1217,9 @@ Dropdown. Arrow icon always points down and does not rotate.
 /* Size — Small */
 .select-sm {
   height: 28px;
-  padding: 4px 8px;
-  gap: 4px;
-  border-radius: 4px;
+  padding: var(--spacing-xxs) var(--spacing-xs);
+  gap: var(--spacing-xxs);
+  border-radius: var(--radius-btn-s); /* 6px */
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.12px;
@@ -1384,11 +1384,11 @@ border through their transparent border.
 
 /* Pill */
 .tab-pill {
-  gap: 12px;
+  gap: var(--spacing-s);
 }
 .tab-pill .tab-item {
-  padding: 6px 16px;
-  border-radius: 4px;
+  padding: 6px var(--spacing-m);
+  border-radius: var(--radius-btn-s); /* 6px */
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
@@ -1403,10 +1403,10 @@ border through their transparent border.
 
 /* Pill — Size S */
 .tab-pill.tab-s {
-  gap: 8px;
+  gap: var(--spacing-xs);
 }
 .tab-pill.tab-s .tab-item {
-  padding: 4px 8px;
+  padding: var(--spacing-xxs) var(--spacing-xs);
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.12px;
