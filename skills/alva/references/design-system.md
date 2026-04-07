@@ -61,11 +61,39 @@ text-rendering: optimizeLegibility;
 <a href="https://example.com" target="_blank" rel="noopener noreferrer">Example</a>
 ```
 
-## Background
+## Theme
 
 **The page background color must use `--b0-page`**
 
+**Default mode** → Light Mode
+
 ## Playbook Container
+
+### Page-Level Scroll Rule
+
+Playbook HTML runs inside an iframe. The **only** element that may carry
+page-level vertical scroll is `<body>`:
+
+```css
+html {
+  height: 100%;
+  overflow: hidden;   /* html never scrolls */
+}
+body {
+  min-height: 100%;
+  overflow-y: auto;   /* sole page-level scroll entry point */
+  overflow-x: hidden;
+}
+```
+
+**Rules:**
+1. `<body>` is the sole page-level scroll container — never add
+   `overflow-y: auto/scroll` to `.playbook-container`, `.main-wrapper`, or any
+   other outer wrapper.
+2. Inner widget scroll (table/feed body) is allowed per widget spec, but must
+   not compete with the page scroll.
+3. `position: sticky` elements (e.g. `.tab-bar-wrapper`) anchor to the `<body>`
+   scroll context — this only works when body is the scroller.
 
 ```css
 /* Hide all persistent scrollbars globally */
