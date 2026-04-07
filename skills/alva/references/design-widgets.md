@@ -6,7 +6,7 @@
 - [Widget Base CSS](#widget-base-css)
 - [Widget Layout](#widget-layout)
 - [Chart Card](#chart-card)
-- [KPI Card](#kpi-card)
+- [Metric Card](#metric-card)
 - [Table Card](#table-card)
 - [Free Text Card](#free-text-card)
 - [Feed Card](#feed-card)
@@ -17,7 +17,7 @@
 > These are the most common sources of error. Read before generating any widget
 > code.
 
-1. **Widget-internal layout uses `flex-wrap`** (KPI rows, metric groups,
+1. **Widget-internal layout uses `flex-wrap`** (metric rows, metric groups,
    side-by-side elements). Never `grid-cols-N` — grid is only for page-level
    `.widget-grid`. → [Details](#content-reflow)
 2. **No border/outline on widgets** — use `--grey-g01` or `--line-l05` dividers.
@@ -311,14 +311,14 @@
   }
 }
 
-/* ── KPI Column (for stacking KPI cards beside a chart) ── */
-.kpi-column {
+/* ── Metric Column (for stacking metric cards beside a chart) ── */
+.metric-column {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-s);
 }
 
-.kpi-column .kpi-card {
+.metric-column .metric-card {
   flex: 1;
   background: var(--grey-g01);
   border-radius: var(--radius-ct-m);
@@ -424,7 +424,7 @@ never wrap — always `width: 100%`.
 
 | Widget Type    | Default Height        | Overflow Behavior        |
 | -------------- | --------------------- | ------------------------ |
-| KPI Card       | auto (content-driven) | Wrap via flex-wrap       |
+| Metric Card    | auto (content-driven) | Wrap via flex-wrap       |
 | Chart Card     | 320px                 | Chart scales internally  |
 | Table Card     | auto, capped at 560px | Scroll within table body |
 | Free Text Card | auto (content-driven) | Scroll or truncate       |
@@ -659,12 +659,12 @@ No `shadowBlur`, no `focus: 'series'`.
 
 ---
 
-## KPI Card
+## Metric Card
 
 ### Template
 
 ```html
-<!-- KPI Card — copy this structure exactly -->
+<!-- Metric Card — copy this structure exactly -->
 <div class="widget-card">
   <div class="widget-title">
     <span class="widget-title-text">KPI Title</span>
@@ -689,7 +689,7 @@ No `shadowBlur`, no `focus: 'series'`.
 </div>
 ```
 
-### KPI Rules
+### Metric Card Rules
 
 - Key metric font size: 24px or 28px
 - When multiple metrics share one card, use `.divider-v` / `.divider-h` to

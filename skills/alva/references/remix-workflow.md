@@ -73,7 +73,7 @@ GET /api/v1/fs/read?path=/alva/home/{owner}/playbooks/{name}/index.html
 ```
 
 This returns the full HTML source of the playbook dashboard — the ECharts
-charts, KPI cards, layout, and data-fetching logic. Use this as the template for
+charts, metric cards, layout, and data-fetching logic. Use this as the template for
 the new playbook's UI.
 
 ---
