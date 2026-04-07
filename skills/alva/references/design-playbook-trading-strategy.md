@@ -233,7 +233,7 @@ markPoint: {
 ┌────────────────────────────────────────────────────┐
 │  Meta Info Bar (4 fields)                          │
 ├────────────────────────────────────────────────────┤
-│  Performance Metrics (6 × KPI Cards)               │
+│  Performance Metrics (6 × Metric Cards)             │
 ├────────────────────────────────────────────────────┤
 │  Equity Curve Chart                                │
 ├────────────────────────────────────────────────────┤
@@ -249,7 +249,7 @@ markPoint: {
 
 ### 2.1 Performance Metrics
 
-6 equal-width KPI cards in a horizontal row.
+6 equal-width metric cards in a horizontal row.
 
 #### Layout
 

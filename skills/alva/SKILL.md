@@ -204,7 +204,7 @@ playbook builds.
 
 ### Data Sourcing
 
-1. **All quantitative data displayed in charts, tables, or KPI cards MUST
+1. **All quantitative data displayed in charts, tables, or metric cards MUST
    originate from Alva feeds** (SDK modules or BYOD via `require("net/http")`).
    Never hardcode data as inline JavaScript literals in playbook HTML.
 
@@ -393,7 +393,7 @@ styling, layout, and component guidelines. Unless the user explicitly asks for a
 static snapshot, default to a live playbook.
 **Data fetching requirement**: Apply the
 [Content Legitimacy Rules](#content-legitimacy-rules) when building the UI.
-All quantitative data in charts, tables, or KPI cards must come from feed
+All quantitative data in charts, tables, or metric cards must come from feed
 outputs read at runtime (no inline literals for data).
 
 ### 7. Release
@@ -1096,7 +1096,7 @@ consistent read pattern (`@last`, `@range`, etc.).
   around chart initialization with a fallback message if rendering fails.
 - **ECharts sizing: allocate sufficient height.** Heatmaps need
   `height = max(300px, numRows * 40px)`. Primary charts on overview tabs should
-  be at least 400px tall and visually dominant over KPI cards. Do not compress
+  be at least 400px tall and visually dominant over metric cards. Do not compress
   charts to fit everything above the fold.
 - **Separate `lastDate` watermarks per data source.** When a feed combines
   multiple data sources with different update frequencies (e.g. ETF OHLCV +
