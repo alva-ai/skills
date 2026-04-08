@@ -103,7 +103,7 @@ Persistent facts about the user. Update when you learn something new. Rarely cha
 - User states a conviction or market view → add it
 - User builds a strategy based on an assumption → extract and record the assumption
 - Market data invalidates a conviction → flag it as ⚠️, don't delete (user decides)
-- User forks a playbook → analyze the code, extract implicit beliefs, confirm with user
+- User remixes a playbook → analyze the code, extract implicit beliefs, confirm with user
 
 **How beliefs drive behavior:**
 - **Playbook monitoring:** Check if each playbook's assumptions still hold
@@ -173,7 +173,7 @@ One file per playbook the user actively manages. This is NOT code documentation 
 - [ ] Test with DEX volume data enhancement
 ```
 
-**When to create:** User deploys a strategy, forks a playbook, or buys a strategy they want monitored.
+**When to create:** User deploys a playbook, remixes a playbook, or updates playbook parameters.
 
 **When to update:** Parameters change, assumptions get validated/invalidated, performance data updates, user makes decisions about the strategy.
 
@@ -212,7 +212,7 @@ For knowledge that doesn't fit in a playbook file. Portfolio-wide rules, market 
 | User states a market conviction or investment thesis | `beliefs.md` |
 | User corrects your approach or confirms a non-obvious choice | `profile.md` (preferences) or `beliefs.md` (conviction) |
 | Meaningful conversation completed | `recent.md` |
-| User deploys, forks, or manages a strategy | `playbooks/<name>.md` |
+| User deploys, remixes, or updates a playbook | `playbooks/<name>.md` |
 | Portfolio-wide rules, tooling notes | `topics/<name>.md` |
 | User says "remember this" | Best-fit file, immediately |
 
