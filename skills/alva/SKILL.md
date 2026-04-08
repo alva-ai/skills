@@ -86,9 +86,20 @@ API calls in this session:
 
 - `ALVA_API_KEY` ← `api_key`
 
-> **Note:** Arrays data API authentication is handled automatically. The
-> platform signs and manages `ARRAYS_JWT` tokens via the secret-manager —
-> no manual Arrays API key configuration is needed.
+> **Note:** Arrays data API authentication uses a Partner JWT stored in
+> the secret-manager as `ARRAYS_JWT`. Before calling any Arrays data
+> endpoint, ensure the token exists and is fresh:
+>
+> ```
+> POST /api/v1/arrays-jwt/ensure   (requires X-Alva-Api-Key auth)
+> ```
+>
+> This is **idempotent** — it checks the existing JWT and only renews if
+> missing or near expiry. Returns `{ expires_at, tier, renewed }`.
+> To inspect without modifying: `GET /api/v1/arrays-jwt/status`.
+>
+> In runtime code, load the token via
+> `require("secret-manager").loadPlaintext("ARRAYS_JWT")`.
 
 ---
 
@@ -163,8 +174,8 @@ Financial data APIs across 16 domains. To find the right API for a task:
    — use the Path value from the summary endpoints table (e.g. `company/list`,
    `market-news`) to get full parameters, response fields, and examples.
 4. **Call Arrays data endpoints** with `Authorization: Bearer <ARRAYS_JWT>`.
-   In runtime code, load the token via `secret.loadPlaintext('ARRAYS_JWT')`
-   (auto-managed by the platform, no manual setup needed).
+   In runtime code, load the token via `secret.loadPlaintext('ARRAYS_JWT')`.
+   If the token is missing, call `POST /api/v1/arrays-jwt/ensure` first.
 
 #### Data Skills Index
 
@@ -333,9 +344,10 @@ substitute for third-party vendor secrets. Vendor credentials belong in Alva
 Secret Manager and should be loaded at runtime via
 `require("secret-manager")`.
 
-> **Arrays authentication:** `ARRAYS_JWT` is managed automatically by the
-> platform and stored in the secret-manager. Runtime code loads it via
-> `secret.loadPlaintext('ARRAYS_JWT')`. No manual key setup is needed.
+> **Arrays authentication:** `ARRAYS_JWT` is a Partner JWT stored in the
+> secret-manager. Call `POST /api/v1/arrays-jwt/ensure` before first use
+> (idempotent — safe to call every session). Runtime code loads it via
+> `secret.loadPlaintext('ARRAYS_JWT')`.
 
 ### First-Time Setup
 
