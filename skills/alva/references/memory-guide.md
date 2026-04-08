@@ -239,8 +239,8 @@ For knowledge that doesn't fit in a playbook file. Portfolio-wide rules, market 
 ### When to read memory
 
 - **Every conversation start**: Read `MEMORY_INDEX.md`, `profile.md`, `beliefs.md`, `recent.md`. Read playbook/topic files only if relevant to the user's request.
-- **User references prior work**: "上次那个策略" / "之前说的规则" → read the relevant memory file.
-- **User explicitly asks**: "还记得吗" / "check my profile" → you **must** read.
+- **User references prior work**: "that strategy from last time" / "the rules we discussed" → read the relevant memory file.
+- **User explicitly asks**: "do you remember" / "check my profile" → you **must** read.
 - **User says to ignore memory**: Proceed as if `~/memory/` is empty. Don't apply, cite, or mention remembered content.
 
 ### Memory is a claim, not truth
