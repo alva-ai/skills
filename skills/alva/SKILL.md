@@ -584,6 +584,7 @@ already configured.
 | [adk.md](references/adk.md) | Agent Development Kit: `adk.agent()` API, tool calling, ReAct loop, examples |
 | [search.md](references/search.md) | Content search SDKs: per-source usage, enrichment patterns, and gotchas for Twitter/X, news, Reddit, YouTube, podcasts, and web |
 | [secret-manager.md](references/secret-manager.md) | Secret upload, CRUD API, and runtime usage via `require("secret-manager")` |
+| [memory-guide.md](references/memory-guide.md) | Persistent memory on ALFS: file structure, reading rules, writing rules |
 
 ---
 
@@ -855,6 +856,27 @@ Test SDK shapes before building a full feed:
 POST /api/v1/run
 {"code":"const { getCryptoKline } = require(\"@arrays/crypto/ohlcv:v1.0.0\"); JSON.stringify(Object.keys(getCryptoKline({ symbol: \"BTCUSDT\", start_time: 0, end_time: 0, interval: \"1h\" })));"}
 ```
+
+---
+
+## Memory
+
+You have persistent memory on ALFS at `~/memory/`. Use it to remember the user across conversations. Read [memory-guide.md](references/memory-guide.md) for detailed formats.
+
+**Every conversation**: Read `~/memory/MEMORY_INDEX.md`, `profile.md`, `beliefs.md`, and `recent.md` at start. Update files inline as you learn new things — don't batch to end. After meaningful work, update `recent.md` and prune entries older than 3 days.
+
+| File | Purpose | When to update |
+|------|---------|---------------|
+| `MEMORY_INDEX.md` | Directory of all memory files (read every session) | File added/removed |
+| `profile.md` | User identity, preferences, expertise, risk tolerance | User shares personal info |
+| `beliefs.md` | Investment thesis, market convictions, signal preferences | User states conviction or market view changes |
+| `recent.md` | Last 3 days: decisions, tasks, pending items | Every meaningful conversation |
+| `playbooks/<name>.md` | Strategy cognitive profile: assumptions, parameters, performance | Playbook successfully created, deployed, or updated |
+| `topics/<name>.md` | General persistent knowledge (portfolio rules, etc.) | When the topic evolves |
+
+**What to save**: User preferences, investment beliefs, strategy assumptions, decisions, corrections, things lost between sessions.
+
+**What NOT to save**: Ephemeral debugging, things derivable from code/ALFS, raw market data, anything in CLAUDE.md.
 
 ---
 
