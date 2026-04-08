@@ -157,6 +157,22 @@ Session variables:
 - **`telegram_username`** — if set, recommend push-enabled feeds; if null,
   guide user to connect Telegram first.
 
+### 4. Load Memory
+
+If you have **not** read the user's memory in this conversation, read it now.
+
+```bash
+source ~/.alva.env && curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" "$ALVA_ENDPOINT/api/v1/fs/read?path=/alva/home/$username/memory/MEMORY.md"
+```
+
+If the file exists, read each file listed in the index (at minimum `user.md`).
+If `~/memory/` does not exist or is empty, skip — it will be seeded on next
+sign-in.
+
+Use the loaded memory to tailor your responses to the user's profile,
+preferences, and investment style. See
+[memory-guide.md](references/memory-guide.md) for reading and writing rules.
+
 ### Making API Requests
 
 All API examples use HTTP notation (`METHOD /path`). Every request requires
@@ -590,7 +606,7 @@ already configured.
 | [adk.md](references/adk.md) | Agent Development Kit: `adk.agent()` API, tool calling, ReAct loop, examples |
 | [search.md](references/search.md) | Content search SDKs: per-source usage, enrichment patterns, and gotchas for Twitter/X, news, Reddit, YouTube, podcasts, and web |
 | [secret-manager.md](references/secret-manager.md) | Secret upload, CRUD API, and runtime usage via `require("secret-manager")` |
-| [memory-guide.md](references/memory-guide.md) | Persistent memory on ALFS: file structure, reading rules, writing rules |
+| [memory-guide.md](references/memory-guide.md) | Persistent memory on ALFS: MEMORY.md index, user.md profile, reading/writing rules |
 
 ---
 
@@ -867,22 +883,26 @@ POST /api/v1/run
 
 ## Memory
 
-You have persistent memory on ALFS at `~/memory/`. Use it to remember the user across conversations. Read [memory-guide.md](references/memory-guide.md) for detailed formats.
+You have persistent memory on ALFS at `~/memory/`. Use it to remember the user
+across conversations. Read [memory-guide.md](references/memory-guide.md) for
+detailed reading/writing rules.
 
-**Every conversation**: Read `~/memory/MEMORY_INDEX.md`, `profile.md`, `beliefs.md`, and `recent.md` at start. Update files inline as you learn new things — don't batch to end. After meaningful work, update `recent.md` and prune entries older than 3 days.
+**Every conversation**: If you have not read memory yet in this conversation,
+read `~/memory/MEMORY.md`, then `user.md` and any topic files relevant to the
+user's request. Update files inline as you learn new things — don't batch to
+end.
 
 | File | Purpose | When to update |
 |------|---------|---------------|
-| `MEMORY_INDEX.md` | Directory of all memory files (read every session) | File added/removed |
-| `profile.md` | User identity, preferences, expertise, risk tolerance | User shares personal info |
-| `beliefs.md` | Investment thesis, market convictions, signal preferences | User states conviction or market view changes |
-| `recent.md` | Last 3 days: decisions, tasks, pending items | Every meaningful conversation |
-| `playbooks/<name>.md` | Strategy cognitive profile: assumptions, parameters, performance | Playbook successfully created, deployed, or updated |
-| `topics/<name>.md` | General persistent knowledge (portfolio rules, etc.) | When the topic evolves |
+| `MEMORY.md` | Concise index of all memory files | File added/removed |
+| `user.md` | User identity, investment style, knowledge, preferences | User shares personal info or corrects a preference |
+| `<topic>.md` | Any persistent knowledge worth remembering across sessions | When the topic emerges or evolves |
 
-**What to save**: User preferences, investment beliefs, strategy assumptions, decisions, corrections, things lost between sessions.
+**What to save**: User preferences, investment style, market convictions,
+corrections, knowledge level — things that change how you work with this user.
 
-**What NOT to save**: Ephemeral debugging, things derivable from code/ALFS, raw market data, anything in CLAUDE.md.
+**What NOT to save**: Ephemeral debugging, things derivable from code/ALFS, raw
+market data, anything already in the Alva skill docs.
 
 ---
 
