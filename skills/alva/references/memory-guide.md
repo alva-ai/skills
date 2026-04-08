@@ -39,28 +39,28 @@ Persistent facts about the user. Update when you learn something new.
 ## Identity
 
 - Name:
-- Role:
+- Role: <!-- e.g. Independent Trader, PM at Fund, Research Analyst, Student -->
 - Timezone:
 - Language:
 
 ## Investment Style
 
-- Markets:
-- Strategy:
-- Holding period:
-- Risk tolerance:
+- Markets: <!-- e.g. US Equities, Crypto, Macro, Commodities -->
+- Strategy: <!-- e.g. Momentum, Mean Reversion, Fundamental, Event-driven -->
+- Holding period: <!-- Intraday / Swing / Position / Long-term -->
+- Risk tolerance: <!-- Conservative / Moderate / Aggressive -->
 - Watching:
 
 ## Knowledge
 
-- Level:
-- Strong:
+- Level: <!-- Beginner / Intermediate / Advanced / Professional -->
+- Strong: <!-- e.g. Technical analysis, On-chain, Macro -->
 - Learning:
-- External tools:
+- External tools: <!-- e.g. TradingView, Bloomberg, Dune -->
 
 ## Preferences
 
-- Communication style:
+- Communication style: <!-- e.g. terse / detailed / visual -->
 - Notification channel:
 ```
 
