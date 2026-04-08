@@ -230,6 +230,10 @@ goal. When a shareable playbook was part of the task, verify:
 
 - [ ] A playbook was released and a `published_url` was returned
 
+Must Do After Completion Gate:
+
+- [ ] Summarize the whole process and what is delivered to the user.
+
 ---
 
 ## Content Legitimacy Rules
@@ -451,10 +455,12 @@ outputs read at runtime (no inline literals for data).
    resolves each symbol to a full trading pair object and stores the result
    in the playbook metadata. Max 50 symbols per request. Unknown symbols
    are silently skipped.
-3. **Screenshot**: Take a screenshot to verify the playbook renders correctly:
+3. **Screenshot**: Take a screenshot to verify the released playbook renders
+   correctly from the deployed published URL (for example,
+   `https://<username>.playbook.alva.ai/<playbook_name>/v1.0.0/index.html`):
 
-   ```
-   GET /api/v1/screenshot?url=$ALVA_ENDPOINT/u/<username>/playbooks/<playbook_name>
+   ```text
+   GET /api/v1/screenshot?url=<published_url>
    ```
 
    Pass `X-Alva-Api-Key` header so the screenshot service can access
