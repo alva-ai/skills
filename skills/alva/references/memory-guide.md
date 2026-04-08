@@ -234,6 +234,32 @@ For knowledge that doesn't fit in a playbook file. Portfolio-wide rules, market 
 
 ---
 
+## Reading Rules
+
+### When to read memory
+
+- **Every conversation start**: Read `MEMORY_INDEX.md`, `profile.md`, `beliefs.md`, `recent.md`. Read playbook/topic files only if relevant to the user's request.
+- **User references prior work**: "上次那个策略" / "之前说的规则" → read the relevant memory file.
+- **User explicitly asks**: "还记得吗" / "check my profile" → you **must** read.
+- **User says to ignore memory**: Proceed as if `~/memory/` is empty. Don't apply, cite, or mention remembered content.
+
+### Memory is a claim, not truth
+
+Memory records what was true **when the memory was written**. The user may have changed their mind, deleted a playbook, or updated parameters since then. Before acting on a memory:
+
+- Memory names a **feed or playbook** → check it exists via ALFS API before referencing it.
+- Memory names a **cronjob or parameter** → verify current state before recommending changes.
+- Memory records a **market view or conviction** → treat as the user's last-known position, not current fact. If the user is about to trade on it, confirm it's still their view.
+- Memory records **user preferences** → apply directly (these are stable).
+
+If a memory conflicts with what the user just told you, **trust what the user says now** — and update the memory.
+
+### Memory summaries are frozen in time
+
+`recent.md` and playbook performance snapshots reflect the moment they were written. If the user asks about **current** state, read ALFS or run the feed — don't cite the snapshot.
+
+---
+
 ## Conversation Flow
 
 Every conversation: read `MEMORY_INDEX.md`, `profile.md`, `beliefs.md`, `recent.md` at start. Read playbook/topic files only if relevant to the user's request. Update files inline as you learn — don't batch to end. If you extract assumptions from a strategy, confirm with the user before saving. After meaningful work, update `recent.md` and prune entries older than 3 days.

@@ -584,7 +584,7 @@ already configured.
 | [adk.md](references/adk.md) | Agent Development Kit: `adk.agent()` API, tool calling, ReAct loop, examples |
 | [search.md](references/search.md) | Content search SDKs: per-source usage, enrichment patterns, and gotchas for Twitter/X, news, Reddit, YouTube, podcasts, and web |
 | [secret-manager.md](references/secret-manager.md) | Secret upload, CRUD API, and runtime usage via `require("secret-manager")` |
-| [memory-guide.md](references/memory-guide.md) | Persistent memory on ALFS: file structure, writing rules, staleness checks, ALFS operations |
+| [memory-guide.md](references/memory-guide.md) | Persistent memory on ALFS: file structure, reading rules, writing rules |
 
 ---
 
