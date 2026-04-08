@@ -49,19 +49,26 @@ you can:
 In short: turn your ideas into a forever-running finance agent that gets things
 done for you.
 
-## CLI (Recommended)
+## Alva CLI (Recommended)
 
 The `alva` CLI (`@alva-ai/toolkit`) is the recommended way to interact with the
 Alva API. It manages authentication, provides self-documenting help for every
 command, and eliminates the need for manual curl/header management.
 
-**Install and configure:**
+**Setup:** Check whether the CLI is already installed by running `alva --help`.
 
-```bash
-npm install -g @alva-ai/toolkit
-alva configure --api-key alva_your_key_here
-alva whoami   # verify credentials
-```
+- **If not installed**, install and configure it:
+  ```bash
+  npm install -g @alva-ai/toolkit
+  alva configure --api-key alva_your_key_here
+  alva whoami   # verify credentials
+  ```
+- **If already installed**, upgrade to the latest version to ensure access to
+  the newest commands and fixes:
+  ```bash
+  npm install -g @alva-ai/toolkit@latest
+  alva whoami   # confirm the upgrade
+  ```
 
 **Discover commands:**
 
@@ -77,14 +84,6 @@ flags, parameter types, and practical examples.
 
 **If the CLI is not available or the user prefers curl**, fall back to the
 manual HTTP/curl workflow described in the Pre-flight section below.
-
-**Multiple profiles** (optional): Use `--profile <name>` to switch between
-environments (e.g. production, staging):
-
-```bash
-alva configure --profile staging --api-key alva_stg_key --base-url https://api-llm.stg.alva.ai
-alva --profile staging whoami
-```
 
 ## Pre-flight
 
