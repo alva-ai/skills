@@ -75,7 +75,7 @@ Create new files in `~/memory/` for knowledge that doesn't fit in `user.md` — 
 ## What NOT to save
 
 - Ephemeral conversation details (current debugging session, temp state)
-- Things derivable from code, ALFS files, or git history
+- Things derivable from code or ALFS files
 - Raw data or large outputs (store on ALFS as feed data, not in memory)
 - Anything already in the Alva skill docs
 - Market data that changes every minute (save your *interpretation*, not the data)
