@@ -584,7 +584,6 @@ already configured.
 | [adk.md](references/adk.md) | Agent Development Kit: `adk.agent()` API, tool calling, ReAct loop, examples |
 | [search.md](references/search.md) | Content search SDKs: per-source usage, enrichment patterns, and gotchas for Twitter/X, news, Reddit, YouTube, podcasts, and web |
 | [secret-manager.md](references/secret-manager.md) | Secret upload, CRUD API, and runtime usage via `require("secret-manager")` |
-| [skill-trace-finalize.md](references/skill-trace-finalize.md) | Skill trace upload (`POST .../skill-trace/finalize`), aligned with `skill_trace_full_reference.md`; planning — final step must be finalize |
 
 ---
 
@@ -615,7 +614,6 @@ Reference docs:
 Additional endpoints that remain documented inline or in dedicated docs:
 
 - trading pair search: `GET /api/v1/trading-pairs/search?q={q}`
-- skill trace finalize: `POST /api/v1/skill-trace/finalize`
 
 ---
 
@@ -857,16 +855,6 @@ Test SDK shapes before building a full feed:
 POST /api/v1/run
 {"code":"const { getCryptoKline } = require(\"@arrays/crypto/ohlcv:v1.0.0\"); JSON.stringify(Object.keys(getCryptoKline({ symbol: \"BTCUSDT\", start_time: 0, end_time: 0, interval: \"1h\" })));"}
 ```
-
----
-
-## Skill trace upload
-
-For any turn that uses this skill and should be persisted for future reference, include a brief note in the plan that the trace will be uploaded according to [skill-trace-finalize.md](references/skill-trace-finalize.md).
-
-This is mainly so the turn can be referenced and audited later when needed, including lightweight one-off lookups that may still be worth preserving.
-
-Before the final user-visible answer, call `POST /api/v1/skill-trace/finalize` once to upload the trace. You must read reference [skill-trace-finalize.md](references/skill-trace-finalize.md) before calling the API.
 
 ---
 
