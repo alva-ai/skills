@@ -119,14 +119,21 @@ Session variables:
 ### 3. Load Memory
 
 If you have **not** read the user's memory in this conversation, read it now.
+**Always single-quote `~` paths** so the shell does not expand `~` (the gateway
+resolves `~/` to `/alva/home/<username>/`).
 
 ```bash
-alva fs read --path ~/memory/MEMORY.md
+alva fs read --path '~/memory/MEMORY.md'
 ```
 
-If the file exists, read each file listed in the index (at minimum `user.md`).
-If `~/memory/` does not exist or is empty, skip — it will be seeded on next
-sign-in.
+If the file exists, read each file listed in the index (at minimum `user.md`):
+
+```bash
+alva fs read --path '~/memory/user.md'
+```
+
+If the memory directory does not exist or is empty, skip — it will be seeded on
+next sign-in.
 
 Use the loaded memory to tailor your responses to the user's profile,
 preferences, and investment style. See the [Memory](#memory) section below for
@@ -931,8 +938,9 @@ market convictions, strategy assumptions, portfolio rules. Add a pointer to
 
 ### Reading rules
 
-- **Every conversation start**: Read `~/memory/MEMORY.md` via ALFS. Then read
-  `user.md` and any topic files relevant to the user's request.
+- **Every conversation start**: Read `'~/memory/MEMORY.md'` via ALFS (single-
+  quoted). Then read `user.md` and any topic files relevant to the user's
+  request.
 - **User references prior work**: "that strategy from last time" / "the rules
   we discussed" → read the relevant memory file.
 - **User explicitly asks**: "do you remember" / "check my profile" → you
