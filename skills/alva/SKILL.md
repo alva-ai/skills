@@ -49,13 +49,17 @@ you can:
 In short: turn your ideas into a forever-running finance agent that gets things
 done for you.
 
-## Alva CLI (Recommended)
+## Pre-flight
 
-The `alva` CLI (`@alva-ai/toolkit`) is the recommended way to interact with the
-Alva API. It manages authentication, provides self-documenting help for every
-command, and eliminates the need for manual curl/header management.
+**Run these checks on first use each session** before doing anything else.
 
-**Setup:** Check whether the CLI is already installed by running `alva --help`.
+### 1. Alva CLI Setup
+
+The `alva` CLI (`@alva-ai/toolkit`) is the required way to interact with the
+Alva platform. It manages authentication, provides self-documenting help for
+every command, and eliminates the need for manual curl/header management.
+
+Check whether the CLI is already installed by running `alva --help`.
 
 - **If not installed**, install and configure it:
 
@@ -73,6 +77,9 @@ command, and eliminates the need for manual curl/header management.
   alva whoami   # confirm the upgrade
   ```
 
+If the user does not have an API key, direct them to sign up at
+[alva.ai](https://alva.ai) and create a key under Settings → API Keys.
+
 **Discover commands:**
 
 ```bash
@@ -80,13 +87,50 @@ alva --help              # list all commands
 alva <command> --help    # detailed usage, flags, and examples for any command
 ```
 
-**If the CLI is available**, prefer it over curl for all API operations. The CLI
-handles authentication, JSON formatting, and error reporting automatically.
 Use `alva <command> --help` to discover usage — the help text includes all
 flags, parameter types, and practical examples.
 
-**If the CLI is not available or the user prefers curl**, fall back to the
-manual HTTP/curl workflow described in the Pre-flight section below.
+On success, offer starting points:
+
+- "Ask me something like 'Who's been buying NVDA insider shares this month?'"
+- "Or build a live dashboard, backtest a strategy, or set up a data pipeline."
+
+Third-party vendor secrets belong in Alva Secret Manager
+(`require("secret-manager")`), not in the CLI config.
+
+### 2. User Profile
+
+```bash
+alva whoami
+```
+
+```json
+{"id":1, "subscription_tier":"free", "telegram_username":"alice_tg", "username":"alice"}
+```
+
+Session variables:
+
+- **`username`** — for public URLs and ALFS paths.
+- **`subscription_tier`** — `"pro"` or `"free"` (default). Determines release
+  flow (Step 7): pro can keep playbooks private.
+- **`telegram_username`** — if set, recommend push-enabled feeds; if null,
+  guide user to connect Telegram first.
+
+### 3. Load Memory
+
+If you have **not** read the user's memory in this conversation, read it now.
+
+```bash
+alva fs read --path ~/memory/MEMORY.md
+```
+
+If the file exists, read each file listed in the index (at minimum `user.md`).
+If `~/memory/` does not exist or is empty, skip — it will be seeded on next
+sign-in.
+
+Use the loaded memory to tailor your responses to the user's profile,
+preferences, and investment style. See the [Memory](#memory) section below for
+reading and writing rules.
 
 ## Browser SDK
 
@@ -115,113 +159,6 @@ pages hosted on Alva receive this automatically.
 `client.user`, `client.fs`, `client.run`, `client.deploy`, `client.release`,
 `client.secrets`, `client.sdk`, `client.comments`, `client.remix`,
 `client.screenshot`
-
-## Pre-flight (Non-cli mode)
-
-**Run these checks on first use each session** before doing anything else.
-
-### 1. Version Check
-
-```bash
-bash "<this skill's directory>/scripts/version_check.sh"
-```
-
-- No output → up to date, proceed.
-- Output present → display to user, apply the update, then proceed.
-
-### 2. API Key
-
-| Variable        | Required | Description                                              |
-| --------------- | -------- | -------------------------------------------------------- |
-| `ALVA_API_KEY`  | **yes**  | Your API key ([alva.ai](https://alva.ai))                |
-| `ALVA_ENDPOINT` | no       | API base URL. Defaults to `https://api-llm.prd.alva.ai`  |
-
-The version check (Step 1) creates a symlink `~/.alva.env` → this skill's
-`.env`. Each Bash tool call is an isolated shell, so **every command that needs
-Alva variables must `source` first**:
-
-```bash
-source ~/.alva.env && curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" "$ALVA_ENDPOINT/api/v1/me"
-```
-
-If `ALVA_API_KEY` is missing or empty after sourcing, **ask the user whether
-they already have a key**:
-
-- **Has a key** — ask them to paste it, write it to `.env`, and verify with
-  the command above.
-
-  On success, suggest persisting in their shell profile. Then offer starting
-  points:
-  - "Ask me something like 'Who's been buying NVDA insider shares this month?'"
-  - "Or build a live dashboard, backtest a strategy, or set up a data pipeline."
-
-- **No key** — sign up at [alva.ai](https://alva.ai), create a key under
-  Settings → API Keys, paste it back, then verify as above.
-
-`.env` format:
-
-```dotenv
-ALVA_API_KEY=alva_...
-ALVA_ENDPOINT=https://api-llm.prd.alva.ai
-last_check=...
-ENV=local
-```
-
-`ALVA_API_KEY` authenticates to Alva itself. Third-party vendor secrets belong
-in Alva Secret Manager (`require("secret-manager")`).
-
-### 3. User Profile
-
-```bash
-source ~/.alva.env && curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" "$ALVA_ENDPOINT/api/v1/me"
-```
-
-```json
-{"id":1, "subscription_tier":"free", "telegram_username":"alice_tg", "username":"alice"}
-```
-
-Session variables:
-
-- **`username`** — for public URLs and ALFS paths.
-- **`subscription_tier`** — `"pro"` or `"free"` (default). Determines release
-  flow (Step 7): pro can keep playbooks private.
-- **`telegram_username`** — if set, recommend push-enabled feeds; if null,
-  guide user to connect Telegram first.
-
-### 4. Load Memory
-
-If you have **not** read the user's memory in this conversation, read it now.
-
-```bash
-source ~/.alva.env && curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" "$ALVA_ENDPOINT/api/v1/fs/read?path=/alva/home/$username/memory/MEMORY.md"
-```
-
-If the file exists, read each file listed in the index (at minimum `user.md`).
-If `~/memory/` does not exist or is empty, skip — it will be seeded on next
-sign-in.
-
-Use the loaded memory to tailor your responses to the user's profile,
-preferences, and investment style. See the [Memory](#memory) section below for
-reading and writing rules.
-
-### Making API Requests
-
-All API examples use HTTP notation (`METHOD /path`). Every request requires
-`X-Alva-Api-Key` unless marked **(public, no auth)**.
-
-**Every bash call must `source ~/.alva.env` first** since each shell is isolated.
-
-```bash
-# Authenticated
-source ~/.alva.env && curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" "$ALVA_ENDPOINT{path}"
-
-# Authenticated + JSON body
-source ~/.alva.env && curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" -H "Content-Type: application/json" \
-  "$ALVA_ENDPOINT{path}" -d '{body}'
-
-# Public read (no API key)
-curl -s "${ALVA_ENDPOINT:-https://api-llm.prd.alva.ai}{path}"
-```
 
 ---
 
@@ -364,8 +301,8 @@ symlink, chmod, grant, revoke.
 
 ### 2. JS Runtime
 
-Run JavaScript on Alva Cloud in a sandboxed V8 isolate. Code executed inside
-Alva's `/api/v1/run` runtime runs entirely on Alva's servers -- it cannot access
+Run JavaScript on Alva Cloud in a sandboxed V8 isolate. Code executed via
+`alva run` runs entirely on Alva's servers -- it cannot access
 the host machine's filesystem, environment variables, or processes. The runtime
 has access to ALFS, all 250+ SDKs, HTTP networking, LLM access, and the Feed
 SDK.
@@ -376,7 +313,7 @@ SDK.
 two-step retrieval flow:
 
 1. **Pick a partition** from the index below.
-2. **Call `GET /api/v1/sdk/partitions/:partition/summary`** to see module
+2. **Call `alva sdk partition-summary --partition <name>`** to see module
    summaries, then load the full doc for the chosen module.
 
 **SDK doc lookup is mandatory.** Always look up SDK documentation before writing
@@ -443,7 +380,7 @@ specific paths so anyone -- or any playbook page -- can read the data.
 **User scope enforcement**: All write, deploy, and release operations MUST
 target only the requesting user's namespace. Before any `fs/write`,
 `draft/playbook`, or `release/playbook` call, verify the target path and
-username match the authenticated user (from `GET /api/v1/me`). If you have
+username match the authenticated user (from `alva whoami`). If you have
 access to multiple API keys (e.g. from prior sessions), identify the requesting
 user and scope all operations to that user only. Do NOT write to or release
 playbooks under other users' namespaces unless the request explicitly asks for
@@ -463,8 +400,8 @@ To make a feed push-capable:
    [feed-sdk.md](references/feed-sdk.md) Pattern D) and write signal records
    using the Altra target format (`{date, instruction, meta}`), where
    `meta.reason` is the human-readable message followers will see.
-2. Set `"push_notify": true` in the `POST /api/v1/deploy/cronjob` request, or
-   update the existing cronjob to set `"push_notify": true`.
+2. Set `--push-notify` in the `alva deploy create` command, or
+   update the existing cronjob with `alva deploy update --id ID --push-notify`.
 
 The platform reads `/data/signal/targets/@last/1` after each successful
 execution and pushes the signal content to all eligible followers.
@@ -487,9 +424,8 @@ outputs read at runtime (no inline literals for data).
 
 #### Common steps (all users)
 
-1. **Write HTML to ALFS**: `POST /api/v1/fs/write` the playbook HTML to
-   `~/playbooks/{name}/index.html`.
-2. **Create playbook draft**: `POST /api/v1/draft/playbook` — creates DB
+1. **Write HTML to ALFS**: `alva fs write --path ~/playbooks/{name}/index.html --file ./index.html --mkdir-parents`
+2. **Create playbook draft**: `alva release playbook-draft` — creates DB
    records, writes draft files and `playbook.json` to ALFS automatically.
    This request must include both the URL-safe `name` and the human-readable
    `display_name`. Use `[subject/theme] [analysis angle/strategy logic]`, put
@@ -506,12 +442,11 @@ outputs read at runtime (no inline literals for data).
    correctly from the deployed published URL (for example,
    `https://<username>.playbook.alva.ai/<playbook_name>/v1.0.0/index.html`):
 
-   ```text
-   GET /api/v1/screenshot?url=<published_url>
+   ```bash
+   alva screenshot --url <published_url> --out /tmp/screenshot.png
    ```
 
-   Pass `X-Alva-Api-Key` header so the screenshot service can access
-   authenticated content. See
+   The CLI handles authentication automatically. See
    [screenshot.md](references/api/screenshot.md) for full parameter details.
 
 #### Pro users (`subscription_tier = "pro"`)
@@ -521,14 +456,13 @@ outputs read at runtime (no inline literals for data).
    accessible only to the creator.
 2. **Ask**: "Your playbook is ready. Would you like to publish it publicly, or
    keep it private for now?"
-   - **Publish** → call `POST /api/v1/release/playbook` → output the public
-     URL.
+   - **Publish** → call `alva release playbook` → output the public URL.
    - **Keep private** → done. Remind the user that only they can access the
      draft URL.
 
 #### Free users (`subscription_tier = "free"`)
 
-1. **Publish directly**: Call `POST /api/v1/release/playbook` — free playbooks
+1. **Publish directly**: Call `alva release playbook` — free playbooks
    are always public. Output the public URL:
    `https://alva.ai/u/<username>/playbooks/<playbook_name>`
 2. **Upsell only on friction**: Do **not** proactively suggest upgrading.
@@ -540,12 +474,11 @@ outputs read at runtime (no inline literals for data).
    <https://alva.ai/pricing> to [specific benefit, e.g. keep playbooks
    private / deploy more cronjobs / ...]."
 
-Use the playbook `name` and the username from `GET /api/v1/me` to construct
-URLs.
+Use the playbook `name` and the username from `alva whoami` to construct URLs.
 
 #### Pre-Release Validation
 
-Before calling `POST /api/v1/release/playbook`, verify all of the following:
+Before calling `alva release playbook`, verify all of the following:
 
 1. **Cronjobs are active**: All feeds referenced by the playbook have
    successfully deployed cronjobs. If `deploy/cronjob` returned `RATE_LIMITED`,
@@ -640,39 +573,30 @@ already configured.
 
 ---
 
-## API Reference
+## CLI Reference
 
-**Important**: Always read the API reference docs before making API requests.
-
-**Base URL**: `$ALVA_ENDPOINT` (defaults to `https://api-llm.prd.alva.ai`).
-
-Examples use HTTP notation (`METHOD /path`). Auth (`X-Alva-Api-Key` header) is
-required on every request unless marked **(public, no auth)**. See `Setup`
-above for curl templates.
+**Important**: Always read the reference docs before making CLI calls. Use
+`alva <command> --help` for quick flag/usage reminders.
 
 Reference docs:
 
-- [User Info](references/api/user-info.md)
-- [Secrets](references/api/secrets.md)
-- [Filesystem](references/api/filesystem.md)
-- [Run](references/api/run.md)
-- [Deploy Cronjob](references/api/deploy-cronjob.md)
-- [Release](references/api/release.md)
-- [Remix](references/api/remix.md)
-- [SDK](references/api/sdk.md)
-- [Playbook Comments](references/api/playbook-comment.md)
-- [Screenshot](references/api/screenshot.md)
+- [User Info](references/api/user-info.md) — `alva whoami`
+- [Secrets](references/api/secrets.md) — `alva secrets`
+- [Filesystem](references/api/filesystem.md) — `alva fs`
+- [Run](references/api/run.md) — `alva run`
+- [Deploy Cronjob](references/api/deploy-cronjob.md) — `alva deploy`
+- [Release](references/api/release.md) — `alva release`
+- [Remix](references/api/remix.md) — `alva remix`
+- [SDK](references/api/sdk.md) — `alva sdk`
+- [Playbook Comments](references/api/playbook-comment.md) — `alva comments`
+- [Screenshot](references/api/screenshot.md) — `alva screenshot`
 - [Error Responses](references/api/error-responses.md)
-
-Additional endpoints that remain documented inline or in dedicated docs:
-
-- trading pair search: `GET /api/v1/trading-pairs/search?q={q}`
 
 ---
 
 ## Runtime Modules Quick Reference
 
-Scripts executed via `/api/v1/run` run in a sandboxed V8 isolate on Alva's
+Scripts executed via `alva run` run in a sandboxed V8 isolate on Alva's
 servers -- they cannot access the host machine's filesystem, environment
 variables, or shell. Host-agent permissions still apply. See
 [jagent-runtime.md](references/jagent-runtime.md) for full details.
@@ -691,7 +615,7 @@ variables, or shell. Host-agent permissions still apply. See
 **SDKHub**: 250+ data modules available via
 `require("@arrays/crypto/ohlcv:v1.0.0")` etc. Version suffix is optional
 (defaults to `v1.0.0`). To discover function signatures and response shapes, use
-the SDK doc API (`GET /api/v1/sdk/doc?name=...`).
+`alva sdk doc --name "..."`).
 
 **Secret Manager**: use `const secret = require("secret-manager");` then
 `secret.loadPlaintext("OPENAI_API_KEY")`. This returns a string when present or
@@ -829,19 +753,18 @@ Every feed follows a 6-step lifecycle including every newly created feed or re-c
 
 1. **Write** -- define schema + incremental logic with `ctx.kv`
 2. **Upload** -- write script to `~/feeds/<name>/v1/src/index.js`
-3. **Test** -- `POST /api/v1/run` with `entry_path` to verify output
+3. **Test** -- `alva run --entry-path ~/feeds/<name>/v1/src/index.js` to verify output
 4. **Grant** -- make feed data publicly readable:
 
-   ```
-   POST /api/v1/fs/grant
-   {"path":"~/feeds/<name>","subject":"special:user:*","permission":"read"}
+   ```bash
+   alva fs grant --path ~/feeds/<name> --subject "special:user:*" --permission read
    ```
 
    Grant on the feed root path (not on `data/`). Subject format:
    `special:user:*` (public), `special:user:+` (authenticated only), `user:<id>`
    (specific user).
-5. **Deploy** -- `POST /api/v1/deploy/cronjob` for scheduled execution
-6. **Release** -- `POST /api/v1/release/feed` to register the feed in the
+5. **Deploy** -- `alva deploy create` for scheduled execution
+6. **Release** -- `alva release feed` to register the feed in the
    database (requires the `cronjob_id` from the deploy step)
 
 | Data Type                     | Recommended Schedule     | Rationale                           |
@@ -886,27 +809,26 @@ API exists.
 
 ### Resetting Feed Data (development only)
 
-During development, use the REST API to clear stale or incorrect data. **Do not
-use this in production.**
+During development, use the CLI to clear stale or incorrect data. **Do not use
+this in production.**
 
-```
+```bash
 # Clear a specific time series output
-DELETE /api/v1/fs/remove?path=~/feeds/my-feed/v1/data/market/ohlcv&recursive=true
+alva fs remove --path ~/feeds/my-feed/v1/data/market/ohlcv --recursive
 
 # Clear an entire group (all outputs under "market")
-DELETE /api/v1/fs/remove?path=~/feeds/my-feed/v1/data/market&recursive=true
+alva fs remove --path ~/feeds/my-feed/v1/data/market --recursive
 
 # Full reset: clear ALL data + KV state (removes the data mount, re-created on next run)
-DELETE /api/v1/fs/remove?path=~/feeds/my-feed/v1/data&recursive=true
+alva fs remove --path ~/feeds/my-feed/v1/data --recursive
 ```
 
 ### Inline Debug Snippets
 
 Test SDK shapes before building a full feed:
 
-```
-POST /api/v1/run
-{"code":"const { getCryptoKline } = require(\"@arrays/crypto/ohlcv:v1.0.0\"); JSON.stringify(Object.keys(getCryptoKline({ symbol: \"BTCUSDT\", start_time: 0, end_time: 0, interval: \"1h\" })));"}
+```bash
+alva run --code 'const { getCryptoKline } = require("@arrays/crypto/ohlcv:v1.0.0"); JSON.stringify(Object.keys(getCryptoKline({ symbol: "BTCUSDT", start_time: 0, end_time: 0, interval: "1h" })));'
 ```
 
 ---
@@ -1054,7 +976,7 @@ webhook secret.
 - If a required secret is missing, stop and tell the user exactly which secret
   name to upload at <https://alva.ai/apikey>.
 - For agent-managed setup, inspection, or cleanup, authenticated CRUD endpoints
-  are available under `/api/v1/secrets`.
+  are available via `alva secrets`.
 
 Read [secret-manager.md](references/secret-manager.md) whenever the task
 involves uploading, naming, rotating, listing, or using third-party secrets.
@@ -1161,12 +1083,11 @@ See [deployment.md](references/deployment.md) for full details.
 
 Deploy feed scripts or tasks as cronjobs for scheduled execution:
 
-```
-POST /api/v1/deploy/cronjob
-{"path":"~/feeds/btc-ema/v1/src/index.js","cron_expression":"0 */4 * * *","name":"btc-ema-update"}
+```bash
+alva deploy create --name btc-ema-update --path ~/feeds/btc-ema/v1/src/index.js --cron "0 */4 * * *"
 ```
 
-Cronjobs execute the script via the same jagent runtime as `/api/v1/run`. Max 20
+Cronjobs execute the script via the same jagent runtime as `alva run`. Max 20
 cronjobs per user. Min interval: 1 minute.
 
 **Name format**: All resource names (cronjobs, feeds, playbooks) must be 1–63
@@ -1180,26 +1101,23 @@ releasing.
 
 **Important**: Feed names and playbook names must be unique within your user
 space. Before creating a new feed or playbook, use
-`GET /api/v1/fs/readdir?path=~/feeds` or
-`GET /api/v1/fs/readdir?path=~/playbooks` to check for existing names and avoid
+`alva fs readdir --path ~/feeds` or
+`alva fs readdir --path ~/playbooks` to check for existing names and avoid
 conflicts.
 
-```
+```bash
 # 1. Release feed (register in DB, link to cronjob)
-POST /api/v1/release/feed
-{"name":"btc-ema","version":"1.0.0","cronjob_id":42}
-→ {"feed_id":100,"name":"btc-ema","feed_major":1}
+alva release feed --name btc-ema --version 1.0.0 --cronjob-id 42
+# → {"feed_id":100,"name":"btc-ema","feed_major":1}
 
 # 2. Create playbook draft (creates DB record + ALFS draft files automatically)
 #    Include trading_symbols when the playbook involves specific assets.
-POST /api/v1/draft/playbook
-{"name":"btc-dashboard","display_name":"BTC Trend Dashboard","description":"BTC market dashboard","feeds":[{"feed_id":100}],"trading_symbols":["BTC"]}
-→ {"playbook_id":99,"playbook_version_id":200}
+alva release playbook-draft --name btc-dashboard --display-name "BTC Trend Dashboard" --description "BTC market dashboard" --feeds '[{"feed_id":100}]' --trading-symbols '["BTC"]'
+# → {"playbook_id":99,"playbook_version_id":200}
 
 # 3. Release playbook (reads HTML from ALFS, uploads to CDN, writes release files automatically)
-POST /api/v1/release/playbook
-{"name":"btc-dashboard","version":"v1.0.0","feeds":[{"feed_id":100}]}
-→ {"playbook_id":99,"version":"v1.0.0","published_url":"https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html"}
+alva release playbook --name btc-dashboard --version v1.0.0 --feeds '[{"feed_id":100}]' --changelog "Initial release"
+# → {"playbook_id":99,"version":"v1.0.0","published_url":"https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html"}
 
 # After release, output the alva.ai playbook link to the user:
 # https://alva.ai/u/<username>/playbooks/<playbook_name>
@@ -1261,7 +1179,7 @@ consistent read pattern (`@last`, `@range`, etc.).
   Don't name your group `"data"` or you'll get `data/data/...`.
 - **Public reads require absolute paths.** Unauthenticated reads must use
   `/alva/home/<username>/...` (not `~/...`). Discover your username via
-  `GET /api/v1/me`.
+  `alva whoami`.
 - **Top-level `await` is not supported.** Wrap async code in
   `(async () => { ... })();`.
 - **`require("alfs")` uses absolute paths.** Inside the V8 runtime,
@@ -1274,15 +1192,18 @@ consistent read pattern (`@last`, `@range`, etc.).
 - **Altra lookback: feature vs strategy.** Feature lookback controls how many
   bars the feature computation sees. Strategy lookback controls how many feature
   outputs the strategy function sees. They are independent.
+- **Quote `~` paths to prevent shell expansion.** The shell expands bare `~` to
+  your local home (e.g. `/Users/alice/`), not the ALFS home
+  (`/alva/home/alice/`). Always quote paths: `--path '~/feeds/...'`.
 - **Home directory not provisioned?** If you get `PERMISSION_DENIED` on all
   ALFS operations (including `~/`), your home directory was not created during
-  sign-up. Call `POST /api/v1/fs/ensure-home` (no body needed, uses your auth
-  token) to provision it. This is idempotent and safe to call anytime.
+  sign-up. Call `alva fs mkdir --path ~/` to provision it. This is idempotent
+  and safe to call anytime.
 - **Cronjob path must point to an existing script.** The deploy API validates
   the entry_path exists via filesystem stat before creating the cronjob.
-- **Always create a draft before releasing.** `POST /api/v1/release/playbook`
+- **Always create a draft before releasing.** `alva release playbook`
   requires the playbook to already exist (created via
-  `POST /api/v1/draft/playbook`).
+  `alva release playbook-draft`).
 - **Create new playbooks from scratch unless you are doing a version update.**
   Only version updates may refer to an existing playbook. For all other new
   playbooks, do not read existing ones.

@@ -1,8 +1,5 @@
 # Feed SDK Guide
 
-> API examples use HTTP notation (`METHOD /path`). See SKILL.md Setup for curl
-> templates.
-
 The Feed SDK (`@alva/feed`) lets you build persistent data pipelines that store
 time series data on the Alva filesystem. Feed outputs are readable via standard
 filesystem paths, making them accessible to other scripts, dashboards, and
@@ -500,12 +497,12 @@ on read, they are auto-flattened back into individual flat records.
 
 Feed outputs are accessible via the filesystem after the feed runs.
 
-### From the REST API
+### From the CLI
 
-```
-GET /api/v1/fs/read?path=~/feeds/btc-ema/v1/data/metrics/prices/@last/100
+```bash
+alva fs read --path ~/feeds/btc-ema/v1/data/metrics/prices/@last/100
 
-GET /api/v1/fs/read?path=/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100  (public, no auth)
+alva fs read --path /alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100
 ```
 
 ### From JavaScript (inside jagent)
@@ -552,9 +549,9 @@ await ctx.self
 // Next run adds another record for the same date; both are grouped and auto-flattened on read.
 ```
 
-**REST API vs SDK**: The REST API returns raw values—for grouped rows,
-`{date, items: [...]}`. The SDK auto-flattens grouped records into individual
-flat records when using `last()`, `first()`, `range()`, etc.
+**CLI / REST vs SDK**: The CLI (and REST API) returns raw values—for grouped
+rows, `{date, items: [...]}`. The SDK auto-flattens grouped records into
+individual flat records when using `last()`, `first()`, `range()`, etc.
 
 **Limit behavior**: The `limit` parameter in `last()`, `first()`, etc. applies
 to unique timestamps (DB rows), not individual records after auto-flatten. A
@@ -594,11 +591,10 @@ records if some timestamps have multiple items.
 
 ## Making Feeds Public
 
-Grant public read access so anyone can read the data without an API key:
+Grant public read access so anyone can read the data:
 
-```
-POST /api/v1/fs/grant
-{"path":"~/feeds/btc-ema/v1","subject":"special:user:*","permission":"read"}
+```bash
+alva fs grant --path ~/feeds/btc-ema/v1 --subject "special:user:*" --permission read
 ```
 
 Public reads must use absolute paths:
@@ -610,18 +606,13 @@ Public reads must use absolute paths:
 
 ### Step 1: Create the directory and write the script
 
-```
-POST /api/v1/fs/mkdir
-{"path":"~/feeds/btc-ema/v1/src"}
-```
-
-Write the script (raw body upload):
-
 ```bash
-curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" \
-  -H "Content-Type: application/octet-stream" \
-  "$ALVA_ENDPOINT/api/v1/fs/write?path=~/feeds/btc-ema/v1/src/index.js" \
-  --data-binary @- <<'JS'
+alva fs write --path ~/feeds/btc-ema/v1/src/index.js --file ./index.js --mkdir-parents
+```
+
+Where `index.js` contains:
+
+```javascript
 const { Feed, feedPath, makeDoc, num } = require("@alva/feed");
 const { getCryptoKline } = require("@arrays/crypto/ohlcv:v1.0.0");
 const { indicators } = require("@alva/algorithm");
@@ -653,34 +644,30 @@ feed.def("metrics", {
     await ctx.self.ts("metrics", "prices").append(records);
   });
 })();
-JS
 ```
 
 ### Step 2: Run the feed
 
-```
-POST /api/v1/run
-{"entry_path":"~/feeds/btc-ema/v1/src/index.js"}
+```bash
+alva run --entry-path ~/feeds/btc-ema/v1/src/index.js
 ```
 
 ### Step 3: Make it public
 
-```
-POST /api/v1/fs/grant
-{"path":"~/feeds/btc-ema/v1","subject":"special:user:*","permission":"read"}
+```bash
+alva fs grant --path ~/feeds/btc-ema/v1 --subject "special:user:*" --permission read
 ```
 
 ### Step 4: Read from any client
 
-```
-GET /api/v1/fs/read?path=/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100  (public, no auth)
+```bash
+alva fs read --path /alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100
 ```
 
 ### Step 5: Deploy as a cronjob (required for live playbooks)
 
-```
-POST /api/v1/deploy/cronjob
-{"path":"~/feeds/btc-ema/v1/src/index.js","cron_expression":"0 */4 * * *","name":"btc-ema-update"}
+```bash
+alva deploy create --name btc-ema-update --path ~/feeds/btc-ema/v1/src/index.js --cron "0 */4 * * *"
 ```
 
 ---
@@ -712,18 +699,18 @@ POST /api/v1/deploy/cronjob
 
 ## Resetting Feed Data
 
-During development, clear stale data via the REST API. **This is for development
+During development, clear stale data via the CLI. **This is for development
 only -- do not use in production.**
 
-```
+```bash
 # Clear a specific time series output (e.g. market/ohlcv)
-DELETE /api/v1/fs/remove?path=~/feeds/my-feed/v1/data/market/ohlcv&recursive=true
+alva fs remove --path ~/feeds/my-feed/v1/data/market/ohlcv --recursive
 
 # Clear an entire group (all outputs under "market")
-DELETE /api/v1/fs/remove?path=~/feeds/my-feed/v1/data/market&recursive=true
+alva fs remove --path ~/feeds/my-feed/v1/data/market --recursive
 
 # Full reset: clear ALL data + KV state (removes the data mount, re-created on next run)
-DELETE /api/v1/fs/remove?path=~/feeds/my-feed/v1/data&recursive=true
+alva fs remove --path ~/feeds/my-feed/v1/data --recursive
 ```
 
 Clearing time series also removes the associated typedoc (schema metadata). KV

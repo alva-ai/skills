@@ -1,8 +1,5 @@
 # Deployment Guide
 
-> API examples use HTTP notation (`METHOD /path`). See SKILL.md Setup for curl
-> templates.
-
 Deploy scripts as cronjobs for scheduled, automated execution. This is essential
 for feeds that need regular updates (e.g. hourly price data) and recurring
 tasks.
@@ -14,52 +11,40 @@ tasks.
 The deployment workflow:
 
 1. **Write** a script (feed or task) and upload it to the filesystem
-2. **Test** it manually via `POST /api/v1/run`
-3. **Deploy** it as a cronjob via `POST /api/v1/deploy/cronjob`
-4. **Monitor** the cronjob status via the deploy API
+2. **Test** it manually via `alva run`
+3. **Deploy** it as a cronjob via `alva deploy create`
+4. **Monitor** the cronjob status via `alva deploy list` / `alva deploy get`
 
-Cronjobs execute the script through the same jagent runtime as `/api/v1/run`.
+Cronjobs execute the script through the same jagent runtime as `alva run`.
 The script receives the same environment (`require("env").args` contains the
 cronjob's args).
 
 ---
 
-## Cronjob API
+## Cronjob CLI
 
-All endpoints are under `/api/v1/deploy/` and require `X-Alva-Api-Key`
-authentication.
+All cronjob operations use `alva deploy <subcommand>`.
 
 ### Create Cronjob
 
-```
-POST /api/v1/deploy/cronjob
-```
-
-```
-POST /api/v1/deploy/cronjob
-{
-  "path": "~/feeds/btc-ema/v1/src/index.js",
-  "cron_expression": "0 */4 * * *",
-  "name": "btc-ema-update",
-  "args": {"symbol": "BTC"},
-  "push_notify": true
-}
+```bash
+alva deploy create --name btc-ema-update --path ~/feeds/btc-ema/v1/src/index.js --cron "0 */4 * * *" --args '{"symbol": "BTC"}' --push-notify
 ```
 
-| Field           | Type   | Required | Description                                            |
+| Flag            | Type   | Required | Description                                            |
 | --------------- | ------ | -------- | ------------------------------------------------------ |
-| path            | string | yes      | Path to entry script (home-relative or absolute)       |
-| cron_expression | string | yes      | Standard cron expression                               |
-| name            | string | yes      | Job name (1–63 lowercase alphanumeric or hyphens, no leading/trailing hyphen) |
-| args            | object | no       | JSON passed to `require("env").args` on each execution |
-| push_notify     | bool   | no       | Enable push notifications for playbook followers       |
+| --path          | string | yes      | Path to entry script (home-relative or absolute)       |
+| --cron          | string | yes      | Standard cron expression                               |
+| --name          | string | yes      | Job name (1–63 lowercase alphanumeric or hyphens, no leading/trailing hyphen) |
+| --args          | JSON   | no       | JSON passed to `require("env").args` on each execution |
+| --push-notify   | flag   | no       | Enable push notifications for playbook followers       |
 
-When `push_notify` is `true`, every successful cronjob execution triggers a
+When `--push-notify` is set, every successful cronjob execution triggers a
 notification fan-out: the platform reads the feed's
 `/data/signal/targets/@last/1`, and pushes the signal content to all playbook
-followers who have enabled Telegram notifications. Defaults to `false`.
+followers who have enabled Telegram notifications.
 
-The API validates that the entry_path exists on the filesystem before creating
+The CLI validates that the entry path exists on the filesystem before creating
 the cronjob.
 
 **Response**:
@@ -80,60 +65,42 @@ the cronjob.
 
 ### List Cronjobs
 
-```
-GET /api/v1/deploy/cronjobs?limit={limit}&cursor={cursor}
-```
-
-```
-GET /api/v1/deploy/cronjobs
-→ {"cronjobs":[...],"next_cursor":"..."}
+```bash
+alva deploy list [--limit 10] [--cursor CURSOR]
 ```
 
-| Parameter | Type   | Default | Description                              |
-| --------- | ------ | ------- | ---------------------------------------- |
-| limit     | int    | 20      | Max results per page                     |
-| cursor    | string |         | Pagination cursor from previous response |
+| Flag     | Type   | Default | Description                              |
+| -------- | ------ | ------- | ---------------------------------------- |
+| --limit  | int    | 20      | Max results per page                     |
+| --cursor | string |         | Pagination cursor from previous response |
 
 ### Get Cronjob
 
-```
-GET /api/v1/deploy/cronjob/:id
-```
-
-```
-GET /api/v1/deploy/cronjob/42
+```bash
+alva deploy get --id 42
 ```
 
 ### Update Cronjob
 
-```
-PATCH /api/v1/deploy/cronjob/:id
+Partial update -- only include flags you want to change.
+
+```bash
+alva deploy update --id 42 --cron "0 */2 * * *" --args '{"symbol":"ETH"}'
 ```
 
-Partial update -- only include fields you want to change.
-
-```
-PATCH /api/v1/deploy/cronjob/42
-{"cron_expression":"0 */2 * * *","args":{"symbol":"ETH"}}
-```
-
-Updatable fields: `name`, `cron_expression`, `args`, `push_notify`.
+Updatable fields: `--name`, `--cron`, `--args`, `--push-notify` / `--no-push-notify`.
 
 ### Delete Cronjob
 
-```
-DELETE /api/v1/deploy/cronjob/:id
-```
-
-```
-DELETE /api/v1/deploy/cronjob/42
+```bash
+alva deploy delete --id 42
 ```
 
 ### Pause / Resume
 
-```
-POST /api/v1/deploy/cronjob/42/pause
-POST /api/v1/deploy/cronjob/42/resume
+```bash
+alva deploy pause --id 42
+alva deploy resume --id 42
 ```
 
 Both return the updated cronjob object.
@@ -165,7 +132,7 @@ When a cronjob triggers:
 
 1. The scheduler reads the cronjob config
 2. It executes the script with the configured `entry_path` and `args`
-3. The script runs in the same environment as a manual `/api/v1/run` call
+3. The script runs in the same environment as a manual `alva run` call
 
 The script has full access to:
 
@@ -183,7 +150,7 @@ The script has full access to:
 | --------------------- | --------------------- |
 | Max cronjobs per user | 20                    |
 | Min cron interval     | 1 minute              |
-| Execution timeout     | Same as `/api/v1/run` |
+| Execution timeout     | Same as `alva run`    |
 | Heap per execution    | 2 GB                  |
 
 ---
@@ -194,18 +161,19 @@ This example creates a BTC price feed that runs every 4 hours.
 
 ### 1. Write the feed script
 
-```
-POST /api/v1/fs/mkdir
-{"path":"~/feeds/btc-hourly/v1/src"}
+```bash
+alva fs mkdir --path ~/feeds/btc-hourly/v1/src
 ```
 
-Write the script (raw body upload):
+Write the script (upload from local file):
 
 ```bash
-curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" \
-  -H "Content-Type: application/octet-stream" \
-  "$ALVA_ENDPOINT/api/v1/fs/write?path=~/feeds/btc-hourly/v1/src/index.js" \
-  --data-binary @- <<'JS'
+alva fs write --path ~/feeds/btc-hourly/v1/src/index.js --file ./index.js --mkdir-parents
+```
+
+Where `index.js` contains:
+
+```javascript
 const { Feed, feedPath, makeDoc, num } = require("@alva/feed");
 const { getCryptoKline } = require("@arrays/crypto/ohlcv:v1.0.0");
 
@@ -245,44 +213,36 @@ feed.def("market", {
     }
   });
 })();
-JS
 ```
 
 ### 2. Test the script manually
 
-```
-POST /api/v1/run
-{"entry_path":"~/feeds/btc-hourly/v1/src/index.js"}
+```bash
+alva run --entry-path ~/feeds/btc-hourly/v1/src/index.js
 ```
 
 ### 3. Make the output public
 
-```
-POST /api/v1/fs/grant
-{"path":"~/feeds/btc-hourly/v1","subject":"special:user:*","permission":"read"}
+```bash
+alva fs grant --path ~/feeds/btc-hourly/v1 --subject "special:user:*" --permission read
 ```
 
 ### 4. Deploy as a cronjob
 
-```
-POST /api/v1/deploy/cronjob
-{
-  "path": "~/feeds/btc-hourly/v1/src/index.js",
-  "cron_expression": "0 */4 * * *",
-  "name": "btc-hourly-price-feed"
-}
+```bash
+alva deploy create --name btc-hourly-price-feed --path ~/feeds/btc-hourly/v1/src/index.js --cron "0 */4 * * *"
 ```
 
 ### 5. Verify the cronjob
 
-```
-GET /api/v1/deploy/cronjobs
+```bash
+alva deploy list
 ```
 
 ### 6. Read the data (from anywhere)
 
-```
-GET /api/v1/fs/read?path=/alva/home/alice/feeds/btc-hourly/v1/data/market/ohlcv/@last/24  (public, no auth)
+```bash
+alva fs read --path /alva/home/alice/feeds/btc-hourly/v1/data/market/ohlcv/@last/24
 ```
 
 ---
@@ -293,7 +253,7 @@ GET /api/v1/fs/read?path=/alva/home/alice/feeds/btc-hourly/v1/data/market/ohlcv/
   timestamp with `ctx.kv.put()`/`ctx.kv.load()` to avoid re-fetching all
   historical data on each run.
 - **Test thoroughly before deploying**: Run the script manually via
-  `/api/v1/run` and verify the output before creating a cronjob.
+  `alva run` and verify the output before creating a cronjob.
 - **Use descriptive names**: The cronjob name helps you identify jobs when
   listing them.
 - **Pause before updating**: If you need to update the script, pause the cronjob
