@@ -103,7 +103,8 @@
   background-size: 3px 3px;
 }
 
-[data-theme="dark"] .chart-dotted-background {
+/* Dark Mode (disabled — kept for future use) */
+[data-theme="dark-disabled"] .chart-dotted-background {
   background-image: radial-gradient(
     circle,
     rgba(255, 255, 255, 0.12) 0.6px,
@@ -570,16 +571,13 @@ function mkFmt(valueFn) {
   };
 }
 
-// Theme-aware color constants — set once per page based on data-theme
-var isDark = document.documentElement.getAttribute("data-theme") === "dark";
-
-// Shared tooltip config (theme-aware)
+// Shared tooltip config (light mode)
 var TT_COLORS = {
-  bg: isDark ? "rgba(30,31,35,0.96)" : "rgba(255,255,255,0.96)",
-  border: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)",
-  title: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)",
-  text: isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.9)",
-  pointer: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+  bg: "rgba(255,255,255,0.96)",
+  border: "rgba(0,0,0,0.08)",
+  title: "rgba(0,0,0,0.7)",
+  text: "rgba(0,0,0,0.9)",
+  pointer: "rgba(0,0,0,0.1)",
 };
 
 const TT = {

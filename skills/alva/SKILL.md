@@ -1211,19 +1211,18 @@ POST /api/v1/release/playbook
 ## Alva Design System
 
 All Alva playbook pages, dashboards, and widgets must follow the Alva Design
-System. Start with [design-system.md](references/design-system.md): it is the
-single global entry point for tokens, typography, page-level layout rules, and
-the reading path to the more detailed design references.
+System. **Always read
+[design-system.md](references/design-system.md) first** — it covers visual
+identity, design principles, do/don't guardrails, tokens, typography, and
+page-level layout. Then read only the spec you need:
 
-Read only what you need:
-
-- **Global rules only** → [design-system.md](references/design-system.md)
-- **Widget and chart implementation** →
-  [design-widgets.md](references/design-widgets.md)
-- **Component behavior and templates** →
-  [design-components.md](references/design-components.md)
-- **Trading strategy playbooks** →
-  [design-playbook-trading-strategy.md](references/design-playbook-trading-strategy.md)
+1. **Generating a widget or chart** →
+   [design-widgets.md](references/design-widgets.md)
+2. **Using a component** (Button, Tag, Dropdown, Tab, etc.) →
+   [design-components.md](references/design-components.md)
+3. **Building a trading strategy playbook** →
+   [design-playbook-trading-strategy.md](references/design-playbook-trading-strategy.md)
+4. **Only need global rules** → stay in design-system.md
 
 ---
 
