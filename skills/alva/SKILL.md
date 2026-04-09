@@ -58,13 +58,16 @@ command, and eliminates the need for manual curl/header management.
 **Setup:** Check whether the CLI is already installed by running `alva --help`.
 
 - **If not installed**, install and configure it:
+
   ```bash
   npm install -g @alva-ai/toolkit
   alva configure --api-key alva_your_key_here
   alva whoami   # verify credentials
   ```
+
 - **If already installed**, upgrade to the latest version to ensure access to
   the newest commands and fixes:
+
   ```bash
   npm install -g @alva-ai/toolkit@latest
   alva whoami   # confirm the upgrade
@@ -85,7 +88,35 @@ flags, parameter types, and practical examples.
 **If the CLI is not available or the user prefers curl**, fall back to the
 manual HTTP/curl workflow described in the Pre-flight section below.
 
-## Pre-flight
+## Browser SDK
+
+The `@alva-ai/toolkit` package also ships a browser bundle for use directly in
+web pages. Load it from a CDN and instantiate the client:
+
+```html
+<script src="https://unpkg.com/@alva-ai/toolkit/dist/browser.global.js"></script>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('_t');
+
+  const client = new AlvaToolkit.AlvaClient({ apiKey: token });
+
+  client.fs.readdir({ path: '/' }).then((entries) => {
+    console.log(entries);
+  });
+</script>
+```
+
+The API key is passed via the `_t` query parameter in the page URL. Playbook
+pages hosted on Alva receive this automatically.
+
+### Browser SDK Resources
+
+`client.user`, `client.fs`, `client.run`, `client.deploy`, `client.release`,
+`client.secrets`, `client.sdk`, `client.comments`, `client.remix`,
+`client.screenshot`
+
+## Pre-flight (Non-cli mode)
 
 **Run these checks on first use each session** before doing anything else.
 
