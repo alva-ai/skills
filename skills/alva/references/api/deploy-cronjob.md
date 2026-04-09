@@ -1,36 +1,34 @@
 # Deploy Cron Job
 
-Create and manage cron jobs for scheduled execution. All endpoints are under
-`/api/v1/deploy/`.
+Create and manage cron jobs for scheduled execution using the `alva deploy`
+CLI commands.
 
 See [deployment.md](../deployment.md) for a comprehensive workflow guide.
 
 ## Create Cronjob
 
 ```
-POST /api/v1/deploy/cronjob
+alva deploy create --name NAME --path PATH --cron "EXPR" [--args 'JSON'] [--push-notify]
 ```
 
-```
-POST /api/v1/deploy/cronjob
-{
-  "path": "~/feeds/btc-ema/v1/src/index.js",
-  "cron_expression": "0 */4 * * *",
-  "name": "btc-ema-update",
-  "args": {"symbol": "BTC"},
-  "push_notify": true
-}
+```bash
+alva deploy create \
+  --name btc-ema-update \
+  --path ~/feeds/btc-ema/v1/src/index.js \
+  --cron "0 */4 * * *" \
+  --args '{"symbol": "BTC"}' \
+  --push-notify
 ```
 
-| Field           | Type   | Required | Description                                            |
-| --------------- | ------ | -------- | ------------------------------------------------------ |
-| path            | string | yes      | Path to entry script (home-relative or absolute)       |
-| cron_expression | string | yes      | Standard cron expression (min interval: 1 minute)      |
-| name            | string | yes      | Job name (1–63 lowercase alphanumeric or hyphens, no leading/trailing hyphen) |
-| args            | object | no       | JSON passed to `require("env").args` on each execution |
-| push_notify     | bool   | no       | Enable push notifications for playbook followers       |
+| Flag          | Type   | Required | Description                                                                   |
+| ------------- | ------ | -------- | ----------------------------------------------------------------------------- |
+| --name        | string | yes      | Job name (1–63 lowercase alphanumeric or hyphens, no leading/trailing hyphen) |
+| --path        | string | yes      | Path to entry script (home-relative or absolute)                              |
+| --cron        | string | yes      | Standard cron expression (min interval: 1 minute)                             |
+| --args        | JSON   | no       | JSON passed to `require("env").args` on each execution                        |
+| --push-notify | flag   | no       | Enable push notifications for playbook followers                              |
 
-When `push_notify` is `true`, every successful execution reads the feed's
+When `--push-notify` is set, every successful execution reads the feed's
 `/data/signal/targets/@last/1` and pushes it to playbook followers (Telegram).
 
 Response:
@@ -52,62 +50,61 @@ Response:
 ## List Cronjobs
 
 ```
-GET /api/v1/deploy/cronjobs?limit={limit}&cursor={cursor}
+alva deploy list [--limit N] [--cursor CURSOR]
 ```
 
-| Parameter | Type   | Required | Description                              |
-| --------- | ------ | -------- | ---------------------------------------- |
-| limit     | int    | no       | Max results (default: 20)                |
-| cursor    | string | no       | Pagination cursor from previous response |
+| Flag     | Type   | Required | Description                              |
+| -------- | ------ | -------- | ---------------------------------------- |
+| --limit  | int    | no       | Max results (default: 20)                |
+| --cursor | string | no       | Pagination cursor from previous response |
 
-```
-GET /api/v1/deploy/cronjobs
-→ {"cronjobs":[...],"next_cursor":"..."}
+```bash
+alva deploy list
+# → {"cronjobs":[...],"next_cursor":"..."}
 ```
 
 ## Get Cronjob
 
 ```
-GET /api/v1/deploy/cronjob/:id
+alva deploy get --id ID
 ```
 
-```
-GET /api/v1/deploy/cronjob/42
+```bash
+alva deploy get --id 42
 ```
 
 ## Update Cronjob
 
 ```
-PATCH /api/v1/deploy/cronjob/:id
+alva deploy update --id ID [--cron "EXPR"] [--args 'JSON'] [--push-notify|--no-push-notify]
 ```
 
-Partial update -- only include fields you want to change.
+Partial update -- only include flags you want to change.
 
-```
-PATCH /api/v1/deploy/cronjob/42
-{"cron_expression":"0 */2 * * *"}
+```bash
+alva deploy update --id 42 --cron "0 */2 * * *"
 ```
 
-| Field           | Type   | Description                      |
-| --------------- | ------ | -------------------------------- |
-| name            | string | Update job name                  |
-| cron_expression | string | Update schedule                  |
-| args            | object | Update arguments                 |
-| push_notify     | bool   | Enable/disable push notification |
+| Flag              | Type   | Description                      |
+| ----------------- | ------ | -------------------------------- |
+| --cron            | string | Update schedule                  |
+| --args            | JSON   | Update arguments                 |
+| --push-notify     | flag   | Enable push notification         |
+| --no-push-notify  | flag   | Disable push notification        |
 
 ## Delete Cronjob
 
 ```
-DELETE /api/v1/deploy/cronjob/:id
+alva deploy delete --id ID
 ```
 
-```
-DELETE /api/v1/deploy/cronjob/42
+```bash
+alva deploy delete --id 42
 ```
 
 ## Pause / Resume Cronjob
 
-```
-POST /api/v1/deploy/cronjob/42/pause
-POST /api/v1/deploy/cronjob/42/resume
+```bash
+alva deploy pause --id 42
+alva deploy resume --id 42
 ```

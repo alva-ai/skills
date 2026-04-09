@@ -4,19 +4,25 @@ Execute JavaScript in a V8 isolate with access to the filesystem, SDKs, and
 HTTP.
 
 ```
-POST /api/v1/run
+alva run [flags]
 ```
 
-## Request Fields
+## Flags
 
-| Field       | Type   | Required | Description                                        |
-| ----------- | ------ | -------- | -------------------------------------------------- |
-| code        | string | \*       | Inline JavaScript to execute                       |
-| entry_path  | string | \*       | Path to script on filesystem (home-relative)       |
-| working_dir | string | no       | Working directory for require() (inline code only) |
-| args        | object | no       | JSON accessible via `require("env").args`          |
+| Flag             | Type   | Required | Description                                        |
+| ---------------- | ------ | -------- | -------------------------------------------------- |
+| `--code`         | string | \*       | Inline JavaScript to execute                       |
+| `--entry-path`   | string | \*       | Path to script on filesystem (home-relative)       |
+| `--working-dir`  | string | no       | Working directory for require() (inline code only) |
+| `--args`         | JSON   | no       | JSON accessible via `require("env").args`          |
 
-\*Exactly one of `code` or `entry_path` must be provided.
+\*Exactly one of `--code` or `--entry-path` must be provided.
+
+> **Warning**: `--code` expects inline JavaScript, not a file path.
+> `alva run --code /tmp/script.js` passes the string as code and fails with
+> `SyntaxError`. To execute a local file: upload it first with
+> `alva fs write --path '~/path/to/script.js' --file /tmp/script.js`, then run
+> with `alva run --entry-path '~/path/to/script.js'`.
 
 ## Response Fields
 
@@ -30,17 +36,18 @@ POST /api/v1/run
 
 ## Examples
 
-```
+```bash
 # Inline code
-POST /api/v1/run
-{"code":"1 + 2 + 3;"}
-→ {"result":"6","logs":"","stats":{"duration_ms":24},"status":"completed","error":null}
+alva run --code '1 + 2 + 3;'
+# → {"result":"6","logs":"","stats":{"duration_ms":24},"status":"completed","error":null}
 
 # Inline code with arguments
-POST /api/v1/run
-{"code":"const env = require(\"env\"); JSON.stringify(env.args);","args":{"symbol":"ETH","limit":50}}
+alva run --code 'const env = require("env"); JSON.stringify(env.args);' --args '{"symbol":"ETH","limit":50}'
 
-# Execute script from filesystem
-POST /api/v1/run
-{"entry_path":"~/tasks/my-task/src/index.js","args":{"n":42}}
+# Execute script from ALFS (quote ~ to prevent shell expansion)
+alva run --entry-path '~/tasks/my-task/src/index.js' --args '{"n":42}'
+
+# Upload a local file to ALFS, then execute it
+alva fs write --path '~/feeds/my-feed/v1/src/index.js' --file ./index.js --mkdir-parents
+alva run --entry-path '~/feeds/my-feed/v1/src/index.js'
 ```

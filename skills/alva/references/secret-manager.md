@@ -65,67 +65,47 @@ Behavior from the runtime implementation:
 - if the secret loader is not configured, the module throws a clear error
 - the JS module is read-only; writes and updates happen outside the runtime
 
-Use this whenever the code needs to call an external service from `/api/v1/run`
+Use this whenever the code needs to call an external service from `alva run`
 or from a deployed cronjob.
 
 ---
 
 ## Programmatic CRUD API
 
-Authenticated CRUD is available under `/api/v1/secrets`. These endpoints are
-scoped to the current user.
+Authenticated CRUD is available via `alva secrets`. All operations are scoped
+to the current user.
 
 ### Create
 
-```http
-POST /api/v1/secrets
-Content-Type: application/json
-
-{"name":"OPENAI_API_KEY","value":"sk-..."}
+```bash
+alva secrets create --name OPENAI_API_KEY --value "sk-..."
 ```
 
 ### List
 
-```http
-GET /api/v1/secrets
+```bash
+alva secrets list
 ```
 
-Returns metadata only:
-
-```json
-{
-  "secrets": [
-    {
-      "name": "OPENAI_API_KEY",
-      "keyVersion": 1,
-      "createdAt": "2026-03-20T08:00:00Z",
-      "updatedAt": "2026-03-20T08:00:00Z",
-      "valueLength": 56,
-      "keyPrefix": "sk-proj-abc12"
-    }
-  ]
-}
-```
+Returns metadata only (name, keyVersion, createdAt, updatedAt, valueLength,
+keyPrefix).
 
 ### Get plaintext value
 
-```http
-GET /api/v1/secrets/OPENAI_API_KEY
+```bash
+alva secrets get --name OPENAI_API_KEY
 ```
 
 ### Update
 
-```http
-PUT /api/v1/secrets/OPENAI_API_KEY
-Content-Type: application/json
-
-{"value":"sk-new-..."}
+```bash
+alva secrets update --name OPENAI_API_KEY --value "sk-new-..."
 ```
 
 ### Delete
 
-```http
-DELETE /api/v1/secrets/OPENAI_API_KEY
+```bash
+alva secrets delete --name OPENAI_API_KEY
 ```
 
 Validation and error behavior:

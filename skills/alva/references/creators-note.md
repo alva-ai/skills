@@ -82,13 +82,11 @@ Wait for the user's response. Do not auto-post.
 
 On approval (or after user edits):
 
-```
-POST /api/v1/playbook/comment
-{"username":"<username>","name":"<playbook_name>","content":"<note>"}
-→ {"id": <comment_id>, ...}
+```bash
+alva comments create --username <username> --name <playbook_name> --content "<note>"
+# → {"id": <comment_id>, ...}
 
-POST /api/v1/playbook/comment/pin
-{"comment_id": <comment_id>}
+alva comments pin --comment-id <comment_id>
 ```
 
 ### 3. On skip

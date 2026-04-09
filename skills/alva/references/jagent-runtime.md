@@ -1,8 +1,7 @@
 # Jagent Runtime Guide
 
 The jagent runtime executes JavaScript inside a V8 isolate. Scripts are invoked
-via `POST /api/v1/run` (inline code or filesystem entry path) or triggered by
-cronjobs.
+via `alva run` (inline code or filesystem entry path) or triggered by cronjobs.
 
 ---
 
@@ -12,7 +11,7 @@ cronjobs.
 - **Isolation**: Each execution runs in a separate subprocess with its own V8
   isolate
 - **Heap**: 2 GB per execution
-- **No persistent state between executions**: each `/api/v1/run` call starts
+- **No persistent state between executions**: each `alva run` call starts
   fresh (use `alfs` for persistence)
 
 ---
@@ -122,7 +121,7 @@ Behavior:
 - `loadPlaintext(name)` returns `null` when the secret is missing
 - calling it without an authenticated execution context throws an error
 - the module is read-only from JS; writes happen through the web UI or
-  `/api/v1/secrets`
+  `alva secrets`
 - do not log the returned value or write it into ALFS / released assets
 
 ### net/http -- HTTP Requests
@@ -263,7 +262,7 @@ Most SDK functions are **synchronous** and return
 `{ success: boolean, response: { data: [...] } }`.
 
 To discover function signatures and response shapes, use the SDK doc API
-(`GET /api/v1/sdk/doc?name=...`).
+(`alva sdk doc --name "..."`).
 
 ---
 
