@@ -58,7 +58,7 @@
   display: flex;
   align-items: center;
   padding: 7px var(--spacing-m);
-  gap: 8px;
+  gap: var(--spacing-xs);
 }
 
 .list-item-text {
@@ -208,7 +208,7 @@ tags, and scoped CSS maps them to the Alva design spec.
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--spacing-m);
 }
 .markdown-container * {
   box-sizing: border-box;
@@ -273,7 +273,7 @@ tags, and scoped CSS maps them to the Alva design spec.
 .markdown-container ol {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--spacing-xs);
   list-style: none;
   margin: 0;
   padding: 0;
@@ -363,15 +363,15 @@ tags, and scoped CSS maps them to the Alva design spec.
   height: 1px;
   background: var(--line-l07);
   border: none;
-  margin: 4px 0;
+  margin: var(--spacing-xxs) 0;
 }
 
 /* ── Table ── follows Table Card rules (design-widgets.md) */
 .markdown-container table {
   width: 100%;
   border-collapse: separate;
-  border-spacing: 16px 0;
-  margin: 0 -16px;
+  border-spacing: var(--spacing-m) 0;
+  margin: 0 calc(var(--spacing-m) * -1);
 }
 .markdown-container th,
 .markdown-container td {
@@ -426,13 +426,13 @@ tags, and scoped CSS maps them to the Alva design spec.
     no-repeat;
   display: inline-block;
   vertical-align: middle;
-  margin-left: 4px;
+  margin-left: var(--spacing-xxs);
   flex-shrink: 0;
 }
 
 /* ── Medium ── */
 .markdown-container--m {
-  gap: 8px;
+  gap: var(--spacing-xs);
 }
 .markdown-container--m h1 {
   font-size: 18px;
@@ -479,7 +479,7 @@ tags, and scoped CSS maps them to the Alva design spec.
 }
 .markdown-container--m ul,
 .markdown-container--m ol {
-  gap: 4px;
+  gap: var(--spacing-xxs);
 }
 .markdown-container--m th,
 .markdown-container--m td {
@@ -504,7 +504,7 @@ tags, and scoped CSS maps them to the Alva design spec.
 
 /* ── Small ── */
 .markdown-container--s {
-  gap: 4px;
+  gap: var(--spacing-xxs);
 }
 .markdown-container--s h1 {
   font-size: 14px;
@@ -555,7 +555,7 @@ tags, and scoped CSS maps them to the Alva design spec.
 }
 .markdown-container--s ul,
 .markdown-container--s ol {
-  gap: 4px;
+  gap: var(--spacing-xxs);
 }
 .markdown-container--s code {
   font-size: 10px;
@@ -1063,14 +1063,14 @@ Modal                        ← Overlay
 | Border Radius | `var(--radius-pop-dialog)` / `12px`|
 | Border        | `0.5px solid var(--line-l2)`       |
 | Padding       | `var(--spacing-xxl)` / `28px` (all sides)|
-| Gap           | `16px` (between title and content) |
+| Gap           | `var(--spacing-m)` / `16px` (between title and content) |
 
 ### Modal Title
 
 | Property       | Value                                   |
 | -------------- | --------------------------------------- |
 | Layout         | `flex` / `row` / `space-between`        |
-| Gap            | `12px` (between title and close button) |
+| Gap            | `var(--spacing-s)` / `12px` (between title and close button) |
 | Font Family    | `Delight`                               |
 | Font Weight    | `500`                                   |
 | Font Size      | `18px`                                  |
@@ -1414,7 +1414,7 @@ border through their transparent border.
 
 /* Underline */
 .tab-underline {
-  gap: 16px;
+  gap: var(--spacing-m);
 }
 .tab-underline .tab-item {
   padding-bottom: var(--spacing-xxs);
@@ -1432,7 +1432,7 @@ border through their transparent border.
 
 /* Underline — Size S */
 .tab-underline.tab-s {
-  gap: 12px;
+  gap: var(--spacing-s);
 }
 .tab-underline.tab-s .tab-item {
   font-size: 12px;

@@ -1,27 +1,8 @@
 # Alva Design System
 
-This file is the global entry point for Alva design rules. Read this first to
-understand what Alva looks and feels like, then follow the progressive reading
-path at the bottom for implementation details.
-
-## Visual Identity
-
-Alva is a playbook marketplace for investors — build, share, remix, and trade
-on collaborative investing strategies powered by AI agents.
-
-## Design Principles
-
-1. **Signal first** — every element must serve analysis. If it doesn't help the
-   user read data, compare metrics, or make decisions, remove it.
-2. **Density with restraint** — pack information tightly but maintain clear
-   visual hierarchy. Whitespace is structure, not waste.
-3. **Color is state, not decoration** — green means bullish, red means bearish,
-   yellow means alert. Never use semantic colors for backgrounds, accents, or
-   branding.
-4. **Typography over ornament** — hierarchy comes from font size and opacity,
-   not bold weights, colors, or decorative elements.
-5. **Components support analysis** — Table = scanability, KPI = comparison,
-   Chart = context-rich but visually quiet, Feed = chronology and relevance.
+This file is the global entry point for Alva design rules — tokens, typography,
+theme, and page-level layout. Read this first, then follow the reading path at
+the bottom for widget and component specs.
 
 ## Design Tokens
 
@@ -36,7 +17,7 @@ hardcode hex or rgba values. Below is a quick reference:
 | Text         | `--text-n9/n7/n5/n3/n2`                        | n9=primary, n7=secondary, n5=supporting |
 | Background   | `--b0-page`, `--grey-g01`~`g1`, `--b-r02`~`r1` | g01 for card backgrounds                |
 | Line         | `--line-l05/l07/l12/l2/l3`                     | l07=default                             |
-| Shadow       | `--shadow-xs/s/l`                              | Floating surfaces only (dropdown/modal/tooltip) |
+| Shadow       | `--shadow-xs/s/l`                              | Floating surfaces only (dropdown/tooltip) |
 | Spacing      | `--spacing-xxxs`(2) ~ `--spacing-xxxxxxl`(56)  | Common: xs=8, m=16, xl=24               |
 | Radius       | `--radius-ct-xs`(2) ~ `--radius-ct-l`(8)       | xs=Tag, s=Card, l=Page                  |
 
@@ -45,7 +26,7 @@ hardcode hex or rgba values. Below is a quick reference:
 ### General Rules
 
 1. **The default font for Alva must be Delight**;
-2. Backup fonts: `-apple-system`, `BlinkMacSystemFont`, `sans-serif`;
+2. Backup fonts: `-apple-system`, `OPPO Sans 4.0`, `BlinkMacSystemFont`, `sans-serif`;
 
 ### Font Weight
 
@@ -186,8 +167,7 @@ applied as `margin-bottom` on `.playbook-title`. **Do not add any margin to
 3. **Building a Trading Strategy Playbook** → read
    [design-playbook-trading-strategy.md](./design-playbook-trading-strategy.md).
    This spec defines the complete page structure, tab layout, module order,
-   component usage, and data schema. Do not deviate from it or invent
-   alternative layouts.
+   component usage, and data schema.
 4. **Only need global rules** → stay in this file. Open
    [design-tokens.css](./design-tokens.css) only when you need exact token
    values.

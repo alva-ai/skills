@@ -3,7 +3,7 @@
 ## Widget Types
 
 - [Critical Rules (TL;DR)](#critical-rules-tldr)
-- [Widget Base CSS](#widget-base-css)
+- [Shared Styles](#shared-styles)
 - [Widget Layout](#widget-layout)
 - [Chart Card](#chart-card)
 - [Metric Card](#metric-card)
@@ -29,15 +29,15 @@
 5. **Same-row widgets must equal height** — `.widget-body.fill` + `flex: 1`.
    ECharts: `height:100%; min-height:180px`. → [Details](#equal-height-fill)
 6. **Table columns require JS `initTableAlignment`** — proportional widths based
-   on content, horizontal scroll when overflow. `gap:16px` on rows,
+   on content, horizontal scroll when overflow. `gap:var(--spacing-m)` on rows,
    `border-bottom` on rows not cells. → [Details](#column-alignment)
 
 ---
 
-## Widget Base CSS
+## Shared Styles
 
-> **Include this entire block in every playbook / dashboard page.** It contains
-> all shared widget styles. Do not rewrite or partially recreate these classes.
+> **Include this block in every playbook page.** Then add each widget type's CSS
+> block as needed.
 
 ```css
 /* ── Widget Card ── */
@@ -47,11 +47,6 @@
   flex-direction: column;
   position: relative;
   overflow: visible;
-}
-
-/* Chart cards clip canvas overflow; table/feed cards must not clip scroll */
-.widget-card:has(.chart-body) {
-  overflow: hidden;
 }
 
 .widget-title {
@@ -93,7 +88,191 @@
   line-height: 0;
 }
 
-/* ── Chart Card ── */
+/* ── Dividers ── */
+.divider-v {
+  width: 1px;
+  flex-shrink: 0;
+  margin-block: var(--spacing-l);
+  background-color: var(--line-l05);
+}
+
+.divider-h {
+  height: 1px;
+  margin-inline: var(--spacing-l);
+  background-color: var(--line-l05);
+}
+
+/* ── Equal Height Fill ── */
+.widget-card .widget-body.fill {
+  flex: 1;
+  height: 0;
+}
+
+/* ── Widget Grid ── */
+.widget-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: var(--spacing-xl);
+  align-items: stretch;
+}
+
+.col-2 {
+  grid-column: span 2;
+}
+.col-3 {
+  grid-column: span 3;
+}
+.col-4 {
+  grid-column: span 4;
+}
+.col-5 {
+  grid-column: span 5;
+}
+.col-6 {
+  grid-column: span 6;
+}
+.col-8 {
+  grid-column: span 8;
+}
+
+.col-thirds {
+  grid-column: span 8;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-xl);
+  align-items: stretch;
+}
+
+@media (max-width: 768px) {
+  .widget-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-l);
+  }
+  .col-2 {
+    grid-column: span 2;
+  }
+  .col-3,
+  .col-4,
+  .col-5,
+  .col-6,
+  .col-8 {
+    grid-column: span 4;
+  }
+  .col-thirds {
+    grid-column: span 4;
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Content Reflow ── */
+.widget-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.widget-row > * {
+  flex: 1 1 auto;
+  min-width: 120px;
+}
+```
+
+> **Watermark SVG**: Always use the CDN URL via `<img>` tag. Do not inline SVG.
+
+---
+
+## Widget Layout
+
+### Grid System
+
+| Platform | Total Columns | Gap                   |
+| -------- | ------------- | --------------------- |
+| Web      | 8 columns     | 24px (`--spacing-xl`) |
+| Mweb     | 4 columns     | 16px (`--spacing-l`)  |
+
+### Column Spans
+
+| Class    | Web Proportion | Mweb Behavior               | Use Case                   |
+| -------- | -------------- | --------------------------- | -------------------------- |
+| `.col-2` | 25% (2/8)      | Stays 2/4 (half-width)      | Small KPI, up to 4 per row |
+| `.col-3` | 37.5% (3/8)    | Expands to 4/4 (full-width) | Narrow column widget       |
+| `.col-4` | 50% (4/8)      | Expands to 4/4 (full-width) | Equal two-column split     |
+| `.col-5` | 62.5% (5/8)    | Expands to 4/4 (full-width) | Main column (wide)         |
+| `.col-6` | 75% (6/8)      | Expands to 4/4 (full-width) | Large widget               |
+| `.col-8` | 100% (8/8)     | Expands to 4/4 (full-width) | Full width                 |
+
+### Line Break Rules
+
+Each row's col spans must total exactly 8; shortfalls leave empty space.
+
+| Combination              | Col Spans       | Width Ratio         |
+| ------------------------ | --------------- | ------------------- |
+| Equal two-column         | `4 + 4`         | 50% + 50%           |
+| Left narrow, right wide  | `3 + 5`         | 37.5% + 62.5%       |
+| Left wide, right narrow  | `5 + 3`         | 62.5% + 37.5%       |
+| Large + small two-column | `6 + 2`         | 75% + 25%           |
+| Near-equal three-column  | `3 + 3 + 2`     | 37.5% + 37.5% + 25% |
+| One main + two small     | `4 + 2 + 2`     | 50% + 25% + 25%     |
+| Four-column KPI          | `2 + 2 + 2 + 2` | 25% x 4             |
+| Full width               | `8`             | 100%                |
+
+For true equal-width three columns, use `.col-thirds` (see Shared Styles).
+
+### Solo Widget Rule
+
+Non-KPI widget alone on a row must use `col-8`.
+
+### Equal-Height Fill
+
+Same-row widgets with different content heights: add `.fill` to `.widget-body`
+(`flex:1; height:0`). ECharts containers: `height:100%; min-height:180px`.
+
+### Content Reflow
+
+Use `.widget-row` for widget-internal horizontal layouts. Charts and tables
+never wrap — always `width: 100%`.
+
+### Widget Height
+
+| Widget Type    | Default Height        | Overflow Behavior        |
+| -------------- | --------------------- | ------------------------ |
+| Metric Card    | auto (content-driven) | Wrap via flex-wrap       |
+| Chart Card     | 320px                 | Chart scales internally  |
+| Table Card     | auto, capped at 680px | Scroll within table body |
+| Free Text Card | auto (content-driven) | Scroll or truncate       |
+| Feed Card      | auto, capped at 680px | Scroll within feed body  |
+
+Table / Feed: content < 320px → auto; ≥ 320px → 320px body + internal scroll. Do
+not exceed 680px total height. Max for all widgets: **960px**
+(`overflow-y: auto` on widget body, not card).
+
+### Widget Background
+
+No border/outline on widgets (only Tag elements may have borders). Background:
+
+| Widget Type | Background                 |
+| ----------- | -------------------------- |
+| Chart Card  | `.chart-dotted-background` |
+| Table Card  | None (transparent)         |
+| Others      | `var(--grey-g01)`          |
+
+### Divider
+
+Use `.divider-v` / `.divider-h` — both ends align with content padding (not full
+width). Do not use `border-bottom` / `border-right` for widget dividers.
+
+---
+
+## Chart Card
+
+### CSS
+
+```css
+/* Chart cards clip canvas overflow */
+.widget-card:has(.chart-body) {
+  overflow: hidden;
+}
+
 .chart-dotted-background {
   background-image: radial-gradient(
     circle,
@@ -153,306 +332,12 @@
   border-radius: 50%;
 }
 
-/* ── Table Card ── */
-.table-card {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  border-radius: 4px;
-  isolation: isolate;
-  overflow-x: auto;
-}
-
-.table-row {
-  display: flex;
-  width: 100%;
-  gap: 16px; /* column spacing between cells */
-  border-bottom: 1px solid var(--line-l07); /* row divider — on the row, not cells */
-  /* min-width is set by initTableAlignment JS — do NOT use CSS min-width here */
-}
-.table-row:last-child {
-  border-bottom: none;
-}
-
-.table-cell {
-  font-size: 14px;
-  line-height: 22px;
-  letter-spacing: 0.14px;
-  font-weight: 400;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-}
-
-/* ── Free Text Card ── */
-.free-text-body {
-  padding: var(--spacing-l);
-}
-
-/* ── Feed Card ── */
-.feed-body {
-  padding: var(--spacing-xxs) 0;
-}
-
-.feed-item {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-m);
-  position: relative;
-}
-
-.feed-item::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: var(--spacing-m);
-  right: var(--spacing-m);
-  height: 1px;
-  background: var(--line-l05);
-}
-
-.feed-item:last-child::after {
-  display: none;
-}
-
-.feed-item-content {
-  flex: 1;
-  min-width: 0;
-}
-
-.feed-thumb {
-  width: 88px;
-  height: 70px;
-  border-radius: var(--radius-ct-s);
-  flex-shrink: 0;
-  order: 1;
-  object-fit: cover;
-}
-
-/* ── Dividers ── */
-.divider-v {
-  width: 1px;
-  flex-shrink: 0;
-  margin-block: var(--spacing-l);
-  background-color: var(--line-l05);
-}
-
-.divider-h {
-  height: 1px;
-  margin-inline: var(--spacing-l);
-  background-color: var(--line-l05);
-}
-
-/* ── Equal Height Fill ── */
-.widget-card .widget-body.fill {
-  flex: 1;
-  height: 0;
-}
-
 .chart-container {
   width: 100%;
   height: 100%;
   min-height: 180px;
 }
-
-/* ── Widget Grid ── */
-.widget-grid {
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  gap: var(--spacing-xl);
-  align-items: stretch;
-}
-
-.col-2 {
-  grid-column: span 2;
-}
-.col-3 {
-  grid-column: span 3;
-}
-.col-4 {
-  grid-column: span 4;
-}
-.col-5 {
-  grid-column: span 5;
-}
-.col-6 {
-  grid-column: span 6;
-}
-.col-8 {
-  grid-column: span 8;
-}
-
-.col-thirds {
-  grid-column: span 8;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-xl);
-  align-items: stretch;
-}
-
-@media (max-width: 768px) {
-  .widget-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--spacing-l);
-  }
-  .col-2 {
-    grid-column: span 2;
-  }
-  .col-3,
-  .col-4,
-  .col-5,
-  .col-6,
-  .col-8 {
-    grid-column: span 4;
-  }
-  .col-thirds {
-    grid-column: span 4;
-    grid-template-columns: 1fr;
-  }
-}
-
-/* ── Metric Column (for stacking metric cards beside a chart) ── */
-.metric-column {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-s);
-}
-
-.metric-column .metric-card {
-  flex: 1;
-  background: var(--grey-g01);
-  border-radius: var(--radius-ct-m);
-  padding: var(--spacing-m);
-}
-
-/* ── Content Reflow ── */
-.widget-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-xs);
-}
-
-.widget-row > * {
-  flex: 1 1 auto;
-  min-width: 120px;
-}
-
-/* ── Group Title ── */
-.section-title {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.section-title-icon {
-  font-size: 22px;
-  line-height: 1;
-}
-
-.section-title-text {
-  font-size: 22px;
-  font-weight: 400;
-  color: var(--text-n9);
-  letter-spacing: 0.3px;
-}
-
-.section-title-sub {
-  font-size: 12px;
-  color: var(--text-n5);
-  padding-left: 8px;
-  border-left: 1px solid var(--line-l07);
-}
 ```
-
-> **Watermark SVG**: Always use the CDN URL via `<img>` tag. Do not inline SVG.
-
----
-
-## Widget Layout
-
-### Grid System
-
-| Platform | Total Columns | Gap                   |
-| -------- | ------------- | --------------------- |
-| Web      | 8 columns     | 24px (`--spacing-xl`) |
-| Mweb     | 4 columns     | 16px (`--spacing-l`)  |
-
-### Column Spans
-
-| Class    | Web Proportion | Mweb Behavior               | Use Case                   |
-| -------- | -------------- | --------------------------- | -------------------------- |
-| `.col-2` | 25% (2/8)      | Stays 2/4 (half-width)      | Small KPI, up to 4 per row |
-| `.col-3` | 37.5% (3/8)    | Expands to 4/4 (full-width) | Narrow column widget       |
-| `.col-4` | 50% (4/8)      | Expands to 4/4 (full-width) | Equal two-column split     |
-| `.col-5` | 62.5% (5/8)    | Expands to 4/4 (full-width) | Main column (wide)         |
-| `.col-6` | 75% (6/8)      | Expands to 4/4 (full-width) | Large widget               |
-| `.col-8` | 100% (8/8)     | Expands to 4/4 (full-width) | Full width                 |
-
-### Line Break Rules
-
-Each row's col spans must total exactly 8; shortfalls leave empty space.
-
-| Combination              | Col Spans       | Width Ratio         |
-| ------------------------ | --------------- | ------------------- |
-| Equal two-column         | `4 + 4`         | 50% + 50%           |
-| Left narrow, right wide  | `3 + 5`         | 37.5% + 62.5%       |
-| Left wide, right narrow  | `5 + 3`         | 62.5% + 37.5%       |
-| Large + small two-column | `6 + 2`         | 75% + 25%           |
-| Near-equal three-column  | `3 + 3 + 2`     | 37.5% + 37.5% + 25% |
-| One main + two small     | `4 + 2 + 2`     | 50% + 25% + 25%     |
-| Four-column KPI          | `2 + 2 + 2 + 2` | 25% x 4             |
-| Full width               | `8`             | 100%                |
-
-For true equal-width three columns, use `.col-thirds` (see Base CSS).
-
-### Solo Widget Rule
-
-Non-KPI widget alone on a row must use `col-8`.
-
-### Equal-Height Fill
-
-Same-row widgets with different content heights: add `.fill` to `.widget-body`
-(`flex:1; height:0`). ECharts containers: `height:100%; min-height:180px`.
-
-### Content Reflow
-
-Use `.widget-row` for widget-internal horizontal layouts. Charts and tables
-never wrap — always `width: 100%`.
-
-### Widget Height
-
-| Widget Type    | Default Height        | Overflow Behavior        |
-| -------------- | --------------------- | ------------------------ |
-| Metric Card    | auto (content-driven) | Wrap via flex-wrap       |
-| Chart Card     | 320px                 | Chart scales internally  |
-| Table Card     | auto, capped at 560px | Scroll within table body |
-| Free Text Card | auto (content-driven) | Scroll or truncate       |
-| Feed Card      | auto, capped at 560px | Scroll within feed body  |
-
-Table / Feed: content < 320px → auto; ≥ 320px → 320px body + internal scroll. Do
-not exceed 560px total height. Max for all widgets: **960px**
-(`overflow-y: auto` on widget body, not card).
-
-### Widget Background
-
-No border/outline on widgets (only Tag elements may have borders). Background:
-
-| Widget Type | Background                 |
-| ----------- | -------------------------- |
-| Chart Card  | `.chart-dotted-background` |
-| Table Card  | None (transparent)         |
-| Others      | `var(--grey-g01)`          |
-
-### Divider
-
-Use `.divider-v` / `.divider-h` — both ends align with content padding (not full
-width). Do not use `border-bottom` / `border-right` for widget dividers.
-
----
-
-## Chart Card
 
 ### Template
 
@@ -518,7 +403,7 @@ const AX = {
   axisLabel: {
     fontSize: 10,
     color: "rgba(0,0,0,0.7)",  // --text-n7
-    fontFamily: "'Delight', -apple-system, BlinkMacSystemFont, sans-serif",
+    fontFamily: "'Delight', -apple-system, 'OPPO Sans 4.0', BlinkMacSystemFont, sans-serif",
     margin: 8, // 8px gap from label to axis line
   },
   splitLine: { show: false },
@@ -588,7 +473,7 @@ const TT = {
   borderRadius: 6,
   padding: 12,
   textStyle: {
-    fontFamily: "'Delight',-apple-system,BlinkMacSystemFont,sans-serif",
+    fontFamily: "'Delight', -apple-system, 'OPPO Sans 4.0', BlinkMacSystemFont, sans-serif",
     fontSize: 12,
     fontWeight: 400,
     color: TT_COLORS.text,
@@ -659,6 +544,24 @@ No `shadowBlur`, no `focus: 'series'`.
 
 ## Metric Card
 
+### CSS
+
+```css
+/* ── Metric Column (for stacking metric cards beside a chart) ── */
+.metric-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+}
+
+.metric-column .metric-card {
+  flex: 1;
+  background: var(--grey-g01);
+  border-radius: var(--radius-ct-m);
+  padding: var(--spacing-m);
+}
+```
+
 ### Template
 
 ```html
@@ -671,7 +574,7 @@ No `shadowBlur`, no `focus: 'series'`.
     class="widget-body"
     style="background:var(--grey-g01);padding:var(--spacing-l);flex-direction:column;align-items:flex-start;"
   >
-    <!-- Single KPI -->
+    <!-- Single Metric -->
     <div style="font-size:11px;color:var(--text-n7);letter-spacing:0.12px;">
       Label
     </div>
@@ -705,6 +608,39 @@ No `shadowBlur`, no `focus: 'series'`.
 
 ## Table Card
 
+### CSS
+
+```css
+.table-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  isolation: isolate;
+  overflow-x: auto;
+}
+
+.table-row {
+  display: flex;
+  width: 100%;
+  gap: var(--spacing-m); /* column spacing between cells */
+  border-bottom: 1px solid var(--line-l07); /* row divider — on the row, not cells */
+  /* min-width is set by initTableAlignment JS — do NOT use CSS min-width here */
+}
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-cell {
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+  font-weight: 400;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+```
+
 ### Template
 
 ```html
@@ -734,7 +670,7 @@ No `shadowBlur`, no `focus: 'series'`.
 
 - No background. Delight Regular (400) only.
 - Row-first flex layout. **Do NOT use column-first layout.**
-- Column spacing: `gap: 16px` on `.table-row`. **Do NOT use cell padding for
+- Column spacing: `gap: var(--spacing-m)` on `.table-row`. **Do NOT use cell padding for
   inter-column spacing.**
 - Row divider: `border-bottom: 1px solid var(--line-l07)` on `.table-row` (not
   cells). Last row: no border.
@@ -792,7 +728,7 @@ function initTableAlignment(tableEl) {
   // Phase 3: Resolve — proportional fill, min = content width
   var totalContent = 0;
   for (var i = 0; i < colWidths.length; i++) totalContent += colWidths[i];
-  var gapTotal = (colCount - 1) * 16;
+  var gapTotal = (colCount - 1) * 16; // --spacing-m
   var available = tableEl.clientWidth - gapTotal;
 
   var resolved = [];
@@ -833,6 +769,14 @@ exceed container. No hover effects on rows.
 
 ## Free Text Card
 
+### CSS
+
+```css
+.free-text-body {
+  padding: var(--spacing-l);
+}
+```
+
 ### Template
 
 ```html
@@ -864,10 +808,261 @@ for rich text rendering.
 
 ## Feed Card
 
-### Template
+### CSS
+
+```css
+.feed-body {
+  padding: var(--spacing-xxs) 0;
+}
+
+.feed-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-m);
+  padding: var(--spacing-m);
+  position: relative;
+  border-radius: var(--radius-ct-s);
+  transition: background 0.15s;
+}
+
+.feed-item:hover {
+  background: var(--b-r02);
+  cursor: pointer;
+}
+
+.feed-item::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: var(--spacing-m);
+  right: var(--spacing-m);
+  height: 1px;
+  background: var(--line-l05);
+}
+
+.feed-item:last-child::after {
+  display: none;
+}
+
+/* ── Left column: header + indented content ── */
+.feed-item-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+}
+
+/* Header row — avatar + title / user-info */
+.feed-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+/* ── Avatar / Logo ── */
+.feed-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 100px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.feed-avatar.has-badge {
+  overflow: visible;
+}
+
+.feed-avatar.no-radius {
+  border-radius: 0;
+  overflow: visible;
+}
+
+.feed-avatar > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 100px;
+}
+
+.feed-avatar.no-radius > img {
+  border-radius: 0;
+}
+
+.feed-avatar-badge {
+  position: absolute;
+  bottom: -1px;
+  right: -3px;
+  width: 14px;
+  height: 14px;
+  background: var(--b0-container);
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feed-avatar-badge img {
+  width: 12px;
+  height: 12px;
+  border-radius: 100px;
+}
+
+/* ── Header text variants ── */
+
+/* Podcast / Youtube / News: bold single-line title */
+.feed-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+  color: var(--text-n9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* X / Reddit: name + handle + date inline */
+.feed-header-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xxs);
+  white-space: nowrap;
+}
+
+.feed-display-name {
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+  color: var(--text-n9);
+}
+
+.feed-handle,
+.feed-meta-sep,
+.feed-meta-date {
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
+  color: var(--text-n5);
+}
+
+/* ── Indented content below header ── */
+.feed-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+  padding-left: var(--spacing-xxl); /* 28px = 22px avatar + 6px gap */
+  width: 100%;
+}
+
+.feed-post-title {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+  color: var(--text-n9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.feed-text {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+  color: var(--text-n9);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.feed-text:empty {
+  display: none;
+}
+
+.feed-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xxs);
+  height: 20px;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
+  color: var(--text-n5);
+  white-space: nowrap;
+}
+
+/* ── Actions (X / Reddit) ── */
+.feed-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.feed-action {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xxxs);
+  overflow: hidden;
+}
+
+.feed-action-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.feed-action span {
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
+  color: var(--text-n5);
+  white-space: nowrap;
+}
+
+/* ── Thumbnail ── */
+.feed-thumb {
+  width: 88px;
+  height: 70px;
+  border-radius: var(--radius-ct-s);
+  border: 1px solid var(--line-l07);
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.feed-thumb img:not(.feed-thumb-play) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.feed-thumb-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 28px;
+  height: 28px;
+}
+```
+
+### Template — Podcast / Youtube / News
+
+These three types share the same layout. Podcast and Youtube use fixed CDN
+platform logos; News uses the source website's favicon. Only Podcast and
+Youtube thumbnails show a play button.
 
 ```html
-<!-- Feed Card — copy this structure exactly -->
+<!-- Feed Card (Podcast / Youtube / News) — copy this structure exactly -->
 <div class="widget-card">
   <div class="widget-title">
     <span class="widget-title-text">Feed Title</span>
@@ -877,13 +1072,96 @@ for rich text rendering.
     style="background:var(--grey-g01);flex-direction:column;align-items:stretch;"
   >
     <div class="feed-body">
+      <!-- Podcast item (avatar = CDN platform logo) -->
       <div class="feed-item">
-        <div class="feed-item-content">
-          <div><!-- headline --></div>
-          <div><!-- description --></div>
+        <div class="feed-item-main">
+          <div class="feed-header">
+            <div class="feed-avatar">
+              <img
+                src="https://alva-ai-static.b-cdn.net/icons/logo-social-podcast.svg"
+                alt=""
+              />
+            </div>
+            <div class="feed-title">Headline text, single line with ellipsis</div>
+          </div>
+          <div class="feed-content">
+            <div class="feed-text">
+              Body text capped at two lines (44px). Overflow is hidden...
+            </div>
+            <div class="feed-info">
+              <span>Podcast</span>
+              <span>·</span>
+              <span>Jan 21</span>
+              <span>·</span>
+              <span>By Danya</span>
+            </div>
+          </div>
         </div>
-        <img class="feed-thumb" src="thumb.jpg" alt="" />
-        <!-- optional -->
+        <!-- optional thumbnail (Podcast / Youtube get play button) -->
+        <div class="feed-thumb">
+          <img src="thumb.jpg" alt="" />
+          <img
+            class="feed-thumb-play"
+            src="https://alva-ai-static.b-cdn.net/icons/play.svg"
+            alt=""
+          />
+        </div>
+      </div>
+      <!-- Youtube item (avatar = CDN platform logo, no-radius) -->
+      <div class="feed-item">
+        <div class="feed-item-main">
+          <div class="feed-header">
+            <div class="feed-avatar no-radius">
+              <img
+                src="https://alva-ai-static.b-cdn.net/icons/logo-social-youtube.svg"
+                alt=""
+              />
+            </div>
+            <div class="feed-title">Headline text, single line with ellipsis</div>
+          </div>
+          <div class="feed-content">
+            <div class="feed-text">Body text...</div>
+            <div class="feed-info">
+              <span>Youtube</span>
+              <span>·</span>
+              <span>Jan 21</span>
+              <span>·</span>
+              <span>By Danya</span>
+            </div>
+          </div>
+        </div>
+        <div class="feed-thumb">
+          <img src="thumb.jpg" alt="" />
+          <img
+            class="feed-thumb-play"
+            src="https://alva-ai-static.b-cdn.net/icons/play.svg"
+            alt=""
+          />
+        </div>
+      </div>
+      <!-- News item (avatar = website favicon, no play button) -->
+      <div class="feed-item">
+        <div class="feed-item-main">
+          <div class="feed-header">
+            <div class="feed-avatar">
+              <img src="https://website.com/favicon.png" alt="" />
+            </div>
+            <div class="feed-title">Headline text, single line with ellipsis</div>
+          </div>
+          <div class="feed-content">
+            <div class="feed-text">Body text...</div>
+            <div class="feed-info">
+              <span>Reuters</span>
+              <span>·</span>
+              <span>Jan 21</span>
+              <span>·</span>
+              <span>By Danya</span>
+            </div>
+          </div>
+        </div>
+        <div class="feed-thumb">
+          <img src="thumb.jpg" alt="" />
+        </div>
       </div>
       <!-- more feed-items... -->
     </div>
@@ -897,14 +1175,274 @@ for rich text rendering.
 </div>
 ```
 
-> Thumbnail (`.feed-thumb`) is always on the right via `order: 1`. Text fills
-> remaining width via `flex: 1`.
+### Template — X (Twitter)
+
+```html
+<!-- Feed Card (X) — copy this structure exactly -->
+<div class="feed-item">
+  <div class="feed-item-main">
+    <div class="feed-header">
+      <div class="feed-avatar has-badge">
+        <img src="user-avatar.jpg" alt="" />
+        <div class="feed-avatar-badge">
+          <img
+            src="https://alva-ai-static.b-cdn.net/icons/logo-feed-x.svg"
+            alt=""
+          />
+        </div>
+      </div>
+      <div class="feed-header-meta">
+        <span class="feed-display-name">Tesla Owners SV</span>
+        <span class="feed-handle">@teslaownersSV</span>
+        <span class="feed-meta-sep">·</span>
+        <span class="feed-meta-date">Jan 21</span>
+      </div>
+    </div>
+    <div class="feed-content">
+      <div class="feed-text">
+        Elon Musk: "It appears that, when civilizations are under stress..."
+      </div>
+      <div class="feed-actions">
+        <div class="feed-action">
+          <img
+            class="feed-action-icon"
+            src="https://alva-ai-static.b-cdn.net/icons/social-reply-l.svg"
+            alt=""
+          />
+          <span>12</span>
+        </div>
+        <div class="feed-action">
+          <img
+            class="feed-action-icon"
+            src="https://alva-ai-static.b-cdn.net/icons/social-repost-l.svg"
+            alt=""
+          />
+          <span>14</span>
+        </div>
+        <div class="feed-action">
+          <img
+            class="feed-action-icon"
+            src="https://alva-ai-static.b-cdn.net/icons/social-like-l.svg"
+            alt=""
+          />
+          <span>285</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- optional thumbnail (no play button) -->
+  <div class="feed-thumb">
+    <img src="thumb.jpg" alt="" />
+  </div>
+</div>
+```
+
+### Template — Reddit
+
+```html
+<!-- Feed Card (Reddit) — copy this structure exactly -->
+<div class="feed-item">
+  <div class="feed-item-main">
+    <div class="feed-header">
+      <div class="feed-avatar has-badge">
+        <img src="user-avatar.jpg" alt="" />
+        <div class="feed-avatar-badge">
+          <img
+            src="https://alva-ai-static.b-cdn.net/icons/logo-feed-reddit.svg"
+            alt=""
+          />
+        </div>
+      </div>
+      <div class="feed-header-meta">
+        <span class="feed-display-name">r/interesting</span>
+        <span class="feed-meta-sep">·</span>
+        <span class="feed-meta-date">Jan 21</span>
+      </div>
+    </div>
+    <div class="feed-content">
+      <div class="feed-post-title">How to I Invest in Silver or Gold?</div>
+      <div class="feed-text">
+        The ishares physical versions are "paper gold/silver"...
+      </div>
+      <div class="feed-actions">
+        <div class="feed-action">
+          <img
+            class="feed-action-icon"
+            src="https://alva-ai-static.b-cdn.net/icons/social-vote-l.svg"
+            alt=""
+          />
+          <span>14</span>
+        </div>
+        <div class="feed-action">
+          <img
+            class="feed-action-icon"
+            src="https://alva-ai-static.b-cdn.net/icons/social-reply-l.svg"
+            alt=""
+          />
+          <span>12</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- optional thumbnail (no play button) -->
+  <div class="feed-thumb">
+    <img src="thumb.jpg" alt="" />
+  </div>
+</div>
+```
+
+### Feed Card Rules
+
+#### Avatar / Logo by Source Type
+
+| Type    | Avatar (22×22)                                       | Badge (14×14)                 | Thumbnail Play |
+| ------- | ---------------------------------------------------- | ----------------------------- | -------------- |
+| Podcast | CDN fixed: `logo-social-podcast.svg`                 | —                             | Yes            |
+| Youtube | CDN fixed: `logo-social-youtube.svg` (**no-radius**) | —                             | Yes            |
+| News    | Website favicon / logo (round)                       | —                             | No             |
+| X       | User avatar (round)                                  | `logo-feed-x.svg` (CDN)      | No             |
+| Reddit  | User avatar (round)                                  | `logo-feed-reddit.svg` (CDN) | No             |
+
+- `.feed-avatar` is always 22×22 with `border-radius: 100px`.
+- **Youtube** logo is rectangular — add `.no-radius` to `.feed-avatar` to
+  remove the circular clip.
+- **Podcast / Youtube** use platform logos from CDN
+  (`https://alva-ai-static.b-cdn.net/icons/logo-social-podcast.svg`,
+  `https://alva-ai-static.b-cdn.net/icons/logo-social-youtube.svg`).
+- **News** uses the source website's favicon or logo image.
+- For X / Reddit, add `.has-badge` to `.feed-avatar` (disables `overflow:hidden`
+  so the badge can overflow the circle).
+- Badge background uses `--b0-container` to mask the avatar edge; inner icon is
+  12×12 with `border-radius: 100px`.
+- X badge: `https://alva-ai-static.b-cdn.net/icons/logo-feed-x.svg`.
+- Reddit badge: `https://alva-ai-static.b-cdn.net/icons/logo-feed-reddit.svg`.
+
+#### Layout Rules
+
+- **Header row** (`.feed-header`): avatar + title or meta, `gap: 6px`.
+- **Content** (`.feed-content`): indented `padding-left: var(--spacing-xxl)`
+  (28px = 22px avatar + 6px gap) to align with header text.
+- **Body text** (`.feed-text`): auto height, max 2 lines via `-webkit-line-clamp: 2`.
+  Collapses via `:empty` when body is blank.
+- **Post title** (`.feed-post-title`): Reddit only; single line, `font-weight: 500`,
+  placed before `.feed-text`.
+- **Info line** (`.feed-info`): for Podcast / Youtube / News — `Source · Date · By Author`.
+- **Actions** (`.feed-actions`): for X / Reddit — icon 14×14 + count, `gap: var(--spacing-xs)`.
+- **Thumbnail** (`.feed-thumb`): 88×70, right side via flex order,
+  `border: 1px solid var(--line-l07)`. Optional for all types.
+- **Play button**: Podcast and Youtube thumbnails show a centered play icon
+  (`.feed-thumb-play`, 28×28).
+- **Divider** (`.feed-item::after`): 1px line between items, inset by
+  `var(--spacing-m)` on both sides. Hidden on `:last-child`. **`.feed-item`
+  must be a direct child of `.feed-body`** — do NOT wrap it in `<a>` or any
+  other element. Wrapping breaks `:last-child` (every item becomes the only
+  child of its wrapper, so all dividers disappear). Use `data-href` +
+  delegated click instead:
+
+  ```html
+  <div class="feed-item" data-href="https://...">...</div>
+  ```
+
+  ```js
+  document.addEventListener("click", function(e) {
+    var el = e.target.closest(".feed-item[data-href]");
+    if (!el) return;
+    var url = el.getAttribute("data-href");
+    var m = url.match(/youtube\.com\/watch\?v=([\w-]+)/);
+    if (m) {
+      document.getElementById("yt-frame").src =
+        "https://www.youtube.com/embed/" + m[1] + "?autoplay=1";
+      document.getElementById("yt-modal").classList.add("open");
+    } else {
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
+  });
+  ```
+
+- **YouTube links open inline** via `youtube.com/embed/{id}` in a modal
+  overlay. Close on backdrop click or close button; set `iframe.src = ""`
+  on close to stop playback.
+
+  ```css
+  .yt-modal {
+    display: none; position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6); z-index: 9999;
+    align-items: center; justify-content: center;
+  }
+  .yt-modal.open { display: flex; }
+  .yt-modal-inner {
+    position: relative; width: 90%; max-width: 800px;
+    aspect-ratio: 16/9; border-radius: var(--radius-ct-s);
+    overflow: hidden; background: #000;
+  }
+  .yt-modal-inner iframe { width: 100%; height: 100%; border: 0; }
+  .yt-modal-close {
+    position: absolute; top: -32px; right: 0;
+    width: 28px; height: 28px; border: none; background: none;
+    color: #fff; font-size: 20px; cursor: pointer;
+    line-height: 28px; text-align: center;
+  }
+  ```
+
+  ```html
+  <div class="yt-modal" id="yt-modal">
+    <div class="yt-modal-inner">
+      <button class="yt-modal-close" id="yt-close">&times;</button>
+      <iframe id="yt-frame" src="" allow="autoplay; encrypted-media"
+        allowfullscreen></iframe>
+    </div>
+  </div>
+  ```
+
+  ```js
+  document.getElementById("yt-close").addEventListener("click", function() {
+    document.getElementById("yt-modal").classList.remove("open");
+    document.getElementById("yt-frame").src = "";
+  });
+  document.getElementById("yt-modal").addEventListener("click", function(e) {
+    if (e.target === this) {
+      this.classList.remove("open");
+      document.getElementById("yt-frame").src = "";
+    }
+  });
+  ```
 
 ---
 
 ## Group Title
 
 Not a widget-card; a page-level section separator.
+
+### CSS
+
+```css
+.section-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.section-title-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.section-title-text {
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--text-n9);
+  letter-spacing: 0.3px;
+}
+
+.section-title-sub {
+  font-size: 12px;
+  color: var(--text-n5);
+  padding-left: 8px;
+  border-left: 1px solid var(--line-l07);
+}
+```
 
 ### Template
 
