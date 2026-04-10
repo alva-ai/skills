@@ -330,6 +330,17 @@ Benchmark Attribution:  Alpha {computed}%  Beta {computed}
 > amount, and project the result into
 > `overview.equityCurve.series.benchmark.data`. Do not skip the benchmark
 > series.
+>
+> **Benchmark computation**: Fetch the benchmark asset's OHLCV over the same
+> date range as the backtest. Compute the normalized equity as:
+> ```js
+> const benchmarkEquity = prices.map(p =>
+>   initialAmount * (p.close / prices[0].close)
+> );
+> ```
+> This produces an independent buy-and-hold curve. Do NOT copy or derive the
+> benchmark from the strategy equity array — they must be computed from
+> separate data sources (strategy trades vs raw price series).
 
 #### Chart Spec
 
