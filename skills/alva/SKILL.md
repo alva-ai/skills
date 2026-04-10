@@ -132,25 +132,6 @@ Use the loaded memory to tailor your responses to the user's profile,
 preferences, and investment style. See the [Memory](#memory) section below for
 reading and writing rules.
 
-## Browser SDK
-
-The `@alva-ai/toolkit` package also ships a browser bundle for use directly in
-web pages. Load it from a CDN and instantiate the client:
-
-```html
-<script src="https://unpkg.com/@alva-ai/toolkit/dist/browser.global.js"></script>
-<script>
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get('_t');
-
-  const client = new AlvaToolkit.AlvaClient({ apiKey: token });
-
-  client.fs.readdir({ path: '/' }).then((entries) => {
-    console.log(entries);
-  });
-</script>
-```
-
 The API key is passed via the `_t` query parameter in the page URL. Playbook
 pages hosted on Alva receive this automatically.
 
@@ -804,10 +785,12 @@ Every feed follows a 6-step lifecycle including every newly created feed or re-c
 3. **Test** -- `alva run --entry-path ~/feeds/<name>/v1/src/index.js` to verify output.
    For SDK modules you haven't used before in this session, first run a
    shape-check snippet to verify response structure:
+
    ```js
    const r = await mod.someFunction({ symbol: "AAPL" });
    console.log(JSON.stringify(r).slice(0, 500));
    ```
+
    Verify the actual response nesting (e.g. `{success, response: {rates:[]}}`
    vs flat array) matches your feed script's parsing logic before proceeding.
 4. **Grant** -- make feed data publicly readable:
@@ -1070,11 +1053,6 @@ over SDK data (e.g. `getCryptoKline`) to evaluate trading conditions — this
 leads to incorrect timestamps and look-ahead bias. Use Altra even for simple
 strategies; it supports any interval (`"1min"` to `"1w"`) and any combination
 of OHLCV + external data via `registerRawData`.
-
-**Altra is not only for backtesting.** Any feed that outputs `signal/targets`
-or `signal/alerts` — including real-time monitors and alert feeds — must use
-`FeedAltra`. The `registerRawData` + `setStrategy` pattern applies even when
-the "strategy" is a simple threshold check (e.g. funding rate > X → alert).
 
 **After a successful backtest, you should package the results in a form the user
 can use.** That may be a playbook, a dashboard, or a concise analytical summary,
