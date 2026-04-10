@@ -406,6 +406,24 @@ To make a feed push-capable:
 The platform reads `/data/signal/targets/@last/1` after each successful
 execution and pushes the signal content to all eligible followers.
 
+**AlvaAsk + owner notifications:** Feeds can use `@alva/alvaask` to call
+Alva's agent and push the result to the feed owner — useful for scheduled
+reports, heartbeat monitoring, and proactive alerts. Write to
+`notify/message` (see [feed-sdk.md](references/feed-sdk.md) Pattern E):
+
+```javascript
+const result = ask("Brief crypto market update with key levels.");
+await ctx.self.ts("notify", "message").append([{
+  date: Date.now(),
+  title: "Daily Briefing",
+  text: result.text,
+}]);
+```
+
+The platform reads `/data/notify/message/@last/1` and pushes `title` + `text`
+to the owner on all connected channels (Telegram, Discord, Web). No playbook
+or followers required.
+
 See **Step 9** below for the full post-release subscription flow.
 
 ### 6. Build the Playbook Web App
