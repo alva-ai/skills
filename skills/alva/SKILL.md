@@ -132,25 +132,6 @@ Use the loaded memory to tailor your responses to the user's profile,
 preferences, and investment style. See the [Memory](#memory) section below for
 reading and writing rules.
 
-## Browser SDK
-
-The `@alva-ai/toolkit` package also ships a browser bundle for use directly in
-web pages. Load it from a CDN and instantiate the client:
-
-```html
-<script src="https://unpkg.com/@alva-ai/toolkit/dist/browser.global.js"></script>
-<script>
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get('_t');
-
-  const client = new AlvaToolkit.AlvaClient({ apiKey: token });
-
-  client.fs.readdir({ path: '/' }).then((entries) => {
-    console.log(entries);
-  });
-</script>
-```
-
 The API key is passed via the `_t` query parameter in the page URL. Playbook
 pages hosted on Alva receive this automatically.
 
@@ -264,14 +245,29 @@ playbook builds.
 
 ### SDK Coverage Gaps
 
-1. **When an SDK partition lacks the requested data type, report it as a
-   blocker.** For example, if `equity_events_calendar` only has dividends/splits
-   but the user wants FDA events, report this gap. Suggest BYOD alternatives
-   (`require("net/http")` to a live API) if one exists. Do NOT fabricate events.
+1. **When an SDK partition lacks the requested data type**, reduce scope:
+   - **Omit the missing data section** from the playbook and note the gap
+     (e.g. "ECB, BOJ, BOE rates — data source not yet available").
+   - If the user has provided a specific data source URL, use BYOD
+     (`require("net/http")`) to fetch from it.
+   - Do NOT hardcode point-in-time values in HTML — they become stale
+     immediately and violate content legitimacy rules.
+   - Do NOT fabricate events or fill gaps from agent knowledge.
 
 2. **When >20% of requested symbols fail SDK lookup, report a data-quality
    blocker.** Do not silently substitute with estimated or fabricated values
    marked `live: false`.
+
+### Thematic Ticker Curation
+
+When building sector or thematic dashboards with curated ticker lists:
+
+1. Do NOT rely on agent knowledge for ticker-to-sector mapping.
+2. After assembling the list, cross-check each ticker's sector using an SDK
+   call (e.g. `getStockCompanyDetail`) to verify it belongs to the intended
+   segment.
+3. Remove mismatches before building the feed. A single wrong ticker (e.g. a
+   cybersecurity company in a battery segment) can distort the entire analysis.
 
 ### Description and Provenance Accuracy
 
@@ -320,6 +316,17 @@ two-step retrieval flow:
 any feed script. Do not guess function signatures, parameter names, or response
 shapes from memory. The doc lookup ensures you use the correct module, call the
 right function, and handle the actual response format.
+
+**Enforcement**: Before any `require("@arrays/...")` or `alva run` call, you
+MUST have completed a doc lookup for that specific module in this session.
+The required sequence is:
+
+1. `alva sdk partition-summary --partition <name>` → find exact module path
+2. `alva sdk doc --name <module>` → get function names, params, response shape
+3. Write code using ONLY the names and shapes from step 2
+
+If an `alva run` call fails with "module not found" or "not a function",
+do NOT guess a different name. Return to step 1.
 
 #### SDK Partition Index
 
@@ -391,6 +398,10 @@ cross-user operations (e.g. remix with lineage).
 (building target records without Altra) bypasses bar alignment, portfolio
 simulation, and look-ahead bias prevention. Use `FeedAltra` even for simple
 signal logic — it ensures correct timestamps and prevents forward-looking bugs.
+This applies to ALL feed types that produce signal output — including
+monitoring feeds, alert feeds, and notification feeds, not just backtest
+strategies. If the feed pushes signals to Telegram or triggers alerts, it
+MUST use `FeedAltra`.
 
 **Push notifications for followers:** Feeds can produce actionable,
 subscription-worthy signals that get pushed to playbook followers via Telegram.
@@ -753,7 +764,17 @@ Every feed follows a 6-step lifecycle including every newly created feed or re-c
 
 1. **Write** -- define schema + incremental logic with `ctx.kv`
 2. **Upload** -- write script to `~/feeds/<name>/v1/src/index.js`
-3. **Test** -- `alva run --entry-path ~/feeds/<name>/v1/src/index.js` to verify output
+3. **Test** -- `alva run --entry-path ~/feeds/<name>/v1/src/index.js` to verify output.
+   For SDK modules you haven't used before in this session, first run a
+   shape-check snippet to verify response structure:
+
+   ```js
+   const r = await mod.someFunction({ symbol: "AAPL" });
+   console.log(JSON.stringify(r).slice(0, 500));
+   ```
+
+   Verify the actual response nesting (e.g. `{success, response: {rates:[]}}`
+   vs flat array) matches your feed script's parsing logic before proceeding.
 4. **Grant** -- make feed data publicly readable:
 
    ```bash
@@ -766,6 +787,21 @@ Every feed follows a 6-step lifecycle including every newly created feed or re-c
 5. **Deploy** -- `alva deploy create` for scheduled execution
 6. **Release** -- `alva release feed` to register the feed in the
    database (requires the `cronjob_id` from the deploy step)
+
+### Pre-Release Verification
+
+Before calling `alva release feed` or `alva release playbook`,
+verify these prerequisites:
+
+1. **Grant check** — confirm `special:user:*` read permission exists on the
+   feed path. If missing, run the grant step now.
+2. **Data check** — fetch the feed data path without authentication and
+   confirm HTTP 200 (not 403).
+3. **HTML check** (playbook only) — confirm the playbook HTML file exists in
+   ALFS at the expected path.
+
+If the build was interrupted and resumed, re-run this checklist from the top.
+Do not assume prior steps completed successfully.
 
 | Data Type                     | Recommended Schedule     | Rationale                           |
 | ----------------------------- | ------------------------ | ----------------------------------- |
@@ -789,11 +825,19 @@ Do not silently fall back to inferior data sources.
 When an SDK module returns a Pro-only or subscription error:
 
 1. **Inform the user** which module is unavailable and why (subscription tier).
-2. **Explain what capability is lost** (e.g. "senator trading data requires
-   Pro — this playbook won't include congressional trading activity").
-3. If falling back to an alternative source, **clearly state** what the fallback
-   is and its limitations (e.g. "Using web search as fallback — data may be
-   incomplete or unverified").
+2. **Assess scope impact** — determine whether the gated module is the *sole*
+   data source for the playbook, or one of several.
+   - **Partial dependency** (other free-tier modules can still power most of
+     the playbook): proceed with a reduced-scope build. Omit the gated
+     section and note it in the playbook (e.g. "Congressional trading data
+     requires Pro — section omitted"). Deliver what you can.
+   - **Full dependency** (the entire playbook hinges on this module): tell
+     the user specifically: *"This data requires a Pro subscription. You can
+     upgrade, or provide a custom data source URL and I'll wire it up via
+     BYOD."* Do NOT leave an open-ended question; give exactly these two
+     actionable options.
+3. **Never stop with zero output.** If you can build *any* useful subset of
+   the requested playbook with free-tier modules, do so.
 4. Never silently substitute with LLM-fabricated data.
 
 ### Coverage Limitations
