@@ -230,6 +230,63 @@ When this feed runs as a cronjob, the platform reads
 - Altra strategies write to this path automatically. Use this pattern only for
   non-Altra feeds that want to produce push-worthy signals.
 
+### Pattern E: AlvaAsk + Owner Notification (notify/message)
+
+For feeds that use `@alva/alvaask` to call Alva's agent and push the result
+to the feed owner. Common use cases: scheduled market reports, periodic
+research summaries, heartbeat monitoring, and proactive alerts.
+
+Write the agent's response to the **`notify`** group with a **`message`**
+output. When the cronjob completes, the platform reads this path and pushes
+the content to the owner on all connected channels (Telegram, Discord, Web).
+
+```javascript
+const { ask } = require("@alva/alvaask");
+const { Feed, feedPath, makeDoc, str } = require("@alva/feed");
+
+const feed = new Feed({ path: feedPath("daily-briefing") });
+feed.def("notify", {
+  message: makeDoc("Notification", "Agent-generated push content", [
+    str("title"),
+    str("text"),
+  ]),
+});
+
+(async () => {
+  const result = ask("Give a brief crypto market update with key levels.");
+
+  await feed.run(async (ctx) => {
+    await ctx.self.ts("notify", "message").append([
+      {
+        date: Date.now(),
+        title: "Daily Crypto Briefing",
+        text: result.text,
+      },
+    ]);
+  });
+})();
+```
+
+Deploy as a scheduled cronjob with `push_notify: true`:
+
+```bash
+alva deploy create --name daily-briefing \
+  --path ~/feeds/daily-briefing/v1/scripts/main.js \
+  --cron "0 8 * * *" --push-notify
+```
+
+**Key points:**
+
+- The group **must** be named `notify` and the output **must** be named
+  `message` — this is the path the notification system looks for.
+- `title` is optional — if provided, the notification renders as
+  `**title**\n\ncontent`.
+- `text` is the notification body (required for content push).
+- If `notify/message` has no data, the owner receives a generic
+  "Feed completed." notification instead.
+- Does **not** require a playbook or followers — works for any feed.
+- Combine with Pattern D if you want to push to both owner AND followers.
+
 ### Deduplication
 
 `append()` deduplicates by `date` -- re-appending a record with an existing
