@@ -1,13 +1,7 @@
 # Trading Strategy Playbook
 
-> **This is the authoritative spec for all trading strategy playbooks.** When
-> generating or modifying a trading strategy playbook, follow this document
-> strictly — page structure, tab layout, module order, component references, and
-> data schema must all match exactly. Do not invent alternative layouts.
->
-> Use [design-system.md](./design-system.md) as the global design entry point.
-> This document only adds trading-strategy-specific page structure,
-> interactions, and UI data requirements.
+> Follow this spec strictly for all trading strategy playbooks. Do not invent
+> alternative layouts. Global tokens and rules: [design-system.md](./design-system.md).
 
 ---
 
@@ -38,10 +32,8 @@ switches content based on the active tab.
 | Padding  | `0`                                              |
 | Layout   | `display: flex; flex-direction: column; flex: 1` |
 
-`.main-wrapper` has **no padding of its own** — all page-edge spacing comes from
-the parent `.playbook-container` (28px left/right on web, 16px on mobile). The
-**top padding is intentionally 0** because it is owned by `.tab-bar-wrapper`
-(see §1.1), which ensures the 24px top gap scrolls with the sticky tab bar.
+`.main-wrapper` has no padding. Page-edge spacing comes from `.playbook-container`.
+Top padding is 0 — owned by `.tab-bar-wrapper` (see §1.1).
 
 #### Mobile Override (≤ 768px)
 
@@ -89,7 +81,7 @@ first child or extra `margin-bottom`/`padding-bottom` on `.tab-bar-wrapper`.
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Items          | Overview · Analytics · Strategy · Feed                                                                                                                                                                                                                                                 |
 | Style          | [Underline M](./design-components.md#tab) — class `.tab .tab-underline`                                                                                                                                                                                                                |
-| Position       | `.tab-bar-wrapper`: `position: sticky`, `top: 0`, `z-index: 100`, `background: var(--b0-page)`, `padding-top: var(--spacing-xl)` (24px) — the wrapper **owns the top padding** so it travels with the sticky element; when pinned at `top: 0` the 24px gap above the tabs is preserved |
+| Position       | `.tab-bar-wrapper`: `position: sticky`, `top: 0`, `z-index: 100`, `background: var(--b0-page)`, `padding-top: var(--spacing-xl)` (24px) |
 | Bottom Divider | 1px solid var(--line-l07) on `.tab-bar-wrapper`. Active indicator and container border sit on the **same line** — apply `margin-bottom: -1px` to `.tab-item` so the 2px indicator overlaps the 1px border                                                                              |
 | URL Routing    | Each tab has a unique URL hash (`#overview`, `#analytics`, `#strategy`, `#feed`); on load, activate tab matching hash. Use `history.replaceState()` (not `window.location.hash`) to update the hash without triggering a scroll jump                                                   |
 
@@ -421,8 +413,7 @@ All charts follow [Chart Card](./design-widgets.md#chart-card) spec.
 | ≥ 1280px   | 2 cards per row (`grid-template-columns: repeat(2, 1fr)`, gap: 24px) |
 | < 1280px   | 1 card per row (single column stack, gap: 24px)                      |
 
-> Analytics container uses `flex: none` to prevent parent flex stretching. Cards
-> keep intrinsic height (`align-items: start`).
+> Analytics container: `flex: none`. Cards: `align-items: start`.
 
 ### Requirements
 

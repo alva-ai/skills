@@ -1147,11 +1147,8 @@ alva release playbook --name btc-dashboard --version v1.0.0 --feeds '[{"feed_id"
 
 ## Alva Design System
 
-All Alva playbook pages, dashboards, and widgets must follow the Alva Design
-System. **Always read
-[design-system.md](references/design-system.md) first** — it covers visual
-identity, design principles, do/don't guardrails, tokens, typography, and
-page-level layout. Then read only the spec you need:
+**Always read [design-system.md](references/design-system.md) first** — it covers tokens,
+typography, theme, and page-level layout. Then read only the spec you need:
 
 1. **Generating a widget or chart** →
    [design-widgets.md](references/design-widgets.md)
