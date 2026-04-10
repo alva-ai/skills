@@ -946,6 +946,7 @@ market convictions, strategy assumptions, portfolio rules. Add a pointer to
 3. **Create new file** only if no existing file covers the topic
 4. **Update `MEMORY.md`** — add a one-line entry for each new file
 5. Keep `MEMORY.md` as a concise index — one line per file, under 120 characters
+6. **Every write → confirm in chat:** 📌 Memory updated: {one-sentence summary}
 
 ### Reading rules
 
