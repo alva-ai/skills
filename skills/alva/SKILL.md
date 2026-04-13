@@ -132,15 +132,6 @@ Use the loaded memory to tailor your responses to the user's profile,
 preferences, and investment style. See the [Memory](#memory) section below for
 reading and writing rules.
 
-The API key is passed via the `_t` query parameter in the page URL. Playbook
-pages hosted on Alva receive this automatically.
-
-### Browser SDK Resources
-
-`client.user`, `client.fs`, `client.run`, `client.deploy`, `client.release`,
-`client.secrets`, `client.sdk`, `client.comments`, `client.remix`,
-`client.screenshot`
-
 ---
 
 ## Communication
