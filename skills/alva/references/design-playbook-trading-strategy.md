@@ -265,11 +265,11 @@ markPoint: {
 ```html
 <div style="display:flex;flex-direction:column;gap:4px;">
   <div
-    style="font-size:11px;color:var(--text-n7);letter-spacing:0.12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
+    style="font-size:11px;color:var(--text-n7);letter-spacing:0.11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
   >
     Label
   </div>
-  <div style="font-size:18px;letter-spacing:0.2px;color:var(--main-m3);">
+  <div style="font-size:18px;letter-spacing:0.18px;color:var(--main-m3);">
     +18.4%
   </div>
   <div id="sparkline-xxx" style="width:100%;height:52px;"></div>
@@ -278,8 +278,8 @@ markPoint: {
 
 | Element         | Spec                                                                                         |
 | --------------- | -------------------------------------------------------------------------------------------- |
-| Label           | 11px, Regular 400, `--text-n7`, letter-spacing 0.12px, single-line ellipsis                  |
-| Value           | 18px, Regular 400, letter-spacing 0.2px                                                      |
+| Label           | 11px, Regular 400, `--text-n7`, letter-spacing 0.11px, single-line ellipsis                  |
+| Value           | 18px, Regular 400, letter-spacing 0.18px                                                     |
 | Value Color     | Positive `--main-m3`, negative `--main-m4`                                                   |
 | Sparkline       | ECharts mini line chart, height 52px, full-width, no axis/labels/grid/tooltip                |
 | Sparkline Color | Positive `--main-m3`, negative `--main-m4`                                                   |

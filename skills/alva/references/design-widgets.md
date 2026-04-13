@@ -311,6 +311,7 @@ width). Do not use `border-bottom` / `border-right` for widget dividers.
   align-items: center;
   gap: var(--spacing-xxs);
   font-size: 10px;
+  letter-spacing: 0.1px;
   color: var(--text-n5);
 }
 
@@ -575,10 +576,10 @@ No `shadowBlur`, no `focus: 'series'`.
     style="background:var(--grey-g01);padding:var(--spacing-l);flex-direction:column;align-items:flex-start;"
   >
     <!-- Single Metric -->
-    <div style="font-size:11px;color:var(--text-n7);letter-spacing:0.12px;">
+    <div style="font-size:11px;color:var(--text-n7);letter-spacing:0.11px;">
       Label
     </div>
-    <div style="font-size:24px;color:var(--main-m3);">+18.4%</div>
+    <div style="font-size:24px;letter-spacing:0.24px;color:var(--main-m3);">+18.4%</div>
     <!-- Watermark -->
     <div class="alva-watermark">
       <img
@@ -1433,11 +1434,12 @@ Not a widget-card; a page-level section separator.
   font-size: 22px;
   font-weight: 400;
   color: var(--text-n9);
-  letter-spacing: 0.3px;
+  letter-spacing: 0.22px;
 }
 
 .section-title-sub {
   font-size: 12px;
+  letter-spacing: 0.12px;
   color: var(--text-n5);
   padding-left: 8px;
   border-left: 1px solid var(--line-l07);

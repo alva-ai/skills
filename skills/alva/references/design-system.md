@@ -134,6 +134,7 @@ applied as `margin-bottom` on `.playbook-title`. **Do not add any margin to
   line-height: 34px;
   font-weight: 400;
   color: var(--text-n9);
+  letter-spacing: 0.24px;
   margin: 0 0 var(--spacing-xl) 0; /* 24px bottom = gap to .playbook-desc */
 }
 
