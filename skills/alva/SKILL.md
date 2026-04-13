@@ -589,7 +589,7 @@ already configured.
 
 | Document | Contents |
 | --- | --- |
-| `references/api/*.md` | Split REST API reference docs (user info, filesystem, run, deploy, release, SDK, screenshots, and errors) |
+| `references/api/*.md` | Split REST API reference docs (user info, filesystem, run, deploy, release, SDK, screenshots, trading, and errors) |
 | [jagent-runtime.md](references/jagent-runtime.md) | Writing jagent scripts: module system, built-in modules, async model, constraints |
 | [feed-sdk.md](references/feed-sdk.md) | Feed SDK guide: creating data feeds, time series, upstreams, state management |
 | [altra-trading.md](references/altra-trading.md) | Altra backtesting engine: strategies, features, signals, testing, debugging |
@@ -619,6 +619,7 @@ Reference docs:
 - [SDK](references/api/sdk.md) — `alva sdk`
 - [Playbook Comments](references/api/playbook-comment.md) — `alva comments`
 - [Screenshot](references/api/screenshot.md) — `alva screenshot`
+- [Trading](references/api/trading.md) — `alva trading`
 - [Error Responses](references/api/error-responses.md)
 
 ---
