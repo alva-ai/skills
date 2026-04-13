@@ -540,8 +540,8 @@ e.ohlcv("BINANCE_SPOT_BTC_USDT", "1d"); // Daily bar close
 e.raw("sentiment_score"); // Raw data update
 e.feature("rsi"); // Feature computed
 
-e.all(e.ohlcv("AAPL", "1d"), e.ohlcv("BTCUSDT", "1d")); // AND
-e.any(e.ohlcv("BTCUSDT", "1h"), e.raw("funding")); // OR
+e.all(e.ohlcv("XNAS_SPOT_AAPL_USD", "1d"), e.ohlcv("BINANCE_SPOT_BTC_USDT", "1d")); // AND
+e.any(e.ohlcv("BINANCE_SPOT_BTC_USDT", "1h"), e.raw("funding")); // OR
 ```
 
 ### Strategy Config
