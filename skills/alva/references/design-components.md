@@ -9,6 +9,7 @@
 - [Switch](#switch)
 - [Modal](#modal)
 - [Select](#select)
+- [Input](#input)
 - [Tab](#tab)
 - [Tooltip](#tooltip)
 
@@ -29,7 +30,7 @@
   flex-direction: column;
   padding: var(--spacing-xs) 0;
   position: relative;
-  border-radius: var(--radius-pop-dropdown); /* 8px */
+  border-radius: var(--radius-pop-dropdown);
   width: 100%;
   box-shadow: var(--shadow-s);
 }
@@ -37,7 +38,7 @@
 .dropdown-border {
   position: absolute;
   border: 0.5px solid var(--line-l2);
-  border-radius: var(--radius-pop-dropdown); /* 8px */
+  border-radius: var(--radius-pop-dropdown);
   inset: 0;
   pointer-events: none;
 }
@@ -323,7 +324,7 @@ tags, and scoped CSS maps them to the Alva design spec.
 .markdown-container code,
 .markdown-container pre {
   background: var(--b-r02);
-  border-radius: var(--radius-ct-xs); /* 2px */
+  border-radius: var(--radius-ct-xs);
   font-family: "JetBrains Mono", monospace;
   color: var(--text-n7);
 }
@@ -683,7 +684,7 @@ The button component system contains **2 types** x **4 sizes** x **4 states** =
 }
 
 .btn-secondary:hover:not(.btn-disabled) {
-  border-color: var(--text-n9);
+  border-color: var(--line-l9);
 }
 
 .btn-secondary:active:not(.btn-disabled) {
@@ -702,7 +703,7 @@ The button component system contains **2 types** x **4 sizes** x **4 states** =
   height: 48px;
   padding: 11px var(--spacing-l);
   gap: var(--spacing-xs);
-  border-radius: var(--radius-btn-m); /* 8px */
+  border-radius: var(--radius-btn-m);
   font-size: 16px;
   line-height: 26px;
   letter-spacing: 0.16px;
@@ -713,7 +714,7 @@ The button component system contains **2 types** x **4 sizes** x **4 states** =
   height: 40px;
   padding: 9px var(--spacing-l);
   gap: var(--spacing-xs);
-  border-radius: var(--radius-btn-m); /* 8px */
+  border-radius: var(--radius-btn-m);
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
@@ -724,7 +725,7 @@ The button component system contains **2 types** x **4 sizes** x **4 states** =
   height: 32px;
   padding: 6px var(--spacing-m);
   gap: 6px;
-  border-radius: var(--radius-btn-s); /* 6px */
+  border-radius: var(--radius-btn-s);
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.12px;
@@ -735,7 +736,7 @@ The button component system contains **2 types** x **4 sizes** x **4 states** =
   height: 28px;
   padding: var(--spacing-xxs) var(--spacing-s);
   gap: var(--spacing-xxs);
-  border-radius: var(--radius-btn-s); /* 6px */
+  border-radius: var(--radius-btn-s);
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.12px;
@@ -770,7 +771,7 @@ The button component system contains **2 types** x **4 sizes** x **4 states** =
 }
 
 .btn-secondary.btn-loading::after {
-  border-color: var(--text-n9);
+  border-color: var(--line-l9);
   border-top-color: transparent;
 }
 
@@ -1168,7 +1169,7 @@ Dropdown. Arrow icon always points down and does not rotate.
 }
 
 .select:hover .select-border {
-  border-color: var(--text-n9);
+  border-color: var(--line-l9);
 }
 
 .select-text {
@@ -1197,7 +1198,7 @@ Dropdown. Arrow icon always points down and does not rotate.
   height: 48px;
   padding: 11px var(--spacing-m);
   gap: var(--spacing-xs);
-  border-radius: var(--radius-btn-m); /* 8px */
+  border-radius: var(--radius-btn-m);
   font-size: 16px;
   line-height: 26px;
   letter-spacing: 0.16px;
@@ -1208,7 +1209,7 @@ Dropdown. Arrow icon always points down and does not rotate.
   height: 40px;
   padding: var(--spacing-xs) var(--spacing-s);
   gap: var(--spacing-xs);
-  border-radius: var(--radius-btn-m); /* 8px */
+  border-radius: var(--radius-btn-m);
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
@@ -1219,7 +1220,7 @@ Dropdown. Arrow icon always points down and does not rotate.
   height: 28px;
   padding: var(--spacing-xxs) var(--spacing-xs);
   gap: var(--spacing-xxs);
-  border-radius: var(--radius-btn-s); /* 6px */
+  border-radius: var(--radius-btn-s);
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.12px;
@@ -1340,6 +1341,113 @@ document.addEventListener("click", function () {
 
 ---
 
+## Input
+
+Same container style and sizes as [Select](#select), without the arrow icon.
+Uses a native `<input>` element. Placeholder color matches Select's placeholder
+state; typed text matches the filled state.
+
+### CSS
+
+```css
+.input {
+  display: flex;
+  align-items: center;
+  background-color: var(--b0-container);
+  position: relative;
+  font-family:
+    "Delight",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  font-weight: 400;
+  transition: border-color 0.12s ease;
+}
+
+.input-border {
+  position: absolute;
+  inset: 0;
+  border: 0.5px solid var(--line-l3);
+  border-radius: inherit;
+  pointer-events: none;
+  transition: border-color 0.12s ease;
+}
+
+.input:hover .input-border,
+.input:focus-within .input-border {
+  border-color: var(--line-l9);
+}
+
+.input-field {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
+  font: inherit;
+  color: var(--text-n9);
+}
+
+.input-field::placeholder {
+  color: var(--text-n3);
+}
+
+/* Size — Large */
+.input-lg {
+  height: 48px;
+  padding: 11px var(--spacing-m);
+  border-radius: var(--radius-btn-m);
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: 0.16px;
+}
+
+/* Size — Medium (default) */
+.input {
+  height: 40px;
+  padding: var(--spacing-xs) var(--spacing-s);
+  border-radius: var(--radius-btn-m);
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+}
+
+/* Size — Small */
+.input-sm {
+  height: 28px;
+  padding: var(--spacing-xxs) var(--spacing-xs);
+  border-radius: var(--radius-btn-s);
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
+}
+```
+
+### HTML Template
+
+```html
+<!-- Medium Input (default) -->
+<div class="input">
+  <div class="input-border"></div>
+  <input type="text" class="input-field" placeholder="Enter value" />
+</div>
+
+<!-- Large Input -->
+<div class="input input-lg">
+  <div class="input-border"></div>
+  <input type="text" class="input-field" placeholder="Enter value" />
+</div>
+
+<!-- Small Input -->
+<div class="input input-sm">
+  <div class="input-border"></div>
+  <input type="text" class="input-field" placeholder="Enter value" />
+</div>
+```
+
+---
+
 ## Tab
 
 2 styles (Pill, Underline) × 2 sizes (M, S) = 4 variants.
@@ -1388,7 +1496,7 @@ border through their transparent border.
 }
 .tab-pill .tab-item {
   padding: 6px var(--spacing-m);
-  border-radius: var(--radius-btn-s); /* 6px */
+  border-radius: var(--radius-btn-s);
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;

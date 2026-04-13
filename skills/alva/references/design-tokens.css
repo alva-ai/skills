@@ -125,6 +125,7 @@
     --line-l12: rgba(0, 0, 0, 0.12); /* Card Border */
     --line-l2: rgba(0, 0, 0, 0.2); /* Popup/Dropdown Border */
     --line-l3: rgba(0, 0, 0, 0.3); /* Button/Input/Select Border */
+    --line-l9: rgba(0, 0, 0, 0.9); 
 
     /* Shadow */
     --shadow-xs: 0 4px 15px 0 rgba(0, 0, 0, 0.05);
@@ -158,11 +159,12 @@
     --b-r1: rgba(255, 255, 255, 0.1);
 
     /* Line & Border */
-    --line-l07: rgba(255, 255, 255, 0.08);
+    --line-l07: rgba(255, 255, 255, 0.07);
     --line-l05: rgba(255, 255, 255, 0.05);
-    --line-l12: rgba(255, 255, 255, 0.1);
-    --line-l2: rgba(255, 255, 255, 0.15);
-    --line-l3: rgba(255, 255, 255, 0.25);
+    --line-l12: rgba(255, 255, 255, 0.12);
+    --line-l2: rgba(255, 255, 255, 0.2);
+    --line-l3: rgba(255, 255, 255, 0.3);
+    --line-l9: rgba(255, 255, 255, 0.9);
 
     /* Shadow */
     --shadow-xs: 0 4px 15px 0 rgba(0, 0, 0, 0.25);
