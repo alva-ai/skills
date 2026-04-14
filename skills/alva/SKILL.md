@@ -202,13 +202,14 @@ session ends with a released playbook.
 
 **Core principle**: the agent's role is to **build the pipeline**, not to **be
 the data source**. Any quantitative value the user sees must trace back to an
-Alva SDK module, a published Alva feed, or a BYOD HTTP source the user
-explicitly provided. Agent knowledge, LLM output, WebSearch snippets,
-random/synthetic generators, and user-pasted snapshots are **not** legitimate
-data sources — regardless of whether they appear as HTML literals, feed-script
-literals, backfilled history, or agent-authored opinion columns. When the SDK
-has no coverage for the requested domain, report the gap and stop; do not
-manufacture plausible-looking data.
+Alva SDK module, a published Alva feed, or a BYOD HTTP source that is either
+user-provided or explicitly validated and wired into the feed pipeline. Agent
+knowledge, LLM output, WebSearch snippets, random/synthetic generators, and
+user-pasted snapshots are **not** legitimate data sources — regardless of
+whether they appear as HTML literals, feed-script literals, backfilled
+history, or agent-authored opinion columns. When the SDK has no coverage for
+the requested domain, report the gap and stop; do not manufacture
+plausible-looking data.
 
 ### Data Sourcing
 
@@ -233,11 +234,11 @@ manufacture plausible-looking data.
 
 1. **WebSearch / WebFetch results must NOT be embedded as data.** Web search is
    only legitimate for: reading documentation, finding API endpoints for BYOD,
-   understanding user requirements. Never inject web search results as static
-   data literals in feed scripts or playbook HTML, and never quote them as the
-   answer to a data query. This rule applies even when Alva API auth fails —
-   in that case, report the failure and stop; do NOT substitute a web-sourced
-   value.
+   understanding user requirements. It may help you discover a legitimate BYOD
+   source, but discovered values themselves must never be quoted as the answer
+   or injected as static data literals in feed scripts or playbook HTML. This
+   rule applies even when Alva API auth fails — in that case, report the
+   failure and stop; do NOT substitute a web-sourced value.
 
 2. **LLM / ADK output must NOT be presented as factual sourced data.** ADK is
    for reasoning, classification, summarization, and synthesis of real data — not
