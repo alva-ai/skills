@@ -230,6 +230,16 @@ plausible-looking data.
    Static content (labels, colors, layout config) is fine. Quantitative data is
    not — it must flow through the feed pipeline.
 
+3. **Verification claims and quoted tool outputs must reflect actual tool
+   calls.** Do not describe a screenshot you did not take ("the dashboard
+   looks good"). When citing a tool-returned value such as `published_url`,
+   `feed_id`, or an ALFS path, copy it verbatim from the response. The
+   user-facing share link is the canonical
+   `https://alva.ai/u/<username>/playbooks/<playbook_name>` URL; `published_url`
+   is the deployed HTML URL used for verification steps such as screenshots.
+   Do not present one as if it were the other. If you need a value, re-read
+   the tool response first.
+
 ### Prohibited Data Sources for Charts, Tables, and Query Answers
 
 1. **WebSearch / WebFetch results must NOT be embedded as data.** Web search is
@@ -526,7 +536,9 @@ outputs read at runtime (no inline literals for data).
    <https://alva.ai/pricing> to [specific benefit, e.g. keep playbooks
    private / deploy more cronjobs / ...]."
 
-Use the playbook `name` and the username from `alva whoami` to construct URLs.
+Use the playbook `name` and the username from `alva whoami` to construct the
+canonical share URL. Use `published_url` from the release response for
+verification steps such as screenshots; do not present it as the share link.
 
 #### Pre-Release Validation
 
@@ -1214,7 +1226,7 @@ alva release playbook-draft --name btc-dashboard --display-name "BTC Trend Dashb
 alva release playbook --name btc-dashboard --version v1.0.0 --feeds '[{"feed_id":100}]' --changelog "Initial release"
 # → {"playbook_id":99,"version":"v1.0.0","published_url":"https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html"}
 
-# After release, output the alva.ai playbook link to the user:
+# After release, output the canonical share link to the user:
 # https://alva.ai/u/<username>/playbooks/<playbook_name>
 # e.g. https://alva.ai/u/alice/playbooks/btc-dashboard
 ```
