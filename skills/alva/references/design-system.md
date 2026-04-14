@@ -26,8 +26,18 @@ on collaborative investing strategies powered by AI agents.
 ## Design Tokens
 
 Full token definitions (colors, spacing, radius, theme) are in
-[design-tokens.css](./design-tokens.css). Always reference tokens — never
-hardcode hex or rgba values. Below is a quick reference:
+[design-tokens.css](./design-tokens.css). Always read that file for exact
+token values.
+
+In generated HTML, import tokens from the CDN — do not copy token values
+inline:
+
+```html
+<link rel="stylesheet" href="https://alva-ai-static.b-cdn.net/design-system/design-tokens.css" />
+```
+
+Always reference tokens via `var(--token-name)` — never hardcode hex or rgba
+values. Below is a quick reference:
 
 | Category     | Tokens                                         | Notes                                   |
 | ------------ | ---------------------------------------------- | --------------------------------------- |
