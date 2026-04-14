@@ -40,7 +40,8 @@ you can:
 - **Deploy trading strategies** -- backtest with the Altra trading engine and
   run continuous live paper trading.
 - **Release and share** -- turn your work into a hosted playbook web app at
-  `$ALVA_ENDPOINT/u/<username>/<playbook_name>`, and share it with the world.
+  `https://alva.ai/u/<username>/playbooks/<playbook_name>`, and share it with
+  the world.
 - **Remix existing playbooks** -- take any published playbook as a template,
   read its feed scripts and HTML source, customize parameters/logic/UI, and
   deploy as your own new playbook.
@@ -513,7 +514,7 @@ outputs read at runtime (no inline literals for data).
 #### Pro users (`subscription_tier = "pro"`)
 
 1. **Show draft link**: Output the playbook URL —
-   `$ALVA_ENDPOINT/u/<username>/<playbook_name>`. The draft is
+   `https://alva.ai/u/<username>/playbooks/<playbook_name>`. The draft is
    accessible only to the creator.
 2. **Ask**: "Your playbook is ready. Would you like to publish it publicly, or
    keep it private for now?"
@@ -525,7 +526,7 @@ outputs read at runtime (no inline literals for data).
 
 1. **Publish directly**: Call `alva release playbook` — free playbooks
    are always public. Output the public URL:
-   `$ALVA_ENDPOINT/u/<username>/<playbook_name>`
+   `https://alva.ai/u/<username>/playbooks/<playbook_name>`
 2. **Upsell only on friction**: Do **not** proactively suggest upgrading.
    But when the user's experience is degraded because of free-tier
    limitations — wanting private playbooks, hitting the cronjob cap,
@@ -1226,8 +1227,8 @@ alva release playbook --name btc-dashboard --version v1.0.0 --feeds '[{"feed_id"
 # → {"playbook_id":99,"version":"v1.0.0","published_url":"https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html"}
 
 # After release, output the canonical share link to the user:
-# $ALVA_ENDPOINT/u/<username>/<playbook_name>
-# e.g. $ALVA_ENDPOINT/u/alice/btc-dashboard
+# https://alva.ai/u/<username>/playbooks/<playbook_name>
+# e.g. https://alva.ai/u/alice/playbooks/btc-dashboard
 ```
 
 ---
