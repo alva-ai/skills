@@ -40,8 +40,7 @@ you can:
 - **Deploy trading strategies** -- backtest with the Altra trading engine and
   run continuous live paper trading.
 - **Release and share** -- turn your work into a hosted playbook web app at
-  `https://alva.ai/u/<username>/playbooks/<playbook_name>`, and share it with
-  the world.
+  `$ALVA_ENDPOINT/u/<username>/<playbook_name>`, and share it with the world.
 - **Remix existing playbooks** -- take any published playbook as a template,
   read its feed scripts and HTML source, customize parameters/logic/UI, and
   deploy as your own new playbook.
@@ -514,7 +513,7 @@ outputs read at runtime (no inline literals for data).
 #### Pro users (`subscription_tier = "pro"`)
 
 1. **Show draft link**: Output the playbook URL —
-   `https://alva.ai/u/<username>/playbooks/<playbook_name>`. The draft is
+   `$ALVA_ENDPOINT/u/<username>/<playbook_name>`. The draft is
    accessible only to the creator.
 2. **Ask**: "Your playbook is ready. Would you like to publish it publicly, or
    keep it private for now?"
@@ -526,7 +525,7 @@ outputs read at runtime (no inline literals for data).
 
 1. **Publish directly**: Call `alva release playbook` — free playbooks
    are always public. Output the public URL:
-   `https://alva.ai/u/<username>/playbooks/<playbook_name>`
+   `$ALVA_ENDPOINT/u/<username>/<playbook_name>`
 2. **Upsell only on friction**: Do **not** proactively suggest upgrading.
    But when the user's experience is degraded because of free-tier
    limitations — wanting private playbooks, hitting the cronjob cap,
@@ -536,7 +535,9 @@ outputs read at runtime (no inline literals for data).
    <https://alva.ai/pricing> to [specific benefit, e.g. keep playbooks
    private / deploy more cronjobs / ...]."
 
-Use the playbook `name` and the username from `alva whoami` to construct URLs.
+Use the playbook `name` and the username from `alva whoami` to construct the
+canonical share URL. Use `published_url` from the release response for
+verification steps such as screenshots; do not present it as the share link.
 
 #### Pre-Release Validation
 
@@ -1224,9 +1225,9 @@ alva release playbook-draft --name btc-dashboard --display-name "BTC Trend Dashb
 alva release playbook --name btc-dashboard --version v1.0.0 --feeds '[{"feed_id":100}]' --changelog "Initial release"
 # → {"playbook_id":99,"version":"v1.0.0","published_url":"https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html"}
 
-# After release, output the alva.ai playbook link to the user:
-# https://alva.ai/u/<username>/playbooks/<playbook_name>
-# e.g. https://alva.ai/u/alice/playbooks/btc-dashboard
+# After release, output the canonical share link to the user:
+# $ALVA_ENDPOINT/u/<username>/<playbook_name>
+# e.g. $ALVA_ENDPOINT/u/alice/btc-dashboard
 ```
 
 ---
