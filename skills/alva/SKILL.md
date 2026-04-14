@@ -173,6 +173,13 @@ upfront than to rebuild.
 If the user says "just do it" at any point, skip planning for the rest of the
 session.
 
+### Preserve User Literals
+
+When the user specifies a literal — metric, symbol, parameter, display name —
+treat it as fixed. If it's unavailable, ambiguous, or in conflict with another
+constraint, ask one short clarifying question before deviating. Never silently
+substitute, rename, reinterpret, or overwrite. The user notices.
+
 ### Completion Gate
 
 For **Dashboard/Playbook** and **Backtest/Strategy** requests, the default goal
