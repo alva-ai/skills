@@ -500,11 +500,11 @@ Use the playbook `name` and the username from `alva whoami` to construct URLs.
 
 Before calling `alva release playbook`, verify all of the following:
 
-1. **Deployment coverage**: Every feed you wrote to in this session must
-   have had a successful `alva deploy create` AND its `feed_id` must appear
-   in `--feeds`. `alva run` is a test step, not a deployment — a run-tested
-   but undeployed feed has no data at its public `@last` path and the HTML
-   will fail to read it.
+1. **Deployment coverage**: Every feed the released playbook reads at runtime
+   must have had a successful `alva deploy create` AND its `feed_id` must
+   appear in `--feeds`. `alva run` is a test step, not a deployment — a
+   run-tested but undeployed feed has no data at its public `@last` path and
+   the HTML will fail to read it.
 2. **Cronjobs are active**: All feeds referenced by the playbook have
    successfully deployed cronjobs. If `deploy/cronjob` returned `RATE_LIMITED`,
    see [Cronjob Rate Limit Recovery](#cronjob-rate-limit-recovery) below.
