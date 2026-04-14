@@ -500,19 +500,24 @@ Use the playbook `name` and the username from `alva whoami` to construct URLs.
 
 Before calling `alva release playbook`, verify all of the following:
 
-1. **Cronjobs are active**: All feeds referenced by the playbook have
+1. **Deployment coverage**: Every feed you wrote to in this session must
+   have had a successful `alva deploy create` AND its `feed_id` must appear
+   in `--feeds`. `alva run` is a test step, not a deployment — a run-tested
+   but undeployed feed has no data at its public `@last` path and the HTML
+   will fail to read it.
+2. **Cronjobs are active**: All feeds referenced by the playbook have
    successfully deployed cronjobs. If `deploy/cronjob` returned `RATE_LIMITED`,
    see [Cronjob Rate Limit Recovery](#cronjob-rate-limit-recovery) below.
-2. **HTML fetches from feeds**: The playbook HTML reads quantitative data from
+3. **HTML fetches from feeds**: The playbook HTML reads quantitative data from
   feed output paths at runtime (not from inline literals), consistent with the
   [Content Legitimacy Rules](#content-legitimacy-rules).
-3. **Data is fresh**: Read the latest data point from each referenced feed
+4. **Data is fresh**: Read the latest data point from each referenced feed
    (via `@last/1`) and check its timestamp. If the latest timestamp is older
    than 2x the cron interval, warn the user that the playbook will display
    stale data.
-4. **Description is accurate**: Update frequency claims match actual cronjob
+5. **Description is accurate**: Update frequency claims match actual cronjob
    status. Data source claims match actual SDK/BYOD calls in the feed script.
-5. **Target user is correct**: The playbook is being released under the
+6. **Target user is correct**: The playbook is being released under the
    requesting user's namespace (see user scope enforcement above).
 
 ### 8. Remix (Create from Existing Playbook)
@@ -785,6 +790,9 @@ Every feed follows a 6-step lifecycle including every newly created feed or re-c
 
    Verify the actual response nesting (e.g. `{success, response: {rates:[]}}`
    vs flat array) matches your feed script's parsing logic before proceeding.
+   `alva run` is a test step — it does NOT write to the production `@last`
+   path. Never skip `alva deploy` below on the assumption that the run
+   "already produced the data".
 4. **Grant** -- make feed data publicly readable:
 
    ```bash
