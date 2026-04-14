@@ -104,7 +104,20 @@ alva fs read --path /alva/home/{owner}/feeds/{feed_name}/v1/data/{group}/{output
 
 ---
 
-## Step 4 — Deploy as New Playbook
+## Step 4 — Content Legitimacy Audit
+
+Remix inherits the source's provenance — don't propagate fabricated content
+into a new namespace. Apply the [Content Legitimacy Rules](../SKILL.md#content-legitimacy-rules)
+to both the source HTML and feed scripts: any value the user will see must
+fetch from a feed at runtime. If the source has hardcoded arrays, inline
+analyst ratings, procedural/RNG output, or pasted-in literals, either
+refactor them into your own feed, strip the offending sections, or refuse
+the remix and tell the user why. Do not `sed`-replace the username and
+re-release a source whose data layer was never legitimate.
+
+---
+
+## Step 5 — Deploy as New Playbook
 
 Follow the standard playbook creation flow (see SKILL.md):
 
@@ -124,7 +137,7 @@ data storage — copy the logic, not the paths.
 
 ---
 
-## Step 5 — Save Remix Lineage
+## Step 6 — Save Remix Lineage
 
 After the new playbook is created, record the parent-child relationship:
 
@@ -169,8 +182,10 @@ alva fs read --path /alva/home/alice/feeds/btc-momentum/v1/src/index.js
 alva fs read --path /alva/home/alice/feeds/btc-momentum/v1/data/market/ohlcv/@last/3
 ```
 
-Agent then modifies the feed script and HTML, deploys under the user's own
-namespace with a new name (e.g. `my-btc-strategy`), and releases.
+Agent then runs the content-legitimacy audit on the source HTML and feed
+scripts (Step 4), modifies the feed script and HTML, deploys under the
+user's own namespace with a new name (e.g. `my-btc-strategy`), and
+releases.
 
 Save lineage (assuming current user is `bob`, new playbook name is `my-btc-strategy`):
 

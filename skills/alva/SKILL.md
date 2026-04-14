@@ -194,9 +194,21 @@ Must Do After Completion Gate:
 
 ## Content Legitimacy Rules
 
-These rules are **non-negotiable**. Violations produce misleading playbooks that
-display fabricated data as if it were real. Every rule below applies to all
-playbook builds.
+These rules are **non-negotiable**. Violations produce misleading content that
+displays fabricated data as if it were real. They apply to **every response
+that surfaces financial values to the user** — playbook builds, dashboards,
+query-mode answers, remixes, edits, and follow-ups — regardless of whether the
+session ends with a released playbook.
+
+**Core principle**: the agent's role is to **build the pipeline**, not to **be
+the data source**. Any quantitative value the user sees must trace back to an
+Alva SDK module, a published Alva feed, or a BYOD HTTP source the user
+explicitly provided. Agent knowledge, LLM output, WebSearch snippets,
+random/synthetic generators, and user-pasted snapshots are **not** legitimate
+data sources — regardless of whether they appear as HTML literals, feed-script
+literals, backfilled history, or agent-authored opinion columns. When the SDK
+has no coverage for the requested domain, report the gap and stop; do not
+manufacture plausible-looking data.
 
 ### Data Sourcing
 
@@ -217,12 +229,15 @@ playbook builds.
    Static content (labels, colors, layout config) is fine. Quantitative data is
    not — it must flow through the feed pipeline.
 
-### Prohibited Data Sources for Charts and Tables
+### Prohibited Data Sources for Charts, Tables, and Query Answers
 
 1. **WebSearch / WebFetch results must NOT be embedded as data.** Web search is
    only legitimate for: reading documentation, finding API endpoints for BYOD,
    understanding user requirements. Never inject web search results as static
-   data literals in feed scripts or playbook HTML.
+   data literals in feed scripts or playbook HTML, and never quote them as the
+   answer to a data query. This rule applies even when Alva API auth fails —
+   in that case, report the failure and stop; do NOT substitute a web-sourced
+   value.
 
 2. **LLM / ADK output must NOT be presented as factual sourced data.** ADK is
    for reasoning, classification, summarization, and synthesis of real data — not
@@ -233,6 +248,12 @@ playbook builds.
 3. **Agent training knowledge must NOT fill data gaps.** If an SDK does not have
    the requested data type, report the gap as a blocker. Do not invent data from
    your own knowledge to fill the hole.
+
+Qualitative analysis (ratings, theses, outlook text) is not data and must not
+appear as feed output columns or "data" fields in HTML tables. If the user
+asks for a rating, either compute it from SDK fundamentals with the formula
+shown, or place it in a clearly labelled "AI analysis" section separated from
+data-driven metrics.
 
 ### SDK Coverage Gaps
 
@@ -248,6 +269,16 @@ playbook builds.
 2. **When >20% of requested symbols fail SDK lookup, report a data-quality
    blocker.** Do not silently substitute with estimated or fabricated values
    marked `live: false`.
+
+### Release Gate: `--feeds` Is a Declaration, Not a Shortcut
+
+`alva release playbook --feeds '[]'` is **only** valid when the released HTML
+renders zero quantitative values at runtime (landing pages, UI-only demos).
+If the HTML shows any numbers, charts, tables, or metric cards, the release
+MUST reference deployed feeds in `--feeds` and the HTML MUST `fetch()` them
+at runtime. `alva run` is a test run of a feed, not a substitute for
+deploying one — if you used `alva run` to source data, deploy that same
+logic as a feed and reference it.
 
 ### Thematic Ticker Curation
 
