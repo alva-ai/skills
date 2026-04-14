@@ -514,6 +514,10 @@ Before calling `alva release playbook`, verify all of the following:
    status. Data source claims match actual SDK/BYOD calls in the feed script.
 5. **Target user is correct**: The playbook is being released under the
    requesting user's namespace (see user scope enforcement above).
+6. **Values are sane**: Spot-check the actual numbers each chart, KPI card,
+   and table will display. If anything is obviously broken, fix the upstream
+   feed (or remove the chart) before releasing — do not ship known-broken
+   visuals.
 
 ### 8. Remix (Create from Existing Playbook)
 
