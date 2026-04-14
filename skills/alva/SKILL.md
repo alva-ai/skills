@@ -230,6 +230,16 @@ plausible-looking data.
    Static content (labels, colors, layout config) is fine. Quantitative data is
    not — it must flow through the feed pipeline.
 
+3. **Verification claims and quoted tool outputs must reflect actual tool
+   calls.** Do not describe a screenshot you did not take ("the dashboard
+   looks good"). When citing a tool-returned value such as `published_url`,
+   `feed_id`, or an ALFS path, copy it verbatim from the response. The
+   user-facing share link is the canonical
+   `https://alva.ai/u/<username>/playbooks/<playbook_name>` URL; `published_url`
+   is the deployed HTML URL used for verification steps such as screenshots.
+   Do not present one as if it were the other. If you need a value, re-read
+   the tool response first.
+
 ### Prohibited Data Sources for Charts, Tables, and Query Answers
 
 1. **WebSearch / WebFetch results must NOT be embedded as data.** Web search is
