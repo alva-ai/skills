@@ -14,6 +14,7 @@ The deployment workflow:
 2. **Test** it manually via `alva run`
 3. **Deploy** it as a cronjob via `alva deploy create`
 4. **Monitor** the cronjob status via `alva deploy list` / `alva deploy get`
+5. **Debug** execution history via `alva deploy runs` / `alva deploy run-logs`
 
 Cronjobs execute the script through the same jagent runtime as `alva run`.
 The script receives the same environment (`require("env").args` contains the
@@ -104,6 +105,26 @@ alva deploy resume --id 42
 ```
 
 Both return the updated cronjob object.
+
+### Debugging Runs
+
+When a cronjob fails or produces unexpected output, use `runs` and `run-logs`
+to diagnose the problem.
+
+**List run history** — shows each execution's status, duration, and error
+message. The response also includes aggregate stats (total/success/fail counts).
+
+```bash
+alva deploy runs --id 42                # recent runs
+alva deploy runs --id 42 --first 10     # paginate
+```
+
+**Get logs for a specific run** — returns the full stdout/stderr from that
+execution, useful for tracing errors or verifying output.
+
+```bash
+alva deploy run-logs --id 42 --run-id 123
+```
 
 ---
 
@@ -258,5 +279,6 @@ alva fs read --path /alva/home/alice/feeds/btc-hourly/v1/data/market/ohlcv/@last
   listing them.
 - **Pause before updating**: If you need to update the script, pause the cronjob
   first, update the script file, test it, then resume.
-- **Check execution results**: Read the feed's time series data to verify the
-  cronjob is producing expected output.
+- **Debug failed runs**: `alva deploy runs --id <id>` shows execution history
+  and stats; `alva deploy run-logs --id <id> --run-id <rid>` shows the full
+  log output from a specific run.
