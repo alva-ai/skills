@@ -70,12 +70,10 @@ every command, and eliminates the need for manual curl/header management.
 
 Check whether the CLI is already installed by running `alva --help`.
 
-- **If not installed**, install and configure it:
+- **If not installed**, install it:
 
   ```bash
   npm install -g @alva-ai/toolkit
-  alva configure --api-key alva_your_key_here
-  alva whoami   # verify credentials
   ```
 
 - **If already installed**, upgrade to the latest version to ensure access to
@@ -83,11 +81,9 @@ Check whether the CLI is already installed by running `alva --help`.
 
   ```bash
   npm install -g @alva-ai/toolkit@latest
-  alva whoami   # confirm the upgrade
   ```
 
-If the user does not have an API key, direct them to sign up at
-[alva.ai](https://alva.ai) and create a key under Settings → API Keys.
+Then check authentication (see step 2a below).
 
 **Discover commands:**
 
@@ -99,13 +95,18 @@ alva <command> --help    # detailed usage, flags, and examples for any command
 Use `alva <command> --help` to discover usage — the help text includes all
 flags, parameter types, and practical examples.
 
+Third-party vendor secrets belong in Alva Secret Manager
+(`require("secret-manager")`), not in the CLI config.
+
+### 2a. Authentication Check
+
+Run `alva whoami`. If it fails (no API key), run `alva auth login` to open
+browser-based login, then re-run `alva whoami` to confirm.
+
 On success, offer starting points:
 
 - "Ask me something like 'Who's been buying NVDA insider shares this month?'"
 - "Or build a live dashboard, backtest a strategy, or set up a data pipeline."
-
-Third-party vendor secrets belong in Alva Secret Manager
-(`require("secret-manager")`), not in the CLI config.
 
 ### 3. User Profile
 
