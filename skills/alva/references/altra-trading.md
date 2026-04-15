@@ -299,7 +299,7 @@ const altra = new FeedAltra(
 
 | Field                          | Description                                                                     |
 | ------------------------------ | ------------------------------------------------------------------------------- |
-| `path`                         | ALFS feed path (e.g. `~/feeds/my-strategy/v1`). All output data stored here.   |
+| `path`                         | ALFS feed path (e.g. `'~/feeds/my-strategy/v1'`). All output data stored here.   |
 | `startDate`                    | Backtest start timestamp (ms UTC). Use the exact date, never adjust for warmup. |
 | `portfolioOptions.initialCash` | Starting cash (default: 1,000,000)                                              |
 | `portfolioOptions.currency`    | Quote currency (default: "USDT")                                                |
@@ -717,7 +717,7 @@ The `RunResult` contains:
 - `orders` -- All executed orders with fill details
 - `perf` -- Performance metrics (total return, Sharpe ratio, max drawdown, etc.)
 
-All output data is also persisted under the feed's ALFS path:
+All output data is also persisted under the feed's ALFS path (quote in CLI, e.g. `'~/feeds/my-strategy/v1/data/'`):
 
 ```
 ~/feeds/my-strategy/v1/data/

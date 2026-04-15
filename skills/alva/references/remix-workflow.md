@@ -29,10 +29,10 @@ The `@{owner}/{name}` token after "Playbook(" contains the two key fields:
 
 For the example above: owner = `alice`, name = `btc-momentum`.
 
-Together they resolve to the ALFS base path:
+Together they resolve to the ALFS base path (quote in CLI):
 
 ```
-/alva/home/{owner}/playbooks/{name}/
+'/alva/home/{owner}/playbooks/{name}/'
 ```
 
 **Behavior note**: If the user's prompt does not specify what to change (only
@@ -44,7 +44,7 @@ user what they'd like to customize** before proceeding.
 ## Step 1 — Read Playbook Metadata
 
 ```bash
-alva fs read --path /alva/home/{owner}/playbooks/{name}/playbook.json
+alva fs read --path '/alva/home/{owner}/playbooks/{name}/playbook.json'
 ```
 
 Returns JSON with structure:
@@ -69,7 +69,7 @@ From `latest_release.feeds`, collect the feed IDs you need to inspect.
 ## Step 2 — Read UI Layer (HTML Source)
 
 ```bash
-alva fs read --path /alva/home/{owner}/playbooks/{name}/index.html
+alva fs read --path '/alva/home/{owner}/playbooks/{name}/index.html'
 ```
 
 This returns the full HTML source of the playbook dashboard — the ECharts
@@ -84,14 +84,14 @@ Each feed referenced in `playbook.json` has a symlink under the release's
 `feeds/` directory pointing to the feed's ALFS path.
 
 ```bash
-alva fs readlink --path /alva/home/{owner}/playbooks/{name}/releases/{version}/feeds/{feed_id}
+alva fs readlink --path '/alva/home/{owner}/playbooks/{name}/releases/{version}/feeds/{feed_id}'
 # → {"target_path": "/alva/home/{owner}/feeds/{feed_name}"}
 ```
 
 Then read the feed script source:
 
 ```bash
-alva fs read --path /alva/home/{owner}/feeds/{feed_name}/v1/src/index.js
+alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v1/src/index.js'
 ```
 
 This contains the strategy logic, data fetching, and indicator computations.
@@ -99,7 +99,7 @@ This contains the strategy logic, data fetching, and indicator computations.
 Optionally, read sample feed output to understand the data schema:
 
 ```bash
-alva fs read --path /alva/home/{owner}/feeds/{feed_name}/v1/data/{group}/{output}/@last/5
+alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v1/data/{group}/{output}/@last/5'
 ```
 
 ---
@@ -121,12 +121,12 @@ re-release a source whose data layer was never legitimate.
 
 Follow the standard playbook creation flow (see SKILL.md):
 
-1. **Write feed script** to `~/feeds/{new-name}/v1/src/index.js`
-2. **Test** via `alva run --entry-path ~/feeds/{new-name}/v1/src/index.js`
-3. **Grant** public read: `alva fs grant --path ~/feeds/{new-name} --subject "special:user:*" --permission read`
-4. **Deploy cronjob**: `alva deploy create --name {new-name} --path ~/feeds/{new-name}/v1/src/index.js --cron "..."`
+1. **Write feed script** to `'~/feeds/{new-name}/v1/src/index.js'`
+2. **Test** via `alva run --entry-path '~/feeds/{new-name}/v1/src/index.js'`
+3. **Grant** public read: `alva fs grant --path '~/feeds/{new-name}' --subject "special:user:*" --permission read`
+4. **Deploy cronjob**: `alva deploy create --name {new-name} --path '~/feeds/{new-name}/v1/src/index.js' --cron "..."`
 5. **Release feed**: `alva release feed --name {new-name} --version 1.0.0 --cronjob-id ID`
-6. **Write HTML** to `~/playbooks/{new-name}/index.html` (update data paths to
+6. **Write HTML** to `'~/playbooks/{new-name}/index.html'` (update data paths to
    point to your own feed)
 7. **Draft playbook**: `alva release playbook-draft --name {new-name} --display-name "..." --feeds '[{"feed_id":ID}]'`
 8. **Release playbook**: `alva release playbook --name {new-name} --version v1.0.0 --feeds '[{"feed_id":ID}]' --changelog "..."`
@@ -166,20 +166,20 @@ Agent reads:
 
 ```bash
 # 1. Metadata
-alva fs read --path /alva/home/alice/playbooks/btc-momentum/playbook.json
+alva fs read --path '/alva/home/alice/playbooks/btc-momentum/playbook.json'
 
 # 2. HTML source
-alva fs read --path /alva/home/alice/playbooks/btc-momentum/index.html
+alva fs read --path '/alva/home/alice/playbooks/btc-momentum/index.html'
 
 # 3. Feed symlink → feed path
-alva fs readlink --path /alva/home/alice/playbooks/btc-momentum/releases/v1.0.0/feeds/100
+alva fs readlink --path '/alva/home/alice/playbooks/btc-momentum/releases/v1.0.0/feeds/100'
 # → /alva/home/alice/feeds/btc-momentum
 
 # 4. Feed source code
-alva fs read --path /alva/home/alice/feeds/btc-momentum/v1/src/index.js
+alva fs read --path '/alva/home/alice/feeds/btc-momentum/v1/src/index.js'
 
 # 5. (Optional) Sample data for schema understanding
-alva fs read --path /alva/home/alice/feeds/btc-momentum/v1/data/market/ohlcv/@last/3
+alva fs read --path '/alva/home/alice/feeds/btc-momentum/v1/data/market/ohlcv/@last/3'
 ```
 
 Agent then runs the content-legitimacy audit on the source HTML and feed

@@ -29,7 +29,7 @@ All cronjob operations use `alva deploy <subcommand>`.
 ### Create Cronjob
 
 ```bash
-alva deploy create --name btc-ema-update --path ~/feeds/btc-ema/v1/src/index.js --cron "0 */4 * * *" --args '{"symbol": "BTC"}' --push-notify
+alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js' --cron "0 */4 * * *" --args '{"symbol": "BTC"}' --push-notify
 ```
 
 | Flag            | Type   | Required | Description                                            |
@@ -183,13 +183,13 @@ This example creates a BTC price feed that runs every 4 hours.
 ### 1. Write the feed script
 
 ```bash
-alva fs mkdir --path ~/feeds/btc-hourly/v1/src
+alva fs mkdir --path '~/feeds/btc-hourly/v1/src'
 ```
 
 Write the script (upload from local file):
 
 ```bash
-alva fs write --path ~/feeds/btc-hourly/v1/src/index.js --file ./index.js --mkdir-parents
+alva fs write --path '~/feeds/btc-hourly/v1/src/index.js' --file ./index.js --mkdir-parents
 ```
 
 Where `index.js` contains:
@@ -239,19 +239,19 @@ feed.def("market", {
 ### 2. Test the script manually
 
 ```bash
-alva run --entry-path ~/feeds/btc-hourly/v1/src/index.js
+alva run --entry-path '~/feeds/btc-hourly/v1/src/index.js'
 ```
 
 ### 3. Make the output public
 
 ```bash
-alva fs grant --path ~/feeds/btc-hourly/v1 --subject "special:user:*" --permission read
+alva fs grant --path '~/feeds/btc-hourly/v1' --subject "special:user:*" --permission read
 ```
 
 ### 4. Deploy as a cronjob
 
 ```bash
-alva deploy create --name btc-hourly-price-feed --path ~/feeds/btc-hourly/v1/src/index.js --cron "0 */4 * * *"
+alva deploy create --name btc-hourly-price-feed --path '~/feeds/btc-hourly/v1/src/index.js' --cron "0 */4 * * *"
 ```
 
 ### 5. Verify the cronjob
@@ -263,7 +263,7 @@ alva deploy list
 ### 6. Read the data (from anywhere)
 
 ```bash
-alva fs read --path /alva/home/alice/feeds/btc-hourly/v1/data/market/ohlcv/@last/24
+alva fs read --path '/alva/home/alice/feeds/btc-hourly/v1/data/market/ohlcv/@last/24'
 ```
 
 ---

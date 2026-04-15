@@ -14,7 +14,7 @@ alva deploy create --name NAME --path PATH --cron "EXPR" [--args 'JSON'] [--push
 ```bash
 alva deploy create \
   --name btc-ema-update \
-  --path ~/feeds/btc-ema/v1/src/index.js \
+  --path '~/feeds/btc-ema/v1/src/index.js' \
   --cron "0 */4 * * *" \
   --args '{"symbol": "BTC"}' \
   --push-notify
