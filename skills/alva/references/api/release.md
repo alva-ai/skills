@@ -14,7 +14,7 @@ after** `alva deploy create` -- the `cronjob-id` comes from the
 cronjob response.
 
 **Name uniqueness**: The `name` must be unique within your user space. Use
-`alva fs readdir --path ~/feeds` to check existing feed names before
+`alva fs readdir --path '~/feeds'` to check existing feed names before
 releasing.
 
 | Flag          | Type   | Required | Description                                                  |
@@ -70,7 +70,7 @@ alva release playbook --name NAME --version VERSION --feeds '[{"feed_id":100}]' 
 ```
 
 Release an existing playbook for public hosting. Reads the playbook HTML from
-`~/playbooks/{name}/index.html` and uploads it to CDN.
+`'~/playbooks/{name}/index.html'` (ALFS — quote in CLI) and uploads it to CDN.
 
 | Flag        | Type   | Required | Description                                 |
 | ----------- | ------ | -------- | ------------------------------------------- |

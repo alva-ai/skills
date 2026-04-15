@@ -271,7 +271,7 @@ Deploy as a scheduled cronjob with `push_notify: true`:
 
 ```bash
 alva deploy create --name daily-briefing \
-  --path ~/feeds/daily-briefing/v1/scripts/main.js \
+  --path '~/feeds/daily-briefing/v1/scripts/main.js' \
   --cron "0 8 * * *" --push-notify
 ```
 
@@ -557,9 +557,9 @@ Feed outputs are accessible via the filesystem after the feed runs.
 ### From the CLI
 
 ```bash
-alva fs read --path ~/feeds/btc-ema/v1/data/metrics/prices/@last/100
+alva fs read --path '~/feeds/btc-ema/v1/data/metrics/prices/@last/100'
 
-alva fs read --path /alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100
+alva fs read --path '/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100'
 ```
 
 ### From JavaScript (inside jagent)
@@ -651,7 +651,7 @@ records if some timestamps have multiple items.
 Grant public read access so anyone can read the data:
 
 ```bash
-alva fs grant --path ~/feeds/btc-ema/v1 --subject "special:user:*" --permission read
+alva fs grant --path '~/feeds/btc-ema/v1' --subject "special:user:*" --permission read
 ```
 
 Public reads must use absolute paths:
@@ -664,7 +664,7 @@ Public reads must use absolute paths:
 ### Step 1: Create the directory and write the script
 
 ```bash
-alva fs write --path ~/feeds/btc-ema/v1/src/index.js --file ./index.js --mkdir-parents
+alva fs write --path '~/feeds/btc-ema/v1/src/index.js' --file ./index.js --mkdir-parents
 ```
 
 Where `index.js` contains:
@@ -706,25 +706,25 @@ feed.def("metrics", {
 ### Step 2: Run the feed
 
 ```bash
-alva run --entry-path ~/feeds/btc-ema/v1/src/index.js
+alva run --entry-path '~/feeds/btc-ema/v1/src/index.js'
 ```
 
 ### Step 3: Make it public
 
 ```bash
-alva fs grant --path ~/feeds/btc-ema/v1 --subject "special:user:*" --permission read
+alva fs grant --path '~/feeds/btc-ema/v1' --subject "special:user:*" --permission read
 ```
 
 ### Step 4: Read from any client
 
 ```bash
-alva fs read --path /alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100
+alva fs read --path '/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100'
 ```
 
 ### Step 5: Deploy as a cronjob (required for live playbooks)
 
 ```bash
-alva deploy create --name btc-ema-update --path ~/feeds/btc-ema/v1/src/index.js --cron "0 */4 * * *"
+alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js' --cron "0 */4 * * *"
 ```
 
 ---
@@ -761,13 +761,13 @@ only -- do not use in production.**
 
 ```bash
 # Clear a specific time series output (e.g. market/ohlcv)
-alva fs remove --path ~/feeds/my-feed/v1/data/market/ohlcv --recursive
+alva fs remove --path '~/feeds/my-feed/v1/data/market/ohlcv' --recursive
 
 # Clear an entire group (all outputs under "market")
-alva fs remove --path ~/feeds/my-feed/v1/data/market --recursive
+alva fs remove --path '~/feeds/my-feed/v1/data/market' --recursive
 
 # Full reset: clear ALL data + KV state (removes the data mount, re-created on next run)
-alva fs remove --path ~/feeds/my-feed/v1/data --recursive
+alva fs remove --path '~/feeds/my-feed/v1/data' --recursive
 ```
 
 Clearing time series also removes the associated typedoc (schema metadata). KV

@@ -42,9 +42,9 @@ When using `entry_path`, relative imports resolve from the entry script's
 directory:
 
 ```javascript
-// ~/tasks/my-task/src/index.js
-const helper = require("./helper.js"); // loads ~/tasks/my-task/src/helper.js
-const utils = require("./lib/utils.js"); // loads ~/tasks/my-task/src/lib/utils.js
+// Entry on ALFS: '~/tasks/my-task/src/index.js'
+const helper = require("./helper.js"); // resolves './helper.js' on ALFS under that directory
+const utils = require("./lib/utils.js"); // resolves './lib/utils.js' on ALFS under that directory
 ```
 
 ---
@@ -59,7 +59,7 @@ like the REST API).
 ```javascript
 const alfs = require("alfs");
 const env = require("env");
-const home = "/alva/home/" + env.username;
+const home = "/alva/home/" + env.username; // absolute ALFS prefix (e.g. '/alva/home/alice')
 ```
 
 | Method           | Signature                                     | Description                                             |

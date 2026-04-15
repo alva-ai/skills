@@ -7,14 +7,15 @@ For subscribing to specific accounts/channels, use `feed_widgets` instead.
 
 | SDK | Module | Best for |
 | --- | ------ | -------- |
-| `searchGrokX` | `@arrays/data/widget-scrap/search-grok-x:v1.0.0` | Twitter/X — returns engagement directly |
-| `searchSerper` | `@arrays/data/widget-scrap/serper-search:v1.0.0` | Google index: News, YouTube, Reddit, Web |
-| `searchBrave` | `@arrays/data/widget-scrap/search-brave:v1.0.0` | Independent index, good Reddit coverage |
-| `scrapeUrl` | `@arrays/data/widget-scrap/scrape-url:v1.0.0` | Scrape any page to markdown for enrichment |
+| `searchGrokX` | `@arrays/data/search/search-grok-x:v1.0.0` | Twitter/X — returns engagement directly |
+| `searchSerper` | `@arrays/data/search/serper-search:v1.0.0` | Google index: News, YouTube, Reddit, Web |
+| `searchBrave` | `@arrays/data/search/search-brave:v1.0.0` | Independent index, good Reddit coverage |
+| `scrapeUrl` | `@arrays/data/search/scrape-url:v1.0.0` | Scrape any page to markdown for enrichment |
 
 ## Sources
 
 ### Twitter/X
+
 - **Search**: `searchGrokX` with `from_date`/`to_date` (YYYY-MM-DD format)
 - **Enrich**: Not needed — GrokX returns engagement natively
 - **Signals**: `like_count`, `retweet_count`, `reply_count`, `quote_count`
@@ -23,6 +24,7 @@ For subscribing to specific accounts/channels, use `feed_widgets` instead.
 - **Gotcha**: A single broad query returns mostly 0-engagement noise. Fix: (1) run 3-5 queries with different topical angles (e.g. "NVDA earnings", "NVDA AI chips", "NVDA stock price") plus entity aliases (`$NVDA`, `NVIDIA`); (2) filter results — tweets with `like_count == 0` AND `retweet_count == 0` are almost always noise; (3) `author_followers_count` and `author_verified` are strong quality signals for sorting survivors.
 
 ### News
+
 - **Search**: `searchSerper` with `type:"news"` + `searchBrave` with `freshness` filter
 - **Enrich**: Optional — `scrapeUrl` for full article text
 - **Signals**: Freshness (time-based), source authority (domain)
@@ -31,6 +33,7 @@ For subscribing to specific accounts/channels, use `feed_widgets` instead.
 - **Fields (Brave)**: `title`, `url`, `description`, `age` (string), `date` (ms, index time)
 
 ### Reddit
+
 - **Search**: `searchSerper` or `searchBrave` with `site:reddit.com`
 - **Enrich**: Append `.json` to post URL → `scrapeUrl` → regex extract `score`, `num_comments`, `created_utc`
 - **Signals**: `score`, `num_comments`, `created_utc` (real publish time, seconds → ×1000 for ms)
@@ -38,6 +41,7 @@ For subscribing to specific accounts/channels, use `feed_widgets` instead.
 - **Gotcha**: `searchBrave` with `result_filter:"discussions"` returns 0 results — do not use. Cross-posts produce duplicate titles — dedup by Jaccard similarity on title if needed.
 
 ### YouTube
+
 - **Search**: `searchSerper` or `searchBrave` with `site:youtube.com`
 - **Enrich**: `scrapeUrl` the watch page → regex extract views/likes. Thumbnails: `https://img.youtube.com/vi/{VIDEO_ID}/mqdefault.jpg`
 - **Signals**: `views`, `likes`
@@ -45,6 +49,7 @@ For subscribing to specific accounts/channels, use `feed_widgets` instead.
 - **Video ID extraction**: `url.match(/(?:v=|shorts\/)([\w-]{11})/)`
 
 ### Podcasts
+
 - **Search**: Apple Podcasts Search API (free, no auth):
   `https://itunes.apple.com/search?term={query}&media=podcast&entity=podcastEpisode&limit=20`
 - **Enrich**: Not needed — API returns full metadata
@@ -53,6 +58,7 @@ For subscribing to specific accounts/channels, use `feed_widgets` instead.
 - **Note**: Limited source — best as supplementary, not primary. No engagement metrics.
 
 ### General Web
+
 - **Search**: `searchSerper` or `searchBrave` (no site filter)
 - **Enrich**: `scrapeUrl` for content extraction
 - **Signals**: Search rank position, freshness

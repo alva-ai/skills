@@ -130,11 +130,11 @@ Session variables:
 If you have **not** read the user's memory in this conversation, read it now.
 
 ```bash
-alva fs read --path ~/memory/MEMORY.md
+alva fs read --path '~/memory/MEMORY.md'
 ```
 
 If the file exists, read each file listed in the index (at minimum `user.md`).
-If `~/memory/` does not exist or is empty, skip — it will be seeded on next
+If `'~/memory/'` does not exist or is empty, skip — it will be seeded on next
 sign-in.
 
 Use the loaded memory to tailor your responses to the user's profile,
@@ -337,6 +337,10 @@ assets, and shared libraries all live on ALFS.
 Key operations: read, write, mkdir, stat, readdir, remove, rename, copy,
 symlink, chmod, grant, revoke.
 
+In shell and documentation, wrap ALFS path arguments in single quotes (e.g.
+`'~/feeds/...'`, `'/alva/home/...'`) so they are not confused with paths on your
+local machine. See [Filesystem](references/api/filesystem.md).
+
 ### 2. JS Runtime
 
 Run JavaScript on Alva Cloud in a sandboxed V8 isolate. Code executed via
@@ -495,7 +499,7 @@ outputs read at runtime (no inline literals for data).
 
 #### Common steps (all users)
 
-1. **Write HTML to ALFS**: `alva fs write --path ~/playbooks/{name}/index.html --file ./index.html --mkdir-parents`
+1. **Write HTML to ALFS**: `alva fs write --path '~/playbooks/{name}/index.html' --file ./index.html --mkdir-parents`
 2. **Create playbook draft**: `alva release playbook-draft` — creates DB
    records, writes draft files and `playbook.json` to ALFS automatically.
    This request must include both the URL-safe `name` and the human-readable
@@ -682,7 +686,7 @@ variables, or shell. Host-agent permissions still apply. See
 
 | Module          | require()                    | Description                                                             |
 | --------------- | ---------------------------- | ----------------------------------------------------------------------- |
-| alfs            | `require("alfs")`            | Filesystem (uses absolute paths `/alva/home/<username>/...`)            |
+| alfs            | `require("alfs")`            | Filesystem (uses absolute paths `'/alva/home/<username>/...'`)            |
 | env             | `require("env")`             | `userId`, `username`, `args` from request                               |
 | secret-manager  | `require("secret-manager")`  | Read user-scoped third-party secrets stored in Alva Secret Manager      |
 | net/http        | `require("net/http")`        | `fetch(url, init)` for async HTTP requests                              |
@@ -760,7 +764,8 @@ feed.def("metrics", {
 })();
 ```
 
-Feed output is readable at: `~/feeds/btc-ema/v1/data/metrics/prices/@last/100`
+Feed output is readable at (ALFS — quote in CLI):
+`'~/feeds/btc-ema/v1/data/metrics/prices/@last/100'`
 
 ---
 
@@ -831,8 +836,8 @@ and deduplication behavior.
 Every feed follows a 6-step lifecycle including every newly created feed or re-created feed:
 
 1. **Write** -- define schema + incremental logic with `ctx.kv`
-2. **Upload** -- write script to `~/feeds/<name>/v1/src/index.js`
-3. **Test** -- `alva run --entry-path ~/feeds/<name>/v1/src/index.js` to verify output.
+2. **Upload** — write script to `'~/feeds/<name>/v1/src/index.js'`
+3. **Test** — `alva run --entry-path '~/feeds/<name>/v1/src/index.js'` to verify output.
    For SDK modules you haven't used before in this session, first run a
    shape-check snippet to verify response structure:
 
@@ -849,7 +854,7 @@ Every feed follows a 6-step lifecycle including every newly created feed or re-c
 4. **Grant** -- make feed data publicly readable:
 
    ```bash
-   alva fs grant --path ~/feeds/<name> --subject "special:user:*" --permission read
+   alva fs grant --path '~/feeds/<name>' --subject "special:user:*" --permission read
    ```
 
    Grant on the feed root path (not on `data/`). Subject format:
@@ -929,13 +934,13 @@ this in production.**
 
 ```bash
 # Clear a specific time series output
-alva fs remove --path ~/feeds/my-feed/v1/data/market/ohlcv --recursive
+alva fs remove --path '~/feeds/my-feed/v1/data/market/ohlcv' --recursive
 
 # Clear an entire group (all outputs under "market")
-alva fs remove --path ~/feeds/my-feed/v1/data/market --recursive
+alva fs remove --path '~/feeds/my-feed/v1/data/market' --recursive
 
 # Full reset: clear ALL data + KV state (removes the data mount, re-created on next run)
-alva fs remove --path ~/feeds/my-feed/v1/data --recursive
+alva fs remove --path '~/feeds/my-feed/v1/data' --recursive
 ```
 
 ### Inline Debug Snippets
@@ -950,7 +955,7 @@ alva run --code 'const { getCryptoKline } = require("@arrays/crypto/ohlcv:v1.0.0
 
 ## Memory
 
-You have a persistent, file-based memory system on ALFS at `~/memory/`. This
+You have a persistent, file-based memory system on ALFS at `'~/memory/'`. This
 directory is created automatically when the user's account is provisioned. Use
 it to accumulate knowledge about the user across conversations — their identity,
 preferences, investment style, and any context that would be useful in future
@@ -961,6 +966,8 @@ delete any memory file through the Alva dashboard or ALFS API. Write memories
 as if the user will read them.
 
 ### Storage layout
+
+**ALFS paths** — use single quotes in the shell (example: `'~/memory/MEMORY.md'`).
 
 ```
 ~/memory/
@@ -1023,7 +1030,7 @@ changes how you should work with them.
 
 ### Additional topic files
 
-Create new files in `~/memory/` for knowledge that doesn't fit in `user.md` —
+Create new files in `'~/memory/'` for knowledge that doesn't fit in `user.md` —
 market convictions, strategy assumptions, portfolio rules. Add a pointer to
 `MEMORY.md` for each new file.
 
@@ -1038,7 +1045,7 @@ market convictions, strategy assumptions, portfolio rules. Add a pointer to
 
 ### Writing rules
 
-1. **Read `~/memory/MEMORY.md` first** — check if a relevant file already exists
+1. **Read `'~/memory/MEMORY.md'` first** — check if a relevant file already exists
 2. **Update existing file** if the topic matches. Don't create duplicates
 3. **Create new file** only if no existing file covers the topic
 4. **Update `MEMORY.md`** — add a one-line entry for each new file
@@ -1047,13 +1054,13 @@ market convictions, strategy assumptions, portfolio rules. Add a pointer to
 
 ### Reading rules
 
-- **Every conversation start**: Read `~/memory/MEMORY.md` via ALFS. Then read
+- **Every conversation start**: Read `'~/memory/MEMORY.md'` via ALFS. Then read
   `user.md` and any topic files relevant to the user's request.
 - **User references prior work**: "that strategy from last time" / "the rules
   we discussed" → read the relevant memory file.
 - **User explicitly asks**: "do you remember" / "check my profile" → you
   **must** read.
-- **User says to ignore memory**: Proceed as if `~/memory/` is empty.
+- **User says to ignore memory**: Proceed as if `'~/memory/'` is empty.
 
 ### Memory is a claim, not truth
 
@@ -1200,7 +1207,7 @@ See [deployment.md](references/deployment.md) for full details.
 Deploy feed scripts or tasks as cronjobs for scheduled execution:
 
 ```bash
-alva deploy create --name btc-ema-update --path ~/feeds/btc-ema/v1/src/index.js --cron "0 */4 * * *"
+alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js' --cron "0 */4 * * *"
 ```
 
 Cronjobs execute the script via the same jagent runtime as `alva run`. Max 20
@@ -1212,13 +1219,13 @@ hyphen (DNS label format). Example: `btc-ema-update`, not `BTC EMA Update`.
 
 After deploying a cronjob, register the feed, create a playbook draft, then
 release the playbook for public hosting. The playbook HTML must already be
-written to ALFS at `~/playbooks/{name}/index.html` via `fs/write` before
+written to ALFS at `'~/playbooks/{name}/index.html'` via `fs/write` before
 releasing.
 
 **Important**: Feed names and playbook names must be unique within your user
 space. Before creating a new feed or playbook, use
-`alva fs readdir --path ~/feeds` or
-`alva fs readdir --path ~/playbooks` to check for existing names and avoid
+`alva fs readdir --path '~/feeds'` or
+`alva fs readdir --path '~/playbooks'` to check for existing names and avoid
 conflicts.
 
 ```bash
@@ -1259,14 +1266,14 @@ typography, theme, and page-level layout. Then read only the spec you need:
 
 ## Filesystem Layout Convention
 
-| Path                      | Purpose                                     |
-| ------------------------- | ------------------------------------------- |
-| `~/tasks/<name>/src/`     | Task source code                            |
-| `~/feeds/<name>/v1/src/`  | Feed script source code                     |
-| `~/feeds/<name>/v1/data/` | Feed synth mount (auto-created by Feed SDK) |
-| `~/playbooks/<name>/`     | Playbook web app assets                     |
-| `~/data/`                 | General data storage                        |
-| `~/library/`              | Shared code modules                         |
+| Path (ALFS — quote in CLI)              | Purpose                                     |
+| --------------------------------------- | ------------------------------------------- |
+| `'~/tasks/<name>/src/'`                 | Task source code                            |
+| `'~/feeds/<name>/v1/src/'`              | Feed script source code                     |
+| `'~/feeds/<name>/v1/data/'`             | Feed synth mount (auto-created by Feed SDK) |
+| `'~/playbooks/<name>/'`                 | Playbook web app assets                     |
+| `'~/data/'`                             | General data storage                        |
+| `'~/library/'`                          | Shared code modules                         |
 
 **Prefer using the Feed SDK for all data organization**, including point-in-time
 snapshots. Store snapshots as single-record time series rather than raw JSON
@@ -1287,15 +1294,15 @@ consistent read pattern (`@last`, `@range`, etc.).
   share a timestamp (grouped via `append()`), auto-flatten may return more than
   N individual records.
 - **The `data/` in feed paths is the synth mount.** `feedPath("my-feed")` gives
-  `~/feeds/my-feed/v1`, and the Feed SDK mounts storage at `<feedPath>/data/`.
+  `'~/feeds/my-feed/v1'`, and the Feed SDK mounts storage at `<feedPath>/data/`.
   Don't name your group `"data"` or you'll get `data/data/...`.
 - **Public reads require absolute paths.** Unauthenticated reads must use
-  `/alva/home/<username>/...` (not `~/...`). Discover your username via
+  `'/alva/home/<username>/...'` (not `'~/...'`). Discover your username via
   `alva whoami`.
 - **Top-level `await` is not supported.** Wrap async code in
   `(async () => { ... })();`.
 - **`require("alfs")` uses absolute paths.** Inside the V8 runtime,
-  `alfs.readFile()` needs full paths like `/alva/home/alice/...`. Get your
+  `alfs.readFile()` needs full paths like `'/alva/home/alice/...'`. Get your
   username from `require("env").username`.
 - **No Node.js builtins.** `require("fs")`, `require("path")`, `require("http")`
   do not exist. Use `require("alfs")` for files, `require("net/http")` for HTTP.
@@ -1306,10 +1313,10 @@ consistent read pattern (`@last`, `@range`, etc.).
   outputs the strategy function sees. They are independent.
 - **Quote `~` paths to prevent shell expansion.** The shell expands bare `~` to
   your local home (e.g. `/Users/alice/`), not the ALFS home
-  (`/alva/home/alice/`). Always quote paths: `--path '~/feeds/...'`.
+  (`'/alva/home/alice/'`). Always quote paths: `--path '~/feeds/...'`.
 - **Home directory not provisioned?** If you get `PERMISSION_DENIED` on all
-  ALFS operations (including `~/`), your home directory was not created during
-  sign-up. Call `alva fs mkdir --path ~/` to provision it. This is idempotent
+  ALFS operations (including `'~/'`), your home directory was not created during
+  sign-up. Call `alva fs mkdir --path '~/'` to provision it. This is idempotent
   and safe to call anytime.
 - **Cronjob path must point to an existing script.** The deploy API validates
   the entry_path exists via filesystem stat before creating the cronjob.
