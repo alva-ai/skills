@@ -232,6 +232,10 @@ When this feed runs as a cronjob, the platform reads
 
 ### Pattern E: AlvaAsk + Owner Notification (notify/message)
 
+**Preferred pattern for scheduled tasks.** Use `@alva/alvaask` instead of
+ADK for cronjob feeds — it's simpler (no sandbox/session management) and
+the `ask()` call handles tool use, web search, and ALFS access automatically.
+
 For feeds that use `@alva/alvaask` to call Alva's agent and push the result
 to the feed owner. Common use cases: scheduled market reports, periodic
 research summaries, heartbeat monitoring, and proactive alerts.
@@ -267,12 +271,18 @@ feed.def("notify", {
 })();
 ```
 
-Deploy as a scheduled cronjob with `push_notify: true`:
+Deploy requires **two steps** — cronjob + feed registration:
 
 ```bash
+# 1. Create the cronjob with push notification enabled
 alva deploy create --name daily-briefing \
-  --path '~/feeds/daily-briefing/v1/scripts/main.js' \
+  --path '~/feeds/daily-briefing/v1/src/index.js' \
   --cron "0 8 * * *" --push-notify
+
+# 2. Register the feed (REQUIRED for push content to work)
+# Without this, notifications arrive without title/text content.
+alva release feed --name daily-briefing --version 1.0.0 \
+  --cronjob-id <ID_FROM_STEP_1>
 ```
 
 **Key points:**
@@ -282,8 +292,8 @@ alva deploy create --name daily-briefing \
 - `title` is optional — if provided, the notification renders as
   `**title**\n\ncontent`.
 - `text` is the notification body (required for content push).
-- If `notify/message` has no data, the owner receives a generic
-  "Feed completed." notification instead.
+- **`alva release feed` is required** — without it, push notifications
+  will not be delivered.
 - Does **not** require a playbook or followers — works for any feed.
 - Combine with Pattern D if you want to push to both owner AND followers.
 
