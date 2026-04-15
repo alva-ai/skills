@@ -19,57 +19,18 @@ read_local_version() {
   sed -n 's/^[[:space:]]*version:[[:space:]]*\(.*\)/\1/p' "$SKILL_MD" 2>/dev/null | head -1
 }
 
-# Write .env, preserving all fields
-write_check() {
-  cat >"$CONFIG_FILE" <<EOF
-ALVA_API_KEY=${ALVA_API_KEY:-}
-ALVA_ENDPOINT=${ALVA_ENDPOINT:-https://api-llm.${ENV:-prd}.alva.ai}
-last_check=$1
-ENV=${ENV:-prd}
-EOF
-}
-
-# Load .env variables: ALVA_API_KEY, ALVA_ENDPOINT, last_check, ENV
+# Load last_check timestamp from .env
+last_check=0
 if [ -f "$CONFIG_FILE" ]; then
-  source "$CONFIG_FILE"
-fi
-
-# Default ENV to prd if empty
-if [ -z "${ENV:-}" ]; then
-  ENV=prd
-  _env_changed=1
-fi
-
-# Default ALVA_ENDPOINT based on ENV if empty
-if [ -z "${ALVA_ENDPOINT:-}" ]; then
-  ALVA_ENDPOINT="https://api-llm.${ENV}.alva.ai"
-  _env_changed=1
-fi
-
-# Persist defaults back to .env if anything was missing
-if [ "${_env_changed:-}" = "1" ]; then
-  write_check "${last_check:-0}"
-fi
-
-# Symlink to ~/.alva.env for short access
-SYMLINK="$HOME/.alva.env"
-if [ ! -L "$SYMLINK" ] || [ "$(readlink "$SYMLINK")" != "$CONFIG_FILE" ]; then
-  ln -sf "$CONFIG_FILE" "$SYMLINK"
-fi
-
-# Skip version check for local/stg environments (env vars and symlink already set above)
-if [ "${ENV:-}" = "local" ] || [ "${ENV:-}" = "stg" ]; then
-  write_check "${last_check:-0}"
-  exit 0
+  last_check=$(sed -n 's/^last_check=\(.*\)/\1/p' "$CONFIG_FILE" 2>/dev/null | head -1 || echo "0")
+  last_check=${last_check:-0}
 fi
 
 # Throttle: skip if checked recently
-if [ -n "${last_check:-}" ]; then
-  now=$(date +%s 2>/dev/null || echo "0")
-  elapsed=$((now - last_check)) 2>/dev/null || elapsed=$CHECK_INTERVAL
-  if [ "$elapsed" -lt "$CHECK_INTERVAL" ]; then
-    exit 0
-  fi
+now=$(date +%s 2>/dev/null || echo "0")
+elapsed=$((now - last_check)) 2>/dev/null || elapsed=$CHECK_INTERVAL
+if [ "$elapsed" -lt "$CHECK_INTERVAL" ]; then
+  exit 0
 fi
 
 # Fetch latest release tag from GitHub API (timeout 5s)
@@ -81,17 +42,23 @@ if [ -z "$remote_tag" ]; then
   exit 0 # Network error or no releases, skip silently
 fi
 
-now=$(date +%s 2>/dev/null || echo "0")
+# Update last_check timestamp in .env
+if [ -f "$CONFIG_FILE" ]; then
+  # Update existing last_check line, or append if absent
+  if grep -q "^last_check=" "$CONFIG_FILE"; then
+    sed -i '' "s/^last_check=.*/last_check=$now/" "$CONFIG_FILE"
+  else
+    echo "last_check=$now" >> "$CONFIG_FILE"
+  fi
+else
+  echo "last_check=$now" > "$CONFIG_FILE"
+fi
 
 # Read local version from SKILL.md frontmatter
 local_tag=$(read_local_version)
 if [ -z "$local_tag" ]; then
-  write_check "$now"
   exit 0
 fi
-
-# Update last_check timestamp
-write_check "$now"
 
 # Compare — notify only when a new release is published
 if [ "$local_tag" != "$remote_tag" ]; then

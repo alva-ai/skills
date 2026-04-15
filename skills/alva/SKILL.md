@@ -53,7 +53,16 @@ done for you.
 
 **Run these checks on first use each session** before doing anything else.
 
-### 1. Alva CLI Setup
+### 1. Version Check
+
+```bash
+bash "<this skill's directory>/scripts/version_check.sh"
+```
+
+- No output → up to date, proceed.
+- Output present → display to user, apply the update, then proceed.
+
+### 2. Alva CLI Setup
 
 The `alva` CLI (`@alva-ai/toolkit`) is the required way to interact with the
 Alva platform. It manages authentication, provides self-documenting help for
@@ -98,7 +107,7 @@ On success, offer starting points:
 Third-party vendor secrets belong in Alva Secret Manager
 (`require("secret-manager")`), not in the CLI config.
 
-### 2. User Profile
+### 3. User Profile
 
 ```bash
 alva whoami
@@ -116,7 +125,7 @@ Session variables:
 - **`telegram_username`** — if set, recommend push-enabled feeds; if null,
   guide user to connect Telegram first.
 
-### 3. Load Memory
+### 4. Load Memory
 
 If you have **not** read the user's memory in this conversation, read it now.
 
