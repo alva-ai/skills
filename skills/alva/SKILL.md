@@ -165,9 +165,11 @@ SDK.
 
 ### 3. Data Skills
 
-Financial data APIs across 16 domains. To find the right API for a task:
+Financial data APIs across 16+ domains. To find the right API for a task:
 
-1. **Pick a data skill** from the index below.
+1. **Discover available data skills**: `GET $ARRAYS_ENDPOINT/api/v1/skills`
+   (public, no auth) — returns all data skills with their names and
+   descriptions. Use this to find the skill that matches your data need.
 2. **Fetch the skill summary**: `GET $ARRAYS_ENDPOINT/api/v1/skills/:name`
    (public, no auth) — returns the endpoints table for that domain.
 3. **Fetch endpoint detail**: `GET $ARRAYS_ENDPOINT/api/v1/skills/:name?endpoint=<path>`
@@ -176,27 +178,6 @@ Financial data APIs across 16 domains. To find the right API for a task:
 4. **Call Arrays data endpoints** with `Authorization: Bearer <ARRAYS_JWT>`.
    In runtime code, load the token via `secret.loadPlaintext('ARRAYS_JWT')`.
    If the token is missing, call `POST /api/v1/arrays-jwt/ensure` first.
-
-#### Data Skills Index
-
-| Domain | Skill name | Use when |
-|--------|------------|----------|
-| Spot market | `arrays-data-api-spot-market-price-and-volume` | Stock/crypto kline, OHLCV, market cap, supply, price |
-| Crypto futures | `arrays-data-api-crypto-futures-data` | Funding rate, open interest, long-short ratio |
-| Crypto metrics | `arrays-data-api-crypto-metrics-and-screener` | On-chain analytics, technical indicators, fear-greed, DeFi pools, screening |
-| Crypto exchange flow | `arrays-data-api-crypto-exchange-flow` | Exchange inflow/outflow |
-| Company crypto | `arrays-data-api-company-crypto-holdings` | Company crypto holdings and transactions |
-| Equity fundamentals | `arrays-data-api-equity-fundamentals` | Company profile, financials, shares, KPI, options |
-| Equity estimates | `arrays-data-api-equity-estimates-and-targets` | Analyst estimates, guidance, price target consensus |
-| Equity events | `arrays-data-api-equity-events` | Dividends, splits, earnings calendar, transcripts, IPO, M&A |
-| Equity ownership | `arrays-data-api-equity-ownership-and-flow` | Institutional holdings, insider trades, senate trades |
-| ETF fundamentals | `arrays-data-api-etf-fundamentals` | ETF holdings, info, sector/country weightings, fund flow |
-| Macro & economics | `arrays-data-api-macro-and-economics` | Treasury rates, economic calendar, forex, commodities, VIX |
-| Stock screener | `arrays-data-api-stock-screener` | Stock filtering by sector, valuation, financials, events |
-| Stock technical | `arrays-data-api-stock-technical-metrics` | Market metrics, darkpool, analyst ratings |
-| News | `arrays-data-api-ask` | Market news |
-| Polymarket markets | `arrays-data-api-polymarket-markets` | Prediction markets, event outcomes, Polymarket search |
-| Polymarket pricing | `arrays-data-api-polymarket-pricing` | Polymarket prices, odds, order books, spreads |
 
 #### Runtime Libraries
 
@@ -477,7 +458,8 @@ releasing.
 These endpoints are on the **Arrays backend** (`$ARRAYS_ENDPOINT`), not the Alva
 backend. They are public and require no authentication.
 
-**Data skill retrieval flow**: pick a skill from the Data Skills Index above →
+**Data skill retrieval flow**: call `$ARRAYS_ENDPOINT/api/v1/skills` to
+discover all available skills → pick the skill that matches your data need →
 call `$ARRAYS_ENDPOINT/api/v1/skills/:name` to get the endpoints summary →
 pick the endpoint you need from the summary table → call
 `$ARRAYS_ENDPOINT/api/v1/skills/:name?endpoint=<path>` to get endpoint detail
