@@ -156,6 +156,11 @@ what they got ("Your dashboard is live at …"), not what you did ("I deployed
 3 feeds and wrote the HTML"). During multi-step builds, give a short status
 update at each milestone so the user knows work is progressing.
 
+**Data provenance in direct answers.** When a direct answer cites specific
+financial figures, each number must either come from a fresh SDK/BYOD fetch
+(attributed inline to its source) or be explicitly qualified as an estimate
+that the user should verify with current sources.
+
 ## Request Routing
 
 | Request Type | Core Objectives |
@@ -588,7 +593,8 @@ request, and deploys a new playbook under their own namespace. If the user does
 not specify what to change, the agent should ask before proceeding.
 
 See [remix-workflow.md](references/remix-workflow.md) for the full step-by-step
-guide.
+guide. `alva remix` commands are exclusively for lineage registration — to
+read any playbook's files, use `alva fs read`.
 
 ### 9. Post-release push notification flow
 
@@ -1112,9 +1118,9 @@ involves uploading, naming, rotating, listing, or using third-party secrets.
 **Always use Altra for backtesting.** Altra handles bar.endTime timestamps,
 data alignment, and portfolio simulation automatically. Do not manually loop
 over SDK data (e.g. `getCryptoKline`) to evaluate trading conditions — this
-leads to incorrect timestamps and look-ahead bias. Use Altra even for simple
-strategies; it supports any interval (`"1min"` to `"1w"`) and any combination
-of OHLCV + external data via `registerRawData`.
+leads to incorrect timestamps and look-ahead bias. Use Altra for all
+strategies regardless of complexity; it supports any interval (`"1min"` to
+`"1w"`) and any combination of OHLCV + external data via `registerRawData`.
 
 **After a successful backtest, you should package the results in a form the user
 can use.** That may be a playbook, a dashboard, or a concise analytical summary,
