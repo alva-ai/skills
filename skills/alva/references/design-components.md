@@ -1450,7 +1450,7 @@ state; typed text matches the filled state.
 
 ## Tab
 
-2 styles (Pill, Underline) × 2 sizes (M, S) = 4 variants.
+2 styles (Pill, Underline) × 3 sizes (L, M, S) = 6 variants.
 
 - **Pill**: rounded rectangles, background changes on select.
 - **Underline**: no background, selected item has a 2px bottom indicator line.
@@ -1509,6 +1509,17 @@ border through their transparent border.
   font-weight: 500;
 }
 
+/* Pill — Size L */
+.tab-pill.tab-l {
+  gap: var(--spacing-m);
+}
+.tab-pill.tab-l .tab-item {
+  padding: var(--spacing-xs) var(--spacing-m);
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: 0.16px;
+}
+
 /* Pill — Size S */
 .tab-pill.tab-s {
   gap: var(--spacing-xs);
@@ -1536,6 +1547,16 @@ border through their transparent border.
   color: var(--text-n9);
   font-weight: 500;
   border-bottom-color: var(--main-m1);
+}
+
+/* Underline — Size L */
+.tab-underline.tab-l {
+  gap: var(--spacing-l);
+}
+.tab-underline.tab-l .tab-item {
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: 0.16px;
 }
 
 /* Underline — Size S */
