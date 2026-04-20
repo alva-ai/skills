@@ -169,7 +169,6 @@ The script has full access to:
 
 | Limit                 | Value                 |
 | --------------------- | --------------------- |
-| Max cronjobs per user | 20                    |
 | Min cron interval     | 1 minute              |
 | Execution timeout     | Same as `alva run`    |
 | Heap per execution    | 2 GB                  |

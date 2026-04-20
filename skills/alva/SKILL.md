@@ -569,8 +569,7 @@ Before calling `alva release playbook`, verify all of the following:
    run-tested but undeployed feed has no data at its public `@last` path and
    the HTML will fail to read it.
 2. **Cronjobs are active**: All feeds referenced by the playbook have
-   successfully deployed cronjobs. If `deploy/cronjob` returned `RATE_LIMITED`,
-   see [Cronjob Rate Limit Recovery](#cronjob-rate-limit-recovery) below.
+   successfully deployed cronjobs.
 3. **HTML fetches from feeds**: The playbook HTML reads quantitative data from
   feed output paths at runtime (not from inline literals), consistent with the
   [Content Legitimacy Rules](#content-legitimacy-rules).
@@ -1217,8 +1216,8 @@ Deploy feed scripts or tasks as cronjobs for scheduled execution:
 alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js' --cron "0 */4 * * *"
 ```
 
-Cronjobs execute the script via the same jagent runtime as `alva run`. Max 20
-cronjobs per user. Min interval: 1 minute.
+Cronjobs execute the script via the same jagent runtime as `alva run`. Min
+interval: 1 minute.
 
 **Name format**: All resource names (cronjobs, feeds, playbooks) must be 1–63
 lowercase alphanumeric characters or hyphens, and cannot start or end with a
@@ -1361,5 +1360,4 @@ consistent read pattern (`@last`, `@range`, etc.).
 | V8 heap per execution | 2 GB                  |
 | Write payload         | 10 MB max per request |
 | HTTP response body    | 128 MB max            |
-| Max cronjobs per user | 20                    |
 | Min cron interval     | 1 minute              |
