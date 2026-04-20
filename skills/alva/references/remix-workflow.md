@@ -5,6 +5,11 @@ The user copies a prompt from the Remix button on any playbook page and pastes
 it into their agent. The agent then fetches the source playbook's code and UI,
 customizes them per the user's preferences, and deploys a new playbook.
 
+> **Note**: This workflow was updated for the dbview refactor (April 2026).
+> Feed references now live inline in `playbook.json` under `releases[].feeds[]`.
+> The legacy `releases/{version}/feeds/{feed_id}` ALFS symlinks no longer exist —
+> resolve feed paths directly from the JSON payload.
+
 ---
 
 ## Prompt Format
@@ -58,11 +63,25 @@ Returns JSON with structure:
     "version": "v1.0.0",
     "feeds_dir": "./releases/v1.0.0/feeds/",
     "feeds": [{ "feed_id": 100, "feed_major": 1 }]
-  }
+  },
+  "releases": [
+    {
+      "version": "v1.0.0",
+      "feeds": [{ "feed_id": 100, "feed_major": 1 }]
+    }
+  ]
 }
 ```
 
-From `latest_release.feeds`, collect the feed IDs you need to inspect.
+`releases[].feeds[]` (and equivalently `latest_release.feeds`) is the
+**authoritative** feed list — each entry gives you `{feed_id, feed_major}`,
+which is everything you need to resolve the feed's canonical ALFS path. The
+`feeds_dir` string is a legacy shape-compatibility field; **do not traverse
+it** — the `./releases/{version}/feeds/` and `./draft/feeds/` directories no
+longer exist on ALFS.
+
+From `latest_release.feeds`, collect the `{feed_id, feed_major}` pairs you
+need to inspect.
 
 ---
 
@@ -80,18 +99,20 @@ the new playbook's UI.
 
 ## Step 3 — Read Code Layer (Feed Scripts)
 
-Each feed referenced in `playbook.json` has a symlink under the release's
-`feeds/` directory pointing to the feed's ALFS path.
+Parse `releases[].feeds[]` from the target release in `playbook.json`
+(typically `latest_release.feeds`). For each entry `{feed_id, feed_major}`,
+the feed's canonical ALFS path is:
 
-```bash
-alva fs readlink --path '/alva/home/{owner}/playbooks/{name}/releases/{version}/feeds/{feed_id}'
-# → {"target_path": "/alva/home/{owner}/feeds/{feed_name}"}
+```
+/alva/home/{owner}/feeds/{feed_id}/v{feed_major}/feed.json
 ```
 
-Then read the feed script source:
+No `readlink` needed — the JSON payload already tells you everything. Read
+the feed metadata, then the script source:
 
 ```bash
-alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v1/src/index.js'
+alva fs read --path '/alva/home/{owner}/feeds/{feed_id}/v{feed_major}/feed.json'
+alva fs read --path '/alva/home/{owner}/feeds/{feed_id}/v{feed_major}/src/index.js'
 ```
 
 This contains the strategy logic, data fetching, and indicator computations.
@@ -99,7 +120,7 @@ This contains the strategy logic, data fetching, and indicator computations.
 Optionally, read sample feed output to understand the data schema:
 
 ```bash
-alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v1/data/{group}/{output}/@last/5'
+alva fs read --path '/alva/home/{owner}/feeds/{feed_id}/v{feed_major}/data/{group}/{output}/@last/5'
 ```
 
 ---
@@ -167,19 +188,16 @@ Agent reads:
 ```bash
 # 1. Metadata
 alva fs read --path '/alva/home/alice/playbooks/btc-momentum/playbook.json'
+# latest_release.feeds = [{ "feed_id": 100, "feed_major": 1 }]
 
 # 2. HTML source
 alva fs read --path '/alva/home/alice/playbooks/btc-momentum/index.html'
 
-# 3. Feed symlink → feed path
-alva fs readlink --path '/alva/home/alice/playbooks/btc-momentum/releases/v1.0.0/feeds/100'
-# → /alva/home/alice/feeds/btc-momentum
+# 3. Feed source code (resolved directly from feed_id/feed_major — no readlink)
+alva fs read --path '/alva/home/alice/feeds/100/v1/src/index.js'
 
-# 4. Feed source code
-alva fs read --path '/alva/home/alice/feeds/btc-momentum/v1/src/index.js'
-
-# 5. (Optional) Sample data for schema understanding
-alva fs read --path '/alva/home/alice/feeds/btc-momentum/v1/data/market/ohlcv/@last/3'
+# 4. (Optional) Sample data for schema understanding
+alva fs read --path '/alva/home/alice/feeds/100/v1/data/market/ohlcv/@last/3'
 ```
 
 Agent then runs the content-legitimacy audit on the source HTML and feed
