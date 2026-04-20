@@ -103,11 +103,6 @@ Third-party vendor secrets belong in Alva Secret Manager
 Run `alva whoami`. If it fails (no API key), run `alva auth login` to open
 browser-based login, then re-run `alva whoami` to confirm.
 
-On success, offer starting points:
-
-- "Ask me something like 'Who's been buying NVDA insider shares this month?'"
-- "Or build a live dashboard, backtest a strategy, or set up a data pipeline."
-
 ### 3. User Profile
 
 ```bash
@@ -169,6 +164,17 @@ that the user should verify with current sources.
 | **Backtest / Strategy** | Use Altra, run the backtest correctly, and always produce a visual playbook (equity curve, trade log, metrics) alongside the text summary. Optionally deploy as live paper trading. |
 | **Data Query** | Fetch the requested data accurately and return it directly unless the user asks for a richer artifact |
 | **Remix** | Reuse the source artifact, apply the requested changes, and return an updated result that matches the requested customization |
+
+### Choose Template (mandatory when `/use-template:<name>` is present)
+
+If the user's message contains a `/use-template:<name>` directive (e.g. `/use-template:thesis`, `/use-template:screener`), this step is **mandatory** and must run before Guided Planning and before any build work.
+
+1. Resolve `<name>` to `skills/alva/templates/<name>/template.md` (relative to this skill).
+2. **Read that template file** via the filesystem — do not proceed from memory of a prior session. If the file does not exist, list the directories under `templates/` and ask the user which to use.
+3. Treat the template as the authoritative blueprint for layout, sections, widgets, data contracts, and cadence. Deviate only where the user explicitly overrides it.
+4. In the plan you present during Guided Planning, state which template is being used and call out any intentional deviations.
+
+No `/use-template:` directive → skip this step and proceed to Guided Planning normally.
 
 ### Guided Planning
 
