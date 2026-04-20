@@ -275,6 +275,17 @@ plausible-looking data.
    the requested data type, report the gap as a blocker. Do not invent data from
    your own knowledge to fill the hole.
 
+### Feed Scope Isolation
+
+**Do not reference other feeds or other playbooks' feeds.** When building a
+playbook, only read from feeds created for this playbook in the current
+session.
+
+Reference an existing feed **only when the user explicitly asks for it** (e.g.
+"reuse my `btc-ema` feed", "pull data from @alice/macro-dashboard"). Otherwise,
+build the playbook's own feeds from scratch so its data lineage is
+self-contained and the playbook remains portable.
+
 Qualitative analysis (ratings, theses, outlook text) is not data and must not
 appear as feed output columns or "data" fields in HTML tables. If the user
 asks for a rating, either compute it from SDK fundamentals with the formula
