@@ -1279,7 +1279,8 @@ conflicts.
 
 ```bash
 # 1. Release feed (register in DB, link to cronjob)
-alva release feed --name btc-ema --version 1.0.0 --cronjob-id 42
+alva release feed --name btc-ema --version 1.0.0 --cronjob-id 42 \
+  --description "Fetches BTC/USDT 1h klines from Binance and emits the 20-period EMA as a time series"
 # → {"feed_id":100,"name":"btc-ema","feed_major":1}
 
 # 2. Create playbook draft (creates DB record + ALFS draft files automatically)

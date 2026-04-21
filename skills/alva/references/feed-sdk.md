@@ -282,7 +282,8 @@ alva deploy create --name daily-briefing \
 # 2. Register the feed (REQUIRED for push content to work)
 # Without this, notifications arrive without title/text content.
 alva release feed --name daily-briefing --version 1.0.0 \
-  --cronjob-id <ID_FROM_STEP_1>
+  --cronjob-id <ID_FROM_STEP_1> \
+  --description "Generates a morning briefing each day at 08:00 summarizing overnight crypto market moves and pushes it as a notification"
 ```
 
 **Key points:**

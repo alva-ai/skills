@@ -6,7 +6,7 @@ Register feeds and playbooks for public hosting. All commands are under
 ## Release Feed
 
 ```
-alva release feed --name NAME --version VERSION --cronjob-id ID [--description TEXT] [--view-json 'JSON']
+alva release feed --name NAME --version VERSION --cronjob-id ID --description TEXT [--view-json 'JSON']
 ```
 
 Register a feed in the database after deploying its cronjob. **Must be called
@@ -17,16 +17,26 @@ cronjob response.
 `alva fs readdir --path '~/feeds'` to check existing feed names before
 releasing.
 
-| Flag          | Type   | Required | Description                                                  |
-| ------------- | ------ | -------- | ------------------------------------------------------------ |
-| --name        | string | yes      | URL-safe feed name (e.g. `btc-ema`), must be unique per user |
-| --version     | string | yes      | SemVer (e.g. `1.0.0`)                                        |
-| --cronjob-id  | int64  | yes      | Cronjob ID from deploy create response                       |
-| --view-json   | object | no       | View configuration JSON                                      |
-| --description | string | no       | Feed description                                             |
+| Flag | Type | Required | Description |
+| --- | --- | --- | --- |
+| --name | string | yes | URL-safe feed name (e.g. `btc-ema`), must be unique per user |
+| --version | string | yes | SemVer (e.g. `1.0.0`) |
+| --cronjob-id | int64 | yes | Cronjob ID from deploy create response |
+| --view-json | object | no | View configuration JSON |
+| --description | string | yes | Complete statement of what the feed does (see below) |
+
+`description` conventions:
+
+- Write a complete statement covering the feed's **data source**, **what
+  it computes**, and the **output it produces**.
+- Prefer concrete specifics (symbol, interval, exchange, indicator
+  parameters) over vague labels.
+- Avoid bare labels like `"BTC EMA"` — they read as names, not
+  descriptions.
 
 ```
-alva release feed --name btc-ema --version 1.0.0 --cronjob-id 42 --description "BTC exponential moving average"
+alva release feed --name btc-ema --version 1.0.0 --cronjob-id 42 \
+  --description "Fetches BTC/USDT 1h klines from Binance and emits the 20-period EMA as a time series"
 → {"feed_id": 100, "name": "btc-ema", "feed_major": 1}
 ```
 

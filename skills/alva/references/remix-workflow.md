@@ -125,7 +125,7 @@ Follow the standard playbook creation flow (see SKILL.md):
 2. **Test** via `alva run --entry-path '~/feeds/{new-name}/v1/src/index.js'`
 3. **Grant** public read: `alva fs grant --path '~/feeds/{new-name}' --subject "special:user:*" --permission read`
 4. **Deploy cronjob**: `alva deploy create --name {new-name} --path '~/feeds/{new-name}/v1/src/index.js' --cron "..."`
-5. **Release feed**: `alva release feed --name {new-name} --version 1.0.0 --cronjob-id ID`
+5. **Release feed**: `alva release feed --name {new-name} --version 1.0.0 --cronjob-id ID --description "..."`
 6. **Write HTML** to `'~/playbooks/{new-name}/index.html'` (update data paths to
    point to your own feed)
 7. **Draft playbook**: `alva release playbook-draft --name {new-name} --display-name "..." --feeds '[{"feed_id":ID}]'`
