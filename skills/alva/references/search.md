@@ -1,16 +1,16 @@
 # Content Search
 
 Search SDKs for discovering unstructured content across multiple sources.
-For subscribing to specific accounts/channels, use `feed_widgets` instead.
+For subscribing to specific accounts/channels, use `feed_widgets` instead. The search SDKs below live in the `unified_search` partition.
 
 ## SDK Modules
 
 | SDK | Module | Best for |
 | --- | ------ | -------- |
-| `searchGrokX` | `@arrays/data/widget-scrap/search-grok-x:v1.0.0` | Twitter/X — returns engagement directly |
-| `searchSerper` | `@arrays/data/widget-scrap/serper-search:v1.0.0` | Google index: News, YouTube, Reddit, Web |
-| `searchBrave` | `@arrays/data/widget-scrap/search-brave:v1.0.0` | Independent index, good Reddit coverage |
-| `scrapeUrl` | `@arrays/data/widget-scrap/scrape-url:v1.0.0` | Scrape any page to markdown for enrichment |
+| `searchGrokX` | `@arrays/data/search/search-grok-x:v1.0.0` | Twitter/X — returns engagement directly |
+| `searchSerper` | `@arrays/data/search/serper-search:v1.0.0` | Google index: News, YouTube, Reddit, Web |
+| `searchBrave` | `@arrays/data/search/search-brave:v1.0.0` | Independent index, good Reddit coverage |
+| `scrapeUrl` | `@arrays/data/search/scrape-url:v1.0.0` | Scrape any page to markdown for enrichment |
 
 ## Sources
 

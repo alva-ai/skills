@@ -189,6 +189,7 @@ libraries available in every script execution.
 |--------------|-------------|
 | `crypto_fundamentals` | Crypto supply, market cap, dominance (internal data source) |
 | `feed_widgets` | Social & news subscription feeds (Twitter/X, YouTube, Reddit, podcasts) |
+| `unified_search` | Web search and URL scraping tools (X/Grok, Google, Brave, serper, decodo) |
 | `technical_indicator_calculation_helpers` | 50+ pure calculation helpers (RSI, MACD, Bollinger, etc.) |
 
 To discover available modules and their documentation:
@@ -211,8 +212,11 @@ discovery ("trending crypto discussions this week"), including social
 discussions, market narratives, news coverage, sentiment, analyst commentary,
 and community reactions.
 
-Content search modules are called directly in code (not via the partition
-API). See [search.md](references/search.md) for per-source SDK usage,
+Content search modules live in the `unified_search` runtime-library
+partition. Discover them via the same partition API as the other runtime
+libraries (`GET /api/v1/sdk/partitions/unified_search/summary` → module
+listing; `GET /api/v1/sdk/doc?name=...` → full per-module documentation).
+See [search.md](references/search.md) for per-source SDK usage,
 enrichment patterns, and gotchas.
 
 ### 4. Altra (Alva Trading Engine)
@@ -532,7 +536,7 @@ variables, or shell. Host-agent permissions still apply. See
 `require()` (e.g. `@alva/technical-indicators/*`). To discover function
 signatures, use the runtime module doc API
 (`GET /api/v1/sdk/doc?name=...`). Module groups:
-`crypto_fundamentals`, `feed_widgets`, `technical_indicator_calculation_helpers`.
+`crypto_fundamentals`, `feed_widgets`, `technical_indicator_calculation_helpers`, `unified_search`.
 
 **Secret Manager**: use `const secret = require("secret-manager");` then
 `secret.loadPlaintext("OPENAI_API_KEY")`. This returns a string when present or
