@@ -19,7 +19,9 @@
 
 ### Specification
 
-- Selected state: text color **unchanged**.
+- Hover and Selected share the same teal tint background.
+- Selected state additionally gets rounded corners (`--radius-ct-m`) and the text (`.list-item-text`) switches to `--main-m1`. Hover leaves text color unchanged.
+- No check icon — selection is conveyed by the rounded tinted pill alone.
 
 ### CSS
 
@@ -28,7 +30,7 @@
   background-color: var(--b0-container);
   display: flex;
   flex-direction: column;
-  padding: var(--spacing-xs) 0;
+  padding: var(--spacing-xxs);
   position: relative;
   border-radius: var(--radius-pop-dropdown);
   width: 100%;
@@ -52,13 +54,21 @@
 
 .list-item:hover,
 .list-item.selected {
-  background-color: var(--b-r03);
+  background-color: rgba(73,163,166,0.08);
+}
+
+.list-item.selected {
+  border-radius: var(--radius-ct-m);
+}
+
+.list-item.selected .list-item-text {
+  color: var(--main-m1);
 }
 
 .list-item-inner {
   display: flex;
   align-items: center;
-  padding: 7px var(--spacing-m);
+  padding: var(--spacing-xs) var(--spacing-s);
   gap: var(--spacing-xs);
 }
 
@@ -78,29 +88,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-.list-item-check {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-  display: none;
-}
-
-.list-item.selected .list-item-check {
-  display: block;
-}
-
-.list-item-check::after {
-  content: "";
-  display: block;
-  width: 16px;
-  height: 16px;
-  background-color: var(--main-m1);
-  -webkit-mask: url("https://alva-ai-static.b-cdn.net/icons/check-l1.svg")
-    center / contain no-repeat;
-  mask: url("https://alva-ai-static.b-cdn.net/icons/check-l1.svg") center /
-    contain no-repeat;
-}
 ```
 
 ### HTML Structure
@@ -112,14 +99,12 @@
   <div class="list-item" data-value="item-1">
     <div class="list-item-inner">
       <span class="list-item-text">Item - Normal</span>
-      <span class="list-item-check"></span>
     </div>
   </div>
 
   <div class="list-item selected" data-value="item-2">
     <div class="list-item-inner">
       <span class="list-item-text">Item - Selected</span>
-      <span class="list-item-check"></span>
     </div>
   </div>
 </div>
@@ -1285,13 +1270,11 @@ Dropdown. Arrow icon always points down and does not rotate.
   <div class="list-item" data-value="opt1">
     <div class="list-item-inner">
       <span class="list-item-text">Option 1</span>
-      <span class="list-item-check"></span>
     </div>
   </div>
   <div class="list-item" data-value="opt2">
     <div class="list-item-inner">
       <span class="list-item-text">Option 2</span>
-      <span class="list-item-check"></span>
     </div>
   </div>
 </div>
