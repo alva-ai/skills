@@ -79,11 +79,16 @@ Sticky across all tabs. Three pieces, left to right then wrap:
 - **One-sentence summary** — 14px / `--text-n5`, below the row. No "What this is"
   duplicate.
 
+Base `.playbook-title` + `.playbook-desc` come from design-system.md#playbook-header —
+do not re-spec. Screener only adds header-row layout (so the title can share a
+flex row with meta pills) and the pills themselves:
+
 ```css
 .playbook-header { display:flex; align-items:center; flex-wrap:wrap;
   row-gap: var(--spacing-xs); margin-bottom: var(--spacing-xs); }
-.playbook-title { font-size:24px; font-weight:400; line-height:34px;
-  color:var(--text-n9); margin:0; margin-right:auto; white-space:nowrap; }
+/* Flex-row extensions on design-system.md .playbook-title */
+.playbook-title { margin-right: auto; white-space: nowrap; }
+
 .header-meta { display:flex; align-items:center; gap: var(--spacing-xs); flex-wrap:wrap;
   font-size:12px; color:var(--text-n5); }
 .header-meta .refresh-badge { display:inline-flex; align-items:center; gap:6px;
@@ -97,8 +102,6 @@ Sticky across all tabs. Three pieces, left to right then wrap:
   padding:0 10px; border-radius: var(--radius-ct-s); height:28px; font-size:12px; }
 .header-meta .last-updated::before { content:''; display:inline-block;
   width:6px; height:6px; background:var(--main-m3); border-radius:50%; }
-.playbook-desc { font-size:14px; line-height:22px; letter-spacing:0.14px;
-  color:var(--text-n5); }
 @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
 ```
 
@@ -275,12 +278,13 @@ Structural rules:
 
 Score column combines a fill bar + numeric value, optional delta pill.
 
-Color rules (score → color):
+Color rules (score → color). Apply via inline style on `.score-bar-fill`;
+JS may use `var(--token)` directly in `element.style.background`.
 
-- `≥ 80` → `#2a9b7d` (green)
-- `≥ 70` → `#54a5c2` (blue)
-- `≥ 60` → `#ff9800` (amber)
-- `< 60` → `#e05357` (red)
+- `≥ 80` → `var(--main-m3)` (green, `#2a9b7d`)
+- `≥ 70` → `#54a5c2` (blue — no direct main token; `--chart-blue2-1`)
+- `≥ 60` → `var(--main-m6)` (amber, `#ff9800`)
+- `< 60` → `var(--main-m4)` (red, `#e05357`)
 
 ```css
 .score-cell { display:flex; align-items:center; gap: var(--spacing-xxs); }
@@ -376,8 +380,8 @@ ECharts spec essentials (beyond design-widgets Chart Card defaults):
 
 - 2 grids stacked: main (62% height) for candles, volume (18% height) below.
   Tops 4% / 76%, both `containLabel: true`.
-- Candle up/down colors: `#2a9b7d` / `#e05357`. Volume bars use 45% alpha of
-  the same.
+- Candle up/down colors: `#2a9b7d` / `#e05357` (= `--main-m3` / `--main-m4`;
+  ECharts canvas needs raw hex). Volume bars use 45% alpha of the same.
 - Shared x-axis pointer via `axisPointer.link: [{ xAxisIndex:'all' }]`.
 - Period-change pct rendered in the widget-timestamp line, color-coded by sign.
 
@@ -388,8 +392,8 @@ unique primitive — spec it here because design-widgets.md doesn't cover gauges
 
 - Radius 78%, single progress arc (width 14, roundCap), no pointer/tick/label.
 - Progress color = score color (same breakpoints as Score Bar).
-- Center: big number (40px, weight 400, `#1a1a1a`) + band label (12px, weight
-  500, tinted to score color) stacked via `rich` formatter.
+- Center: big number (40px, weight 400, `var(--text-n9)`) + band label (12px,
+  weight 500, tinted to score color) stacked via `rich` formatter.
 - Card container = Chart Card with dotted background, center-aligned.
 
 ### Factor Breakdown
@@ -462,12 +466,12 @@ Common building blocks (pick what fits):
 ### Movers Card
 
 KPI-style: icon (22px, solid background) + label + count, then a list of rows.
-Icon background colors:
+Icon background applied via inline style — use tokens:
 
-- Entries → `#2a9b7d` (green)
-- Dropouts → `#e05357` (red)
-- Top Gainers → `#2a9b7d` (green)
-- Top Decliners → `#ff9800` (amber)
+- Entries → `var(--main-m3)` (green)
+- Dropouts → `var(--main-m4)` (red)
+- Top Gainers → `var(--main-m3)` (green)
+- Top Decliners → `var(--main-m6)` (amber)
 
 Row detail colors: entries green, dropouts grey, gainers green / decliners red
 depending on sign.
