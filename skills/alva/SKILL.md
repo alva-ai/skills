@@ -419,7 +419,7 @@ do NOT guess a different name. Return to step 1.
 | `etf_fundamentals`                        | ETF holdings breakdown.                                                                                                                                                 |
 | `macro_and_economics_data`                | CPI, GDP, unemployment, federal funds rate, Treasury rates, PPI, consumer sentiment, VIX, TIPS, nonfarm payroll, retail sales, recession probability, etc. (20 modules) |
 | `technical_indicator_calculation_helpers` | 50+ pure calculation helpers: RSI, MACD, Bollinger Bands, ATR, VWAP, Ichimoku, Parabolic SAR, KDJ, OBV, etc. Input your own price arrays.                               |
-| `feed_widgets`                            | Social & news subscription feeds: news, Twitter/X, YouTube, Reddit, podcasts. For subscribing to specific accounts/channels.                                            |
+| `feed_widgets`                            | Social & news by account/channel: news, Twitter/X, YouTube, Reddit, podcasts. Two modes — declarative **subscriptions** (rolling targets-based feed, e.g. `getTwitterFeed`) and **historical backfill** per handle over an absolute time window (e.g. `getTwitterBackfill`, Pro-gated). For keyword/topic search across sources, use [Content Search](#content-search) instead. |
 
 For unstructured content — news articles, social discussions, videos, podcasts
 — see [Content Search](#content-search) below.
