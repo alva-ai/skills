@@ -217,7 +217,7 @@ await feed.run(async (ctx) => {
 ```
 
 When this feed runs as a cronjob, the platform reads
-`/data/signal/targets/@last/1` and pushes the signal content (truncated to
+`/data/signal/targets` and pushes the signal content (truncated to
 500 chars) to all playbook followers who have enabled Telegram notifications.
 
 **Key points:**
