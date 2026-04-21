@@ -50,11 +50,10 @@ use of Semibold (600) or Bold (700) is prohibited.
 
 ### Anti-aliasing Standards
 
-Text anti-aliasing is enabled by default. The following declarations must be
-included when generating or modifying styles:
+Include these anti-aliasing declarations in generated styles (globally, or on
+any text container):
 
 ```css
-/* Text anti-aliasing: global or text containers requiring sharp rendering */
 -webkit-font-smoothing: antialiased;
 -moz-osx-font-smoothing: grayscale;
 text-rendering: optimizeLegibility;
@@ -87,11 +86,11 @@ page-level vertical scroll is `<body>`:
 ```css
 html {
   height: 100%;
-  overflow: hidden;   /* html never scrolls */
+  overflow: hidden;
 }
 body {
   height: 100%;
-  overflow-y: auto;   /* sole page-level scroll entry point */
+  overflow-y: auto;
   overflow-x: hidden;
 }
 ```
@@ -119,7 +118,7 @@ body {
   width: 100%;
   max-width: 2048px;
   margin: 0 auto;
-  padding: var(--spacing-xs) var(--spacing-xxl) var(--spacing-xxxxl);
+  padding: var(--spacing-m) var(--spacing-xxl) var(--spacing-xxxxl);
 }
 
 @media (max-width: 768px) {
@@ -132,10 +131,11 @@ body {
 ## Playbook Header
 
 Every playbook starts with a **Title** and **Description Card** above all other
-content (including tab bars). Title-to-description gap is 24px (`--spacing-xl`),
-applied as `margin-bottom` on `.playbook-title`. **Do not add any margin to
-`.playbook-desc`** — the gap below it is owned by `.tab-bar-wrapper`'s
-`padding-top`.
+content (including tab bars). The title-to-description gap is applied as
+`margin-top` on `.playbook-desc` — **`.playbook-title` must stay margin-free**
+so it can safely live inside a flex row (e.g. alongside refresh badges or
+last-updated tags). **Do not add `margin-bottom` to `.playbook-desc`** — the
+gap below it is owned by `.tab-bar-wrapper`'s `padding-top`.
 
 ```css
 /* AI-generated summary title */
@@ -145,14 +145,12 @@ applied as `margin-bottom` on `.playbook-title`. **Do not add any margin to
   font-weight: 400;
   color: var(--text-n9);
   letter-spacing: 0.24px;
-  margin: 0 0 var(--spacing-xl) 0; /* 24px bottom = gap to .playbook-desc */
+  margin: 0;
 }
 
 /* 3–4 sentences: data sources and purpose */
 .playbook-desc {
-  background: var(--grey-g01);
-  padding: var(--spacing-s) var(--spacing-m);
-  border-radius: var(--radius-ct-s);
+  margin-top: var(--spacing-xs);
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
@@ -164,8 +162,7 @@ applied as `margin-bottom` on `.playbook-title`. **Do not add any margin to
 <h1 class="playbook-title">Strategy Performance Analysis</h1>
 <div class="playbook-desc">
   This playbook tracks a BTC momentum strategy backtested from Jan 2024. Data
-  sourced from Binance spot via Altra ALFS. Updated every 4 hours. Use the
-  Analytics tab for detailed risk metrics.
+  sourced from Binance spot via Altra ALFS.
 </div>
 ```
 
