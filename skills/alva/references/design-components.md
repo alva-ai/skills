@@ -1554,6 +1554,7 @@ border through their transparent border.
   gap: var(--spacing-l);
 }
 .tab-underline.tab-l .tab-item {
+  padding-bottom: 6px;
   font-size: 16px;
   line-height: 26px;
   letter-spacing: 0.16px;

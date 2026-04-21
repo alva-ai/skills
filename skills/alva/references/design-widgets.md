@@ -57,7 +57,7 @@
 }
 
 .widget-title-text {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   color: var(--text-n9);
   letter-spacing: 0.14px;
