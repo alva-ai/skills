@@ -1,8 +1,9 @@
 # Content Search
 
 Search SDKs for discovering unstructured content across multiple sources.
-For handle-first access (subscribe to an account, or backfill its history),
-use `feed_widgets` — see [Account-Level Access](#account-level-access-feed_widgets).
+For handle-first access (subscribe to an account, or — Twitter only —
+backfill its history), use `feed_widgets` — see
+[Handle-First Access](#handle-first-access-feed_widgets).
 
 ## SDK Modules
 
@@ -23,7 +24,7 @@ use `feed_widgets` — see [Account-Level Access](#account-level-access-feed_wid
 - **Fields**: `content`, `url`, `author_name`, `author_username`, `author_avatar`, `created_at` (ms — real publish time), `author_verified`, `author_followers_count`
 - **Batch queries**: GrokX is AI-powered, not keyword-matching — multiple related entities can be combined into one call (e.g. "Why are $AAPL $TSLA $NVDA moving? Explain each"). The `summary` will segment by entity automatically. Returned tweets are mixed (not per-entity); only do per-entity individual searches when the use case requires raw per-entity source content.
 - **Gotcha**: A single broad query returns mostly 0-engagement noise. Fix: (1) run 3-5 queries with different topical angles (e.g. "NVDA earnings", "NVDA AI chips", "NVDA stock price") plus entity aliases (`$NVDA`, `NVIDIA`); (2) filter results — tweets with `like_count == 0` AND `retweet_count == 0` are almost always noise; (3) `author_followers_count` and `author_verified` are strong quality signals for sorting survivors.
-- **Handle-first → use backfill, not search.** `searchGrokX` + `from:handle` filters for topical relevance, not coverage, and will miss tweets. For every tweet from `@handle` in a window (KOL audits, backtests), use `getTwitterBackfill` — see [Account-Level Access](#account-level-access-feed_widgets).
+- **Handle-first → use backfill, not search.** `searchGrokX` + `from:handle` filters for topical relevance, not coverage, and will miss tweets. For every tweet from `@handle` in a window (KOL audits, backtests), use `getTwitterBackfill` — see [Handle-First Access](#handle-first-access-feed_widgets).
 
 ### News
 
@@ -82,12 +83,14 @@ These apply across all sources:
 | Serper | `tbs` | `qdr:d` | `qdr:w` | `qdr:m` |
 | Brave | `freshness` | `pd` | `pw` | `pm` |
 
-## Account-Level Access (`feed_widgets`)
+## Handle-First Access (`feed_widgets`)
 
-Handle-first intents, picked by shape:
+Twitter-specific pickers by intent:
 
 - **Rolling subscription** (playbook follows an account on a cron) → `getTwitterFeed` (`@arrays/data/widget-scrap/twitter:v1.0.0`)
-- **Historical backfill** (every tweet from `@user` between T0 and T1 — KOL audits, backtests, training data) → `getTwitterBackfill` (`@arrays/data/widget-scrap/twitter-backfill:v1.0.0`) — **Pro-gated**; always check `response.partial` before treating the result as complete (mid-stream errors surface already-drained tweets with `partial: true` and `error` set).
+- **Historical backfill** (every tweet from `@user` between T0 and T1 — KOL audits, backtests, training data) → `getTwitterBackfill` (`@arrays/data/widget-scrap/twitter-backfill:v1.0.0`) — **Pro-gated**; always check `response.partial` before treating the result as complete (mid-stream errors surface already-drained tweets with `partial: true` and `error` set). Twitter-only today — no equivalent for news / YouTube / Reddit / podcasts.
 - **Topic/keyword search** → `searchGrokX` (see [Twitter/X](#twitterx) above).
 
 Run `alva sdk doc --name @arrays/data/widget-scrap/twitter-backfill` for the full shape before calling.
+
+For rolling subscriptions on other sources (news, YouTube, Reddit, podcasts), the same partition has per-source feed SDKs — discover with `alva sdk partition-summary --partition feed_widgets`.
