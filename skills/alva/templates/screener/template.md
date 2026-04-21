@@ -699,7 +699,20 @@ The qualified list is the natural push payload — "who's in today?" is the whol
 - Scored screener: new entries + dropouts + top-N by score.
 - Basket/unscored: entries + exits only. Skip the push when both are empty.
 
-**Format**:
+**Format** — compress to 3 lines so it renders inside a lock-screen preview:
 
-- `title`: `<Screener> · <date> · +N / -M` — scannable from a lock screen.
-- `text`: entries as `<ID> (<score>, <band>)` one per line, followed by dropouts, then a `Top N:` line. Include only the 1–2 most decision-relevant metrics per row — recipients won't click through.
+- `title`: `<Screener> · <date>` — scannable identity + freshness.
+- Line 1 (churn): `🆕 New in Top N: <IDs> | 👋 Dropped: <IDs>`.
+- Line 2 (top pick): `⭐ Top: <ID> · <primary factor> <value> · <sector> · <secondary factor>`. Name the factors — recipients should see *why* this one leads, not just that it does. Pick the 1–2 factors that drove the score (e.g. `Drift 1.85`, `+16% EPS surprise`), not every column in the table.
+- Line 3: `Full list → <playbook URL>` for the click-through.
+
+**Example** (PEAD Momentum screener):
+
+```text
+Title: PEAD Momentum · 2026-04-21
+🆕 New in Top 10: WAFD, ALLY | 👋 Dropped: TFC, SFNC
+⭐ Top: WAFD · Drift 1.85 · Financial Services · +16% EPS surprise
+Full list → https://alva.ai/u/stock-king/playbooks/post-earnings-drift-momentum
+```
+
+Basket/unscored variant: drop the `⭐ Top` line; keep churn + link. Skip the push entirely when both churn sides are empty.
