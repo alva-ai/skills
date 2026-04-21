@@ -178,7 +178,9 @@ module.exports = { strategyFn, initialState };
 
 ```javascript
 const { FeedAltraModule } = require("@alva/feed");
-const { FeedAltra, e, createArraysOhlcvProvider } = FeedAltraModule;
+const { FeedAltra, e } = FeedAltraModule;
+const { AltraModule } = require("@alva/graph");
+const { createArraysOhlcvProvider } = AltraModule;
 const secret = require("secret-manager");
 
 const { SYMBOL, STRATEGY_INTERVAL } = require("./constants.js");
@@ -224,15 +226,13 @@ altra.setStrategy(strategyFn, {
 
 ## Imports
 
-Altra is accessed through the `FeedAltraModule` export from `@alva/feed`:
+Altra is accessed through the `FeedAltraModule` export from `@alva/feed`.
+Field type helpers (`num`, `str`, etc.) are at the `@alva/feed` top level, and
+`createArraysOhlcvProvider` lives on `@alva/graph`'s `AltraModule`:
 
 ```javascript
-const { FeedAltraModule } = require("@alva/feed");
 const {
-  FeedAltra,
-  e,
-  Amount,
-  TIME,
+  FeedAltraModule,
   num,
   str,
   bool,
@@ -240,30 +240,42 @@ const {
   arr,
   fld,
   makeDoc,
+} = require("@alva/feed");
+const {
+  FeedAltra,
+  e,
+  Amount,
+  TIME,
+  allocate,
+  order,
+  orders,
 } = FeedAltraModule;
+const { AltraModule } = require("@alva/graph");
+const { createArraysOhlcvProvider } = AltraModule;
 ```
 
-| Export                                    | Description                                      |
-| ----------------------------------------- | ------------------------------------------------ |
-| `FeedAltra`                               | Main backtesting engine class                    |
-| `e`                                       | Event trigger expression builder                 |
-| `Amount`                                  | Order amount constructors                        |
-| `TIME`                                    | Time constants (SECOND, MINUTE, HOUR, DAY, WEEK) |
-| `allocate`                                | Helper to create allocate target                 |
-| `order` / `orders`                        | Helper to create order targets                   |
-| `num`, `str`, `bool`, `obj`, `arr`, `fld` | Field type helpers (same as Feed SDK)            |
-| `makeDoc`                                 | Type document helper                             |
+| Export                                    | Source                     | Description                                      |
+| ----------------------------------------- | -------------------------- | ------------------------------------------------ |
+| `FeedAltra`                               | `FeedAltraModule`          | Main backtesting engine class                    |
+| `e`                                       | `FeedAltraModule`          | Event trigger expression builder                 |
+| `Amount`                                  | `FeedAltraModule`          | Order amount constructors                        |
+| `TIME`                                    | `FeedAltraModule`          | Time constants (SECOND, MINUTE, HOUR, DAY, WEEK) |
+| `allocate`                                | `FeedAltraModule`          | Helper to create allocate target                 |
+| `order` / `orders`                        | `FeedAltraModule`          | Helper to create order targets                   |
+| `num`, `str`, `bool`, `obj`, `arr`, `fld` | `@alva/feed` (top level)   | Field type helpers (same as Feed SDK)            |
+| `makeDoc`                                 | `@alva/feed` (top level)   | Type document helper                             |
+| `createArraysOhlcvProvider`               | `@alva/graph` `AltraModule` | Builds the OHLCV provider used by Altra          |
 
 ---
 
 ## OHLCV Provider
 
 All OHLCV data must come through `createArraysOhlcvProvider()`. Never fabricate
-price data.
+price data. The provider is exported from `@alva/graph` (not `@alva/feed`).
 
 ```javascript
-const { FeedAltraModule } = require("@alva/feed");
-const { createArraysOhlcvProvider } = FeedAltraModule;
+const { AltraModule } = require("@alva/graph");
+const { createArraysOhlcvProvider } = AltraModule;
 const secret = require("secret-manager");
 
 const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
