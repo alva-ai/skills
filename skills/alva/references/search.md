@@ -2,7 +2,7 @@
 
 Search SDKs for discovering unstructured content across multiple sources.
 For handle-first access (subscribe to an account, or — Twitter only —
-backfill its history), use the `feed_widgets` partition instead.
+backfill its history), use the `feed_widgets` partition instead. The search SDKs below live in the `unified_search` partition.
 
 ## SDK Modules
 

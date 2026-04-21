@@ -157,7 +157,7 @@ When a cronjob triggers:
 
 The script has full access to:
 
-- All `require()` modules (alfs, env, net/http, SDKHub modules, @alva/feed,
+- All `require()` modules (alfs, env, net/http, runtime libraries, @alva/feed,
   etc.)
 - `require("env").args` contains the args from the cronjob configuration
 - Filesystem read/write

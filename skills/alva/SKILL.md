@@ -11,7 +11,7 @@ description: >-
   Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v1.4.0
+  version: v1.5.0
 ---
 
 # Alva
@@ -121,7 +121,14 @@ Session variables:
 - **`telegram_username`** — if set, recommend push-enabled feeds; if null,
   guide user to connect Telegram first.
 
-### 4. Load Memory
+### 4. Arrays JWT Check
+
+Data skills require `ARRAYS_JWT`. The `_meta.arrays_jwt` field in the
+`alva whoami` output above shows its status — if it needs attention (missing,
+`renewal_needed: true`, or absent), use `alva arrays token` to manage it
+(`status` to inspect, `ensure` to provision or refresh).
+
+### 5. Load Memory
 
 If you have **not** read the user's memory in this conversation, read it now.
 
@@ -371,55 +378,59 @@ local machine. See [Filesystem](references/api/filesystem.md).
 Run JavaScript on Alva Cloud in a sandboxed V8 isolate. Code executed via
 `alva run` runs entirely on Alva's servers -- it cannot access
 the host machine's filesystem, environment variables, or processes. The runtime
-has access to ALFS, all 250+ SDKs, HTTP networking, LLM access, and the Feed
-SDK.
+has access to ALFS, data skills via HTTP, runtime libraries, LLM access, and
+the Feed SDK.
 
-### 3. SDKHub
+### 3. Data Skills
 
-250+ built-in financial data SDKs. To find the right SDK for a task, use the
-two-step retrieval flow:
+Financial data APIs across 16+ domains, served by the Arrays backend
+(`$ARRAYS_ENDPOINT`, defaults to `https://data-tools.prd.space.id`). To find
+the right API for a task, use the `alva skills` CLI (public, no auth):
 
-1. **Pick a partition** from the index below.
-2. **Call `alva sdk partition-summary --partition <name>`** to see module
-   summaries, then load the full doc for the chosen module.
+1. **Discover available data skills**: `alva skills list` — returns all data
+   skills with their names and descriptions. Use this to find the skill that
+   matches your data need.
+2. **Fetch the skill summary**: `alva skills summary --name <skill>` — returns
+   the endpoints table for that domain.
+3. **Fetch endpoint detail**: `alva skills endpoint --name <skill> --path <path>`
+   — use the Path value from the summary endpoints table (e.g. `company/list`,
+   `market-news`) to get full parameters, response fields, and examples.
+4. **Call Arrays data endpoints** with `Authorization: Bearer <ARRAYS_JWT>`.
+   In runtime code, load the token via `secret.loadPlaintext('ARRAYS_JWT')`.
+   The token is verified during preflight (see [Arrays JWT Check](#4-arrays-jwt-check));
+   if a call returns 401, re-run `alva arrays token ensure`.
 
-**SDK doc lookup is mandatory.** Always look up SDK documentation before writing
-any feed script. Do not guess function signatures, parameter names, or response
-shapes from memory. The doc lookup ensures you use the correct module, call the
-right function, and handle the actual response format.
+**Data skill doc lookup is mandatory.** Always fetch the endpoint detail before
+writing code that calls it. Do not guess paths, parameter names, or response
+shapes from memory. The doc lookup ensures you use the correct endpoint and
+handle the actual response format.
 
-**Enforcement**: Before any `require("@arrays/...")` or `alva run` call, you
-MUST have completed a doc lookup for that specific module in this session.
-The required sequence is:
+**Enforcement**: Before any Arrays data HTTP call or `alva run` that hits one,
+you MUST have completed `alva skills endpoint --name <skill> --path <path>` for
+that endpoint in this session. If the call fails with an unexpected shape,
+re-fetch the endpoint detail rather than guessing.
 
-1. `alva sdk partition-summary --partition <name>` → find exact module path
-2. `alva sdk doc --name <module>` → get function names, params, response shape
-3. Write code using ONLY the names and shapes from step 2
+#### Runtime Libraries
 
-If an `alva run` call fails with "module not found" or "not a function",
-do NOT guess a different name. Return to step 1.
+Built-in modules that run inside the jagent V8 runtime via `require()`. These
+are **not** data APIs — they are pure computation and utility libraries
+available in every script execution.
 
-#### SDK Partition Index
-
-| Partition                                 | Description                                                                                                                                                             |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `spot_market_price_and_volume`            | Spot OHLCV for crypto and equities. Price bars, volume, historical candles.                                                                                             |
-| `crypto_futures_data`                     | Perpetual futures: OHLCV, funding rates, open interest, long/short ratio.                                                                                               |
-| `crypto_technical_metrics`                | Crypto technical & on-chain indicators: MA, EMA, RSI, MACD, Bollinger, MVRV, SOPR, NUPL, whale ratio, market cap, FDV, etc. (20 modules)                                |
-| `crypto_exchange_flow`                    | Exchange inflow/outflow data for crypto assets.                                                                                                                         |
-| `crypto_fundamentals`                     | Crypto market fundamentals: circulating supply, max supply, market dominance.                                                                                           |
-| `crypto_screener`                         | Screen crypto assets by technical metrics over custom time ranges.                                                                                                      |
-| `company_crypto_holdings`                 | Public companies' crypto token holdings (e.g. MicroStrategy BTC).                                                                                                       |
-| `equity_fundamentals`                     | Stock fundamentals: income statements, balance sheets, cash flow, margins, PE, PB, ROE, ROA, EPS, market cap, dividend yield, enterprise value, etc. (31 modules)       |
-| `equity_estimates_and_targets`            | Analyst price targets, consensus estimates, earnings guidance.                                                                                                          |
-| `equity_events_calendar`                  | Dividend calendar, stock split calendar.                                                                                                                                |
-| `equity_ownership_and_flow`               | Institutional holdings, insider trades, senator trading activity.                                                                                                       |
-| `stock_screener`                          | Screen stocks by sector, industry, country, exchange, IPO date, earnings date, financial & technical metrics. (9 modules)                                               |
-| `stock_technical_metrics`                 | Stock technical indicators: beta, volatility, Bollinger, EMA, MA, MACD, RSI-14, VWAP, avg daily dollar volume.                                                          |
-| `etf_fundamentals`                        | ETF holdings breakdown.                                                                                                                                                 |
-| `macro_and_economics_data`                | CPI, GDP, unemployment, federal funds rate, Treasury rates, PPI, consumer sentiment, VIX, TIPS, nonfarm payroll, retail sales, recession probability, etc. (20 modules) |
-| `technical_indicator_calculation_helpers` | 50+ pure calculation helpers: RSI, MACD, Bollinger Bands, ATR, VWAP, Ichimoku, Parabolic SAR, KDJ, OBV, etc. Input your own price arrays.                               |
+| Module group                              | Description                                                               |
+| ----------------------------------------- | ------------------------------------------------------------------------- |
+| `crypto_fundamentals`                     | Crypto supply, market cap, dominance (internal data source)               |
 | `feed_widgets`                            | Per-handle/channel rolling subscriptions — news, Twitter/X, YouTube, Reddit, podcasts (e.g. `getTwitterFeed`). Twitter also has historical backfill over a time window (`getTwitterBackfill`, Pro-gated). For topic/keyword search, use [Content Search](#content-search). |
+| `unified_search`                          | Web search and URL scraping tools (X/Grok, Google, Brave, serper, decodo) |
+| `technical_indicator_calculation_helpers` | 50+ pure calculation helpers (RSI, MACD, Bollinger, etc.)                 |
+
+To discover available modules and their documentation:
+
+- `alva sdk partitions` — list all runtime module groups
+- `alva sdk partition-summary --partition <name>` — one-line summaries per group
+- `alva sdk doc --name <module>` — full doc for a specific runtime module
+
+Pick a module group → `partition-summary` to see modules → `sdk doc` for full
+documentation.
 
 For unstructured content — news articles, social discussions, videos, podcasts
 — see [Content Search](#content-search) below.
@@ -436,8 +447,11 @@ discovery ("trending crypto discussions this week"), including social
 discussions, market narratives, news coverage, sentiment, analyst commentary,
 and community reactions.
 
-Content search modules are called directly in code (not via the partition
-API). See [search.md](references/search.md) for per-source SDK usage,
+Content search modules live in the `unified_search` runtime-library
+partition. Discover them via the same partition API as the other runtime
+libraries (`GET /api/v1/sdk/partitions/unified_search/summary` → module
+listing; `GET /api/v1/sdk/doc?name=...` → full per-module documentation).
+See [search.md](references/search.md) for per-source SDK usage,
 enrichment patterns, and gotchas.
 
 ### 4. Altra (Alva Trading Engine)
@@ -720,10 +734,16 @@ variables, or shell. Host-agent permissions still apply. See
 | @alva/adk       | `require("@alva/adk")`       | Agent SDK for LLM requests — `agent()` for LLM agents with tool calling |
 | @test/suite     | `require("@test/suite")`     | Jest-style test framework (`describe`, `it`, `expect`, `runTests`)      |
 
-**SDKHub**: 250+ data modules available via
-`require("@arrays/crypto/ohlcv:v1.0.0")` etc. Version suffix is optional
-(defaults to `v1.0.0`). To discover function signatures and response shapes, use
-`alva sdk doc --name "..."`).
+**Runtime libraries**: Built-in computation modules available via `require()`
+(e.g. `@alva/technical-indicators/rsi:v1.0.0`). Version suffix is optional
+(defaults to `v1.0.0`). To discover function signatures, use
+`alva sdk doc --name "..."`. Module groups: `crypto_fundamentals`,
+`feed_widgets`, `technical_indicator_calculation_helpers`, `unified_search`.
+
+**Data APIs**: Financial data (crypto, stock, macro, ETF) is fetched via HTTP
+from the Arrays backend — see the [Data Skills](#3-data-skills) section. Load
+`ARRAYS_JWT` via `secret.loadPlaintext('ARRAYS_JWT')` and call Arrays endpoints
+with `Authorization: Bearer <ARRAYS_JWT>`.
 
 **Secret Manager**: use `const secret = require("secret-manager");` then
 `secret.loadPlaintext("OPENAI_API_KEY")`. This returns a string when present or
@@ -744,8 +764,12 @@ filesystem paths.
 
 ```javascript
 const { Feed, feedPath, makeDoc, num } = require("@alva/feed");
-const { getCryptoKline } = require("@arrays/crypto/ohlcv:v1.0.0");
+const http = require("net/http");
+const secret = require("secret-manager");
 const { indicators } = require("@alva/algorithm");
+
+const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
+const ARRAYS_BASE = "https://data-tools.prd.space.id";
 
 const feed = new Feed({ path: feedPath("btc-ema") });
 
@@ -762,14 +786,11 @@ feed.def("metrics", {
     const start =
       lastDateMs > 0 ? Math.floor(lastDateMs / 1000) : now - 30 * 86400;
 
-    const bars = getCryptoKline({
-      symbol: "BTCUSDT",
-      start_time: start,
-      end_time: now,
-      interval: "1h",
-    })
-      .response.data.slice()
-      .reverse();
+    const resp = http.syncFetch(
+      `${ARRAYS_BASE}/api/v1/crypto/ohlcv?symbol=BTCUSDT&start_time=${start}&end_time=${now}&interval=1h&limit=10000`,
+      { headers: { Authorization: "Bearer " + ARRAYS_JWT } }
+    );
+    const bars = JSON.parse(resp.text()).data.slice().reverse();
     const closes = bars.map((b) => b.close);
     const ema10 = indicators.ema(closes, { period: 10 });
 
@@ -944,9 +965,9 @@ When an SDK module returns a Pro-only or subscription error:
 ### Coverage Limitations
 
 When the user requests data outside Alva's supported asset classes (e.g. forex
-pairs, which are not in SDKHub), state the limitation upfront rather than
-discovering it through failed searches. Suggest BYOD alternatives if a public
-API exists.
+pairs, which are not in the Data Skills catalog), state the limitation upfront
+rather than discovering it through failed searches. Suggest BYOD alternatives
+if a public API exists.
 
 ---
 
@@ -970,10 +991,10 @@ alva fs remove --path '~/feeds/my-feed/v1/data' --recursive
 
 ### Inline Debug Snippets
 
-Test SDK shapes before building a full feed:
+Test data skill response shapes before building a full feed:
 
 ```bash
-alva run --code 'const { getCryptoKline } = require("@arrays/crypto/ohlcv:v1.0.0"); JSON.stringify(Object.keys(getCryptoKline({ symbol: "BTCUSDT", start_time: 0, end_time: 0, interval: "1h" })));'
+alva run --code 'const http = require("net/http"); const secret = require("secret-manager"); const jwt = secret.loadPlaintext("ARRAYS_JWT"); const r = http.syncFetch("https://data-tools.prd.space.id/api/v1/crypto/ohlcv?symbol=BTCUSDT&start_time=1735689600&end_time=1735776000&interval=1h&limit=5", {headers:{Authorization:"Bearer "+jwt}}); JSON.stringify(JSON.parse(r.text()).data[0]);'
 ```
 
 ---
@@ -1149,9 +1170,12 @@ usually incomplete — see
 See [altra-trading.md](references/altra-trading.md) for full details.
 
 ```javascript
-const { createOHLCVProvider } = require("@arrays/data/ohlcv-provider:v1.0.0");
 const { FeedAltraModule } = require("@alva/feed");
-const { FeedAltra, e, Amount } = FeedAltraModule;
+const { FeedAltra, e, Amount, createArraysOhlcvProvider } = FeedAltraModule;
+const secret = require("secret-manager");
+
+const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
+const ohlcvProvider = createArraysOhlcvProvider({ jwt: ARRAYS_JWT });
 
 const altra = new FeedAltra(
   {
@@ -1161,7 +1185,7 @@ const altra = new FeedAltra(
     simOptions: { simTick: "1min", feeRate: 0.001 },
     perfOptions: { timezone: "UTC", marketType: "crypto" },
   },
-  createOHLCVProvider(),
+  ohlcvProvider,
 );
 
 const dg = altra.getDataGraph();

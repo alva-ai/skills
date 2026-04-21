@@ -177,9 +177,9 @@ module.exports = { strategyFn, initialState };
 ### main.js
 
 ```javascript
-const { createOHLCVProvider } = require("@arrays/data/ohlcv-provider:v1.0.0");
 const { FeedAltraModule } = require("@alva/feed");
-const { FeedAltra, e } = FeedAltraModule;
+const { FeedAltra, e, createArraysOhlcvProvider } = FeedAltraModule;
+const secret = require("secret-manager");
 
 const { SYMBOL, STRATEGY_INTERVAL } = require("./constants.js");
 const { createMACDFeature } = require("./features.js");
@@ -188,7 +188,8 @@ const { strategyFn, initialState } = require("./strategy.js");
 const START_DATE = Date.parse("2025-01-01T00:00:00.000Z");
 const END_DATE = Date.now();
 
-const ohlcvProvider = createOHLCVProvider();
+const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
+const ohlcvProvider = createArraysOhlcvProvider({ jwt: ARRAYS_JWT });
 
 const altra = new FeedAltra(
   {
@@ -257,12 +258,16 @@ const {
 
 ## OHLCV Provider
 
-All OHLCV data must come through `createOHLCVProvider()`. Never fabricate price
-data.
+All OHLCV data must come through `createArraysOhlcvProvider()`. Never fabricate
+price data.
 
 ```javascript
-const { createOHLCVProvider } = require("@arrays/data/ohlcv-provider:v1.0.0");
-const ohlcvProvider = createOHLCVProvider();
+const { FeedAltraModule } = require("@alva/feed");
+const { createArraysOhlcvProvider } = FeedAltraModule;
+const secret = require("secret-manager");
+
+const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
+const ohlcvProvider = createArraysOhlcvProvider({ jwt: ARRAYS_JWT });
 
 const altra = new FeedAltra(config, ohlcvProvider);
 ```
@@ -327,6 +332,7 @@ When trading both crypto and stocks, use a single FeedAltra instance with
 `marketType: "mix"`:
 
 ```javascript
+const ohlcvProvider = createArraysOhlcvProvider({ jwt: ARRAYS_JWT });
 const altra = new FeedAltra(
   {
     path: "~/feeds/multi-asset/v1",
@@ -469,29 +475,31 @@ Raw data sources provide external data beyond OHLCV (funding rates, open
 interest, on-chain metrics, sentiment).
 
 ```javascript
-const { getOpenInterest } = require("@arrays/crypto/open-interest:v1.0.0");
+const http = require("net/http");
+const secret = require("secret-manager");
+const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
+const ARRAYS_BASE = "https://data-tools.prd.space.id";
 
 dataGraph.registerRawData({
   name: "btc_open_interest",
   description: "BTC perpetual futures open interest",
   fields: [num("sumOpenInterest"), num("sumOpenInterestValue")],
   fn: (fromExclusive, toInclusive) => {
-    const result = getOpenInterest({
-      symbol: "BINANCE_PERP_BTC_USDT",
-      start_time: fromExclusive,
-      end_time: toInclusive,
-      interval: "1d",
-    });
+    const resp = http.syncFetch(
+      `${ARRAYS_BASE}/api/v1/crypto/open-interest?symbol=BTCUSDT&start_time=${fromExclusive}&end_time=${toInclusive}&interval=1d`,
+      { headers: { Authorization: "Bearer " + ARRAYS_JWT } }
+    );
+    const result = JSON.parse(resp.text());
 
     if (!result.success) {
       throw new Error("getOpenInterest failed: " + JSON.stringify(result));
     }
 
     return {
-      data: result.response.data.map((d) => ({
+      data: result.data.map((d) => ({
         date: d.observedAt, // MUST use observedAt for PIT safety
-        sumOpenInterest: d.sumOpenInterest,
-        sumOpenInterestValue: d.sumOpenInterestValue,
+        sumOpenInterest: d.sum_open_interest,
+        sumOpenInterestValue: d.sum_open_interest_value,
       })),
     };
   },
@@ -531,8 +539,8 @@ e.ohlcv("BINANCE_SPOT_BTC_USDT", "1d"); // Daily bar close
 e.raw("sentiment_score"); // Raw data update
 e.feature("rsi"); // Feature computed
 
-e.all(e.ohlcv("AAPL", "1d"), e.ohlcv("BTCUSDT", "1d")); // AND
-e.any(e.ohlcv("BTCUSDT", "1h"), e.raw("funding")); // OR
+e.all(e.ohlcv("XNAS_SPOT_AAPL_USD", "1d"), e.ohlcv("BINANCE_SPOT_BTC_USDT", "1d")); // AND
+e.any(e.ohlcv("BINANCE_SPOT_BTC_USDT", "1h"), e.raw("funding")); // OR
 ```
 
 ### Strategy Config
