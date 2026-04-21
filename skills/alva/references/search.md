@@ -1,9 +1,8 @@
 # Content Search
 
 Search SDKs for discovering unstructured content across multiple sources.
-For account/channel-level access (subscribe to an account, or backfill a
-handle's full history over a time window), use `feed_widgets` instead —
-see [Account-Level Access](#account-level-access-feed_widgets) below.
+For handle-first access (subscribe to an account, or backfill its history),
+use `feed_widgets` — see [Account-Level Access](#account-level-access-feed_widgets).
 
 ## SDK Modules
 
@@ -24,7 +23,7 @@ see [Account-Level Access](#account-level-access-feed_widgets) below.
 - **Fields**: `content`, `url`, `author_name`, `author_username`, `author_avatar`, `created_at` (ms — real publish time), `author_verified`, `author_followers_count`
 - **Batch queries**: GrokX is AI-powered, not keyword-matching — multiple related entities can be combined into one call (e.g. "Why are $AAPL $TSLA $NVDA moving? Explain each"). The `summary` will segment by entity automatically. Returned tweets are mixed (not per-entity); only do per-entity individual searches when the use case requires raw per-entity source content.
 - **Gotcha**: A single broad query returns mostly 0-engagement noise. Fix: (1) run 3-5 queries with different topical angles (e.g. "NVDA earnings", "NVDA AI chips", "NVDA stock price") plus entity aliases (`$NVDA`, `NVIDIA`); (2) filter results — tweets with `like_count == 0` AND `retweet_count == 0` are almost always noise; (3) `author_followers_count` and `author_verified` are strong quality signals for sorting survivors.
-- **Not the right tool when the input is a handle, not a topic.** `searchGrokX` + `from:handle` will NOT return a complete account timeline — it's optimised for topical relevance, not coverage. If the user wants every tweet from `@handle` between T0 and T1 (KOL analysis, narrative audit, historical backtest), use `getTwitterBackfill` in `feed_widgets` instead. See [Account-Level Access](#account-level-access-feed_widgets).
+- **Handle-first → use backfill, not search.** `searchGrokX` + `from:handle` filters for topical relevance, not coverage, and will miss tweets. For every tweet from `@handle` in a window (KOL audits, backtests), use `getTwitterBackfill` — see [Account-Level Access](#account-level-access-feed_widgets).
 
 ### News
 
@@ -85,29 +84,10 @@ These apply across all sources:
 
 ## Account-Level Access (`feed_widgets`)
 
-When the input is a specific **account/handle** rather than a topic, content
-search is the wrong hammer. The `feed_widgets` partition covers two
-account-level modes — pick by whether you need rolling updates or a bounded
-historical snapshot.
+Handle-first intents, picked by shape:
 
-| Need | SDK | Shape |
-| --- | --- | --- |
-| Rolling subscription — playbook follows an account, feed keeps updating on a cron | `getTwitterFeed` (`@arrays/data/widget-scrap/twitter:v1.0.0`) | Declarative targets-based; the current targets list IS the complete subscribe state. Per-call filters & limit. |
-| One-shot historical backfill — "every tweet from `@user` between T0 and T1" | `getTwitterBackfill` (`@arrays/data/widget-scrap/twitter-backfill:v1.0.0`) | Single unary call. `start_time` required, `end_time` defaults to now. Read-only, no subscription side-effects. **Pro-gated.** |
+- **Rolling subscription** (playbook follows an account on a cron) → `getTwitterFeed` (`@arrays/data/widget-scrap/twitter:v1.0.0`)
+- **Historical backfill** (every tweet from `@user` between T0 and T1 — KOL audits, backtests, training data) → `getTwitterBackfill` (`@arrays/data/widget-scrap/twitter-backfill:v1.0.0`) — **Pro-gated**; always check `response.partial` before treating the result as complete (mid-stream errors surface already-drained tweets with `partial: true` and `error` set).
+- **Topic/keyword search** → `searchGrokX` (see [Twitter/X](#twitterx) above).
 
-### When to pick backfill over search or subscribe
-
-- **KOL / account audits, historical backtests, training datasets** — you want the complete timeline for one handle over a window, not the topically-relevant subset. Use backfill.
-- **Narrative tracking for a live playbook** — ongoing coverage of an account on a cron. Use the subscription feed.
-- **"What are people saying about X" / "find tweets about X"** — topic-first, not handle-first. Use `searchGrokX`.
-
-### `getTwitterBackfill` gotchas
-
-Always run `alva sdk doc --name @arrays/data/widget-scrap/twitter-backfill` for the authoritative shape. The points worth knowing up front:
-
-- **Pro-tier gated.** Non-Pro callers get `PERMISSION_DENIED`. Inside a jagent, `user_id` defaults to `require('env').userId`; outside the jagent runtime it must be passed explicitly.
-- **Partial results on mid-stream errors.** Backend drains a server-streaming RPC internally. On mid-stream failures the envelope still returns already-collected tweets with `response.partial === true` and `response.error` set. Always check `response.partial` before treating the dataset as complete.
-- **Unary response, no progress events.** Callers see one response, not a stream.
-- **Bound the window.** Very wide windows can take minutes and may hit gateway timeouts; prefer reasonable windows (e.g. 30-180 days) and paginate by re-calling with shifted `start_time` if you need more.
-- **Ordering not guaranteed.** `response.data` usually comes back newest-first but the SDK does not promise it — sort by `date` yourself if order matters.
-- **Handle sanitisation.** Leading `@` is stripped automatically; pass either form.
+Run `alva sdk doc --name @arrays/data/widget-scrap/twitter-backfill` for the full shape before calling.
