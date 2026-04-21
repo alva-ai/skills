@@ -174,6 +174,8 @@ If the user's message contains a `/use-template:<name>` directive (e.g. `/use-te
 3. Treat the template as the authoritative blueprint for layout, sections, widgets, data contracts, and cadence. Deviate only where the user explicitly overrides it.
 4. In the plan you present during Guided Planning, state which template is being used and call out any intentional deviations.
 
+**Content arrangement.** A template's default sections are a floor, not a ceiling. Lead with whatever carries the user's core question, proactively add sections the request demands, and cut or fold near-empty sections into neighbors rather than padding them.
+
 No `/use-template:` directive → skip this step and proceed to Guided Planning normally.
 
 ### Guided Planning
