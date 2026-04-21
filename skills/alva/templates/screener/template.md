@@ -683,3 +683,19 @@ updates wastes credits and creates noise.
 - For slow screeners: backfill via point-in-time SDK queries returns *current
   revised* data, not real point-in-time. Forward-only accumulation is more
   honest.
+
+---
+
+## Push Notifications
+
+The qualified list is the natural push payload — "who's in today?" is the whole point of a screener. Guidance below is screener-specific; see SKILL.md Pattern E for the mechanics.
+
+**What to select** — lead with churn, not the full list:
+
+- Scored screener: new entries + dropouts + top-N by score.
+- Basket/unscored: entries + exits only. Skip the push when both are empty.
+
+**Format**:
+
+- `title`: `<Screener> · <date> · +N / -M` — scannable from a lock screen.
+- `text`: entries as `<ID> (<score>, <band>)` one per line, followed by dropouts, then a `Top N:` line. Include only the 1–2 most decision-relevant metrics per row — recipients won't click through.

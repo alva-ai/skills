@@ -474,7 +474,7 @@ To make a feed push-capable:
 2. Set `--push-notify` in the `alva deploy create` command, or
    update the existing cronjob with `alva deploy update --id ID --push-notify`.
 
-The platform reads `/data/signal/targets/@last/1` after each successful
+The platform reads `/data/signal/targets` after each successful
 execution and pushes the signal content to all eligible followers.
 
 **AlvaAsk + owner notifications:** Feeds can use `@alva/alvaask` to call

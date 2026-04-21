@@ -272,3 +272,14 @@ Two crons, not one.
 - Quant feed accepts `args.now` (ms) for one-off backfill runs.
 - Narrative feed accepts `args.date` (YYYY-MM-DD) to (re)generate a specific record — useful when the agent fails and a day needs re-running.
 - **Forward-only narrative accumulation.** Never fake-backfill past narrative records by running the agent on historical snapshots — it will see *currently-revised* quant data, not the real point-in-time state, and produce a misleading "what changed yesterday." Each narrative record should be the one produced live on that date.
+
+## Push Notifications (Pattern E)
+
+The daily hero narrative is the natural push payload. Wire the **narrative feed** (not the quant feed), so the diffed "what changed" is included. See SKILL.md Pattern E for the mechanics.
+
+**Format**:
+
+- `title`: `<Thesis> · <date>`
+- `text`: one-sentence thesis + top 1–2 deltas (sentiment dot + short label). Self-contained — recipients won't click through.
+
+**Skip**: the agent failed and the last-good record was reused — otherwise the same thesis re-pushes.
