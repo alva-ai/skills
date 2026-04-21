@@ -121,7 +121,14 @@ Session variables:
 - **`telegram_username`** — if set, recommend push-enabled feeds; if null,
   guide user to connect Telegram first.
 
-### 4. Load Memory
+### 4. Arrays JWT Check
+
+Data skills require `ARRAYS_JWT`. The `_meta.arrays_jwt` field in the
+`alva whoami` output above shows its status — if it needs attention (missing,
+`renewal_needed: true`, or absent), use `alva arrays token` to manage it
+(`status` to inspect, `ensure` to provision or refresh).
+
+### 5. Load Memory
 
 If you have **not** read the user's memory in this conversation, read it now.
 
@@ -378,21 +385,20 @@ the Feed SDK.
 
 Financial data APIs across 16+ domains, served by the Arrays backend
 (`$ARRAYS_ENDPOINT`, defaults to `https://data-tools.prd.space.id`). To find
-the right API for a task:
+the right API for a task, use the `alva skills` CLI (public, no auth):
 
-1. **Discover available data skills**: `GET $ARRAYS_ENDPOINT/api/v1/skills`
-   (public, no auth) — returns all data skills with their names and
-   descriptions. Use this to find the skill that matches your data need.
-2. **Fetch the skill summary**: `GET $ARRAYS_ENDPOINT/api/v1/skills/:name`
-   (public, no auth) — returns the endpoints table for that domain.
-3. **Fetch endpoint detail**: `GET $ARRAYS_ENDPOINT/api/v1/skills/:name?endpoint=<path>`
+1. **Discover available data skills**: `alva skills list` — returns all data
+   skills with their names and descriptions. Use this to find the skill that
+   matches your data need.
+2. **Fetch the skill summary**: `alva skills summary --name <skill>` — returns
+   the endpoints table for that domain.
+3. **Fetch endpoint detail**: `alva skills endpoint --name <skill> --path <path>`
    — use the Path value from the summary endpoints table (e.g. `company/list`,
    `market-news`) to get full parameters, response fields, and examples.
 4. **Call Arrays data endpoints** with `Authorization: Bearer <ARRAYS_JWT>`.
    In runtime code, load the token via `secret.loadPlaintext('ARRAYS_JWT')`.
-   If the token is missing, call `POST $ALVA_ENDPOINT/api/v1/arrays-jwt/ensure`
-   first (idempotent — safe to call every session; renews only when missing or
-   near expiry).
+   The token is verified during preflight (see [Arrays JWT Check](#4-arrays-jwt-check));
+   if a call returns 401, re-run `alva arrays token ensure`.
 
 **Data skill doc lookup is mandatory.** Always fetch the endpoint detail before
 writing code that calls it. Do not guess paths, parameter names, or response
@@ -400,9 +406,9 @@ shapes from memory. The doc lookup ensures you use the correct endpoint and
 handle the actual response format.
 
 **Enforcement**: Before any Arrays data HTTP call or `alva run` that hits one,
-you MUST have completed `GET /api/v1/skills/:name?endpoint=<path>` for that
-endpoint in this session. If the call fails with an unexpected shape, re-fetch
-the endpoint detail rather than guessing.
+you MUST have completed `alva skills endpoint --name <skill> --path <path>` for
+that endpoint in this session. If the call fails with an unexpected shape,
+re-fetch the endpoint detail rather than guessing.
 
 #### Runtime Libraries
 
