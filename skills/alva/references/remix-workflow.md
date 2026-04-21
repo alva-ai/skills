@@ -5,10 +5,15 @@ The user copies a prompt from the Remix button on any playbook page and pastes
 it into their agent. The agent then fetches the source playbook's code and UI,
 customizes them per the user's preferences, and deploys a new playbook.
 
-> **Note**: This workflow was updated for the dbview refactor (April 2026).
-> Feed references now live inline in `playbook.json` under `releases[].feeds[]`.
+> **Note**: This workflow was updated for the dbview refactor (April 2026) and
+> applies to **playbooks backed by the dbview subsystem (post-2026-04)**. Feed
+> references now live inline in `playbook.json` under both `latest_release.feeds`
+> and `releases[].feeds[]` (same shape — each entry is `{feed_id, feed_major}`).
 > The legacy `releases/{version}/feeds/{feed_id}` ALFS symlinks no longer exist —
-> resolve feed paths directly from the JSON payload.
+> resolve feed paths directly from the JSON payload. Legacy ALFS-only playbooks
+> (pre-dbview cached `playbook.json` files that may omit `releases`/`feeds`
+> entirely) are deprecated and out of scope for this doc; if encountered, fall
+> back to the legacy `alva fs readlink` flow.
 
 ---
 
@@ -112,10 +117,16 @@ the feed metadata, then the script source:
 
 ```bash
 alva fs read --path '/alva/home/{owner}/feeds/{feed_id}/v{feed_major}/feed.json'
-alva fs read --path '/alva/home/{owner}/feeds/{feed_id}/v{feed_major}/src/index.js'
+alva fs read --path '/alva/home/{owner}/feeds/{feed_id}/v{feed_major}/src/main.js'
 ```
 
 This contains the strategy logic, data fetching, and indicator computations.
+
+**Entrypoint note**: Released feeds write their compiled/bundled entrypoint as
+`src/main.js` under the released tree (`~/feeds/{feed_id}/v{major}/src/main.js`).
+The authoring/draft path uses `src/index.js` under the owner's name-scoped tree
+(`~/feeds/{name}/v{major}/src/index.js`). Remix operates on released feeds by
+default, so read `src/main.js`.
 
 Optionally, read sample feed output to understand the data schema:
 
@@ -183,21 +194,23 @@ Add a summary section at the bottom.
 
 Extracted: owner = `alice`, name = `btc-momentum`.
 
-Agent reads:
+Agent reads (using generic placeholders — resolve `<feed_id>`, `<feed_major>`,
+`<group>`, and `<output_name>` from the `playbook.json` + `feed.json` payloads
+read in the preceding steps):
 
 ```bash
 # 1. Metadata
 alva fs read --path '/alva/home/alice/playbooks/btc-momentum/playbook.json'
-# latest_release.feeds = [{ "feed_id": 100, "feed_major": 1 }]
+# latest_release.feeds = [{ "feed_id": <feed_id>, "feed_major": <feed_major> }]
 
 # 2. HTML source
 alva fs read --path '/alva/home/alice/playbooks/btc-momentum/index.html'
 
 # 3. Feed source code (resolved directly from feed_id/feed_major — no readlink)
-alva fs read --path '/alva/home/alice/feeds/100/v1/src/index.js'
+alva fs read --path '/alva/home/alice/feeds/<feed_id>/v<feed_major>/src/main.js'
 
 # 4. (Optional) Sample data for schema understanding
-alva fs read --path '/alva/home/alice/feeds/100/v1/data/market/ohlcv/@last/3'
+alva fs read --path '/alva/home/alice/feeds/<feed_id>/v<feed_major>/data/<group>/<output_name>/@last/3'
 ```
 
 Agent then runs the content-legitimacy audit on the source HTML and feed
