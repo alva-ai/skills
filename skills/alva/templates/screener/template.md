@@ -23,13 +23,14 @@ reference it here by name — do not re-spec it.
 
 Structural:
 
+- [Screener Variants](#screener-variants) — **read first** to know which components apply
 - [Page Layout](#page-layout)
-- [Header](#header) · [Snapshot Picker](#snapshot-picker)
+- [Header](#header) · [Daily TLDR Card](#daily-tldr-card) · [Snapshot Picker](#snapshot-picker)
 - [Tab 1 — Overview](#tab-1--overview)
 - [Tab 2 — Movers & Trends](#tab-2--movers--trends-optional)
 - [Tab 3 — Analysis](#tab-3--analysis-optional)
 - [Tab 4 — Methodology](#tab-4--methodology)
-- [Cron](#cron)
+- [Cron](#cron) · [Push Notifications](#push-notifications--daily-tldr)
 
 Screener-unique components (CSS inline):
 
@@ -38,6 +39,39 @@ Screener-unique components (CSS inline):
 - [Expand Row](#expand-row) · [Factor Breakdown](#factor-breakdown) · [Gauge Ring](#gauge-ring)
 - [Movers Card](#movers-card) · [Basket Trend Chart](#basket-trend-chart)
 - [Method Section](#method-section) · [Worked Example](#worked-example)
+
+---
+
+## Screener Variants
+
+A screener is one of two shapes. Pick the variant first — every downstream
+component section is tagged `**Applies to**: scored | basket | both` so you
+know whether to include it.
+
+| Shape | When to use | Ranking logic |
+|---|---|---|
+| **Scored** | Rows have a composite score (weighted factor combine). Order = score. | Rank by score desc. Band pill maps score → tier. |
+| **Basket** | Pass/fail inclusion — row is either in or out. No score. | Order by the most relevant raw metric (market cap, entry date, etc.). |
+| **Hybrid** | Basket with a secondary score for tie-breaking or ordering. | Treat as **scored** for component choices but keep basket-style churn. |
+
+Component matrix (✓ = include, ✗ = omit, △ = include with variant-specific rules):
+
+| Component | Scored | Basket | Notes |
+|---|---|---|---|
+| [Columns: Rank / Score / Δ Score](#columns) | ✓ | ✗ | Basket uses "Days in basket" / "Entry date" instead. |
+| [Columns: Inclusion signal](#columns) | ✗ | ✓ | Basket only — "Days in basket", "Entry date", "Exit reason". |
+| [Score Bar](#score-bar) | ✓ | ✗ | Requires a score column. |
+| [Band Pill](#band-pill) | ✓ | ✗ | Score-tier label. |
+| [Delta Tag / Δ Score](#delta-tag--delta-score) | ✓ | △ | Basket: rank Δ only if a secondary sort metric is stable across snapshots. |
+| [Flag Pill / Flag Card](#flag-pill) | ✓ | ✓ | Both benefit. |
+| [Expand Row](#expand-row) | △ | △ | Different layouts — see section. |
+| [Gauge Ring](#gauge-ring) | ✓ | ✗ | Needs a score. |
+| [Factor Breakdown](#factor-breakdown) | ✓ | ✗ | Needs weighted factors. |
+| [Movers Card](#movers-card) | ✓ | ✓ | Scored: Entries/Dropouts/Top Gainers/Decliners. Basket: Entries/Exits only. |
+| [Basket Trend Chart](#basket-trend-chart) | ✓ | ✓ | Both — shows basket size + an aggregate stat over time. |
+| [Worked Example](#worked-example) | ✓ | ✗ | Only meaningful when there's a formula to re-derive. |
+| [Daily TLDR Card](#daily-tldr-card) | ✓ | ✓ | Both — ADK-summarized snapshot vs prior. |
+| [Push Notifications](#push-notifications--daily-tldr) | ✓ | ✓ | Shares the TLDR payload; skip when churn is empty (basket). |
 
 ---
 
@@ -197,16 +231,17 @@ universe — the thing a user thinks of as "the row":
 
 ### Columns
 
+**Applies to**: scored | basket (pick the rows that match your variant)
+
 **Often-used** — pick what matters for *this* screener. None are mandatory:
 
-- Position: Rank (only if ranked, not a flat basket)
-- Score: composite score (only if there's a scoring formula; basket-style pass/fail
-  screeners omit this)
-- Identity: Name, Sector, Industry, Asset Class
-- Movement: Δ Rank, Δ Score (vs prior snapshot — only if Rank/Score exist)
-- Inclusion signal *(basket-style)*: "Days in basket", "Entry date", "Exit reason"
-- Risk/quality signals: Flag (descriptive label, tier-colored)
-- Relevant metrics: fundamentals / technicals / on-chain / etc.
+- Position: Rank *(scored)*
+- Score: composite score *(scored)*
+- Identity: Name, Sector, Industry, Asset Class *(both)*
+- Movement: Δ Rank, Δ Score *(scored — vs prior snapshot)*
+- Inclusion signal: "Days in basket", "Entry date", "Exit reason" *(basket)*
+- Risk/quality signals: Flag (descriptive label, tier-colored) *(both)*
+- Relevant metrics: fundamentals / technicals / on-chain / etc. *(both)*
 
 Order columns by importance left-to-right. If there's no Rank/Score, sort by the
 most relevant metric (e.g. market cap, entry date) and make that column primary.
@@ -276,6 +311,8 @@ Structural rules:
 
 ### Score Bar
 
+**Applies to**: scored.
+
 Score column combines a fill bar + numeric value, optional delta pill.
 
 Color rules (score → color). Apply via inline style on `.score-bar-fill`;
@@ -297,11 +334,16 @@ JS may use `var(--token)` directly in `element.style.background`.
 
 ### Band Pill
 
-Used on a scored screener to label the score tier. Four bands map 1:1 to the
-Alva main palette: `elite` (m3 green), `strong` (m1 teal), `average` (m5 amber),
-`weak` (m4 red). Suggested thresholds: 80+ / 70–79 / 60–69 / 0–59.
+**Applies to**: scored.
+
+Labels the score tier. Four bands map 1:1 to the Alva main palette: `elite`
+(m3 green), `strong` (m1 teal), `average` (m5 amber), `weak` (m4 red).
+Suggested thresholds: 80+ / 70–79 / 60–69 / 0–59.
 
 ### Delta Tag / Delta Score
+
+**Applies to**: scored (both tags). Basket: include only if rank ordering is
+stable across snapshots (i.e. a secondary sort metric that doesn't churn).
 
 Rank Δ (vs prior snapshot) → pill:
 
@@ -314,6 +356,8 @@ Score Δ → inline text (not a pill): green `up`, red `down`, grey `—`. Thres
 suppress when `|Δ| < 0.5`.
 
 ### Flag Pill
+
+**Applies to**: both.
 
 Shows the primary red flag in the table cell. `clean` (no flag) / `soft` /
 `hard`. When a row has multiple flags, show the first label plus `+N`.
@@ -351,17 +395,46 @@ Shows the primary red flag in the table cell. `clean` (no flag) / `soft` /
 
 ### Expand Row
 
+**Applies to**: both (layout differs — see below).
+
 Always include a **price/value chart** of the asset. Other blocks are optional —
-mix & match based on what reveals *why* the row is in the basket.
+mix & match based on what reveals *why* the row is in the basket. Every expand
+row should also carry a **[Row TLDR](#row-tldr)** — 1–2 sentences on *why this
+row ranks here today*.
 
 Layout: 8-col grid inside the expand panel.
 
-- Scored screener: row 1 = `col-4` Gauge Ring + `col-4` Factor Breakdown; row 2
-  = `col-8` Price/K-line chart; row 3 = Flag cards (auto-fit grid).
-- Unscored basket: row 1 = `col-8` Price/K-line; row 2 = custom narrative
-  blocks (peer comparison, news links, holdings, on-chain stats, etc.).
+- **Scored**: row 1 = `col-4` Gauge Ring + `col-4` Factor Breakdown; row 2
+  = `col-8` Price/K-line chart; row 3 = Row TLDR; row 4 = Flag cards (auto-fit).
+- **Basket**: row 1 = `col-8` Price/K-line; row 2 = Row TLDR; row 3 = custom
+  narrative blocks (peer comparison, news links, holdings, on-chain stats, etc.).
 
 Skip components that don't add insight.
+
+### Row TLDR
+
+**Applies to**: both.
+
+1–2 sentences (≤ ~160 chars) answering *why this row ranks here today*. Lead
+with the driver, not the description. Examples:
+
+- Scored: *"Leads the composite on cluster breadth (29 insiders) and a $10M CEO
+  purchase — weak name factor drags but doesn't offset."*
+- Basket: *"Joined the basket 12 days ago after the Q1 revision; price holding
+  above the entry-level 20d MA."*
+
+**Generation**: ADK-generated from row data + factor scores. Do not quote an
+LLM's factual claims — restrict ADK to *synthesizing* the numbers already in
+the row. Cache per snapshot; re-generate on new snapshots.
+
+```css
+.row-tldr { background: var(--grey-g01); border-radius: var(--radius-ct-l);
+  padding: var(--spacing-s) var(--spacing-m); margin-top: var(--spacing-m);
+  font-size: 13px; line-height: 20px; color: var(--text-n9); }
+.row-tldr::before { content: 'TLDR'; display: inline-block;
+  font-size: 10px; color: var(--text-n5); letter-spacing: 0.1px;
+  margin-right: var(--spacing-xs); vertical-align: 1px; }
+```
 
 ### Price / K-line
 
@@ -387,6 +460,8 @@ ECharts spec essentials (beyond design-widgets Chart Card defaults):
 
 ### Gauge Ring
 
+**Applies to**: scored.
+
 ECharts `gauge` in the expand panel's Composite Score card. Not a screener-
 unique primitive — spec it here because design-widgets.md doesn't cover gauges.
 
@@ -397,6 +472,8 @@ unique primitive — spec it here because design-widgets.md doesn't cover gauges
 - Card container = Chart Card with dotted background, center-aligned.
 
 ### Factor Breakdown
+
+**Applies to**: scored.
 
 Rows: name (110px) + horizontal bar (flex) + raw pts `/ 100` + weight `×N%`.
 Sits in a `grey-g01` widget body, flex column, justify center. Same widget
@@ -419,6 +496,8 @@ title size as the Gauge card so row heights match.
 ```
 
 ### Flag Card
+
+**Applies to**: both.
 
 Shown at the bottom of the expand panel when a row has any active flag. Accent
 bar only (no border/outline), tier-colored. Grid is auto-fit
@@ -465,11 +544,16 @@ Common building blocks (pick what fits):
 
 ### Movers Card
 
+**Applies to**: both (card set differs).
+
+- **Scored**: Entries · Dropouts · Top Gainers · Top Decliners.
+- **Basket**: Entries · Exits only (Top Gainers/Decliners need a score).
+
 KPI-style: icon (22px, solid background) + label + count, then a list of rows.
 Icon background applied via inline style — use tokens:
 
 - Entries → `var(--main-m3)` (green)
-- Dropouts → `var(--main-m4)` (red)
+- Dropouts / Exits → `var(--main-m4)` (red)
 - Top Gainers → `var(--main-m3)` (green)
 - Top Decliners → `var(--main-m6)` (amber)
 
@@ -501,6 +585,8 @@ depending on sign.
 ```
 
 ### Basket Trend Chart
+
+**Applies to**: both.
 
 Composite bar + line chart showing basket size & aggregate stat over time. Use
 the Chart Card base from design-widgets.md.
@@ -632,9 +718,11 @@ list HTML.
 
 ### Worked Example
 
-For any scored screener — re-derive the current #1 from raw inputs. Always live
-inside a `.method-body`, rendered into an inline `.worked-example` card so it
-stands out from narrative paragraphs.
+**Applies to**: scored.
+
+Re-derive the current #1 from raw inputs. Always lives inside a `.method-body`,
+rendered into an inline `.worked-example` card so it stands out from narrative
+paragraphs.
 
 Three parts:
 
