@@ -172,9 +172,12 @@ Financial data APIs across 16+ domains. To find the right API for a task:
    descriptions. Use this to find the skill that matches your data need.
 2. **Fetch the skill summary**: `GET $ARRAYS_ENDPOINT/api/v1/skills/:name`
    (public, no auth) — returns the endpoints table for that domain.
-3. **Fetch endpoint detail**: `GET $ARRAYS_ENDPOINT/api/v1/skills/:name?endpoint=<path>`
-   — use the Path value from the summary endpoints table (e.g. `company/list`,
-   `market-news`) to get full parameters, response fields, and examples.
+3. **Fetch endpoint detail**: `GET $ARRAYS_ENDPOINT/api/v1/skills/:name?endpoint=<file>`
+   — use the **File** value from the summary endpoints table (e.g. `rates`,
+   `macro-index-historical`, `earnings-calendar`) to get full parameters,
+   response fields, and examples. The `File` column is the endpoint slug;
+   the `Path` column is the REST URL path and is NOT accepted here (e.g. for
+   treasury rates, use `?endpoint=rates`, not `?endpoint=macro/treasury-rates`).
 4. **Call Arrays data endpoints** with `Authorization: Bearer <ARRAYS_JWT>`.
    In runtime code, load the token via `secret.loadPlaintext('ARRAYS_JWT')`.
    If the token is missing, call `POST /api/v1/arrays-jwt/ensure` first.
@@ -466,10 +469,12 @@ backend. They are public and require no authentication.
 discover all available skills → pick the skill that matches your data need →
 call `$ARRAYS_ENDPOINT/api/v1/skills/:name` to get the endpoints summary →
 pick the endpoint you need from the summary table → call
-`$ARRAYS_ENDPOINT/api/v1/skills/:name?endpoint=<path>` to get endpoint detail
-(use the Path value from the table, e.g. `?endpoint=company/list`) →
-use `Authorization: Bearer <ARRAYS_JWT>` header when calling Arrays data
-endpoints (token auto-managed via secret-manager).
+`$ARRAYS_ENDPOINT/api/v1/skills/:name?endpoint=<file>` to get endpoint detail
+(use the **File** value from the table — NOT the Path value. The `File`
+column is the endpoint slug; the `Path` column is the REST URL path. E.g. for
+treasury rates the row is `Path=macro/treasury-rates, File=rates`, so call
+`?endpoint=rates`) → use `Authorization: Bearer <ARRAYS_JWT>` header when
+calling Arrays data endpoints (token auto-managed via secret-manager).
 
 ### Trading Pair Search (`/api/v1/trading-pairs/`)
 
