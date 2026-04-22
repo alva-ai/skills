@@ -45,7 +45,7 @@ alva release feed --name btc-ema --version 1.0.0 --cronjob-id 42 \
 ## Create Playbook Draft
 
 ```
-alva release playbook-draft --name NAME --display-name "Title" --feeds '[{"feed_id":100}]' --changelog "text" [--description TEXT] [--trading-symbols '["BTC"]']
+alva release playbook-draft --name NAME --display-name "Title" --feeds '[{"feed_id":100}]' [--changelog "text"] [--description TEXT] [--trading-symbols '["BTC"]']
 ```
 
 Create a new playbook with a draft version.
@@ -57,7 +57,7 @@ Requires both a URL-safe `name` and a human-readable `display-name`.
 | --name | string | yes | URL-safe playbook name (e.g. `btc-dashboard`), must be unique per user |
 | --display-name | string | yes | Human-readable playbook title, max 40 chars |
 | --feeds | array | yes | Feed references `[{feed_id, feed_major?}]` |
-| --changelog | string | yes | Release changelog |
+| --changelog | string | no | Release changelog (optional; first-create can omit) |
 | --description | string | no | Short description of the playbook |
 | --trading-symbols | string[] | no | Base asset tickers (e.g. `["BTC","ETH"]`). Resolved server-side to full trading pairs, stored in playbook metadata. Max 50. |
 
@@ -69,8 +69,10 @@ Requires both a URL-safe `name` and a human-readable `display-name`.
 - Avoid generic-only titles such as `Stock Dashboard` or `Trading Bot`
 - If the user provides `display-name`, use it and normalize any non-compliant parts
 
+First-time drafts may omit `--changelog`; subsequent calls overwrite the prior note if supplied, or preserve it if omitted.
+
 ``` bash
-alva release playbook-draft --name btc-dashboard --display-name "BTC Trend Dashboard" --description "BTC market dashboard with price, technicals, and volume" --feeds '[{"feed_id": 100}]' --changelog "Initial release" --trading-symbols '["BTC"]'
+alva release playbook-draft --name btc-dashboard --display-name "BTC Trend Dashboard" --description "BTC market dashboard with price, technicals, and volume" --feeds '[{"feed_id": 100}]' --trading-symbols '["BTC"]'
 → {"playbook_id": 99, "playbook_version_id": 200}
 ```
 
