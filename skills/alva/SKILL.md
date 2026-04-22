@@ -739,8 +739,8 @@ variables, or shell. Host-agent permissions still apply. See
 **Runtime libraries**: Built-in computation modules available via `require()`
 (e.g. `@alva/technical-indicators/rsi:v1.0.0`). Version suffix is optional
 (defaults to `v1.0.0`). To discover function signatures, use
-`alva sdk doc --name "..."`. Module groups: `crypto_fundamentals`,
-`feed_widgets`, `technical_indicator_calculation_helpers`, `unified_search`.
+`alva sdk doc --name "..."`. Module groups: `feed_widgets`,
+`technical_indicator_calculation_helpers`, `unified_search`.
 
 **Data APIs**: Financial data (crypto, stock, macro, ETF) is fetched via HTTP
 from the Arrays backend — see the [Data Skills](#3-data-skills) section. Load
