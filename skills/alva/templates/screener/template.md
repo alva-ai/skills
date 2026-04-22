@@ -141,6 +141,52 @@ flex row with meta pills) and the pills themselves:
 
 ---
 
+## Daily TLDR Card
+
+**Applies to**: both.
+
+The twin of the [push notification](#push-notifications--daily-tldr). Sits
+directly under the header so users opening the playbook see the same summary
+they'd see in a push. 1–3 sentences, ADK-generated from today's snapshot vs
+prior: what changed, what drove it, what to watch.
+
+**Content rules**:
+
+- Lead with *change*, not the full basket. If nothing changed, say so in one
+  line ("No new entries, drivers unchanged.") rather than padding.
+- Name the 1–2 factors or flags responsible — not every factor in the table.
+- No buy/sell language. This is observational ("cluster breadth widened to 29
+  insiders"), not directional ("strong buy signal on TSM").
+- Do not cite facts that don't come from the row data or published feeds. ADK
+  synthesizes the numbers already present; it does not introduce new numbers.
+
+**Generation**:
+
+- Prompt ADK with: today's top-N rows, yesterday's top-N, churn (entries /
+  dropouts), factor-delta lookup, a short schema of field semantics.
+- Hard cap the response: 3 sentences, ≤ 280 chars total.
+- Cache per snapshot in `screener/summaries/tldr/<date>.json`. Regenerate only
+  when a new snapshot appears.
+- Deterministic fallback when ADK fails — reuse the push churn line verbatim.
+
+**Visual**:
+
+```css
+.tldr-card { background: var(--main-m1-05); border-left: 3px solid var(--main-m1);
+  border-radius: var(--radius-ct-l); padding: var(--spacing-m) var(--spacing-l);
+  margin-bottom: var(--spacing-l); display: flex; gap: var(--spacing-m);
+  align-items: flex-start; }
+.tldr-card-icon { flex-shrink: 0; width: 20px; height: 20px; color: var(--main-m1); }
+.tldr-card-body { font-size: 14px; line-height: 22px; color: var(--text-n9); }
+.tldr-card-meta { font-size: 11px; color: var(--text-n5); margin-top: var(--spacing-xxs);
+  letter-spacing: 0.11px; }
+```
+
+Meta line below the body: `TLDR · <timestamp> · <source>` (e.g. "TLDR · Apr 22,
+2026 · ADK" — or `· fallback` when ADK failed).
+
+---
+
 ## Snapshot Picker
 
 Pure view filter — switches which historical snapshot drives the tab content.
@@ -778,29 +824,78 @@ updates wastes credits and creates noise.
 
 ---
 
-## Push Notifications
+## Push Notifications / Daily TLDR
 
-The qualified list is the natural push payload — "who's in today?" is the whole point of a screener. Guidance below is screener-specific; see SKILL.md Pattern E for the mechanics.
+**Applies to**: both.
 
-**What to select** — lead with churn, not the full list:
+Push payload is the same TLDR rendered in the [Daily TLDR Card](#daily-tldr-card)
+— one source of truth, so the notification and the open-app experience don't
+drift. Mechanics live in SKILL.md Pattern E; rules below are screener-specific.
 
-- Scored screener: new entries + dropouts + top-N by score.
-- Basket/unscored: entries + exits only. Skip the push when both are empty.
+**When to send**:
 
-**Format** — compress to 3 lines so it renders inside a lock-screen preview:
+- First snapshot of the day (or first snapshot ever) → always send.
+- Subsequent snapshots → only if something *changed*: new entries, new
+  dropouts, rank churn in top-N, new flags, or a factor driver swap.
+- Basket variant: skip the push entirely when both churn sides are empty —
+  don't send "nothing happened" pings.
 
-- `title`: `<Screener> · <date>` — scannable identity + freshness.
-- Line 1 (churn): `🆕 New in Top N: <IDs> | 👋 Dropped: <IDs>`.
-- Line 2 (top pick): `⭐ Top: <ID> · <primary factor> <value> · <sector> · <secondary factor>`. Name the factors — recipients should see *why* this one leads, not just that it does. Pick the 1–2 factors that drove the score (e.g. `Drift 1.85`, `+16% EPS surprise`), not every column in the table.
-- Line 3: `Full list → <playbook URL>` for the click-through.
+**What to send** — ADK-generated TLDR + deterministic appendix.
 
-**Example** (PEAD Momentum screener):
-
-```text
-Title: PEAD Momentum · 2026-04-21
-🆕 New in Top 10: WAFD, ALLY | 👋 Dropped: TFC, SFNC
-⭐ Top: WAFD · Drift 1.85 · Financial Services · +16% EPS surprise
-Full list → https://alva.ai/u/stock-king/playbooks/post-earnings-drift-momentum
+```
+title: <Screener> · <date>
+line 1: <ADK TLDR, ≤ 2 sentences>
+line 2: 🆕 <new IDs> · 👋 <dropped IDs>          ← deterministic churn
+line 3: Full snapshot → <playbook URL>
 ```
 
-Basket/unscored variant: drop the `⭐ Top` line; keep churn + link. Skip the push entirely when both churn sides are empty.
+The ADK TLDR replaces the old hand-written "⭐ Top" line. It must:
+
+- Name the 1–2 factors or flags responsible for the change (e.g. "cluster
+  breadth widened to 29 insiders", not "moved up strongly").
+- Synthesize only data already in the row. No new numbers, no fabricated
+  context. If ADK can't produce a valid TLDR, fall back to the churn line
+  alone (drop line 1 entirely rather than mislead).
+- Stay observational — no buy/sell, no price targets, no timing calls.
+
+**Length budget**: ≤ 280 chars across lines 1 + 2 combined so it fits a
+lock-screen preview. ADK prompt should enforce the char cap; truncate on
+overflow rather than cut mid-sentence.
+
+**Example** (Insider Buying Clusters):
+
+```text
+Title: Insider Buying Clusters · 2026-04-22
+TSM leads on cluster breadth (29 insiders, +6 vs yesterday); PANW enters the
+top-5 after a $10M CEO purchase.
+🆕 PANW, NKE · 👋 ORCL
+Full snapshot → https://alva.ai/u/ivan/playbooks/insider-screener-v2
+```
+
+**Example** (basket, nothing material):
+
+```text
+Title: Quality Value Basket · 2026-04-22
+No new entries or exits; roster stable at 38 names.
+Full snapshot → https://alva.ai/u/ivan/playbooks/quality-value-screener-v2
+```
+
+(This one would be skipped under the "nothing happened" rule — example shown
+for format only.)
+
+**Implementation sketch** — the feed script produces a `tldr/<date>.json` that
+both the playbook HTML and the push cron read from, so the two stay in sync:
+
+```js
+// in the feed script, after computing today's ranking
+const tldr = await adk.summarize({
+  prompt: TLDR_PROMPT,
+  data: { today: topN, prior: priorTopN, churn, factorDeltas },
+  maxTokens: 120,
+});
+const churn = formatChurn(entries, exits);   // deterministic fallback
+await fs.write(
+  `screener/summaries/tldr/${today}.json`,
+  JSON.stringify({ tldr, churn, generatedAt: now, source: tldr ? 'adk' : 'fallback' })
+);
+```
