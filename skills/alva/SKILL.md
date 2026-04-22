@@ -401,7 +401,7 @@ the right API for a task, use the `alva skills` CLI (public, no auth):
 4. **Call Arrays data endpoints** with `Authorization: Bearer <ARRAYS_JWT>`.
    In runtime code, load the token via `secret.loadPlaintext('ARRAYS_JWT')`.
    The token is verified during preflight (see [Arrays JWT Check](#4-arrays-jwt-check));
-   if a call returns 401, re-run `alva arrays token ensure`.
+   if a call returns 401, re-run `alva arrays token ensure`. Do not use `X-API-Key` header.
 
 **Data skill doc lookup is mandatory.** Always fetch the endpoint detail before
 writing code that calls it. Do not guess paths, parameter names, or response
@@ -421,7 +421,6 @@ available in every script execution.
 
 | Module group                              | Description                                                               |
 | ----------------------------------------- | ------------------------------------------------------------------------- |
-| `crypto_fundamentals`                     | Crypto supply, market cap, dominance (internal data source)               |
 | `feed_widgets`                            | Per-handle/channel rolling subscriptions — news, Twitter/X, YouTube, Reddit, podcasts (e.g. `getTwitterFeed`). Twitter also has historical backfill over a time window (`getTwitterBackfill`, Pro-gated). For topic/keyword search, use [Content Search](#content-search). |
 | `unified_search`                          | Web search and URL scraping tools (X/Grok, Google, Brave, serper, decodo) |
 | `technical_indicator_calculation_helpers` | 50+ pure calculation helpers (RSI, MACD, Bollinger, etc.)                 |
