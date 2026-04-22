@@ -392,9 +392,12 @@ the right API for a task, use the `alva skills` CLI (public, no auth):
    matches your data need.
 2. **Fetch the skill summary**: `alva skills summary --name <skill>` — returns
    the endpoints table for that domain.
-3. **Fetch endpoint detail**: `alva skills endpoint --name <skill> --path <path>`
-   — use the Path value from the summary endpoints table (e.g. `company/list`,
-   `market-news`) to get full parameters, response fields, and examples.
+3. **Fetch endpoint detail**: `alva skills endpoint --name <skill> --file <file>`
+   — use the **File** value from the summary endpoints table (e.g. `rates`,
+   `macro-index-historical`, `earnings-calendar`) to get full parameters,
+   response fields, and examples. The `File` column is the endpoint slug;
+   the `Path` column is the REST URL path and is NOT accepted here (e.g. for
+   treasury rates, use `--file rates`, not `--file macro/treasury-rates`).
 4. **Call Arrays data endpoints** with `Authorization: Bearer <ARRAYS_JWT>`.
    In runtime code, load the token via `secret.loadPlaintext('ARRAYS_JWT')`.
    The token is verified during preflight (see [Arrays JWT Check](#4-arrays-jwt-check));
@@ -406,8 +409,8 @@ shapes from memory. The doc lookup ensures you use the correct endpoint and
 handle the actual response format.
 
 **Enforcement**: Before any Arrays data HTTP call or `alva run` that hits one,
-you MUST have completed `alva skills endpoint --name <skill> --path <path>` for
-that endpoint in this session. If the call fails with an unexpected shape,
+you MUST have completed `alva skills endpoint --name <skill> --file <file>` for
+that endpoint in this session (passing the **File** column value, not the Path). If the call fails with an unexpected shape,
 re-fetch the endpoint detail rather than guessing.
 
 #### Runtime Libraries
