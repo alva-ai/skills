@@ -43,16 +43,14 @@ if [ -z "$remote_tag" ]; then
 fi
 
 # Update last_check timestamp in .env
+# Use a tmpfile rewrite instead of `sed -i` — BSD and GNU sed disagree on the
+# -i flag's argument form, and the portable approach avoids that pitfall.
+tmp_config=$(mktemp 2>/dev/null || echo "${CONFIG_FILE}.tmp.$$")
 if [ -f "$CONFIG_FILE" ]; then
-  # Update existing last_check line, or append if absent
-  if grep -q "^last_check=" "$CONFIG_FILE"; then
-    sed -i '' "s/^last_check=.*/last_check=$now/" "$CONFIG_FILE"
-  else
-    echo "last_check=$now" >> "$CONFIG_FILE"
-  fi
-else
-  echo "last_check=$now" > "$CONFIG_FILE"
+  grep -v "^last_check=" "$CONFIG_FILE" > "$tmp_config" 2>/dev/null || true
 fi
+echo "last_check=$now" >> "$tmp_config"
+mv "$tmp_config" "$CONFIG_FILE"
 
 # Read local version from SKILL.md frontmatter
 local_tag=$(read_local_version)
