@@ -32,7 +32,7 @@ alva sdk partitions
 
 ```
 alva sdk partitions
-→ {"partitions":["technical_indicator_calculation_helpers","crypto_fundamentals","feed_widgets"]}
+→ {"partitions":["feed_widgets","technical_indicator_calculation_helpers","unified_search"]}
 ```
 
 ## Get Module Group Summary
