@@ -128,44 +128,6 @@ body {
 }
 ```
 
-## Playbook Header
-
-Every playbook starts with a **Title** and **Description Card** above all other
-content (including tab bars). The title-to-description gap is applied as
-`margin-top` on `.playbook-desc` — **`.playbook-title` must stay margin-free**
-so it can safely live inside a flex row (e.g. alongside refresh badges or
-last-updated tags). **Do not add `margin-bottom` to `.playbook-desc`** — the
-gap below it is owned by `.tab-bar-wrapper`'s `padding-top`.
-
-```css
-/* AI-generated summary title */
-.playbook-title {
-  font-size: 24px;
-  line-height: 34px;
-  font-weight: 400;
-  color: var(--text-n9);
-  letter-spacing: 0.24px;
-  margin: 0;
-}
-
-/* 3–4 sentences: data sources and purpose */
-.playbook-desc {
-  margin-top: var(--spacing-xs);
-  font-size: 14px;
-  line-height: 22px;
-  letter-spacing: 0.14px;
-  color: var(--text-n5);
-}
-```
-
-```html
-<h1 class="playbook-title">Strategy Performance Analysis</h1>
-<div class="playbook-desc">
-  This playbook tracks a BTC momentum strategy backtested from Jan 2024. Data
-  sourced from Binance spot via Altra ALFS.
-</div>
-```
-
 ## Usage — Read only what you need
 
 1. **Generating a widget or chart** → read
