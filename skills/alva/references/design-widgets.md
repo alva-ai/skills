@@ -392,6 +392,13 @@ Legend marker class by chart type:
    `initTableAlignment` must re-run for tables that were hidden. The
    [Tab JS](./design-components.md#js-interaction-1) handles both automatically
    for tab switches.
+6. `.chart-body` MUST carry `.chart-dotted-background`. Do NOT set a solid
+   `background` on `.chart-body` via inline style or any other class — the
+   dotted pattern IS the background.
+7. `.chart-legend` (when used) MUST be inside `.chart-body`, as its first
+   child. Do NOT place it between `.widget-title` and `.chart-body`.
+8. `.alva-watermark` is required, not optional. It MUST be the last child
+   of `.chart-body`, using the exact CDN `<img>` shown in the template.
 
 ### Axis Rules
 
