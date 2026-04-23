@@ -1,21 +1,17 @@
 # Ranked-List Screener Playbook
 
-Reference structure + screener-specific styling for any composite-score screener
-(stocks, crypto, etc.). Built from `quality-value-screener-clean`.
+Reference structure + screener-specific styling for any ranked-list screener
+(stocks, crypto, etc.).
 
 ---
 
 ## Design System Compliance (READ FIRST)
 
-Before writing HTML, read from the Alva skill:
-
-- `references/design-tokens.css` — all spacing, color, radius tokens. Use as-is, do NOT override.
-- `references/design-widgets.md` — Chart Card / Metric Card / Table Card base specs.
-  This playbook only documents screener-unique rules on top of that.
-- `references/design-components.md` — Tab, Dropdown, Pill primitives.
-
-**Rule of thumb**: if a token or base spec already exists in the design system,
-reference it here by name — do not re-spec it.
+Before writing HTML, read `references/design-tokens.css` (tokens),
+`references/design-widgets.md` (Chart / Metric / Table Card bases), and
+`references/design-components.md` (Tab / Dropdown / Pill primitives). This
+playbook only documents screener-unique rules on top of them — never re-spec
+a token or base that already exists.
 
 ---
 
@@ -24,9 +20,10 @@ reference it here by name — do not re-spec it.
 Structural:
 
 - [Screener Variants](#screener-variants) — **read first** to know which components apply
+- [Feed Contract](#feed-contract) — **read second** to know what data shape to emit
 - [Page Layout](#page-layout)
-- [Header](#header) · [Daily TLDR Card](#daily-tldr-card) · [Snapshot Picker](#snapshot-picker)
-- [Tab 1 — Overview](#tab-1--overview)
+- [Header](#header) · [Snapshot Picker](#snapshot-picker)
+- [Tab 1 — Overview](#tab-1--overview) — opens with [Daily Digest](#daily-digest)
 - [Tab 2 — Movers & Trends](#tab-2--movers--trends-optional)
 - [Tab 3 — Analysis](#tab-3--analysis-optional)
 - [Tab 4 — Methodology](#tab-4--methodology)
@@ -52,7 +49,9 @@ know whether to include it.
 |---|---|---|
 | **Scored** | Rows have a composite score (weighted factor combine). Order = score. | Rank by score desc. Band pill maps score → tier. |
 | **Basket** | Pass/fail inclusion — row is either in or out. No score. | Order by the most relevant raw metric (market cap, entry date, etc.). |
-| **Hybrid** | Basket with a secondary score for tie-breaking or ordering. | Treat as **scored** for component choices but keep basket-style churn. |
+
+If your screener wants basket-style inclusion *plus* a secondary score for
+ordering, treat it as **scored** and let the score drive the rank.
 
 Component matrix (✓ = include, ✗ = omit, △ = include with variant-specific rules):
 
@@ -70,8 +69,94 @@ Component matrix (✓ = include, ✗ = omit, △ = include with variant-specific
 | [Movers Card](#movers-card) | ✓ | ✓ | Scored: Entries/Dropouts/Top Gainers/Decliners. Basket: Entries/Exits only. |
 | [Basket Trend Chart](#basket-trend-chart) | ✓ | ✓ | Both — shows basket size + an aggregate stat over time. |
 | [Worked Example](#worked-example) | ✓ | ✗ | Only meaningful when there's a formula to re-derive. |
-| [Daily TLDR Card](#daily-tldr-card) | ✓ | ✓ | Both — ADK-summarized snapshot vs prior. |
-| [Push Notifications](#push-notifications--daily-tldr) | ✓ | ✓ | Shares the TLDR payload; skip when churn is empty (basket). |
+| [Daily Digest](#daily-digest) | ✓ | ✓ | In-tab (Overview), reacts to snapshot picker. Same `screener/tldr` record powers the push. |
+| [Push Notifications](#push-notifications--daily-tldr) | ✓ | ✓ | Derived from `tldr.push_line` + churn line; skip when churn is empty (basket). |
+
+---
+
+## Feed Contract
+
+One frozen data shape so generic tooling (snapshot picker, Daily Digest, push,
+Movers cards, trend chart) always works across screeners. Screener-specific
+fields live in open `metrics` / `detail` escape hatches — free to name and
+shape as the screener needs.
+
+### Storage
+
+```
+~/feeds/<screener-name>/v1/data/
+  screener/
+    rankings/   ← append-only, one record per (snapshot, row)
+    summary/    ← append-only, one record per snapshot
+    tldr/       ← append-only, one record per snapshot
+```
+
+All three are Feed SDK time-series
+(`ctx.self.ts("screener", "rankings").append(...)`). Do **not** use
+`alfs.writeFile` for these, and do **not** park them under
+`playbooks/<name>/data/`. Reads go through `@last/N`. `tldr` is a group on
+the same feed, not a separate `<name>-tldr` feed.
+
+### `rankings` — core fields (every record)
+
+| key | type | notes |
+|---|---|---|
+| `date` | number (ms) | Snapshot timestamp; same value for every row in that snapshot. |
+| `id` | string | Primary identifier — always `id`, never `ticker` / `symbol`. |
+| `name` | string | Human-readable label. |
+| `rank` | number \| null | Scored: required. Basket: may be null. |
+| `flags` | `[{label, tier}]` | `[]` if none; `tier` is `"hard"` \| `"soft"`. |
+
+### `rankings` — variant-required fields
+
+- **scored**: `score` (number), `factors: [{name, raw, pts, weight}]`
+- **basket**: `entry_date` (ms), `exit_reason` (string \| null)
+
+Do not introduce synonyms (`composite`, `consensusScore`, `ticker`, `symbol`).
+Freezing the vocabulary is the whole point of the contract.
+
+### `summary` — required fields
+
+| key | type | notes |
+|---|---|---|
+| `date` | number (ms) | Matches the row `date` for that snapshot. |
+| `universe_size` | number | Count before filters. |
+| `delta` | `{new_ids, dropped_ids}` | vs prior snapshot. First run: both `[]`. |
+
+Screeners may add other aggregates (`qualified_count`, `avg_score`,
+`layer_counts`, …) — loose, tooling ignores.
+
+### `tldr` — required fields
+
+One record per snapshot. Same record powers both the in-tab
+[Daily Digest](#daily-digest) and the
+[push notification](#push-notifications--daily-tldr) — the push uses
+`push_line` directly, so there is **one** ADK generation per snapshot, not two.
+
+| key | type | notes |
+|---|---|---|
+| `date` | number (ms) | Matches the snapshot. |
+| `body` | string | ADK-generated **markdown**. Free shape — bullets, prose, or one line, whatever the day needs. `""` after grounding failure. |
+| `push_line` | string | ADK-generated standalone headline, ≤ 160 chars plain text (not markdown). `""` after grounding failure. |
+| `churn_line` | string | Deterministic `"🆕 X · 👋 Y"` — always present, may be `""` when nothing changed. |
+| `source` | `"adk"` \| `"fallback"` | `"fallback"` when `body` is `""`. |
+
+### Escape hatches (on each `rankings` row)
+
+- **`metrics`** — flat numeric signals for display
+  (`{market_cap: 4.9e12, rev_growth: 104.6, volume_14d: 20}`).
+- **`detail`** — nested blobs for expand-row content (trade logs, news
+  samples, price arrays, etc.).
+
+Name fields in `metrics` / `detail` freely. The three bedrock rules below
+still apply inside them.
+
+### Three bedrock rules
+
+1. **snake_case** for all keys (`market_cap`, not `marketCap`).
+2. **Epoch ms** for all timestamps — no ISO strings anywhere.
+3. **No stringified JSON in field values.** Use real nested objects and
+   arrays; never `"[...]"` wrapped in quotes.
 
 ---
 
@@ -86,7 +171,8 @@ Component matrix (✓ = include, ✗ = omit, △ = include with variant-specific
 │ [ Overview · Movers & Trends · Analysis · Methodology ]      │
 ├──────────────────────────────────────────────────────────────┤
 │ <Tab content>              [Snapshot ▼: Today, Apr 17 EST]   │
-│  ... ranked table / charts / docs ...                        │
+│  Overview: Daily Digest → Ranked Table → expand rows         │
+│  Movers / Analysis / Methodology: as their sections describe │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -102,20 +188,16 @@ on desktop, wraps to its own row on mobile.
 
 ## Header
 
-Sticky across all tabs. Three pieces, left to right then wrap:
+Sticky across all tabs. Title + one-sentence summary reuse the base
+`design-system.md#playbook-header` styles — no re-spec here. Screener-specific
+behaviors:
 
-- **Title** — 24px / 400 weight / line-height 34px, `--text-n9`.
-- **Last-updated pill** — 1px border `--line-l07`, pulsing dot (`--main-m3`),
-  height 28px. Shows the latest snapshot timestamp; **not** affected by the
-  snapshot picker.
-- **Refresh badge** — tinted `--main-m1-10`, text `--main-m1`, height 28px.
-  Label format: `Refreshes <schedule> EST`.
-- **One-sentence summary** — 14px / `--text-n5`, below the row. No "What this is"
-  duplicate.
+- **Last-updated pill** — shows the latest snapshot timestamp; **not**
+  affected by the snapshot picker.
+- **Refresh badge** — label format: `Refreshes <schedule> EST`.
+- **Summary line** — no "What this is" duplicate of the refresh info.
 
-Base `.playbook-title` + `.playbook-desc` come from design-system.md#playbook-header —
-do not re-spec. Screener only adds header-row layout (so the title can share a
-flex row with meta pills) and the pills themselves:
+Screener-specific CSS (header-row flex layout + the two pills):
 
 ```css
 .playbook-header { display:flex; align-items:center; flex-wrap:wrap;
@@ -141,52 +223,6 @@ flex row with meta pills) and the pills themselves:
 
 ---
 
-## Daily TLDR Card
-
-**Applies to**: both.
-
-The twin of the [push notification](#push-notifications--daily-tldr). Sits
-directly under the header so users opening the playbook see the same summary
-they'd see in a push. 1–3 sentences, ADK-generated from today's snapshot vs
-prior: what changed, what drove it, what to watch.
-
-**Content rules**:
-
-- Lead with *change*, not the full basket. If nothing changed, say so in one
-  line ("No new entries, drivers unchanged.") rather than padding.
-- Name the 1–2 factors or flags responsible — not every factor in the table.
-- No buy/sell language. This is observational ("cluster breadth widened to 29
-  insiders"), not directional ("strong buy signal on TSM").
-- Do not cite facts that don't come from the row data or published feeds. ADK
-  synthesizes the numbers already present; it does not introduce new numbers.
-
-**Generation**:
-
-- Prompt ADK with: today's top-N rows, yesterday's top-N, churn (entries /
-  dropouts), factor-delta lookup, a short schema of field semantics.
-- Hard cap the response: 3 sentences, ≤ 280 chars total.
-- Cache per snapshot in `screener/summaries/tldr/<date>.json`. Regenerate only
-  when a new snapshot appears.
-- Deterministic fallback when ADK fails — reuse the push churn line verbatim.
-
-**Visual**:
-
-```css
-.tldr-card { background: var(--main-m1-05); border-left: 3px solid var(--main-m1);
-  border-radius: var(--radius-ct-l); padding: var(--spacing-m) var(--spacing-l);
-  margin-bottom: var(--spacing-l); display: flex; gap: var(--spacing-m);
-  align-items: flex-start; }
-.tldr-card-icon { flex-shrink: 0; width: 20px; height: 20px; color: var(--main-m1); }
-.tldr-card-body { font-size: 14px; line-height: 22px; color: var(--text-n9); }
-.tldr-card-meta { font-size: 11px; color: var(--text-n5); margin-top: var(--spacing-xxs);
-  letter-spacing: 0.11px; }
-```
-
-Meta line below the body: `TLDR · <timestamp> · <source>` (e.g. "TLDR · Apr 22,
-2026 · ADK" — or `· fallback` when ADK failed).
-
----
-
 ## Snapshot Picker
 
 Pure view filter — switches which historical snapshot drives the tab content.
@@ -207,73 +243,210 @@ Never mutates data, never changes the header timestamp.
   before the picked one.
 - First-load smoothness: picker hidden entirely when only 1 snapshot exists.
 
-**History accumulation** *(must follow)*:
-
-1. **First run = today only.** Don't fake-backfill past dates from current SDK
-   queries — point-in-time SDK calls return *currently revised* data, not real
-   historical state. Misleading.
-2. **Every cron run appends a new snapshot, never overwrites.** Each snapshot
-   stays in `screener/rankings` + `screener/summary` indefinitely.
-3. **No retention pruning by default.** Keep full history so picker, Movers
-   Δ-calcs, and basket-trend chart all work on real data.
+**History accumulation** — snapshots are Feed SDK time-series records in
+`screener/rankings` and `screener/summary` (see [Feed Contract](#feed-contract)).
+First run produces today only — do **not** fake-backfill past dates from
+current SDK queries, since point-in-time calls return *currently revised*
+data, not real historical state.
 
 **Visual** — minimal inline trigger (no button chrome), label + value + sub +
 caret. Menu is a dropdown with tier-colored active state.
 
 ```css
+/* Extends design-components.md#dropdown — only screener-unique overrides below:
+   inline trigger (no button chrome), m1 hover/active tint, sub-label styles. */
 .filter-dropdown { position:relative; display:inline-flex; align-items:center; }
-.filter-dropdown-trigger { background:transparent; border:none; border-radius:0;
-  padding:0 0 6px 0; margin-bottom: var(--spacing-xxxs);
-  font-size:12px; color:var(--text-n9); line-height:20px;
-  cursor:pointer; display:inline-flex; align-items:center; gap: var(--spacing-xs);
-  transition:color .15s; }
+.filter-dropdown-trigger { background:transparent; border:none; padding:0 0 6px 0;
+  font-size:12px; line-height:20px; color:var(--text-n9); cursor:pointer;
+  display:inline-flex; align-items:center; gap:var(--spacing-xs); transition:color .15s; }
 .filter-dropdown-trigger:hover,
 .filter-dropdown.open .filter-dropdown-trigger { color:var(--main-m1); }
-.filter-dropdown-label { color:var(--text-n5); font-size:12px; }
-.filter-dropdown-value { color:var(--text-n9); flex:1;
-  display:inline-flex; align-items:baseline; gap:6px; }
-.filter-dropdown-value-sub { font-size:11px; color:var(--text-n5); }
+.filter-dropdown-label     { font-size:12px; color:var(--text-n5); }
+.filter-dropdown-value     { color:var(--text-n9); display:inline-flex; align-items:baseline; gap:6px; }
+.filter-dropdown-value-sub,
+.filter-dropdown-item-sub  { font-size:11px; color:var(--text-n5); }
+.filter-dropdown-item-sub  { margin-left: var(--spacing-s); }
 .filter-dropdown-caret { display:inline-block; width:12px; height:12px;
-  background-color:var(--text-n2);
-  -webkit-mask:url('https://alva-ai-static.b-cdn.net/icons/arrow-down-f2.svg') no-repeat center / contain;
-          mask:url('https://alva-ai-static.b-cdn.net/icons/arrow-down-f2.svg') no-repeat center / contain;
-  transition:transform .15s, background-color .15s; }
-.filter-dropdown.open .filter-dropdown-caret { transform:rotate(180deg);
-  background-color:var(--main-m1); }
-.filter-dropdown-menu { position:absolute; top:calc(100% + 6px); right:0;
-  min-width:220px; background:var(--b0-container);
-  border:0.5px solid var(--line-l2); border-radius:var(--radius-pop-dropdown);
-  box-shadow:var(--shadow-s); padding: var(--spacing-xxs); z-index:100; display:none; }
+  background-color:var(--text-n2); transition:transform .15s, background-color .15s;
+  -webkit-mask:url('https://alva-ai-static.b-cdn.net/icons/arrow-down-f2.svg') no-repeat center/contain;
+          mask:url('https://alva-ai-static.b-cdn.net/icons/arrow-down-f2.svg') no-repeat center/contain; }
+.filter-dropdown.open .filter-dropdown-caret { transform:rotate(180deg); background-color:var(--main-m1); }
+.filter-dropdown-menu { position:absolute; top:calc(100% + 6px); right:0; min-width:220px;
+  background:var(--b0-container); border:0.5px solid var(--line-l2);
+  border-radius:var(--radius-pop-dropdown); box-shadow:var(--shadow-s);
+  padding:var(--spacing-xxs); z-index:100; display:none; }
 .filter-dropdown.open .filter-dropdown-menu { display:block; }
-.filter-dropdown-item { display:flex; align-items:baseline;
-  justify-content:space-between; padding: var(--spacing-xs) var(--spacing-s);
-  font-size:14px; color:var(--text-n9); line-height:22px;
-  background:transparent; border:none; cursor:pointer; width:100%;
-  border-radius: var(--radius-ct-s); text-align:left; }
+.filter-dropdown-item { display:flex; justify-content:space-between; align-items:baseline;
+  width:100%; padding:var(--spacing-xs) var(--spacing-s);
+  font-size:14px; line-height:22px; color:var(--text-n9);
+  background:transparent; border:none; cursor:pointer; text-align:left;
+  border-radius:var(--radius-ct-s); }
 .filter-dropdown-item:hover { background:var(--grey-g01); }
-.filter-dropdown-item.active { background: var(--main-m1-10);
-  color:var(--main-m1); }
-.filter-dropdown-item-sub { font-size:11px; color:var(--text-n5);
-  margin-left: var(--spacing-s); }
+.filter-dropdown-item.active { background:var(--main-m1-10); color:var(--main-m1); }
 ```
 
 ---
 
 ## Tab 1 — Overview (default)
 
-Full ranked table. Always the landing tab.
+Overview layout, top-down: **Daily Digest → Ranked Table (with expandable
+rows)**. Always the landing tab.
+
+### Daily Digest
+
+**Applies to**: both.
+
+Markdown summary of the current snapshot. Sits at the top of Overview, above
+the ranked table, and **reacts to the snapshot picker** — swapping dates
+swaps the digest. One ADK-generated artifact (cached in `screener/tldr`,
+see [Feed Contract](#feed-contract)) powers both this panel and the
+[push notification](#push-notifications--daily-tldr) via the same record's
+`push_line`. One generation per snapshot, two render surfaces.
+
+**Content rules** — **shape follows content**, not the other way around.
+
+- Output is a markdown `body` + a short `push_line`. `body` renders as
+  markdown in the digest container; it can be a bulleted list, a short
+  paragraph, a single sentence, or any mix. Pick what the day actually
+  calls for:
+  - **Churn-heavy / multi-signal day** → bulleted list with `**Label:**`
+    prefixes reads well.
+  - **Single clear driver** → a short paragraph feels more human than
+    one lonely bullet.
+  - **Quiet day** → one or two dry sentences. Don't manufacture structure
+    just to fill the card.
+- `push_line` is a standalone ≤ 160-char headline for the lock screen,
+  drawn from the same observation that leads the body but not required to
+  appear verbatim in it.
+- Useful labels when bulleting (no fixed set, no fixed order):
+  *Top of basket · New entries · Dropouts · Sector tilt · Flags ·
+  Next refresh*.
+- No buy/sell, no price targets, no timing calls. Observational only.
+- Every number in `body` or `push_line` must appear verbatim in the input
+  row data.
+
+**Voice** — write like a sharp analyst dropping a line in Slack, not a
+research-report abstract:
+
+- **Verbs, not nouns.** *"PANW crashed into the top-5"* > *"PANW's ranking
+  improved"*.
+- **Asymmetric rhythm.** Avoid parallel *"A rose to X; B fell to Y"*
+  structures. *"TSM pulled ahead on a quiet wave — six fresh insiders
+  overnight, nothing else moved."*
+- **Texture over aggregates.** *"$10M in a single clip"*, *"stable three
+  days running"*. Generic intensifiers ("strong", "significant") banned.
+- **Dry over hype.** *"Nothing material; roster unchanged."* beats padding.
+  Silence is honest.
+- **Screener-native vocabulary.** Use exact factor names from the table
+  ("cluster breadth", "entry-level 20d MA"), not model-invented synonyms.
+
+**Few-shot pack** — each screener owns `screener/prompts/tldr.yaml`:
+
+- **3 gold examples** from real prior snapshots of *this* screener,
+  showing the full range: one bullet-heavy day, one prose day, one quiet
+  one-liner day. Each example = full `{body, push_line}` pair. Rotate
+  when stale.
+- **2 negative examples** labeled with *why they're bad*:
+  - *"TSM leads with strong momentum and solid fundamentals."* — generic
+    adjectives, no factor driver, no numbers.
+  - *"PANW entered at rank 4; ORCL dropped to rank 12."* — parallel
+    structure, reads like a diff, no driver named.
+
+Include the pack verbatim in the ADK prompt. Without it, output drifts to
+research-report tone within a week.
+
+**Generation**:
+
+- ADK output is structured JSON: `{body: "<markdown>", push_line: "<plain>"}`.
+- Length caps: `push_line` ≤ 160 chars (so push line 1 + churn + URL fit
+  the 280-char lock-screen budget); `body` ≤ ~800 chars rendered (keep the
+  digest from dominating the tab).
+- **Numeric grounding** — extract every number (regex `-?\d+(\.\d+)?%?`)
+  from both fields. If **any** unverified number appears, mark the whole
+  digest as fallback (`body: ""`, `push_line: ""`, `source: "fallback"`) and
+  let the UI render `churn_line` alone. All-or-nothing beats patching
+  partial prose.
+- Persist per snapshot to `screener/tldr`. Regenerate only when a new
+  snapshot appears.
+
+**Prompt skeleton** — use verbatim; only `{{few_shots}}` varies per screener.
+
+```text
+You are writing today's <SCREENER_NAME> digest for a finance-savvy user.
+`body` renders as markdown in the Overview tab. `push_line` is the
+standalone lock-screen headline.
+
+VOICE
+- Verbs, not abstract nouns. Asymmetric rhythm. Texture over aggregates.
+- Dry tone; silence over padding. Use the screener's own factor names.
+- No buy/sell, no price targets, no timing calls.
+- Every number in body or push_line must appear verbatim in INPUT_DATA.
+- push_line ≤ 160 chars. body ≤ ~800 chars rendered.
+
+BODY SHAPE — let the day's content decide:
+- Churn-heavy / multi-signal → bulleted list with **Label:** prefixes.
+- Single clear driver → a short paragraph.
+- Quiet day → one or two sentences. Do not pad with labels to fill space.
+Useful labels when bulleting (pick only what applies, any order):
+Top of basket · New entries · Dropouts · Sector tilt · Flags · Next refresh.
+
+FEW_SHOTS
+{{few_shots}}
+
+INPUT_DATA
+  today_top_n:    {{today_rows}}
+  prior_top_n:    {{prior_rows}}
+  churn:          {{churn_line}}    # e.g. "🆕 PANW, NKE · 👋 ORCL"
+  factor_deltas:  {{factor_deltas}} # {id: {factor: {today, prior}}}
+  new_flags:      {{new_flags}}
+  field_schema:   {{schema}}
+
+Output JSON only: {"body": "<markdown>", "push_line": "<plain ≤160 chars>"}.
+No preamble, no surrounding text.
+```
+
+**Reactivity** — on snapshot picker change, re-fetch the matching
+`screener/tldr` record and re-render. The picker owns which record is
+shown; when only one snapshot exists, the digest still renders (the
+picker is hidden per its own rules).
+
+**Rendering** — reuse `.markdown-container --m` from design-components.md
+inside the digest container, so bullets, bold labels, and paragraphs all
+pick up the design system's shared markdown styles without re-spec.
+
+**Visual**:
+
+```css
+/* Outer container only — inner markdown rendering is handled by
+   .markdown-container --m from design-components.md. Do not re-spec
+   ul / li / strong here. */
+.daily-digest { background: var(--grey-g01); border-radius: var(--radius-ct-l);
+  padding: var(--spacing-l) var(--spacing-xl);
+  margin-bottom: var(--spacing-l); }
+.daily-digest-meta { font-size: 11px; color: var(--text-n5);
+  margin-top: var(--spacing-s); letter-spacing: 0.11px; }
+```
+
+Meta line below the body: `Digest · <timestamp EST> · <source>` — e.g.
+`Digest · Apr 16, 2026 9:58 PM · ADK`, or `· fallback` when `body` is
+empty (in which case render `churn_line` as a single line in place of
+the markdown body).
 
 ### Row anchor
 
-**Required**: `<primary identifier> · ⌄` (the row anchor + expand caret).
+**Required**: `<id> · ⌄` — the row's `id` from the
+[Feed Contract](#feed-contract) plus the expand caret.
 
-The **primary identifier** is the unique label for each row in the screener's
-universe — the thing a user thinks of as "the row":
+`id` is a string; its content depends on the screener's universe, but the
+field is always called `id` both in the feed data and in the rendered markup:
 
-- Stocks/ETFs → ticker (`PLTR`, `NVDA`, `SPY`)
+- Stocks/ETFs → ticker string (`PLTR`, `NVDA`, `SPY`)
 - Crypto → symbol or pair (`BTC`, `ETH-USD`)
 - Bonds → ISIN / CUSIP
 - Sectors / themes → sector or theme name
+
+The UI renders `id` verbatim — no translation layer, no alternate column
+name ("ticker", "symbol") anywhere in the playbook.
 
 ### Columns
 
@@ -295,8 +468,8 @@ most relevant metric (e.g. market cap, entry date) and make that column primary.
 ### Ranked Table
 
 Built on the Table Card base from design-widgets.md. Screener-specific
-additions: horizontal scroll, sticky `#` and primary-identifier columns to the
-left, sticky caret column to the right, expandable rows.
+additions: horizontal scroll, sticky `#` and `id` columns on the left,
+sticky caret column on the right, expandable rows.
 
 Structural rules:
 
@@ -306,7 +479,7 @@ Structural rules:
 - Row content is inset `var(--spacing-m)` from the left via `padding-left`;
   right inset comes from the 40px sticky caret cell. Dividers span the full
   table-card width.
-- Column 1 (`#`, 48px) and column 2 (primary identifier, 88px) are pinned left.
+- Column 1 (`#`, 48px) and column 2 (the row's `id`, 88px) are pinned left.
   Their `box-shadow` extends the cell background leftward to cover the row's
   `padding-left` and the flex gap between them — otherwise scrolled content
   bleeds through.
@@ -361,13 +534,14 @@ Structural rules:
 
 Score column combines a fill bar + numeric value, optional delta pill.
 
-Color rules (score → color). Apply via inline style on `.score-bar-fill`;
-JS may use `var(--token)` directly in `element.style.background`.
+Color rules (score → color) — **must match Band Pill exactly** so a row's bar
+and pill never disagree. Apply via inline style on `.score-bar-fill`; JS may
+use `var(--token)` directly in `element.style.background`.
 
-- `≥ 80` → `var(--main-m3)` (green, `#2a9b7d`)
-- `≥ 70` → `#54a5c2` (blue — no direct main token; `--chart-blue2-1`)
-- `≥ 60` → `var(--main-m6)` (amber, `#ff9800`)
-- `< 60` → `var(--main-m4)` (red, `#e05357`)
+- `≥ 80` → `var(--main-m3)` (green, `#2a9b7d`) — *elite*
+- `≥ 70` → `var(--main-m1)` (teal) — *strong*
+- `≥ 60` → `var(--main-m5)` (amber) — *average*
+- `< 60` → `var(--main-m4)` (red, `#e05357`) — *weak*
 
 ```css
 .score-cell { display:flex; align-items:center; gap: var(--spacing-xxs); }
@@ -382,9 +556,8 @@ JS may use `var(--token)` directly in `element.style.background`.
 
 **Applies to**: scored.
 
-Labels the score tier. Four bands map 1:1 to the Alva main palette: `elite`
-(m3 green), `strong` (m1 teal), `average` (m5 amber), `weak` (m4 red).
-Suggested thresholds: 80+ / 70–79 / 60–69 / 0–59.
+Tier label using the same palette as [Score Bar](#score-bar): `elite` /
+`strong` / `average` / `weak`. Thresholds: 80+ / 70–79 / 60–69 / 0–59.
 
 ### Delta Tag / Delta Score
 
@@ -405,8 +578,11 @@ suppress when `|Δ| < 0.5`.
 
 **Applies to**: both.
 
-Shows the primary red flag in the table cell. `clean` (no flag) / `soft` /
-`hard`. When a row has multiple flags, show the first label plus `+N`.
+Shows the primary red flag in the table cell. Two tiers only: `soft` / `hard`,
+mapped from each flag's `tier` field in the [Feed Contract](#feed-contract).
+When a row has multiple flags, show the first label plus `+N`. When
+`flags: []`, render **nothing** — do not add a "clean" / "—" placeholder,
+since a universe of 500 rows × one placeholder pill is pure visual noise.
 
 ```css
 .band-pill, .flag-pill, .delta-tag {
@@ -432,7 +608,6 @@ Shows the primary red flag in the table cell. `clean` (no flag) / `soft` /
 .delta-score.down { color: var(--main-m4); }
 
 .flag-pill { gap: var(--spacing-xxs); }
-.flag-pill.clean { background: var(--b-r05);      color: var(--text-n5); }
 .flag-pill.soft  { background: var(--main-m5-10); color: var(--main-m5); }
 .flag-pill.hard  { background: var(--main-m4-10); color: var(--main-m4); }
 .flag-pill .flag-extra-count { color: var(--text-n7);
@@ -444,43 +619,16 @@ Shows the primary red flag in the table cell. `clean` (no flag) / `soft` /
 **Applies to**: both (layout differs — see below).
 
 Always include a **price/value chart** of the asset. Other blocks are optional —
-mix & match based on what reveals *why* the row is in the basket. Every expand
-row should also carry a **[Row TLDR](#row-tldr)** — 1–2 sentences on *why this
-row ranks here today*.
+mix & match based on what reveals *why* the row is in the basket.
 
 Layout: 8-col grid inside the expand panel.
 
 - **Scored**: row 1 = `col-4` Gauge Ring + `col-4` Factor Breakdown; row 2
-  = `col-8` Price/K-line chart; row 3 = Row TLDR; row 4 = Flag cards (auto-fit).
-- **Basket**: row 1 = `col-8` Price/K-line; row 2 = Row TLDR; row 3 = custom
-  narrative blocks (peer comparison, news links, holdings, on-chain stats, etc.).
+  = `col-8` Price/K-line chart; row 3 = Flag cards (auto-fit).
+- **Basket**: row 1 = `col-8` Price/K-line; row 2 = custom narrative blocks
+  (peer comparison, news links, holdings, on-chain stats, etc.).
 
 Skip components that don't add insight.
-
-### Row TLDR
-
-**Applies to**: both.
-
-1–2 sentences (≤ ~160 chars) answering *why this row ranks here today*. Lead
-with the driver, not the description. Examples:
-
-- Scored: *"Leads the composite on cluster breadth (29 insiders) and a $10M CEO
-  purchase — weak name factor drags but doesn't offset."*
-- Basket: *"Joined the basket 12 days ago after the Q1 revision; price holding
-  above the entry-level 20d MA."*
-
-**Generation**: ADK-generated from row data + factor scores. Do not quote an
-LLM's factual claims — restrict ADK to *synthesizing* the numbers already in
-the row. Cache per snapshot; re-generate on new snapshots.
-
-```css
-.row-tldr { background: var(--grey-g01); border-radius: var(--radius-ct-l);
-  padding: var(--spacing-s) var(--spacing-m); margin-top: var(--spacing-m);
-  font-size: 13px; line-height: 20px; color: var(--text-n9); }
-.row-tldr::before { content: 'TLDR'; display: inline-block;
-  font-size: 10px; color: var(--text-n5); letter-spacing: 0.1px;
-  margin-right: var(--spacing-xs); vertical-align: 1px; }
-```
 
 ### Price / K-line
 
@@ -508,8 +656,8 @@ ECharts spec essentials (beyond design-widgets Chart Card defaults):
 
 **Applies to**: scored.
 
-ECharts `gauge` in the expand panel's Composite Score card. Not a screener-
-unique primitive — spec it here because design-widgets.md doesn't cover gauges.
+ECharts `gauge` in the expand panel's Score card. Not a screener-unique
+primitive — spec it here because design-widgets.md doesn't cover gauges.
 
 - Radius 78%, single progress arc (width 14, roundCap), no pointer/tick/label.
 - Progress color = score color (same breakpoints as Score Bar).
@@ -770,17 +918,19 @@ Re-derive the current #1 from raw inputs. Always lives inside a `.method-body`,
 rendered into an inline `.worked-example` card so it stands out from narrative
 paragraphs.
 
+**Design rule (required)** — the displayed `score` MUST equal the
+factor-weighted sum, with **no** cross-basket rescaling. This is what makes
+the worked example actually verifiable: a user with SDK access can reproduce
+the exact number. If a screener needs a different display convention, drop
+the Worked Example entirely rather than ship one that doesn't reconcile.
+
 Three parts:
 
-- **Header** — big ticker in `--main-m1`, then "· name · Rank #N · Band X" in
+- **Header** — big `id` in `--main-m1`, then "· name · Rank #N · Band X" in
   `--text-n7`.
 - **Rows** — monospace, one per factor: `name | raw / 100 × weight% = pts`.
-- **Total** — divider + "factor-weighted sum" vs "displayed score" line. These
-  are **not** expected to match exactly (the displayed score is a linear
-  rescaling of the composite across the basket). State this explicitly in the
-  verify badge, e.g. *"All three factors come from the same SDK observation;
-  the display score is a linear rescaling so absolute value may differ but
-  relative ordering is preserved."*
+- **Total** — divider + the sum. Verify badge states the invariant:
+  *"Sum of factor contributions = displayed score (87.3)."*
 
 ```css
 .worked-example { background: var(--b0-container);
@@ -817,52 +967,51 @@ updates wastes credits and creates noise.
 | Real-time signals (rare) | every 5–15 min during market hours |
 
 - Cron in UTC; display in EST in the UI.
-- Feed accepts `args.now` (ms) for one-off backfill runs.
-- For slow screeners: backfill via point-in-time SDK queries returns *current
-  revised* data, not real point-in-time. Forward-only accumulation is more
-  honest.
+- `args.now` (ms) is for **replaying missed runs** — e.g. cron was down
+  Tuesday; pass Tuesday's timestamp and rerun. It stamps today's SDK response
+  with a different snapshot date, which is the correct behavior for recovery.
+- **Do not use `args.now` to fabricate pre-launch history.** Point-in-time
+  SDK calls return *currently revised* data, not real historical state — any
+  "history" built this way would be a fiction. The only honest mode is
+  forward-only accumulation starting from the screener's launch date.
 
 ---
 
-## Push Notifications / Daily TLDR
+## Push Notifications / Daily Digest
 
 **Applies to**: both.
 
-Push payload is the same TLDR rendered in the [Daily TLDR Card](#daily-tldr-card)
-— one source of truth, so the notification and the open-app experience don't
-drift. Mechanics live in SKILL.md Pattern E; rules below are screener-specific.
+Push payload is **deterministically derived** from the same
+`screener/tldr` record that powers the in-tab
+[Daily Digest](#daily-digest) — one ADK generation per snapshot, two render
+surfaces, zero drift. Base push plumbing (signal target schema, subscription,
+delivery) comes from the Alva skill.
 
 **When to send**:
 
 - First snapshot of the day (or first snapshot ever) → always send.
 - Subsequent snapshots → only if something *changed*: new entries, new
   dropouts, rank churn in top-N, new flags, or a factor driver swap.
-- Basket variant: skip the push entirely when both churn sides are empty —
-  don't send "nothing happened" pings.
+- Basket variant: skip entirely when both churn sides are empty — don't
+  send "nothing happened" pings.
+- If the `tldr` record's `source` is `"fallback"` (grounding failed) and
+  churn is empty, skip the push.
 
-**What to send** — ADK-generated TLDR + deterministic appendix.
+**Payload derivation** (no separate ADK call):
 
 ```
-title: <Screener> · <date>
-line 1: <ADK TLDR, ≤ 2 sentences>
-line 2: 🆕 <new IDs> · 👋 <dropped IDs>          ← deterministic churn
-line 3: Full snapshot → <playbook URL>
+title:   <Screener> · <date>
+line 1:  tldr.push_line              ← already grounded + voice-checked + ≤ 160 chars
+line 2:  tldr.churn_line             ← deterministic "🆕 X · 👋 Y"
+line 3:  Full snapshot → <playbook URL>
 ```
 
-The ADK TLDR replaces the old hand-written "⭐ Top" line. It must:
+If `push_line: ""` (fallback), line 1 is omitted and the push is churn line
++ URL only. **Length budget** stays ≤ 280 chars for lines 1+2 combined —
+the 160-char cap on `push_line` in the Daily Digest prompt guarantees the
+fit.
 
-- Name the 1–2 factors or flags responsible for the change (e.g. "cluster
-  breadth widened to 29 insiders", not "moved up strongly").
-- Synthesize only data already in the row. No new numbers, no fabricated
-  context. If ADK can't produce a valid TLDR, fall back to the churn line
-  alone (drop line 1 entirely rather than mislead).
-- Stay observational — no buy/sell, no price targets, no timing calls.
-
-**Length budget**: ≤ 280 chars across lines 1 + 2 combined so it fits a
-lock-screen preview. ADK prompt should enforce the char cap; truncate on
-overflow rather than cut mid-sentence.
-
-**Example** (Insider Buying Clusters):
+**Example**:
 
 ```text
 Title: Insider Buying Clusters · 2026-04-22
@@ -872,30 +1021,27 @@ top-5 after a $10M CEO purchase.
 Full snapshot → https://alva.ai/u/ivan/playbooks/insider-screener-v2
 ```
 
-**Example** (basket, nothing material):
+A basket variant with no churn is **not sent** under the rules above — don't
+ship a second template for "No new entries or exits".
 
-```text
-Title: Quality Value Basket · 2026-04-22
-No new entries or exits; roster stable at 38 names.
-Full snapshot → https://alva.ai/u/ivan/playbooks/quality-value-screener-v2
-```
-
-(This one would be skipped under the "nothing happened" rule — example shown
-for format only.)
-
-**Implementation sketch** — the feed script produces a `tldr/<date>.json` that
-both the playbook HTML and the push cron read from, so the two stay in sync:
+**Implementation sketch** — feed script writes one `tldr` record per
+snapshot (see [Feed Contract](#feed-contract)); the push cron and the
+playbook HTML both read the same record via `@last/1`:
 
 ```js
 // in the feed script, after computing today's ranking
-const tldr = await adk.summarize({
-  prompt: TLDR_PROMPT,
-  data: { today: topN, prior: priorTopN, churn, factorDeltas },
-  maxTokens: 120,
+const churn_line = formatChurn(entries, exits);   // deterministic — computed first so ADK can see it
+const digest = await adk.generateJson({
+  prompt: DIGEST_PROMPT,   // see Daily Digest → Prompt skeleton
+  data: { today: topN, prior: priorTopN, churn: churn_line, factorDeltas, newFlags },
+  maxTokens: 500,
 });
-const churn = formatChurn(entries, exits);   // deterministic fallback
-await fs.write(
-  `screener/summaries/tldr/${today}.json`,
-  JSON.stringify({ tldr, churn, generatedAt: now, source: tldr ? 'adk' : 'fallback' })
-);
+const grounded = passesGrounding(digest, inputData);   // all numbers verified?
+await ctx.self.ts("screener", "tldr").append([{
+  date: snapshotDate,
+  body:       grounded ? digest.body       : "",
+  push_line:  grounded ? digest.push_line  : "",
+  churn_line,
+  source: grounded ? "adk" : "fallback",
+}]);
 ```
