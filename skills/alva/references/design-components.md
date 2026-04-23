@@ -9,7 +9,9 @@
 - [Switch](#switch)
 - [Modal](#modal)
 - [Select](#select)
+- [Input](#input)
 - [Tab](#tab)
+- [Tooltip](#tooltip)
 
 ---
 
@@ -17,7 +19,9 @@
 
 ### Specification
 
-- Selected state: text color **unchanged**.
+- Hover and Selected share the same teal tint background.
+- Selected state additionally gets rounded corners (`--radius-ct-m`) and the text (`.list-item-text`) switches to `--main-m1`. Hover leaves text color unchanged.
+- No check icon — selection is conveyed by the rounded tinted pill alone.
 
 ### CSS
 
@@ -26,9 +30,9 @@
   background-color: var(--b0-container);
   display: flex;
   flex-direction: column;
-  padding: 8px 0;
+  padding: var(--spacing-xxs);
   position: relative;
-  border-radius: 6px;
+  border-radius: var(--radius-pop-dropdown);
   width: 100%;
   box-shadow: var(--shadow-s);
 }
@@ -36,7 +40,7 @@
 .dropdown-border {
   position: absolute;
   border: 0.5px solid var(--line-l2);
-  border-radius: var(--radius-ct-m);
+  border-radius: var(--radius-pop-dropdown);
   inset: 0;
   pointer-events: none;
 }
@@ -50,14 +54,22 @@
 
 .list-item:hover,
 .list-item.selected {
-  background-color: var(--b-r03);
+  background-color: rgba(73,163,166,0.08);
+}
+
+.list-item.selected {
+  border-radius: var(--radius-ct-m);
+}
+
+.list-item.selected .list-item-text {
+  color: var(--main-m1);
 }
 
 .list-item-inner {
   display: flex;
   align-items: center;
-  padding: 7px 16px;
-  gap: 8px;
+  padding: var(--spacing-xs) var(--spacing-s);
+  gap: var(--spacing-xs);
 }
 
 .list-item-text {
@@ -76,29 +88,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-.list-item-check {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-  display: none;
-}
-
-.list-item.selected .list-item-check {
-  display: block;
-}
-
-.list-item-check::after {
-  content: "";
-  display: block;
-  width: 16px;
-  height: 16px;
-  background-color: var(--main-m1);
-  -webkit-mask: url("https://alva-ai-static.b-cdn.net/icons/check-l1.svg")
-    center / contain no-repeat;
-  mask: url("https://alva-ai-static.b-cdn.net/icons/check-l1.svg") center /
-    contain no-repeat;
-}
 ```
 
 ### HTML Structure
@@ -110,14 +99,12 @@
   <div class="list-item" data-value="item-1">
     <div class="list-item-inner">
       <span class="list-item-text">Item - Normal</span>
-      <span class="list-item-check"></span>
     </div>
   </div>
 
   <div class="list-item selected" data-value="item-2">
     <div class="list-item-inner">
       <span class="list-item-text">Item - Selected</span>
-      <span class="list-item-check"></span>
     </div>
   </div>
 </div>
@@ -207,7 +194,7 @@ tags, and scoped CSS maps them to the Alva design spec.
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--spacing-m);
 }
 .markdown-container * {
   box-sizing: border-box;
@@ -236,13 +223,13 @@ tags, and scoped CSS maps them to the Alva design spec.
   font-size: 20px;
   line-height: 30px;
   letter-spacing: 0.2px;
-  padding-top: 8px;
+  padding-top: var(--spacing-xs);
 }
 .markdown-container h3 {
   font-size: 18px;
   line-height: 28px;
   letter-spacing: 0.18px;
-  padding-top: 4px;
+  padding-top: var(--spacing-xxs);
 }
 .markdown-container h4,
 .markdown-container h5,
@@ -272,7 +259,7 @@ tags, and scoped CSS maps them to the Alva design spec.
 .markdown-container ol {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--spacing-xs);
   list-style: none;
   margin: 0;
   padding: 0;
@@ -288,17 +275,17 @@ tags, and scoped CSS maps them to the Alva design spec.
   letter-spacing: 0.16px;
   color: var(--text-n9);
   position: relative;
-  padding-left: 24px;
+  padding-left: var(--spacing-xl);
 }
 .markdown-container ul > li::before {
   content: "";
+  position: absolute;
+  left: 9.5px;
+  top: 10.5px;
   width: 5px;
   height: 5px;
   border-radius: 50%;
   background: var(--text-n9);
-  position: absolute;
-  left: 0;
-  top: 10.5px;
 }
 .markdown-container ol {
   counter-reset: md-ol;
@@ -322,7 +309,7 @@ tags, and scoped CSS maps them to the Alva design spec.
 .markdown-container code,
 .markdown-container pre {
   background: var(--b-r02);
-  border-radius: 2px;
+  border-radius: var(--radius-ct-xs);
   font-family: "JetBrains Mono", monospace;
   color: var(--text-n7);
 }
@@ -333,15 +320,15 @@ tags, and scoped CSS maps them to the Alva design spec.
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.12px;
-  padding: 2px 8px;
-  margin: 0 4px;
+  padding: var(--spacing-xxxs) var(--spacing-xs);
+  margin: 0 var(--spacing-xxs);
 }
 .markdown-container pre {
   border: 1px solid var(--line-l07);
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
-  padding: 12px 16px;
+  padding: var(--spacing-s) var(--spacing-m);
   margin: 0;
   overflow-x: auto;
 }
@@ -362,19 +349,19 @@ tags, and scoped CSS maps them to the Alva design spec.
   height: 1px;
   background: var(--line-l07);
   border: none;
-  margin: 4px 0;
+  margin: var(--spacing-xxs) 0;
 }
 
 /* ── Table ── follows Table Card rules (design-widgets.md) */
 .markdown-container table {
   width: 100%;
   border-collapse: separate;
-  border-spacing: 16px 0;
-  margin: 0 -16px;
+  border-spacing: var(--spacing-m) 0;
+  margin: 0 calc(var(--spacing-m) * -1);
 }
 .markdown-container th,
 .markdown-container td {
-  padding: 12px 0;
+  padding: var(--spacing-s) 0;
   border-bottom: 1px solid var(--line-l07);
   font-family:
     "Delight",
@@ -392,7 +379,7 @@ tags, and scoped CSS maps them to the Alva design spec.
 .markdown-container th {
   color: var(--text-n7);
   padding-top: 0;
-  padding-bottom: 12px;
+  padding-bottom: var(--spacing-s);
 }
 .markdown-container tr:last-child td {
   border-bottom: none;
@@ -425,25 +412,25 @@ tags, and scoped CSS maps them to the Alva design spec.
     no-repeat;
   display: inline-block;
   vertical-align: middle;
-  margin-left: 4px;
+  margin-left: var(--spacing-xxs);
   flex-shrink: 0;
 }
 
 /* ── Medium ── */
 .markdown-container--m {
-  gap: 8px;
+  gap: var(--spacing-xs);
 }
 .markdown-container--m h1 {
   font-size: 18px;
   line-height: 28px;
   letter-spacing: 0.18px;
-  padding-top: 2px;
+  padding-top: var(--spacing-xxxs);
 }
 .markdown-container--m h2 {
   font-size: 16px;
   line-height: 26px;
   letter-spacing: 0.16px;
-  padding-top: 2px;
+  padding-top: var(--spacing-xxxs);
 }
 .markdown-container--m h3 {
   font-size: 14px;
@@ -464,27 +451,32 @@ tags, and scoped CSS maps them to the Alva design spec.
   line-height: 22px;
   letter-spacing: 0.14px;
 }
+.markdown-container--m li {
+  padding-left: var(--spacing-l);
+}
 .markdown-container--m ul > li::before {
+  left: 7.5px;
   top: 8.5px;
 }
 .markdown-container--m ol > li::before {
   font-size: 14px;
   line-height: 22px;
+  width: 20px;
 }
 .markdown-container--m ul,
 .markdown-container--m ol {
-  gap: 4px;
+  gap: var(--spacing-xxs);
 }
 .markdown-container--m th,
 .markdown-container--m td {
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
-  padding: 10px 8px;
+  padding: 10px var(--spacing-xs);
   min-height: 176px;
 }
 .markdown-container--m code {
-  padding: 1px 8px;
+  padding: 1px var(--spacing-xs);
 }
 .markdown-container--m pre {
   font-size: 12px;
@@ -498,13 +490,13 @@ tags, and scoped CSS maps them to the Alva design spec.
 
 /* ── Small ── */
 .markdown-container--s {
-  gap: 4px;
+  gap: var(--spacing-xxs);
 }
 .markdown-container--s h1 {
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
-  padding-top: 2px;
+  padding-top: var(--spacing-xxxs);
 }
 .markdown-container--s h2 {
   font-size: 12px;
@@ -535,33 +527,38 @@ tags, and scoped CSS maps them to the Alva design spec.
   width: 12px;
   height: 12px;
 }
+.markdown-container--s li {
+  padding-left: var(--spacing-l);
+}
 .markdown-container--s ul > li::before {
+  left: 7.5px;
   top: 7.5px;
 }
 .markdown-container--s ol > li::before {
   font-size: 12px;
   line-height: 20px;
+  width: 20px;
 }
 .markdown-container--s ul,
 .markdown-container--s ol {
-  gap: 4px;
+  gap: var(--spacing-xxs);
 }
 .markdown-container--s code {
   font-size: 10px;
   line-height: 16px;
-  padding: 2px 6px;
+  padding: var(--spacing-xxxs) 6px;
 }
 .markdown-container--s pre {
   font-size: 10px;
   line-height: 16px;
-  padding: 8px 12px;
+  padding: var(--spacing-xs) var(--spacing-s);
 }
 .markdown-container--s th,
 .markdown-container--s td {
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.12px;
-  padding: 8px;
+  padding: var(--spacing-xs);
   min-height: 176px;
 }
 
@@ -569,7 +566,7 @@ tags, and scoped CSS maps them to the Alva design spec.
 @media (max-width: 768px) {
   .markdown-container {
     max-width: 100%;
-    padding: 0 16px;
+    padding: 0 var(--spacing-m);
   }
   .markdown-container table {
     overflow-x: scroll;
@@ -672,7 +669,7 @@ The button component system contains **2 types** x **4 sizes** x **4 states** =
 }
 
 .btn-secondary:hover:not(.btn-disabled) {
-  border-color: var(--text-n9);
+  border-color: var(--line-l9);
 }
 
 .btn-secondary:active:not(.btn-disabled) {
@@ -689,9 +686,9 @@ The button component system contains **2 types** x **4 sizes** x **4 states** =
 /* Size - Large */
 .btn-large {
   height: 48px;
-  padding: 11px 20px;
-  gap: 8px;
-  border-radius: var(--radius-ct-m); /* 6px */
+  padding: 11px var(--spacing-l);
+  gap: var(--spacing-xs);
+  border-radius: var(--radius-btn-m);
   font-size: 16px;
   line-height: 26px;
   letter-spacing: 0.16px;
@@ -700,9 +697,9 @@ The button component system contains **2 types** x **4 sizes** x **4 states** =
 /* Size - Medium */
 .btn-medium {
   height: 40px;
-  padding: 9px 20px;
-  gap: 8px;
-  border-radius: var(--radius-ct-m); /* 6px */
+  padding: 9px var(--spacing-l);
+  gap: var(--spacing-xs);
+  border-radius: var(--radius-btn-m);
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
@@ -711,9 +708,9 @@ The button component system contains **2 types** x **4 sizes** x **4 states** =
 /* Size - Small */
 .btn-small {
   height: 32px;
-  padding: 6px 16px;
+  padding: 6px var(--spacing-m);
   gap: 6px;
-  border-radius: var(--radius-ct-s); /* 4px */
+  border-radius: var(--radius-btn-s);
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.12px;
@@ -722,9 +719,9 @@ The button component system contains **2 types** x **4 sizes** x **4 states** =
 /* Size - Extra Small */
 .btn-extra-small {
   height: 28px;
-  padding: 4px 12px;
-  gap: 4px;
-  border-radius: var(--radius-ct-s); /* 4px */
+  padding: var(--spacing-xxs) var(--spacing-s);
+  gap: var(--spacing-xxs);
+  border-radius: var(--radius-btn-s);
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.12px;
@@ -759,7 +756,7 @@ The button component system contains **2 types** x **4 sizes** x **4 states** =
 }
 
 .btn-secondary.btn-loading::after {
-  border-color: var(--text-n9);
+  border-color: var(--line-l9);
   border-top-color: transparent;
 }
 
@@ -820,7 +817,7 @@ style.
 /* Size — Medium */
 .tag-md {
   height: 26px;
-  padding: 2px 8px;
+  padding: var(--spacing-xxxs) var(--spacing-xs);
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
@@ -1036,8 +1033,8 @@ Modal                        ← Overlay
 | Property   | Value                                       |
 | ---------- | ------------------------------------------- |
 | Background | `var(--main-m7)`                            |
-| Padding X  | `16px`                                      |
-| Padding Y  | `48px`                                      |
+| Padding X  | `var(--spacing-m)` / `16px`                 |
+| Padding Y  | `var(--spacing-xxxxxl)` / `48px`            |
 | Layout     | `flex` / `column` / `center` / `center`     |
 | Sizing     | `100%` width & height (full-screen overlay) |
 
@@ -1049,17 +1046,17 @@ Modal                        ← Overlay
 | Max Width     | `960px`                            |
 | Width         | `100%` (constrained by max-width)  |
 | Flex          | `1 0 0` (fills available height)   |
-| Border Radius | `8px`                              |
+| Border Radius | `var(--radius-pop-dialog)` / `12px`|
 | Border        | `0.5px solid var(--line-l2)`       |
-| Padding       | `28px` (all sides)                 |
-| Gap           | `16px` (between title and content) |
+| Padding       | `var(--spacing-xxl)` / `28px` (all sides)|
+| Gap           | `var(--spacing-m)` / `16px` (between title and content) |
 
 ### Modal Title
 
 | Property       | Value                                   |
 | -------------- | --------------------------------------- |
 | Layout         | `flex` / `row` / `space-between`        |
-| Gap            | `12px` (between title and close button) |
+| Gap            | `var(--spacing-s)` / `12px` (between title and close button) |
 | Font Family    | `Delight`                               |
 | Font Weight    | `500`                                   |
 | Font Size      | `18px`                                  |
@@ -1157,7 +1154,7 @@ Dropdown. Arrow icon always points down and does not rotate.
 }
 
 .select:hover .select-border {
-  border-color: var(--text-n9);
+  border-color: var(--line-l9);
 }
 
 .select-text {
@@ -1184,9 +1181,9 @@ Dropdown. Arrow icon always points down and does not rotate.
 /* Size — Large */
 .select-lg {
   height: 48px;
-  padding: 11px 16px;
-  gap: 8px;
-  border-radius: 6px;
+  padding: 11px var(--spacing-m);
+  gap: var(--spacing-xs);
+  border-radius: var(--radius-btn-m);
   font-size: 16px;
   line-height: 26px;
   letter-spacing: 0.16px;
@@ -1195,9 +1192,9 @@ Dropdown. Arrow icon always points down and does not rotate.
 /* Size — Medium (default) */
 .select {
   height: 40px;
-  padding: 8px 12px;
-  gap: 8px;
-  border-radius: 4px;
+  padding: var(--spacing-xs) var(--spacing-s);
+  gap: var(--spacing-xs);
+  border-radius: var(--radius-btn-m);
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
@@ -1206,9 +1203,9 @@ Dropdown. Arrow icon always points down and does not rotate.
 /* Size — Small */
 .select-sm {
   height: 28px;
-  padding: 4px 8px;
-  gap: 4px;
-  border-radius: 4px;
+  padding: var(--spacing-xxs) var(--spacing-xs);
+  gap: var(--spacing-xxs);
+  border-radius: var(--radius-btn-s);
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.12px;
@@ -1273,13 +1270,11 @@ Dropdown. Arrow icon always points down and does not rotate.
   <div class="list-item" data-value="opt1">
     <div class="list-item-inner">
       <span class="list-item-text">Option 1</span>
-      <span class="list-item-check"></span>
     </div>
   </div>
   <div class="list-item" data-value="opt2">
     <div class="list-item-inner">
       <span class="list-item-text">Option 2</span>
-      <span class="list-item-check"></span>
     </div>
   </div>
 </div>
@@ -1329,9 +1324,116 @@ document.addEventListener("click", function () {
 
 ---
 
+## Input
+
+Same container style and sizes as [Select](#select), without the arrow icon.
+Uses a native `<input>` element. Placeholder color matches Select's placeholder
+state; typed text matches the filled state.
+
+### CSS
+
+```css
+.input {
+  display: flex;
+  align-items: center;
+  background-color: var(--b0-container);
+  position: relative;
+  font-family:
+    "Delight",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  font-weight: 400;
+  transition: border-color 0.12s ease;
+}
+
+.input-border {
+  position: absolute;
+  inset: 0;
+  border: 0.5px solid var(--line-l3);
+  border-radius: inherit;
+  pointer-events: none;
+  transition: border-color 0.12s ease;
+}
+
+.input:hover .input-border,
+.input:focus-within .input-border {
+  border-color: var(--line-l9);
+}
+
+.input-field {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
+  font: inherit;
+  color: var(--text-n9);
+}
+
+.input-field::placeholder {
+  color: var(--text-n3);
+}
+
+/* Size — Large */
+.input-lg {
+  height: 48px;
+  padding: 11px var(--spacing-m);
+  border-radius: var(--radius-btn-m);
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: 0.16px;
+}
+
+/* Size — Medium (default) */
+.input {
+  height: 40px;
+  padding: var(--spacing-xs) var(--spacing-s);
+  border-radius: var(--radius-btn-m);
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+}
+
+/* Size — Small */
+.input-sm {
+  height: 28px;
+  padding: var(--spacing-xxs) var(--spacing-xs);
+  border-radius: var(--radius-btn-s);
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
+}
+```
+
+### HTML Template
+
+```html
+<!-- Medium Input (default) -->
+<div class="input">
+  <div class="input-border"></div>
+  <input type="text" class="input-field" placeholder="Enter value" />
+</div>
+
+<!-- Large Input -->
+<div class="input input-lg">
+  <div class="input-border"></div>
+  <input type="text" class="input-field" placeholder="Enter value" />
+</div>
+
+<!-- Small Input -->
+<div class="input input-sm">
+  <div class="input-border"></div>
+  <input type="text" class="input-field" placeholder="Enter value" />
+</div>
+```
+
+---
+
 ## Tab
 
-2 styles (Pill, Underline) × 2 sizes (M, S) = 4 variants.
+2 styles (Pill, Underline) × 3 sizes (L, M, S) = 6 variants.
 
 - **Pill**: rounded rectangles, background changes on select.
 - **Underline**: no background, selected item has a 2px bottom indicator line.
@@ -1373,11 +1475,11 @@ border through their transparent border.
 
 /* Pill */
 .tab-pill {
-  gap: 12px;
+  gap: var(--spacing-s);
 }
 .tab-pill .tab-item {
-  padding: 6px 16px;
-  border-radius: 4px;
+  padding: 6px var(--spacing-m);
+  border-radius: var(--radius-btn-s);
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
@@ -1390,12 +1492,23 @@ border through their transparent border.
   font-weight: 500;
 }
 
+/* Pill — Size L */
+.tab-pill.tab-l {
+  gap: var(--spacing-m);
+}
+.tab-pill.tab-l .tab-item {
+  padding: var(--spacing-xs) var(--spacing-m);
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: 0.16px;
+}
+
 /* Pill — Size S */
 .tab-pill.tab-s {
-  gap: 8px;
+  gap: var(--spacing-xs);
 }
 .tab-pill.tab-s .tab-item {
-  padding: 4px 8px;
+  padding: var(--spacing-xxs) var(--spacing-xs);
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.12px;
@@ -1403,10 +1516,10 @@ border through their transparent border.
 
 /* Underline */
 .tab-underline {
-  gap: 16px;
+  gap: var(--spacing-m);
 }
 .tab-underline .tab-item {
-  padding-bottom: 6px;
+  padding-bottom: var(--spacing-xxs);
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
@@ -1419,9 +1532,20 @@ border through their transparent border.
   border-bottom-color: var(--main-m1);
 }
 
+/* Underline — Size L */
+.tab-underline.tab-l {
+  gap: var(--spacing-l);
+}
+.tab-underline.tab-l .tab-item {
+  padding-bottom: 6px;
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: 0.16px;
+}
+
 /* Underline — Size S */
 .tab-underline.tab-s {
-  gap: 12px;
+  gap: var(--spacing-s);
 }
 .tab-underline.tab-s .tab-item {
   font-size: 12px;
@@ -1500,4 +1624,82 @@ document.querySelectorAll(".tab").forEach(function (tab) {
     }
   });
 });
+```
+
+---
+
+## Tooltip
+
+2 variants: **Simple** (text only) and **Rich** (title + description).
+
+### CSS
+
+```css
+.tooltip {
+  background-color: var(--b0-container);
+  position: absolute;
+  border-radius: var(--radius-ct-m);
+  box-shadow: var(--shadow-s);
+  padding: var(--spacing-m);
+  width: fit-content;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxxs);
+}
+
+.tooltip-border {
+  position: absolute;
+  border: 0.5px solid var(--line-l2);
+  border-radius: var(--radius-ct-m);
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Simple — text only */
+.tooltip-text {
+  font-family:
+    "Delight",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+  color: var(--text-n9);
+  font-weight: 400;
+}
+
+/* Rich — title */
+.tooltip-title {
+  font-family:
+    "Delight",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: 0.16px;
+  color: var(--text-n9);
+  font-weight: 500;
+}
+
+/* Rich — description reuses .tooltip-text */
+```
+
+### HTML
+
+```html
+<!-- Simple Tooltip -->
+<div class="tooltip">
+  <div class="tooltip-border"></div>
+  <div class="tooltip-text">Tooltip description text</div>
+</div>
+
+<!-- Rich Tooltip -->
+<div class="tooltip">
+  <div class="tooltip-border"></div>
+  <div class="tooltip-title">Title</div>
+  <div class="tooltip-text">Tooltip description text</div>
+</div>
 ```

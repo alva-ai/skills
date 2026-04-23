@@ -60,8 +60,7 @@ module.exports = { SYMBOL, STRATEGY_INTERVAL, TICK, TIME };
 const {
   macd,
 } = require("@alva/technical-indicators/moving-average-convergence-divergence-macd:v1.0.0");
-const { FeedAltraModule } = require("@alva/feed");
-const { num } = FeedAltraModule;
+const { FeedAltraModule, num } = require("@alva/feed");
 const { SYMBOL, STRATEGY_INTERVAL, TICK } = require("./constants.js");
 
 function inRange(t, fromExclusive, toInclusive) {
@@ -178,9 +177,11 @@ module.exports = { strategyFn, initialState };
 ### main.js
 
 ```javascript
-const { createOHLCVProvider } = require("@arrays/data/ohlcv-provider:v1.0.0");
 const { FeedAltraModule } = require("@alva/feed");
 const { FeedAltra, e } = FeedAltraModule;
+const { AltraModule } = require("@alva/graph");
+const { createArraysOhlcvProvider } = AltraModule;
+const secret = require("secret-manager");
 
 const { SYMBOL, STRATEGY_INTERVAL } = require("./constants.js");
 const { createMACDFeature } = require("./features.js");
@@ -189,7 +190,8 @@ const { strategyFn, initialState } = require("./strategy.js");
 const START_DATE = Date.parse("2025-01-01T00:00:00.000Z");
 const END_DATE = Date.now();
 
-const ohlcvProvider = createOHLCVProvider();
+const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
+const ohlcvProvider = createArraysOhlcvProvider({ jwt: ARRAYS_JWT });
 
 const altra = new FeedAltra(
   {
@@ -224,15 +226,13 @@ altra.setStrategy(strategyFn, {
 
 ## Imports
 
-Altra is accessed through the `FeedAltraModule` export from `@alva/feed`:
+Altra is accessed through the `FeedAltraModule` export from `@alva/feed`.
+Field type helpers (`num`, `str`, etc.) are at the `@alva/feed` top level, and
+`createArraysOhlcvProvider` lives on `@alva/graph`'s `AltraModule`:
 
 ```javascript
-const { FeedAltraModule } = require("@alva/feed");
 const {
-  FeedAltra,
-  e,
-  Amount,
-  TIME,
+  FeedAltraModule,
   num,
   str,
   bool,
@@ -240,30 +240,46 @@ const {
   arr,
   fld,
   makeDoc,
+} = require("@alva/feed");
+const {
+  FeedAltra,
+  e,
+  Amount,
+  TIME,
+  allocate,
+  order,
+  orders,
 } = FeedAltraModule;
+const { AltraModule } = require("@alva/graph");
+const { createArraysOhlcvProvider } = AltraModule;
 ```
 
-| Export                                    | Description                                      |
-| ----------------------------------------- | ------------------------------------------------ |
-| `FeedAltra`                               | Main backtesting engine class                    |
-| `e`                                       | Event trigger expression builder                 |
-| `Amount`                                  | Order amount constructors                        |
-| `TIME`                                    | Time constants (SECOND, MINUTE, HOUR, DAY, WEEK) |
-| `allocate`                                | Helper to create allocate target                 |
-| `order` / `orders`                        | Helper to create order targets                   |
-| `num`, `str`, `bool`, `obj`, `arr`, `fld` | Field type helpers (same as Feed SDK)            |
-| `makeDoc`                                 | Type document helper                             |
+| Export                                    | Source                     | Description                                      |
+| ----------------------------------------- | -------------------------- | ------------------------------------------------ |
+| `FeedAltra`                               | `FeedAltraModule`          | Main backtesting engine class                    |
+| `e`                                       | `FeedAltraModule`          | Event trigger expression builder                 |
+| `Amount`                                  | `FeedAltraModule`          | Order amount constructors                        |
+| `TIME`                                    | `FeedAltraModule`          | Time constants (SECOND, MINUTE, HOUR, DAY, WEEK) |
+| `allocate`                                | `FeedAltraModule`          | Helper to create allocate target                 |
+| `order` / `orders`                        | `FeedAltraModule`          | Helper to create order targets                   |
+| `num`, `str`, `bool`, `obj`, `arr`, `fld` | `@alva/feed` (top level)   | Field type helpers (same as Feed SDK)            |
+| `makeDoc`                                 | `@alva/feed` (top level)   | Type document helper                             |
+| `createArraysOhlcvProvider`               | `@alva/graph` `AltraModule` | Builds the OHLCV provider used by Altra          |
 
 ---
 
 ## OHLCV Provider
 
-All OHLCV data must come through `createOHLCVProvider()`. Never fabricate price
-data.
+All OHLCV data must come through `createArraysOhlcvProvider()`. Never fabricate
+price data. The provider is exported from `@alva/graph` (not `@alva/feed`).
 
 ```javascript
-const { createOHLCVProvider } = require("@arrays/data/ohlcv-provider:v1.0.0");
-const ohlcvProvider = createOHLCVProvider();
+const { AltraModule } = require("@alva/graph");
+const { createArraysOhlcvProvider } = AltraModule;
+const secret = require("secret-manager");
+
+const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
+const ohlcvProvider = createArraysOhlcvProvider({ jwt: ARRAYS_JWT });
 
 const altra = new FeedAltra(config, ohlcvProvider);
 ```
@@ -300,7 +316,7 @@ const altra = new FeedAltra(
 
 | Field                          | Description                                                                     |
 | ------------------------------ | ------------------------------------------------------------------------------- |
-| `path`                         | ALFS feed path (e.g. `~/feeds/my-strategy/v1`). All output data stored here.   |
+| `path`                         | ALFS feed path (e.g. `'~/feeds/my-strategy/v1'`). All output data stored here.   |
 | `startDate`                    | Backtest start timestamp (ms UTC). Use the exact date, never adjust for warmup. |
 | `portfolioOptions.initialCash` | Starting cash (default: 1,000,000)                                              |
 | `portfolioOptions.currency`    | Quote currency (default: "USDT")                                                |
@@ -328,6 +344,7 @@ When trading both crypto and stocks, use a single FeedAltra instance with
 `marketType: "mix"`:
 
 ```javascript
+const ohlcvProvider = createArraysOhlcvProvider({ jwt: ARRAYS_JWT });
 const altra = new FeedAltra(
   {
     path: "~/feeds/multi-asset/v1",
@@ -470,29 +487,31 @@ Raw data sources provide external data beyond OHLCV (funding rates, open
 interest, on-chain metrics, sentiment).
 
 ```javascript
-const { getOpenInterest } = require("@arrays/crypto/open-interest:v1.0.0");
+const http = require("net/http");
+const secret = require("secret-manager");
+const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
+const ARRAYS_BASE = "https://data-tools.prd.space.id";
 
 dataGraph.registerRawData({
   name: "btc_open_interest",
   description: "BTC perpetual futures open interest",
   fields: [num("sumOpenInterest"), num("sumOpenInterestValue")],
   fn: (fromExclusive, toInclusive) => {
-    const result = getOpenInterest({
-      symbol: "BINANCE_PERP_BTC_USDT",
-      start_time: fromExclusive,
-      end_time: toInclusive,
-      interval: "1d",
-    });
+    const resp = http.syncFetch(
+      `${ARRAYS_BASE}/api/v1/crypto/open-interest?symbol=BTCUSDT&start_time=${fromExclusive}&end_time=${toInclusive}&interval=1d`,
+      { headers: { Authorization: "Bearer " + ARRAYS_JWT } }
+    );
+    const result = JSON.parse(resp.text());
 
     if (!result.success) {
       throw new Error("getOpenInterest failed: " + JSON.stringify(result));
     }
 
     return {
-      data: result.response.data.map((d) => ({
+      data: result.data.map((d) => ({
         date: d.observedAt, // MUST use observedAt for PIT safety
-        sumOpenInterest: d.sumOpenInterest,
-        sumOpenInterestValue: d.sumOpenInterestValue,
+        sumOpenInterest: d.sum_open_interest,
+        sumOpenInterestValue: d.sum_open_interest_value,
       })),
     };
   },
@@ -532,8 +551,8 @@ e.ohlcv("BINANCE_SPOT_BTC_USDT", "1d"); // Daily bar close
 e.raw("sentiment_score"); // Raw data update
 e.feature("rsi"); // Feature computed
 
-e.all(e.ohlcv("AAPL", "1d"), e.ohlcv("BTCUSDT", "1d")); // AND
-e.any(e.ohlcv("BTCUSDT", "1h"), e.raw("funding")); // OR
+e.all(e.ohlcv("XNAS_SPOT_AAPL_USD", "1d"), e.ohlcv("BINANCE_SPOT_BTC_USDT", "1d")); // AND
+e.any(e.ohlcv("BINANCE_SPOT_BTC_USDT", "1h"), e.raw("funding")); // OR
 ```
 
 ### Strategy Config
@@ -718,7 +737,7 @@ The `RunResult` contains:
 - `orders` -- All executed orders with fill details
 - `perf` -- Performance metrics (total return, Sharpe ratio, max drawdown, etc.)
 
-All output data is also persisted under the feed's ALFS path:
+All output data is also persisted under the feed's ALFS path (quote in CLI, e.g. `'~/feeds/my-strategy/v1/data/'`):
 
 ```
 ~/feeds/my-strategy/v1/data/

@@ -29,10 +29,10 @@ The `@{owner}/{name}` token after "Playbook(" contains the two key fields:
 
 For the example above: owner = `alice`, name = `btc-momentum`.
 
-Together they resolve to the ALFS base path:
+Together they resolve to the ALFS base path (quote in CLI):
 
 ```
-/alva/home/{owner}/playbooks/{name}/
+'/alva/home/{owner}/playbooks/{name}/'
 ```
 
 **Behavior note**: If the user's prompt does not specify what to change (only
@@ -43,8 +43,8 @@ user what they'd like to customize** before proceeding.
 
 ## Step 1 — Read Playbook Metadata
 
-```
-GET /api/v1/fs/read?path=/alva/home/{owner}/playbooks/{name}/playbook.json
+```bash
+alva fs read --path '/alva/home/{owner}/playbooks/{name}/playbook.json'
 ```
 
 Returns JSON with structure:
@@ -68,12 +68,12 @@ From `latest_release.feeds`, collect the feed IDs you need to inspect.
 
 ## Step 2 — Read UI Layer (HTML Source)
 
-```
-GET /api/v1/fs/read?path=/alva/home/{owner}/playbooks/{name}/index.html
+```bash
+alva fs read --path '/alva/home/{owner}/playbooks/{name}/index.html'
 ```
 
 This returns the full HTML source of the playbook dashboard — the ECharts
-charts, KPI cards, layout, and data-fetching logic. Use this as the template for
+charts, metric cards, layout, and data-fetching logic. Use this as the template for
 the new playbook's UI.
 
 ---
@@ -83,40 +83,53 @@ the new playbook's UI.
 Each feed referenced in `playbook.json` has a symlink under the release's
 `feeds/` directory pointing to the feed's ALFS path.
 
-```
-GET /api/v1/fs/readlink?path=/alva/home/{owner}/playbooks/{name}/releases/{version}/feeds/{feed_id}
-→ {"target_path": "/alva/home/{owner}/feeds/{feed_name}"}
+```bash
+alva fs readlink --path '/alva/home/{owner}/playbooks/{name}/releases/{version}/feeds/{feed_id}'
+# → {"target_path": "/alva/home/{owner}/feeds/{feed_name}"}
 ```
 
 Then read the feed script source:
 
-```
-GET /api/v1/fs/read?path=/alva/home/{owner}/feeds/{feed_name}/v1/src/index.js
+```bash
+alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v1/src/index.js'
 ```
 
 This contains the strategy logic, data fetching, and indicator computations.
 
 Optionally, read sample feed output to understand the data schema:
 
-```
-GET /api/v1/fs/read?path=/alva/home/{owner}/feeds/{feed_name}/v1/data/{group}/{output}/@last/5
+```bash
+alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v1/data/{group}/{output}/@last/5'
 ```
 
 ---
 
-## Step 4 — Deploy as New Playbook
+## Step 4 — Content Legitimacy Audit
+
+Remix inherits the source's provenance — don't propagate fabricated content
+into a new namespace. Apply the [Content Legitimacy Rules](../SKILL.md#content-legitimacy-rules)
+to both the source HTML and feed scripts: any value the user will see must
+fetch from a feed at runtime. If the source has hardcoded arrays, inline
+analyst ratings, procedural/RNG output, or pasted-in literals, either
+refactor them into your own feed, strip the offending sections, or refuse
+the remix and tell the user why. Do not `sed`-replace the username and
+re-release a source whose data layer was never legitimate.
+
+---
+
+## Step 5 — Deploy as New Playbook
 
 Follow the standard playbook creation flow (see SKILL.md):
 
-1. **Write feed script** to `~/feeds/{new-name}/v1/src/index.js`
-2. **Test** via `POST /api/v1/run` with `entry_path`
-3. **Grant** public read: `POST /api/v1/fs/grant` on `~/feeds/{new-name}`
-4. **Deploy cronjob**: `POST /api/v1/deploy/cronjob`
-5. **Release feed**: `POST /api/v1/release/feed`
-6. **Write HTML** to `~/playbooks/{new-name}/index.html` (update data paths to
+1. **Write feed script** to `'~/feeds/{new-name}/v1/src/index.js'`
+2. **Test** via `alva run --entry-path '~/feeds/{new-name}/v1/src/index.js'`
+3. **Grant** public read: `alva fs grant --path '~/feeds/{new-name}' --subject "special:user:*" --permission read`
+4. **Deploy cronjob**: `alva deploy create --name {new-name} --path '~/feeds/{new-name}/v1/src/index.js' --cron "..."`
+5. **Release feed**: `alva release feed --name {new-name} --version 1.0.0 --cronjob-id ID --description "..."`
+6. **Write HTML** to `'~/playbooks/{new-name}/index.html'` (update data paths to
    point to your own feed)
-7. **Draft playbook**: `POST /api/v1/draft/playbook`
-8. **Release playbook**: `POST /api/v1/release/playbook`
+7. **Draft playbook**: `alva release playbook-draft --name {new-name} --display-name "..." --feeds '[{"feed_id":ID}]'`
+8. **Release playbook**: `alva release playbook --name {new-name} --version v1.0.0 --feeds '[{"feed_id":ID}]' --changelog "..."`
 
 **Important**: The new playbook must use a unique name in your user space. The
 feed scripts must use **your own** ALFS paths (not the original owner's) for
@@ -124,16 +137,12 @@ data storage — copy the logic, not the paths.
 
 ---
 
-## Step 5 — Save Remix Lineage
+## Step 6 — Save Remix Lineage
 
 After the new playbook is created, record the parent-child relationship:
 
-```
-POST /api/v1/remix
-{
-  "child": {"username": "{your_username}", "name": "{new-name}"},
-  "parents": [{"username": "{owner}", "name": "{source-playbook-name}"}]
-}
+```bash
+alva remix --child-username {your_username} --child-name {new-name} --parents '[{"username":"{owner}","name":"{source-playbook-name}"}]'
 ```
 
 ---
@@ -157,30 +166,32 @@ Agent reads:
 
 ```bash
 # 1. Metadata
-GET /api/v1/fs/read?path=/alva/home/alice/playbooks/btc-momentum/playbook.json
+alva fs read --path '/alva/home/alice/playbooks/btc-momentum/playbook.json'
 
 # 2. HTML source
-GET /api/v1/fs/read?path=/alva/home/alice/playbooks/btc-momentum/index.html
+alva fs read --path '/alva/home/alice/playbooks/btc-momentum/index.html'
 
 # 3. Feed symlink → feed path
-GET /api/v1/fs/readlink?path=/alva/home/alice/playbooks/btc-momentum/releases/v1.0.0/feeds/100
-→ /alva/home/alice/feeds/btc-momentum
+alva fs readlink --path '/alva/home/alice/playbooks/btc-momentum/releases/v1.0.0/feeds/100'
+# → /alva/home/alice/feeds/btc-momentum
 
 # 4. Feed source code
-GET /api/v1/fs/read?path=/alva/home/alice/feeds/btc-momentum/v1/src/index.js
+alva fs read --path '/alva/home/alice/feeds/btc-momentum/v1/src/index.js'
 
 # 5. (Optional) Sample data for schema understanding
-GET /api/v1/fs/read?path=/alva/home/alice/feeds/btc-momentum/v1/data/market/ohlcv/@last/3
+alva fs read --path '/alva/home/alice/feeds/btc-momentum/v1/data/market/ohlcv/@last/3'
 ```
 
-Agent then modifies the feed script and HTML, deploys under the user's own
-namespace with a new name (e.g. `my-btc-strategy`), and releases.
+Agent then runs the content-legitimacy audit on the source HTML and feed
+scripts (Step 4), modifies the feed script and HTML, deploys under the
+user's own namespace with a new name (e.g. `my-btc-strategy`), and
+releases.
 
 Save lineage (assuming current user is `bob`, new playbook name is `my-btc-strategy`):
 
 ```bash
 # 6. Save remix lineage
-POST /api/v1/remix  {"child": {"username": "bob", "name": "my-btc-strategy"}, "parents": [{"username": "alice", "name": "btc-momentum"}]}
+alva remix --child-username bob --child-name my-btc-strategy --parents '[{"username":"alice","name":"btc-momentum"}]'
 ```
 
 ---

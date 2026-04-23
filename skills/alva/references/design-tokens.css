@@ -1,3 +1,5 @@
+/* Published at https://alva-ai-static.b-cdn.net/design-system/design-tokens.css */
+
 @layer tokens.static {
   :root {
     /* ── Common ── */
@@ -37,8 +39,8 @@
     --chart-blue1-main: #3d8bd1;
     --chart-blue1-1: #005daf;
     --chart-blue1-2: #88b7e0;
-    --chart-blue2-main: #0d7498;
-    --chart-blue2-1: #54a5c2;
+    --chart-blue2-main: #54A5C2;
+    --chart-blue2-1: #0D7498;
     --chart-blue2-2: #91d1db;
     --chart-purple1-main: #5f75c9;
     --chart-purple1-1: #3a52be;
@@ -74,10 +76,21 @@
     --spacing-xxxxxxl: 56px;
 
     /* ── Radius ── */
-    --radius-ct-xs: 2px; /* Tag */
-    --radius-ct-s: 4px; /* Small Card */
-    --radius-ct-m: 6px; /* Medium Card */
-    --radius-ct-l: 8px; /* Large Card/Page */
+    --radius-ct-xs: 2px;
+    --radius-ct-s: 4px;
+    --radius-ct-m: 6px;
+    --radius-ct-l: 8px;
+    --radius-ct-xl: 12px;
+    --radius-pop-dialog: 12px;
+    --radius-pop-action-sheets: 12px;
+    --radius-pop-dropdown: 8px;
+    --radius-pop-popover: 8px;
+    --radius-pop-toast: 8px;
+    --radius-pop-tips: 8px;
+    --radius-btn-xs: 4px;
+    --radius-btn-s: 6px;
+    --radius-btn-m: 8px;
+    --radius-btn-l: 12px;
   }
 }
 
@@ -114,6 +127,7 @@
     --line-l12: rgba(0, 0, 0, 0.12); /* Card Border */
     --line-l2: rgba(0, 0, 0, 0.2); /* Popup/Dropdown Border */
     --line-l3: rgba(0, 0, 0, 0.3); /* Button/Input/Select Border */
+    --line-l9: rgba(0, 0, 0, 0.9); 
 
     /* Shadow */
     --shadow-xs: 0 4px 15px 0 rgba(0, 0, 0, 0.05);
@@ -121,8 +135,8 @@
     --shadow-l: 0 10px 20px 0 rgba(0, 0, 0, 0.08);
   }
 
-  /* Dark Mode */
-  [data-theme="dark"] {
+  /* Dark Mode (disabled — kept for future use) */
+  [data-theme="dark-disabled"] {
     /* Text */
     --text-n9: rgba(255, 255, 255, 0.9);
     --text-n7: rgba(255, 255, 255, 0.7);
@@ -147,11 +161,12 @@
     --b-r1: rgba(255, 255, 255, 0.1);
 
     /* Line & Border */
-    --line-l07: rgba(255, 255, 255, 0.08);
+    --line-l07: rgba(255, 255, 255, 0.07);
     --line-l05: rgba(255, 255, 255, 0.05);
-    --line-l12: rgba(255, 255, 255, 0.1);
-    --line-l2: rgba(255, 255, 255, 0.15);
-    --line-l3: rgba(255, 255, 255, 0.25);
+    --line-l12: rgba(255, 255, 255, 0.12);
+    --line-l2: rgba(255, 255, 255, 0.2);
+    --line-l3: rgba(255, 255, 255, 0.3);
+    --line-l9: rgba(255, 255, 255, 0.9);
 
     /* Shadow */
     --shadow-xs: 0 4px 15px 0 rgba(0, 0, 0, 0.25);

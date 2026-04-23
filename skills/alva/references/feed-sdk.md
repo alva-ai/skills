@@ -1,8 +1,5 @@
 # Feed SDK Guide
 
-> API examples use HTTP notation (`METHOD /path`). See SKILL.md Setup for curl
-> templates.
-
 The Feed SDK (`@alva/feed`) lets you build persistent data pipelines that store
 time series data on the Alva filesystem. Feed outputs are readable via standard
 filesystem paths, making them accessible to other scripts, dashboards, and
@@ -164,6 +161,142 @@ await feed.run(async (ctx) => {
 ```
 
 Read `@last/N` (where N >= batch size) to get the most recent batch.
+
+### Pattern D: Signal / Push Notification
+
+For feeds that produce actionable signals worth pushing to playbook followers.
+Write signal records to the **`signal`** group with a **`targets`** output --
+the resulting path `~/feeds/{name}/v{major}/data/signal/targets` is the
+convention the platform reads when notifying followers via Telegram (or other
+push channels).
+
+The target format follows the same structure used by Altra trading strategies:
+
+```javascript
+const { Feed, feedPath, makeDoc, str, num, obj, arr, fld } = require("@alva/feed");
+
+const feed = new Feed({ path: feedPath("my-signal") });
+
+feed.def("signal", {
+  targets: makeDoc("Signal Targets", "Actionable signals for followers", [
+    obj("instruction", [
+      str("type"),       // "allocate" | "orders"
+      arr("weights", [   // for type: "allocate"
+        str("symbol"),
+        num("weight"),
+      ]),
+      arr("orders", [    // for type: "orders"
+        str("symbol"),
+        str("side"),     // "buy" | "sell"
+        fld("amount", "object"),
+      ]),
+    ]),
+    obj("meta", [
+      str("reason"),     // human-readable explanation
+    ]),
+  ]),
+});
+
+await feed.run(async (ctx) => {
+  const now = Date.now();
+
+  await ctx.self.ts("signal", "targets").append([
+    {
+      date: now,
+      instruction: {
+        type: "allocate",
+        weights: [
+          { symbol: "BINANCE_SPOT_BTC_USDT", weight: 0.6 },
+          { symbol: "BINANCE_SPOT_ETH_USDT", weight: 0.4 },
+        ],
+      },
+      meta: { reason: "EMA crossover: shift to 60/40 BTC/ETH" },
+    },
+  ]);
+});
+```
+
+When this feed runs as a cronjob, the platform reads
+`/data/signal/targets` and pushes the signal content (truncated to
+500 chars) to all playbook followers who have enabled Telegram notifications.
+
+**Key points:**
+
+- The group **must** be named `signal` and the output **must** be named
+  `targets` -- this is the path the notification system looks for.
+- Use `meta.reason` to provide a human-readable message -- this is what
+  followers see in their push notification.
+- One record per run is typical; the platform reads `@last/1`.
+- Altra strategies write to this path automatically. Use this pattern only for
+  non-Altra feeds that want to produce push-worthy signals.
+
+### Pattern E: AlvaAsk + Owner Notification (notify/message)
+
+**Preferred pattern for scheduled tasks.** Use `@alva/alvaask` instead of
+ADK for cronjob feeds — it's simpler (no sandbox/session management) and
+the `ask()` call handles tool use, web search, and ALFS access automatically.
+
+For feeds that use `@alva/alvaask` to call Alva's agent and push the result
+to the feed owner. Common use cases: scheduled market reports, periodic
+research summaries, heartbeat monitoring, and proactive alerts.
+
+Write the agent's response to the **`notify`** group with a **`message`**
+output. When the cronjob completes, the platform reads this path and pushes
+the content to the owner on all connected channels (Telegram, Discord, Web).
+
+```javascript
+const { ask } = require("@alva/alvaask");
+const { Feed, feedPath, makeDoc, str } = require("@alva/feed");
+
+const feed = new Feed({ path: feedPath("daily-briefing") });
+feed.def("notify", {
+  message: makeDoc("Notification", "Agent-generated push content", [
+    str("title"),
+    str("text"),
+  ]),
+});
+
+(async () => {
+  const result = ask("Give a brief crypto market update with key levels.");
+
+  await feed.run(async (ctx) => {
+    await ctx.self.ts("notify", "message").append([
+      {
+        date: Date.now(),
+        title: "Daily Crypto Briefing",
+        text: result.text,
+      },
+    ]);
+  });
+})();
+```
+
+Deploy requires **two steps** — cronjob + feed registration:
+
+```bash
+# 1. Create the cronjob with push notification enabled
+alva deploy create --name daily-briefing \
+  --path '~/feeds/daily-briefing/v1/src/index.js' \
+  --cron "0 8 * * *" --push-notify
+
+# 2. Register the feed (REQUIRED for push content to work)
+# Without this, notifications arrive without title/text content.
+alva release feed --name daily-briefing --version 1.0.0 \
+  --cronjob-id <ID_FROM_STEP_1> \
+  --description "Generates a morning briefing each day at 08:00 summarizing overnight crypto market moves and pushes it as a notification"
+```
+
+**Key points:**
+
+- The group **must** be named `notify` and the output **must** be named
+  `message` — this is the path the notification system looks for.
+- `title` is optional — if provided, the notification renders as
+  `**title**\n\ncontent`.
+- `text` is the notification body (required for content push).
+- **`alva release feed` is required** — without it, push notifications
+  will not be delivered.
+- Does **not** require a playbook or followers — works for any feed.
+- Combine with Pattern D if you want to push to both owner AND followers.
 
 ### Deduplication
 
@@ -432,12 +565,12 @@ on read, they are auto-flattened back into individual flat records.
 
 Feed outputs are accessible via the filesystem after the feed runs.
 
-### From the REST API
+### From the CLI
 
-```
-GET /api/v1/fs/read?path=~/feeds/btc-ema/v1/data/metrics/prices/@last/100
+```bash
+alva fs read --path '~/feeds/btc-ema/v1/data/metrics/prices/@last/100'
 
-GET /api/v1/fs/read?path=/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100  (public, no auth)
+alva fs read --path '/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100'
 ```
 
 ### From JavaScript (inside jagent)
@@ -484,9 +617,9 @@ await ctx.self
 // Next run adds another record for the same date; both are grouped and auto-flattened on read.
 ```
 
-**REST API vs SDK**: The REST API returns raw values—for grouped rows,
-`{date, items: [...]}`. The SDK auto-flattens grouped records into individual
-flat records when using `last()`, `first()`, `range()`, etc.
+**CLI / REST vs SDK**: The CLI (and REST API) returns raw values—for grouped
+rows, `{date, items: [...]}`. The SDK auto-flattens grouped records into
+individual flat records when using `last()`, `first()`, `range()`, etc.
 
 **Limit behavior**: The `limit` parameter in `last()`, `first()`, etc. applies
 to unique timestamps (DB rows), not individual records after auto-flatten. A
@@ -526,11 +659,10 @@ records if some timestamps have multiple items.
 
 ## Making Feeds Public
 
-Grant public read access so anyone can read the data without an API key:
+Grant public read access so anyone can read the data:
 
-```
-POST /api/v1/fs/grant
-{"path":"~/feeds/btc-ema/v1","subject":"special:user:*","permission":"read"}
+```bash
+alva fs grant --path '~/feeds/btc-ema/v1' --subject "special:user:*" --permission read
 ```
 
 Public reads must use absolute paths:
@@ -542,18 +674,13 @@ Public reads must use absolute paths:
 
 ### Step 1: Create the directory and write the script
 
-```
-POST /api/v1/fs/mkdir
-{"path":"~/feeds/btc-ema/v1/src"}
-```
-
-Write the script (raw body upload):
-
 ```bash
-curl -s -H "X-Alva-Api-Key: $ALVA_API_KEY" \
-  -H "Content-Type: application/octet-stream" \
-  "$ALVA_ENDPOINT/api/v1/fs/write?path=~/feeds/btc-ema/v1/src/index.js" \
-  --data-binary @- <<'JS'
+alva fs write --path '~/feeds/btc-ema/v1/src/index.js' --file ./index.js --mkdir-parents
+```
+
+Where `index.js` contains:
+
+```javascript
 const { Feed, feedPath, makeDoc, num } = require("@alva/feed");
 const { getCryptoKline } = require("@arrays/crypto/ohlcv:v1.0.0");
 const { indicators } = require("@alva/algorithm");
@@ -585,34 +712,30 @@ feed.def("metrics", {
     await ctx.self.ts("metrics", "prices").append(records);
   });
 })();
-JS
 ```
 
 ### Step 2: Run the feed
 
-```
-POST /api/v1/run
-{"entry_path":"~/feeds/btc-ema/v1/src/index.js"}
+```bash
+alva run --entry-path '~/feeds/btc-ema/v1/src/index.js'
 ```
 
 ### Step 3: Make it public
 
-```
-POST /api/v1/fs/grant
-{"path":"~/feeds/btc-ema/v1","subject":"special:user:*","permission":"read"}
+```bash
+alva fs grant --path '~/feeds/btc-ema/v1' --subject "special:user:*" --permission read
 ```
 
 ### Step 4: Read from any client
 
-```
-GET /api/v1/fs/read?path=/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100  (public, no auth)
+```bash
+alva fs read --path '/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100'
 ```
 
 ### Step 5: Deploy as a cronjob (required for live playbooks)
 
-```
-POST /api/v1/deploy/cronjob
-{"path":"~/feeds/btc-ema/v1/src/index.js","cron_expression":"0 */4 * * *","name":"BTC EMA Update"}
+```bash
+alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js' --cron "0 */4 * * *"
 ```
 
 ---
@@ -644,18 +767,18 @@ POST /api/v1/deploy/cronjob
 
 ## Resetting Feed Data
 
-During development, clear stale data via the REST API. **This is for development
+During development, clear stale data via the CLI. **This is for development
 only -- do not use in production.**
 
-```
+```bash
 # Clear a specific time series output (e.g. market/ohlcv)
-DELETE /api/v1/fs/remove?path=~/feeds/my-feed/v1/data/market/ohlcv&recursive=true
+alva fs remove --path '~/feeds/my-feed/v1/data/market/ohlcv' --recursive
 
 # Clear an entire group (all outputs under "market")
-DELETE /api/v1/fs/remove?path=~/feeds/my-feed/v1/data/market&recursive=true
+alva fs remove --path '~/feeds/my-feed/v1/data/market' --recursive
 
 # Full reset: clear ALL data + KV state (removes the data mount, re-created on next run)
-DELETE /api/v1/fs/remove?path=~/feeds/my-feed/v1/data&recursive=true
+alva fs remove --path '~/feeds/my-feed/v1/data' --recursive
 ```
 
 Clearing time series also removes the associated typedoc (schema metadata). KV

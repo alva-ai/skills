@@ -1,8 +1,7 @@
 # Jagent Runtime Guide
 
 The jagent runtime executes JavaScript inside a V8 isolate. Scripts are invoked
-via `POST /api/v1/run` (inline code or filesystem entry path) or triggered by
-cronjobs.
+via `alva run` (inline code or filesystem entry path) or triggered by cronjobs.
 
 ---
 
@@ -12,7 +11,7 @@ cronjobs.
 - **Isolation**: Each execution runs in a separate subprocess with its own V8
   isolate
 - **Heap**: 2 GB per execution
-- **No persistent state between executions**: each `/api/v1/run` call starts
+- **No persistent state between executions**: each `alva run` call starts
   fresh (use `alfs` for persistence)
 
 ---
@@ -25,8 +24,8 @@ cronjobs.
    `require("./helper.js")`) -- resolved from the filesystem on ALFS
 2. **Official/system modules** -- `alfs`, `env`, `secret-manager`,
    `net/http`, `@alva/algorithm`, `@alva/feed`, `@alva/adk`
-3. **SDKHub modules** -- versioned modules like
-   `require("@arrays/crypto/ohlcv:v1.0.0")`
+3. **Runtime library modules** -- versioned modules like
+   `require("@alva/technical-indicators/rsi:v1.0.0")`
 
 ### Version Handling
 
@@ -43,9 +42,9 @@ When using `entry_path`, relative imports resolve from the entry script's
 directory:
 
 ```javascript
-// ~/tasks/my-task/src/index.js
-const helper = require("./helper.js"); // loads ~/tasks/my-task/src/helper.js
-const utils = require("./lib/utils.js"); // loads ~/tasks/my-task/src/lib/utils.js
+// Entry on ALFS: '~/tasks/my-task/src/index.js'
+const helper = require("./helper.js"); // resolves './helper.js' on ALFS under that directory
+const utils = require("./lib/utils.js"); // resolves './lib/utils.js' on ALFS under that directory
 ```
 
 ---
@@ -60,7 +59,7 @@ like the REST API).
 ```javascript
 const alfs = require("alfs");
 const env = require("env");
-const home = "/alva/home/" + env.username;
+const home = "/alva/home/" + env.username; // absolute ALFS prefix (e.g. '/alva/home/alice')
 ```
 
 | Method           | Signature                                     | Description                                             |
@@ -122,7 +121,7 @@ Behavior:
 - `loadPlaintext(name)` returns `null` when the secret is missing
 - calling it without an authenticated execution context throws an error
 - the module is read-only from JS; writes happen through the web UI or
-  `/api/v1/secrets`
+  `alva secrets`
 - do not log the returned value or write it into ALFS / released assets
 
 ### net/http -- HTTP Requests
@@ -225,45 +224,36 @@ requests.
 
 ---
 
-## SDKHub Modules
+## Runtime Library Modules
 
-250+ financial data modules are embedded in the runtime. They follow the
-pattern:
+Built-in computation and utility modules available via `require()` in the
+V8 runtime. These are **not** data APIs — they run locally in the isolate.
 
 ```javascript
-const { getXxx } = require("@org/namespace/module:v1.0.0");
+const { rsi } = require("@alva/technical-indicators/relative-strength-index-rsi:v1.0.0");
 ```
 
 **Naming convention**: `@org/[namespace]*/module_name:v1.0.0`
 
-- `@alva/...` -- Alva-maintained modules (indicators, data, LLM)
-- `@arrays/...` -- Data provider modules (crypto, stock, macro, ETF)
+- `@alva/technical-indicators/...` -- 50+ pure calculation helpers (RSI, MACD, Bollinger, etc.)
+- `@alva/...` -- Alva-maintained modules (algorithm, feed, adk)
 - `@test/...` -- Testing utilities
 
 **Common response pattern**:
 
 ```javascript
-const { getCryptoKline } = require("@arrays/crypto/ohlcv:v1.0.0");
-const result = getCryptoKline({
-  symbol: "BTCUSDT",
-  start_time: startTimestamp,
-  end_time: endTimestamp,
-  interval: "1h",
-});
-
-if (!result.success) {
-  throw new Error("API call failed: " + JSON.stringify(result));
-}
-
-const bars = result.response.data;
-// bars = [{date, open, high, low, close, volume, ...}, ...]
+const { getRSI } = require("@alva/technical-indicators/relative-strength-index-rsi:v1.0.0");
+const result = getRSI({ prices: closePrices, period: 14 });
 ```
 
-Most SDK functions are **synchronous** and return
-`{ success: boolean, response: { data: [...] } }`.
+Most runtime library functions are **synchronous**.
 
 To discover function signatures and response shapes, use the SDK doc API
-(`GET /api/v1/sdk/doc?name=...`).
+(`alva sdk doc --name "..."`).
+
+**Data APIs** (crypto, stock, macro, ETF) are now served by Arrays via HTTP
+endpoints — see the Data Skills section in SKILL.md. They are **not**
+loaded via `require()`.
 
 ---
 
