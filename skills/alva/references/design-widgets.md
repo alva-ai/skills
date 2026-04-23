@@ -422,6 +422,13 @@ const GRID = { top: 4, right: 4, bottom: 4, left: 4, containLabel: true };
 
 // Line chart xAxis must add boundaryGap:false
 xAxis: { type: "category", data: x, boundaryGap: false, ...AX }
+
+// yAxis: use scale:true when the data is NOT naturally anchored at 0
+// (rebased-to-N trajectories, indices, percentile bands, prices far from 0).
+// Default ECharts behavior forces 0 into the range, which wastes the canvas
+// on data that orbits 100, 2500, 0.95, etc. Omit scale for return-around-0
+// and bar charts where the 0 baseline is meaningful.
+yAxis: { type: "value", scale: true, ...AX }
 ```
 
 ### Mark Line
