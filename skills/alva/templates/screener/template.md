@@ -165,7 +165,6 @@ still apply inside them.
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │ <Screener Name>                                              │
-│ Last updated · <ts EST> · Refreshes <schedule EST>           │
 │ <One-sentence summary>                                       │
 ├──────────────────────────────────────────────────────────────┤
 │ [ Overview · Movers & Trends · Analysis · Methodology ]      │
@@ -188,45 +187,20 @@ on desktop, wraps to its own row on mobile.
 
 ## Header
 
-Sticky across all tabs. Title + one-sentence summary reuse the base
-`design-system.md#playbook-header` styles — no re-spec here. Screener-specific
-behaviors:
-
-- **Last-updated pill** — shows the latest snapshot timestamp; **not**
-  affected by the snapshot picker.
-- **Refresh badge** — label format: `Refreshes <schedule> EST`.
-- **Summary line** — no "What this is" duplicate of the refresh info.
-
-Screener-specific CSS (header-row flex layout + the two pills):
-
-```css
-.playbook-header { display:flex; align-items:center; flex-wrap:wrap;
-  row-gap: var(--spacing-xs); margin-bottom: var(--spacing-xs); }
-/* Flex-row extensions on design-system.md .playbook-title */
-.playbook-title { margin-right: auto; white-space: nowrap; }
-
-.header-meta { display:flex; align-items:center; gap: var(--spacing-xs); flex-wrap:wrap;
-  font-size:12px; color:var(--text-n5); }
-.header-meta .refresh-badge { display:inline-flex; align-items:center; gap:6px;
-  background: var(--main-m1-10); color:var(--main-m1);
-  padding:0 10px; border-radius: var(--radius-ct-s); height:28px; font-size:12px; }
-.header-meta .refresh-badge::before { content:''; width:6px; height:6px;
-  border-radius:50%; background:var(--main-m3);
-  animation:pulse 2s ease-in-out infinite; }
-.header-meta .last-updated { display:inline-flex; align-items:center; gap:6px;
-  border:1px solid var(--line-l07); color:var(--text-n5);
-  padding:0 10px; border-radius: var(--radius-ct-s); height:28px; font-size:12px; }
-.header-meta .last-updated::before { content:''; display:inline-block;
-  width:6px; height:6px; background:var(--main-m3); border-radius:50%; }
-@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
-```
+Sticky across all tabs. Title + one-sentence summary use
+`design-system.md#playbook-header` as-is — no screener-specific markup or
+CSS. Keep the summary short (one sentence, no "What this is" duplicate of
+what the playbook description already says). Snapshot freshness and refresh
+cadence are **not** rendered in the header; timestamp surfaces through the
+[Daily Digest](#daily-digest) meta line and the
+[Snapshot Picker](#snapshot-picker) label.
 
 ---
 
 ## Snapshot Picker
 
 Pure view filter — switches which historical snapshot drives the tab content.
-Never mutates data, never changes the header timestamp.
+Never mutates data.
 
 **Naming** — match the label to the cadence:
 
