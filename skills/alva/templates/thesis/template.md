@@ -1,1015 +1,435 @@
-# Thesis Tracker Playbook
+# Thesis Tracking Template
 
-Reference structure + thesis-specific styling for any narrative-driven thematic
-thesis tracker (defense, AI infra, GLP-1, energy transition, etc.). Built from
-`playbook-thesis.html`. Sibling to `screener.md`.
-
----
+Reference structure for any narrative-driven thematic thesis tracker (defense, AI infra, GLP-1, energy transition, capex bottlenecks, etc.). Distilled from three production playbooks: `siriusshen/space-defense-orders`, `siriusshen/mag7-capex`, and `steven/next-bottleneck`.
 
 ## Design System Compliance (READ FIRST)
 
 Before writing HTML, read from the Alva skill:
+- `references/design-system.md` -- `.playbook-container` rule verbatim (max-width 2048px, 28px horizontal padding)
+- `references/design-widgets.md` -- **Chart Card / Metric Card / Table Card / Free Text Card / Feed Card** bases. Every surface in this template maps to one of these widgets; do not invent new card types or re-style widget internals.
+- `references/design-components.md` -- **Tab** (Underline / Pill), **Modal**, **Dropdown**, **Markdown** primitives.
+- `references/design-tokens.css` -- use spacing/color tokens as-is, do NOT override.
 
-- `references/design-tokens.css` — spacing, color, radius tokens. Use as-is.
-- `references/design-widgets.md` — Metric Card / Chart Card / Table Card base
-  specs. This playbook documents thesis-unique rules on top of that.
-- `references/design-components.md` — Tab (Underline, Pill), Dropdown primitives.
-
-**Rule of thumb**: if a token or base spec already exists in the design system,
-reference it here by name — do not re-spec.
-
-**Reference implementation**: `playbook-thesis.html` is the pixel-level ground
-truth. Structure follows this md; exact pixel/DOM details → check the HTML.
-
----
-
-## Component Index
-
-Structural:
-
-- [Page Layout](#page-layout)
-- [Header](#header) · [Hero Section](#hero-section)
-- [Tab 1 — Overview](#tab-1--overview)
-- [Tab 2 — Basket](#tab-2--basket)
-- [Tab 3 — Catalysts](#tab-3--catalysts)
-- [Tab 4 — Risks](#tab-4--risks)
-- [Tab 5 — News & Social](#tab-5--news--social)
-- [Tab 6 — Methodology](#tab-6--methodology)
-- [Tab 7 — Macro & Industry](#tab-7--macro--industry-optional)
-- [Other Tabs](#other-tabs-as-thesis-demands) · [Cron](#cron)
-
-Thesis-unique components (CSS inline):
-
-- [Hero Card](#hero-card) · [Date Switcher](#date-switcher) · [Sentiment Dot](#sentiment-dot) · [Category Badge](#category-badge) · [Delta List](#delta-list)
-- [Horizon Grid](#horizon-grid) · [Equity Curve + Attribution](#equity-curve--attribution)
-- [Basket Table](#basket-table) · [Valuation Tag](#valuation-tag) · [Basket Expand Panel](#basket-expand-panel) · [KV Row](#kv-row) · [Valuation Scatter](#valuation-scatter)
-- [Sub-Pill Tabs](#sub-pill-tabs) · [Catalyst Timeline](#catalyst-timeline)
-- [Risk Register](#risk-register) · [Priority Chip](#priority-chip)
-- [Feed Filter Bar](#feed-filter-bar) · [Feed Item](#feed-item) · [Ticker Tag](#ticker-tag)
-- [Free Text Card](#free-text-card) · [Callout](#callout) · [Verdict Hero](#verdict-hero-optional)
-
----
+This template shares its shell (tab bar + README chip + methodology modal) with the screener template. Where screener has already specified a pattern, **reference `templates/screener/template.md` rather than re-specing it** -- matching surfaces must stay visually identical across playbook families.
 
 ## Page Layout
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│ <Thesis Name>                                                │
-│ ● Last updated · <ts ET>     [Quant 6 PM ET · Narrative 6:30]│
-├──────────────────────────────────────────────────────────────┤
-│ ┌──────────────────────────────────────────────────────────┐ │
-│ │ HERO (sticky)  Today's Thesis …       [Snapshot ▼: Apr17]│ │
-│ │ ─────────────────────────────────────────────────────── │ │
-│ │ <ADK-generated narrative for selected date>              │ │
-│ │ What changed since yesterday                             │ │
-│ │   ● [Valuation] Label — body                             │ │
-│ │   ● [Catalyst]  Label — body                             │ │
-│ └──────────────────────────────────────────────────────────┘ │
-├──────────────────────────────────────────────────────────────┤
-│ [ Overview · Basket · Catalysts · Risks · Macro · News ·     │
-│   Methodology ]                                              │
-├──────────────────────────────────────────────────────────────┤
-│ <Tab content — all ADK-driven tabs honor the hero date>     │
-└──────────────────────────────────────────────────────────────┘
++--------------------------------------------------------------------+
+| [ Thesis · Basket · Catalysts · Risks · News & Social ]  [📖 README] |
++--------------------------------------------------------------------+
+| <Tab content -- everything is "current" except the TLDR card       |
+|  inside Tab 1, which has its own date picker over narrative history> |
+|  README chip → Methodology modal (max-width 896px)                 |
++--------------------------------------------------------------------+
 ```
 
-Container: `.playbook-container` from design-widgets.md. Do not re-spec.
+Five tabs of equal weight. Methodology is **not** a tab -- it lives in a modal opened by a `README` chip in the tab-right group (mirrors screener; see [Tab-Right Group](#tab-right-group) below). **No internal header**: the Alva playbook shell already renders the thesis name, last-updated timestamp, refresh cadence, and feed list -- do not duplicate them inside the page. All content within each tab is expanded (not collapsed) and laid out vertically.
 
-Tab bar: Underline-L (`.tab-underline.tab-l`, 16px / 26px / gap `--spacing-l`)
-from design-components.md. The hero card sits **above** the tab bar, so every
-tab shows the same hero — the hero is the anchor, the tab is the lens.
+**Tab bar**: reuse the same Tab component as screener's main tab bar -- Underline tab from `design-components.md#tab`, mounted inside `.tab-wrapper-row` with a `.tab-right-group` on the right. Full CSS / HTML skeleton lives in `templates/screener/template.md § Page Layout` and § Tab-Right Group; do not re-spec here.
+
+Only Tab 1's TLDR card is time-scrubbable (see Tab 1 → TLDR). Every other surface reads the latest snapshot / record. This mirrors how the data is actually produced: quant feeds overwrite "latest" each day, only the narrative feed accumulates history worth re-reading.
+
+## Tab-Right Group
+
+The right side of the tab bar row carries a single chip:
+
+- **README chip** -- opens the [Methodology Modal](#methodology-modal).
+
+Unlike screener, thesis does **not** put a snapshot picker at the page level -- the only historical scrub surface is the TLDR card's own date picker inside Tab 1. The tab-right group is therefore a single-chip cluster on desktop, and wraps below the tabs on mobile.
+
+Reuse `.tab-wrapper-row` / `.tab-right-group` / `.tab-chip` / `.tab-readme` CSS and chip-chassis tokens verbatim from `templates/screener/template.md § Tab-Right Group`. Do not redefine these classes in a thesis playbook.
+
+## How it's generated -- ADK agent + quant feed
+
+- A dedicated **ADK narrative agent** runs once per cadence, after the quant feed has finished.
+- Agent input: today's quant snapshot (basket, prices, macro, filings, news, socials), yesterday's snapshot, the prior narrative record, the basket universe, and tool access (news search, social search, URL scrape, optional web search).
+- Agent output: a single **narrative record** per date. See **Data Contract** below for field names and allowed values.
+- A thesis may have one claim or several independent pillars. When there are pillars, each delta / catalyst / risk tags its `pillar`; single-pillar theses simply omit the field. No separate pillar UI is required, though playbooks are free to add one.
+- **Post-processing step**: after the narrative record is written, a matching pass attaches relevant news/social items to each catalyst and risk entry as `relatedNews: [{type, title, url, snippet}]`. Matching is by ticker overlap + keyword similarity. Unmatched items go to the News & Social tab.
+- The same record powers Tab 1 (TLDR + deltas), Tab 3 (catalysts), and Tab 4 (risks). But only Tab 1 is historically scrubbable -- Tabs 3/4 always read the latest record (see "Date scope" below).
+- **The TLDR is never hand-written.** If the agent fails, show the most recent successful TLDR with a "stale" indicator; the quant widgets still render.
+- In Methodology, spell out **exactly** which data sources feed the agent -- the reader should be able to reproduce the context.
+
+**Date scope.** Only the TLDR card in Tab 1 has a date picker. That picker scrubs two things from `narrative/records`: the `thesis` body (TLDR) and the `deltas` list rendered beneath it in Tab 1. Everything else -- metric cards, equity curve, horizon returns, basket table, catalysts tab, risks tab, news feed -- reads the latest data and ignores the picker. Catalyst `status` changes and risk edits are reflected via the TLDR narrative prose, not by rewinding the Tab 3/4 lists.
 
 ---
 
-## Header
+## Data Contract
 
-Sticky across all tabs. One row, no separate tagline (the thesis narrative
-lives in the hero card below).
+Three surveyed playbooks diverged on field names, casing, and record shapes -- enough that generic tooling (date picker, TLDR renderer, catalyst/risk widgets, news matcher) can't be reused across them. This section freezes the joints that caused the divergence. Everything else is free.
 
-- **Title** — 24px / 400 / `--text-n9`, line-height 34px.
-- **Last-updated pill** — 1px `--line-l07` border, solid dot `--main-m3`,
-  height 28px. Reflects the latest narrative record's `generatedAt`; **not**
-  affected by the hero date picker.
-- **Refresh badge(s)** — tinted `--main-m1-10`, text `--main-m1`, height 28px.
-  Thesis uses **two cadences** in one badge: `Quant 6 PM ET · Narrative 6:30 PM ET`.
-  Add an EST shift note if relevant (5:00 / 5:30 PM ET during Nov–Mar).
+### Frozen field names
 
-Base `.playbook-title` comes from design-system.md#playbook-header — do not
-re-spec. Thesis doesn't use `.playbook-desc` (the hero card replaces it).
-Thesis only adds header-row layout (so the title can share a flex row with
-meta pills) and the pills themselves:
+Do not invent synonyms for these. UI code decodes case-exactly.
 
-```css
-.playbook-header { display:flex; align-items:center; flex-wrap:wrap;
-  row-gap: var(--spacing-xs); margin-bottom: var(--spacing-l); }
-/* Flex-row extensions on design-system.md .playbook-title */
-.playbook-title { margin-right: auto; white-space: nowrap; }
+| Term        | Meaning                                                             | Do not use                      |
+|-------------|---------------------------------------------------------------------|---------------------------------|
+| `id`        | Basket member primary key (uppercase ticker / symbol).              | `ticker`, `symbol`, `code`      |
+| `layer`     | Member's grouping inside the basket (sub-industry / persona / tier).| `segment`, `bucket`, `tier`     |
+| `pillar`    | Independent support of the thesis. Distinct from `layer`.           | `leg`, `axis`, `arm`            |
+| `sentiment` | Title Case, chosen from `{"Bull", "Bear", "Neutral", "Ambiguous"}`. Each object field uses a subset -- see Delta / Catalyst below. | lowercase, numeric, `"bullish"` |
+| `category`  | Delta / risk tag. Enumerated below.                                 | `tag`, `type`, `kind`           |
 
-.header-meta { display:flex; align-items:center; gap: var(--spacing-xs); flex-wrap:wrap;
-  font-size:12px; color:var(--text-n5); }
-.header-meta .refresh-badge { display:inline-flex; align-items:center; gap:6px;
-  background: var(--main-m1-10); color:var(--main-m1);
-  padding:0 10px; border-radius: var(--radius-ct-s); height:28px; font-size:12px; }
-.header-meta .refresh-badge::before { content:''; width:6px; height:6px;
-  border-radius:50%; background:var(--main-m3);
-  animation:pulse 2s ease-in-out infinite; }
-.header-meta .last-updated { display:inline-flex; align-items:center; gap:6px;
-  border:1px solid var(--line-l07); color:var(--text-n5);
-  padding:0 10px; border-radius: var(--radius-ct-s); height:28px; font-size:12px; }
-.header-meta .last-updated::before { content:''; display:inline-block;
-  width:6px; height:6px; background:var(--main-m3); border-radius:50%;
-  flex-shrink:0; }
-.header-meta .stale-pill { background:rgba(212,133,0,0.12); color:#d48500;
-  padding:1px 6px; border-radius: var(--radius-ct-xs);
-  font-size:10px; font-weight:500; letter-spacing:0.3px; }
-@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+### `narrative/records` — one record per date
+
+```
+date          int   epoch ms at midnight UTC of the record date
+recordDate    str   "YYYY-MM-DD"  (redundant with `date`, carried for UI pickers)
+generatedAt   int   epoch ms, when the agent produced this record
+thesis        str   markdown TLDR body, rendered in Tab 1's TLDR card
+pushLine      str   standalone plain-text headline, ≤ 160 chars, used verbatim
+                    by push notifications. ADK produces it in the same call as
+                    `thesis` -- one generation, two consumption surfaces, zero
+                    second-pass drift.
+source        str   "adk" | "fallback"  -- "fallback" when grounding failed
+                    and `thesis` + `pushLine` were both blanked
+deltasJson    str   JSON-encoded array of delta objects
+catalystsJson str   JSON-encoded array of catalyst objects
+risksJson     str   JSON-encoded array of risk objects
 ```
 
-Show `.stale-pill` beside `.last-updated` when the narrative record is older
-than the expected cadence (e.g. narrative should be ≤24h old).
+The `Json`-suffixed fields are JSON strings, not native arrays -- this matches Feed SDK behavior and both surveyed live playbooks. Renderers `JSON.parse()` at read time.
+
+**Re-run semantics**: a re-triggered narrative agent for the same `recordDate` appends a new row (Feed SDK default). Readers deduplicate by `recordDate`, keeping the row with the largest `generatedAt`. The date picker dropdown also dedupes on `recordDate`.
+
+**ADK output shape**: the narrative agent produces structured JSON `{thesis, pushLine}` in a single call, not free-form text. Both fields go through the same voice check and the same numeric grounding check (see Tab 1 → TLDR). If either field fails grounding, **both** are blanked and `source: "fallback"` is written -- partial prose in a finance UI is worse than silence.
+
+### Delta object
+
+```
+{ sentiment, category, label, body?, pillar? }
+```
+
+- `sentiment`: `"Bull"` | `"Bear"` | `"Neutral"`
+- `category`: `"Valuation"` | `"Catalyst"` | `"Risk"` | `"Macro"` | `"News"` | `"Positioning"` | `"Flows"`
+- `label`: one line, ≤ 80 chars
+- `body`: optional 1-2 sentence context
+- `pillar`: required if the thesis is multi-pillar; must match a declared pillar id
+
+### Catalyst object
+
+```
+{ date, status, sentiment, title, notes, ids, relatedNews?, pillar? }
+```
+
+- `date`: absolute `"YYYY-MM-DD"`, rough `"YYYY Q3"`, or `"TBD"`
+- `status`: `"Upcoming"` | `"Delivered"` | `"Missed"`
+- `sentiment`: `"Bull"` | `"Bear"` | `"Ambiguous"`
+- `ids`: array of member `id`s affected by this catalyst
+- `relatedNews`: post-processing populates as `[{type, title, url, snippet}]`. `type`: `"news"` | `"twitter"` (extend per source only if you wire it in the matcher).
+- `pillar`: required if multi-pillar
+
+### Risk object
+
+```
+{ category, description, divergenceType, exitTrigger, ifTriggered, priority,
+  relatedNews?, pillar?, thesisClaim? }
+```
+
+- `category`: `"Policy"` | `"Regulatory"` | `"Tech substitution"` | `"Cyclical"` | `"Execution"` | `"Valuation"` | `"Narrative"` | `"Geopolitical"`
+- `divergenceType`: `"Fundamental"` | `"Narrative"` | `"Valuation"` | `"Flows"`
+- `exitTrigger`: concrete threshold, or `"--"` if none
+- `ifTriggered`: planned action (trim / rotate / exit / prose)
+- `priority`: `"High"` | `"Medium"` | `"Low"`
+- `pillar` + `thesisClaim`: required if multi-pillar. `thesisClaim` quotes the pillar commitment this risk diverges from -- anchors the risk to a specific thesis claim instead of free-floating worry. Do not use `pillarQuote`, `claim`, etc.
+
+### `alpha/snapshot` — theme-level return snapshot
+
+```
+date            int
+basketRet       {d1, d5, d30, d180}   percentage points (5.23 = +5.23%)
+benchmarkRet    {d1, d5, d30, d180}
+alpha           {d1, d5, d30, d180}   basketRet - benchmarkRet per horizon
+controlRet?     {d1, d5, d30, d180}   if the thesis has a control universe
+vsControl?      {d1, d5, d30, d180}
+```
+
+**Do not embed member tickers in field names.** `pltr1d` / `rklb1d` / `ita1d` is a forbidden pattern -- it locks the snapshot to a specific thesis. Per-member horizon returns belong in `alpha/basket` (one row per member). Hero-ticker curves belong in `prices/<id>`.
+
+### Empty-state rules
+
+Three rules are load-bearing -- template renderers must follow them verbatim, otherwise the same empty data will render three different ways across playbooks:
+
+- `flags: []` on a basket row → render **no** flag pill. Do not render a synthetic `"clean"` pill.
+- `deltas: []` on a narrative record → **hide** the whole "What changed since yesterday" section (no heading, no placeholder).
+- `catalysts: []` / `risks: []` on the latest record → keep the tab visible; show a single muted line ("No tracked catalysts." / "No tracked risks today."). Do not hide the tab.
+- `relatedNews: []` on a catalyst or risk → hide the related-news pill entirely; do not render `0 news & social`.
+- Narrative record missing for a selected date → fall back to the deterministic TLDR one-liner (see Tab 1 TLDR); quant widgets render normally from the snapshot.
 
 ---
 
-## Hero Section
+## Tab 1 -- Thesis (ADK + quant)
 
-The heart of the page. **Sticky below the header.** Always the first widget
-after the title, shown on every tab. Everything about cadence, inputs, and
-fallback behavior is documented here so the reader trusts the narrative.
+The daily thesis view. All widgets default expanded, laid out vertically. No collapsible sections. Prefer charts and visual elements over tables and text wherever possible.
 
-### How it's generated — ADK agent
+### TLDR
 
-- A dedicated **ADK narrative agent** runs once per cadence, **after** the
-  quant feed. Input: today's quant snapshot (basket, prices, macro, filings,
-  news, social), yesterday's snapshot, the prior narrative record, the basket
-  universe, tool access (Serper/Brave news, GrokX, URL scrape).
-- Output: one **narrative record per date** —
-  `{date, generatedAt, thesis, deltas[], catalysts[], risks[], changelog[]}`.
-- The same record powers the hero, Catalysts tab, and Risks tab. Changing the
-  hero date reshapes all three.
-- **The hero is never hand-written.** If the agent fails, show
-  `Narrative refresh pending · last successful <date>` and keep the last-good
-  record visible; quant tabs still render.
+Short-form markdown summary rendered inside a **Free Text Card** (`design-widgets.md#free-text-card`) with the body rendered via the **Markdown (M)** primitive (`.markdown-container --m` from `design-components.md#markdown`). Same combination screener uses for its Daily Digest -- do not spec a thesis-unique `.tldr` class, and do not re-style `ul / li / strong` / headings. The card is the only historically scrubbable surface in the playbook.
 
-### Context the agent must consume
-
-- Current day's basket table (prices, fundamentals, valuation tags, α vs
-  benchmark)
-- Day-over-day moves + status flips on prior catalysts/risks
-- News & Social feed (last 24–72h window, basket-tagged, de-duped)
-- Any Macro & Industry series on the page
-- The prior narrative record (for diffing)
-
-List the exact data sources in Methodology — the reader should be able to
-reproduce the context.
-
-### Hero Card
-
-```css
-.hero-card {
-  background: var(--grey-g01);
-  border-radius: var(--radius-ct-l);
-  padding: var(--spacing-l) var(--spacing-l) var(--spacing-s);
-}
-.hero-head { display:flex; justify-content:space-between; align-items:center;
-  gap: var(--spacing-m); margin-bottom: var(--spacing-xs); flex-wrap:wrap; }
-.hero-head-meta { font-size:12px; line-height:20px; color: var(--text-n5);
-  text-transform:uppercase; letter-spacing: 0.06em; }
-.hero-text { font-size:14px; line-height:22px; color: var(--text-n7);
-  letter-spacing:0.14px; margin:0; }
+**Card layout**:
+```
++----------------------------------------------------------+
+| < [ Apr 22 · today      v ] >     generated 6:32 PM ET  |
+|                                                          |
+|  <TLDR markdown body>                                    |
++----------------------------------------------------------+
 ```
 
-DOM skeleton:
+- **Date picker** (top-left of the card): left arrow, dropdown, right arrow. The dropdown lists up to ~60 `narrative/records` entries, newest-first, each labeled `<Date> · <relative age>` (e.g. `Apr 22 · today`, `Apr 18 · 4d ago`). Prev/Next step one record; disable at boundaries. The selected date is the record currently rendered in the card **and** in the "What changed since yesterday" deltas section below -- nowhere else.
+- **Generated-at label** (top-right): `generated <HH:MM ET>` from the selected record's `generatedAt`. A separate small "stale" pill appears if the selected date is today and the record is older than one cadence.
+- Writes `#tldr-date=YYYY-MM-DD` to the URL hash for deep-linking; restore on page load. Omitted hash means "latest".
 
-```html
-<div class="hero-card">
-  <div class="hero-head">
-    <span class="hero-head-meta">Today's Thesis · Narrative refresh 6:30 PM ET</span>
-    <!-- .filter-dropdown date switcher, see below -->
-  </div>
-  <p class="hero-text"><!-- narrative --></p>
-  <div class="hero-deltas-block">
-    <div class="hero-deltas-title">What changed since yesterday</div>
-    <ul class="hero-deltas-list"><!-- .hero-delta items --></ul>
-  </div>
-</div>
-```
+**Input to ADK:** same as the agent's full context (see "How it's generated" above) -- quant snapshot pair, deltas, catalyst/risk status changes, macro trends, band flips.
 
-### Date Switcher
+**TLDR must answer four questions, in order:**
+1. **What happened?** -- the key event or data point since last snapshot (catalyst flip, earnings, macro release, big price move). If nothing happened, say so.
+2. **What's the impact on our basket?** -- how it moved alpha, scores, or specific names. Tie the event to basket-level or name-level numbers.
+3. **Is there a longer-term push?** -- does this reinforce or weaken the structural thesis? One clause, not a paragraph.
+4. **What to watch next?** -- the next upcoming catalyst, earnings date, or data release that could move the thesis.
 
-Pure view filter over the narrative-record history. Uses the same
-`.filter-dropdown` primitive as screener's snapshot picker (see
-`screener.md#snapshot-picker`) — identical CSS, just swap the label.
+**Content rules:**
+- One sentence can cover multiple questions. Don't pad to fill all four if two suffice.
+- When multiple events (e.g. one catalyst + one risk), cover both -- give each its own clause or sentence.
+- Name 1-2 specific drivers (ticker, event, factor) -- not a summary of everything.
+- No buy/sell language. Observational only.
+- Voice: verbs over adjectives, numbers embedded in prose, thesis-native terms. No research-report hedging ("we believe", "arguably", "on balance").
 
-- **Label** — `Snapshot`.
-- **Value** — `<Date>` + age sub (e.g. `Apr 17 EST`, sub `1d ago`).
-- Lists the last ~60 narrative records, newest-first.
-- Selecting a date:
-  - Rewrites hero narrative, deltas, Catalysts tab, Risks tab, and any ADK
-    changelog to that record.
-  - Does **not** change the header last-updated (always reflects newest).
-  - Writes `#hero=YYYY-MM-DD` to URL hash for deep-linking; restore on load.
-- Methodology is static — picker hidden entirely there.
+**Hard constraints:**
+- **Must render as formatted markdown** -- use `**bold**` for tickers and key events, keep paragraphs short or use a brief list. A plain-text wall is a bug.
+- Follow the four-question order. Do not reorganize by pillar or layer.
+- Length follows the day: ~3-5 sentences is the soft upper bound. A quiet day with no material change is one or two sentences -- say so explicitly. A churn-heavy day may use short bullets. Do not pad to hit a length target; do not append when overshooting, compress.
+- **Grounding**: every number must be traceable to a field in today's `alpha/snapshot`, `alpha/basket`, `fundamentals/snapshot`, or events feeds. Agent-synthesized numbers are forbidden. Implementation: after the ADK call, extract every number from both `thesis` and `pushLine` with regex `-?\d+(?:\.\d+)?%?` and cross-check each against the input data. One miss → blank **both** fields and write `source: "fallback"` (all-or-nothing; see Data Contract). Silence beats partial fabrication in a finance UI.
+- The generated `{thesis, pushLine, source}` is persisted as fields on the day's `narrative/records` row. Regenerate only when a new snapshot appears -- do not recompute on every page load.
 
-*(Optional)* Prev/Next arrows flanking the dropdown for one-step navigation,
-disabled at boundaries. If you add them, use `--text-n3` icon mask buttons at
-24px, matching `.filter-dropdown-caret`.
+**Fallback (when ADK fails or grounding fails):**
+- Storage: `thesis` and `pushLine` are stored blank; `source: "fallback"` flags the row.
+- Render-time substitute: when UI reads a row with `source === "fallback"`, it renders a deterministic one-liner computed client-side from the latest `alpha/snapshot` alone (not from the narrative record, which is untrusted): `Basket <±X.X%> today vs benchmark <±Y.Y%> · 5d alpha <±Z.Z pp>`. Numbers come straight from `basketRet.d1`, `benchmarkRet.d1`, `alpha.d5`.
+- On grounding failure only (not ADK crash), prepend a muted `<small>Narrative self-check failed -- showing quant summary.</small>` line.
+- Never show an empty TLDR card -- always fall back.
 
-### Body Format — flexible
+Methodology should include 1-2 gold TLDRs (real past records you'd happily ship) as few-shot exemplars for the agent. This is a recommendation, not a contract.
 
-Pick one per playbook (don't mix):
+### Metric cards (3)
 
-**Format A — Short thesis + deltas** (fast-moving theses):
+Three KPI cards in a row, each rendered with the **Metric Card** widget (`design-widgets.md#metric-card`). Follow the widget's color rules (green/red for +/-) and typography verbatim -- do not override. Each card: large number + label + sub-description.
 
-- `<p class="hero-text">` paragraph (~60–120 words).
-- Deltas list below (`.hero-deltas-list`) — each delta: sentiment dot +
-  category badge + label + optional body.
-- Hide `.hero-deltas-block` entirely when no deltas.
+- **Theme YTD** -- basket absolute return YTD + basket description (e.g. "8 names EW").
+- **Benchmark YTD** -- benchmark return YTD + benchmark name (e.g. "iShares A&D ETF").
+- **Alpha YTD** -- theme minus benchmark + definition label. Give this card the most visual weight (accent border or background tint) as the thesis headline.
 
-**Format B — Long-form narrative** (slow structural theses):
+### What changed since yesterday (deltas)
 
-- Multi-paragraph essay (~200–400 words) in `.hero-text` weaving in
-  what-changed inline. No separate delta list.
+Bound to the TLDR card's date picker above: selecting a date swaps both the TLDR body and this deltas list, which are two renderings of the same `narrative/records` entry.
 
-### Sentiment Dot
+Each delta has:
+- Sentiment dot: `[Bull]` / `[Bear]` / `[Neutral]`
+- Category badge: one of the enumerated categories (see Data Contract)
+- Short label (one line) + optional 1-2 sentence body
+- Pillar chip (if multi-pillar): small pillar id
 
-Used in hero deltas, catalyst timeline, and anywhere the agent labels polarity.
+Empty state: see Data Contract (`deltas: []` hides the whole section).
 
-- `bull` → `--main-m3` (green) — positive for thesis
-- `bear` → `--main-m4` (red) — negative for thesis
-- `neutral` / `ambiguous` → `--text-n3` (grey) — unclear
+### Equity curve vs benchmark
 
-```css
-.hero-delta-dot { width:8px; height:8px; border-radius:50%;
-  margin-top:7px; flex-shrink:0; }
-.hero-delta-dot.bull    { background: var(--main-m3); }
-.hero-delta-dot.bear    { background: var(--main-m4); }
-.hero-delta-dot.neutral { background: var(--text-n3); }
-```
+**Chart Card** widget (`design-widgets.md#chart-card`), Line chart variant. Default expanded, 1Y window. Base=100; basket in brand color, benchmark (SPY / sector ETF / BTC / etc.) in neutral, dashed 100 baseline. Beneath the curve: `Alpha · Beta · R2 · Correlation` one-liner. Follow the widget's ECharts rules verbatim -- raw hex in ECharts config (no `var(--x)`, ECharts is Canvas), dotted background handled by `.chart-dotted-background`, no `backgroundColor` override.
 
-### Category Badge
+### Horizon returns bar chart
 
-Small uppercase tag inside the delta body identifying what kind of change it
-is. Five categories; each maps to a fixed tint (thesis-specific palette — do
-not reuse the main palette here, category is orthogonal to polarity):
+**Chart Card** widget, grouped Bar chart variant (not a table). X-axis = horizons (1D / 7D / 1M / 3M / YTD / 1Y), two bars per horizon (theme return + benchmark return), alpha labeled above each pair. Color: theme in brand color, benchmark in neutral. Data comes from `alpha/snapshot` (1D/5D/30D/180D) plus derived YTD/1Y from `prices/themeIndex`.
 
-- `Valuation` → purple `#7c3aed` (category-only, no main-token equivalent)
-- `Catalyst` → `var(--main-m3)` (green)
-- `Risk` → `var(--main-m4)` (red)
-- `Macro` → blue `#2c5fb5` (category-only, no main-token equivalent)
-- `News` → `var(--text-n7)` (grey)
+### Macro / industry charts (if any)
 
-```css
-.hero-delta-cat { display:inline-flex; align-items:center;
-  height:22px; box-sizing:border-box;
-  font-size:10px; line-height:1;
-  text-transform:uppercase; letter-spacing:0.06em;
-  padding:0 6px; border-radius: var(--radius-ct-xs);
-  margin-right:6px; vertical-align:top; }
-.hero-delta-cat.cat-valuation { background:rgba(124,58,237,0.10); color:#7c3aed; }
-.hero-delta-cat.cat-catalyst  { background:rgba(42,155,125,0.14); color: var(--main-m3); }
-.hero-delta-cat.cat-risk      { background:rgba(224,83,87,0.14);  color: var(--main-m4); }
-.hero-delta-cat.cat-macro     { background:rgba(60,120,200,0.12); color:#2c5fb5; }
-.hero-delta-cat.cat-news      { background:rgba(120,120,120,0.14); color: var(--text-n7); }
-```
-
-### Delta List
-
-```css
-.hero-deltas-title { font-size:11px; color: var(--text-n5);
-  text-transform:uppercase; letter-spacing:0.06em;
-  margin: var(--spacing-m) 0 var(--spacing-xs) 0; }
-.hero-deltas-list { list-style:none; padding:0; margin:0; }
-.hero-delta { display:flex; align-items:flex-start; gap:10px;
-  padding:12px 0; font-size:13px; line-height:22px;
-  border-bottom: 1px solid var(--line-l05); }
-.hero-delta:last-child { border-bottom: none; }
-.hero-delta-body-wrap { flex:1; min-width:0; }
-.hero-delta-label { color: var(--text-n9); font-weight:500; }
-.hero-delta-body  { color: var(--text-n7); }
-.hero-delta-empty { font-size:13px; color: var(--text-n5); padding:8px 0; }
-```
-
-Delta row DOM:
-
-```html
-<li class="hero-delta">
-  <span class="hero-delta-dot bull"></span>
-  <div class="hero-delta-body-wrap">
-    <span class="hero-delta-cat cat-catalyst">catalyst</span>
-    <span class="hero-delta-label">Label text</span>
-    <span class="hero-delta-body">— optional body clause</span>
-  </div>
-</li>
-```
+Thesis-level context charts that don't fit in the basket table. E.g. hyperscaler capex stacked bars, DoD budget trend, GLP-1 Rx volumes. Each chart uses the **Chart Card** widget -- pick the variant (Line / Bar / Stacked Bar) from the widget spec. Include only if the thesis has 1-2 macro signals that directly drive conviction; skip when the basket is the whole story. Document every series in Methodology.
 
 ---
 
-## Tab 1 — Overview (default, quant-driven)
+## Tab 2 -- Basket
 
-Lands here by default. Shows the quant snapshot of the basket as a whole. Do
-**not** restate the hero narrative.
+Basket membership is judgment-driven (manually curated per thesis). How the basket is ranked and described has two forms.
 
-Typical widgets (skip any that don't add signal):
+**Default**: members are grouped by `layer`, sorted within layer by alpha vs benchmark, and each member carries a short hand-written rationale. No composite score. This is what every surveyed production playbook uses, and the right choice unless you have a specific reason otherwise.
 
-1. [Horizon Grid](#horizon-grid) — 1D / 7D / 1M / 3M / YTD / 1Y return cards.
-2. [Equity Curve + Attribution](#equity-curve--attribution) — 1Y basket vs
-   benchmark line chart with CAPM row.
+**Optional: composite scoring**. If you have 20+ members and genuinely definable factors, you can add a weighted `thesisScore` column that ranks members 0-100 across layers. Spec is at the end of this section. Use it only when comparability across layers matters more than rationale depth.
 
-### Horizon Grid
+### Ranked table
 
-Six metric cards (or match however many horizons the thesis cares about). Each
-shows basket return big, benchmark comparison as a tag below.
+**Table Card** widget (`design-widgets.md#table-card`), used verbatim -- do not re-spec the table chassis, sticky behavior, hover tint, or expanded-row border handling. Column widths are set by `initTableAlignment` at runtime (proportional flex); **never** set `width` on `<td>` / `<th>` in CSS. Column 1 (`#`) and column 2 (`id`) pinned left; caret pinned right.
 
-```css
-.horizon-grid { display:grid;
-  grid-template-columns: repeat(6, 1fr); gap:12px; width:100%; }
-@media (max-width:960px) { .horizon-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width:560px) { .horizon-grid { grid-template-columns: repeat(2, 1fr); } }
-.hz-value.hz-pos { color: var(--main-m3); }
-.hz-value.hz-neg { color: var(--main-m4); }
-.hz-value.hz-neu { color: var(--text-n9); }
-```
+Columns left-to-right:
 
-Card DOM (`.metric-card` from design-widgets.md):
+- **`#`** (sticky) -- rank by layer then alpha desc (default), or by `thesisScore` desc if using composite scoring.
+- **`<id>`** (sticky) -- row anchor + expand caret.
+- **Name - Layer** -- layer chip, colored by layer.
+- **Thesis-relevant fundamentals** (2-3 columns) -- pick what matters for *this* thesis.
+- **Alpha vs benchmark YTD** -- color-coded +/-.
+- **(optional) Thesis Score** + Score Bar -- only if using composite scoring. Color by score: ≥80 green, ≥70 blue, ≥60 amber, <60 red.
+- **(optional) Band Pill** -- `Elite` / `Strong` / `Average` / `Weak` at 80/70/60/0.
+- **(optional) Flag Pill** -- `soft` (amber) / `hard` (red). `flags: []` means no pill.
+- **v** (sticky right) -- expand caret.
 
-```html
-<div class="metric-card">
-  <div class="metric-label">1Y</div>
-  <div class="metric-value hz-value hz-pos">+24.31%</div>
-  <div style="display:flex; gap:8px;">
-    <span class="tag tag-bull">SPY +12.08%</span>
-  </div>
-</div>
-```
+Every column sortable.
 
-Value sign-color: positive `var(--main-m3)` (green), negative `var(--main-m4)`
-(red), null/NaN `var(--text-n9)` (neutral). Benchmark tag uses `.tag-bull` /
-`.tag-bear` / `.tag-neutral` (see [Valuation Tag](#valuation-tag)).
+### Expand-row panel
 
-### Equity Curve + Attribution
+8-col grid. All chart surfaces use the **Chart Card** widget (`design-widgets.md#chart-card`); prose surfaces use the **Free Text Card** widget with `.markdown-container --m`. Three invariants:
 
-Chart Card from design-widgets.md. Thesis-specific: the title area is
-flex-direction column with an **attribution sub-row** below the title.
+- **Subtitle typography**: every in-panel card title is uniformly **14px / weight 400** (this is the Chart Card `widget-title-text` default -- do not override). Do not bold, do not upsize, do not re-color titles in this panel.
+- **Equal-height on the same row**: cards sharing a row must match heights via the widget's `.widget-row` + `flex:1; height:0` pattern (ECharts containers: `height:100%; min-height:180px`). Never let one card grow tall while its row-mate collapses.
+- **No new card classes**: reuse `.widget-card` / `.widget-body` / `.chart-body` / `.free-text-body`.
 
-Attribution row format:
-`Benchmark Attribution: Alpha <α>% (annualized) · Beta <β> · R² <r²> · Correlation <corr>`
+Layout:
 
-- Alpha text is **colored by sign** via JS: `>= 0` → `var(--main-m3)`, `< 0`
-  → `var(--main-m4)` (set as inline `style.color`).
-- Beta / R² / Corr stay `var(--text-n9)`.
+- **Row 1**: `col-8` Price chart (Chart Card, K-line + volume, daily bars, interval sized to thesis horizon).
+- **Row 2**: `col-8` **Rationale** (Free Text Card, `.markdown-container --m`) -- 2-5 sentences of hand-written prose: what this member IS in the thesis, why it fits right now, what the market is missing, what would break the rationale. Shape is up to the author; keep it tight. Static until manually updated (basket changelog).
+- **Row 3** (composite scoring only): `col-4` Gauge Ring (Chart Card) + `col-4` Factor Breakdown (Chart Card, horizontal Bar). Equal-height required.
+- **Row 4** (if any flags): Flag Cards -- one card per active flag, tier-colored accent bar. Omit if no flags.
 
-ECharts spec (on top of design-widgets.md Chart Card defaults):
+### Valuation scatter
 
-- Two line series, 1Y of daily closes normalized to base=100:
-  - **Basket** → `#5f75c9` (`--chart-purple1-main`)
-  - **Benchmark** (SPY / sector ETF / BTC / etc.) → `#ff9800` (`--chart-orange1-main`)
-- Both: `type:"line"`, `smooth: 0.1`, `showSymbol: false`, `lineStyle.width: 1`,
-  `areaStyle` linear gradient 15% → 0% alpha of the line color.
-- `xAxis.type: "time"`; `yAxis.scale: true` (don't force 0 origin — base=100 is
-  the implicit baseline).
-- `grid: { top:4, right:4, bottom:4, left:4, containLabel:true }`.
-- Chart height: 320px.
+**Chart Card** widget (`design-widgets.md#chart-card`), Scatter variant.
 
-Legend uses the `.chart-legend` + `.legend-item` + `.legend-line` primitives
-(same as screener). Two entries; put the basket first.
+- X: valuation percentile (e.g. 5Y P/E %ile)
+- Y: 1Y return
+- Dot size: market cap, mapped via `log10(cap/1e9 + 1) * 14` clamped to `[10, 40]` (same formula as screener's factor scatter, so sizes read consistently across playbooks).
+- Dot color: by `layer` (default) or by band (composite scoring).
+- Shade the "sweet spot" quadrant (cheap + outperforming).
+- Labels on points: `labelLayout: { hideOverlap: true }`.
+
+Footnote: "Cheap in a fading thesis is a trap -- read alongside Catalysts and Risks."
+
+### Composite scoring (optional)
+
+Only use when (a) 20+ members, (b) factors are definable and measurable uniformly across members, (c) cross-layer ranking matters.
+
+- **Factors**: each factor has a name, what it measures, a normalization rule (how raw → 0-100), and a weight (all weights sum to 100%).
+- **Composite**: `thesisScore = Σ (normalized factor × weight)`, range 0-100.
+- **Bands**: Elite ≥ 80 / Strong ≥ 70 / Average ≥ 60 / Weak < 60. Adjust thresholds per thesis if the distribution is skewed -- by changing factor weights or normalization, not by rescaling the final score. The displayed score must equal the weighted sum verbatim.
+- **Flags**: threshold breaches on raw metrics, independent of the composite. Each flag is `hard` (actionable) or `soft` (watch). Flags do not move the score. `flags: []` means no pill (no synthetic `"clean"`).
+- **Refresh**: scores recompute every quant feed run. Factor definitions and weights are static until manually updated (log in Methodology basket changelog).
 
 ---
 
-## Tab 2 — Basket (quant-driven)
+## Tab 3 -- Catalysts (ADK-driven)
 
-Two widgets: the basket table (with expand panels), and a valuation scatter.
+Always reads the **latest** `narrative/records` entry -- no date picker, no historical scrub. If you want to know how today's catalyst state differs from yesterday's, the TLDR in Tab 1 (which IS scrubbable) describes the transition in prose. Each catalyst card can be expanded to show related News & Social items that support it (attached via post-processing).
 
-### Basket Table
+### Sub-tabs
 
-Built on the Table Card base from design-widgets.md. Less complex than
-screener's ranked table — **no sticky columns, no ranking, no sticky caret.**
-Just a horizontally-scrollable table with expandable rows.
+`Ongoing` / `Delivered` / `Missed` -- rendered with the **Pill M** tab variant (`design-components.md#tab`, `.tab .tab-pill .tab-m`). Label format: `<Name> <count>`, e.g. `Ongoing 4`. Count is the catalyst array length filtered by `status` for that sub-tab.
 
-**Row inset**: body rows have `padding: var(--spacing-m)` horizontal (both
-sides); header row no inset.
+### Timeline per sub-tab
+- Ongoing: ascending (soonest first).
+- Delivered / Missed: descending (most recent first).
 
-```css
-#basket-table .table-row {
-  padding-left: var(--spacing-m);
-  padding-right: var(--spacing-m);
-  box-sizing: border-box;
-}
-```
+### Catalyst card (collapsed)
+- Date -- absolute (`2026-06-15`), rough (`2026 Q3`), or `TBD`
+- Status badge: `Upcoming` / `Delivered` / `Missed` -- **grey pill** (neutral background, muted text). Informational, low visual weight.
+- Sentiment pill: `Bull` / `Bear` / `Ambiguous` -- **colored fill pill**. Bull = green (m3), Bear = red (m4), Ambiguous = grey. Highest-contrast element on the card.
+- Pillar chip (multi-pillar only): small pillar id.
+- Title (one line)
+- Notes (2-4 sentences of context + impact)
+- Affected basket names (from the `ids` array)
+- Related News & Social pill: `<count> news & social` -- **blue pill** (m1 teal tint). Only shown if related items exist.
 
-**Columns** — pick what matters for the thesis. `ticker` is always the row
-anchor (colored `--main-m1`), always first, always has the caret column at the
-end.
+Past events dim; upcoming events prominent.
 
-Often-used:
-
-- Ticker — `--main-m1`, the row anchor.
-- Name
-- Layer / sub-theme — short text; thesis-specific layer taxonomy (e.g.
-  `Primes`, `Shipbuilder`, `Hyperscaler`, `Enabler`). Document layers in
-  Methodology.
-- Mkt Cap
-- Thesis-relevant fundamentals: P/E, EV/EBITDA, Rev YoY (swap for NVT / FCF
-  yield / pipeline count / on-chain volume as fits).
-- 1Y return (sign-colored)
-- α vs benchmark YTD (sign-colored)
-- Valuation tag — `Cheap` / `Fair` / `Rich` / `N/A` pill.
-- Caret (sticky-free, last column).
-
-Sort by layer, then market cap within layer. Keep every column sortable.
-
-Row hover: `background: var(--b-r02)`. Row open state: bottom border goes
-transparent (expand panel below carries the divider).
-
-### Valuation Tag
-
-Thesis variants of the `.tag` primitive (base spec: design-components.md#tag).
-Do not re-spec base — only the thesis-specific color modifiers below.
-
-```css
-.tag-bull        { background:rgba(42,155,125,0.14); color: var(--main-m3); }
-.tag-bear        { background:rgba(224,83,87,0.14);  color: var(--main-m4); }
-.tag-neutral     { background: var(--grey-g01);      color: var(--text-n7); }
-.tag-cheap       { background:rgba(42,155,125,0.14); color: var(--main-m3); } /* same as bull */
-.tag-rich        { background:rgba(224,83,87,0.14);  color: var(--main-m4); } /* same as bear */
-.tag-fair        { background:rgba(120,120,120,0.14); color: var(--text-n7); }
-.tag-na          { background: var(--grey-g01);      color: var(--text-n5); }
-.tag-approaching { background:rgba(223,167,60,0.18); color:#a56b10; } /* amber warning */
-```
-
-Mapping:
-
-- `Cheap` / `Rich` / `Fair` — basket valuation pill.
-- `N/A` — negative or missing earnings.
-- `Bull` / `Bear` / `Neutral` — signed-return pills (e.g. SPY comparison in
-  Horizon Grid).
-- `Approaching` (optional) — "near the threshold" warning (e.g. near exit
-  trigger).
-
-Valuation threshold: percentile of current P/E vs own 5y history — `Cheap <25%`,
-`Rich >75%`, everything else `Fair`.
-
-### Basket Expand Panel
-
-Lazy-rendered on first click, fade-in 0.25s. Uses `.basket-expand-panel` (not
-`.expand-panel`) to avoid colliding with screener.md's sticky-column expand
-panel — two playbooks loaded in the same page must not share that class.
-
-```css
-.basket-expand-panel { padding: var(--spacing-l) var(--spacing-m) var(--spacing-xl);
-  border-bottom: 1px solid var(--line-l07);
-  animation: expandFade .25s ease; }
-.basket-expand-panel:last-child { border-bottom: none; }
-@keyframes expandFade {
-  from { opacity:0; transform: translateY(-4px); }
-  to   { opacity:1; transform: translateY(0); }
-}
-.basket-expand-grid { display:grid;
-  grid-template-columns: 2fr 1fr; gap: var(--spacing-l); }
-@media (max-width:900px) {
-  .basket-expand-grid { grid-template-columns: 1fr; }
-}
-```
-
-Layout: 2-col grid inside `.basket-expand-grid`.
-
-**Left (`2fr`)** — price chart (Chart Card). Daily bars, 1Y window by default.
-ECharts line chart, green `#2a9b7d` (= `--main-m3`; ECharts canvas needs raw
-hex), smooth 0.1, gradient fill 15% → 0%. No volume, no OHLC tooltips — keep
-it clean.
-
-**Right (`1fr`)** — two stacked `.ft-card`s:
-
-1. "Why it's in the basket" — 1–3 sentence narrative tying the name to the
-   thesis. **Prewritten per name**, refreshed only when basket changes. Not
-   part of the ADK daily record.
-2. Key metrics — `.kv-row` list (P/E percentile, 1M / 3M / YTD return, Rev
-   YoY, any thesis-relevant signal). Sign-color numeric values.
-
-### KV Row
-
-General-purpose label/value row used in expand panels, methodology, and
-anywhere you need a tight two-column layout.
-
-```css
-.kv-row { display:flex; justify-content:space-between;
-  padding: 6px 0; border-bottom: 1px solid var(--line-l05);
-  font-size:13px; }
-.kv-row:last-child { border-bottom: none; }
-.kv-row .k { color: var(--text-n5); }
-.kv-row .v { color: var(--text-n9); }
-```
-
-Sign-color the `.v` span for signed numerics via a utility class: positive
-green, negative red, neutral `--text-n9`.
-
-### Valuation Scatter
-
-Chart Card. Two-axis map of the basket — valuation on X, return on Y.
-
-- **X** — P/E percentile (0–100) vs own 5y history, `nameLocation: "middle"`,
-  `nameGap: 30`.
-- **Y** — 1Y total return (%), `nameLocation: "middle"`, `nameGap: 45`.
-- **Dot size** — `Math.sqrt(mcap/1e9) * 3 + 8` (market-cap scaling, clamped
-  visually by the formula).
-- **Dot color** — by valuation tag (ECharts canvas — raw hex):
-  `Cheap` `#2a9b7d` (= `--main-m3`), `Rich` `#e05357` (= `--main-m4`),
-  else grey `#64748b`.
-- **Labels** — ticker on each dot, `position: "top"`, `fontSize: 10`,
-  `color: "#333"`.
-- **Quadrant guides** — second `type: "line"` series carries `markLine.data =
-  [{ xAxis: 50 }, { yAxis: 0 }]`, dashed `rgba(0,0,0,0.15)`.
-- **Grid** — `{ left:60, right:30, top:40, bottom:60 }`.
-- **Splitlines** — visible, very light (`rgba(0,0,0,0.05)`).
-- **Height** — 460px.
-
-Caption (`.widget-title-sub`): "Upper-left = cheap + outperforming (sweet
-spot). Upper-right = expensive momentum. Lower-right = crowded, rolling over."
-And a footnote callout: "Cheap in a fading thesis is a trap — read alongside
-Catalysts and Risks."
+### Catalyst card (expanded)
+Expand to reveal related News & Social items (shared expand format -- see below).
 
 ---
 
-## Tab 3 — Catalysts (ADK-driven)
+## Tab 4 -- Risks (ADK-driven)
 
-Hero date ↔ Catalyst list are bound — they share one narrative record.
+Always reads the **latest** `narrative/records` entry (same as Catalysts -- no date picker). Each risk row can be expanded to show related News & Social items (same post-processing as Catalysts).
 
-Structure: sub-pill tab row at top (Ongoing / Delivered / Missed with counts),
-then a single `.ft-card` container with three `.sub-tab-panel`s, each holding
-a `.timeline`.
+Structured risk register -- no hand-waving. Rendered with the **Table Card** widget (`design-widgets.md#table-card`), same column-alignment rules as Tab 2 (widths via `initTableAlignment`, no CSS cell widths). Columns:
+- **Category chip** -- from the risk `category` enum.
+- **Pillar chip + thesis-claim quote** (multi-pillar only) -- the `pillar` id and the `thesisClaim` rendered as a muted quote block, anchoring the risk to a specific thesis commitment.
+- **Risk description** -- must cite today-snapshot evidence.
+- **Divergence type** -- `Fundamental` / `Narrative` / `Valuation` / `Flows`. Small pill.
+- **Exit trigger** -- concrete threshold (`--` if none). E.g. "DoD FY27 budget grows <3% YoY nominal."
+- **If triggered** -- planned portfolio action.
+- **Priority** -- `High` (red) / `Medium` (orange) / `Low` (grey).
+- **Related News & Social** -- count badge; only if related items exist.
 
-### Sub-Pill Tabs
+Sort by priority descending, then by status (Materializing > Watching > Dormant).
 
-Different primitive from the main tab bar — uses the **`.tab-pill`** variant
-(rounded chip buttons, not underline). Full CSS is in
-design-components.md#tab — do not re-spec base. Thesis only adds:
+### Risk row (expanded)
+Same shared expand format as Catalysts.
 
-- A `.count` child for the number badge.
-- `.sub-tab-panel` for the content-toggle container.
-- Kill the width-reservation `::after` trick that `.tab-underline` uses (not
-  needed on pills).
-
-```css
-.tab-pill .tab-item .count { opacity:0.55; font-size:12px; font-weight:400; }
-.tab-pill .tab-item::after { display:none; }  /* disable underline's layout-shim */
-.sub-tab-panel { display:none; }
-.sub-tab-panel.active { display:block; }
-```
-
-DOM:
-
-```html
-<div class="tab tab-pill">
-  <div class="tab-item active" data-sub-tab="ongoing">Ongoing <span class="count">4</span></div>
-  <div class="tab-item" data-sub-tab="delivered">Delivered <span class="count">6</span></div>
-  <div class="tab-item" data-sub-tab="missed">Missed <span class="count">1</span></div>
-</div>
-```
-
-Sort order:
-
-- **Ongoing** (includes `upcoming` + live `ongoing`): ASC (nearest future
-  first); null dates last.
-- **Delivered / Missed**: DESC (most recent first); null dates last.
-
-### Catalyst Timeline
-
-Vertical timeline — line on the left, dot per event, event text stacked right
-of each dot.
-
-```css
-.timeline { position:relative; padding-left: var(--spacing-xl); }
-.timeline::before { content:""; position:absolute;
-  left:11px; top:4px; bottom:4px; width:2px;
-  background: var(--line-l07); }
-.tl-item { position:relative;
-  padding: var(--spacing-xs) 0 var(--spacing-s) 0; }
-.tl-item::before { content:""; box-sizing:border-box;
-  position:absolute; left:-19px; top:11px;
-  width:14px; height:14px; border-radius:50%;
-  background: var(--text-n5);
-  border: 2px solid var(--b0-page); }
-.tl-item.bull::before      { background: var(--main-m3); }
-.tl-item.bear::before      { background: var(--main-m4); }
-.tl-item.ambig::before,
-.tl-item.ambiguous::before { background: var(--text-n5); }
-.tl-item.done::before,
-.tl-item.delivered::before { background: var(--main-m3);
-  box-shadow: 0 0 0 2px rgba(42,155,125,0.25); }  /* 0.25 halo, no token equiv */
-.tl-item.missed::before    { background: var(--main-m4); }
-.tl-date  { font-size:12px; line-height:20px;
-  letter-spacing:0.12px; color: var(--text-n5); }
-.tl-title { font-size:14px; line-height:22px;
-  letter-spacing:0.14px; font-weight:500;
-  color: var(--text-n9); margin: var(--spacing-xxxs) 0; }
-.tl-sub   { font-size:12px; line-height:20px;
-  letter-spacing:0.12px; color: var(--text-n5); }
-```
-
-Event DOM:
-
-```html
-<div class="tl-item bull">            <!-- or .bear / .ambig / .delivered / .missed -->
-  <div class="tl-date">2026-06-15 · Upcoming</div>
-  <div class="tl-title">FY27 DoD budget mark-up hearing</div>
-  <div class="tl-sub">2–4 sentences of context + impact. Affected: LMT, RTX.</div>
-</div>
-```
-
-Status badge for the date line:
-
-- Ongoing → `Upcoming` (grey text).
-- Delivered → append `✓` (green check).
-- Missed → append `✗` (red cross).
-
-Dot coloring reflects **sentiment for thesis**, not event outcome. A
-`delivered` event can still be `.bear` if it harmed the thesis.
-
-Past events visually dim (`.tl-sub` already `--text-n5`); upcoming events
-prominent.
+### Shared expand format (Catalysts + Risks)
+- Each item: source icon (`N` news / `X` Twitter), title (clickable, opens in new tab), snippet (~1 line), timestamp.
+- Cap ~5 items, highest-relevance first. No expand affordance if nothing matched.
 
 ---
 
-## Tab 4 — Risks (ADK-driven)
-
-Same narrative record as the hero. Structured risk register — no hand-waving.
-
-Table Card with four columns:
-
-- **Risk** — narrative description, optionally prefixed with a `[CATEGORY]`
-  tag (wrapped in `.risk-cat-prefix` for `--text-n5` color). Categories:
-  `Policy` / `Regulatory` / `Tech substitution` / `Cyclical` / `Execution` /
-  `Valuation` / `Narrative` / `Geopolitical`.
-- **Exit trigger** — concrete measurable threshold. `—` (em-dash, wrapped in
-  `.risk-exit-cell.empty` for muted color) if none. Example: "DoD FY27 budget
-  grows <3% YoY nominal."
-- **If triggered** — planned portfolio action (trim / rotate / exit).
-- **Priority** — see [Priority Chip](#priority-chip).
-
-Body cells use `white-space: normal` so long text wraps.
-
-```css
-.risk-cat-prefix { color: var(--text-n5); }
-.risk-exit-cell.empty { color: var(--text-n5); }
-```
-
-### Priority Chip
-
-Priority is **derived**, not hand-set. Derive from `Severity` × `Status`:
-
-| Severity \ Status | Dormant | Watching | Materializing |
-|---|---|---|---|
-| **High**   | Medium | High   | High   |
-| **Medium** | Low    | Medium | High   |
-| **Low**    | Low    | Low    | Medium |
-
-Chip shows the level; the raw `<sev> · <status>` shows on hover via the
-native `title=""` attribute (`cursor: help`).
-
-```css
-.prio-chip { display:inline-flex; align-items:center; gap:6px;
-  padding: 3px 10px; border-radius: 999px;
-  font-size:12px; font-weight:500; line-height:18px;
-  cursor: help; }
-.prio-chip::before { content:""; width:6px; height:6px; border-radius:50%; }
-.prio-high   { background:rgba(224,83,87,0.14);  color: var(--main-m4); }
-.prio-high::before   { background: var(--main-m4); }
-.prio-medium { background:rgba(223,167,60,0.18); color:#a56b10; }
-.prio-medium::before { background:#d4a63c; }
-.prio-low    { background:rgba(120,120,120,0.14); color: var(--text-n7); }
-.prio-low::before    { background: var(--text-n5); }
-```
-
-Sort rows: Priority DESC, then Severity DESC (H > M > L), then Status DESC
-(Materializing > Watching > Dormant).
-
----
-
-## Tab 5 — News & Social (quant-driven)
-
-Unified feed. The ADK also consumes this upstream, but the tab shows raw items.
-
-Structure: `.tab-pill` filter bar at top (`All` / `News` / `X (Twitter)` with
-counts) → a `.widget-body` wrapper (`padding:0; background: var(--grey-g01)`)
-containing `.feed-body` with `.feed-item` children.
-
-### Feed Filter Bar
-
-Same `.tab.tab-pill` primitive as catalyst sub-tabs. Add `.feed-filter-bar`
-class for `margin-bottom: var(--spacing-m); flex-wrap: wrap;`.
-
-```css
-.feed-filter-bar { margin-bottom: var(--spacing-m); flex-wrap: wrap; }
-```
-
-DOM:
-
-```html
-<div class="tab tab-pill feed-filter-bar">
-  <div class="tab-item active" data-filter="all">All <span class="count">120</span></div>
-  <div class="tab-item" data-filter="news">News <span class="count">80</span></div>
-  <div class="tab-item" data-filter="x">X (Twitter) <span class="count">40</span></div>
-</div>
-```
-
-### Feed Item
-
-Base Feed Card spec (all `.feed-*` structure, avatar/title/content/thumb CSS,
-hover, divider) is in design-widgets.md#feed-card — do not re-spec. Thesis
-only overrides the avatar and adds thesis-specific inline chips inside
-`.feed-info`.
-
-**Avatar per source** — priority is always: **real avatar first, generic
-source logo only as fallback.** The generic X / letter logo is the last
-resort, not the default.
-
-Resolution order:
-
-1. **Real avatar from the item** — the post author's profile picture (X) or
-   the publisher's logo (news). If the item provides one, use it as-is on
-   the default `.feed-avatar` background. No `style` override.
-2. **Source-inferred icon** — news falls back to Google favicon for the
-   article's host (`favicons?domain=<host>&sz=64`); X has no equivalent
-   author lookup.
-3. **Generic source fallback** — only when both above fail:
-   - X → black background (`style="background:#000;"`) + white X SVG
-     (`logo-feed-x.svg`) padded 4px. This is the tier-3 fallback; do NOT
-     apply it when a real author avatar is available.
-   - News → `.feed-avatar-fallback` showing the first letter of the host
-     (uppercase), default muted background from design-widgets.
-
-HTML per tier (agent: pick the highest tier with a usable source):
-
-```html
-<!-- Tier 1 — real avatar (preferred; no bg override) -->
-<div class="feed-avatar">
-  <img src="{{authorAvatarUrl}}" alt=""
-       onerror="this.parentNode.innerHTML='<!-- fall through to tier 2 or 3 -->'">
-</div>
-
-<!-- Tier 2 — news favicon -->
-<div class="feed-avatar">
-  <img src="https://www.google.com/s2/favicons?domain={{host}}&sz=64" alt=""
-       onerror="this.parentNode.innerHTML='<div class=feed-avatar-fallback>{{firstLetter}}</div>'">
-</div>
-
-<!-- Tier 3 — generic X logo (only when item.source==='x' AND no author avatar) -->
-<div class="feed-avatar" style="background:#000;">
-  <img src="https://alva-ai-static.b-cdn.net/design-system/logo-feed-x.svg"
-       alt="X" style="padding:4px;"
-       onerror="this.parentNode.innerHTML='<div class=feed-avatar-fallback style=background:#000;>X</div>'">
-</div>
-```
-
-The black background belongs to the tier-3 generic logo only. On tier 1 and
-tier 2, `.feed-avatar` keeps the default background from
-design-widgets.md#feed-card — do not add `style="background:#000;"`.
-
-**Click behavior**: each `.feed-item` carries `data-href="<article url>"`. A
-single delegated click listener on the feed container opens it in a new tab
-with `noopener, noreferrer`.
-
-### Ticker Tag
-
-Thesis-specific inline chip + sentiment color spans — sit inside the
-`.feed-info` row to tag which basket name each item mentions.
-
-```css
-.feed-ticker-tag { font-size:11px; line-height:16px;
-  padding:1px 6px; border-radius:3px;
-  background:rgba(124,58,237,0.1); color:#7c3aed;
-  font-weight:500; }
-.feed-sentiment-bull { color: var(--main-m3); }
-.feed-sentiment-bear { color: var(--main-m4); }
-```
-
-### Inclusion rules (document in Methodology)
-
-- **News** — basket-tagged, de-duped by URL, 24–72h rolling window, cap ~80.
-- **Social** — engagement-filtered (≥1 like/RT or verified author),
-  spam-filtered, cap ~40.
-- **Combined** — ~120 item cap; older items paginate or drop.
-
-Dedupe both streams by URL after merge. Sort newest-first.
-
----
-
-## Tab 6 — Methodology
-
-Always include. Every pipeline and every derived field must be explained so the
-reader can trust the page.
-
-### Structure
-
-Two-column grid of `.method-cell`s using `.grid .grid-2` from
-design-widgets.md#grid-system with `gap: var(--spacing-xl)`. Each cell:
-`h3.section-h` title + `.ft-card` body. Grid collapses to single column below
-1100px (handled by the base `.grid-2` rule).
-
-```css
-.section-h { font-size:16px; color: var(--text-n9);
-  margin: 0 0 var(--spacing-m) 0; font-weight:400; }
-.method-cell { display:flex; flex-direction:column; }
-.method-cell .ft-card { flex: 1; }
-```
-
-### Free Text Card
-
-The default narrative container inside methodology / hero overflow / expand-
-right-column.
-
-```css
-.ft-card { background: var(--grey-g01);
-  border-radius: var(--radius-ct-s);
-  padding: var(--spacing-l); }
-.ft-card h3 { margin: 0 0 var(--spacing-s) 0;
-  font-size:16px; font-weight:500; color: var(--text-n9); }
-.ft-card p { margin: 0 0 var(--spacing-s) 0;
-  font-size:14px; line-height:22px; color: var(--text-n7);
-  letter-spacing:0.14px; }
-.ft-card ul { margin: 0 0 var(--spacing-s) 0;
-  padding-left: var(--spacing-l);
-  color: var(--text-n7); font-size:14px; line-height:22px; }
-.ft-card li { margin-bottom: 4px; }
-strong, b { font-weight:500; color: var(--text-n9); }
-```
-
-### Subsections to cover
-
-- **How this playbook works** — two pipelines (quant + ADK narrative), cadence
-  in ET (with EST shift note), and that hero / Catalysts / Risks share one
-  ADK record per date.
-- **Hero format choice** — A or B, and why.
-- **ADK context** — exact list of inputs fed to the narrative agent (snapshots,
-  prior record, news/social, macro, tool access).
-- **Basket selection** — list every name by layer; rule-based vs judgment-
-  based; basket change-log policy.
-- **Computation rules** — define every derived field:
-  - Rev YoY / TTM basis
-  - Valuation tag thresholds (e.g. `Cheap <25%` P/E percentile vs 5Y)
-  - α definition (e.g. α vs SPY YTD = ticker YTD − SPY YTD, in pp)
-  - CAPM α / β / R² / Corr method (e.g. 1Y daily excess returns, α annualized)
-  - Risk priority matrix
-  - Hero-delta surfacing rules (e.g. `|1D move| > 3%`, catalyst status flips,
-    ≥2-source news)
-- **Data sources** — OHLCV + fundamentals (Alva SDK); macro (FRED / World
-  Bank / USAspending / etc.); news (Alva News SDK); social (GrokX or
-  equivalent); narrative (ADK agent + tools).
-- **What this does NOT capture** — honest blind-spot list.
-- **Glossary** — thesis-specific jargon.
-
-Use `.kv-row` lists for tight source/computation tables; use `<p>` + `<ul>`
-for prose subsections. Hero date picker is hidden on this tab (static).
-
-### Callout
-
-Short emphasized note — left accent bar, grey background. Same as screener.
-
-```css
-.callout { border-left: 3px solid var(--main-m1);
-  padding: var(--spacing-s) var(--spacing-m);
-  background: var(--grey-g01);
-  border-radius: var(--radius-ct-xs);
-  font-size:13px; line-height:20px; color: var(--text-n7); }
-.callout strong { color: var(--text-n9); }
-```
-
-### Verdict Hero *(optional)*
-
-For conviction summaries (e.g. in Methodology or a standalone summary page).
-4-column grid of `.vh-block`s (label / value / sub). Not used in the default
-thesis template but available.
-
-```css
-.verdict-hero { background: var(--grey-g01);
-  border-radius: var(--radius-ct-s); padding: var(--spacing-xl);
-  display:grid; grid-template-columns: 1.2fr 1fr 1fr 1.2fr;
-  gap: var(--spacing-l); margin-bottom: var(--spacing-xl); }
-@media (max-width:900px) {
-  .verdict-hero { grid-template-columns: 1fr 1fr; }
-}
-.vh-block { display:flex; flex-direction:column; gap:6px; }
-.vh-label { font-size:12px; color: var(--text-n5);
-  text-transform:uppercase; letter-spacing:0.06em; }
-.vh-value { font-size:28px; color: var(--text-n9); line-height:36px; }
-.vh-sub   { font-size:12px; color: var(--text-n5); }
-.val-bull    { color: var(--main-m3); }
-.val-bear    { color: var(--main-m4); }
-.val-neutral { color: var(--text-n7); }
-```
-
----
-
-## Tab 7 — Macro & Industry *(optional)*
-
-Include only if the thesis has 2+ macro / industry signals that actually move
-conviction and aren't captured by the basket chart. Skip when the basket is
-the whole story.
-
-All charts are Chart Cards (design-widgets.md). Stack vertically with
-`margin-top: var(--spacing-xxxxl)` between them.
-
-Common building blocks (mix & match):
-
-- **Aggregate spend / volume** — time-series line, last 10y. Green
-  `#40a544` (= `--chart-green1-main`; ECharts canvas — raw hex) line, smooth
-  0.1, gradient fill 15% → 0%.
-- **Cross-country / cross-region bar** — horizontal bars, conditional color
-  (e.g. green if ≥ threshold else red), value label on right
-  (`position:"right"`, `formatter: p => p.value.toFixed(2) + "%"`),
-  `barMaxWidth: 16`, `borderRadius: [0, 1, 1, 0]`.
-- **Quarterly trend stack** — stacked bars by contributing factor (e.g.
-  contractor family, sponsor). Use the shared chart palette (no duplicates;
-  grey reserved for "Other" bucket):
-  `["#3d8bd1","#ff9800","#40a544","#5f75c9","#c76466","#dc7aa5","#a878dc","#7cafad","#54A5C2","#8fc13a"]`.
-  Top-N contributors + "Other" catch-all. `barMaxWidth: 16`.
-- **Latest-period horizontal breakdown** — single-period share bars; percent-
-  of-total label at bar end.
-- **Filings / contracts / deal-flow table** — Table Card. Size threshold to
-  strip noise; newest-first; clean description text of source prefixes.
-
-All ECharts tooltips follow the design-widgets.md Chart Card `TT` defaults
-(white bg, 6px radius, 12px padding, dotted-line axis pointer).
-
-Document every series, window, cleaning rule, and threshold in Methodology.
-
----
-
-## Other tabs (as thesis demands)
-
-Don't bolt on tabs speculatively. Add one only when a type of content
-genuinely doesn't fit elsewhere.
-
-Examples:
-
-- **Regulatory / Policy** — for theses where policy timing is the primary
-  driver (biotech approvals, antitrust, tariffs).
-- **Supply Chain** — for hardware / physical theses (semis, EV, defense
-  components).
-- **On-chain** — for crypto theses (flows, fees, holder distribution).
-- **Sentiment / Positioning** — for crowded-trade theses (CFTC positioning,
-  short interest, fund flows).
-
-Each new tab must:
-
-- Be clearly either **quant-driven** or **ADK-driven**.
-- Respect the hero date picker if ADK-driven (share one narrative record per
-  date with hero / Catalysts / Risks).
-- Be documented in Methodology (sources + computation).
-
----
+## Tab 5 -- News & Social
+
+The full news and social feed for the basket. All items, including those already matched to catalysts or risks -- this is the complete picture, not a spillover.
+
+### Layout
+
+**Feed Card** widget (`design-widgets.md#feed-card`). Pick the `News` or `X (Twitter)` item template from the widget spec based on `type` -- do not invent a new item type. Avatar / source-logo slot rules come from the widget (`N` for news, `X` for Twitter) automatically; do not re-spec.
+
+- Flat list, newest-first.
+- Each item: source icon (widget default), title (clickable, opens in new tab), ticker tags (using `id`), sentiment dot, timestamp, snippet (~1 line).
+- Items matched to a catalyst or risk show a tag indicating which one (e.g. `-> MSFT earnings catalyst`), rendered inside the feed item's metadata row (not as a separate badge).
+- No pagination -- 24-72h window, oldest drops off. Full feed: basket-tagged, de-duped, engagement-filtered for social, no exclusions (matched + unmatched). Details in Methodology.
+
+## Methodology Modal
+
+Always include -- explains how the playbook works. Lives in a **modal**, triggered by the README chip in the [Tab-Right Group](#tab-right-group). Entry, trigger, overlay, panel, and section markup all reuse `templates/screener/template.md § Methodology Modal` verbatim:
+
+- **Trigger**: `.tab-readme` chip with `data-modal-open="methodology-modal"`. Overlay click, close-X, and `Esc` all dismiss. Body scroll locks while open.
+- **Panel**: Modal base from `design-components.md#modal` with the same `max-width: 896px` override screener uses (text-dense content reads better at narrower line length). Do not re-spec overlay color, panel radius, title typography, or close icon.
+- **Section markup**: `.method-section` / `.method-body` / `.method-code` / `.method-limit-list` classes from screener. Reuse, do not redefine.
+- **Performance**: lazy-render the modal body on first open, not on page load.
+
+### Content subsections
+
+Pick what applies -- shape follows the thesis's nature. Skip subsections that don't fit (a single-pillar thesis has no pillars list; a default-scored basket has no factor weights table).
+
+- **How this playbook works** -- two pipelines (quant + ADK narrative), post-processing news matcher, cadence in ET, exact list of inputs fed to the narrative agent. One ADK record per date powers Thesis / Catalysts / Risks.
+- **Thesis pillars** (multi-pillar theses only) -- for each pillar: short id, name, the one-sentence claim, and what daily signal would verify or contradict it.
+- **News matching** -- ticker overlap + keyword similarity; unmatched items flow to News & Social tab.
+- **TLDR generation** -- four-question framework, grounding rule, fallback behavior, how `pushLine` is written (one-line plain-text headline, same grounding as `thesis`). 1-2 gold few-shot TLDRs recommended (each example is a `{thesis, pushLine}` pair, not just prose).
+- **Basket selection** -- every name by layer; judgment-based inclusion criteria; change-log policy. If using composite scoring: each factor (name, measure, normalization, weight), composite formula, band thresholds, flag definitions, a worked example re-deriving the current #1.
+- **Computation rules** -- every derived field: Rev YoY/TTM, alpha definition, risk priority matrix, delta surfacing rules.
+- **Data sources** -- OHLCV + fundamentals (Alva SDK); macro (FRED / World Bank / etc.); news (Alva News SDK); social (GrokX or equivalent); narrative (ADK agent + tools).
+- **Blind spots** -- honest list of what this does NOT capture.
+- **Glossary** -- thesis-specific terms.
+
+## Push Notification
+
+For users who subscribe to the playbook. Fires once per new `narrative/records` entry, deterministically derived -- no second ADK call, no truncation of `thesis`.
+
+- **Title**: `<Thesis Name> · <recordDate>`
+- **Body**: read `pushLine` from the new record verbatim. No truncation, no paraphrase. Empty `pushLine` (fallback source) means this push would have had nothing to say -- see "When to send" below.
+- **Source of truth**: the same `narrative/records` row that powers Tab 1. One ADK generation per snapshot, two render surfaces (card + push), zero drift.
+
+### When to send
+
+Use deterministic signals from the new record, not prose parsing of `thesis`:
+
+- **First record ever** for this playbook → always send.
+- **Subsequent records** → send only if at least one of these is true (all comparisons are scalar diffs against the prior record, no prose parsing):
+  - `deltas.length` > 0
+  - any catalyst with the same `title` changed `status` vs the prior record (covers Upcoming → Delivered / Missed)
+  - `risks.length` increased, OR the count of risks with `priority === "High"` increased
+- **Fallback source + no signal changes** → skip. If `source === "fallback"` and none of the deterministic signals fired, there is nothing trustworthy to push.
+- **Fallback source + signals fired** → still send, but substitute `pushLine` with a deterministic line from the signals themselves (e.g. `"3 catalyst flips, 1 new High risk -- narrative self-check failed"`). Never send an empty body.
 
 ## Cron
 
-**Two crons, not one.** The narrative agent must run **after** the quant feed
-so it can diff today vs yesterday on fresh data.
+Two crons, not one.
 
 | Pipeline | Cadence | Notes |
 |---|---|---|
 | Quant feed | Daily post-close (e.g. 6 PM ET) | Faster only if an input metric actually updates intraday. |
-| Narrative feed (ADK) | Daily ~30 min after quant (e.g. 6:30 PM ET) | Runs **after** quant so it diffs today vs yesterday on fresh data. |
+| Narrative feed (ADK) | Daily ~30 min after quant (e.g. 6:30 PM ET) | Must run **after** quant so it can diff today vs yesterday. |
 
-- Cron expressions in UTC; display in ET in the UI. Both feeds shift one hour
-  earlier during EST (Nov–Mar).
+- Cron in UTC; display in ET in the UI (account for EDT/EST shift).
 - Quant feed accepts `args.now` (ms) for one-off backfill runs.
-- Narrative feed accepts `args.date` (YYYY-MM-DD) to re-generate a specific
-  record — useful when the agent fails and a day needs re-running.
-- **Forward-only narrative accumulation.** Never fake-backfill past narrative
-  records by running the agent on historical snapshots — point-in-time quant
-  queries return *currently-revised* data, not real point-in-time state, so
-  a backfilled "what changed yesterday" is misleading. Each narrative record
-  should be the one produced live on its date.
-- Quant and narrative outputs live in separate feeds, stored as independent
-  time series — historical hero entries are browsable via the hero date
-  picker.
-
----
-
-## Reference Implementation
-
-`playbook-thesis.html` is the visual/behavioral ground truth.
-
-- **Structure** of each tab and widget → this md.
-- **Pixel / exact DOM details** where the md is ambiguous → open the HTML
-  and match verbatim.
-- **ECharts configs** beyond what's specified here → mirror the relevant
-  `render<X>` function in the HTML (look for `renderBenchChart`,
-  `renderValScatter`, `renderCatalysts`, `renderRiskTable`, `renderFeed`,
-  `renderDoDChart`, `renderNatoChart`, `renderContractsCharts`).
-
-When generating a new thesis playbook, also check `screener.md` for any shared
-primitive (`.filter-dropdown`, `.tag`, `.expand-caret`, `.ft-card`, `.callout`,
-`.kv-row`, `.chart-dotted-background`, `.alva-watermark`) — don't re-spec
-those, they're identical across both playbooks.
-
----
-
-## Push Notifications
-
-The daily hero narrative is the natural push payload. Wire the **narrative feed** (not the quant feed), so the diffed "what changed" is included. See SKILL.md Pattern E for the mechanics.
-
-**Format**:
-
-- `title`: `<Thesis> · <date>`
-- `text`: one-sentence thesis + top 1–2 deltas (sentiment dot + short label). Self-contained — recipients won't click through.
-
-**Skip**: the agent failed and the last-good record was reused — otherwise the same thesis re-pushes.
+- Narrative feed accepts `args.date` (YYYY-MM-DD) to (re)generate a specific record -- useful when the agent fails and a day needs re-running.
+- **Forward-only narrative accumulation.** Never fake-backfill past narrative records by running the agent on historical snapshots -- it will see currently-revised quant data, not the real point-in-time state, and produce a misleading "what changed yesterday." Each narrative record should be the one produced live on that date.
