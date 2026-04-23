@@ -54,15 +54,18 @@ Returns JSON with structure:
   "playbook_id": 42,
   "name": "btc-momentum",
   "description": "...",
-  "latest_release": {
-    "version": "v1.0.0",
-    "feeds_dir": "./releases/v1.0.0/feeds/",
-    "feeds": [{ "feed_id": 100, "feed_major": 1 }]
-  }
+  "releases": [
+    {
+      "version": "v1.0.0",
+      "feeds": [{ "feed_id": 100, "feed_major": 1 }]
+    }
+  ]
 }
 ```
 
-From `latest_release.feeds`, collect the feed IDs you need to inspect.
+`releases` is ordered newest-first, so `releases[0]` is the latest
+release. From `releases[0].feeds`, collect the feed IDs you need to
+inspect.
 
 ---
 
