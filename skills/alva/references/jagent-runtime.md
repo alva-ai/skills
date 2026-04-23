@@ -97,6 +97,10 @@ const env = require("env");
 env.userId; // "1" (string) -- your numeric user ID
 env.username; // "alice" (string) -- your username, used in ALFS paths
 env.args; // parsed JSON from the request's "args" field
+env.availableProxyRegions; // frozen string[] of outbound proxy region labels,
+                           // e.g. ["jp","mx1","mx2","us1","us2"]. Empty array
+                           // when no proxy pool is configured. See net/http
+                           // below for the proxyRegion fetch option.
 ```
 
 ### secret-manager -- Third-Party Secrets
@@ -141,8 +145,31 @@ resp.json(); // parsed JSON
 resp.headers; // response headers
 ```
 
-`fetch` returns a Promise. Request `init` fields: `method`, `headers`, `body`.
-Max response body: 128 MB.
+`fetch` returns a Promise. Request `init` fields: `method`, `headers`, `body`,
+`proxyRegion`. Max response body: 128 MB.
+
+**Outbound proxy pool.** `fetch` egresses through a pool of proxies spanning
+multiple regions. By default each request picks a random proxy, and the
+runtime automatically retries on a different proxy for transport errors,
+5xx responses, and 429 rate-limit responses (4xx business errors are
+returned as-is, never retried).
+
+Pass `proxyRegion` in the init object to pin a request to a specific region
+(strict — only proxies with that exact label are considered, and the request
+fails rather than falling back to another region):
+
+```javascript
+const resp = await http.fetch("https://api.hyperliquid.xyz/info", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ type: "meta" }),
+  proxyRegion: "us1", // pin to a specific outbound region
+});
+```
+
+Use `require("env").availableProxyRegions` to enumerate the labels available
+in the current environment. An unknown region throws
+`"fetch: unknown proxyRegion '<name>'; available: [...]"` synchronously.
 
 ### @alva/algorithm -- Statistics and Indicators
 
