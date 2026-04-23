@@ -22,11 +22,11 @@ Structural:
 - [Screener Variants](#screener-variants) — **read first** to know which components apply
 - [Feed Contract](#feed-contract) — **read second** to know what data shape to emit
 - [Page Layout](#page-layout)
-- [Header](#header) · [Snapshot Picker](#snapshot-picker)
+- [Tab-Right Group (README chip · Snapshot Picker)](#tab-right-group)
 - [Tab 1 — Overview](#tab-1--overview) — opens with [Daily Digest](#daily-digest)
 - [Tab 2 — Movers & Trends](#tab-2--movers--trends-optional)
 - [Tab 3 — Analysis](#tab-3--analysis-optional)
-- [Tab 4 — Methodology](#tab-4--methodology)
+- [Methodology Modal](#methodology-modal) — README chip on tab row, opens modal
 - [Cron](#cron) · [Push Notifications](#push-notifications--daily-tldr)
 
 Screener-unique components (CSS inline):
@@ -164,66 +164,40 @@ still apply inside them.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│ <Screener Name>                                              │
-│ Last updated · <ts EST> · Refreshes <schedule EST>           │
-│ <One-sentence summary>                                       │
+│ [ Overview · Movers & Trends · Analysis ]  [📖 README] [▼]   │
 ├──────────────────────────────────────────────────────────────┤
-│ [ Overview · Movers & Trends · Analysis · Methodology ]      │
-├──────────────────────────────────────────────────────────────┤
-│ <Tab content>              [Snapshot ▼: Today, Apr 17 EST]   │
+│ <Tab content>                                                │
 │  Overview: Daily Digest → Ranked Table → expand rows         │
-│  Movers / Analysis / Methodology: as their sections describe │
+│  Movers / Analysis: as their sections describe               │
+│  README chip → Methodology modal (max-width 896px)           │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-Container: `.playbook-container` from design-widgets.md (`max-width: 2048px`,
-`padding: var(--spacing-m) var(--spacing-xxl) var(--spacing-xxxxl)`, mobile
-`padding: var(--spacing-m)`). Do not re-spec.
+Container: `.playbook-container` from design-system.md. Do not re-spec.
 
-Tab bar: Underline-M style from `design-components.md#tab`. Sits above the
-content panels; the snapshot picker is anchored to the right of the tab bar row
-on desktop, wraps to its own row on mobile.
-
----
-
-## Header
-
-Sticky across all tabs. Title + one-sentence summary reuse the base
-`design-system.md#playbook-header` styles — no re-spec here. Screener-specific
-behaviors:
-
-- **Last-updated pill** — shows the latest snapshot timestamp; **not**
-  affected by the snapshot picker.
-- **Refresh badge** — label format: `Refreshes <schedule> EST`.
-- **Summary line** — no "What this is" duplicate of the refresh info.
-
-Screener-specific CSS (header-row flex layout + the two pills):
-
-```css
-.playbook-header { display:flex; align-items:center; flex-wrap:wrap;
-  row-gap: var(--spacing-xs); margin-bottom: var(--spacing-xs); }
-/* Flex-row extensions on design-system.md .playbook-title */
-.playbook-title { margin-right: auto; white-space: nowrap; }
-
-.header-meta { display:flex; align-items:center; gap: var(--spacing-xs); flex-wrap:wrap;
-  font-size:12px; color:var(--text-n5); }
-.header-meta .refresh-badge { display:inline-flex; align-items:center; gap:6px;
-  background: var(--main-m1-10); color:var(--main-m1);
-  padding:0 10px; border-radius: var(--radius-ct-s); height:28px; font-size:12px; }
-.header-meta .refresh-badge::before { content:''; width:6px; height:6px;
-  border-radius:50%; background:var(--main-m3);
-  animation:pulse 2s ease-in-out infinite; }
-.header-meta .last-updated { display:inline-flex; align-items:center; gap:6px;
-  border:1px solid var(--line-l07); color:var(--text-n5);
-  padding:0 10px; border-radius: var(--radius-ct-s); height:28px; font-size:12px; }
-.header-meta .last-updated::before { content:''; display:inline-block;
-  width:6px; height:6px; background:var(--main-m3); border-radius:50%; }
-@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
-```
+Tab bar: Underline-M style from `design-components.md#tab`. A single row holds:
+tab items on the left (Overview · Movers & Trends · Analysis), and a
+`.tab-right-group` on the right holding the README chip (opens the
+[Methodology Modal](#methodology-modal)) and the
+[Snapshot Picker](#tab-right-group). Both share the same underline baseline on
+desktop; the right group wraps below the tabs on mobile.
 
 ---
 
-## Snapshot Picker
+## Tab-Right Group
+
+The right side of the tab bar row carries two chips, right-aligned on the same
+underline baseline as the tab items:
+
+1. **README chip** — opens the [Methodology Modal](#methodology-modal).
+2. **Snapshot picker** — dropdown chip that switches which historical snapshot
+   drives the tab content.
+
+Both share the chip chassis below (24px, `var(--b-r02)` fill, `0.5px`
+`var(--line-l2)` border, `var(--radius-ct-s)`). Wrap below the tab row on
+mobile.
+
+### Snapshot Picker
 
 Pure view filter — switches which historical snapshot drives the tab content.
 Never mutates data, never changes the header timestamp.
@@ -237,8 +211,8 @@ Never mutates data, never changes the header timestamp.
 **Behavior**:
 
 - Lists all available historical snapshots (most recent first), defaults to latest.
-- Filters Overview / Movers / Analysis only. Methodology is static; picker is
-  hidden (`visibility: hidden`, keeps layout) there.
+- Filters all tabs (Overview / Movers / Analysis). Methodology is a modal and
+  static — it no longer participates in snapshot selection.
 - "Δ vs prior" calculations on the selected tab use the snapshot immediately
   before the picked one.
 - First-load smoothness: picker hidden entirely when only 1 snapshot exists.
@@ -249,40 +223,88 @@ First run produces today only — do **not** fake-backfill past dates from
 current SDK queries, since point-in-time calls return *currently revised*
 data, not real historical state.
 
-**Visual** — minimal inline trigger (no button chrome), label + value + sub +
-caret. Menu is a dropdown with tier-colored active state.
+**Visual** — chip trigger (value + caret only, no inline label), matching the
+README chip so the right group reads as one cluster. Menu is a dropdown, opens
+right-aligned when inside the tab row.
 
 ```css
-/* Extends design-components.md#dropdown — only screener-unique overrides below:
-   inline trigger (no button chrome), m1 hover/active tint, sub-label styles. */
+/* Tab-right group — sits on the same row as the tabs, right-aligned */
+.tab-wrapper-row { display:flex; align-items:flex-end; justify-content:space-between;
+  gap: var(--spacing-m); flex-wrap:nowrap;
+  border-bottom: 1px solid var(--line-l07); }
+.tab-wrapper-row .tab.tab-underline { flex:1 1 auto; min-width:0; border-bottom:none;
+  overflow-x:auto; scrollbar-width:none; }
+.tab-wrapper-row .tab.tab-underline::-webkit-scrollbar { display:none; }
+.tab-wrapper-row .tab-right-group { display:flex; align-items:center;
+  gap: var(--spacing-xs); flex-shrink:0; align-self:flex-end; padding-bottom:11px; }
+@media (max-width: 768px) {
+  .tab-wrapper-row { flex-wrap:wrap; }
+  .tab-wrapper-row .tab-right-group { padding-bottom:0; margin-bottom: var(--spacing-s); }
+}
+
+/* Shared chip chassis — applied to both README button and snapshot trigger */
+.tab-chip { display:inline-flex; align-items:center; gap: var(--spacing-xxs);
+  height:24px; margin:0; padding: var(--spacing-xxxs) var(--spacing-xs);
+  background: var(--b-r02); border: 0.5px solid var(--line-l2);
+  border-radius: var(--radius-ct-s);
+  font:inherit; font-size:12px; line-height:20px; letter-spacing:0.12px;
+  color: var(--text-n9); cursor:pointer;
+  transition: background .15s, border-color .15s; }
+.tab-chip:hover, .tab-chip.is-open,
+.filter-dropdown.open .tab-chip { background: var(--b-r03); border-color: var(--line-l9); }
+
+/* README chip — icon only */
+.tab-readme-icon { width:14px; height:14px; }
+.tab-readme:hover .tab-readme-icon { filter: brightness(0); }
+
+/* Snapshot picker — extends design-components.md#dropdown for the menu */
 .filter-dropdown { position:relative; display:inline-flex; align-items:center; }
-.filter-dropdown-trigger { background:transparent; border:none; padding:0 0 6px 0;
-  font-size:12px; line-height:20px; color:var(--text-n9); cursor:pointer;
-  display:inline-flex; align-items:center; gap:var(--spacing-xs); transition:color .15s; }
-.filter-dropdown-trigger:hover,
-.filter-dropdown.open .filter-dropdown-trigger { color:var(--main-m1); }
-.filter-dropdown-label     { font-size:12px; color:var(--text-n5); }
-.filter-dropdown-value     { color:var(--text-n9); display:inline-flex; align-items:baseline; gap:6px; }
-.filter-dropdown-value-sub,
-.filter-dropdown-item-sub  { font-size:11px; color:var(--text-n5); }
-.filter-dropdown-item-sub  { margin-left: var(--spacing-s); }
-.filter-dropdown-caret { display:inline-block; width:12px; height:12px;
-  background-color:var(--text-n2); transition:transform .15s, background-color .15s;
+.filter-dropdown-value     { display:inline-flex; align-items:baseline; gap:4px; }
+.filter-dropdown-value-sub { font-size:11px; color:var(--text-n5); }
+.filter-dropdown-caret { width:12px; height:12px; background-color:var(--text-n2);
+  transition:transform .15s;
   -webkit-mask:url('https://alva-ai-static.b-cdn.net/icons/arrow-down-f2.svg') no-repeat center/contain;
           mask:url('https://alva-ai-static.b-cdn.net/icons/arrow-down-f2.svg') no-repeat center/contain; }
-.filter-dropdown.open .filter-dropdown-caret { transform:rotate(180deg); background-color:var(--main-m1); }
-.filter-dropdown-menu { position:absolute; top:calc(100% + 6px); right:0; min-width:220px;
+.filter-dropdown.open .filter-dropdown-caret { transform:rotate(180deg); }
+.filter-dropdown-menu { position:absolute; top:calc(100% + 6px); left:0; min-width:220px;
+  padding: var(--spacing-xxxs); z-index:100; display:none;
   background:var(--b0-container); border:0.5px solid var(--line-l2);
-  border-radius:var(--radius-pop-dropdown); box-shadow:var(--shadow-s);
-  padding:var(--spacing-xxs); z-index:100; display:none; }
+  border-radius:var(--radius-pop-dropdown); box-shadow:var(--shadow-s); }
 .filter-dropdown.open .filter-dropdown-menu { display:block; }
+.tab-wrapper-row .tab-snapshot .filter-dropdown-menu { left:auto; right:0; }
 .filter-dropdown-item { display:flex; justify-content:space-between; align-items:baseline;
-  width:100%; padding:var(--spacing-xs) var(--spacing-s);
+  width:100%; padding: var(--spacing-xs) var(--spacing-s);
   font-size:14px; line-height:22px; color:var(--text-n9);
   background:transparent; border:none; cursor:pointer; text-align:left;
   border-radius:var(--radius-ct-s); }
+.filter-dropdown-item-sub { font-size:11px; color:var(--text-n5); margin-left: var(--spacing-s); }
 .filter-dropdown-item:hover { background:var(--grey-g01); }
 .filter-dropdown-item.active { background:var(--main-m1-10); color:var(--main-m1); }
+```
+
+**HTML skeleton** — README chip + snapshot picker in the right group:
+
+```html
+<div class="tab-wrapper-row">
+  <div class="tab tab-underline tab-l" data-tab-group="main">
+    <div class="tab-item active" data-tab="overview">Overview</div>
+    <div class="tab-item" data-tab="trends">Movers &amp; Trends</div>
+    <div class="tab-item" data-tab="analysis">Analysis</div>
+  </div>
+  <div class="tab-right-group">
+    <button type="button" class="tab-chip tab-readme" data-modal-open="methodology-modal">
+      <img class="tab-readme-icon" src="https://alva-ai-static.b-cdn.net/icons/researcher-l1.svg" alt="" />
+      <span>README</span>
+    </button>
+    <div class="filter-dropdown tab-snapshot" id="snap-filter">
+      <button type="button" class="tab-chip" aria-haspopup="listbox" aria-expanded="false">
+        <span class="filter-dropdown-value">—</span>
+        <span class="filter-dropdown-caret"></span>
+      </button>
+      <div class="filter-dropdown-menu" role="listbox"></div>
+    </div>
+  </div>
+</div>
 ```
 
 ---
@@ -414,23 +436,29 @@ picker is hidden per its own rules).
 inside the digest container, so bullets, bold labels, and paragraphs all
 pick up the design system's shared markdown styles without re-spec.
 
-**Visual**:
+**Visual** — reuse widget primitives, no new classes:
 
-```css
-/* Outer container only — inner markdown rendering is handled by
-   .markdown-container --m from design-components.md. Do not re-spec
-   ul / li / strong here. */
-.daily-digest { background: var(--grey-g01); border-radius: var(--radius-ct-l);
-  padding: var(--spacing-l) var(--spacing-xl);
-  margin-bottom: var(--spacing-l); }
-.daily-digest-meta { font-size: 11px; color: var(--text-n5);
-  margin-top: var(--spacing-s); letter-spacing: 0.11px; }
+```html
+<div class="widget-card" style="margin-bottom: var(--spacing-xl);">
+  <div class="widget-body" style="background: var(--grey-g01);">
+    <div class="free-text-body">
+      <div class="markdown-container markdown-container--m">
+        <script type="text/markdown">…ADK body…</script>
+      </div>
+    </div>
+  </div>
+</div>
 ```
 
-Meta line below the body: `Digest · <timestamp EST> · <source>` — e.g.
-`Digest · Apr 16, 2026 9:58 PM · ADK`, or `· fallback` when `body` is
-empty (in which case render `churn_line` as a single line in place of
-the markdown body).
+`.widget-card` / `.widget-body` / `.free-text-body` come from
+design-widgets.md; `.markdown-container --m` from design-components.md. Do
+not spec a screener-unique `.daily-digest` class and do not re-style
+`ul / li / strong` — the markdown container already handles that.
+
+Meta line is rendered inside the markdown body as a final italic line
+(`*Digest · Apr 16, 2026 9:58 PM · ADK*`, or `*Digest · fallback*` when
+`body` is empty and only `churn_line` is shown). No separate CSS class
+needed.
 
 ### Row anchor
 
@@ -467,53 +495,26 @@ most relevant metric (e.g. market cap, entry date) and make that column primary.
 
 ### Ranked Table
 
-Built on the Table Card base from design-widgets.md. Screener-specific
-additions: horizontal scroll, sticky `#` and `id` columns on the left,
-sticky caret column on the right, expandable rows.
+Use the Table Card base verbatim from design-widgets.md (`.table-card` +
+`.table-row` + `.table-cell`, `gap: var(--spacing-m)` for column spacing,
+`initTableAlignment` for column widths, `overflow-x: auto` for horizontal
+scroll). Do **not** re-spec cell padding, row layout, or column sizing.
 
-Structural rules:
+Screener-only additions:
 
-- Each `.table-row` is its own box (`min-width: max-content`) so its background
-  and bottom border cover every cell — including cells that overflow during
-  horizontal scroll.
-- Row content is inset `var(--spacing-m)` from the left via `padding-left`;
-  right inset comes from the 40px sticky caret cell. Dividers span the full
-  table-card width.
-- Column 1 (`#`, 48px) and column 2 (the row's `id`, 88px) are pinned left.
-  Their `box-shadow` extends the cell background leftward to cover the row's
-  `padding-left` and the flex gap between them — otherwise scrolled content
-  bleeds through.
-- Hover tint is applied via an `::after` overlay (z-index 3) so the tint is
-  uniform across sticky and non-sticky cells (avoids double-stacking of
-  semi-transparent `--b-r02`).
-- When a row is expanded, hide its bottom border — the expand-panel below
-  carries the divider instead.
+- Expandable rows — `.table-row.expandable` gets `cursor: pointer` and a
+  hover tint (`var(--b-r02)`). When open, hide the row's bottom border —
+  the `.expand-panel` below carries the divider.
+- Expand caret — rightmost column renders a `.expand-caret` that rotates
+  180° when the row is open.
 
 ```css
-#rankings-table .table-row { position: relative;
-  padding-left: var(--spacing-m);
-  box-sizing: border-box; min-width: max-content;
-  border-bottom: 1px solid var(--line-l07); }
-#rankings-table .expand-panel { position: sticky; left: 0;
-  padding: var(--spacing-xl) var(--spacing-m) var(--spacing-xxl);
-  box-sizing: border-box;
-  border-bottom: 1px solid var(--line-l07); }
-#rankings-table .caret-cell { position: sticky; right: 0; z-index: 2;
-  background: var(--b0-page); }
-#rankings-table .table-row .table-cell:nth-child(1),
-#rankings-table .table-row .table-cell:nth-child(2) {
-  position: sticky; z-index: 2; background: var(--b0-page);
-  box-shadow: calc(-1 * var(--spacing-m)) 0 0 var(--b0-page); }
-#rankings-table .table-row .table-cell:nth-child(1) { left: var(--spacing-m); }
-#rankings-table .table-row .table-cell:nth-child(2) {
-  left: calc(var(--spacing-m) + 48px + var(--spacing-m)); }
-#rankings-table .table-row.expandable { cursor: pointer; }
-#rankings-table .table-row.expandable::after {
-  content: ''; position: absolute; inset: 0;
-  background: transparent; pointer-events: none;
-  z-index: 3; transition: background .15s; }
-#rankings-table .table-row.expandable:hover::after { background: var(--b-r02); }
+#rankings-table .table-row.expandable { cursor: pointer; transition: background .15s; }
+#rankings-table .table-row.expandable:hover { background: var(--b-r02); }
 #rankings-table .table-row.expandable.open { border-bottom-color: transparent; }
+#rankings-table .expand-panel {
+  padding: var(--spacing-xl) var(--spacing-m) var(--spacing-xxl);
+  border-bottom: 1px solid var(--line-l07); }
 #rankings-table > .table-body > .table-row:last-child,
 #rankings-table > .table-body > .expand-panel:last-child { border-bottom: none; }
 
@@ -549,7 +550,7 @@ use `var(--token)` directly in `element.style.background`.
   background: var(--line-l07); border-radius: var(--radius-ct-xs);
   overflow: hidden; flex-shrink: 0; }
 .score-bar-fill { height: 100%; border-radius: var(--radius-ct-xs); transition: width .4s; }
-.score-value { font-size: 14px; min-width: 24px; letter-spacing: 0.14px; }
+.score-value { font-size: 14px; font-weight: 400; min-width: 24px; letter-spacing: 0.14px; }
 ```
 
 ### Band Pill
@@ -587,6 +588,7 @@ since a universe of 500 rows × one placeholder pill is pure visual noise.
 ```css
 .band-pill, .flag-pill, .delta-tag {
   display:inline-flex; align-items:center; justify-content:center;
+  font-family:'Delight', -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight:400; white-space:nowrap;
   min-width:40px; padding:1px 6px;
   font-size:12px; line-height:20px; letter-spacing:0.12px;
@@ -611,7 +613,7 @@ since a universe of 500 rows × one placeholder pill is pure visual noise.
 .flag-pill.soft  { background: var(--main-m5-10); color: var(--main-m5); }
 .flag-pill.hard  { background: var(--main-m4-10); color: var(--main-m4); }
 .flag-pill .flag-extra-count { color: var(--text-n7);
-  font-size:10px; line-height:16px; margin-left: var(--spacing-xxxs); }
+  font-size:10px; font-weight:400; line-height:16px; margin-left: var(--spacing-xxxs); }
 ```
 
 ### Expand Row
@@ -632,8 +634,10 @@ Skip components that don't add insight.
 
 ### Price / K-line
 
-Use the Chart Card base from design-widgets.md. K-line / candlestick by
-default, or a line chart for assets without OHLC.
+Copy the Chart Card **template** from `design-widgets.md#chart-card` verbatim
+(structural invariants — `.chart-body.chart-dotted-background`, inside-body
+legend, required watermark — apply). K-line / candlestick by default, or a
+line chart for assets without OHLC.
 
 **Interval by screener cadence** (rule of thumb: interval ≤ update cadence,
 enough bars to see the pattern the screener cares about):
@@ -663,7 +667,8 @@ primitive — spec it here because design-widgets.md doesn't cover gauges.
 - Progress color = score color (same breakpoints as Score Bar).
 - Center: big number (40px, weight 400, `var(--text-n9)`) + band label (12px,
   weight 500, tinted to score color) stacked via `rich` formatter.
-- Card container = Chart Card with dotted background, center-aligned.
+- Card container = Chart Card template verbatim
+  (`.chart-body.chart-dotted-background` + watermark), center-aligned.
 
 ### Factor Breakdown
 
@@ -674,19 +679,20 @@ Sits in a `grey-g01` widget body, flex column, justify center. Same widget
 title size as the Gauge card so row heights match.
 
 ```css
-.breakdown-title { font-size:12px; color:var(--text-n5); margin-bottom: var(--spacing-s); }
+.breakdown-title { font-size:12px; color:var(--text-n5);
+  letter-spacing:0.12px; margin-bottom: var(--spacing-s); }
 .breakdown-row { display:flex; align-items:center; padding: var(--spacing-xs) 0;
   font-size:14px; gap: var(--spacing-s);
   border-bottom:1px solid var(--line-l05); }
 .breakdown-row:last-child { border-bottom:none; }
-.breakdown-name { width:110px; color:var(--text-n9); }
+.breakdown-name { width:110px; color:var(--text-n9); letter-spacing:0.14px; }
 .breakdown-bar  { flex:1; height:6px; background:var(--line-l07);
   border-radius:3px; overflow:hidden; min-width:60px; }
 .breakdown-bar-fill { height:100%; border-radius:3px; transition: width .5s; }
 .breakdown-raw { width:72px; text-align:right; color:var(--text-n7);
-  font-size:12px; font-variant-numeric:tabular-nums; }
+  font-size:12px; letter-spacing:0.12px; font-variant-numeric:tabular-nums; }
 .breakdown-pts { width:68px; text-align:right; color:var(--text-n9);
-  font-size:12px; font-variant-numeric:tabular-nums; }
+  font-size:12px; font-weight:400; letter-spacing:0.12px; font-variant-numeric:tabular-nums; }
 ```
 
 ### Flag Card
@@ -707,18 +713,19 @@ bar only (no border/outline), tier-colored. Grid is auto-fit
 .flag-card::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; }
 .flag-card.hard::before { background: var(--main-m4); }
 .flag-card.soft::before { background: var(--main-m5); }
-.flag-card-title { font-size:12px; margin-bottom: var(--spacing-xxs);
+.flag-card-title { font-size:12px; letter-spacing:0.12px; margin-bottom: var(--spacing-xxs);
   display:flex; align-items:center; gap: var(--spacing-xxs); }
 .flag-card.hard .flag-card-title { color: var(--main-m4); }
 .flag-card.soft .flag-card-title { color: var(--main-m5); }
-.flag-card-tier { font-size:10px; padding:1px 6px; line-height:16px;
-  border-radius: var(--radius-ct-xs); }
+.flag-card-tier { font-size:10px; font-weight:400; letter-spacing:0.1px;
+  padding:1px 6px; line-height:16px; border-radius: var(--radius-ct-xs); }
 .flag-card.hard .flag-card-tier { background: var(--main-m4-10); }
 .flag-card.soft .flag-card-tier { background: var(--main-m5-10); }
 .flag-card-threshold { font-family:'JetBrains Mono', monospace;
-  font-size:11px; padding:1px 6px; border-radius: var(--radius-ct-xs);
+  font-size:11px; letter-spacing:0.11px; padding:1px 6px;
+  border-radius: var(--radius-ct-xs);
   background: var(--b-r02); color: var(--text-n7); }
-.flag-card-body { color: var(--text-n7); margin-top: var(--spacing-xxs); }
+.flag-card-body { color: var(--text-n7); letter-spacing:0.12px; margin-top: var(--spacing-xxs); }
 ```
 
 ---
@@ -760,21 +767,27 @@ depending on sign.
 .mover-card { background: var(--grey-g01); border-radius: var(--radius-ct-l);
   padding: var(--spacing-m) var(--spacing-l) var(--spacing-xs); min-height:160px; }
 .mover-card-header { display:flex; align-items:center; gap: var(--spacing-xs);
-  margin-bottom: var(--spacing-s); }
+  margin-bottom: var(--spacing-s); min-width:0; }
 .mover-icon { width:22px; height:22px; border-radius: var(--radius-ct-s);
   display:flex; align-items:center; justify-content:center;
-  font-size:13px; color: var(--b-common-white); flex-shrink:0; }
-.mover-card-label { font-size:14px; color: var(--text-n9); }
-.mover-card-count { font-size:12px; color: var(--text-n5); margin-left:auto; }
+  font-size:13px; font-weight:400; color: var(--b-common-white); flex-shrink:0; }
+.mover-card-label { font-size:14px; font-weight:400; letter-spacing:0.14px;
+  color: var(--text-n9);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
+.mover-card-count { font-size:12px; color: var(--text-n5);
+  letter-spacing:0.12px; margin-left:auto; flex-shrink:0; }
 .mover-row { display:flex; align-items:center; justify-content:space-between;
-  padding: var(--spacing-xs) 0; border-bottom:1px solid var(--line-l05); font-size:13px; }
+  padding: var(--spacing-xs) 0; border-bottom:1px solid var(--line-l05);
+  font-size:13px; letter-spacing:0.13px; }
 .mover-row:last-child { border-bottom:none; }
-.mover-ticker { color: var(--main-m1); }
+.mover-ticker { color: var(--main-m1); font-weight:400; letter-spacing:0.13px; }
 .mover-name { font-size:11px; color: var(--text-n5);
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  max-width:90px; margin-left: var(--spacing-xxs); }
-.mover-detail { font-size:12px; }
+  max-width:90px; margin-left: var(--spacing-xxs); letter-spacing:0.11px; }
+.mover-detail { font-size:12px; font-weight:400; letter-spacing:0.12px;
+  white-space:nowrap; flex-shrink:0; }
 .mover-empty { font-size:12px; color: var(--text-n5);
+  line-height:20px; letter-spacing:0.12px;
   padding: var(--spacing-s) 0; text-align:center; }
 ```
 
@@ -782,8 +795,10 @@ depending on sign.
 
 **Applies to**: both.
 
-Composite bar + line chart showing basket size & aggregate stat over time. Use
-the Chart Card base from design-widgets.md.
+Composite bar + line chart showing basket size & aggregate stat over time.
+Copy the Chart Card **template** from `design-widgets.md#chart-card` verbatim
+(structural invariants — `.chart-body.chart-dotted-background`, inside-body
+legend, required watermark — apply).
 
 Screener-specific ECharts rules:
 
@@ -800,7 +815,7 @@ Screener-specific ECharts rules:
 ```css
 .trend-empty { background: var(--grey-g01); border-radius: var(--radius-ct-l);
   padding: var(--spacing-xxxxl) var(--spacing-l); text-align:center;
-  font-size:14px; color: var(--text-n5); line-height:22px; }
+  font-size:14px; color: var(--text-n5); line-height:22px; letter-spacing:0.14px; }
 ```
 
 ---
@@ -815,8 +830,11 @@ doesn't. Examples:
 - Distribution histograms / boxplots
 - Correlation matrix between factors
 
-Every chart goes in a Chart Card (design-widgets.md) with an
-`.analysis-caption` sitting between the title and the chart body:
+Every chart uses the Chart Card **template** from
+`design-widgets.md#chart-card` verbatim (structural invariants —
+`.chart-body.chart-dotted-background`, inside-body legend, required
+watermark — apply), with an `.analysis-caption` sitting between the title
+and the chart body:
 
 ```css
 .analysis-caption { font-size:12px; color: var(--text-n5); line-height:20px;
@@ -833,9 +851,45 @@ Common screener analysis charts (ECharts rules on top of Chart Card defaults):
 
 ---
 
-## Tab 4 — Methodology
+## Methodology Modal
 
-Always include — explain how the screener works. Pick the subsections that apply:
+Always include — explain how the screener works. Lives in a **modal**,
+triggered by the README chip in the [tab-right group](#tab-right-group).
+
+### Trigger & overlay
+
+The README chip (`.tab-readme`) carries `data-modal-open="methodology-modal"`.
+Clicking it opens the modal; overlay click, close-X, and `Esc` all dismiss.
+Body scroll locks while open.
+
+Modal base comes from `design-components.md#modal`. Screener-specific override:
+panel `max-width: 896px` (narrower than the 960px base — methodology content
+is text-dense, shorter line length reads better). Everything else (overlay
+`var(--main-m7)`, panel radius/border, title typography, close icon) inherits
+from the base spec — do not re-spec.
+
+```css
+/* Screener override only — base modal spec in design-components.md#modal */
+#methodology-modal .modal-panel { max-width: 896px; }
+```
+
+```html
+<div class="modal-overlay" id="methodology-modal" aria-hidden="true">
+  <div class="modal-panel" role="dialog" aria-labelledby="methodology-modal-title">
+    <div class="modal-title">
+      <span id="methodology-modal-title">README</span>
+      <div class="modal-close" data-modal-close="methodology-modal" aria-label="Close"></div>
+    </div>
+    <div class="modal-body">
+      <!-- method-section blocks below -->
+    </div>
+  </div>
+</div>
+```
+
+### Content subsections
+
+Pick the subsections that apply — shape follows the screener's nature:
 
 - One-paragraph plain-English overview (always)
 - Worked example (re-derive #1 from raw inputs) — for composite scores
@@ -847,6 +901,9 @@ Always include — explain how the screener works. Pick the subsections that app
 
 Skip subsections that don't apply (a momentum screener may have no factor
 weights; a binary filter screener has no scoring formula).
+
+**Performance tip** — lazy-render the modal body the first time it opens, not
+on page load; methodology is rarely the first thing a user wants.
 
 ### Method Section
 
@@ -872,31 +929,35 @@ and `.method-limit-list` for caveats.
   width:100%; box-sizing:border-box; }
 .factor-row:first-child { padding-top: 0; }
 .factor-row:last-child  { border-bottom: none; padding-bottom: 0; }
-.factor-name { width:160px; font-size:14px; color: var(--text-n9); flex-shrink:0; }
-.factor-weight-label { width:40px; font-size:14px; color: var(--text-n7);
-  text-align:right; flex-shrink:0; font-variant-numeric: tabular-nums; }
+.factor-name { width:160px; font-size:14px; font-weight:400; letter-spacing:0.14px;
+  color: var(--text-n9); flex-shrink:0; }
+.factor-weight-label { width:40px; font-size:14px; letter-spacing:0.14px;
+  color: var(--text-n7); text-align:right; flex-shrink:0;
+  font-variant-numeric: tabular-nums; }
 .factor-bar-track { flex:1; height:6px; background: var(--line-l07);
   border-radius:3px; overflow:hidden; }
 .factor-bar-fill  { height:100%; border-radius:3px; }
-.factor-desc { font-size:13px; color: var(--text-n5); line-height:22px; }
+.factor-desc { font-size:13px; color: var(--text-n5); line-height:22px;
+  letter-spacing:0.13px; }
 .band-row .factor-name { width:72px; }
 .band-row .factor-weight-label { width:60px; text-align:left; color: var(--text-n9); }
 .band-row .factor-desc { flex:1; }
 
 /* Filter rules / formula code */
 .method-label { font-size:14px; font-weight:500; line-height:22px;
-  margin-bottom: var(--spacing-xs); color: var(--text-n9); }
+  letter-spacing:0.14px; margin-bottom: var(--spacing-xs); color: var(--text-n9); }
 .method-label.hard { color: var(--main-m4); }
 .method-label.soft { color: var(--main-m5); }
 .method-block { margin-bottom: var(--spacing-m); }
 .method-block:last-child { margin-bottom: 0; }
 .method-code { font-family:'JetBrains Mono', monospace;
-  font-size:12px; line-height:20px; color: var(--text-n7);
-  margin-top: var(--spacing-m); }
+  font-size:12px; line-height:20px; letter-spacing:0.12px;
+  color: var(--text-n7); margin-top: var(--spacing-m); }
 
 /* Limitations / caveats */
 .method-limit-list { list-style:none; padding:0; margin:0; }
 .method-limit-list li { font-size:13px; color: var(--text-n7); line-height:20px;
+  letter-spacing:0.13px;
   padding: var(--spacing-xs) 0 var(--spacing-xs) var(--spacing-l);
   border-bottom:1px solid var(--line-l05); position:relative; }
 .method-limit-list li:first-child { padding-top: 0; }
@@ -938,15 +999,17 @@ Three parts:
   margin-top: var(--spacing-s); }
 .worked-example-header { display:flex; align-items:baseline;
   gap: var(--spacing-xs); margin-bottom: var(--spacing-s); flex-wrap: wrap; }
-.worked-example-ticker { font-size:18px; color: var(--main-m1); line-height:28px; }
-.worked-example-score { font-size:13px; color: var(--text-n7); }
+.worked-example-ticker { font-size:18px; font-weight:400; letter-spacing:0.18px;
+  color: var(--main-m1); line-height:28px; }
+.worked-example-score { font-size:13px; letter-spacing:0.13px; color: var(--text-n7); }
 .worked-example-rows { font-family:'JetBrains Mono', monospace;
-  font-size:12px; line-height:20px; color: var(--text-n7); }
+  font-size:12px; line-height:20px; letter-spacing:0.12px; color: var(--text-n7); }
 .worked-example-total { font-family:'JetBrains Mono', monospace;
-  font-size:13px; color: var(--text-n9);
+  font-size:13px; font-weight:400; letter-spacing:0.13px; color: var(--text-n9);
   padding-top: var(--spacing-s); margin-top: var(--spacing-s);
   border-top: 1px solid var(--line-l05); }
-.worked-example-verify { font-size:12px; margin-top: var(--spacing-s);
+.worked-example-verify { font-size:12px; letter-spacing:0.12px;
+  margin-top: var(--spacing-s);
   padding: var(--spacing-xs) var(--spacing-s); border-radius: var(--radius-ct-s);
   background: var(--main-m3-10); color: var(--main-m3);
   display:inline-flex; align-items:center; gap: var(--spacing-xxs); line-height:20px; }
