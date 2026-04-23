@@ -23,13 +23,14 @@ reference it here by name — do not re-spec it.
 
 Structural:
 
+- [Screener Variants](#screener-variants) — **read first** to know which components apply
 - [Page Layout](#page-layout)
-- [Header](#header) · [Snapshot Picker](#snapshot-picker)
+- [Header](#header) · [Daily TLDR Card](#daily-tldr-card) · [Snapshot Picker](#snapshot-picker)
 - [Tab 1 — Overview](#tab-1--overview)
 - [Tab 2 — Movers & Trends](#tab-2--movers--trends-optional)
 - [Tab 3 — Analysis](#tab-3--analysis-optional)
 - [Tab 4 — Methodology](#tab-4--methodology)
-- [Cron](#cron)
+- [Cron](#cron) · [Push Notifications](#push-notifications--daily-tldr)
 
 Screener-unique components (CSS inline):
 
@@ -38,6 +39,39 @@ Screener-unique components (CSS inline):
 - [Expand Row](#expand-row) · [Factor Breakdown](#factor-breakdown) · [Gauge Ring](#gauge-ring)
 - [Movers Card](#movers-card) · [Basket Trend Chart](#basket-trend-chart)
 - [Method Section](#method-section) · [Worked Example](#worked-example)
+
+---
+
+## Screener Variants
+
+A screener is one of two shapes. Pick the variant first — every downstream
+component section is tagged `**Applies to**: scored | basket | both` so you
+know whether to include it.
+
+| Shape | When to use | Ranking logic |
+|---|---|---|
+| **Scored** | Rows have a composite score (weighted factor combine). Order = score. | Rank by score desc. Band pill maps score → tier. |
+| **Basket** | Pass/fail inclusion — row is either in or out. No score. | Order by the most relevant raw metric (market cap, entry date, etc.). |
+| **Hybrid** | Basket with a secondary score for tie-breaking or ordering. | Treat as **scored** for component choices but keep basket-style churn. |
+
+Component matrix (✓ = include, ✗ = omit, △ = include with variant-specific rules):
+
+| Component | Scored | Basket | Notes |
+|---|---|---|---|
+| [Columns: Rank / Score / Δ Score](#columns) | ✓ | ✗ | Basket uses "Days in basket" / "Entry date" instead. |
+| [Columns: Inclusion signal](#columns) | ✗ | ✓ | Basket only — "Days in basket", "Entry date", "Exit reason". |
+| [Score Bar](#score-bar) | ✓ | ✗ | Requires a score column. |
+| [Band Pill](#band-pill) | ✓ | ✗ | Score-tier label. |
+| [Delta Tag / Δ Score](#delta-tag--delta-score) | ✓ | △ | Basket: rank Δ only if a secondary sort metric is stable across snapshots. |
+| [Flag Pill / Flag Card](#flag-pill) | ✓ | ✓ | Both benefit. |
+| [Expand Row](#expand-row) | △ | △ | Different layouts — see section. |
+| [Gauge Ring](#gauge-ring) | ✓ | ✗ | Needs a score. |
+| [Factor Breakdown](#factor-breakdown) | ✓ | ✗ | Needs weighted factors. |
+| [Movers Card](#movers-card) | ✓ | ✓ | Scored: Entries/Dropouts/Top Gainers/Decliners. Basket: Entries/Exits only. |
+| [Basket Trend Chart](#basket-trend-chart) | ✓ | ✓ | Both — shows basket size + an aggregate stat over time. |
+| [Worked Example](#worked-example) | ✓ | ✗ | Only meaningful when there's a formula to re-derive. |
+| [Daily TLDR Card](#daily-tldr-card) | ✓ | ✓ | Both — ADK-summarized snapshot vs prior. |
+| [Push Notifications](#push-notifications--daily-tldr) | ✓ | ✓ | Shares the TLDR payload; skip when churn is empty (basket). |
 
 ---
 
@@ -104,6 +138,52 @@ flex row with meta pills) and the pills themselves:
   width:6px; height:6px; background:var(--main-m3); border-radius:50%; }
 @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
 ```
+
+---
+
+## Daily TLDR Card
+
+**Applies to**: both.
+
+The twin of the [push notification](#push-notifications--daily-tldr). Sits
+directly under the header so users opening the playbook see the same summary
+they'd see in a push. 1–3 sentences, ADK-generated from today's snapshot vs
+prior: what changed, what drove it, what to watch.
+
+**Content rules**:
+
+- Lead with *change*, not the full basket. If nothing changed, say so in one
+  line ("No new entries, drivers unchanged.") rather than padding.
+- Name the 1–2 factors or flags responsible — not every factor in the table.
+- No buy/sell language. This is observational ("cluster breadth widened to 29
+  insiders"), not directional ("strong buy signal on TSM").
+- Do not cite facts that don't come from the row data or published feeds. ADK
+  synthesizes the numbers already present; it does not introduce new numbers.
+
+**Generation**:
+
+- Prompt ADK with: today's top-N rows, yesterday's top-N, churn (entries /
+  dropouts), factor-delta lookup, a short schema of field semantics.
+- Hard cap the response: 3 sentences, ≤ 280 chars total.
+- Cache per snapshot in `screener/summaries/tldr/<date>.json`. Regenerate only
+  when a new snapshot appears.
+- Deterministic fallback when ADK fails — reuse the push churn line verbatim.
+
+**Visual**:
+
+```css
+.tldr-card { background: var(--main-m1-05); border-left: 3px solid var(--main-m1);
+  border-radius: var(--radius-ct-l); padding: var(--spacing-m) var(--spacing-l);
+  margin-bottom: var(--spacing-l); display: flex; gap: var(--spacing-m);
+  align-items: flex-start; }
+.tldr-card-icon { flex-shrink: 0; width: 20px; height: 20px; color: var(--main-m1); }
+.tldr-card-body { font-size: 14px; line-height: 22px; color: var(--text-n9); }
+.tldr-card-meta { font-size: 11px; color: var(--text-n5); margin-top: var(--spacing-xxs);
+  letter-spacing: 0.11px; }
+```
+
+Meta line below the body: `TLDR · <timestamp> · <source>` (e.g. "TLDR · Apr 22,
+2026 · ADK" — or `· fallback` when ADK failed).
 
 ---
 
@@ -197,16 +277,17 @@ universe — the thing a user thinks of as "the row":
 
 ### Columns
 
+**Applies to**: scored | basket (pick the rows that match your variant)
+
 **Often-used** — pick what matters for *this* screener. None are mandatory:
 
-- Position: Rank (only if ranked, not a flat basket)
-- Score: composite score (only if there's a scoring formula; basket-style pass/fail
-  screeners omit this)
-- Identity: Name, Sector, Industry, Asset Class
-- Movement: Δ Rank, Δ Score (vs prior snapshot — only if Rank/Score exist)
-- Inclusion signal *(basket-style)*: "Days in basket", "Entry date", "Exit reason"
-- Risk/quality signals: Flag (descriptive label, tier-colored)
-- Relevant metrics: fundamentals / technicals / on-chain / etc.
+- Position: Rank *(scored)*
+- Score: composite score *(scored)*
+- Identity: Name, Sector, Industry, Asset Class *(both)*
+- Movement: Δ Rank, Δ Score *(scored — vs prior snapshot)*
+- Inclusion signal: "Days in basket", "Entry date", "Exit reason" *(basket)*
+- Risk/quality signals: Flag (descriptive label, tier-colored) *(both)*
+- Relevant metrics: fundamentals / technicals / on-chain / etc. *(both)*
 
 Order columns by importance left-to-right. If there's no Rank/Score, sort by the
 most relevant metric (e.g. market cap, entry date) and make that column primary.
@@ -276,6 +357,8 @@ Structural rules:
 
 ### Score Bar
 
+**Applies to**: scored.
+
 Score column combines a fill bar + numeric value, optional delta pill.
 
 Color rules (score → color). Apply via inline style on `.score-bar-fill`;
@@ -297,11 +380,16 @@ JS may use `var(--token)` directly in `element.style.background`.
 
 ### Band Pill
 
-Used on a scored screener to label the score tier. Four bands map 1:1 to the
-Alva main palette: `elite` (m3 green), `strong` (m1 teal), `average` (m5 amber),
-`weak` (m4 red). Suggested thresholds: 80+ / 70–79 / 60–69 / 0–59.
+**Applies to**: scored.
+
+Labels the score tier. Four bands map 1:1 to the Alva main palette: `elite`
+(m3 green), `strong` (m1 teal), `average` (m5 amber), `weak` (m4 red).
+Suggested thresholds: 80+ / 70–79 / 60–69 / 0–59.
 
 ### Delta Tag / Delta Score
+
+**Applies to**: scored (both tags). Basket: include only if rank ordering is
+stable across snapshots (i.e. a secondary sort metric that doesn't churn).
 
 Rank Δ (vs prior snapshot) → pill:
 
@@ -314,6 +402,8 @@ Score Δ → inline text (not a pill): green `up`, red `down`, grey `—`. Thres
 suppress when `|Δ| < 0.5`.
 
 ### Flag Pill
+
+**Applies to**: both.
 
 Shows the primary red flag in the table cell. `clean` (no flag) / `soft` /
 `hard`. When a row has multiple flags, show the first label plus `+N`.
@@ -351,17 +441,46 @@ Shows the primary red flag in the table cell. `clean` (no flag) / `soft` /
 
 ### Expand Row
 
+**Applies to**: both (layout differs — see below).
+
 Always include a **price/value chart** of the asset. Other blocks are optional —
-mix & match based on what reveals *why* the row is in the basket.
+mix & match based on what reveals *why* the row is in the basket. Every expand
+row should also carry a **[Row TLDR](#row-tldr)** — 1–2 sentences on *why this
+row ranks here today*.
 
 Layout: 8-col grid inside the expand panel.
 
-- Scored screener: row 1 = `col-4` Gauge Ring + `col-4` Factor Breakdown; row 2
-  = `col-8` Price/K-line chart; row 3 = Flag cards (auto-fit grid).
-- Unscored basket: row 1 = `col-8` Price/K-line; row 2 = custom narrative
-  blocks (peer comparison, news links, holdings, on-chain stats, etc.).
+- **Scored**: row 1 = `col-4` Gauge Ring + `col-4` Factor Breakdown; row 2
+  = `col-8` Price/K-line chart; row 3 = Row TLDR; row 4 = Flag cards (auto-fit).
+- **Basket**: row 1 = `col-8` Price/K-line; row 2 = Row TLDR; row 3 = custom
+  narrative blocks (peer comparison, news links, holdings, on-chain stats, etc.).
 
 Skip components that don't add insight.
+
+### Row TLDR
+
+**Applies to**: both.
+
+1–2 sentences (≤ ~160 chars) answering *why this row ranks here today*. Lead
+with the driver, not the description. Examples:
+
+- Scored: *"Leads the composite on cluster breadth (29 insiders) and a $10M CEO
+  purchase — weak name factor drags but doesn't offset."*
+- Basket: *"Joined the basket 12 days ago after the Q1 revision; price holding
+  above the entry-level 20d MA."*
+
+**Generation**: ADK-generated from row data + factor scores. Do not quote an
+LLM's factual claims — restrict ADK to *synthesizing* the numbers already in
+the row. Cache per snapshot; re-generate on new snapshots.
+
+```css
+.row-tldr { background: var(--grey-g01); border-radius: var(--radius-ct-l);
+  padding: var(--spacing-s) var(--spacing-m); margin-top: var(--spacing-m);
+  font-size: 13px; line-height: 20px; color: var(--text-n9); }
+.row-tldr::before { content: 'TLDR'; display: inline-block;
+  font-size: 10px; color: var(--text-n5); letter-spacing: 0.1px;
+  margin-right: var(--spacing-xs); vertical-align: 1px; }
+```
 
 ### Price / K-line
 
@@ -387,6 +506,8 @@ ECharts spec essentials (beyond design-widgets Chart Card defaults):
 
 ### Gauge Ring
 
+**Applies to**: scored.
+
 ECharts `gauge` in the expand panel's Composite Score card. Not a screener-
 unique primitive — spec it here because design-widgets.md doesn't cover gauges.
 
@@ -397,6 +518,8 @@ unique primitive — spec it here because design-widgets.md doesn't cover gauges
 - Card container = Chart Card with dotted background, center-aligned.
 
 ### Factor Breakdown
+
+**Applies to**: scored.
 
 Rows: name (110px) + horizontal bar (flex) + raw pts `/ 100` + weight `×N%`.
 Sits in a `grey-g01` widget body, flex column, justify center. Same widget
@@ -419,6 +542,8 @@ title size as the Gauge card so row heights match.
 ```
 
 ### Flag Card
+
+**Applies to**: both.
 
 Shown at the bottom of the expand panel when a row has any active flag. Accent
 bar only (no border/outline), tier-colored. Grid is auto-fit
@@ -465,11 +590,16 @@ Common building blocks (pick what fits):
 
 ### Movers Card
 
+**Applies to**: both (card set differs).
+
+- **Scored**: Entries · Dropouts · Top Gainers · Top Decliners.
+- **Basket**: Entries · Exits only (Top Gainers/Decliners need a score).
+
 KPI-style: icon (22px, solid background) + label + count, then a list of rows.
 Icon background applied via inline style — use tokens:
 
 - Entries → `var(--main-m3)` (green)
-- Dropouts → `var(--main-m4)` (red)
+- Dropouts / Exits → `var(--main-m4)` (red)
 - Top Gainers → `var(--main-m3)` (green)
 - Top Decliners → `var(--main-m6)` (amber)
 
@@ -501,6 +631,8 @@ depending on sign.
 ```
 
 ### Basket Trend Chart
+
+**Applies to**: both.
 
 Composite bar + line chart showing basket size & aggregate stat over time. Use
 the Chart Card base from design-widgets.md.
@@ -632,9 +764,11 @@ list HTML.
 
 ### Worked Example
 
-For any scored screener — re-derive the current #1 from raw inputs. Always live
-inside a `.method-body`, rendered into an inline `.worked-example` card so it
-stands out from narrative paragraphs.
+**Applies to**: scored.
+
+Re-derive the current #1 from raw inputs. Always lives inside a `.method-body`,
+rendered into an inline `.worked-example` card so it stands out from narrative
+paragraphs.
 
 Three parts:
 
@@ -690,29 +824,78 @@ updates wastes credits and creates noise.
 
 ---
 
-## Push Notifications
+## Push Notifications / Daily TLDR
 
-The qualified list is the natural push payload — "who's in today?" is the whole point of a screener. Guidance below is screener-specific; see SKILL.md Pattern E for the mechanics.
+**Applies to**: both.
 
-**What to select** — lead with churn, not the full list:
+Push payload is the same TLDR rendered in the [Daily TLDR Card](#daily-tldr-card)
+— one source of truth, so the notification and the open-app experience don't
+drift. Mechanics live in SKILL.md Pattern E; rules below are screener-specific.
 
-- Scored screener: new entries + dropouts + top-N by score.
-- Basket/unscored: entries + exits only. Skip the push when both are empty.
+**When to send**:
 
-**Format** — compress to 3 lines so it renders inside a lock-screen preview:
+- First snapshot of the day (or first snapshot ever) → always send.
+- Subsequent snapshots → only if something *changed*: new entries, new
+  dropouts, rank churn in top-N, new flags, or a factor driver swap.
+- Basket variant: skip the push entirely when both churn sides are empty —
+  don't send "nothing happened" pings.
 
-- `title`: `<Screener> · <date>` — scannable identity + freshness.
-- Line 1 (churn): `🆕 New in Top N: <IDs> | 👋 Dropped: <IDs>`.
-- Line 2 (top pick): `⭐ Top: <ID> · <primary factor> <value> · <sector> · <secondary factor>`. Name the factors — recipients should see *why* this one leads, not just that it does. Pick the 1–2 factors that drove the score (e.g. `Drift 1.85`, `+16% EPS surprise`), not every column in the table.
-- Line 3: `Full list → <playbook URL>` for the click-through.
+**What to send** — ADK-generated TLDR + deterministic appendix.
 
-**Example** (PEAD Momentum screener):
-
-```text
-Title: PEAD Momentum · 2026-04-21
-🆕 New in Top 10: WAFD, ALLY | 👋 Dropped: TFC, SFNC
-⭐ Top: WAFD · Drift 1.85 · Financial Services · +16% EPS surprise
-Full list → https://alva.ai/u/stock-king/playbooks/post-earnings-drift-momentum
+```
+title: <Screener> · <date>
+line 1: <ADK TLDR, ≤ 2 sentences>
+line 2: 🆕 <new IDs> · 👋 <dropped IDs>          ← deterministic churn
+line 3: Full snapshot → <playbook URL>
 ```
 
-Basket/unscored variant: drop the `⭐ Top` line; keep churn + link. Skip the push entirely when both churn sides are empty.
+The ADK TLDR replaces the old hand-written "⭐ Top" line. It must:
+
+- Name the 1–2 factors or flags responsible for the change (e.g. "cluster
+  breadth widened to 29 insiders", not "moved up strongly").
+- Synthesize only data already in the row. No new numbers, no fabricated
+  context. If ADK can't produce a valid TLDR, fall back to the churn line
+  alone (drop line 1 entirely rather than mislead).
+- Stay observational — no buy/sell, no price targets, no timing calls.
+
+**Length budget**: ≤ 280 chars across lines 1 + 2 combined so it fits a
+lock-screen preview. ADK prompt should enforce the char cap; truncate on
+overflow rather than cut mid-sentence.
+
+**Example** (Insider Buying Clusters):
+
+```text
+Title: Insider Buying Clusters · 2026-04-22
+TSM leads on cluster breadth (29 insiders, +6 vs yesterday); PANW enters the
+top-5 after a $10M CEO purchase.
+🆕 PANW, NKE · 👋 ORCL
+Full snapshot → https://alva.ai/u/ivan/playbooks/insider-screener-v2
+```
+
+**Example** (basket, nothing material):
+
+```text
+Title: Quality Value Basket · 2026-04-22
+No new entries or exits; roster stable at 38 names.
+Full snapshot → https://alva.ai/u/ivan/playbooks/quality-value-screener-v2
+```
+
+(This one would be skipped under the "nothing happened" rule — example shown
+for format only.)
+
+**Implementation sketch** — the feed script produces a `tldr/<date>.json` that
+both the playbook HTML and the push cron read from, so the two stay in sync:
+
+```js
+// in the feed script, after computing today's ranking
+const tldr = await adk.summarize({
+  prompt: TLDR_PROMPT,
+  data: { today: topN, prior: priorTopN, churn, factorDeltas },
+  maxTokens: 120,
+});
+const churn = formatChurn(entries, exits);   // deterministic fallback
+await fs.write(
+  `screener/summaries/tldr/${today}.json`,
+  JSON.stringify({ tldr, churn, generatedAt: now, source: tldr ? 'adk' : 'fallback' })
+);
+```
