@@ -54,15 +54,21 @@ Returns JSON with structure:
   "playbook_id": 42,
   "name": "btc-momentum",
   "description": "...",
-  "latest_release": {
-    "version": "v1.0.0",
-    "feeds_dir": "./releases/v1.0.0/feeds/",
-    "feeds": [{ "feed_id": 100, "feed_major": 1 }]
-  }
+  "releases": [
+    {
+      "version": "v1.0.0",
+      "feeds": [
+        { "feed_id": 100, "feed_name": "btc-ema", "feed_major": 1 }
+      ]
+    }
+  ]
 }
 ```
 
-From `latest_release.feeds`, collect the feed IDs you need to inspect.
+`releases` is ordered newest-first, so `releases[0]` is the latest
+release. From `releases[0].feeds`, collect the feed refs you need to
+inspect — each entry carries both `feed_name` (for ALFS paths) and
+`feed_id` (for API calls).
 
 ---
 
@@ -80,15 +86,8 @@ the new playbook's UI.
 
 ## Step 3 — Read Code Layer (Feed Scripts)
 
-Each feed referenced in `playbook.json` has a symlink under the release's
-`feeds/` directory pointing to the feed's ALFS path.
-
-```bash
-alva fs readlink --path '/alva/home/{owner}/playbooks/{name}/releases/{version}/feeds/{feed_id}'
-# → {"target_path": "/alva/home/{owner}/feeds/{feed_name}"}
-```
-
-Then read the feed script source:
+Each entry in `releases[0].feeds` carries `feed_name` — use it to read
+the feed's script source directly:
 
 ```bash
 alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v1/src/index.js'
@@ -165,20 +164,16 @@ Extracted: owner = `alice`, name = `btc-momentum`.
 Agent reads:
 
 ```bash
-# 1. Metadata
+# 1. Metadata — releases[0].feeds carries feed_name + feed_id per ref
 alva fs read --path '/alva/home/alice/playbooks/btc-momentum/playbook.json'
 
 # 2. HTML source
 alva fs read --path '/alva/home/alice/playbooks/btc-momentum/index.html'
 
-# 3. Feed symlink → feed path
-alva fs readlink --path '/alva/home/alice/playbooks/btc-momentum/releases/v1.0.0/feeds/100'
-# → /alva/home/alice/feeds/btc-momentum
-
-# 4. Feed source code
+# 3. Feed source code (use feed_name from playbook.json)
 alva fs read --path '/alva/home/alice/feeds/btc-momentum/v1/src/index.js'
 
-# 5. (Optional) Sample data for schema understanding
+# 4. (Optional) Sample data for schema understanding
 alva fs read --path '/alva/home/alice/feeds/btc-momentum/v1/data/market/ohlcv/@last/3'
 ```
 
