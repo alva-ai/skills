@@ -5,10 +5,10 @@ Reference structure for any narrative-driven thematic thesis tracker (defense, A
 ## Design System Compliance (READ FIRST)
 
 Before writing HTML, read from the Alva skill:
-- `references/design-system.md` -- `.playbook-container` rule verbatim (max-width 2048px, 28px horizontal padding)
-- `references/design-widgets.md` -- **Chart Card / Metric Card / Table Card / Free Text Card / Feed Card** bases. Every surface in this template maps to one of these widgets; do not invent new card types or re-style widget internals.
-- `references/design-components.md` -- **Tab** (Underline / Pill), **Modal**, **Dropdown**, **Markdown** primitives.
-- `references/design-tokens.css` -- use spacing/color tokens as-is, do NOT override.
+- [references/design-system.md](../../references/design-system.md) -- `.playbook-container` rule verbatim (max-width 2048px, 28px horizontal padding)
+- [references/design-widgets.md](../../references/design-widgets.md) -- **Chart Card / Metric Card / Table Card / Free Text Card / Feed Card** bases. Every surface in this template maps to one of these widgets; do not invent new card types or re-style widget internals.
+- [references/design-components.md](../../references/design-components.md) -- **Tab** (Underline / Pill), **Modal**, **Dropdown**, **Markdown** primitives.
+- [references/design-tokens.css](../../references/design-tokens.css) -- use spacing/color tokens as-is, do NOT override.
 
 This template shares its shell (tab bar + README chip + methodology modal) with the screener template. Where screener has already specified a pattern, **reference `templates/screener/template.md` rather than re-specing it** -- matching surfaces must stay visually identical across playbook families.
 
