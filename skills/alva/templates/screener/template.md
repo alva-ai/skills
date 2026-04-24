@@ -7,9 +7,9 @@ Reference structure + screener-specific styling for any ranked-list screener
 
 ## Design System Compliance (READ FIRST)
 
-Before writing HTML, read `references/design-tokens.css` (tokens),
-`references/design-widgets.md` (Chart / Metric / Table Card bases), and
-`references/design-components.md` (Tab / Dropdown / Pill primitives). This
+Before writing HTML, read [references/design-tokens.css](../../references/design-tokens.css) (tokens),
+[references/design-widgets.md](../../references/design-widgets.md) (Chart / Metric / Table Card bases), and
+[references/design-components.md](../../references/design-components.md) (Tab / Dropdown / Pill primitives). This
 playbook only documents screener-unique rules on top of them — never re-spec
 a token or base that already exists.
 
