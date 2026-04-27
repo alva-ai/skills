@@ -356,6 +356,24 @@ When building sector or thematic dashboards with curated ticker lists:
 
 ---
 
+## Narrative Voice Rules
+
+All user-facing prose the agent writes — playbook `description` and
+`display_name`, hand-written HTML copy (hero text, intro cards, methodology
+modal body, chart footnotes, rationale paragraphs), and any ADK system
+prompts that produce narrative (TLDRs, digests, why-it-matters, delta
+bodies, push-line headlines) — must follow
+[narrative-voice.md](references/narrative-voice.md). Read that file before
+writing or generating any user-facing prose.
+
+The rules ban a specific list of AI-tell tokens and shapes (significance
+inflation, negative parallelism, rule-of-three, generic closers, em-dash
+overuse) and ship as a copy-paste system-prompt block with embedded
+few-shots for ADK calls. Pure structured fields (numbers, tickers, dates,
+enum labels, button labels) are exempt.
+
+---
+
 ## Capabilities & Common Workflows
 
 ### 1. ALFS (Alva FileSystem)
@@ -693,6 +711,7 @@ already configured.
 | [adk.md](references/adk.md) | Agent Development Kit: `adk.agent()` API, tool calling, ReAct loop, examples |
 | [search.md](references/search.md) | Content search SDKs: per-source usage, enrichment patterns, and gotchas for Twitter/X, news, Reddit, YouTube, podcasts, and web |
 | [secret-manager.md](references/secret-manager.md) | Secret upload, CRUD API, and runtime usage via `require("secret-manager")` |
+| [narrative-voice.md](references/narrative-voice.md) | Voice rules for user-facing prose: banned tokens/shapes, copy-paste ADK system-prompt block with few-shots |
 
 ---
 

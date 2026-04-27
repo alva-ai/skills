@@ -2,6 +2,10 @@
 
 A SDK for building LLM-powered agents with tool calling to enable agentic features.
 
+> **If your ADK call produces user-facing prose** (TLDR, digest, why-it-matters,
+> delta body, push line, etc.), include the voice block from
+> [narrative-voice.md](narrative-voice.md) verbatim in `system`.
+
 ## Quick Start
 
 ```javascript
