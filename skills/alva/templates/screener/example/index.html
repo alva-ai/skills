@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Senate Trading Screener - Alva</title>
+<title>Growth Inflection Screener - Alva</title>
 <link rel="stylesheet" href="https://alva-ai-static.b-cdn.net/design-system/design-tokens.css" />
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
 <style>
     /* ── Page-specific theme (everything else comes from tokens.css) ── */
     :root {
-        --theme-color: #1f3a5f;
-        --theme-color-soft: rgba(31,58,95,0.10);
-        --theme-grad:  linear-gradient(135deg, #1f3a5f 0%, #0f1d33 100%);
+        --theme-color: #5B4AA8;
+        --theme-color-soft: rgba(91,74,168,0.10);
+        --theme-grad:  linear-gradient(135deg, #5B4AA8 0%, #3D2A6B 100%);
     }
 
     html { height: 100%; overflow: hidden; }
@@ -746,7 +746,7 @@
   }
   .factor-row:first-child { padding-top: 0; }
   .factor-row:last-child { border-bottom: none; padding-bottom: 0; }
-  .factor-name { width: 220px; white-space: nowrap; font-size: 14px; font-weight:400; color: var(--text-n9); flex-shrink: 0; letter-spacing: 0.14px; }
+  .factor-name { width: 160px; font-size: 14px; font-weight:400; color: var(--text-n9); flex-shrink: 0; letter-spacing: 0.14px; }
   .factor-weight-label { width: 40px; font-size: 14px; color: var(--text-n7); text-align: right; flex-shrink: 0; font-variant-numeric: tabular-nums; letter-spacing: 0.14px; }
   .factor-bar-track { flex:1; height: 6px; background: var(--line-l07); border-radius: 3px; overflow: hidden; }
   .factor-bar-fill { height: 100%; border-radius: 3px; }
@@ -1151,13 +1151,13 @@
           <div class="free-text-body">
             <div class="markdown-container markdown-container--m">
               <script type="text/markdown">
-**Apr 27, 2026 &middot; Senate Conviction Digest**
+**Apr 27, 2026 &middot; Market Close Digest**
 
-- **Top of basket:** MSFT (Microsoft) holds #1 at Score 95 — 6 senators · 12 trades · $905K total purchase value over the trailing 90 days.
-- **Strong cohort:** GOOGL (Alphabet, #2 Score 76) and GS (Goldman Sachs, #3 Score 72) on broad senator participation.
-- **Average band:** AMZN (Amazon, #4 Score 70) and TSM (Taiwan Semi, #5 Score 69) round out the top five.
-- **Sector tilt:** Technology dominates the elite band; Financial Services contributes Goldman Sachs to the strong band.
-- **Next refresh:** 06:00 ET (6h cadence). Watch fresh disclosure filings as the 45-day reporting window cycles.
+- **Top of basket:** SHG (Shinhan Financial) holds #1 at Score 95 — gross-margin Δ +13.75pp · op-margin 100; Banks - Regional shows the strongest inflection.
+- **Strong cohort:** NMR (Nomura) at #2 (Score 77); PEG (PSEG) at #3 (Score 73) on +35.25pp GM acceleration.
+- **Average band:** IBKR (Interactive Brokers, #4 Score 69) and PCG (PG&amp;E, #5 Score 67) round out the top five.
+- **Sector tilt:** Financial Services dominates the elite band; Utilities and Energy contribute to the average band.
+- **Next refresh:** 06:00 ET (6h cadence). Watch earnings-driven repricing in mid-cap names with margin inflection.
               </script>
             </div>
           </div>
@@ -1262,9 +1262,9 @@
     <div id="analysis-content" style="display:none;">
       <div class="widget-grid">
         <div class="widget-card col-8">
-          <div class="widget-title"><span class="widget-title-text">Breadth &amp; Size Map &mdash; Senators &times; Total $</span></div>
+          <div class="widget-title"><span class="widget-title-text">Growth &amp; Margin Map &mdash; Rev YoY &times; GM Δ</span></div>
           <div class="analysis-caption">
-            Top-right = many senators + high total purchase value (broad-conviction zone). Color indicates band (Elite / Strong / Average / Weak); bubble size maps to total purchase value. Hover for details.
+            Top-right = high revenue growth + accelerating gross margin (inflection zone). Color indicates band (Elite / Strong / Average / Weak); bubble size maps to market cap. Hover for details.
           </div>
           <div class="widget-body chart-dotted-background" style="flex-direction:column;align-items:stretch;">
             <div class="chart-body">
@@ -1302,8 +1302,8 @@
     <div class="method-section">
       <h3>Overview in Plain English</h3>
       <div class="method-body">
-        <p>This strategy ingests the trailing 90 days of senator stock purchases (ETFs excluded), aggregates each ticker by distinct senator count, total dollar volume, and most-recent disclosure timestamp, and applies a hard filter requiring at least 2 distinct senators and at least $50K total purchase value.</p>
-        <p>The remaining tickers are scored using <strong>Breadth (senator count, 40%)</strong> + <strong>Size (log total $, 40%)</strong> + <strong>Freshness (hours since last buy, 20%)</strong> to produce a composite score from 0&ndash;100. The top 40 are output with red flag annotations.</p>
+        <p>This strategy screens the US mid-cap universe (market cap $5B&ndash;$50B) for companies showing fundamental inflection: positive revenue growth, four+ quarters of gross-margin data, and gross-margin acceleration in at least two of the last four quarters.</p>
+        <p>The remaining companies are scored using <strong>Growth (revenue, 40%)</strong> + <strong>Margin (gross-margin acceleration, 40%)</strong> + <strong>Safety (operating margin + current ratio, 20%)</strong> to produce a composite score from 0&ndash;100. The top 40 are output with red flag annotations.</p>
       </div>
     </div>
 
@@ -1323,25 +1323,25 @@
       <h3>Factor Weights</h3>
       <div class="method-body">
         <div class="factor-row">
-          <div class="factor-name">Breadth (Senator Count)</div>
+          <div class="factor-name">Growth (Revenue YoY)</div>
           <div class="factor-weight-label">40%</div>
           <div class="factor-bar-track"><div class="factor-bar-fill" style="width:100%;background:var(--main-m1);"></div></div>
         </div>
         <div class="factor-row">
-          <div class="factor-name">Size (Log Total $)</div>
+          <div class="factor-name">Margin (GM Acceleration)</div>
           <div class="factor-weight-label">40%</div>
           <div class="factor-bar-track"><div class="factor-bar-fill" style="width:100%;background:var(--main-m3);"></div></div>
         </div>
         <div class="factor-row">
-          <div class="factor-name">Freshness (Hours Since Last)</div>
+          <div class="factor-name">Safety (Op Margin + Current Ratio)</div>
           <div class="factor-weight-label">20%</div>
           <div class="factor-bar-track"><div class="factor-bar-fill" style="width:50%;background:var(--chart-violet1-main);"></div></div>
         </div>
         <div class="method-code">
-          breadthScore   = normalize( senatorCount )            // More senators = higher conviction<br>
-          sizeScore      = normalize( log10(totalValueUsd) )    // Larger purchases = higher signal<br>
-          freshnessScore = normalize( -hoursSinceLast )         // Recent buys outweigh stale clusters<br>
-          composite      = 0.40 &times; breadthScore + 0.40 &times; sizeScore + 0.20 &times; freshnessScore<br>
+          growthScore  = normalize( revenue growth YoY )         // Higher = better<br>
+          marginScore  = normalize( avg GM Δ over last 4 quarters ) // Higher = accelerating<br>
+          safetyScore  = 0.5 &times; norm(opMargin) + 0.5 &times; norm(currentRatio) // Stability<br>
+          composite    = 0.40 &times; growthScore + 0.40 &times; marginScore + 0.20 &times; safetyScore<br>
           <strong>score = clamp(0, 100, round( 45 + 50 &times; (composite &minus; min) / (max &minus; min) ))</strong>
         </div>
       </div>
@@ -1354,9 +1354,9 @@
           <div class="method-label">Hard Filters (fail = excluded)</div>
           <div class="markdown-container markdown-container--m">
             <script type="text/markdown">
-- ≥ 2 distinct senators — Single-senator clusters are excluded; we want corroborated conviction.
-- ≥ $50K total purchase value — Sub-$50K aggregate value is excluded as noise.
-- ETF / fund tickers excluded — Diversified vehicles do not represent a stock-specific thesis.
+- Revenue growth > 0 — Negative or zero TTM revenue growth is excluded.
+- ≥ 4 quarters of gross-margin data — Need enough history to detect acceleration.
+- GM acceleration in ≥ 2 of last 4 quarters — Margin must be inflecting up, not just stable.
             </script>
           </div>
         </div>
@@ -1364,8 +1364,8 @@
           <div class="method-label hard">Hard Flags (structural)</div>
           <div class="markdown-container markdown-container--m">
             <script type="text/markdown">
-- **Insufficient Breadth** — Fewer than 2 distinct senators; below the corroboration floor.
-- **Below Value Floor** — Total purchase value under $50K aggregate; signal too small to act on.
+- **Low Liquidity** — Current ratio < 1.0; near-term obligations may stress balance sheet.
+- **No Margin Acceleration** — Fewer than 2 of last 4 quarters showing GM uptick; trend is not yet inflecting.
             </script>
           </div>
         </div>
@@ -1373,9 +1373,9 @@
           <div class="method-label soft">Soft Flags (relative to current basket)</div>
           <div class="markdown-container markdown-container--m">
             <script type="text/markdown">
-- **Single Party** — All disclosed buyers come from one party; conviction may be partisan rather than broad.
-- **Stale Cluster** — Most recent purchase is more than 2 weeks old; freshness penalty already applied.
-- **One-Chamber Only** — Buying confined to House or Senate alone (no cross-chamber confirmation).
+- **Margin Leader** — GM Δ exceeds basket 75th percentile; standout pace of margin expansion. *(Active when basket valid GM Δ ≥ 20)*
+- **Decelerating** — Most recent quarter's GM Δ is weaker than the trailing 4-quarter average; momentum may be fading.
+- **Growth Below Avg** — Revenue YoY below basket 25th percentile; relatively weak growth among inflection candidates. *(Active when basket valid revGrowth ≥ 20)*
             </script>
           </div>
         </div>
@@ -1413,12 +1413,11 @@
       <div class="method-body">
         <div class="markdown-container markdown-container--m">
           <script type="text/markdown">
-- Senator trade disclosures (90-day lookback): Alva SDK \`@arrays/data/stock/person/senator-trading\`
+- Market cap, gross margin (MRQ), operating margin (MRQ), revenue growth, current ratio (MRQ): Alva SDK \`@arrays/data/financial-metrics/*\`
 - Company name, sector, industry: Alva SDK \`@arrays/data/stock/company/detail\`
-- Market cap (reference): Alva SDK \`@arrays/data/market-metrics/market-cap\`
 - Daily candlesticks: Alva SDK \`@arrays/data/stock/spot/ohlcv\`
 - Refresh cadence: Every 6 hours (Cron: \`0 */6 * * *\` UTC)
-- Universe: every individual-equity ticker (ETFs excluded) appearing in senator purchase disclosures over the trailing 90 days.
+- Universe: US mid-cap stocks ($5B–$50B), filtered for revenue growth > 0 and gross-margin acceleration evidence.
           </script>
         </div>
       </div>
@@ -1429,8 +1428,8 @@
       <div class="method-body">
         <div class="markdown-container markdown-container--m">
           <script type="text/markdown">
-- Senator purchase amounts are reported as ranges (e.g. "$1,001 - $15,000"); we use the midpoint, which can systematically understate or overstate the true notional value.
-- Disclosure has up to a 45-day reporting lag, so freshness reflects the timestamp of the disclosure observation rather than the trade itself.
+- Revenue growth is TTM YoY; companies recently exiting near-zero or negative revenue can produce extreme percentage values that should be interpreted cautiously.
+- Gross-margin acceleration is computed from quarterly MRQ data; smaller companies with limited history may receive lower margin scores even when fundamentals are improving.
 - Data reflects the SDK's most recent observation; revisions around earnings dates may cause temporary rank volatility.
 - The screening universe covers SDK-tracked US stocks with MC > $5B; small-caps and foreign cross-listings may not be fully covered.
           </script>
@@ -1510,7 +1509,7 @@
 <script>
 (function() {
   var API = 'https://api-llm.prd.alva.ai';
-  var BASE = '/api/v1/fs/read?path=/alva/home/sheer-ruan/feeds/senate-conviction-feed/v1/data';
+  var BASE = '/api/v1/fs/read?path=/alva/home/ivan/feeds/inflection-screener-v2-feed/v1/data';
   var P = {
     rankings: BASE + '/screener/rankings/@last/60',
     summary:  BASE + '/screener/summary/@last/60',
@@ -1518,10 +1517,11 @@
   };
   var STALE_MS = 12 * 60 * 60 * 1000; // 2x 6h cron cadence
 
+  /* Three-Factor palette: Alva chart tokens (chart-cyan1-1, chart-orange1-main, chart-pink1-main). */
   var FACTORS = [
-    { name:'Breadth',   key:'breadthScore',   weight:0.40, color:'#3d8bd1', desc:'Normalized senator count' },
-    { name:'Size',      key:'sizeScore',      weight:0.40, color:'#8fc13a', desc:'Normalized log10(total $)' },
-    { name:'Freshness', key:'freshnessScore', weight:0.20, color:'#a878dc', desc:'Normalized -hours since last' }
+    { name:'Growth',  key:'growthScore',  weight:0.40, color:'#117a7d', desc:'Normalized revenue YoY' },
+    { name:'Margin',  key:'marginScore',  weight:0.40, color:'#ff9800', desc:'Normalized gross-margin Δ' },
+    { name:'Safety',  key:'safetyScore',  weight:0.20, color:'#dc7aa5', desc:'Op margin + current ratio' }
   ];
   var BAND_LABEL = { elite:'Elite', strong:'Strong', average:'Average', weak:'Weak' };
 
@@ -1560,10 +1560,10 @@
   function fd(path) {
     return fetch(API + path).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); });
   }
-  /* Adapter: convert pre-migration nested records (detail/factors/metrics) into the flat schema. */
+  /* Adapter: convert pre-migration nested records into the flat schema. */
   function adaptRanking(r) {
     if (!r) return r;
-    if (r.ticker !== undefined) return r;
+    if (r.ticker !== undefined) { r._fmt = 'new'; return r; }
     var sm = window._SECTOR_MAP || {};
     var sec = sm[r.id] || {};
     var m = r.metrics || {};
@@ -1571,7 +1571,9 @@
     var fByName = {};
     f.forEach(function(x){ fByName[x.name] = x; });
     var score = +r.score || 0;
-    var trades = (r.detail && r.detail.trades) ? r.detail.trades.length : 0;
+    var marginPts = ((fByName['Margin Slope']||{}).pts || 0) + ((fByName['Margin Expansion']||{}).pts || 0);
+    var marginWeight = ((fByName['Margin Slope']||{}).weight || 0) + ((fByName['Margin Expansion']||{}).weight || 0);
+    var marginScore = marginWeight > 0 ? Math.round(marginPts * 100 / marginWeight) : 0;
     return {
       ticker: r.id,
       name: r.name || sec.name || '',
@@ -1579,23 +1581,20 @@
       industry: sec.industry || '',
       score: Math.round(score),
       band: score>=80?'elite':score>=70?'strong':score>=60?'average':'weak',
-      senatorCount: m.senator_count || 0,
-      totalValueUsd: m.total_value_usd || 0,
-      hoursSinceLast: (m.days_since_last||0) * 24,
-      partyCount: m.party_count || 0,
-      chamberCount: m.chamber_count || 0,
-      tradeCount: trades,
-      marketCap: m.market_cap || sec.marketCap || 0,
-      topSenator: m.top_senator || '',
-      topParty: m.top_party || '',
-      breadthScore: Math.round((fByName['Conviction']||{}).raw || 0),
-      sizeScore: Math.round((fByName['Volume ($)']||{}).raw || 0),
-      freshnessScore: Math.round((fByName['Recency']||{}).raw || 0),
+      revGrowth: m.rev_growth || 0,
+      gmDelta: m.gm_delta || 0,
+      opMargin: m.op_margin || 0,
+      currentRatio: m.current_ratio || 0,
+      marketCap: (m.market_cap_b || 0) * 1e9 || sec.marketCap || 0,
+      growthScore: Math.round((fByName['Rev Acceleration']||{}).raw || 0),
+      marginScore: marginScore,
+      safetyScore: Math.round((fByName['Safety']||{}).raw || 0),
       flagTier: (r.flags && r.flags[0]) ? r.flags[0].tier : '',
       flagLabel: (r.flags && r.flags[0]) ? r.flags[0].label : '',
       flagsCsv: (r.flags||[]).map(function(x){return x.label;}).join(', '),
       rank: r.rank,
-      date: r.date
+      date: r.date,
+      _fmt: 'old'
     };
   }
   function adaptSummary(s) {
@@ -1605,8 +1604,6 @@
       avgScore: Math.round(+s.avg_score || 0),
       totalPassed: +s.qualified_count || 0,
       totalScreened: +s.universe_size || 0,
-      totalSenators: +s.total_senators || 0,
-      totalTrades: +s.total_trades || 0,
       lastUpdated: +s.date || 0,
       date: s.date
     };
@@ -1931,8 +1928,8 @@
       },
       axisPointer: { link: [{ xAxisIndex:'all' }] },
       grid: [
-        { left: '60px', right: '16px', top: 4,     height: '62%' },
-        { left: '60px', right: '16px', top: '76%', height: '18%' }
+        { left: 56, right: 8, top: 4,     height: '62%' },
+        { left: 56, right: 8, top: '76%', height: '18%' }
       ],
       xAxis: [
         Object.assign({ type:'time', gridIndex:0 }, AX, { axisLabel:{ show:false } }),
@@ -1967,9 +1964,9 @@
       { label:'Score', flex:'1', mw:'160px', render:function(r){return sbHTML(r.score)+scoreDeltaTag(r, priorMap);} },
       { label:'Band', flex:'1', mw:'88px', render:function(r){ return '<span class="band-pill '+r.band+'">'+BAND_LABEL[r.band]+'</span>'; } },
       { label:'Rank', flex:'1', mw:'88px', render:function(r){ return deltaTag(r, priorMap); } },
-      { label:'Senators', flex:'1', mw:'88px', render:function(r){return (+r.senatorCount||0).toString();} },
-      { label:'Total $', flex:'1', mw:'108px', render:function(r){return fmtCap(+r.totalValueUsd||0);} },
-      { label:'Last Buy', flex:'1', mw:'108px', render:function(r){var h=+r.hoursSinceLast||0;if(h<24)return h.toFixed(0)+'h ago';var d=h/24;return d<30?d.toFixed(0)+'d ago':(d/30).toFixed(0)+'mo ago';} },
+      { label:'Rev YoY', flex:'1', mw:'96px', render:function(r){var v=Math.min(999,Math.max(-99,+r.revGrowth||0));return v.toFixed(1)+'%';} },
+      { label:'GM Δ',    flex:'1', mw:'88px', render:function(r){var v=+r.gmDelta||0;return (v>=0?'+':'')+v.toFixed(2)+'pp';} },
+      { label:'Op Mgn',  flex:'1', mw:'88px', render:function(r){return (+r.opMargin||0).toFixed(0);} },
       { label:'Mkt Cap', flex:'1', mw:'88px', render:function(r){return fmtCap(r.marketCap);} },
       { label:'Flag', flex:'1', mw:'88px', render:function(r){
         var labels = r.flagsCsv ? r.flagsCsv.split(',') : [];
@@ -1992,7 +1989,12 @@
     document.getElementById('entries-count').textContent = movers.entries.length;
     document.getElementById('dropouts-count').textContent = movers.dropouts.length;
     var renderList = function(arr, mode, max){
-      if (!arr.length) return '<div class="mover-empty">No changes</div>';
+      if (!arr.length) {
+        var msg = (mode==='gain') ? 'No score gains in this window'
+               : (mode==='decline') ? 'No score declines in this window'
+               : (mode==='entry') ? 'No new entries' : 'No dropouts';
+        return '<div class="mover-empty">'+msg+'</div>';
+      }
       return arr.slice(0, max||5).map(function(s){
         var detail = '';
         if (mode==='entry') detail = '<span class="mover-detail" style="color:#2a9b7d;">#'+s.rank+' · '+s.score+'</span>';
@@ -2115,16 +2117,19 @@
   function renderQualityMap(today) {
     var el = document.getElementById('quality-map-chart'); if (!el) return;
     var chart = chartInit(el);
-    var sens = today.map(function(s){return +s.senatorCount||0;});
-    var dollars = today.map(function(s){return Math.log10(Math.max(1000, +s.totalValueUsd||1000));});
-    var senMax = Math.max(3, Math.ceil(Math.max.apply(null, sens) + 1));
-    var dollarMin = Math.floor(Math.min.apply(null, dollars) * 10) / 10;
-    var dollarMax = Math.ceil(Math.max.apply(null, dollars) * 10) / 10;
+    function clipRev(v){ return Math.min(200, Math.max(-50, +v||0)); }
+    var revs = today.map(function(s){return clipRev(s.revGrowth);});
+    var gms = today.map(function(s){return +s.gmDelta||0;});
+    var revMin = Math.floor(Math.min.apply(null, revs.concat([-5])) / 10) * 10;
+    var revMax = Math.ceil(Math.max.apply(null, revs.concat([5])) / 10) * 10;
+    var gmMin = Math.floor(Math.min.apply(null, gms.concat([-2])));
+    var gmMax = Math.ceil(Math.max.apply(null, gms.concat([2])));
     var data = today.map(function(s){
-      var v = +s.totalValueUsd||0;
-      var size = Math.max(10, Math.min(40, Math.log10(Math.max(1000,v)) * 4));
+      var size = Math.max(10, Math.min(40, Math.log10((s.marketCap||1e9)/1e9 + 1) * 14));
+      var rev = clipRev(s.revGrowth);
+      var gm = +s.gmDelta||0;
       return {
-        value:[+s.senatorCount||0, Math.log10(Math.max(1000,v)), s.score, v, +s.senatorCount||0, v],
+        value:[rev, gm, s.score, s.marketCap, +s.revGrowth||0, gm],
         ticker:s.ticker, name:s.name, sector:s.sector, band:s.band,
         symbolSize:size,
         itemStyle:{color:bandColor(s.band), opacity:0.78, borderColor:'rgba(0,0,0,0.15)', borderWidth:0.5}
@@ -2159,18 +2164,23 @@
           }
           return '<div style="font-size:12px;color:'+TTC.title+';margin-bottom:6px;">'+escHTML(s.ticker)+' · '+escHTML(s.name||'')+'</div>'+
             row('Score', s.value[2]+' · '+BAND_LABEL[s.band], bandColor(s.band))+
-            row('Senators', s.value[4].toString())+
-            row('Total $', fmtCap(s.value[5]));
+            row('Rev YoY', Math.min(999,Math.max(-99,s.value[4])).toFixed(1)+'%')+
+            row('GM Δ', (s.value[5]>=0?'+':'')+s.value[5].toFixed(2)+'pp')+
+            row('Mkt Cap', fmtCap(s.value[3]));
         }
       },
       xAxis:Object.assign({
-        type:'value', min:0, max:senMax,
-        name:'Distinct Senators (more = broader conviction)', nameLocation:'middle', nameGap:28, nameTextStyle:NAME_STYLE
-      }, AX),
+        type:'value', min:revMin, max:revMax,
+        name:'Rev YoY % (clipped to ±200%)', nameLocation:'middle', nameGap:28, nameTextStyle:NAME_STYLE
+      }, AX, {
+        axisLabel:Object.assign({}, AX.axisLabel, { formatter:'{value}%' })
+      }),
       yAxis:Object.assign({
-        type:'value', min:dollarMin, max:dollarMax,
-        name:'log10(Total $) (higher = larger basket)', nameLocation:'middle', nameGap:40, nameTextStyle:NAME_STYLE
-      }, AX),
+        type:'value', min:gmMin, max:gmMax,
+        name:'GM Δ pp (positive = accelerating)', nameLocation:'middle', nameGap:40, nameTextStyle:NAME_STYLE
+      }, AX, {
+        axisLabel:Object.assign({}, AX.axisLabel, { formatter:'{value}pp' })
+      }),
       series:[{
         type:'scatter', data:data,
         label:{ show:true, position:'right', formatter:function(p){return p.data.ticker;}, fontSize:10, color:'rgba(0,0,0,0.5)', fontFamily:FONT, distance:4 },
@@ -2351,12 +2361,16 @@
   }
 
   function flagDefsFromSummary(summary) {
+    var gmP75 = summary && summary.basketGmDeltaP75 != null ? summary.basketGmDeltaP75 : '?';
+    var revP25 = summary && summary.basketRevGrowthP25 != null ? summary.basketRevGrowthP25 : '?';
+    var gmN = summary && summary.basketGmDeltaValidCount || 0;
+    var revN = summary && summary.basketRevGrowthValidCount || 0;
     return {
-      'Insufficient Breadth': { tier:'hard', threshold:'< 2 distinct senators', body:'Below the corroboration floor; not retained by hard filter.' },
-      'Below Value Floor': { tier:'hard', threshold:'total purchase value < $50K', body:'Aggregate dollar volume too small to act on as a stand-alone signal.' },
-      'Single Party': { tier:'soft', threshold:'all disclosed buyers from one party', body:'Conviction may reflect partisan rather than broad investor positioning.' },
-      'Stale Cluster': { tier:'soft', threshold:'last buy > 14 days ago', body:'Most recent purchase is more than two weeks old; the freshness penalty is already applied to the score.' },
-      'One-Chamber Only': { tier:'soft', threshold:'buyers all in House or all in Senate', body:'No cross-chamber confirmation of the conviction signal.' }
+      'Low Liquidity': { tier:'hard', threshold:'current ratio < 1.0', body:'Near-term obligations may strain balance sheet.' },
+      'No Margin Acceleration': { tier:'hard', threshold:'<2 of last 4 quarters with GM uptick', body:'Margin trend is not yet inflecting.' },
+      'Margin Leader': { tier:'soft', threshold:'GM Δ > basket P75 ('+gmP75+'pp, n='+gmN+')', body:'Standout pace of gross-margin expansion within the basket.' },
+      'Decelerating': { tier:'soft', threshold:'most recent qtr GM Δ < trailing 4Q average', body:'Margin momentum may be fading; verify against latest filing.' },
+      'Growth Below Avg': { tier:'soft', threshold:'rev YoY < basket P25 ('+revP25+'%, n='+revN+')', body:'Relatively weak growth within the current inflection basket.' }
     };
   }
 
@@ -2705,7 +2719,8 @@
       // Each snapshot = one bucket (6h cadence → many per day)
       var todayKey = new Date().toLocaleDateString('en-CA',{timeZone:'America/New_York'});
       var buckets = grouped.map(function(g){
-        return { key:g.date, dateMs:g.date, stocks:g.stocks, summary:sumByDate[g.date]||null, label:snapLabel(g.date, todayKey) };
+        var fmt = (g.stocks[0] && g.stocks[0]._fmt) || 'new';
+        return { key:g.date, dateMs:g.date, stocks:g.stocks, summary:sumByDate[g.date]||null, label:snapLabel(g.date, todayKey), fmt:fmt };
       });
 
       // Default = latest
@@ -2726,13 +2741,19 @@
 
       function buildForIdx(idx) {
         var curr = buckets[idx];
-        /* Pick the snapshot closest to 24h before curr (real day-over-day). */
+        /* Pick the snapshot closest to 24h before curr that shares the same schema-format
+           (score scale changed at migration); fall back to nearest if none same-fmt. */
         var target = curr.dateMs - 24 * 3600 * 1000;
         var prior = null, bestDiff = Infinity;
+        var priorFallback = null, fbDiff = Infinity;
         for (var pi = 0; pi < idx; pi++) {
           var diff = Math.abs(buckets[pi].dateMs - target);
-          if (diff < bestDiff) { bestDiff = diff; prior = buckets[pi]; }
+          if (buckets[pi].fmt === curr.fmt) {
+            if (diff < bestDiff) { bestDiff = diff; prior = buckets[pi]; }
+          }
+          if (diff < fbDiff) { fbDiff = diff; priorFallback = buckets[pi]; }
         }
+        if (!prior) prior = priorFallback;
         var priorMap = null;
         if (prior) {
           priorMap = {}; prior.stocks.forEach(function(s){ priorMap[s.ticker] = s; });

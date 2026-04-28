@@ -701,8 +701,21 @@
   .small { font-size:12px; color: var(--text-n5); }
   .loading { color: var(--text-n5); font-size:13px; padding: var(--spacing-m); }
 
-  .basket-expand-grid { display: grid; grid-template-columns: 2fr 1fr; gap: var(--spacing-l); }
-  @media (max-width: 900px) { .basket-expand-grid { grid-template-columns: 1fr; } }
+  /* ── Basket expand panel ── */
+  .inner-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: var(--spacing-l); margin-bottom: var(--spacing-l); align-items: stretch; }
+  @media (max-width: 900px) { .inner-grid { grid-template-columns: 1fr; } }
+  .inner-grid > .widget-card { height: 100%; min-height: 240px; }
+  .inner-grid > .widget-card > .chart-body { flex: 1; min-height: 0; display: flex; align-items: stretch; justify-content: stretch; }
+  .gauge-container { width:100%; height:100%; min-height:200px; }
+  .breakdown-container { width:100%; display:flex; flex-direction:column; justify-content:center; }
+  .breakdown-title { font-size:15px; font-weight:500; color:var(--text-n9); margin-bottom:var(--spacing-m); }
+  .breakdown-row { display:flex; align-items:center; padding:var(--spacing-xs) 0; gap:var(--spacing-s); border-bottom:1px solid var(--line-l05); }
+  .breakdown-row:last-child { border-bottom:none; }
+  .breakdown-name { width:120px; font-size:14px; color:var(--text-n9); flex-shrink:0; }
+  .breakdown-bar { flex:1; height:6px; background:var(--grey-g03); border-radius:3px; overflow:hidden; min-width:60px; }
+  .breakdown-bar-fill { height:100%; border-radius:3px; transition:width .5s; }
+  .breakdown-raw { width:72px; text-align:right; font-size:12px; color:var(--text-n5); font-variant-numeric:tabular-nums; }
+  .breakdown-pts { width:36px; text-align:right; font-size:12px; color:var(--text-n5); }
 
   /* Changelog */
   .changelog-entry { padding: 6px 0; border-bottom: 1px solid var(--line-l05); font-size:13px; }
@@ -842,7 +855,7 @@
   .event-ids{display:flex;gap:var(--spacing-xxs);flex-wrap:wrap;margin-top:var(--spacing-xs)}
 
   /* Feed (current-only sep + ids extras, plus flex avatar) */
-  .feed-avatar{width:22px;height:22px;border-radius:100px;flex-shrink:0;background:var(--grey-g02);display:inline-flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-n7)}
+  .feed-avatar{width:22px;height:22px;border-radius:100px;flex-shrink:0;position:relative;overflow:hidden;background:var(--grey-g01);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-n7)}
   .feed-info .sep{color:var(--text-n2)}
   .feed-ids{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px}
 
@@ -883,6 +896,7 @@
   .attr-line-simple b{color:var(--text-n9);font-weight:500}
   .attr-line-simple b.up{color:var(--main-m3)}
   .attr-line-simple b.down{color:var(--main-m4)}
+  .attr-line-simple{margin:0 0 var(--spacing-m) 0 !important}
 
   /* Change log (cx-) */
   .cx-log{display:flex;flex-direction:column;gap:var(--spacing-xs);padding:var(--spacing-m);background:var(--grey-g01);border-radius:var(--radius-ct-l)}
@@ -899,8 +913,10 @@
   .cx-row .cx-reason{color:var(--text-n7);flex:1;min-width:0}
 
   /* Related-news pill + expand list */
-  .related-pill{display:inline-flex;align-items:center;gap:var(--spacing-xxs);padding:2px 10px;border-radius:999px;background:var(--main-m1-10);color:var(--main-m1);font-size:11px;letter-spacing:0.11px;cursor:pointer;user-select:none;border:1px solid var(--main-m1-10)}
-  .related-pill:hover{background:var(--main-m1);color:#fff}
+  .related-pill{display:inline-flex;align-items:center;gap:2px;padding:1px 6px;border-radius:var(--radius-ct-s);background:var(--grey-g01);color:var(--text-n5);font-size:11px;line-height:18px;letter-spacing:0.11px;cursor:pointer;user-select:none;border:1px solid transparent;transition:background 0.15s, color 0.15s}
+  .related-pill:hover{background:var(--grey-g02);color:var(--text-n7)}
+  .related-pill img{transition:opacity 0.15s, filter 0.15s;opacity:0.55}
+  .related-pill:hover img{opacity:1}
   .related-list{display:flex;flex-direction:column;gap:var(--spacing-xxs);padding:var(--spacing-s);background:var(--b-r02);border-radius:var(--radius-ct-s)}
   .related-item{display:flex;gap:var(--spacing-s);padding:var(--spacing-xs) var(--spacing-s);background:var(--b0-container);border-radius:var(--radius-ct-xs);transition:background 0.15s}
   .related-item:hover{background:var(--b-r03)}
@@ -1084,7 +1100,6 @@
           <span class="widget-title-sub">1-year normalized (base = 100)</span>
         </div>
         <div id="attr-line-simple" class="attr-line-simple">Benchmark attribution loading…</div>
-        <div class="chart-caption"><span class="cap-h">How to read:</span>Basket above <b>PAVE</b> orange = real thematic alpha beyond infrastructure beta. The SMH and SPY comparison lines (semis + market) give you two extra reference frames. Breaking below SPY dashed grey = the thesis is failing; re-read Risks.</div>
         <div class="chart-body chart-dotted-background">
           <div class="chart-legend">
             <div class="legend-item"><span class="legend-line" style="background:#49a3a6"></span>Basket</div>
@@ -1104,7 +1119,6 @@
           <span class="widget-title-text">Layer performance · 3M</span>
           <span class="widget-title-sub">which dimension is working</span>
         </div>
-        <div class="chart-caption"><span class="cap-h">How to read:</span>The three layers are <b>Power</b> (turbines, nuclear, grid), <b>Compute</b> (GPUs, HBM, fabs), and <b>Deployment</b> (EPC crews, data-center real estate). The longest bar is where capital is currently buying. All three positive = the AI bottleneck is simultaneously binding across power, compute, and deployment; the thesis is working. One layer sharply negative while others rally = the bottleneck in that layer is loosening.</div>
         <div class="chart-body chart-dotted-background">
           <div id="chart-layers" class="chart-container" style="height:240px"></div>
           <div class="alva-watermark"><img src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg" alt="Alva"></div>
@@ -1123,7 +1137,6 @@
           <span class="widget-title-text">Holdings</span>
           <span class="widget-title-sub">click any row to expand — real 180-day price + role breakdown</span>
         </div>
-        <div class="chart-caption"><span class="cap-h">How to read:</span>Grouped by <b>layer</b>, sorted by market cap. The <b>α vs PAVE</b> and <b>α vs SMH</b> columns are the ones to watch — positive α vs both = the name is earning the bottleneck premium independent of infra or semi beta. Click any row for the real 180-day chart plus the four-row role breakdown (role / why now / what the market may be missing / what breaks this expression).</div>
         <div class="table-card" id="basket-table"></div>
       </div>
     </div>
@@ -1539,6 +1552,7 @@
       SOCIAL = lSocial.map(function(s){
         return {
           source: 'X', author: s.author_handle || s.author_name || 'X', handle: s.author_handle || '',
+          avatar: s.author_avatar || s.authorAvatar || s.avatar || '',
           time: s.date, likes: s.likes || 0,
           ids: (s.ids || '').split(',').filter(Boolean),
           sentiment: s.sentiment || 'Neutral',
@@ -1859,7 +1873,7 @@
       + '<div class="table-cell num">1Y</div>'
       + '<div class="table-cell num">α vs PAVE</div>'
       + '<div class="table-cell num">α vs SMH</div>'
-      + '<div class="table-cell">Valuation</div>'
+      + '<div class="table-cell num">Valuation</div>'
       + '<div class="table-cell caret-cell"></div>'
       + '</div>'
     );
@@ -1882,26 +1896,31 @@
         + '<div class="table-cell num '+upDownClass(b.ret_1y)+'">'+fmtPct(b.ret_1y)+'</div>'
         + '<div class="table-cell num '+upDownClass(b.alpha_pave)+'">'+fmtPts(b.alpha_pave)+'</div>'
         + '<div class="table-cell num '+upDownClass(b.alpha_smh)+'">'+fmtPts(b.alpha_smh)+'</div>'
-        + '<div class="table-cell"><span class="tag '+valClass+'">'+valLabel+'</span></div>'
+        + '<div class="table-cell num"><span class="tag '+valClass+'">'+valLabel+'</span></div>'
         + '<div class="table-cell caret-cell"><span class="expand-caret"></span></div>'
         + '</div>'
         + '<div class="expand-panel" data-exp="'+i+'" style="display:none">'
-        +   '<div class="basket-expand-grid">'
-        +     '<div class="widget-card" style="min-height:260px;">'
-        +       '<div class="widget-title"><span class="widget-title-text">1-year price chart</span></div>'
-        +       '<div class="chart-body chart-dotted-background" style="flex:1;height:0;min-height:200px;border-radius:var(--radius-ct-s);">'
-        +         '<div id="rx-chart-'+b.id+'" class="chart-container"></div>'
-        +         '<div class="alva-watermark"><img src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg" alt="Alva"></div>'
-        +       '</div>'
+        +   '<div class="inner-grid">'
+        +     '<div class="widget-card">'
+        +       '<div class="widget-title"><span class="widget-title-text">Composite Score</span></div>'
+        +       '<div class="chart-body chart-dotted-background" style="border-radius:var(--radius-ct-s);"><div id="rx-gauge-'+b.id+'" class="gauge-container"></div><div class="alva-watermark"><img src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg" alt="Alva"></div></div>'
         +     '</div>'
         +     '<div class="widget-card">'
-        +       '<div class="widget-title"><span class="widget-title-text">Why it&rsquo;s in the basket</span></div>'
-        +       '<div class="ft-card" style="padding:var(--spacing-m);display:flex;flex-direction:column;gap:var(--spacing-xxs);flex:1;">'
-        +         '<div><h3>Theme role</h3><p>'+esc(b.role)+'</p></div>'
-        +         '<div><h3>Why now</h3><p>'+esc(b.why)+'</p></div>'
-        +         '<div><h3>What the market may be missing</h3><p>'+esc(b.miss)+'</p></div>'
-        +         '<div><h3>What breaks this expression</h3><p>'+esc(b.breaks)+'</p></div>'
+        +       '<div class="widget-title"><span class="widget-title-text">Factor Breakdown</span></div>'
+        +       '<div class="chart-body" style="padding:var(--spacing-l);background:var(--grey-g01);border-radius:var(--radius-ct-s);"><div id="rx-bd-'+b.id+'" class="breakdown-container"></div></div>'
+        +     '</div>'
+        +   '</div>'
+        +   '<div class="widget-card">'
+        +     '<div class="widget-title">'
+        +       '<span class="widget-title-text">'+esc(b.id)+' price</span>'
+        +       '<span class="widget-title-sub">last 200 sessions</span>'
+        +     '</div>'
+        +     '<div class="chart-body chart-dotted-background" style="border-radius:var(--radius-ct-s);">'
+        +       '<div class="chart-legend">'
+        +         '<div class="legend-item"><span class="legend-line" style="background:#49a3a6"></span>'+esc(b.id)+' close</div>'
         +       '</div>'
+        +       '<div id="rx-chart-'+b.id+'" class="chart-container" style="height:320px;"></div>'
+        +       '<div class="alva-watermark"><img src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg" alt="Alva"></div>'
         +     '</div>'
         +   '</div>'
         + '</div>'
@@ -1964,10 +1983,127 @@
     state.charts.scatter = sc;
   }
 
+  /* ── Score helpers (mag7-capex pattern) ── */
+  function scoreColorHex(s){
+    if (s >= 80) return '#2a9b7d';
+    if (s >= 70) return '#49a3a6';
+    if (s >= 60) return '#e6a91a';
+    return '#e05357';
+  }
+  function bandLabel(s){
+    if (s >= 80) return 'Elite';
+    if (s >= 70) return 'Strong';
+    if (s >= 60) return 'Average';
+    return 'Weak';
+  }
+  function computeThesisScore(b){
+    // Rev Trajectory ×25% — based on rev_yoy (decimal, e.g. 0.71 = 71%)
+    let revPts = 50;
+    if (b.rev_yoy != null){
+      let r = b.rev_yoy * 100;
+      revPts = r > 30 ? 100 : r > 10 ? Math.round(50 + (r - 10) * 2.5) : r > 0 ? Math.round(r * 5) : Math.max(0, Math.round(50 + r * 2));
+    }
+    // Momentum ×25% — alpha vs PAVE, normalised to 0-100
+    let momPts = 50;
+    if (b.alpha_pave != null){
+      momPts = b.alpha_pave > 20 ? 100 : b.alpha_pave > 0 ? Math.round(50 + b.alpha_pave * 2.5) : Math.max(0, Math.round(50 + b.alpha_pave * 1.5));
+    }
+    // Pillar Fit ×20% — always 100, they earned their spot in the basket
+    let pillarPts = 100;
+    // Val Discipline ×15% — cheap=high score, rich=low score
+    let valPts = 50;
+    if (b.pe_pct != null){ valPts = Math.min(100, Math.max(0, Math.round(100 - b.pe_pct))); }
+    else if (b.val === 'cheap'){ valPts = 82; }
+    else if (b.val === 'rich'){ valPts = 18; }
+    // Catalyst Prox ×15% — alpha vs SPY as proxy
+    let catPts = 50;
+    if (b.alpha_spy != null){
+      catPts = b.alpha_spy > 20 ? 100 : b.alpha_spy > 0 ? Math.round(50 + b.alpha_spy * 2.5) : Math.max(0, Math.round(50 + b.alpha_spy * 1.5));
+    }
+    let factors = [
+      { name:'Rev Trajectory', pts: Math.min(100, Math.max(0, revPts)), weight:0.25 },
+      { name:'Momentum',       pts: Math.min(100, Math.max(0, momPts)), weight:0.25 },
+      { name:'Pillar Fit',     pts: pillarPts,                          weight:0.20 },
+      { name:'Val Discipline', pts: Math.min(100, Math.max(0, valPts)), weight:0.15 },
+      { name:'Catalyst Prox',  pts: Math.min(100, Math.max(0, catPts)), weight:0.15 }
+    ];
+    let composite = Math.round(factors.reduce(function(s,f){ return s + f.pts * f.weight; }, 0));
+    return { composite: composite, factors: factors };
+  }
+
   function renderExpandChart(id){
+    let b = BASKET.filter(function(x){ return x.id === id; })[0];
+    if (!b) return;
+
+    /* ── Gauge ── */
+    let gaugeDom = document.getElementById('rx-gauge-'+id);
+    if (gaugeDom && !echarts.getInstanceByDom(gaugeDom)){
+      let sd = computeThesisScore(b);
+      let sc = sd.composite;
+      let gc = echarts.init(gaugeDom);
+      var scColor = scoreColorHex(sc);
+      gc.setOption({
+        series:[
+          {
+            type:'pie',
+            radius:['72%','90%'],
+            center:['50%','50%'],
+            silent:true,
+            animation:false,
+            label:{ show:false },
+            labelLine:{ show:false },
+            itemStyle:{ borderRadius:0, borderWidth:0 },
+            data:[ { value:1, itemStyle:{ color:'rgba(0,0,0,0.06)' } } ],
+            z:1
+          },
+          {
+            type:'pie',
+            radius:['72%','90%'],
+            center:['50%','50%'],
+            startAngle:90,
+            silent:true,
+            animation:false,
+            label:{ show:false },
+            labelLine:{ show:false },
+            itemStyle:{ borderRadius:10, borderWidth:0 },
+            data:[
+              { value: sc, name:'score', itemStyle:{ color: scColor } },
+              { value: Math.max(0.01, 100 - sc), name:'rest', itemStyle:{ color:'transparent' } }
+            ],
+            z:2
+          }
+        ],
+        graphic:[
+          { type:'text', left:'center', top:'38%', style:{ text:String(Math.round(sc)), fontSize:40, fontFamily:FONT, fontWeight:400, fill:'rgba(0,0,0,0.9)', textAlign:'center' } },
+          { type:'text', left:'center', top:'62%', style:{ text:bandLabel(sc), fontSize:12, fontFamily:FONT, fontWeight:500, fill:scColor, textAlign:'center' } }
+        ]
+      });
+      try {
+        if (window.ResizeObserver) {
+          var ro = new ResizeObserver(function(){ try { gc.resize(); } catch(e){} });
+          ro.observe(gaugeDom);
+        }
+        window.addEventListener('resize', function(){ try { gc.resize(); } catch(e){} });
+      } catch(e){}
+
+      /* ── Factor Breakdown ── */
+      let bdDom = document.getElementById('rx-bd-'+id);
+      if (bdDom && !bdDom.dataset.rendered){
+        bdDom.dataset.rendered = '1';
+        bdDom.innerHTML = sd.factors.map(function(f){
+          return '<div class="breakdown-row">'
+            + '<span class="breakdown-name">'+f.name+'</span>'
+            + '<div class="breakdown-bar"><div class="breakdown-bar-fill" style="width:'+f.pts+'%;background:'+scoreColorHex(f.pts)+';"></div></div>'
+            + '<span class="breakdown-raw">'+f.pts+' / 100</span>'
+            + '<span class="breakdown-pts">&times;'+(f.weight*100).toFixed(0)+'%</span>'
+            + '</div>';
+        }).join('');
+      }
+    }
+
+    /* ── Price chart ── */
     let el = document.getElementById('rx-chart-'+id); if (!el) return;
     if (echarts.getInstanceByDom(el)) return;
-    let b = BASKET.filter(function(x){ return x.id === id; })[0];
     let data = (b && Array.isArray(b.prices)) ? b.prices : [];
     let c = echarts.init(el);
     if (!data.length){
@@ -1980,17 +2116,24 @@
       return;
     }
     c.setOption({
-      grid:{ top:12, right:12, bottom:8, left:8, containLabel:true },
+      grid:{ top:8, right:16, bottom:8, left:8, containLabel:true },
       xAxis:Object.assign({ type:'time', boundaryGap:false }, AX),
       yAxis:Object.assign({ type:'value', scale:true }, AX, { splitLine:{show:true, lineStyle:{color:'rgba(0,0,0,0.05)', type:'dashed'}} }),
       tooltip:Object.assign({}, TT, { formatter: mkFmt(function(v){ return '$' + Number(v[1]).toFixed(2); }) }),
-      series:[{ name:id, type:'line', smooth:0.1, symbol:'circle', symbolSize:10, showSymbol:false,
-        emphasis:{ itemStyle:{ borderColor:'#ffffff', borderWidth:1, color:'#49a3a6' } },
+      series:[{ name:id, type:'line', smooth:0.1, showSymbol:false,
         data:data,
-        itemStyle:{ color:'#49a3a6' },
         lineStyle:{ width:1, color:'#49a3a6' },
-        areaStyle:{ color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(73,163,166,0.15)'},{offset:1,color:'rgba(73,163,166,0)'}]) } }]
+        itemStyle:{ color:'#49a3a6' },
+        areaStyle:{ color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(73,163,166,0.18)'},{offset:1,color:'rgba(73,163,166,0)'}]) }
+      }]
     });
+    try {
+      if (window.ResizeObserver) {
+        var ro2 = new ResizeObserver(function(){ try { c.resize(); } catch(e){} });
+        ro2.observe(el);
+      }
+      window.addEventListener('resize', function(){ try { c.resize(); } catch(e){} });
+    } catch(e){}
   }
 
   // ═══ CATALYSTS ═══
@@ -2021,7 +2164,10 @@
       let sent = (e.sentiment || 'Neutral').toLowerCase();
       let past = (state.catSub !== 'upcoming') ? ' past' : '';
       let rel = Array.isArray(e.relatedNews) ? e.relatedNews : [];
-      let relPill = rel.length ? '<span class="related-pill" data-cat-related="'+i+'">'+rel.length+' related</span>' : '';
+      let relPill = rel.length ? '<span class="related-pill" data-cat-related="'+i+'">'
+        + rel.length+' Relative News'
+        + '<img src="https://alva-ai-static.b-cdn.net/icons/arrow-right-l2.svg" data-icon-rel alt="" style="width:12px;height:12px;opacity:0.45;flex-shrink:0">'
+        + '</span>' : '';
       let relExp = rel.length ? '<div class="related-list" data-cat-rel-list="'+i+'" style="display:none;margin-top:var(--spacing-s)">'
         + rel.slice(0,5).map(function(it){ return renderRelatedItem(it); }).join('')
         + '</div>' : '';
@@ -2030,12 +2176,16 @@
         +   '<span class="e-date">'+esc(e.date)+'</span>'
         +   statusTag
         +   '<span class="tag tag-sent '+sent+'">'+esc(e.sentiment||'Neutral')+'</span>'
-        +   (relPill ? '<span style="margin-left:auto"></span>' + relPill : '')
         + '</div>'
         + '<div class="event-title">'+escMd(e.title)+'</div>'
         + (e.pillar ? '<div class="event-pillar">Pillar · '+esc(e.pillar)+'</div>' : '')
         + '<div class="event-notes">'+escMd(e.notes||'')+'</div>'
-        + (e.ids && e.ids.length ? '<div class="event-ids">'+e.ids.map(function(t){ return '<span class="tag tag-id">'+esc(t)+'</span>'; }).join('')+'</div>' : '')
+        + ((e.ids && e.ids.length) || relPill
+            ? '<div class="event-ids" style="display:flex;align-items:center;flex-wrap:wrap;gap:var(--spacing-xxs);">'
+              + (e.ids && e.ids.length ? e.ids.map(function(t){ return '<span class="tag tag-id">'+esc(t)+'</span>'; }).join('') : '')
+              + (relPill ? '<span style="flex:1"></span>' + relPill : '')
+              + '</div>'
+            : '')
         + relExp
         + '</div>';
     }).join('');
@@ -2045,7 +2195,14 @@
         ev.stopPropagation();
         let idx = p.getAttribute('data-cat-related');
         let exp = host.querySelector('[data-cat-rel-list="'+idx+'"]');
-        if (exp) exp.style.display = exp.style.display === 'none' ? '' : 'none';
+        if (exp) {
+          let isOpen = exp.style.display !== 'none';
+          exp.style.display = isOpen ? 'none' : '';
+          let icon = p.querySelector('[data-icon-rel]');
+          if (icon) icon.src = isOpen
+            ? 'https://alva-ai-static.b-cdn.net/icons/arrow-right-l2.svg'
+            : 'https://alva-ai-static.b-cdn.net/icons/arrow-down-l2.svg';
+        }
       });
     });
   }
@@ -2190,7 +2347,8 @@
     // author may be stored as x.author, x.handle, or x.source
     var displayName = x.author || x.source || 'X User';
     var handle = x.handle ? '@'+x.handle : '';
-    var avatarUrl = x.avatar || '';
+    var rawHandle = (x.handle || '').replace(/^@/,'').trim();
+    var avatarUrl = x.avatar || (rawHandle ? 'https://unavatar.io/x/'+encodeURIComponent(rawHandle) : '');
     var ids = x.ids && x.ids.length
       ? '<div class="feed-ids">' + x.ids.map(function(t){ return '<span class="tag tag-id">'+esc(t)+'</span>'; }).join('') + '</div>'
       : '';

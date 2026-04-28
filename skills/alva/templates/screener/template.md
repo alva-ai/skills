@@ -7,11 +7,11 @@ list).
 ## How to use this template
 
 **Start from [`example/`](./example/) — do not rebuild from scratch.** It's a
-working "Senate Conviction Buys" screener (US stocks senators disclosed buying
-in the last 90 days, scored by Breadth · Size · Freshness) with the full UI
-shell, all three tabs, the methodology modal with worked example, the gauge
-ring, factor breakdown, movers grid, basket trend chart, and the feed wired up.
-Copy it, then swap in your universe / factors / filters.
+working "Growth Inflection Screener" (US mid-caps $5B–$50B scored by Growth ·
+Margin · Safety, ranked on revenue re-acceleration + gross-margin improvement)
+with the full UI shell, all three tabs, the methodology modal with worked
+example, the gauge ring, factor breakdown, movers grid, basket trend chart, and
+the feed wired up. Copy it, then swap in your universe / factors / filters.
 
 The example is the source of truth for **all implementation detail** — CSS,
 widget chassis, ECharts options for K-line / gauge / trend / scatter, sticky
@@ -25,7 +25,7 @@ Files:
   chip, snapshot picker, ranked table with expandable rows, gauge ring,
   factor breakdown, K-line, movers cards, basket trend chart, methodology
   modal with worked example.
-- [`example/feeds/senate-conviction-feed.js`](./example/feeds/senate-conviction-feed.js)
+- [`example/feeds/inflection-screener-feed.js`](./example/feeds/inflection-screener-feed.js)
   — feed: rankings group, summary group, klines group; factor scoring,
   flag derivation, churn vs prior snapshot.
 
