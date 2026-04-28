@@ -12,8 +12,9 @@ Returns the authenticated user's profile.
 | username            | string | Username                                                       |
 | subscription_tier   | string | `"free"` or `"pro"`. Determines release flow and feature gates |
 | telegram_username   | string | Telegram username if connected, otherwise `null`               |
+| home_path           | string | Caller's alfs home directory (`/alva/home/<username>`)         |
 
 ```bash
 alva whoami
-# → {"id":1, "subscription_tier":"free", "telegram_username":"alice_tg", "username":"alice"}
+# → {"id":1, "subscription_tier":"free", "telegram_username":"alice_tg", "username":"alice", "home_path":"/alva/home/alice"}
 ```
