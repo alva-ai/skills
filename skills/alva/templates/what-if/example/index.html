@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The S&amp;P 500 After a Copper-to-Gold One-Year Low — 15-Year What-If</title>
+<link rel="stylesheet" href="https://alva-ai-static.b-cdn.net/design-system/design-tokens.css" />
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing:border-box; -ms-overflow-style:none; scrollbar-width:none; }
+  *::-webkit-scrollbar { display:none; }
+
+  html { height:100%; overflow:hidden; }
+  body {
+    height:100%; overflow-y:auto; overflow-x:hidden; margin:0;
+    background:var(--b0-page); color:var(--text-n9);
+    font-family:'Delight', -apple-system, 'OPPO Sans 4.0', BlinkMacSystemFont, sans-serif;
+    font-weight:400;
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; text-rendering:optimizeLegibility;
+  }
+  a { color:var(--text-n9); text-decoration:underline; }
+  strong, b { font-weight:500; }
+
+  .playbook-container {
+    width:100%; max-width:2048px; margin:0 auto;
+    padding: var(--spacing-m) var(--spacing-xxl) var(--spacing-xxxxl);
+  }
+  @media (max-width:768px) {
+    .playbook-container { padding: 0 var(--spacing-m) var(--spacing-xxxxl); }
+  }
+
+  .section-title {
+    display:flex; width:100%; align-items:center; gap:12px;
+    margin-top: var(--spacing-xxl);
+    margin-bottom: var(--spacing-m);
+    flex-wrap: wrap;
+  }
+  .playbook-container > .section-title:first-child { margin-top: var(--spacing-xs); }
+  .section-title-text {
+    font-size:20px; font-weight:400;
+    color: var(--text-n9); letter-spacing:0.2px; line-height:28px;
+  }
+  .section-readme-btn {
+    margin-left:auto;
+    display:inline-flex; align-items:center; gap: var(--spacing-xxs);
+    height:24px; padding: var(--spacing-xxxs) var(--spacing-xs);
+    background: var(--b-r02);
+    border: 0.5px solid var(--line-l2);
+    border-radius: var(--radius-ct-s);
+    font-family: inherit; font-size:12px; line-height:20px; letter-spacing:0.12px;
+    color: var(--text-n9); cursor:pointer;
+    transition: background .15s ease, border-color .15s ease;
+  }
+  .section-readme-btn:hover,
+  .section-readme-btn:active {
+    background: var(--b-r03);
+    border-color: var(--line-l9);
+  }
+  .section-readme-icon {
+    width:14px; height:14px; flex-shrink:0;
+    background-color: currentColor;
+    -webkit-mask: url('https://alva-ai-static.b-cdn.net/icons/researcher-l1.svg') center / contain no-repeat;
+            mask: url('https://alva-ai-static.b-cdn.net/icons/researcher-l1.svg') center / contain no-repeat;
+  }
+
+  .widget-grid {
+    display:grid; grid-template-columns: repeat(8, 1fr);
+    gap: var(--spacing-xl); align-items: stretch;
+  }
+  .widget-grid + .widget-grid { margin-top: var(--spacing-xl); }
+  .col-2 { grid-column: span 2; }
+  .col-4 { grid-column: span 4; }
+  .col-8 { grid-column: span 8; }
+  @media (max-width: 768px) {
+    .widget-grid { grid-template-columns: repeat(4, 1fr); gap: var(--spacing-l); }
+    .col-2 { grid-column: span 2; }
+    .col-4, .col-8 { grid-column: span 4; }
+  }
+
+  .widget-card {
+    background: transparent;
+    display:flex; flex-direction:column;
+    position:relative; overflow:visible;
+  }
+  .widget-title {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom: var(--spacing-m);
+  }
+  .widget-title-text {
+    font-size:16px; font-weight:400; color:var(--text-n9);
+    letter-spacing:0.16px; line-height:26px;
+  }
+  .widget-subtitle {
+    font-size:12px; line-height:20px; letter-spacing:0.12px;
+    color: var(--text-n5);
+    margin-top: calc(-1 * var(--spacing-xs));
+    margin-bottom: var(--spacing-m);
+  }
+  .widget-body {
+    display:flex; border-radius: var(--radius-ct-s);
+  }
+  .alva-watermark {
+    position:absolute; bottom: var(--spacing-m); right: var(--spacing-m);
+    opacity:0.2; line-height:0; pointer-events:none;
+  }
+
+  .free-text-body { padding: var(--spacing-l); width:100%; }
+  .markdown-container {
+    width:100%; display:flex; flex-direction:column;
+    gap: var(--spacing-m);
+  }
+  .markdown-container p {
+    font-family:'Delight', sans-serif;
+    font-size:16px; line-height:26px; letter-spacing:0.16px;
+    color: var(--text-n9); margin:0; white-space:pre-wrap;
+  }
+  .markdown-container--m { gap: var(--spacing-xs); }
+  .markdown-container--m p {
+    font-size:14px; line-height:22px; letter-spacing:0.14px;
+  }
+  .markdown-container .pos { color: var(--main-m3); font-weight:500; }
+  .markdown-container .neg { color: var(--main-m4); font-weight:500; }
+
+  .kpi-body {
+    background: var(--grey-g01);
+    border-radius: var(--radius-ct-s);
+    padding: var(--spacing-l);
+    display:flex; flex-direction:column; gap: var(--spacing-xxs);
+    position:relative;
+  }
+  .kpi-label {
+    font-size:12px; line-height:20px; letter-spacing:0.12px;
+    color: var(--text-n7);
+  }
+  .kpi-value {
+    font-size:28px; line-height:36px; letter-spacing:0.28px;
+    color: var(--text-n9); font-weight:400;
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi-value.pos { color: var(--main-m3); }
+  .kpi-value.neg { color: var(--main-m4); }
+  .kpi-foot {
+    font-size:12px; line-height:18px; letter-spacing:0.12px;
+    color: var(--text-n5);
+  }
+
+  .widget-card:has(.chart-body) { overflow:hidden; }
+  .chart-dotted-background {
+    background-image: radial-gradient(circle, rgba(0,0,0,0.18) 0.6px, transparent 0.6px);
+    background-size: 3px 3px;
+  }
+  .chart-body {
+    flex:1; padding: var(--spacing-m);
+    position:relative;
+    border-radius: var(--radius-ct-s);
+  }
+  .chart-container { width:100%; height:100%; min-height:180px; }
+
+  .table-card {
+    display:flex; flex-direction:column;
+    width:100%; isolation:isolate;
+    overflow-x:auto;
+  }
+  .table-row {
+    display:flex; width:100%;
+    gap: var(--spacing-m);
+    border-bottom: 1px solid var(--line-l07);
+    padding: 12px 0;
+  }
+  .table-row.table-header { padding: 0 0 12px 0; }
+  .table-row:last-child { border-bottom: none; }
+  .table-cell {
+    font-size:14px; line-height:22px; letter-spacing:0.14px;
+    font-weight:400; white-space:nowrap;
+    display:flex; align-items:center;
+    color: var(--text-n9);
+  }
+  .table-row.table-header .table-cell { color: var(--text-n7); }
+  .cell-right { justify-content: flex-end; }
+  .cell-pos { color: var(--main-m3); }
+  .cell-neg { color: var(--main-m4); }
+  .cell-muted { color: var(--text-n5); }
+
+  .modal-overlay {
+    display:none; position:fixed; inset:0; z-index:1000;
+    background: rgba(0,0,0,0.4);
+    padding: var(--spacing-xxxxl) var(--spacing-m);
+    align-items:center; justify-content:center;
+  }
+  .modal-overlay.open { display:flex; }
+  .modal-panel {
+    background: var(--b0-container, #fff);
+    width:100%; max-width: 896px;
+    max-height: 100%;
+    border-radius: 12px;
+    border: 0.5px solid var(--line-l2);
+    padding: var(--spacing-xxl);
+    display:flex; flex-direction:column; gap: var(--spacing-m);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  }
+  .modal-title {
+    display:flex; align-items:center; justify-content:space-between;
+    gap: var(--spacing-s);
+    font-family: 'Delight', sans-serif; font-weight:500;
+    font-size:18px; line-height:28px; letter-spacing:0.18px;
+    color: var(--text-n9);
+  }
+  .modal-close {
+    width:18px; height:18px; flex-shrink:0; cursor:pointer;
+    background-color: var(--text-n9);
+    -webkit-mask: url('https://alva-ai-static.b-cdn.net/icons/close-l1.svg') center / contain no-repeat;
+            mask: url('https://alva-ai-static.b-cdn.net/icons/close-l1.svg') center / contain no-repeat;
+    transition: opacity .15s ease;
+  }
+  .modal-close:hover { opacity: 0.6; }
+  .modal-body { flex:1 1 auto; width:100%; overflow-y:auto; }
+
+  .method-section { margin-bottom: var(--spacing-xl); }
+  .method-section:last-child { margin-bottom: 0; }
+  .method-section h3 {
+    font-size:16px; font-weight:500; letter-spacing:0.16px; line-height:22px;
+    color: var(--text-n9);
+    margin: 0 0 var(--spacing-m) 0;
+  }
+  .method-body {
+    background: var(--grey-g01);
+    border-radius: var(--radius-ct-l);
+    padding: var(--spacing-l);
+    display:flex; flex-direction:column; gap: var(--spacing-xs);
+  }
+  .method-body p {
+    font-size:14px; line-height:22px; letter-spacing:0.14px;
+    color: var(--text-n9); margin:0;
+  }
+  .method-body p + p { margin-top: var(--spacing-xs); }
+  .method-body em { color: var(--text-n5); font-style: italic; }
+
+  .loading { color: var(--text-n5); font-style: italic; }
+</style>
+</head>
+<body>
+
+<div class="playbook-container">
+
+  <div class="section-title">
+    <span class="section-title-text">The S&amp;P 500 After a Copper-to-Gold One-Year Low — 15-Year What-If</span>
+    <button type="button" class="section-readme-btn" data-modal-open="methodology-modal" aria-label="Open README">
+      <span class="section-readme-icon" aria-hidden="true"></span>
+      <span>README</span>
+    </button>
+  </div>
+
+  <div class="widget-grid">
+    <div class="widget-card col-8">
+      <div class="widget-body" style="background:var(--grey-g01); border-radius: var(--radius-ct-s);">
+        <div class="free-text-body">
+          <div class="markdown-container markdown-container--m">
+            <p id="hero-sentence"><span class="loading">Loading live data…</span></p>
+          </div>
+        </div>
+        <div class="alva-watermark"><img src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg" alt="Alva" /></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="widget-grid" id="summary-cards"></div>
+
+  <div class="widget-grid">
+    <div class="widget-card col-8">
+      <div class="widget-title"><span class="widget-title-text">The copper-to-gold ratio since 2011, with every past one-year low marked</span></div>
+      <div class="widget-subtitle">Daily copper ETF (CPER) divided by gold ETF (GLD). Red dots mark days the ratio closed at a fresh one-year low, with a 90-day gap so the same decline is not double-counted.</div>
+      <div class="chart-body chart-dotted-background">
+        <div id="chart-ratio" class="chart-container" style="height:400px;"></div>
+        <div class="alva-watermark"><img src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg" alt="Alva" /></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="widget-grid">
+    <div class="widget-card col-8">
+      <div class="widget-title"><span class="widget-title-text">Typical S&amp;P 500 move at each horizon, event vs plain historical average</span></div>
+      <div class="widget-subtitle">Green bars: the typical move after past one-year-low events. Grey bars: the S&amp;P 500's plain historical average over the same sample. Dashed line is zero.</div>
+      <div class="chart-body chart-dotted-background">
+        <div id="chart-horizon" class="chart-container" style="height:320px;"></div>
+        <div class="alva-watermark"><img src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg" alt="Alva" /></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="widget-grid">
+    <div class="widget-card col-8">
+      <div class="widget-title"><span class="widget-title-text">How the S&amp;P 500 moved three months after each past event</span></div>
+      <div class="widget-subtitle">One bar per past one-year-low event, sorted best to worst. Green means the S&amp;P 500 was higher three months later; red means lower. Dashed line is zero.</div>
+      <div class="chart-body chart-dotted-background">
+        <div id="chart-fwd3m" class="chart-container" style="height:320px;"></div>
+        <div class="alva-watermark"><img src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg" alt="Alva" /></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="widget-grid">
+    <div class="widget-card col-8">
+      <div class="widget-title"><span class="widget-title-text">Every past one-year-low event, row by row</span></div>
+      <div class="widget-subtitle">Newest first. Event day, market era at the time, the ratio on that day, and how the S&amp;P 500 moved a month, three months, six months, and a year later. Dashes mean the horizon has not yet finished.</div>
+      <div class="table-card" id="event-table">
+        <div class="table-row table-header">
+          <div class="table-cell">Event day</div>
+          <div class="table-cell">Era</div>
+          <div class="table-cell cell-right">Ratio</div>
+          <div class="table-cell cell-right">A month later</div>
+          <div class="table-cell cell-right">Three months later</div>
+          <div class="table-cell cell-right">Six months later</div>
+          <div class="table-cell cell-right">A year later</div>
+        </div>
+        <div id="event-table-body"><div class="table-row"><div class="table-cell cell-muted">Loading…</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="widget-grid">
+    <div class="widget-card col-8">
+      <div class="widget-title"><span class="widget-title-text">References</span></div>
+      <div class="widget-body" style="background:var(--grey-g01); border-radius: var(--radius-ct-s);">
+        <div class="free-text-body">
+          <div class="markdown-container markdown-container--m">
+            <p><strong>Trigger source:</strong> every trading day since a copper ETF (CPER) launched in November 2011 where the copper-to-gold ratio closed at a fresh one-year low, with a 90-day gap so the same decline is not double-counted. The ratio is daily CPER close divided by a gold ETF (GLD) daily close.</p>
+            <p><strong>Data source:</strong> Alva SDK adjusted daily closes for CPER, GLD, and the S&amp;P 500 (via SPY). Forward moves are SPY close on the event day compared to SPY close 21, 63, 126, and 252 trading days later — roughly a month, three months, six months, and a year.</p>
+          </div>
+        </div>
+        <div class="alva-watermark"><img src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg" alt="Alva" /></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="modal-overlay" id="methodology-modal" aria-hidden="true">
+  <div class="modal-panel" role="dialog" aria-labelledby="methodology-modal-title">
+    <div class="modal-title">
+      <span id="methodology-modal-title">README</span>
+      <div class="modal-close" data-modal-close="methodology-modal" aria-label="Close"></div>
+    </div>
+    <div class="modal-body">
+      <div class="method-section">
+        <h3>Why copper-to-gold</h3>
+        <div class="method-body">
+          <p>The copper-to-gold price ratio is a long-running macro barometer. Copper reflects industrial demand and growth expectations; gold reflects fear, inflation hedging, and rate expectations. When the ratio breaks to a fresh one-year low, it is usually because growth expectations have cooled or fear has spiked — a classic "something is off" signal that investors have historically watched as a recession tell.</p>
+        </div>
+      </div>
+      <div class="method-section">
+        <h3>How we picked events</h3>
+        <div class="method-body">
+          <p>We built a daily copper-to-gold ratio from a copper ETF (CPER) divided by a gold ETF (GLD), starting from CPER's November 2011 launch through today. A new event fires when the ratio closes below its lowest print of the prior 252 trading days, with a 90-day cooldown so we do not double-count the same decline.</p>
+          <p>That rule produced a small number of past events over 15 years, which is the main thing to keep in mind reading this page: the sample is thin, so the medians below should be read as suggestive, not conclusive.</p>
+        </div>
+      </div>
+      <div class="method-section">
+        <h3>How we measured the follow-through</h3>
+        <div class="method-body">
+          <p>For each past event we took the S&amp;P 500 (via SPY) close on the event day and compared it to SPY close 21, 63, 126, and 252 trading days later — roughly a month, three months, six months, and a year out.</p>
+          <p>The plain historical average uses the same SPY series and the same horizons, sampled across the same window, so the event number and the plain-average number are measured the same way.</p>
+          <p><em>Historical observation only — not investment advice.</em></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (async () => {
+    const ENDPOINT = "https://api-llm.prd.alva.ai";
+    const USER = "sheer-ruan";
+    const FEED = "copper-gold-recession-signal";
+    const BASE = `${ENDPOINT}/api/v1/fs/read?path=/alva/home/${USER}/feeds/${FEED}/v1/data`;
+
+    const TT_COLORS = { bg:"rgba(255,255,255,0.96)", border:"rgba(0,0,0,0.08)", title:"rgba(0,0,0,0.7)", text:"rgba(0,0,0,0.9)" };
+
+    function setError(msg) {
+      document.querySelectorAll(".loading").forEach((el) => { el.textContent = msg; el.classList.remove("loading"); });
+    }
+    async function fetchJSON(path) {
+      const r = await fetch(`${BASE}${path}`);
+      if (!r.ok) throw new Error(`${path}: ${r.status}`);
+      return r.json();
+    }
+    const fmtPct = (v, d=1) => v == null ? "—" : (v >= 0 ? "+" : "") + v.toFixed(d) + "%";
+    const signClass = (v) => v == null ? "cell-muted" : (v >= 0 ? "cell-pos" : "cell-neg");
+
+    let events, summary, series;
+    try {
+      [events, summary, series] = await Promise.all([
+        fetchJSON(`/events/rows/@last/200`),
+        fetchJSON(`/summary/stats/@last/20`),
+        fetchJSON(`/series/daily/@last/2000`),
+      ]);
+    } catch (err) { setError("Could not load live data: " + err.message); return; }
+
+    const byE = new Map();
+    events.forEach((r) => { const p = byE.get(r.event_date); if (!p || (p.date||0) < (r.date||0)) byE.set(r.event_date, r); });
+    events = Array.from(byE.values()).sort((a,b) => a.event_date.localeCompare(b.event_date));
+
+    const byS = new Map();
+    series.forEach((r) => { const p = byS.get(r.date_iso); if (!p || (p.date||0) < (r.date||0)) byS.set(r.date_iso, r); });
+    series = Array.from(byS.values()).sort((a,b) => a.date_iso.localeCompare(b.date_iso));
+
+    summary = [...summary].sort((a,b) => (b.date||0) - (a.date||0))[0] || {};
+
+    const heroPos = (summary.median_fwd_3m_pct != null && summary.median_fwd_3m_pct >= 0) ? "pos" : "neg";
+    const heroYrPos = (summary.median_fwd_12m_pct != null && summary.median_fwd_12m_pct >= 0) ? "pos" : "neg";
+    const basePos3m = (summary.spx_baseline_3m_pct != null && summary.spx_baseline_3m_pct >= 0) ? "pos" : "neg";
+    const basePos12m = (summary.spx_baseline_12m_pct != null && summary.spx_baseline_12m_pct >= 0) ? "pos" : "neg";
+    document.getElementById("hero-sentence").innerHTML =
+      `Across <strong>${summary.n_events}</strong> past copper-to-gold one-year lows since 2011, the S&P 500 (via SPY) typically drifted <span class="${heroPos}">${fmtPct(summary.median_fwd_3m_pct)} three months later</span> and <span class="${heroYrPos}">${fmtPct(summary.median_fwd_12m_pct)} a year later</span>. Over the same window the plain historical average was <span class="${basePos3m}">${fmtPct(summary.spx_baseline_3m_pct)}</span> and <span class="${basePos12m}">${fmtPct(summary.spx_baseline_12m_pct)}</span>, so the signal does not move the S&P 500 much beyond its usual drift higher over time.`;
+
+    const median = (a) => { if (!a.length) return null; const s = [...a].sort((x,y)=>x-y); return s.length%2?s[(s.length-1)/2]:(s[s.length/2-1]+s[s.length/2])/2; };
+
+    const horizons = [
+      { key: "fwd_1m_pct",  title: "A month later",       base: null, summaryKey: "median_fwd_1m_pct" },
+      { key: "fwd_3m_pct",  title: "Three months later", base: summary.spx_baseline_3m_pct,  summaryKey: "median_fwd_3m_pct" },
+      { key: "fwd_6m_pct",  title: "Six months later",   base: null, summaryKey: "median_fwd_6m_pct" },
+      { key: "fwd_12m_pct", title: "A year later",       base: summary.spx_baseline_12m_pct, summaryKey: "median_fwd_12m_pct" },
+    ];
+    const cardsEl = document.getElementById("summary-cards");
+    cardsEl.innerHTML = "";
+    horizons.forEach((h) => {
+      const vals = events.map((e) => e[h.key]).filter((v) => v != null);
+      const med = summary[h.summaryKey] != null ? summary[h.summaryKey] : median(vals);
+      const posN = vals.filter((v) => v >= 0).length;
+      const posRate = vals.length ? Math.round((posN / vals.length) * 100) : 0;
+      const cls = med == null ? "" : (med >= 0 ? "pos" : "neg");
+      const baseLine = h.base != null
+        ? `plain historical average ${fmtPct(h.base)}`
+        : `across ${vals.length} past ${vals.length === 1 ? "event" : "events"}`;
+      const el = document.createElement("div");
+      el.className = "widget-card col-2";
+      el.innerHTML = `
+        <div class="kpi-body">
+          <div class="kpi-label">${h.title}</div>
+          <div class="kpi-value ${cls}">${fmtPct(med)}</div>
+          <div class="kpi-foot">positive in ${posN} of ${vals.length} past ${vals.length === 1 ? "event" : "events"} · ${baseLine}</div>
+          <div class="alva-watermark"><img src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg" alt="Alva" /></div>
+        </div>`;
+      cardsEl.appendChild(el);
+    });
+
+    const AX = { axisLine: { show: false }, axisTick: { show: false }, axisLabel: { fontSize: 10, color: "rgba(0,0,0,0.7)", fontFamily: "'Delight', sans-serif", margin: 8 }, splitLine: { show: false } };
+    const GRID = { top: 20, right: 24, bottom: 48, left: 16, containLabel: true };
+    const GRID_NO_LEGEND = { top: 20, right: 24, bottom: 12, left: 16, containLabel: true };
+
+    /* Ratio chart */
+    const eventSet = new Set(events.map((e) => e.event_date));
+    const ratioDates = series.map((r) => r.date_iso);
+    const ratioVals = series.map((r) => r.ratio);
+    const markPoints = events.map((e) => ({
+      name: e.event_date,
+      coord: [e.event_date, e.ratio_at_event],
+      value: "",
+      symbol: "circle",
+      symbolSize: 10,
+      itemStyle: { color: "#e05a67", borderColor: "#fff", borderWidth: 1.5 },
+    }));
+    const chartRatio = echarts.init(document.getElementById("chart-ratio"));
+    chartRatio.setOption({
+      grid: GRID_NO_LEGEND,
+      tooltip: { trigger:"axis", axisPointer: { type: "line", lineStyle: { color: "rgba(0,0,0,0.2)" } },
+        backgroundColor:TT_COLORS.bg, borderColor:TT_COLORS.border, borderWidth:1, borderRadius:6, padding:12, extraCssText:"box-shadow:none;",
+        textStyle: { fontFamily:"'Delight', sans-serif", fontSize:12, color:TT_COLORS.text },
+        formatter: (ps) => {
+          const p = ps[0];
+          const date = p.axisValue;
+          const v = p.value;
+          const isEvent = eventSet.has(date);
+          return `<div style="color:${TT_COLORS.title};margin-bottom:6px;">${date}</div>`
+               + `<div>copper/gold <strong>${v == null ? "—" : v.toFixed(4)}</strong></div>`
+               + (isEvent ? `<div style="color:var(--main-m4);">one-year low event</div>` : "");
+        }
+      },
+      xAxis: { type: "category", data: ratioDates, ...AX,
+        axisLabel: { ...AX.axisLabel, formatter: (v) => v ? v.slice(0, 7) : "", showMaxLabel: true, interval: Math.floor(ratioDates.length / 8) }
+      },
+      yAxis: { type: "value", ...AX, axisLabel: { ...AX.axisLabel, formatter: (v) => v.toFixed(3) } },
+      series: [{
+        type:"line", smooth:true, showSymbol:false, data: ratioVals,
+        lineStyle: { color: "#5f75c9", width: 1.5 },
+        areaStyle: { color: { type: "linear", x: 0, y: 0, x2: 0, y2: 1, colorStops: [ { offset: 0, color: "rgba(95,117,201,0.28)" }, { offset: 1, color: "rgba(95,117,201,0.02)" } ] } },
+        markPoint: { data: markPoints, silent: false, label: { show: false } }
+      }],
+    });
+    chartRatio.resize();
+
+    /* Horizon comparison */
+    const horizonLabels = ["A month later", "Three months later", "Six months later", "A year later"];
+    const horizonKeys = ["median_fwd_1m_pct", "median_fwd_3m_pct", "median_fwd_6m_pct", "median_fwd_12m_pct"];
+    const baselineKeys = [null, "spx_baseline_3m_pct", null, "spx_baseline_12m_pct"];
+    const eventVals = horizonKeys.map((k) => summary[k]);
+    const baselineVals = baselineKeys.map((k) => k == null ? null : summary[k]);
+    const chartHorizon = echarts.init(document.getElementById("chart-horizon"));
+    chartHorizon.setOption({
+      grid: GRID_NO_LEGEND,
+      tooltip: { trigger:"axis", axisPointer: { type: "shadow" }, backgroundColor:TT_COLORS.bg, borderColor:TT_COLORS.border, borderWidth:1, borderRadius:6, padding:12, extraCssText:"box-shadow:none;",
+        textStyle: { fontFamily:"'Delight', sans-serif", fontSize:12, color:TT_COLORS.text },
+        formatter: (ps) => {
+          let out = `<div style="color:${TT_COLORS.title};margin-bottom:6px;">${ps[0].axisValue}</div>`;
+          ps.forEach((p) => {
+            if (p.value == null) return;
+            const sign = p.value >= 0 ? "pos" : "neg";
+            const color = p.value >= 0 ? "var(--main-m3)" : "var(--main-m4)";
+            out += `<div>${p.seriesName} <strong style="color:${color};">${fmtPct(p.value)}</strong></div>`;
+          });
+          return out;
+        }
+      },
+      legend: { data: ["After a past event", "Plain historical average"], top: 0, right: 8, itemWidth: 12, itemHeight: 8, textStyle: { fontSize: 11, color: "rgba(0,0,0,0.7)", fontFamily: "'Delight', sans-serif" } },
+      xAxis: { type: "category", data: horizonLabels, ...AX, axisLabel: { ...AX.axisLabel, interval: 0 } },
+      yAxis: { type: "value", ...AX, axisLabel: { ...AX.axisLabel, formatter: (v) => v + "%" } },
+      series: [
+        { name: "After a past event", type: "bar", barMaxWidth: 22,
+          itemStyle: { color: "#2c9a6b", borderRadius: [2,2,0,0] },
+          data: eventVals,
+          markLine: { silent: true, symbol: "none", lineStyle: { color: "rgba(0,0,0,0.35)", type: "dashed", width: 1 },
+            data: [{ yAxis: 0, label: { show: false } }] }
+        },
+        { name: "Plain historical average", type: "bar", barMaxWidth: 22,
+          itemStyle: { color: "#b5b9c2", borderRadius: [2,2,0,0] },
+          data: baselineVals }
+      ],
+    });
+    chartHorizon.resize();
+
+    /* Per-event 3-month move */
+    const fwd3Sorted = [...events].filter((e) => e.fwd_3m_pct != null).sort((a,b) => b.fwd_3m_pct - a.fwd_3m_pct);
+    const chartFwd3m = echarts.init(document.getElementById("chart-fwd3m"));
+    chartFwd3m.setOption({
+      grid: GRID_NO_LEGEND,
+      tooltip: { trigger:"item", backgroundColor:TT_COLORS.bg, borderColor:TT_COLORS.border, borderWidth:1, borderRadius:6, padding:12, extraCssText:"box-shadow:none;",
+        textStyle: { fontFamily:"'Delight', sans-serif", fontSize:12, color:TT_COLORS.text },
+        formatter: (p) => {
+          const r = fwd3Sorted[p.dataIndex];
+          const sign = r.fwd_3m_pct >= 0 ? "pos" : "neg";
+          const color = r.fwd_3m_pct >= 0 ? "var(--main-m3)" : "var(--main-m4)";
+          return `<div style="color:${TT_COLORS.title};margin-bottom:6px;">${r.event_date}</div>`
+               + `<div>three months later <strong style="color:${color};">${fmtPct(r.fwd_3m_pct)}</strong></div>`
+               + `<div style="color:${TT_COLORS.title};">${r.era_label || ""}</div>`;
+        }
+      },
+      xAxis: { type: "category", data: fwd3Sorted.map((r) => r.event_date), ...AX, axisLabel: { ...AX.axisLabel, formatter: () => "" } },
+      yAxis: { type: "value", ...AX, axisLabel: { ...AX.axisLabel, formatter: (v) => v + "%" } },
+      series: [{
+        type:"bar", barMaxWidth: 18,
+        data: fwd3Sorted.map((r) => ({ value: r.fwd_3m_pct, itemStyle: { color: r.fwd_3m_pct >= 0 ? "#2c9a6b" : "#e05a67" } })),
+        markLine: { silent: true, symbol: "none", lineStyle: { color: "rgba(0,0,0,0.35)", type: "dashed", width: 1 },
+          data: [{ yAxis: 0, label: { show: false } }] }
+      }],
+    });
+    chartFwd3m.resize();
+
+    window.addEventListener('resize', () => {
+      chartRatio.resize(); chartHorizon.resize(); chartFwd3m.resize();
+    });
+
+    /* Table */
+    const tbody = document.getElementById("event-table-body");
+    const rows = [...events].sort((a,b) => b.event_date.localeCompare(a.event_date));
+    tbody.innerHTML = rows.map((r) => `
+      <div class="table-row">
+        <div class="table-cell">${r.event_date}</div>
+        <div class="table-cell">${r.era_label || ""}</div>
+        <div class="table-cell cell-right">${r.ratio_at_event == null ? "—" : r.ratio_at_event.toFixed(4)}</div>
+        <div class="table-cell cell-right ${signClass(r.fwd_1m_pct)}">${fmtPct(r.fwd_1m_pct)}</div>
+        <div class="table-cell cell-right ${signClass(r.fwd_3m_pct)}">${fmtPct(r.fwd_3m_pct)}</div>
+        <div class="table-cell cell-right ${signClass(r.fwd_6m_pct)}">${fmtPct(r.fwd_6m_pct)}</div>
+        <div class="table-cell cell-right ${signClass(r.fwd_12m_pct)}">${fmtPct(r.fwd_12m_pct)}</div>
+      </div>`).join("");
+
+    function initTableAlignment(tableEl){
+      var rs = tableEl.querySelectorAll(".table-row");
+      if (rs.length === 0) return;
+      var colCount = rs[0].querySelectorAll(".table-cell").length;
+      rs.forEach(function(row){ row.style.removeProperty("min-width"); var cs = row.querySelectorAll(".table-cell"); for (var i=0;i<cs.length;i++) cs[i].removeAttribute("style"); });
+      var cws = [];
+      for (var c=0;c<colCount;c++){ var mx=0; rs.forEach(function(row){ var cell = row.querySelectorAll(".table-cell")[c]; if (cell) mx = Math.max(mx, cell.scrollWidth); }); cws.push(mx); }
+      var tc = 0; for (var i=0;i<cws.length;i++) tc += cws[i];
+      var gap = (colCount - 1) * 16;
+      var avail = tableEl.clientWidth - gap;
+      var rv = [];
+      for (var c2=0;c2<colCount;c2++){ var p = Math.round((cws[c2] / tc) * avail); rv.push(Math.max(cws[c2], p)); }
+      var tw = gap;
+      for (var c3=0;c3<colCount;c3++){ tw += rv[c3]; rs.forEach(function(row){ var cell = row.querySelectorAll(".table-cell")[c3]; if (!cell) return; cell.style.flex = "0 0 " + rv[c3] + "px"; }); }
+      rs.forEach(function(row){ row.style.minWidth = tw + "px"; });
+    }
+    var tableEl = document.getElementById("event-table");
+    initTableAlignment(tableEl);
+    window.addEventListener("resize", function(){ initTableAlignment(tableEl); });
+
+    function openModal(id){ var el = document.getElementById(id); if (!el) return; el.classList.add("open"); el.setAttribute("aria-hidden","false"); document.body.style.overflow="hidden"; }
+    function closeModal(id){ var el = document.getElementById(id); if (!el) return; el.classList.remove("open"); el.setAttribute("aria-hidden","true"); document.body.style.overflow=""; }
+    document.querySelectorAll("[data-modal-open]").forEach(function(btn){ btn.addEventListener("click", function(){ openModal(btn.getAttribute("data-modal-open")); }); btn.addEventListener("keydown", function(e){ if (e.key==="Enter"||e.key===" "){ openModal(btn.getAttribute("data-modal-open")); } }); });
+    document.querySelectorAll("[data-modal-close]").forEach(function(btn){ btn.addEventListener("click", function(e){ e.stopPropagation(); closeModal(btn.getAttribute("data-modal-close")); }); });
+    document.querySelectorAll(".modal-overlay").forEach(function(ov){ ov.addEventListener("click", function(e){ if (e.target === ov) closeModal(ov.id); }); });
+    document.addEventListener("keydown", function(e){ if (e.key === "Escape") document.querySelectorAll(".modal-overlay.open").forEach(function(m){ closeModal(m.id); }); });
+  })();
+</script>
+</body>
+</html>
