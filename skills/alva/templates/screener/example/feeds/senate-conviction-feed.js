@@ -16,11 +16,24 @@
 // Hard filter: ≥2 distinct senators AND total value ≥ $50K.
 
 const { Feed, feedPath, makeDoc, num, str } = require("@alva/feed");
-const { getSenatorTrades } = require("@arrays/data/stock/person/senator-trading:v1.0.0");
-const { getStockCompanyDetail } = require("@arrays/data/stock/company/detail:v1.0.0");
-const { getMarketCap } = require("@arrays/data/market-metrics/market-cap:v1.0.0");
-const { getStockKline } = require("@arrays/data/stock/spot/ohlcv:v1.0.0");
+const http = require("net/http");
+const secret = require("secret-manager");
 const envMod = require("env");
+
+const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
+const ARRAYS_BASE = "https://data-tools.prd.space.id";
+const ARRAYS_HEADERS = { Authorization: "Bearer " + ARRAYS_JWT };
+
+function arraysGet(path, params) {
+  const qs = Object.keys(params)
+    .filter((k) => params[k] !== undefined && params[k] !== null && params[k] !== "")
+    .map((k) => encodeURIComponent(k) + "=" + encodeURIComponent(params[k]))
+    .join("&");
+  const url = ARRAYS_BASE + path + (qs ? "?" + qs : "");
+  const r = http.syncFetch(url, { headers: ARRAYS_HEADERS });
+  if (!r.ok) throw new Error("HTTP " + r.status + " " + path);
+  return JSON.parse(r.text());
+}
 
 const _args = envMod.args || {};
 const _overrideNow = _args.now ? +_args.now : null;
@@ -88,18 +101,9 @@ function parseDateMs(s) {
   return isFinite(t) ? t : 0;
 }
 
-function inferParty(office) {
-  const o = (office || "").toUpperCase();
-  if (o.includes("(R")) return "R";
-  if (o.includes("(D")) return "D";
-  if (o.includes("(I")) return "I";
-  return "U";
-}
-
-function inferChamber(office, district) {
-  const o = (office || "").toLowerCase();
-  if (o.includes("senator")) return "Senate";
-  if (o.includes("representative") || district) return "House";
+function inferChamber(memberType) {
+  const m = (memberType || "").toLowerCase();
+  if (m === "house") return "House";
   return "Senate";
 }
 
@@ -111,17 +115,16 @@ function inferChamber(office, district) {
 
     let trades = [];
     try {
-      const r = getSenatorTrades({
-        start_time: lookbackStart, end_time: now,
-        time_type: "OBSERVED_AT", tag: "all", limit: 1000,
+      const j = arraysGet("/api/v1/stocks/congress/recent-trades", {
+        start_time: Math.floor(lookbackStart / 1000),
+        end_time: Math.floor(now / 1000),
+        time_type: "TRANSACTION_DATE",
+        tag: "all",
+        limit: 1000,
       });
-      if (r && r.success) {
-        if (r.data && Array.isArray(r.data.items)) trades = r.data.items;
-        else if (r.response && Array.isArray(r.response.data)) trades = r.response.data;
-        else if (Array.isArray(r.data)) trades = r.data;
-      }
+      if (j && Array.isArray(j.data)) trades = j.data;
     } catch (e) {
-      console.log("getSenatorTrades error: " + (e && e.message ? e.message : e));
+      console.log("congress/recent-trades error: " + (e && e.message ? e.message : e));
     }
     console.log("trades_raw=" + trades.length);
     if (!trades.length) { console.log("No trades — abort"); return; }
@@ -130,24 +133,27 @@ function inferChamber(office, district) {
     let totalTrades = 0;
     const senatorSet = new Set();
     for (const tr of trades) {
-      const tx = (tr.type || "").toLowerCase();
-      if (!tx.includes("purchase") || tx.includes("sale")) continue;
+      const tx = (tr.transaction_type || "").toLowerCase();
+      // HTTP returns either "Buy" or "Purchase" for buys; exclude any "Sale" variants.
+      if (tx.includes("sale") || tx.includes("sell")) continue;
+      if (!(tx.includes("purchase") || tx.includes("buy"))) continue;
       const ticker = (tr.symbol || "").trim().toUpperCase();
       if (!ticker || ticker.includes("_") || /^(N\/A|--)$/.test(ticker)) continue;
       if (ticker.length > 6) continue;
       if (ticker.length === 5 && ticker.endsWith("X")) continue;
       if (ETF_BLACKLIST.has(ticker)) continue;
-      const desc = (tr.assetDescription || "").toLowerCase();
+      const desc = (tr.notes || tr.issuer || "").toLowerCase();
       if (desc.includes("etf") || desc.includes("mutual fund") || desc.includes("index fund")
           || desc.includes("treasury") || desc.includes("municipal bond") || desc.includes("bond fund")
           || (desc.includes("fund") && !desc.includes("funding"))) continue;
 
-      const senator = `${tr.firstName || ""} ${tr.lastName || ""}`.trim() || "Unknown";
-      const party = inferParty(tr.office);
-      const chamber = inferChamber(tr.office, tr.district);
-      const value = parseAmount(tr.amount);
-      const txDateMs = parseDateMs(tr.transactionDate);
-      const obsMs = +tr.observedAt || 0;
+      const senator = (tr.name || "").trim() || "Unknown";
+      // HTTP /congress/recent-trades does not expose party. Defaults to "U".
+      const party = "U";
+      const chamber = inferChamber(tr.member_type);
+      const value = parseAmount(tr.amounts);
+      const txDateMs = parseDateMs(tr.transaction_date);
+      const obsMs = (+tr.observed_at || 0) * 1000;  // HTTP returns seconds
       const refMs = txDateMs || obsMs;
       if (!refMs) continue;
 
@@ -233,20 +239,19 @@ function inferChamber(office, district) {
 
     for (const s of top) {
       try {
-        const d = getStockCompanyDetail({ symbol: s.ticker });
-        if (d.success && d.response) {
-          s.name = d.response.name || s.ticker;
-          s.sector = d.response.sector || "Unknown";
-          s.industry = d.response.industry || "Unknown";
-        } else { s.name = s.ticker; s.sector = "Unknown"; s.industry = "Unknown"; }
-      } catch (e) { s.name = s.ticker; s.sector = "Unknown"; s.industry = "Unknown"; }
-      try {
-        const mc = getMarketCap({ symbol: s.ticker });
-        if (mc && mc.success && mc.response) {
-          const v = mc.response.value || mc.response.marketCap || mc.response.market_cap;
-          s.marketCap = +v || 0;
-        } else { s.marketCap = 0; }
-      } catch (e) { s.marketCap = 0; }
+        const d = arraysGet("/api/v1/stocks/company/detail", { symbol: s.ticker });
+        const c = d && Array.isArray(d.data) && d.data.length ? d.data[0] : null;
+        if (c) {
+          s.name = c.name || s.ticker;
+          s.sector = c.sector || "Unknown";
+          s.industry = c.industry || "Unknown";
+          s.marketCap = +c.market_cap || 0;
+        } else {
+          s.name = s.ticker; s.sector = "Unknown"; s.industry = "Unknown"; s.marketCap = 0;
+        }
+      } catch (e) {
+        s.name = s.ticker; s.sector = "Unknown"; s.industry = "Unknown"; s.marketCap = 0;
+      }
     }
 
     const senatorCountsSorted = top.map(s => s.senatorCount).sort((a, b) => a - b);
@@ -353,16 +358,20 @@ function inferChamber(office, district) {
         const startSec = wmSec + 1;
         if (startSec >= nowSec) { newKlState[s.ticker] = wmSec; continue; }
         try {
-          const kr = getStockKline({ ticker: s.ticker, start_time: startSec, end_time: nowSec, interval: "1d" });
-          if (kr.success && kr.response && kr.response.data && kr.response.data.length > 0) {
-            const bars = kr.response.data.slice().reverse();
+          const kr = arraysGet("/api/v1/stocks/kline", {
+            symbol: s.ticker, start_time: startSec, end_time: nowSec, interval: "1d", limit: 10000,
+          });
+          if (kr && Array.isArray(kr.data) && kr.data.length > 0) {
+            // HTTP returns newest-first; reverse to oldest-first.
+            const bars = kr.data.slice().reverse();
             let maxSec = wmSec;
             for (const b of bars) {
-              const barSec = Math.floor(b.date / 1000);
+              const barSec = b.time_open;
               if (barSec > wmSec) {
                 klineRecords.push({
-                  date: b.date, ticker: s.ticker,
-                  open: b.open, high: b.high, low: b.low, close: b.close, volume: b.volume,
+                  date: barSec * 1000, ticker: s.ticker,
+                  open: b.price_open, high: b.price_high, low: b.price_low,
+                  close: b.price_close, volume: b.volume_traded,
                 });
                 if (barSec > maxSec) maxSec = barSec;
               }

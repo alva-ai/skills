@@ -1,8 +1,21 @@
 const { Feed, feedPath, makeDoc, num, str } = require("@alva/feed");
-const { getStockKline } = require("@arrays/data/stock/spot/ohlcv:v1.0.0");
-const { getPeRatio } = require("@arrays/data/market-metrics/pe-ratio:v1.0.0");
-const { getMarketCap } = require("@arrays/data/market-metrics/market-cap:v1.0.0");
-const { getRevenueGrowth } = require("@arrays/data/financial-metrics/revenue-growth:v1.0.0");
+const http = require("net/http");
+const secret = require("secret-manager");
+
+const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
+const ARRAYS_BASE = "https://data-tools.prd.space.id";
+const ARRAYS_HEADERS = { Authorization: "Bearer " + ARRAYS_JWT };
+
+function arraysGet(path, params) {
+  const qs = Object.keys(params)
+    .filter((k) => params[k] !== undefined && params[k] !== null)
+    .map((k) => encodeURIComponent(k) + "=" + encodeURIComponent(params[k]))
+    .join("&");
+  const url = ARRAYS_BASE + path + (qs ? "?" + qs : "");
+  const r = http.syncFetch(url, { headers: ARRAYS_HEADERS });
+  if (!r.ok) throw new Error("HTTP " + r.status + " " + path);
+  return JSON.parse(r.text());
+}
 
 // ─── AI Bottleneck — quant feed ───
 //
@@ -166,32 +179,62 @@ function r0(v){ return Math.round(v); }
 
 function loadDaily(ticker, startSec, endSec) {
   try {
-    const r = getStockKline({ ticker: ticker, start_time: startSec, end_time: endSec, interval: "1d" });
-    if (!r.success || !r.response || !r.response.data) return [];
-    return r.response.data.slice().reverse();
-  } catch (e) { log(`OHLCV err ${ticker}: ${e.message}`); return []; }
-}
-function latestMetric(fn, args) {
-  try {
-    const r = fn(args);
-    if (!r.success || !r.response || !r.response.data || !r.response.data.length) return null;
-    const vals = r.response.data[0].values;
-    if (!vals || !vals.length) return null;
-    return vals[vals.length-1].value;
-  } catch (e) { log(`metric err: ${e.message}`); return null; }
-}
-function loadPeSeries(sym, startMs, endMs) {
-  try {
-    const r = getPeRatio({ symbol:sym, interval:"1d", start_time:startMs, end_time:endMs });
-    if (!r.success || !r.response || !r.response.data || !r.response.data.length) return [];
-    const vals = r.response.data[0].values || [];
+    const j = arraysGet("/api/v1/stocks/kline", {
+      symbol: ticker, start_time: startSec, end_time: endSec, interval: "1d", limit: 10000,
+    });
+    if (!j || !Array.isArray(j.data)) return [];
+    // HTTP returns newest-first; reverse to oldest-first and map to {date, close, ...}
     const out = [];
-    for (let i=0;i<vals.length;i++){
-      const v = vals[i].value;
-      if (v != null && v > 0 && v < 500) out.push(v);
+    for (let i = j.data.length - 1; i >= 0; i--) {
+      const b = j.data[i];
+      out.push({
+        date: b.time_open * 1000,
+        endTime: b.time_close * 1000,
+        open: b.price_open,
+        high: b.price_high,
+        low: b.price_low,
+        close: b.price_close,
+        volume: b.volume_traded,
+      });
     }
     return out;
-  } catch (e) { log(`pe series err ${sym}: ${e.message}`); return []; }
+  } catch (e) { log(`OHLCV err ${ticker}: ${e.message}`); return []; }
+}
+function metricSeries(path, params) {
+  try {
+    const j = arraysGet(path, params);
+    if (!j || !Array.isArray(j.data) || !j.data.length) return [];
+    return j.data[0].values || [];
+  } catch (e) { log(`metric err ${path}: ${e.message}`); return []; }
+}
+function latestMarketMetric(symbol, indicator, startMs, endMs) {
+  const vals = metricSeries("/api/v1/stocks/market-metrics", {
+    symbol: symbol, indicator: indicator, interval: "1d",
+    start_time: Math.floor(startMs / 1000), end_time: Math.floor(endMs / 1000),
+  });
+  if (!vals.length) return null;
+  // Preserve original behavior: take vals[length-1] (HTTP returns newest-first → this is the oldest in window).
+  return vals[vals.length - 1].value;
+}
+function latestFinancialMetric(symbol, metric, startMs, endMs) {
+  const vals = metricSeries("/api/v1/stocks/financial-metrics", {
+    symbol: symbol, metric: metric,
+    start_time: Math.floor(startMs / 1000), end_time: Math.floor(endMs / 1000),
+  });
+  if (!vals.length) return null;
+  return vals[vals.length - 1].value;
+}
+function loadPeSeries(sym, startMs, endMs) {
+  const vals = metricSeries("/api/v1/stocks/market-metrics", {
+    symbol: sym, indicator: "PE_RATIO", interval: "1d",
+    start_time: Math.floor(startMs / 1000), end_time: Math.floor(endMs / 1000),
+  });
+  const out = [];
+  for (let i = 0; i < vals.length; i++) {
+    const v = vals[i].value;
+    if (v != null && v > 0 && v < 500) out.push(v);
+  }
+  return out;
 }
 function percentileRank(series, cur) {
   if (!series || !series.length || cur == null || cur <= 0) return null;
@@ -245,11 +288,9 @@ function classifyValByPct(pePct) {
     const fiveYrMs = now - 5 * 365 * 86400 * 1000;
     for (let i=0;i<BASKET.length;i++){
       const t = BASKET[i].id;
-      mcap[t]   = latestMetric(getMarketCap, { symbol:t, interval:"1d", start_time:m30ms, end_time:now });
-      pe[t]     = latestMetric(getPeRatio,   { symbol:t, interval:"1d", start_time:m30ms, end_time:now });
-      revYoy[t] = latestMetric(getRevenueGrowth, {
-        metric:"REVENUE_GROWTH_YOY_TTM", symbol:t, start_time:m400ms, end_time:now
-      });
+      mcap[t]   = latestMarketMetric(t, "MARKET_CAP", m30ms, now);
+      pe[t]     = latestMarketMetric(t, "PE_RATIO", m30ms, now);
+      revYoy[t] = latestFinancialMetric(t, "REVENUE_GROWTH_YOY_TTM", m400ms, now);
       const peHist = loadPeSeries(t, fiveYrMs, now);
       pePct[t] = percentileRank(peHist, pe[t]);
     }
