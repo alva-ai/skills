@@ -807,11 +807,11 @@ feed.def("metrics", {
     const start =
       lastDateMs > 0 ? Math.floor(lastDateMs / 1000) : now - 30 * 86400;
 
-    const resp = http.syncFetch(
+    const resp = await http.fetch(
       `${ARRAYS_BASE}/api/v1/crypto/ohlcv?symbol=BTCUSDT&start_time=${start}&end_time=${now}&interval=1h&limit=10000`,
       { headers: { Authorization: "Bearer " + ARRAYS_JWT } }
     );
-    const bars = JSON.parse(resp.text()).data.slice().reverse();
+    const bars = JSON.parse(await resp.text()).data.slice().reverse();
     const closes = bars.map((b) => b.close);
     const ema10 = indicators.ema(closes, { period: 10 });
 
@@ -1015,7 +1015,7 @@ alva fs remove --path '~/feeds/my-feed/v1/data' --recursive
 Test data skill response shapes before building a full feed:
 
 ```bash
-alva run --code 'const http = require("net/http"); const secret = require("secret-manager"); const jwt = secret.loadPlaintext("ARRAYS_JWT"); const r = http.syncFetch("https://data-tools.prd.space.id/api/v1/crypto/ohlcv?symbol=BTCUSDT&start_time=1735689600&end_time=1735776000&interval=1h&limit=5", {headers:{Authorization:"Bearer "+jwt}}); JSON.stringify(JSON.parse(r.text()).data[0]);'
+alva run --code '(async()=>{const http=require("net/http");const secret=require("secret-manager");const jwt=secret.loadPlaintext("ARRAYS_JWT");const r=await http.fetch("https://data-tools.prd.space.id/api/v1/crypto/ohlcv?symbol=BTCUSDT&start_time=1735689600&end_time=1735776000&interval=1h&limit=5",{headers:{Authorization:"Bearer "+jwt}});console.log(JSON.stringify(JSON.parse(await r.text()).data[0]));})();'
 ```
 
 ---
