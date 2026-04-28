@@ -68,6 +68,45 @@ playbook families. The example already conforms — keep it that way.
 
 ---
 
+## Build workflow
+
+- **Respect the [Feed Contract](#feed-contract) verbatim** — snake_case,
+  epoch ms, flat `metrics`, frozen field names (`id` / `score` / `rank` /
+  `flags`). Doing this means the example HTML's renderers work first try and
+  the test-debug loop on field-name mismatches disappears. The temptation is
+  "my screener is special, one camelCase field won't hurt"; it will, because
+  it pushes you back into adapter-shimming the renderers.
+- `cp` example files then mutate in place. Don't `Write` whole files back
+  when 70%+ is identical.
+- Do all mechanical renames in one `sed -i` pass (screener name, theme color +
+  CSS slugs, factor names, feed name, `USER`, API endpoint). `grep -nE` after
+  to catch stragglers.
+- Don't read the HTML linearly. `grep -n` the marker, then `Read` with
+  `offset` + `limit` on that section only.
+- Single feed: `grant` and `deploy create` have no cross-dependencies —
+  issue them in parallel. Only `playbook draft` → `release playbook` is
+  strictly serial.
+- Batch ticker → sector verification via one `alva run` against
+  `company/detail` before writing the universe. **`company/detail`'s sector
+  field can mislead on thematic baskets** — e.g. optical-transceiver makers
+  tagged "Semiconductors", fiber-laser makers tagged the same. When you
+  override the SDK's bucketing to match thematic intent, log the override in
+  the Methodology modal (under Data sources or Blind spots) so users see it's
+  a deliberate reclassification, not a bug.
+- Spend disproportionate time on **factor weights + flag thresholds**
+  (always) and on the **Daily Digest few-shot pack** + `push_line` voice
+  (when shipping the digest). Smallest blocks, highest leverage.
+- Drop the example HTML's `adaptRanking` / `adaptSummary` adapters once your
+  feed conforms to the frozen contract — they exist to paper over the senate
+  feed's quirks. A new feed that respects [Feed Contract](#feed-contract)
+  should pass through directly; leaving the adapters in place hides schema
+  drift.
+
+Cannot shortcut: universe curation, factor selection + weights, flag
+thresholds, the Daily Digest few-shot pack. Everything else is plumbing.
+
+---
+
 ## Variants
 
 Pick first. Every component below is tagged with which variant it applies to.
@@ -250,6 +289,14 @@ Optional. Common building blocks (pick what fits): Movers cards (Entries ·
 Dropouts · Top Gainers · Top Decliners for scored; Entries · Exits only for
 basket) → basket trend chart (eligible count bar + aggregate stat line over
 time) → optional detail tables / sector rotation.
+
+**Within-session reruns produce identical snapshots** for any feed whose
+inputs are daily OHLCV / fundamentals — every score is the same, so Movers
+cards render `0 entries / 0 dropouts / no changes`. This is correct behavior,
+not a bug. Real churn appears only after the next trading day's cron fires.
+Don't rerun manually expecting Movers to populate, and don't try to
+fake-backfill prior days; if the screener genuinely needs intra-day movers,
+move the inputs to an intraday cadence and tighten the cron accordingly.
 
 ### Tab 3 — Analysis
 
