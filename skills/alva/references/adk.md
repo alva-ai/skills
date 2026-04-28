@@ -128,8 +128,12 @@ const env = require("env");
 const http = require("net/http");
 
 const result = await adk.agent({
-  system: `Stock analyst. Compare current data to previous analysis. Return JSON:
-{"summary":"...","changes":["..."],"sentiment":"up|down|neutral"}`,
+  system: `Stock analyst. Compare current data to previous analysis.
+
+Reply MUST begin with \`{\` and end with \`}\`. No prose, no markdown, no code fences.
+Output is parsed by JSON.parse with no preprocessing.
+
+Schema: {"summary":"...","changes":["..."],"sentiment":"up|down|neutral"}`,
   prompt: "Analyze AAPL quarterly performance.",
   tools: [{
     name: "getIncomeStatements",
@@ -290,12 +294,32 @@ One tool to read from **any** deployed feed — reusable across agents.
 ### Structured Output
 
 Enforce JSON output via system prompt when result must be parsed by downstream code.
+Use positive framing ("MUST begin with `{`") rather than negative ("no fences") — the
+model has a strong learned prior to wrap JSON in markdown fences that negative
+instructions alone don't reliably override. Pair the prompt with a defensive
+`parseJson` helper: even with the contract below, the model occasionally still
+wraps output in ` ```json ... ``` ` fences, and a naked `JSON.parse` will throw.
 
 ```javascript
+// Defensive parse — strip optional markdown fences, fall back to inner-object regex.
+function parseJson(s) {
+  if (!s) return null;
+  const cleaned = s.replace(/^```(?:json)?/, "").replace(/```$/, "").trim();
+  try { return JSON.parse(cleaned); } catch (e) {
+    const m = cleaned.match(/\{[\s\S]*\}/);
+    if (m) { try { return JSON.parse(m[0]); } catch (e2) { return null; } }
+    return null;
+  }
+}
+
 const result = await adk.agent({
-  system: `Return ONLY valid JSON: {"insights":[{"sentiment":"up|down|neutral","title":"...","text":"..."}]}`,
+  system: `Return JSON only.
+Reply MUST begin with \`{\` and end with \`}\`. No prose, no markdown, no code fences.
+Output is parsed by JSON.parse with no preprocessing.
+
+Schema: {"insights":[{"sentiment":"up|down|neutral","title":"...","text":"..."}]}`,
   prompt: "...",
   tools: [/* ... */],
 });
-const parsed = JSON.parse(result.content);
+const parsed = parseJson(result.content);
 ```
