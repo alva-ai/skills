@@ -37,7 +37,7 @@ releasing.
 ```
 alva release feed --name btc-ema --version 1.0.0 --cronjob-id 42 \
   --description "Fetches BTC/USDT 1h klines from Binance and emits the 20-period EMA as a time series"
-→ {"feed_id": 100, "name": "btc-ema", "feed_major": 1}
+→ {"feed_id": 100, "name": "btc-ema", "feed_major": 1, "feed_path": "/alva/home/alice/feeds/btc-ema"}
 ```
 
 ## Release Playbook
@@ -70,7 +70,7 @@ Requires both a URL-safe `name` and a human-readable `display-name`.
 
 ``` bash
 alva release playbook-draft --name btc-dashboard --display-name "BTC Trend Dashboard" --description "BTC market dashboard with price, technicals, and volume" --feeds '[{"feed_id": 100}]' --trading-symbols '["BTC"]'
-→ {"playbook_id": 99, "playbook_version_id": 200}
+→ {"playbook_id": 99, "playbook_version_id": 200, "playbook_path": "/alva/home/alice/playbooks/btc-dashboard"}
 ```
 
 ## Release Playbook
@@ -100,7 +100,7 @@ Feed reference fields:
 
 ```
 alva release playbook --name btc-dashboard --version v1.0.0 --feeds '[{"feed_id": 100, "feed_major": 1}]' --changelog "Initial release"
-→ {"playbook_id": 99, "version": "v1.0.0", "published_url": "https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html"}
+→ {"playbook_id": 99, "version": "v1.0.0", "published_url": "https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html", "playbook_path": "/alva/home/alice/playbooks/btc-dashboard"}
 ```
 
 After a successful release, output the alva.ai playbook link to the user:

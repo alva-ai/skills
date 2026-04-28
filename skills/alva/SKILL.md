@@ -733,6 +733,7 @@ Reference docs:
 - [Playbook Comments](references/api/playbook-comment.md) — `alva comments`
 - [Screenshot](references/api/screenshot.md) — `alva screenshot`
 - [Trading](references/api/trading.md) — `alva trading`
+- [Notifications](references/api/notifications.md) — `alva notifications`
 - [Error Responses](references/api/error-responses.md)
 
 ---
