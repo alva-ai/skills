@@ -11,15 +11,15 @@ const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
 const ARRAYS_BASE = "https://data-tools.prd.space.id";
 const ARRAYS_HEADERS = { Authorization: "Bearer " + ARRAYS_JWT };
 
-function arraysGet(path, params) {
+async function arraysGet(path, params) {
   const qs = Object.keys(params)
     .filter((k) => params[k] !== undefined && params[k] !== null)
     .map((k) => encodeURIComponent(k) + "=" + encodeURIComponent(params[k]))
     .join("&");
   const url = ARRAYS_BASE + path + (qs ? "?" + qs : "");
-  const r = http.syncFetch(url, { headers: ARRAYS_HEADERS });
-  if (!r.ok) throw new Error("HTTP " + r.status + " " + path);
-  return JSON.parse(r.text());
+  const r = await http.fetch(url, { headers: ARRAYS_HEADERS });
+  if (r.status < 200 || r.status >= 300) throw new Error("HTTP " + r.status + " " + path);
+  return JSON.parse(await r.text());
 }
 
 const COOLDOWN_DAYS = 90;
@@ -51,27 +51,18 @@ feed.def("summary", {
   ]),
 });
 
-function sleep(ms){const t=Date.now();while(Date.now()-t<ms){}}
-function fetchDaily(symbol, startSec) {
+async function fetchDaily(symbol, startSec) {
   const endSec = Math.floor(Date.UTC(2027,5,1)/1000);
-  for (let a=0; a<4; a++) {
-    try {
-      const j = arraysGet("/api/v1/stocks/kline", {
-        symbol, start_time: startSec, end_time: endSec, interval: "1d", limit: 10000,
-      });
-      if (j && Array.isArray(j.data)) {
-        // HTTP returns newest-first; reverse to oldest-first and normalize to {date, close}
-        const out = [];
-        for (let i = j.data.length - 1; i >= 0; i--) {
-          const b = j.data[i];
-          out.push({ date: b.time_open * 1000, close: b.price_close });
-        }
-        return out;
-      }
-    } catch(e) { console.log("retry", symbol, a, e.message); }
-    sleep(2000+a*1500);
+  const j = await arraysGet("/api/v1/stocks/kline", {
+    symbol, start_time: startSec, end_time: endSec, interval: "1d", limit: 10000,
+  });
+  if (!j || !Array.isArray(j.data)) return [];
+  const out = [];
+  for (let i = j.data.length - 1; i >= 0; i--) {
+    const b = j.data[i];
+    out.push({ date: b.time_open * 1000, close: b.price_close });
   }
-  return [];
+  return out;
 }
 
 function eraFor(isoDate) {
@@ -86,11 +77,11 @@ function eraFor(isoDate) {
 (async () => {
   await feed.run(async (ctx) => {
     const CPER_START = Math.floor(Date.UTC(2011,10,15)/1000);
-    const cperBars = fetchDaily("CPER", CPER_START);
-    sleep(1500);
-    const gldBars = fetchDaily("GLD", CPER_START);
-    sleep(1500);
-    const spyBars = fetchDaily("SPY", CPER_START);
+    const [cperBars, gldBars, spyBars] = await Promise.all([
+      fetchDaily("CPER", CPER_START),
+      fetchDaily("GLD", CPER_START),
+      fetchDaily("SPY", CPER_START),
+    ]);
 
     console.log("CPER bars:", cperBars.length, "GLD bars:", gldBars.length, "SPY bars:", spyBars.length);
     if (!cperBars.length || !gldBars.length || !spyBars.length) {

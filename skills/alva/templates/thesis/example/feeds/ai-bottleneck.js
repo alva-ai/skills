@@ -6,15 +6,15 @@ const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
 const ARRAYS_BASE = "https://data-tools.prd.space.id";
 const ARRAYS_HEADERS = { Authorization: "Bearer " + ARRAYS_JWT };
 
-function arraysGet(path, params) {
+async function arraysGet(path, params) {
   const qs = Object.keys(params)
     .filter((k) => params[k] !== undefined && params[k] !== null)
     .map((k) => encodeURIComponent(k) + "=" + encodeURIComponent(params[k]))
     .join("&");
   const url = ARRAYS_BASE + path + (qs ? "?" + qs : "");
-  const r = http.syncFetch(url, { headers: ARRAYS_HEADERS });
-  if (!r.ok) throw new Error("HTTP " + r.status + " " + path);
-  return JSON.parse(r.text());
+  const r = await http.fetch(url, { headers: ARRAYS_HEADERS });
+  if (r.status < 200 || r.status >= 300) throw new Error("HTTP " + r.status + " " + path);
+  return JSON.parse(await r.text());
 }
 
 // ─── AI Bottleneck — quant feed ───
@@ -177,13 +177,13 @@ feed.def("basket", {
 function r1(v){ return Math.round(v*10)/10; }
 function r0(v){ return Math.round(v); }
 
-function loadDaily(ticker, startSec, endSec) {
+async function loadDaily(ticker, startSec, endSec) {
   try {
-    const j = arraysGet("/api/v1/stocks/kline", {
+    const j = await arraysGet("/api/v1/stocks/kline", {
       symbol: ticker, start_time: startSec, end_time: endSec, interval: "1d", limit: 10000,
     });
     if (!j || !Array.isArray(j.data)) return [];
-    // HTTP returns newest-first; reverse to oldest-first and map to {date, close, ...}
+    // HTTP returns newest-first; reverse to oldest-first
     const out = [];
     for (let i = j.data.length - 1; i >= 0; i--) {
       const b = j.data[i];
@@ -198,34 +198,37 @@ function loadDaily(ticker, startSec, endSec) {
       });
     }
     return out;
-  } catch (e) { log(`OHLCV err ${ticker}: ${e.message}`); return []; }
+  } catch (e) { console.log(`OHLCV err ${ticker}: ${e.message}`); return []; }
 }
-function metricSeries(path, params) {
+
+async function metricSeries(path, params) {
   try {
-    const j = arraysGet(path, params);
+    const j = await arraysGet(path, params);
     if (!j || !Array.isArray(j.data) || !j.data.length) return [];
     return j.data[0].values || [];
-  } catch (e) { log(`metric err ${path}: ${e.message}`); return []; }
+  } catch (e) { console.log(`metric err ${path}: ${e.message}`); return []; }
 }
-function latestMarketMetric(symbol, indicator, startMs, endMs) {
-  const vals = metricSeries("/api/v1/stocks/market-metrics", {
-    symbol: symbol, indicator: indicator, interval: "1d",
-    start_time: Math.floor(startMs / 1000), end_time: Math.floor(endMs / 1000),
-  });
-  if (!vals.length) return null;
-  // Preserve original behavior: take vals[length-1] (HTTP returns newest-first → this is the oldest in window).
-  return vals[vals.length - 1].value;
-}
-function latestFinancialMetric(symbol, metric, startMs, endMs) {
-  const vals = metricSeries("/api/v1/stocks/financial-metrics", {
-    symbol: symbol, metric: metric,
+
+async function latestMarketMetric(symbol, indicator, startMs, endMs) {
+  const vals = await metricSeries("/api/v1/stocks/market-metrics", {
+    symbol, indicator, interval: "1d",
     start_time: Math.floor(startMs / 1000), end_time: Math.floor(endMs / 1000),
   });
   if (!vals.length) return null;
   return vals[vals.length - 1].value;
 }
-function loadPeSeries(sym, startMs, endMs) {
-  const vals = metricSeries("/api/v1/stocks/market-metrics", {
+
+async function latestFinancialMetric(symbol, metric, startMs, endMs) {
+  const vals = await metricSeries("/api/v1/stocks/financial-metrics", {
+    symbol, metric,
+    start_time: Math.floor(startMs / 1000), end_time: Math.floor(endMs / 1000),
+  });
+  if (!vals.length) return null;
+  return vals[vals.length - 1].value;
+}
+
+async function loadPeSeries(sym, startMs, endMs) {
+  const vals = await metricSeries("/api/v1/stocks/market-metrics", {
     symbol: sym, indicator: "PE_RATIO", interval: "1d",
     start_time: Math.floor(startMs / 1000), end_time: Math.floor(endMs / 1000),
   });
@@ -236,6 +239,7 @@ function loadPeSeries(sym, startMs, endMs) {
   }
   return out;
 }
+
 function percentileRank(series, cur) {
   if (!series || !series.length || cur == null || cur <= 0) return null;
   let below = 0;
@@ -272,27 +276,28 @@ function classifyValByPct(pePct) {
     const startSec = nowSec - lookbackDays * 86400;
     const jan1Ms = Date.UTC(2026, 0, 1);
 
-    // ─── Fetch OHLCV ───
+    // ─── Fetch all OHLCV in parallel ───
+    const barsArr = await Promise.all(ALL.map(t => loadDaily(t, startSec, nowSec)));
     const bars = {};
-    for (let i=0;i<ALL.length;i++){
-      bars[ALL[i]] = loadDaily(ALL[i], startSec, nowSec);
-    }
+    for (let i = 0; i < ALL.length; i++) bars[ALL[i]] = barsArr[i];
 
-    // ─── Fundamentals + P/E percentile ───
-    const mcap = {};
-    const pe = {};
-    const pePct = {};
-    const revYoy = {};
+    // ─── Fundamentals + P/E percentile in parallel ───
     const m30ms = now - 30*86400*1000;
     const m400ms = now - 400*86400*1000;
     const fiveYrMs = now - 5 * 365 * 86400 * 1000;
-    for (let i=0;i<BASKET.length;i++){
-      const t = BASKET[i].id;
-      mcap[t]   = latestMarketMetric(t, "MARKET_CAP", m30ms, now);
-      pe[t]     = latestMarketMetric(t, "PE_RATIO", m30ms, now);
-      revYoy[t] = latestFinancialMetric(t, "REVENUE_GROWTH_YOY_TTM", m400ms, now);
-      const peHist = loadPeSeries(t, fiveYrMs, now);
-      pePct[t] = percentileRank(peHist, pe[t]);
+
+    const fundamentals = await Promise.all(BASKET.map(async (b) => {
+      const [mcapV, peV, revYoyV, peHist] = await Promise.all([
+        latestMarketMetric(b.id, "MARKET_CAP", m30ms, now),
+        latestMarketMetric(b.id, "PE_RATIO", m30ms, now),
+        latestFinancialMetric(b.id, "REVENUE_GROWTH_YOY_TTM", m400ms, now),
+        loadPeSeries(b.id, fiveYrMs, now),
+      ]);
+      return { id: b.id, mcap: mcapV, pe: peV, revYoy: revYoyV, pePct: percentileRank(peHist, peV) };
+    }));
+    const mcap = {}, pe = {}, pePct = {}, revYoy = {};
+    for (const f of fundamentals) {
+      mcap[f.id] = f.mcap; pe[f.id] = f.pe; pePct[f.id] = f.pePct; revYoy[f.id] = f.revYoy;
     }
 
     // ─── Per-member returns by horizon ───
@@ -375,15 +380,12 @@ function classifyValByPct(pePct) {
       for (let k=0;k<bb.length;k++){ if (bb[k].date >= jan1Ms) { baseByT[BASKET[i].id] = bb[k].close; break; } }
     }
     const days = Object.keys(dayMap).map(Number).sort((a,b)=> a-b);
-    let basePave=null;
-    let baseSmh=null;
-    let baseSpy=null;
+    let basePave=null, baseSmh=null, baseSpy=null;
     const equityRecords = [];
     for (let d=0; d<days.length; d++){
       const dm = days[d];
       const rec = dayMap[dm];
-      let sumRet = 0;
-      let covered = 0;
+      let sumRet = 0, covered = 0;
       for (let i=0;i<BASKET.length;i++){
         const t = BASKET[i].id;
         const bb2 = bars[t];
@@ -412,8 +414,7 @@ function classifyValByPct(pePct) {
     const horizonRecs = [];
     for (let w=0;w<winKeys.length;w++){
       const key = winKeys[w];
-      let s = 0;
-      let n = 0;
+      let s = 0, n = 0;
       for (let i=0;i<BASKET.length;i++){
         const v = retBy[BASKET[i].id]?.[key];
         if (v != null) { s += v; n++; }
@@ -441,8 +442,7 @@ function classifyValByPct(pePct) {
     for (let k=0;k<layerKeys.length;k++){
       const L = layerKeys[k];
       const members = BASKET.filter((b)=> b.layer === L);
-      const r3m = [];
-      const rYtd = [];
+      const r3m = [], rYtd = [];
       for (let m=0;m<members.length;m++){
         const rr = retBy[members[m].id] || {};
         if (rr["3m"] != null) r3m.push(rr["3m"]);
@@ -492,13 +492,10 @@ function classifyValByPct(pePct) {
       const n = Math.min(b.length, m.length);
       if (n < 20) return null;
       b = b.slice(-n); m = m.slice(-n);
-      let mb = 0;
-      let mm = 0;
+      let mb = 0, mm = 0;
       for (let i=0;i<n;i++){ mb += b[i]; mm += m[i]; }
       mb /= n; mm /= n;
-      let covBM = 0;
-      let varM = 0;
-      let varB = 0;
+      let covBM = 0, varM = 0, varB = 0;
       for (let i=0;i<n;i++){
         covBM += (b[i]-mb)*(m[i]-mm);
         varM  += (m[i]-mm)*(m[i]-mm);
@@ -509,7 +506,7 @@ function classifyValByPct(pePct) {
       const corr = (varM > 0 && varB > 0) ? covBM / Math.sqrt(varM * varB) : 0;
       const r2 = corr * corr;
       const alphaAnnual = (mb - beta * mm) * 252 * 100;
-      return { beta:beta, corr:corr, r2:r2, alpha:alphaAnnual, n:n };
+      return { beta, corr, r2, alpha: alphaAnnual, n };
     }
     const attrRecs = [];
     for (const bench of ["pave","smh","spy"]){
@@ -523,9 +520,7 @@ function classifyValByPct(pePct) {
     if (attrRecs.length) await ctx.self.ts("basket","attribution").append(attrRecs);
 
     // ─── Basket change log (kv-diff) ───
-    function basketSig(arr){
-      return arr.map((b)=> `${b.id}:${b.layer}`).sort().join(',');
-    }
+    function basketSig(arr){ return arr.map((b)=> `${b.id}:${b.layer}`).sort().join(','); }
     const curSig = basketSig(BASKET);
     const prevSig = await ctx.kv.load("basket_sig");
     const changeRecs = [];
@@ -538,14 +533,9 @@ function classifyValByPct(pePct) {
         });
       }
     } else if (prevSig !== curSig){
-      const prevMap = {};
-      const curMap = {};
-      for (const s of prevSig.split(',')) {
-        const p = s.split(':'); prevMap[p[0]] = p[1];
-      }
-      for (const s of curSig.split(',')) {
-        const p = s.split(':'); curMap[p[0]] = p[1];
-      }
+      const prevMap = {}, curMap = {};
+      for (const s of prevSig.split(',')) { const p = s.split(':'); prevMap[p[0]] = p[1]; }
+      for (const s of curSig.split(','))  { const p = s.split(':'); curMap[p[0]]  = p[1]; }
       for (const t in curMap){
         if (!prevMap[t]) changeRecs.push({ date:todayMs, action:"added", id:t, from_layer:"", to_layer:curMap[t], reason:"Added." });
         else if (prevMap[t] !== curMap[t]) changeRecs.push({ date:todayMs, action:"relayered", id:t, from_layer:prevMap[t], to_layer:curMap[t], reason:"Layer reclassified." });
@@ -561,6 +551,6 @@ function classifyValByPct(pePct) {
       await ctx.kv.put("basket_sig", curSig);
     }
 
-    log(`ai-bottleneck quant: ${memberRecords.length} members, ${equityRecords.length} equity days, ${horizonRecs.length} horizons, ${attrRecs.length} attributions, ${changeRecs.length} changelog.`);
+    console.log(`ai-bottleneck quant: ${memberRecords.length} members, ${equityRecords.length} equity days, ${horizonRecs.length} horizons, ${attrRecs.length} attributions, ${changeRecs.length} changelog.`);
   });
 })();
