@@ -1,0 +1,2346 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Next AI Bottleneck — Supply-side constraint tracker</title>
+<link rel="preconnect" href="https://alva-ai-static.b-cdn.net">
+<link rel="stylesheet" href="https://alva-ai-static.b-cdn.net/fonts/delight/delight.css">
+<link rel="stylesheet" href="https://alva-ai-static.b-cdn.net/design-system/design-tokens.css">
+
+<style>
+  html { height:100%; overflow:hidden; }
+  body {
+    height:100%; overflow-y:auto; overflow-x:hidden;
+    margin:0; padding:0;
+    background: var(--b0-page);
+    color: var(--text-n9);
+    font-family: Delight, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  * { -ms-overflow-style: none; scrollbar-width: none; box-sizing: border-box; }
+  *::-webkit-scrollbar { display: none; }
+  button, input, select, textarea { font-family: inherit; }
+  .playbook-container {
+    width: 100%; max-width: 2048px; margin: 0 auto;
+    padding: 0 var(--spacing-xxl) var(--spacing-xxxxl);
+    display:flex; flex-direction:column; gap: var(--spacing-xl);
+  }
+  a { color: var(--main-m1); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .meta-sep { color: var(--text-n3); }
+  .badge { display:inline-flex; align-items:center; gap:6px; font-size:12px; padding:2px 8px; border-radius: var(--radius-ct-xs); line-height:18px; }
+  .badge-phase { padding:2px 8px; border-radius: var(--radius-ct-xs); font-size:12px; line-height:18px; }
+  .badge-phase-accel { background: rgba(42,155,125,0.14); color:#2a9b7d; }
+  .badge-phase-early { background: rgba(100,116,139,0.14); color:#64748b; }
+  .badge-phase-mature { background: rgba(223,167,60,0.18); color:#a56b10; }
+  .badge-phase-declining { background: rgba(224,83,87,0.14); color:#e05357; }
+  .badge-refresh { background: var(--grey-g01); color: var(--text-n7); }
+  .conviction-dots { display:inline-flex; align-items:center; gap:3px; }
+  .conviction-dots .dot { width:8px; height:8px; border-radius:50%; background: var(--text-n3); }
+  .conviction-dots .dot.on { background: var(--main-m1); }
+  .playbook-desc {
+    background: var(--grey-g01); padding: var(--spacing-s) var(--spacing-m);
+    border-radius: var(--radius-ct-s); font-size:14px; line-height:22px;
+    letter-spacing:0.14px; color:var(--text-n5);
+  }
+
+  .sec-stamp {
+    display:inline-flex; align-items:center; gap:4px;
+    font-size: 11px; color: var(--text-n5);
+    margin-left: var(--spacing-s);
+  }
+
+  /* Hero Section — daily thesis summary + deltas (Markdown medium card) */
+  .hero-card { margin: 0; }
+  .free-text-body { padding: var(--spacing-l); }
+  .markdown-container {
+    width: 100%;
+    display: flex; flex-direction: column;
+    gap: var(--spacing-m);
+  }
+  .markdown-container * { box-sizing: border-box; }
+  .markdown-container p {
+    font-family: 'Delight', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 16px; line-height: 26px; letter-spacing: 0.16px;
+    color: var(--text-n9); margin: 0; white-space: pre-wrap;
+  }
+  .markdown-container ul,
+  .markdown-container ol {
+    display: flex; flex-direction: column; gap: var(--spacing-xs);
+    list-style: none; margin: 0; padding: 0;
+  }
+  .markdown-container li {
+    font-family: 'Delight', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 16px; line-height: 26px; letter-spacing: 0.16px;
+    color: var(--text-n9); position: relative; padding-left: var(--spacing-xl);
+  }
+  .markdown-container ul > li::before {
+    content: ''; position: absolute;
+    left: 9.5px; top: 10.5px;
+    width: 5px; height: 5px; border-radius: 50%; background: var(--text-n9);
+  }
+  .markdown-container em { font-style: italic; }
+  .markdown-container strong { font-weight: 500; }
+  .markdown-container--m { gap: var(--spacing-xs); }
+  .markdown-container--m p,
+  .markdown-container--m li { font-size: 14px; line-height: 22px; letter-spacing: 0.14px; }
+  .markdown-container--m li { padding-left: var(--spacing-l); }
+  .markdown-container--m ul > li::before { left: 7.5px; top: 8.5px; }
+  .markdown-container--m ul { gap: var(--spacing-xxs); }
+  .hero-head {
+    display:flex; justify-content: space-between; align-items: center;
+    gap: var(--spacing-m); margin-bottom: var(--spacing-xs);
+    flex-wrap: wrap;
+  }
+  .hero-head-meta { font-size:12px; line-height:20px; color: var(--text-n5); text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* Snapshot dropdown — aligned with Screener filter-dropdown pattern */
+  .filter-dropdown { position:relative; display:inline-flex; align-items:center; }
+  .filter-dropdown-trigger {
+    background:transparent; border:none; border-radius:0;
+    padding:0; margin:0;
+    font-family:inherit; font-size:12px; color:var(--text-n9);
+    cursor:pointer; display:inline-flex; align-items:center; gap:8px;
+    line-height:20px; transition:color .15s;
+  }
+  .filter-dropdown-trigger:hover { color:var(--main-m1); }
+  .filter-dropdown.open .filter-dropdown-trigger { color:var(--main-m1); }
+  .filter-dropdown-label { color:var(--text-n5); font-size:12px; line-height:20px; }
+  .filter-dropdown-value { color:var(--text-n9); display:inline-flex; align-items:baseline; gap:6px; font-size:12px; line-height:20px; font-variant-numeric: tabular-nums; }
+  .filter-dropdown-value-sub { font-size:12px; line-height:20px; color:var(--text-n5); }
+  .filter-dropdown-caret {
+    display:inline-block; width:12px; height:12px;
+    background-color:var(--text-n3);
+    -webkit-mask:url('https://alva-ai-static.b-cdn.net/icons/arrow-down-f2.svg') no-repeat center / contain;
+            mask:url('https://alva-ai-static.b-cdn.net/icons/arrow-down-f2.svg') no-repeat center / contain;
+    transition:transform .15s, background-color .15s;
+  }
+  .filter-dropdown.open .filter-dropdown-caret { transform:rotate(180deg); background-color:var(--main-m1); }
+  .filter-dropdown-menu {
+    position:absolute; top:calc(100% + 6px); left:0;
+    min-width:220px; max-height:280px; overflow-y:auto;
+    background:var(--b0-container);
+    border:0.5px solid var(--line-l2); border-radius:var(--radius-pop-dropdown);
+    box-shadow:var(--shadow-s);
+    padding:4px; z-index:100; display:none;
+  }
+  .filter-dropdown.open .filter-dropdown-menu { display:block; }
+  .filter-dropdown-item {
+    display:flex; align-items:baseline; justify-content:space-between;
+    padding:8px 12px; font-family:inherit; font-size:13px;
+    color:var(--text-n9); background:transparent; border:none;
+    cursor:pointer; width:100%; border-radius:4px; text-align:left;
+    line-height:20px; font-variant-numeric: tabular-nums;
+  }
+  .filter-dropdown-item:hover { background:var(--grey-g01); }
+  .filter-dropdown-item.active {
+    background:rgba(73,163,166,0.08); color:var(--main-m1);
+  }
+  .filter-dropdown-item-sub {
+    font-size:11px; color:var(--text-n5); margin-left:12px;
+  }
+
+  /* Hero date switcher — prev | date pill | next */
+  .hero-date-switcher {
+    display:inline-flex; align-items:center; gap: var(--spacing-xxs);
+    margin-bottom: var(--spacing-s);
+  }
+  .hero-date-nav {
+    width:28px; height:28px; padding:0;
+    display:inline-flex; align-items:center; justify-content:center;
+    background: var(--b0-container, #fff);
+    border: 0.5px solid var(--line-l2, rgba(0,0,0,0.08));
+    border-radius: var(--radius-btn-s);
+    cursor:pointer;
+    color: var(--text-n7);
+    transition: background .15s, color .15s, border-color .15s, opacity .15s;
+  }
+  .hero-date-nav:hover:not(:disabled) {
+    background: var(--grey-g01);
+    color: var(--text-n9);
+  }
+  .hero-date-nav:disabled { opacity:0.35; cursor:not-allowed; }
+  .hero-date-nav-icon {
+    width:12px; height:12px;
+    background-color: currentColor;
+    -webkit-mask:url('https://alva-ai-static.b-cdn.net/icons/arrow-down-f2.svg') no-repeat center / contain;
+            mask:url('https://alva-ai-static.b-cdn.net/icons/arrow-down-f2.svg') no-repeat center / contain;
+  }
+  .hero-date-nav-icon.prev  { transform: rotate(90deg); }
+  .hero-date-nav-icon.next  { transform: rotate(-90deg); }
+  .hero-date-switcher .hero-date-pill {
+    height:28px; box-sizing:border-box;
+    padding: 0 var(--spacing-s);
+    background: var(--b0-container, #fff);
+    border: 0.5px solid var(--line-l2, rgba(0,0,0,0.08));
+    border-radius: var(--radius-btn-s);
+    transition: border-color .15s;
+  }
+  .hero-date-switcher .hero-date-pill:hover { border-color: var(--line-l3, rgba(0,0,0,0.16)); }
+  .hero-date-switcher .hero-date-pill .filter-dropdown-trigger {
+    height:100%;
+    gap: var(--spacing-xs);
+  }
+  .hero-text {
+    font-size: 14px; line-height: 22px; color: var(--text-n7);
+    letter-spacing: 0.14px; margin: 0;
+  }
+  .hero-deltas-title {
+    font-size: 11px; color: var(--text-n5); text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: var(--spacing-m) 0 var(--spacing-xs) 0;
+  }
+  .hero-deltas-list { list-style: none; padding: 0; margin: 0; }
+  .hero-delta {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 12px 0;
+    font-size: 13px; line-height: 22px;
+    border-bottom: 1px solid var(--line-l05);
+  }
+  .hero-delta:last-child { border-bottom: none; }
+  .hero-delta-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    margin-top: 7px; flex-shrink: 0;
+  }
+  .hero-delta-dot.bull { background: var(--main-m3); }
+  .hero-delta-dot.bear { background: var(--main-m4); }
+  .hero-delta-dot.neutral { background: var(--text-n3); }
+  .hero-delta-body-wrap { flex: 1; min-width: 0; }
+  .hero-delta-cat {
+    display: inline-flex; align-items: center;
+    height: 22px; box-sizing: border-box;
+    font-size: 10px; line-height: 1; text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 0 6px; border-radius: var(--radius-ct-xs);
+    margin-right: 6px; vertical-align: top;
+  }
+  .hero-delta-cat.cat-valuation { background: rgba(124,58,237,0.10); color:#7c3aed; }
+  .hero-delta-cat.cat-catalyst  { background: rgba(42,155,125,0.14); color:#2a9b7d; }
+  .hero-delta-cat.cat-risk      { background: rgba(224,83,87,0.14);  color:#e05357; }
+  .hero-delta-cat.cat-macro     { background: rgba(60,120,200,0.12); color:#2c5fb5; }
+  .hero-delta-cat.cat-news      { background: rgba(120,120,120,0.14); color: var(--text-n7); }
+  .hero-delta-label { color: var(--text-n9); font-weight: 500; }
+  .hero-delta-body  { color: var(--text-n7); }
+  .hero-delta-empty { font-size: 13px; color: var(--text-n5); padding: 8px 0; }
+  .hero-delta.is-hidden { display: none; }
+  .hero-deltas-toggle {
+    display: inline-flex; align-items: center;
+    margin-top: var(--spacing-s);
+    padding: 0; background: none; border: none; cursor: pointer;
+    font-size: 12px; color: var(--text-n7); letter-spacing: 0.12px;
+    transition: color .15s ease;
+  }
+  .hero-deltas-toggle:hover { color: var(--text-n9); }
+
+  /* Tabs — Alva Underline (aligned with Screener redesign) */
+  .tab-wrapper-row .tab-snapshot .filter-dropdown-menu { left:auto; right:0; }
+  .tab-wrapper-row {
+    display:flex; align-items:flex-end; justify-content:space-between;
+    gap: var(--spacing-m); flex-wrap:nowrap;
+    border-bottom: 1px solid var(--line-l07);
+  }
+  .tab.tab-underline {
+    display:flex; align-items:center; flex:1 1 auto; min-width:0;
+    gap: var(--spacing-m);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tab.tab-underline::-webkit-scrollbar { display:none; }
+  .tab.tab-underline .tab-item { flex-shrink:0; white-space:nowrap; }
+  .tab-wrapper-row .tab-snapshot { flex-shrink:0; align-self:flex-end; padding-bottom:9px; }
+  .tab-wrapper-row .tab-right-group {
+    display:flex; align-items:center; gap: var(--spacing-xs);
+    flex-shrink:0; align-self:flex-end; padding-bottom:11px;
+  }
+  .tab-wrapper-row .tab-right-group .tab-snapshot { padding-bottom:0; }
+  .tab-wrapper-row .tab-readme { cursor:pointer; }
+
+  /* ── Tab-bar README (chip style, scoped to .tab-readme only) ── */
+  .pb-meta-link--readme.tab-readme {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xxs);
+    height: 24px;
+    padding: var(--spacing-xxxs) var(--spacing-xs);
+    background: var(--b-r02);
+    border: 0.5px solid var(--line-l2);
+    border-radius: var(--radius-ct-s);
+    font-family: inherit;
+    font-size: 12px;
+    line-height: 20px;
+    letter-spacing: 0.12px;
+    color: var(--text-n9);
+    transition: background .15s, border-color .15s;
+  }
+  .pb-meta-link--readme.tab-readme .pb-meta-icon-badge {
+    width: 14px; height: 14px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+  }
+  .pb-meta-link--readme.tab-readme .pb-meta-icon-img {
+    width: 14px; height: 14px;
+  }
+  .pb-meta-link--readme.tab-readme:hover,
+  .pb-meta-link--readme.tab-readme:active,
+  .pb-meta-link--readme.tab-readme.is-open {
+    background: var(--b-r03);
+    border-color: var(--line-l9);
+    opacity: 1;
+  }
+  .pb-meta-link--readme.tab-readme:hover .pb-meta-icon-badge {
+    background: transparent;
+    border: none;
+  }
+  .pb-meta-link--readme.tab-readme:hover .pb-meta-icon-img {
+    filter: brightness(0);
+  }
+  .tab-wrapper-row .tab-right-group:has(#hero-date-filter[style*="none"]) .pb-meta-sep { display:none; }
+  .tab-underline .tab-item {
+    padding-bottom: var(--spacing-xxs);
+    color: var(--text-n7);
+    border-bottom: 2px solid transparent;
+    cursor: pointer; user-select: none;
+    transition: color .15s, border-color .15s;
+    font-family: 'Delight', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 14px;
+    line-height: 22px;
+    letter-spacing: 0.14px;
+  }
+  .tab-underline.tab-l { gap: var(--spacing-l); }
+  .tab-underline.tab-l .tab-item {
+    padding-bottom: 6px;
+    font-size: 16px;
+    line-height: 26px;
+    letter-spacing: 0.16px;
+  }
+  .tab-underline .tab-item:hover { color: var(--text-n9); }
+  .tab-underline .tab-item.active {
+    color: var(--text-n9);
+    font-weight: 500;
+    border-bottom-color: var(--main-m1);
+  }
+  /* Prevent layout shift when active weight toggles to 500 */
+  .tab-item::after {
+    content: attr(data-text);
+    font-weight: 500; visibility: hidden;
+    height: 0; display: block; overflow: hidden;
+  }
+  /* tab-panel visibility is controlled by inline style in JS (see tabs handler) */
+  .tab-panel { display:flex; flex-direction:column; gap: var(--spacing-xl); }
+  /* Reset native <button> chrome on tab-items (current uses <button>, template assumed <div>) */
+  button.tab-item {
+    background:none; border:none; margin:0; padding:0; padding-bottom:6px;
+    font-family:inherit; cursor:pointer;
+  }
+  .tab-underline button.tab-item { border-bottom: 2px solid transparent; }
+  .tab-underline button.tab-item.active { border-bottom-color: var(--main-m1); }
+
+  /* Widgets */
+  .widget-card { background: transparent; display:flex; flex-direction:column; position:relative; }
+  .widget-title { display:flex; align-items:center; justify-content:space-between; margin-bottom: var(--spacing-m); }
+  .widget-title-text { font-size:18px; color:var(--text-n9); letter-spacing:0.18px; line-height:28px; font-weight:400; }
+  .expand-panel .widget-title-text { font-size:14px; line-height:22px; }
+  .widget-title-sub { font-size:12px; color:var(--text-n5); }
+  .widget-body { border-radius: var(--radius-ct-s); }
+  .chart-dotted-background {
+    background-image: radial-gradient(circle, rgba(0,0,0,0.18) 0.6px, transparent 0.6px);
+    background-size: 3px 3px;
+  }
+  .chart-body { padding: var(--spacing-m); position:relative; }
+  .widget-card:has(.chart-body) { overflow: hidden; }
+  .chart-legend { display:flex; align-items:center; justify-content:flex-end; gap: var(--spacing-xs); height:16px; margin-bottom: var(--spacing-xxs); }
+  .legend-item { display:flex; align-items:center; gap: var(--spacing-xxs); font-size:10px; letter-spacing:0.1px; color: var(--text-n5); }
+  .legend-line { width:12px; height:2px; border-radius:0.5px; }
+  .chart-container { width:100%; height:100%; min-height:180px; }
+  .alva-watermark { position:absolute; bottom: var(--spacing-m); right: var(--spacing-m); opacity:0.2; line-height:0; pointer-events:none; }
+
+  /* Grid */
+  .grid { display:grid; gap: var(--spacing-l); }
+  .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .grid-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  @media (max-width: 1100px) { .grid-4, .grid-5 { grid-template-columns: repeat(2, 1fr); } .grid-3 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; } }
+
+  /* Verdict Hero */
+  .verdict-hero {
+    background: var(--grey-g01);
+    border-radius: var(--radius-ct-s);
+    padding: var(--spacing-xl);
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr 1.2fr;
+    gap: var(--spacing-l);
+    margin-bottom: var(--spacing-xl);
+  }
+  @media (max-width: 900px) { .verdict-hero { grid-template-columns: 1fr 1fr; } }
+  .vh-block { display:flex; flex-direction:column; gap:6px; }
+  .vh-label { font-size:12px; color:var(--text-n5); text-transform:uppercase; letter-spacing:0.06em; }
+  .vh-value { font-size:28px; color:var(--text-n9); line-height:36px; }
+  .vh-sub { font-size:12px; color:var(--text-n5); }
+  .val-bull { color: #2a9b7d; }
+  .val-bear { color: #e05357; }
+  .val-neutral { color: var(--text-n7); }
+
+  /* Horizon cards — match .metric-card style */
+  .horizon-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    width: 100%;
+  }
+  @media (max-width: 960px) { .horizon-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 560px) { .horizon-grid { grid-template-columns: repeat(2, 1fr); } }
+  .hz-value.hz-pos { color: #2a9b7d; }
+  .hz-value.hz-neg { color: #e05357; }
+  .hz-value.hz-neu { color: var(--text-n9); }
+
+  /* News & Social feed cards */
+  .feed-filter-bar { margin-bottom: var(--spacing-m); flex-wrap: wrap; }
+  .tab.tab-pill { display: flex; align-items: center; gap: var(--spacing-s); }
+  .tab-pill .tab-item {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px var(--spacing-m);
+    border-radius: var(--radius-btn-s, 6px);
+    font-size: 14px; line-height: 22px; letter-spacing: 0.14px;
+    background: var(--b-r03, rgba(0,0,0,0.03));
+    color: var(--text-n7);
+    cursor: pointer; user-select: none;
+  }
+  .tab-pill .tab-item.active {
+    background: rgba(73, 163, 166, 0.2);
+    color: var(--text-n9);
+    font-weight: 500;
+  }
+  .tab-pill .tab-item .count { opacity: 0.55; font-size: 12px; font-weight: 400; }
+  .tab-pill .tab-item::after { display: none; }
+
+  /* Alva feed-widget */
+  .feed-body { padding: var(--spacing-xxs) 0; }
+  .feed-item {
+    display: flex; align-items: flex-start;
+    gap: var(--spacing-m);
+    padding: var(--spacing-m);
+    position: relative;
+    border-radius: var(--radius-ct-s, 8px);
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+  .feed-item:hover { background: var(--b-r02, rgba(0,0,0,0.02)); text-decoration: none; }
+  a.feed-item:hover { text-decoration: none; }
+  .feed-item::after {
+    content: ""; position: absolute; bottom: 0;
+    left: var(--spacing-m); right: var(--spacing-m);
+    height: 1px; background: var(--line-l05, rgba(0,0,0,0.06));
+  }
+  .feed-item:last-child::after { display: none; }
+  .feed-item-main {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; gap: var(--spacing-xxs);
+  }
+  .feed-header { display: flex; align-items: center; gap: 6px; width: 100%; }
+  .feed-avatar {
+    width: 22px; height: 22px; border-radius: 100px;
+    flex-shrink: 0; position: relative; overflow: hidden;
+    background: var(--grey-g01);
+  }
+  .feed-avatar.has-badge { overflow: visible; }
+  .feed-avatar.no-radius { border-radius: 0; overflow: visible; background: transparent; }
+  .feed-avatar > img { width: 100%; height: 100%; object-fit: cover; border-radius: 100px; }
+  .feed-avatar.no-radius > img { border-radius: 0; }
+  .feed-avatar-fallback {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--text-n5); color: #fff;
+    font-size: 11px; font-weight: 600;
+  }
+  .feed-avatar-badge {
+    position: absolute; bottom: -1px; right: -3px;
+    width: 14px; height: 14px;
+    background: var(--b0-container, #fff); border-radius: 100px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .feed-avatar-badge img { width: 12px; height: 12px; border-radius: 100px; }
+
+  .feed-title {
+    flex: 1; min-width: 0;
+    font-size: 14px; font-weight: 500;
+    line-height: 22px; letter-spacing: 0.14px;
+    color: var(--text-n9);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .feed-header-meta {
+    flex: 1; min-width: 0;
+    display: flex; align-items: center; gap: var(--spacing-xxs);
+    white-space: nowrap; overflow: hidden;
+  }
+  .feed-display-name {
+    font-size: 14px; line-height: 22px; letter-spacing: 0.14px;
+    color: var(--text-n9);
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .feed-handle, .feed-meta-sep, .feed-meta-date {
+    font-size: 12px; line-height: 20px; letter-spacing: 0.12px;
+    color: var(--text-n5);
+  }
+
+  .feed-content {
+    display: flex; flex-direction: column; gap: var(--spacing-xxs);
+    padding-left: var(--spacing-xxl, 28px);
+    width: 100%;
+  }
+  .feed-post-title {
+    font-size: 14px; font-weight: 500;
+    line-height: 22px; letter-spacing: 0.14px;
+    color: var(--text-n9);
+    display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .feed-text {
+    font-size: 14px; font-weight: 400;
+    line-height: 22px; letter-spacing: 0.14px;
+    color: var(--text-n9);
+    display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .feed-text:empty { display: none; }
+  .feed-info {
+    display: flex; align-items: center;
+    gap: var(--spacing-xxs);
+    height: 20px;
+    font-size: 12px; line-height: 20px; letter-spacing: 0.12px;
+    color: var(--text-n5);
+    white-space: nowrap; overflow: hidden;
+  }
+  .feed-actions {
+    display: flex; align-items: center; gap: var(--spacing-xs);
+  }
+  .feed-action {
+    display: flex; align-items: center; gap: var(--spacing-xxxs); overflow: hidden;
+  }
+  .feed-action-icon { width: 14px; height: 14px; flex-shrink: 0; }
+  .feed-action span {
+    font-size: 12px; line-height: 20px; letter-spacing: 0.12px;
+    color: var(--text-n5); white-space: nowrap;
+  }
+
+  .feed-thumb {
+    width: 88px; height: 70px;
+    border-radius: var(--radius-ct-s, 8px);
+    border: 1px solid var(--line-l07, rgba(0,0,0,0.08));
+    flex-shrink: 0; overflow: hidden; position: relative;
+    background: var(--grey-g01);
+  }
+  .feed-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* App-specific: ticker chip + sentiment color, shown inside .feed-info */
+  .feed-ticker-tag {
+    font-size: 11px; line-height: 16px;
+    padding: 1px 6px; border-radius: 3px;
+    background: rgba(124, 58, 237, 0.1); color: #7c3aed;
+    font-weight: 500;
+  }
+  .feed-sentiment-bull { color: #2a9b7d; }
+  .feed-sentiment-bear { color: #e05357; }
+  .feed-empty { padding: var(--spacing-xl); text-align: center; color: var(--text-n5); font-size: 13px; }
+
+  /* Metric Card */
+  .metric-card {
+    background: var(--grey-g01);
+    border-radius: var(--radius-ct-s);
+    padding: var(--spacing-m);
+    display:flex; flex-direction:column; gap: 4px;
+  }
+  .metric-label { font-size:12px; color: var(--text-n5); }
+  .metric-value { font-size:22px; color: var(--text-n9); line-height:28px; }
+  .metric-sub { font-size:11px; color: var(--text-n5); }
+  /* Tag pill — aligned with Screener .band-pill spec */
+  .tag {
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: 'Delight', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 400; white-space: nowrap;
+    min-width: 40px; padding: 1px 6px;
+    font-size: 12px; line-height: 20px; letter-spacing: 0.12px;
+    border-radius: var(--radius-ct-s);
+  }
+  .tag-bull { background: rgba(42,155,125,0.14); color:#2a9b7d; }
+  .tag-bear { background: rgba(224,83,87,0.14); color:#e05357; }
+  .tag-neutral { background: var(--grey-g01); color: var(--text-n7); }
+  .tag-cheap { background: rgba(42,155,125,0.14); color:#2a9b7d; }
+  .tag-rich { background: rgba(224,83,87,0.14); color:#e05357; }
+  .tag-fair { background: rgba(120,120,120,0.14); color: var(--text-n7); }
+  .tag-na { background: var(--grey-g01); color: var(--text-n5); }
+  .tag-approaching { background: rgba(223,167,60,0.18); color:#a56b10; }
+
+  /* Table — per Alva widget spec */
+  .table-card { display:flex; flex-direction:column; width:100%; isolation: isolate; overflow-x:auto; }
+  .table-row {
+    display:flex; width:100%;
+    gap: var(--spacing-m);
+    border-bottom: 1px solid var(--line-l07);
+    padding: 12px 0;
+  }
+  .table-row.table-header {
+    font-size:14px; line-height:22px; letter-spacing:0.14px;
+    color: var(--text-n7);
+    padding: 0 0 12px 0;
+  }
+  .table-row:last-child { border-bottom: none; }
+  .table-row.expandable { cursor:pointer; transition: background .15s; }
+  .table-row.expandable:hover { background: var(--b-r02); }
+  .table-row.expandable.open { border-bottom-color: transparent; }
+  .table-cell {
+    font-size:14px; line-height:22px; letter-spacing:0.14px; font-weight:400;
+    white-space:nowrap; display:flex; align-items:center;
+    max-height: 180px;
+  }
+
+  /* Expand caret — Alva icon, rotates on open (Screener pattern) */
+  .expand-caret {
+    display:inline-block; width:12px; height:12px;
+    background-color: var(--text-n3);
+    -webkit-mask: url('https://alva-ai-static.b-cdn.net/icons/arrow-down-f2.svg') no-repeat center / contain;
+            mask: url('https://alva-ai-static.b-cdn.net/icons/arrow-down-f2.svg') no-repeat center / contain;
+    transition: transform .2s, background-color .15s;
+  }
+  .table-row.expandable.open .expand-caret {
+    transform: rotate(180deg);
+  }
+
+  /* Expand panel — sibling of row, lazy-rendered, fade-in on open */
+  .expand-panel {
+    padding: var(--spacing-l) var(--spacing-m) var(--spacing-xl);
+    border-bottom: 1px solid var(--line-l07);
+    animation: expandFade .25s ease;
+  }
+  .expand-panel:last-child { border-bottom: none; }
+  @keyframes expandFade {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Basket table — row indentation (Screener pattern: 16px inset both sides) */
+  #basket-table .table-row {
+    padding-left: var(--spacing-m);
+    padding-right: var(--spacing-m);
+    box-sizing: border-box;
+  }
+
+  /* Free text */
+  .ft-card { background: var(--grey-g01); border-radius: var(--radius-ct-s); padding: var(--spacing-l); }
+  .ft-card h3 { margin: 0 0 var(--spacing-s) 0; font-size: 16px; font-weight: 500; color: var(--text-n9); }
+  .ft-card p { margin: 0 0 var(--spacing-s) 0; font-size: 14px; line-height: 22px; color: var(--text-n7); letter-spacing: 0.14px; }
+  .ft-card ul { margin:0 0 var(--spacing-s) 0; padding-left: var(--spacing-l); color: var(--text-n7); font-size:14px; line-height:22px; }
+  .ft-card li { margin-bottom: 4px; }
+
+  .section-h { font-size:16px; color: var(--text-n9); margin: 0 0 var(--spacing-m) 0; font-weight: 400; }
+  .method-cell { display: flex; flex-direction: column; }
+  .method-cell .ft-card { flex: 1; }
+  strong, b { font-weight: 500; color: var(--text-n9); }
+
+  /* Catalyst timeline */
+  .timeline { position:relative; padding-left: var(--spacing-xl); }
+  .timeline::before { content:""; position:absolute; left:11px; top:4px; bottom:4px; width:2px; background: var(--line-l07); }
+  .tl-item { position:relative; padding: var(--spacing-xs) 0 var(--spacing-s) 0; }
+  .tl-item::before {
+    content:""; box-sizing: border-box;
+    position:absolute; left:-19px; top:11px;
+    width:14px; height:14px; border-radius:50%; background: var(--grey-g1);
+    border: 2px solid var(--b0-page);
+  }
+  .tl-item.bull::before { background: #2a9b7d; }
+  .tl-item.bear::before { background: #e05357; }
+  .tl-item.ambig::before, .tl-item.ambiguous::before { background: var(--grey-g1); }
+  .tl-item.done::before, .tl-item.delivered::before { background: #2a9b7d; box-shadow: 0 0 0 2px rgba(42,155,125,0.25); }
+  .tl-item.missed::before { background: #e05357; }
+  .tl-date { font-size:12px; line-height:20px; letter-spacing:0.12px; color: var(--text-n5); }
+  .tl-title { font-size:14px; line-height:22px; letter-spacing:0.14px; font-weight:500; color: var(--text-n9); margin: var(--spacing-xxxs) 0; }
+  .tl-sub { font-size:12px; line-height:20px; letter-spacing:0.12px; color: var(--text-n5); }
+
+  /* Risk register — body cells follow table-cell spec (14px / 22px / 0.14px / 400 / text-n9) */
+  .risk-cat-prefix { color: var(--text-n5); }
+  .risk-exit-cell.empty { color: var(--text-n5); }
+
+  /* Priority chip — derived from Severity × Status. Raw sev·status shown via native title tooltip on hover. */
+  .prio-chip {
+    display:inline-flex; align-items:center; gap:6px;
+    padding: 3px 10px; border-radius: 999px;
+    font-size:12px; font-weight:500; line-height:18px;
+    cursor: help;
+  }
+  .prio-chip::before {
+    content:""; width:6px; height:6px; border-radius:50%;
+  }
+  .prio-high   { background: rgba(224,83,87,0.14);  color:#e05357; }
+  .prio-high::before   { background:#e05357; }
+  .prio-medium { background: rgba(223,167,60,0.18); color:#a56b10; }
+  .prio-medium::before { background:#d4a63c; }
+  .prio-low    { background: rgba(120,120,120,0.14); color: var(--text-n7); }
+  .prio-low::before    { background: var(--text-n5); }
+
+  /* Catalyst sub-tab panels (tab bar uses .tab.tab-pill) */
+  .sub-tab-panel { display:none; }
+  .sub-tab-panel.active { display:block; }
+
+  .kv-row { display:flex; justify-content:space-between; padding: 6px 0; border-bottom: 1px solid var(--line-l05); font-size:13px; }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-row .k { color: var(--text-n5); }
+  .kv-row .v { color: var(--text-n9); }
+
+  .callout {
+    border-left: 3px solid var(--main-m1); padding: var(--spacing-s) var(--spacing-m);
+    background: var(--grey-g01); border-radius: var(--radius-ct-xs); font-size:13px; line-height:20px; color: var(--text-n7);
+  }
+  .callout strong { color: var(--text-n9); }
+
+  .small { font-size:12px; color: var(--text-n5); }
+  .loading { color: var(--text-n5); font-size:13px; padding: var(--spacing-m); }
+
+  .basket-expand-grid { display: grid; grid-template-columns: 2fr 1fr; gap: var(--spacing-l); }
+  @media (max-width: 900px) { .basket-expand-grid { grid-template-columns: 1fr; } }
+
+  /* Changelog */
+  .changelog-entry { padding: 6px 0; border-bottom: 1px solid var(--line-l05); font-size:13px; }
+  .changelog-entry:last-child { border-bottom: none; }
+  .changelog-date { color: var(--text-n5); font-size:11px; }
+  .changelog-section { color: var(--main-m1); font-size:11px; text-transform:uppercase; }
+
+  /* ── Modal (Alva) ── */
+  .modal-overlay {
+    display:none;
+    position:fixed; inset:0; z-index:1000;
+    background: var(--main-m7, rgba(0,0,0,0.4));
+    padding: var(--spacing-xxxxxl) var(--spacing-m);
+    align-items:center; justify-content:center;
+  }
+  .modal-overlay.open { display:flex; }
+  .modal-panel {
+    background: var(--b0-container, #fff);
+    width: 100%; max-width: 896px;
+    max-height: 100%;
+    border-radius: var(--radius-pop-dialog, 12px);
+    border: 0.5px solid var(--line-l2, rgba(0,0,0,0.1));
+    padding: var(--spacing-xxl);
+    display:flex; flex-direction:column; gap: var(--spacing-m);
+    box-shadow: var(--shadow-s, 0 8px 32px rgba(0,0,0,0.12));
+  }
+  .modal-title {
+    display:flex; align-items:center; justify-content:space-between;
+    gap: var(--spacing-s);
+    font-family: 'Delight', sans-serif; font-weight:500;
+    font-size:18px; line-height:28px; letter-spacing:0.18px;
+    color: var(--text-n9);
+    flex-shrink: 0;
+  }
+  .modal-close {
+    width:18px; height:18px; flex-shrink:0; cursor:pointer;
+    background-color: var(--text-n9, rgba(0,0,0,0.9));
+    -webkit-mask: url('https://alva-ai-static.b-cdn.net/icons/close-l1.svg') center / contain no-repeat;
+            mask: url('https://alva-ai-static.b-cdn.net/icons/close-l1.svg') center / contain no-repeat;
+    transition: opacity 0.15s ease;
+  }
+  .modal-close:hover { opacity: 0.6; }
+  .modal-body { flex:1 1 auto; width:100%; overflow-y:auto; min-height:0; }
+
+  /* ── Current-only widgets (preserved) ── */
+
+  /* Hero (current uses card-style hero with eyebrow + picker) */
+  .hero-card{background:var(--grey-g01);border-radius:var(--radius-ct-l);padding:var(--spacing-xl) var(--spacing-xl);position:relative;overflow:hidden}
+  .hero-eyebrow{display:flex;align-items:center;gap:var(--spacing-s);color:var(--text-n7);font-size:12px;letter-spacing:0.12px;text-transform:uppercase}
+  .hero-eyebrow .hero-mark{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--main-m1-10);color:var(--main-m1);font-size:11px;font-weight:500}
+  .hero-eyebrow strong{color:var(--text-n9);font-weight:500;text-transform:none;font-size:13px;letter-spacing:0.13px}
+  .hero-picker{display:flex;align-items:center;gap:var(--spacing-xs)}
+  .picker-btn{width:28px;height:28px;border:none;background:var(--b-r03);border-radius:var(--radius-btn-s);color:var(--text-n7);cursor:pointer;font-size:14px;line-height:1;display:inline-flex;align-items:center;justify-content:center;transition:background 0.15s}
+  .picker-btn:hover:not(:disabled){background:var(--line-l07)}
+  .picker-btn:disabled{opacity:0.4;cursor:default}
+  .picker-select{height:28px;padding:0 var(--spacing-s);border-radius:var(--radius-btn-s);background:var(--b0-container);border:1px solid var(--line-l12);font-family:inherit;font-size:12px;color:var(--text-n9);cursor:pointer;letter-spacing:0.12px;min-width:180px}
+
+  /* hero body uses .markdown-container.markdown-container--m (alva markdown medium) */
+
+  /* Tab-bar wrapper (sticky top) and tab-chip (right-group buttons) */
+  .tab-bar-wrapper{position:sticky;top:0;z-index:10;background:var(--b0-page);padding-top:var(--spacing-m)}
+  .tab-chip{display:inline-flex;align-items:center;gap:var(--spacing-xxs);padding:5px var(--spacing-s);background:var(--grey-g01);border:1px solid var(--line-l07);border-radius:999px;color:var(--text-n7);font-size:12px;letter-spacing:0.12px;cursor:pointer;line-height:18px;transition:background 0.15s,border-color 0.15s}
+  .tab-chip:hover{background:var(--b0-container);border-color:var(--line-l12);color:var(--text-n9)}
+  .tab-chip.tab-readme::before{content:"";display:inline-block;width:14px;height:14px;background-color:currentColor;-webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 4l-7 3v9c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V7l-7-3zm0 2.18L17 8.5V15H7V8.5l5-2.32zM12 10c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>') no-repeat center/contain;mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10" stroke="black" stroke-width="2" stroke-linecap="round" fill="none"/></svg>') no-repeat center/contain}
+  .tab{display:flex;align-items:center;flex-wrap:wrap;gap:var(--spacing-m)}
+  .tab-sub{display:flex;gap:var(--spacing-s);flex-wrap:wrap}
+  .tab-sub .tab-item{padding:6px var(--spacing-m);border-radius:var(--radius-btn-s);background:var(--b-r03);color:var(--text-n7);border-bottom:none;margin-bottom:0}
+  .tab-sub .tab-item.active{background:rgba(73,163,166,0.2);color:var(--text-n9);font-weight:500;border-bottom:none}
+  .tab-sub .tab-item .tc{color:var(--text-n5);font-size:12px;margin-left:4px}
+
+  /* Widget grid (8-col), widget-card overflow:visible variant, widget-body flex variants */
+  .widget-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:var(--spacing-xl);align-items:stretch}
+  .col-2{grid-column:span 2}.col-3{grid-column:span 3}.col-4{grid-column:span 4}
+  .col-5{grid-column:span 5}.col-6{grid-column:span 6}.col-8{grid-column:span 8}
+  @media (max-width:768px){.widget-grid{grid-template-columns:repeat(4,1fr);gap:var(--spacing-m)}.col-2,.col-3,.col-4,.col-5,.col-6,.col-8{grid-column:span 4}}
+  .widget-body.col{flex-direction:column;align-items:stretch;gap:var(--spacing-s)}
+  .legend-dot{width:8px;height:8px;border-radius:50%}
+
+  /* Metric card body (different from template's .metric-card; current variant) */
+  .metric-card-body{background:var(--grey-g01);padding:var(--spacing-l);border-radius:var(--radius-ct-s);flex-direction:column;align-items:flex-start;min-height:88px}
+  .metric-value.up{color:var(--main-m3)}
+  .metric-value.down{color:var(--main-m4)}
+
+  /* Table extras (compound selectors not in template) */
+  .table-row.table-body-row{cursor:pointer;transition:background 0.15s}
+  .table-row.table-body-row:hover{background:var(--b-r02)}
+  .table-cell.num{justify-content:flex-end;font-variant-numeric:tabular-nums}
+  .table-cell.up{color:var(--main-m3)}
+  .table-cell.down{color:var(--main-m4)}
+  .caret-cell{justify-content:flex-end}
+
+  /* Row-expand panel (current-only) */
+  .row-expand{padding:0;background:var(--grey-g01);border-bottom:1px solid var(--line-l07)}
+  .row-expand-inner{display:grid;grid-template-columns:1fr 1fr;gap:var(--spacing-l);padding:var(--spacing-l)}
+  @media (max-width:768px){.row-expand-inner{grid-template-columns:1fr}}
+  .row-expand-chart{height:200px}
+  .row-expand-side{display:flex;flex-direction:column;gap:var(--spacing-s)}
+  .rx-block{display:flex;flex-direction:column;gap:2px}
+  .rx-h{font-size:10px;text-transform:uppercase;color:var(--text-n5);letter-spacing:0.3px}
+  .rx-t{color:var(--text-n9);font-size:13px;line-height:20px;letter-spacing:0.13px}
+
+  /* Tag variants used in current (none of these names exist in template) */
+  .tag-layer.power{background:rgba(230,169,26,0.08);color:#b8820d;border-color:rgba(230,169,26,0.2)}
+  .tag-layer.compute{background:rgba(61,139,209,0.08);color:#2668a5;border-color:rgba(61,139,209,0.2)}
+  .tag-layer.deployment{background:rgba(42,155,125,0.08);color:var(--main-m3);border-color:rgba(42,155,125,0.2)}
+  .tag-val{border:1px solid currentColor}
+  .tag-val.cheap{color:var(--main-m3)}
+  .tag-val.fair{color:var(--text-n7)}
+  .tag-val.rich{color:var(--main-m4)}
+  .tag-priority{padding:2px 10px;font-weight:500}
+  .tag-priority.high{background:var(--main-m4-10);color:var(--main-m4);border-color:transparent}
+  .tag-priority.medium{background:var(--main-m5-10);color:var(--main-m5);border-color:transparent}
+  .tag-priority.low{background:var(--b-r03);color:var(--text-n7);border-color:transparent}
+  .tag-status-done{background:var(--main-m3-10);color:var(--main-m3)}
+  .tag-status-miss{background:var(--main-m4-10);color:var(--main-m4)}
+  .tag-status-up{background:var(--main-m1-10);color:var(--main-m1)}
+  .tag-sent.bull{background:var(--main-m3-10);color:var(--main-m3)}
+  .tag-sent.bear{background:var(--main-m4-10);color:var(--main-m4)}
+  .tag-sent.neutral,.tag-sent.ambiguous{background:var(--b-r03);color:var(--text-n7)}
+  .tag-id{background:var(--b-r03);color:var(--text-n7);border-color:var(--line-l07);font-variant-numeric:tabular-nums}
+
+  /* Section title (current-only) */
+  .section-title{display:flex;flex-direction:column;gap:var(--spacing-xxs)}
+  .section-title-text{font-size:18px;font-weight:400;color:var(--text-n9);letter-spacing:0.18px;line-height:28px}
+  .section-title-sub{font-size:12px;letter-spacing:0.12px;color:var(--text-n5)}
+
+  /* Events timeline (current-only event-card model; replaces template's .timeline+.tl-item) */
+  .timeline{display:flex;flex-direction:column;gap:var(--spacing-s);padding-left:0}
+  .timeline::before{display:none}
+  .event-card{background:var(--grey-g01);border-radius:var(--radius-ct-l);padding:var(--spacing-m) var(--spacing-l);display:flex;flex-direction:column;gap:var(--spacing-xs)}
+  .event-card.past{opacity:0.7}
+  .event-head{display:flex;align-items:center;gap:var(--spacing-s);flex-wrap:wrap;font-size:12px;color:var(--text-n7);letter-spacing:0.12px}
+  .event-head .e-date{font-weight:500;color:var(--text-n9);letter-spacing:0.13px;font-size:13px}
+  .event-title{font-size:15px;font-weight:500;letter-spacing:0.15px;color:var(--text-n9)}
+  .event-notes{color:var(--text-n7);font-size:13px;line-height:20px;letter-spacing:0.13px}
+  .event-pillar{font-size:11px;color:var(--text-n5);letter-spacing:0.3px;text-transform:uppercase;margin-top:2px}
+  .event-ids{display:flex;gap:var(--spacing-xxs);flex-wrap:wrap;margin-top:var(--spacing-xs)}
+
+  /* Feed (current-only sep + ids extras, plus flex avatar) */
+  .feed-avatar{width:22px;height:22px;border-radius:100px;flex-shrink:0;background:var(--grey-g02);display:inline-flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-n7)}
+  .feed-info .sep{color:var(--text-n2)}
+  .feed-ids{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px}
+
+  /* Risks table */
+  .risk-table .table-cell{white-space:normal;min-height:52px;align-items:flex-start;padding:var(--spacing-s) 0}
+  .risk-table .table-row.table-header .table-cell{min-height:32px;align-items:center;padding:0}
+  /* Category col (1st) + Divergence col (4th): min-width beats flex-basis so tag padding is never crushed */
+  .risk-table .table-cell:first-child{min-width:112px!important;overflow:visible}
+  .risk-table .table-cell:nth-child(4){min-width:110px!important;overflow:visible}
+  /* Rows are read-only — remove pointer cursor and hover highlight */
+  .risk-table .table-row.table-body-row{cursor:default}
+  .risk-table .table-row.table-body-row:hover{background:transparent}
+  /* section-title → table gap within the risks panel */
+  [data-panel="risks"]{gap:var(--spacing-m)}
+
+  /* Read-grid (3-col reader strip) */
+  .read-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--spacing-xl);padding:var(--spacing-l);background:var(--grey-g01);border-radius:var(--radius-ct-l)}
+  .read-col{display:flex;flex-direction:column;gap:var(--spacing-xs)}
+  .read-h{font-size:11px;letter-spacing:0.3px;text-transform:uppercase;color:var(--text-n5);font-weight:500}
+  .read-p{font-size:13px;line-height:20px;color:var(--text-n7);letter-spacing:0.13px}
+  @media (max-width:900px){.read-grid{grid-template-columns:1fr;gap:var(--spacing-m)}}
+
+  /* Empty state, chart caption, attr-line, attr-line-simple */
+  .empty{padding:var(--spacing-xl);text-align:center;color:var(--text-n5);font-size:13px;letter-spacing:0.13px;background:var(--grey-g01);border-radius:var(--radius-ct-l)}
+  .chart-caption{font-size:12px;line-height:20px;letter-spacing:0.12px;color:var(--text-n5);margin:0 0 var(--spacing-m) 0;padding:0;background:none;border:none;border-radius:0}
+  .chart-caption .cap-h{color:var(--text-n5);font-weight:400;margin-right:var(--spacing-xxs)}
+  .chart-caption b{color:var(--text-n5);font-weight:500}
+  /* Tighten title → attribution → caption stack to xxs (e.g. Equity Curve) */
+  .widget-title:has(+ .attr-line-simple){margin-bottom:var(--spacing-xxs)}
+  .widget-title:has(+ .chart-caption){margin-bottom:var(--spacing-xxs)}
+  .attr-line{font-size:11px;line-height:18px;color:var(--text-n7);letter-spacing:0.11px;padding:var(--spacing-xs) var(--spacing-m);background:var(--b-r02);border-radius:var(--radius-ct-s);margin-top:var(--spacing-xs);font-variant-numeric:tabular-nums;display:flex;gap:var(--spacing-l);flex-wrap:wrap}
+  .attr-line .attr-group{display:inline-flex;gap:var(--spacing-xs);align-items:baseline}
+  .attr-line .attr-group b{color:var(--text-n9);font-weight:500}
+  .attr-line .attr-label{color:var(--text-n5);text-transform:uppercase;font-size:10px;letter-spacing:0.3px;margin-right:var(--spacing-xs)}
+  .attr-line .attr-sep{color:var(--text-n2)}
+  .attr-line-simple{font-size:12px;line-height:20px;color:var(--text-n5);letter-spacing:0.12px;margin:0 0 var(--spacing-xxs) 0;font-variant-numeric:tabular-nums}
+  .attr-line-simple .attr-kw{color:var(--text-n7)}
+  .attr-line-simple b{color:var(--text-n9);font-weight:500}
+  .attr-line-simple b.up{color:var(--main-m3)}
+  .attr-line-simple b.down{color:var(--main-m4)}
+
+  /* Change log (cx-) */
+  .cx-log{display:flex;flex-direction:column;gap:var(--spacing-xs);padding:var(--spacing-m);background:var(--grey-g01);border-radius:var(--radius-ct-l)}
+  .cx-log-h{font-size:11px;letter-spacing:0.3px;text-transform:uppercase;color:var(--text-n5);margin-bottom:var(--spacing-xxs)}
+  .cx-row{display:flex;gap:var(--spacing-s);font-size:12px;line-height:18px;color:var(--text-n7);align-items:baseline;padding:var(--spacing-xxs) 0}
+  .cx-row .cx-date{color:var(--text-n5);font-variant-numeric:tabular-nums;flex-shrink:0;min-width:74px}
+  .cx-row .cx-action{display:inline-block;font-size:10px;letter-spacing:0.3px;text-transform:uppercase;padding:1px 6px;border-radius:var(--radius-ct-xs);min-width:64px;text-align:center}
+  .cx-row .cx-action.initial{background:var(--main-m1-10);color:var(--main-m1)}
+  .cx-row .cx-action.added{background:var(--main-m3-10);color:var(--main-m3)}
+  .cx-row .cx-action.removed{background:var(--main-m4-10);color:var(--main-m4)}
+  .cx-row .cx-action.relayered{background:var(--main-m5-10);color:var(--main-m5)}
+  .cx-row .cx-id{font-weight:500;color:var(--text-n9);min-width:56px}
+  .cx-row .cx-layer{color:var(--text-n7)}
+  .cx-row .cx-reason{color:var(--text-n7);flex:1;min-width:0}
+
+  /* Related-news pill + expand list */
+  .related-pill{display:inline-flex;align-items:center;gap:var(--spacing-xxs);padding:2px 10px;border-radius:999px;background:var(--main-m1-10);color:var(--main-m1);font-size:11px;letter-spacing:0.11px;cursor:pointer;user-select:none;border:1px solid var(--main-m1-10)}
+  .related-pill:hover{background:var(--main-m1);color:#fff}
+  .related-list{display:flex;flex-direction:column;gap:var(--spacing-xxs);padding:var(--spacing-s);background:var(--b-r02);border-radius:var(--radius-ct-s)}
+  .related-item{display:flex;gap:var(--spacing-s);padding:var(--spacing-xs) var(--spacing-s);background:var(--b0-container);border-radius:var(--radius-ct-xs);transition:background 0.15s}
+  .related-item:hover{background:var(--b-r03)}
+  .related-icon{width:20px;height:20px;border-radius:4px;background:var(--grey-g02);display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-n7);flex-shrink:0}
+  .related-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .related-title{font-size:12px;line-height:18px;color:var(--text-n9);letter-spacing:0.12px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+  .related-snippet{font-size:11px;line-height:17px;color:var(--text-n5);letter-spacing:0.11px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+  /* Risk extras */
+  .risk-cat-tag{display:inline-flex;align-items:center;font-size:10px;letter-spacing:0.3px;text-transform:uppercase;padding:2px 8px;border-radius:var(--radius-ct-s);background:var(--b-r03);color:var(--text-n7);margin-right:var(--spacing-xxs)}
+  .tag-divergence{background:var(--b-r03);color:var(--text-n7);border:1px solid var(--line-l07);font-size:11px}
+  .risk-thesis-claim{font-size:11px;line-height:16px;color:var(--text-n5);margin-top:var(--spacing-xxs);max-width:220px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;cursor:help}
+  .risk-thesis-claim::before{content:"\201C"}
+  .risk-thesis-claim::after{content:"\201D"}
+  .risk-pillar-cell{white-space:normal;flex-direction:column;align-items:flex-start;gap:var(--spacing-xxs);padding-top:var(--spacing-s)!important;padding-bottom:var(--spacing-s)!important}
+  .risk-desc-cell,.risk-long-cell{white-space:normal;color:var(--text-n7);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;cursor:help;align-items:flex-start!important;padding-top:var(--spacing-s)!important;padding-bottom:var(--spacing-s)!important;font-size:13px;line-height:19px;max-width:380px}
+  .risk-desc-cell{color:var(--text-n9)}
+  .risk-desc-cell strong,.risk-long-cell strong{color:var(--text-n9);font-weight:500}
+
+  /* README chip icon */
+  .tab-readme{gap:6px;padding-left:10px}
+  .tab-readme-icon{width:14px;height:14px;opacity:0.72}
+
+  /* Methodology modal sections — matches senate-conviction-buys */
+  .method-section { margin-bottom: var(--spacing-xl); }
+  .method-section:last-child { margin-bottom: 0; }
+  .method-section h3 {
+    font-size: 16px; font-weight: 400; color: var(--text-n9);
+    letter-spacing: 0.16px; line-height: 22px;
+    margin: 0 0 var(--spacing-m) 0;
+  }
+  .method-body {
+    background: var(--grey-g01);
+    border-radius: var(--radius-ct-l);
+    padding: var(--spacing-l);
+  }
+  .method-body > *:first-child { margin-top: 0; }
+  .method-body > *:last-child { margin-bottom: 0; }
+  .method-section p {
+    font-size: 14px; color: var(--text-n9); line-height: 22px;
+    margin-bottom: var(--spacing-xs); letter-spacing: 0.14px;
+  }
+  .method-section p:last-child { margin-bottom: 0; }
+  .method-body ul, .method-body ol { margin: 0 0 var(--spacing-xs) 0; padding-left: var(--spacing-l); }
+  .method-body li { font-size: 14px; color: var(--text-n9); line-height: 22px; letter-spacing: 0.14px; margin: 4px 0; }
+  .method-body strong { color: var(--text-n9); font-weight: 500; }
+  .method-body code { background: var(--b-r03); padding: 1px 6px; border-radius: var(--radius-ct-xs); font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-n9); }
+  .method-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; line-height: 20px; color: var(--text-n7);
+    margin-top: var(--spacing-m); letter-spacing: 0.12px; white-space: pre-wrap;
+  }
+  .method-label { font-size: 14px; font-weight: 500; line-height: 22px; margin-bottom: var(--spacing-xs); letter-spacing: 0.13px; color: var(--text-n9); }
+  .method-block { margin-bottom: var(--spacing-m); }
+  .method-block:last-child { margin-bottom: 0; }
+  .method-limit-list { list-style: none; padding: 0; margin: 0; }
+  .method-limit-list li {
+    font-size: 14px; color: var(--text-n7); line-height: 22px;
+    padding: var(--spacing-xs) 0 var(--spacing-xs) var(--spacing-l);
+    border-bottom: 1px solid var(--line-l05);
+    letter-spacing: 0.14px; position: relative;
+  }
+  .method-limit-list li:first-child { padding-top: 0; }
+  .method-limit-list li:last-child { border-bottom: none; padding-bottom: 0; }
+  .method-limit-list li::before { content: '\2014'; position: absolute; left: 0; color: var(--text-n5); }
+  .method-limit-list li strong { color: var(--text-n9); font-weight: 500; }
+
+
+  /* KPI row — 3 equal cards */
+  .kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--spacing-xl)}
+  @media (max-width:768px){.kpi-row{grid-template-columns:1fr;gap:var(--spacing-m)}}
+  .kpi-card{background:var(--grey-g01);padding:var(--spacing-l);border-radius:var(--radius-ct-s);display:flex;flex-direction:column;min-height:110px}
+  .kpi-card.kpi-highlight{background:var(--main-m3-10)}
+  .kpi-card .kpi-label{font-size:12px;color:var(--text-n7);letter-spacing:0.12px;line-height:20px;margin-bottom:var(--spacing-xxs)}
+  .kpi-card .kpi-value{font-size:30px;letter-spacing:0.3px;line-height:38px;color:var(--text-n9);font-weight:400;font-variant-numeric:tabular-nums}
+  .kpi-card .kpi-value.up{color:var(--main-m3)}
+  .kpi-card .kpi-value.down{color:var(--main-m4)}
+  .kpi-card .kpi-sub{font-size:12px;color:var(--text-n5);letter-spacing:0.12px;margin-top:var(--spacing-xs)}
+
+  /* Horizon grid — 6 mini cards */
+  .horizon-row{display:grid;grid-template-columns:repeat(6,1fr);gap:var(--spacing-m)}
+  @media (max-width:900px){.horizon-row{grid-template-columns:repeat(3,1fr)}}
+  @media (max-width:480px){.horizon-row{grid-template-columns:repeat(2,1fr)}}
+  .horizon-card{background:var(--grey-g01);padding:var(--spacing-m);border-radius:var(--radius-ct-s);display:flex;flex-direction:column;gap:var(--spacing-xxs);min-height:92px}
+  .horizon-card .h-win{font-size:11px;letter-spacing:0.3px;text-transform:uppercase;color:var(--text-n5)}
+  .horizon-card .h-val{font-size:22px;letter-spacing:0.22px;line-height:30px;color:var(--text-n9);font-weight:400;font-variant-numeric:tabular-nums}
+  .horizon-card .h-val.up{color:var(--main-m3)}
+  .horizon-card .h-val.down{color:var(--main-m4)}
+  .horizon-card .h-bench{display:inline-flex;align-items:center;gap:4px;font-size:11px;letter-spacing:0.11px;padding:2px 8px;border-radius:var(--radius-ct-xs);align-self:flex-start;margin-top:auto}
+  .horizon-card .h-bench.up{background:var(--main-m3-10);color:var(--main-m3)}
+  .horizon-card .h-bench.down{background:var(--main-m4-10);color:var(--main-m4)}
+  .horizon-card .h-bench.flat{background:var(--b-r03);color:var(--text-n7)}
+
+  /* ── Compat overrides (preserve critical fixes that template lacks) ── */
+  /* Flex table cells need overflow:hidden + min-width:0 to prevent column misalignment */
+  .table-cell{overflow:hidden;min-width:0}
+</style>
+</head>
+<body>
+
+<div class="playbook-container">
+
+  <!-- Platform shell auto-renders title, description, refresh timestamp, and
+       Automations badge from release metadata + cron state. First row of our
+       HTML is therefore the tab bar. -->
+
+  <!-- Tab bar (5 tabs + right-group with README chip) -->
+  <div class="tab-bar-wrapper">
+    <div class="tab-wrapper-row">
+      <div class="tab tab-underline tab-l" id="tabs">
+        <button class="tab-item active" data-tab="thesis" data-text="Thesis">Thesis</button>
+        <button class="tab-item" data-tab="basket" data-text="Basket">Basket</button>
+        <button class="tab-item" data-tab="catalysts" data-text="Catalysts">Catalysts</button>
+        <button class="tab-item" data-tab="risks" data-text="Risks">Risks</button>
+        <button class="tab-item" data-tab="feed" data-text="News & Social">News &amp; Social</button>
+      </div>
+      <div class="tab-right-group">
+        <button class="pb-meta-link pb-meta-link--readme tab-readme" type="button" data-modal-open="methodology-modal" aria-label="Open Methodology">
+          <span class="pb-meta-icon-badge" aria-hidden="true">
+            <img class="pb-meta-icon-img" src="https://alva-ai-static.b-cdn.net/icons/researcher-l1.svg" width="14" height="14" alt="" />
+          </span>
+          <span>README</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ THESIS ═══ -->
+  <div class="tab-panel" data-panel="thesis">
+
+    <!-- Hero / TLDR card — lives INSIDE Tab 1 per template v1.6.2 (only Tab 1 is scrubbable) -->
+    <div class="hero-card">
+      <div class="hero-date-switcher" id="hero-date-switcher">
+        <button type="button" class="hero-date-nav" id="hero-date-prev" aria-label="Previous snapshot">
+          <span class="hero-date-nav-icon prev" aria-hidden="true"></span>
+        </button>
+        <div class="filter-dropdown hero-date-pill" id="hero-date-filter">
+          <button type="button" class="filter-dropdown-trigger" id="hero-date-trigger" aria-haspopup="listbox" aria-expanded="false">
+            <span class="filter-dropdown-value">
+              <span id="hero-date-label">—</span>
+              <span class="filter-dropdown-value-sub" id="hero-date-age-label"></span>
+            </span>
+            <span class="filter-dropdown-caret"></span>
+          </button>
+          <div class="filter-dropdown-menu" id="hero-date-dropdown" role="listbox"></div>
+        </div>
+        <button type="button" class="hero-date-nav" id="hero-date-next" aria-label="Next snapshot">
+          <span class="hero-date-nav-icon next" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="markdown-container markdown-container--m" id="hero-tldr"></div>
+    </div>
+
+    <!-- 3 equal-width KPI cards — Alpha highlighted by border per template v1.6.0 -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">Theme YTD</div>
+        <div class="kpi-value" id="kpi-basket-ytd">—</div>
+        <div class="kpi-sub" id="kpi-basket-breadth">equal-weight basket</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Benchmark YTD</div>
+        <div class="kpi-value" id="kpi-benchmark-ytd">—</div>
+        <div class="kpi-sub">PAVE</div>
+      </div>
+      <div class="kpi-card kpi-highlight">
+        <div class="kpi-label">Alpha YTD</div>
+        <div class="kpi-value" id="kpi-alpha-pave">—</div>
+        <div class="kpi-sub">Theme − Benchmark</div>
+      </div>
+    </div>
+
+    <!-- 6 horizon metric cards — template v1.6.0 replaces the bar chart -->
+    <div class="horizon-row" id="horizon-cards"></div>
+
+    <!-- Equity curve full-width with single-line attribution above -->
+    <div class="widget-grid">
+      <div class="col-8 widget-card">
+        <div class="widget-title">
+          <span class="widget-title-text">Equity Curve — Basket vs PAVE</span>
+          <span class="widget-title-sub">1-year normalized (base = 100)</span>
+        </div>
+        <div id="attr-line-simple" class="attr-line-simple">Benchmark attribution loading…</div>
+        <div class="chart-caption"><span class="cap-h">How to read:</span>Basket above <b>PAVE</b> orange = real thematic alpha beyond infrastructure beta. The SMH and SPY comparison lines (semis + market) give you two extra reference frames. Breaking below SPY dashed grey = the thesis is failing; re-read Risks.</div>
+        <div class="chart-body chart-dotted-background">
+          <div class="chart-legend">
+            <div class="legend-item"><span class="legend-line" style="background:#49a3a6"></span>Basket</div>
+            <div class="legend-item"><span class="legend-line" style="background:#ff9800"></span>PAVE</div>
+            <div class="legend-item"><span class="legend-line" style="background:#5f75c9"></span>SMH</div>
+            <div class="legend-item"><span class="legend-line" style="background:#838383"></span>SPY</div>
+          </div>
+          <div id="chart-equity" class="chart-container" style="height:320px"></div>
+          <div class="alva-watermark"><img src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg" alt="Alva"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="widget-grid">
+      <div class="col-8 widget-card">
+        <div class="widget-title">
+          <span class="widget-title-text">Layer performance · 3M</span>
+          <span class="widget-title-sub">which dimension is working</span>
+        </div>
+        <div class="chart-caption"><span class="cap-h">How to read:</span>The three layers are <b>Power</b> (turbines, nuclear, grid), <b>Compute</b> (GPUs, HBM, fabs), and <b>Deployment</b> (EPC crews, data-center real estate). The longest bar is where capital is currently buying. All three positive = the AI bottleneck is simultaneously binding across power, compute, and deployment; the thesis is working. One layer sharply negative while others rally = the bottleneck in that layer is loosening.</div>
+        <div class="chart-body chart-dotted-background">
+          <div id="chart-layers" class="chart-container" style="height:240px"></div>
+          <div class="alva-watermark"><img src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg" alt="Alva"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ BASKET ═══ -->
+  <div class="tab-panel" data-panel="basket" style="display:none">
+
+<div class="widget-grid">
+      <div class="col-8 widget-card">
+        <div class="widget-title">
+          <span class="widget-title-text">Holdings</span>
+          <span class="widget-title-sub">click any row to expand — real 180-day price + role breakdown</span>
+        </div>
+        <div class="chart-caption"><span class="cap-h">How to read:</span>Grouped by <b>layer</b>, sorted by market cap. The <b>α vs PAVE</b> and <b>α vs SMH</b> columns are the ones to watch — positive α vs both = the name is earning the bottleneck premium independent of infra or semi beta. Click any row for the real 180-day chart plus the four-row role breakdown (role / why now / what the market may be missing / what breaks this expression).</div>
+        <div class="table-card" id="basket-table"></div>
+      </div>
+    </div>
+
+    <div class="widget-grid">
+      <div class="col-8 widget-card">
+        <div class="widget-title">
+          <span class="widget-title-text">Valuation vs 1Y return</span>
+          <span class="widget-title-sub">X axis = percentile within the name's own 5-year forward P/E history</span>
+        </div>
+        <div class="chart-caption">
+          <div><span class="cap-h">Four quadrants:</span><b>Top-left (cheap + rising) = sweet spot</b> — market hasn't paid the thesis premium yet. <b>Top-right (rich + rising) = momentum crowding</b> — physics still tight, positioning tighter; don't chase, don't short. <b>Bottom-left (cheap + falling) = value trap</b> — re-rating never came because the story has been seen through. <b>Bottom-right (rich + falling) = crowding breaking</b>, exit signal.</div>
+        </div>
+        <div class="chart-body chart-dotted-background">
+          <div class="chart-legend">
+            <div class="legend-item"><span class="legend-dot" style="background:#2a9b7d"></span>Cheap (≤30%ile)</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#838383"></span>Fair (30–70%ile)</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#e05357"></span>Rich (≥70%ile)</div>
+          </div>
+          <div id="chart-scatter" class="chart-container" style="height:360px"></div>
+          <div class="alva-watermark"><img src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg" alt="Alva"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ CATALYSTS ═══ -->
+  <div class="tab-panel" data-panel="catalysts" style="display:none">
+    <div class="section-title">
+      <span class="section-title-text">Catalysts</span>
+      <span class="section-title-sub">from the same ADK narrative record · pillar: Power / Compute / Deployment · status: Upcoming / Delivered ✓ (kept 14 days) / Missed ✗ (trim signal)</span>
+    </div>
+
+    <div class="tab-sub tab tab-pill" id="cat-subtabs">
+      <button class="tab-item active" data-sub="upcoming">Upcoming <span class="tc" id="cat-n-upcoming">0</span></button>
+      <button class="tab-item" data-sub="delivered">Delivered ✓ <span class="tc" id="cat-n-delivered">0</span></button>
+      <button class="tab-item" data-sub="missed">Missed ✗ <span class="tc" id="cat-n-missed">0</span></button>
+    </div>
+    <div class="timeline" id="cat-timeline"></div>
+  </div>
+
+  <!-- ═══ RISKS ═══ -->
+  <div class="tab-panel" data-panel="risks" style="display:none">
+    <div class="section-title">
+      <span class="section-title-text">Risks</span>
+      <span class="section-title-sub">frozen categories · concrete exit triggers · sorted High first — each entry has a threshold that would materialize it; no number = not a plan</span>
+    </div>
+    <div class="widget-card">
+      <div class="table-card risk-table" id="risks-table"></div>
+    </div>
+  </div>
+
+  <!-- ═══ NEWS & SOCIAL ═══ -->
+  <div class="tab-panel" data-panel="feed" style="display:none">
+    <div class="section-title">
+      <span class="section-title-text">News &amp; Social</span>
+      <span class="section-title-sub">basket-tagged, 72h window · only items supporting or challenging the thesis claim · Bull = supply tighter, Bear = loosening, Neutral = no signal</span>
+    </div>
+    <div class="tab-sub tab tab-pill" id="feed-filters">
+      <button class="tab-item active" data-filter="all">All <span class="tc" id="feed-n-all">0</span></button>
+      <button class="tab-item" data-filter="news">News <span class="tc" id="feed-n-news">0</span></button>
+      <button class="tab-item" data-filter="social">X <span class="tc" id="feed-n-social">0</span></button>
+    </div>
+    <div class="widget-card">
+      <div class="widget-body col" style="background:var(--grey-g01);border-radius:var(--radius-ct-l);padding:var(--spacing-xs) 0;position:relative;">
+        <div class="feed-body" id="feed-list"></div>
+        <div class="alva-watermark">
+          <img src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg" alt="Alva">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Methodology now lives in a modal (triggered by README chip) — template v1.6.0 -->
+
+</div>
+
+<!-- ═══ METHODOLOGY MODAL — structured per screener shell ═══ -->
+<div class="modal-overlay" id="methodology-modal" aria-hidden="true">
+  <div class="modal-panel" role="dialog" aria-labelledby="methodology-modal-title">
+    <div class="modal-title">
+      <span id="methodology-modal-title">README</span>
+      <div class="modal-close" data-modal-close="methodology-modal" aria-label="Close"></div>
+    </div>
+
+    <div class="modal-body">
+    <div class="method-section">
+      <h3>How this playbook works</h3>
+      <div class="method-body">
+        <p>Two pipelines, running in sequence on weekday post-close.</p>
+        <ul>
+          <li><strong>Quant feed</strong> runs at <strong>6:00 PM ET</strong>. Prices, fundamentals, 5-year P/E history, benchmark regression, news + social tagging.</li>
+          <li><strong>Narrative feed (ADK agent)</strong> runs at <strong>6:30 PM ET</strong>, after the quant feed. It reads today's quant snapshot, the last 72h of news + social, and the prior narrative record, and produces one narrative record per date.</li>
+        </ul>
+        <p>The same narrative record powers the <strong>TLDR hero</strong>, <strong>Catalysts tab</strong>, and <strong>Risks tab</strong>. Only the TLDR is time-scrubbable; Catalysts / Risks / Basket / News all read the latest snapshot.</p>
+      </div>
+    </div>
+
+    <div class="method-section">
+      <h3>TLDR — four questions, in order</h3>
+      <div class="method-body">
+        <p>The ADK agent answers these four questions every day, in this order:</p>
+        <ol>
+          <li>What <strong>happened</strong> since the last snapshot?</li>
+          <li>How did it affect basket <strong>alpha</strong> and individual names?</li>
+          <li>Does it <strong>reinforce or weaken</strong> the structural thesis that power, compute, and deployment are constrained?</li>
+          <li>What's the <strong>next catalyst</strong> to watch?</li>
+        </ol>
+        <p>This is a tracker, not a theme-discovery tool. The thesis is fixed; the TLDR reports whether today made it more or less likely to be right.</p>
+      </div>
+    </div>
+
+    <div class="method-section">
+      <h3>Basket selection — three supply-side layers</h3>
+      <div class="method-body">
+        <ul>
+          <li><strong>Power</strong> — what AI has to plug into. GEV, CEG, VST, ETN, HUBB.</li>
+          <li><strong>Compute</strong> — what AI runs on. NVDA, AVGO, MU, TSM, ASML.</li>
+          <li><strong>Deployment</strong> — what puts AI in the physical world. PWR, FIX, STRL, EME, EQIX.</li>
+        </ul>
+        <p>Names sit in a layer because of what they supply to an AI buildout, not because of GICS. Equal-weight within each layer. The Basket change-log in the Basket tab auto-diffs composition on every run.</p>
+      </div>
+    </div>
+
+    <div class="method-section">
+      <h3>Computation rules</h3>
+      <div class="method-body">
+        <ul>
+          <li><strong>Equity curve</strong>: equal-weighted basket, rebased to 100 at Jan 1 2026. Benchmarks: PAVE (US Infrastructure, primary), SMH (Semiconductors), SPY (S&amp;P 500).</li>
+          <li><strong>Horizon returns</strong>: 1D / 7D / 1M / 3M / YTD / 1Y, equal-weight basket total return.</li>
+          <li><strong>Alpha vs PAVE</strong>: Basket YTD minus PAVE YTD, in points.</li>
+          <li><strong>Valuation tag</strong>: forward P/E percentile vs the name's own 5-year history. Cheap ≤30, Fair 30–70, Rich ≥70.</li>
+          <li><strong>Benchmark attribution</strong>: Pearson regression of basket daily returns on benchmark daily returns since Jan 1. Alpha is annualized from the average daily excess return; Beta is the regression coefficient; R² is the correlation squared.</li>
+        </ul>
+        <div class="method-code">alpha_annual = (mean(basket_ret - beta × benchmark_ret)) × 252 × 100</div>
+      </div>
+    </div>
+
+    <div class="method-section">
+      <h3>Data sources</h3>
+      <div class="method-body">
+        <ul>
+          <li><strong>Prices &amp; fundamentals</strong>: Alva equities module — OHLCV, forward estimates, 5-year P/E time series.</li>
+          <li><strong>Benchmarks</strong>: PAVE, SMH, SPY.</li>
+          <li><strong>News</strong>: Brave search (trade press, Reuters, Bloomberg, Nikkei, Utility Dive).</li>
+          <li><strong>Social</strong>: X / Twitter via Grok search, engagement-filtered.</li>
+          <li><strong>Narrative</strong>: ADK agent output written to <code>~/feeds/ai-bottleneck-narrative/v1/data/narrative/records</code>, one record per date.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="method-section">
+      <h3>Grounding &amp; fallback</h3>
+      <div class="method-body">
+        <p>Every number in the TLDR and the push line is verified against the input snapshot. If any number fails verification, the record is flagged <code>source: "fallback"</code>, the TLDR becomes a short deterministic summary, and push notifications are suppressed unless there are non-numeric signals (delta, catalyst flip, risk change).</p>
+      </div>
+    </div>
+
+    <div class="method-section">
+      <h3>What this does NOT capture</h3>
+      <div class="method-body">
+        <ul class="method-limit-list">
+          <li><strong>Private-market AI capex.</strong> Sovereign AI funds or private data-center developers moving faster than public vendors show up late here.</li>
+          <li><strong>Bilateral PPAs that stay confidential.</strong> If Meta signs another Crane-style deal that never hits an 8-K, we miss it until earnings.</li>
+          <li><strong>Intra-quarter hyperscaler guidance.</strong> Public commentary is the input; private roadmap shifts aren't.</li>
+          <li><strong>Chinese fab / turbine capacity.</strong> Export data is lagged; direction only, not magnitude.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="method-section">
+      <h3>Glossary</h3>
+      <div class="method-body">
+        <ul>
+          <li><strong>Power layer</strong> — supply of electrons to an AI workload (generation + T&amp;D + site power equipment).</li>
+          <li><strong>Compute layer</strong> — supply of AI-capable silicon (GPU / ASIC / HBM / lithography).</li>
+          <li><strong>Deployment layer</strong> — supply of physical AI deployment (site, construction, interconnect, data-center real estate).</li>
+          <li><strong>Bottleneck</strong> — a supply constraint whose backlog or lead-time is visibly setting pricing.</li>
+          <li><strong>PAVE</strong> — Global X US Infrastructure Development ETF.</li>
+          <li><strong>SMH</strong> — VanEck Semiconductor ETF.</li>
+          <li><strong>Grounding</strong> — the rule that every number on the page comes from the day's data snapshot.</li>
+        </ul>
+      </div>
+    </div>
+    </div><!-- /.modal-body -->
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+<script>
+(function(){
+  'use strict';
+
+  // ═══ FEED PATHS ═══
+  let API = 'https://api-llm.prd.alva.ai/api/v1/fs/read?path=';
+  let USER = 'steven';
+  function feedPath(feed, g, series, n) {
+    return '/alva/home/' + USER + '/feeds/' + feed + '/v1/data/' + g + '/' + series + '/@last/' + n;
+  }
+  function fetchFeed(feed, g, series, n){
+    return fetch(API + encodeURIComponent(feedPath(feed, g, series, n)))
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .catch(function(){ return []; });
+  }
+
+  let TODAY = Date.now();
+
+  // ─── Seed fallback (live data arrives via loadLive) ───
+  let BASKET = [];
+  let SUMMARY = { basket_ytd:0, basket_breadth:0, total_members:15, alpha_pave_ytd:0, alpha_smh_ytd:0, alpha_spy_ytd:0 };
+  let HORIZONS = [];
+  let LAYER_PERF = [];
+  let EQUITY = [];
+  let ATTR = [];
+  let CHANGELOG = [];
+  let NEWS = [];
+  let SOCIAL = [];
+  let NARRATIVE = [{
+    date: TODAY, generatedAt: TODAY, recordDate: new Date(TODAY).toISOString().slice(0,10),
+    thesis: "Live narrative refresh pending — the ADK agent runs at 6:30 PM ET weekdays.",
+    pushLine: "Narrative refresh pending — the ADK agent runs post-close.",
+    source: "fallback",
+    deltasJson: "[]", catalystsJson: "[]", risksJson: "[]"
+  }];
+  let LAYER_ORDER = ["Power","Compute","Deployment"];
+  let LAYER_COLORS = { Power:'#e6a91a', Compute:'#3d8bd1', Deployment:'#2a9b7d' };
+
+  // ─── Helpers ───
+  function fmtPct(v, digits){ if (v == null || isNaN(v)) return '—'; digits = (digits!==undefined)?digits:1; return (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(digits) + '%'; }
+  function fmtPts(v){ if (v == null || isNaN(v)) return '—'; return (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(1) + ' pts'; }
+  function fmtNum(v, digits){ if (v == null || isNaN(v)) return '—'; digits = (digits!==undefined)?digits:1; return Number(v).toFixed(digits); }
+  function fmtMcap(v){ if (v == null || isNaN(v) || v === 0) return '—'; if (v >= 1000) return '$' + (v/1000).toFixed(2) + 'T'; return '$' + Math.round(v) + 'B'; }
+  function upDownClass(v){ if (v == null || v === 0) return ''; return v > 0 ? 'up' : 'down'; }
+  function esc(s){ return (s == null ? '' : String(s)).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  // ADK output often contains **bold** markdown for tickers / numbers.
+  // escape HTML first, then lift ** pairs into <strong>.
+  function escMd(s){ return esc(s).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>'); }
+  function parseJson(s){ try { return JSON.parse(s); } catch (e) { return []; } }
+  function formatDateISO(ms){ let d = new Date(ms); return d.toISOString().slice(0, 10); }
+  function formatDateLabel(ms){ let d = new Date(ms); let mon = d.toLocaleDateString('en-US', { month:'short', timeZone:'UTC' }); return mon + ' ' + d.getUTCDate(); }
+  function ago(ms){ let diff = TODAY + 24*3600*1000 - ms; let d = Math.floor(diff / 86400000); if (d <= 0) return 'today'; if (d === 1) return '1d ago'; return d + 'd ago'; }
+  function agoHours(ms){ let diff = TODAY - ms; let h = Math.max(1, Math.floor(diff / 3600000)); if (h < 24) return h + 'h ago'; let d = Math.floor(h/24); return d + 'd ago'; }
+
+  let TT_COLORS = { bg:'rgba(255,255,255,0.96)', border:'rgba(0,0,0,0.08)', title:'rgba(0,0,0,0.7)', text:'rgba(0,0,0,0.9)', pointer:'rgba(0,0,0,0.1)' };
+  let FONT = "'Delight', -apple-system, 'OPPO Sans 4.0', BlinkMacSystemFont, sans-serif";
+  let AX = { axisLine:{show:false}, axisTick:{show:false}, axisLabel:{fontSize:10, color:'rgba(0,0,0,0.7)', fontFamily:FONT, margin:8}, splitLine:{show:false} };
+  function mkFmt(valueFn){
+    valueFn = valueFn || function(v){ return v; };
+    return function(params){
+      if (!Array.isArray(params)) params = [params];
+      let t = params[0].axisValueLabel || params[0].axisValue || params[0].name || '';
+      let s = '<div style="font-size:12px;color:'+TT_COLORS.title+';margin-bottom:6px;">'+t+'</div>';
+      params.forEach(function(p){
+        s += '<div style="display:flex;align-items:center;gap:6px;line-height:20px;">'
+          + '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;flex-shrink:0;background:'+p.color+';"></span>'
+          + '<span style="color:'+TT_COLORS.text+';">'+p.seriesName+'</span>'
+          + '<span style="color:'+TT_COLORS.text+';margin-left:auto;">'+valueFn(p.value, p)+'</span>'
+          + '</div>';
+      });
+      return s;
+    };
+  }
+  let TT = { trigger:'axis', backgroundColor:TT_COLORS.bg, borderColor:TT_COLORS.border, borderWidth:1, borderRadius:6, padding:12,
+    textStyle:{ fontFamily:FONT, fontSize:12, fontWeight:400, color:TT_COLORS.text },
+    axisPointer:{ type:'line', lineStyle:{ color:TT_COLORS.pointer, width:1 } },
+    extraCssText:'box-shadow:none;', formatter: mkFmt() };
+
+  // ─── Table column auto-alignment — per design-widgets.md spec ───
+  // Measures intrinsic content width per column, allocates remaining space
+  // proportionally, never applies CSS widths directly. Must be called after
+  // render + after visibility changes (tab switch) + on resize.
+  window.initTableAlignment = function(tableEl){
+    if (!tableEl) return;
+    let rows = tableEl.querySelectorAll('.table-row');
+    if (!rows.length) return;
+    let firstCells = rows[0].querySelectorAll('.table-cell');
+    let totalCells = firstCells.length;
+    if (!totalCells) return;
+    let lastIsCaret = firstCells[totalCells-1].classList.contains('caret-cell');
+    let CARET_W = 32;
+    let dataCount = lastIsCaret ? totalCells - 1 : totalCells;
+    rows.forEach(function(row){
+      row.style.removeProperty('min-width');
+      let cells = row.querySelectorAll('.table-cell');
+      for (let i=0;i<cells.length;i++){
+        cells[i].style.removeProperty('flex');
+        cells[i].style.removeProperty('margin-left');
+      }
+    });
+    let colWidths = [];
+    for (let col=0; col<dataCount; col++){
+      let maxW = 0;
+      rows.forEach(function(row){ let c = row.querySelectorAll('.table-cell')[col]; if (c) maxW = Math.max(maxW, c.scrollWidth); });
+      colWidths.push(maxW);
+    }
+    let total = 0; for (let i=0;i<colWidths.length;i++) total += colWidths[i];
+    let gap = (totalCells - 1) * 16;
+    let rowPadX = 0;
+    let rs = getComputedStyle(rows[0]);
+    rowPadX = (parseFloat(rs.paddingLeft)||0) + (parseFloat(rs.paddingRight)||0);
+    let avail = Math.max(0, tableEl.clientWidth - rowPadX - gap - (lastIsCaret ? CARET_W : 0));
+    let resolved = [];
+    for (let col=0; col<dataCount; col++){
+      let prop = total ? Math.round((colWidths[col] / total) * avail) : colWidths[col];
+      resolved.push(Math.max(colWidths[col], prop));
+    }
+    let totalW = rowPadX + gap;
+    for (let i=0;i<resolved.length;i++) totalW += resolved[i];
+    if (lastIsCaret) totalW += CARET_W;
+    rows.forEach(function(row){
+      let cells = row.querySelectorAll('.table-cell');
+      for (let col=0; col<dataCount; col++){
+        if (cells[col]) cells[col].style.flex = '0 0 ' + resolved[col] + 'px';
+      }
+      if (lastIsCaret && cells[totalCells-1]) {
+        cells[totalCells-1].style.flex = '0 0 ' + CARET_W + 'px';
+        cells[totalCells-1].style.marginLeft = 'auto';
+      }
+      row.style.minWidth = totalW + 'px';
+    });
+  };
+
+  let state = {
+    narrativeList: NARRATIVE.slice().sort(function(a,b){ return b.date - a.date; }),
+    currentIdx: 0,
+    catSub: 'upcoming',
+    feedFilter: 'all',
+    charts: {}
+  };
+
+  // ═══ LIVE FEED HYDRATION ═══
+  async function loadLive(){
+    // Fetch generously (more than one date worth) so the dedup-by-key step
+    // can pick the latest row per entity, even if older days are mixed in.
+    let [lMembers, lEquity, lHorizons, lLayerPerf, lSummary, lAttr, lChangelog, lNarrative, lNews, lSocial] = await Promise.all([
+      fetchFeed('ai-bottleneck','basket','tickers', 60),
+      fetchFeed('ai-bottleneck','basket','equity', 260),
+      fetchFeed('ai-bottleneck','basket','horizons', 24),
+      fetchFeed('ai-bottleneck','basket','layer_perf', 12),
+      fetchFeed('ai-bottleneck','basket','summary', 1),
+      fetchFeed('ai-bottleneck','basket','attribution', 12),
+      fetchFeed('ai-bottleneck','basket','change_log', 60),
+      fetchFeed('ai-bottleneck-narrative','narrative','records', 60),
+      fetchFeed('ai-bottleneck-news','items','news', 80),
+      fetchFeed('ai-bottleneck-news','items','social', 40),
+    ]);
+
+    // Dedup time-series ts collections to one record per logical entity,
+    // keeping the most recent. Fixes ghost rows from earlier-day cron runs
+    // (e.g. Apr 24 records with empty prices_json mixing with today's clean data).
+    if (lMembers) lMembers = dedupBy(lMembers, function(r){ return r.id; });
+    if (lHorizons) lHorizons = dedupBy(lHorizons, function(r){ return (r.window||'').toLowerCase(); });
+    if (lLayerPerf) lLayerPerf = dedupBy(lLayerPerf, function(r){ return r.layer; });
+    if (lAttr) lAttr = dedupBy(lAttr, function(r){ return r.benchmark; });
+
+    if (lMembers && lMembers.length){
+      BASKET = lMembers.map(function(m){
+        let prices = [];
+        try { prices = JSON.parse(m.prices_json || '[]'); } catch(e) {}
+        return {
+          id: m.id, layer: m.layer, name: m.name,
+          mcap: m.mcap || 0,
+          fpe: m.pe || null,
+          pe_pct: (m.pe_pct != null && m.pe_pct >= 0) ? m.pe_pct : null,
+          rev_yoy: m.rev_yoy || null,
+          ret_1y: m.ret_1y || 0,
+          alpha_pave: m.alpha_pave || 0,
+          alpha_smh: m.alpha_smh || 0,
+          alpha_spy: m.alpha_spy || 0,
+          val: (m.val_tag || 'fair').toLowerCase(),
+          role: m.role || '', why: m.why || '', miss: m.miss || '', breaks: m.breaks || '',
+          prices: prices
+        };
+      });
+    }
+
+    if (lEquity && lEquity.length){
+      EQUITY = lEquity.map(function(r){ return { date:r.date, basket:r.basket, pave:r.pave, smh:r.smh, spy:r.spy }; });
+    }
+    if (lHorizons && lHorizons.length){
+      let order = {'1d':0,'7d':1,'1m':2,'3m':3,'ytd':4,'1y':5};
+      HORIZONS = lHorizons.slice().sort(function(a,b){ return (order[a.window]||9) - (order[b.window]||9); })
+        .map(function(r){ return { window:r.window.toUpperCase(), basket:r.basket, pave:r.pave, smh:r.smh, spy:r.spy }; });
+    }
+    if (lLayerPerf && lLayerPerf.length){
+      LAYER_PERF = lLayerPerf.map(function(r){ return { layer:r.layer, avg_3m:r.avg_3m, avg_ytd:r.avg_ytd }; });
+    }
+    if (lSummary && lSummary.length){
+      let s = lSummary[0];
+      SUMMARY = {
+        basket_ytd: s.basket_ytd, basket_breadth: s.breadth_up_ytd, total_members: s.total_members,
+        pave_ytd: s.pave_ytd, smh_ytd: s.smh_ytd, spy_ytd: s.spy_ytd,
+        alpha_pave_ytd: s.alpha_pave_ytd, alpha_smh_ytd: s.alpha_smh_ytd, alpha_spy_ytd: s.alpha_spy_ytd,
+      };
+    }
+    ATTR = lAttr || [];
+    CHANGELOG = lChangelog || [];
+    if (lNarrative && lNarrative.length) NARRATIVE = lNarrative.map(function(r){ return r; });
+
+    if (lNews && lNews.length){
+      NEWS = lNews.map(function(n){
+        return {
+          source: n.source || 'news', author: n.source || 'news', time: n.date,
+          ids: (n.ids || '').split(',').filter(Boolean),
+          sentiment: n.sentiment || 'Neutral',
+          title: n.title || '', snippet: n.snippet || '', url: n.url || '#'
+        };
+      });
+    }
+    if (lSocial && lSocial.length){
+      SOCIAL = lSocial.map(function(s){
+        return {
+          source: 'X', author: s.author_handle || s.author_name || 'X', handle: s.author_handle || '',
+          time: s.date, likes: s.likes || 0,
+          ids: (s.ids || '').split(',').filter(Boolean),
+          sentiment: s.sentiment || 'Neutral',
+          title: s.author_name || s.author_handle || 'X',
+          snippet: s.content || '', url: s.url || '#'
+        };
+      });
+    }
+
+    state.narrativeList = dedupNarrative(NARRATIVE);
+  }
+
+  // Dedup narrative records by recordDate — keep the one with max generatedAt.
+  // Per template: "re-triggered narrative agent for same recordDate APPENDS
+  // a new row. Readers dedupe by recordDate, keeping largest generatedAt."
+  function dedupNarrative(records){
+    if (!records || !records.length) return [];
+    let byDate = {};
+    records.forEach(function(r){
+      let key = r.recordDate || (r.date ? new Date(r.date).toISOString().slice(0,10) : null);
+      if (!key) return;
+      if (!byDate[key] || (r.generatedAt || 0) > (byDate[key].generatedAt || 0)) {
+        byDate[key] = r;
+      }
+    });
+    return Object.keys(byDate).map(function(k){ return byDate[k]; })
+      .sort(function(a,b){ return b.date - a.date; });
+  }
+
+  // Generic ts dedup — feeds keep historical records and a fetch of @last/N
+  // can return cross-date contamination (e.g. yesterday's ticker rows mixed
+  // with today's). For each logical entity (id, window, layer, benchmark)
+  // we keep the row with the largest date.
+  function dedupBy(arr, keyFn){
+    if (!arr || !arr.length) return [];
+    let byKey = {};
+    arr.forEach(function(r){
+      let k = keyFn(r); if (!k) return;
+      if (!byKey[k] || (r.date || 0) > (byKey[k].date || 0)) byKey[k] = r;
+    });
+    return Object.keys(byKey).map(function(k){ return byKey[k]; });
+  }
+
+  // Platform shell renders refresh timestamp + Automations badge from cron state
+  // and release metadata. No page-level title / meta / notification strip in HTML.
+
+  // ═══ HERO ═══
+  function renderHeroDateDropdown(){
+    let dd = document.getElementById('hero-date-dropdown');
+    if (!dd) return;
+    // narrativeList is newest-first (idx=0 = latest); dropdown matches that order.
+    dd.innerHTML = state.narrativeList.map(function(rec, i){
+      let isActive = (i === state.currentIdx) ? ' active' : '';
+      let dateStr = formatDateLabel(rec.date);
+      let ageStr  = ago(rec.date);
+      return '<button type="button" class="filter-dropdown-item' + isActive +
+             '" data-idx="' + i + '" role="option">' +
+             '<span>' + dateStr + '</span>' +
+             '<span class="filter-dropdown-item-sub">' + ageStr + '</span>' +
+             '</button>';
+    }).join('');
+    dd.querySelectorAll('.filter-dropdown-item').forEach(function(el){
+      el.addEventListener('click', function(e){
+        e.stopPropagation();
+        let idx = parseInt(el.dataset.idx, 10);
+        if (!isNaN(idx)) {
+          state.currentIdx = idx;
+          paintHero();
+          renderHeroDateDropdown();
+          updateHash();
+          let filter = document.getElementById('hero-date-filter');
+          if (filter) filter.classList.remove('open');
+          let trigger = document.getElementById('hero-date-trigger');
+          if (trigger) trigger.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+  }
+  function renderHero(){
+    if (!state.narrativeList.length) return;
+    let m = location.hash.match(/tldr-date=(\d{4}-\d{2}-\d{2})/);
+    if (m) {
+      for (let i=0;i<state.narrativeList.length;i++){
+        if (formatDateISO(state.narrativeList[i].date) === m[1]) { state.currentIdx = i; break; }
+      }
+    }
+    renderHeroDateDropdown();
+    // Trigger toggle (Screener filter-dropdown pattern)
+    let trigger = document.getElementById('hero-date-trigger');
+    if (trigger) {
+      trigger.addEventListener('click', function(e){
+        e.stopPropagation();
+        let filter = document.getElementById('hero-date-filter');
+        let willOpen = !filter.classList.contains('open');
+        filter.classList.toggle('open', willOpen);
+        trigger.setAttribute('aria-expanded', String(willOpen));
+      });
+    }
+    document.addEventListener('click', function(){
+      let filter = document.getElementById('hero-date-filter');
+      if (!filter) return;
+      filter.classList.remove('open');
+      let trg = document.getElementById('hero-date-trigger');
+      if (trg) trg.setAttribute('aria-expanded', 'false');
+    });
+    document.getElementById('hero-date-prev').addEventListener('click', function(e){
+      e.stopPropagation();
+      if (state.currentIdx < state.narrativeList.length - 1) { state.currentIdx++; paintHero(); renderHeroDateDropdown(); updateHash(); }
+    });
+    document.getElementById('hero-date-next').addEventListener('click', function(e){
+      e.stopPropagation();
+      if (state.currentIdx > 0) { state.currentIdx--; paintHero(); renderHeroDateDropdown(); updateHash(); }
+    });
+    paintHero();
+  }
+  function updateHash(){
+    let rec = state.narrativeList[state.currentIdx];
+    if (rec) location.hash = 'tldr-date=' + formatDateISO(rec.date);
+  }
+  function paintHero(){
+    let rec = state.narrativeList[state.currentIdx];
+    let tldrHost = document.getElementById('hero-tldr');
+    let ageEl = document.getElementById('hero-date-age-label');
+    if (!rec) {
+      // Graceful empty: feed hasn't produced a record yet (very first run, or
+      // pre-cron on a fresh deploy). Don't leave a blank card.
+      document.getElementById('hero-date-label').textContent = '—';
+      if (ageEl) ageEl.textContent = '';
+      if (tldrHost) tldrHost.innerHTML = '<p style="color:var(--text-n7)">Narrative refresh pending — the ADK agent runs at 6:30 PM ET on weekdays. The quant tabs below show the most recent available data.</p>';
+      return;
+    }
+    document.getElementById('hero-date-label').textContent = formatDateLabel(rec.date);
+    if (ageEl) ageEl.textContent = '· ' + ago(rec.date);
+
+    // Thesis body (4-question TLDR, rendered as markdown).
+    if (window.markdownit && rec.thesis) {
+      tldrHost.innerHTML = window.markdownit({ html:false, linkify:true, breaks:false }).render(rec.thesis);
+    } else {
+      tldrHost.textContent = rec.thesis || '';
+    }
+
+    document.getElementById('hero-date-prev').disabled = state.currentIdx >= state.narrativeList.length - 1;
+    document.getElementById('hero-date-next').disabled = state.currentIdx <= 0;
+
+    // NOTE: Catalysts and Risks intentionally NOT rebuilt here.
+  }
+
+  // ═══ ATTRIBUTION LINE ═══
+  function renderAttribution(){
+    let host = document.getElementById('attr-line-simple');
+    if (!host) return;
+    if (!ATTR || !ATTR.length) { host.style.display = 'none'; return; }
+    let pave = ATTR.filter(function(a){ return a.benchmark === 'PAVE'; })[0] || ATTR[0];
+    let alphaClass = pave.alpha >= 0 ? 'up' : 'down';
+    let alphaTxt = (pave.alpha >= 0 ? '+' : '−') + Math.abs(pave.alpha).toFixed(2) + '%';
+    host.innerHTML = '<span class="attr-kw">Benchmark Attribution:</span> '
+      + 'Alpha <b class="' + alphaClass + '">' + alphaTxt + '</b> (annualized)'
+      + ' <span class="attr-kw">·</span> Beta <b>' + Number(pave.beta).toFixed(2) + '</b>'
+      + ' <span class="attr-kw">·</span> R² <b>' + Number(pave.r2).toFixed(3) + '</b>'
+      + ' <span class="attr-kw">·</span> Correlation <b>' + Number(pave.corr).toFixed(2) + '</b>'
+      + ' <span class="attr-kw">· n=' + (pave.n || '—') + ' days · vs ' + esc(pave.benchmark) + '</span>';
+    host.style.display = '';
+  }
+
+  // ═══ CHANGE LOG ═══
+  function renderChangelog(){
+    let host = document.getElementById('cx-log');
+    if (!host) return;
+    if (!CHANGELOG || !CHANGELOG.length) {
+      host.innerHTML = '<div class="cx-log-h">Change log loads from quant feed</div>';
+      return;
+    }
+    let sorted = CHANGELOG.slice().sort(function(a,b){ return b.date - a.date; });
+    let initials = sorted.filter(function(r){ return r.action === 'initial'; });
+    let diffs = sorted.filter(function(r){ return r.action !== 'initial'; });
+    let rows = [];
+    if (diffs.length){
+      rows.push('<div class="cx-log-h">Recent changes (' + diffs.length + ')</div>');
+      diffs.slice(0, 12).forEach(function(r){
+        let layerTxt = r.from_layer ? (r.from_layer + ' → ' + r.to_layer) : r.to_layer;
+        rows.push('<div class="cx-row">'
+          + '<span class="cx-date">' + formatDateLabel(r.date) + '</span>'
+          + '<span class="cx-action ' + r.action + '">' + esc(r.action) + '</span>'
+          + '<span class="cx-id">' + esc(r.id) + '</span>'
+          + '<span class="cx-layer">' + esc(layerTxt) + '</span>'
+          + '<span class="cx-reason">' + esc(r.reason || '') + '</span>'
+          + '</div>');
+      });
+    }
+    if (initials.length){
+      rows.push('<div class="cx-log-h" style="margin-top:' + (diffs.length ? 'var(--spacing-s)' : '0') + '">Initial composition · ' + formatDateLabel(initials[0].date) + ' (' + initials.length + ' names)</div>');
+      rows.push('<div class="cx-row" style="flex-wrap:wrap;gap:var(--spacing-xs)">'
+        + initials.map(function(r){
+            return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:var(--b0-container);border:1px solid var(--line-l07);border-radius:var(--radius-ct-xs);font-size:11px"><b style="color:var(--text-n9);font-weight:500">' + esc(r.id) + '</b><span style="color:var(--text-n5)">' + esc(r.to_layer) + '</span></span>';
+          }).join('')
+        + '</div>');
+    }
+    host.innerHTML = rows.join('');
+  }
+
+  // ═══ THESIS / OVERVIEW ═══
+  function buildThesis(){
+    let s = SUMMARY;
+    let k1 = document.getElementById('kpi-basket-ytd'); k1.textContent = fmtPct(s.basket_ytd); k1.className = 'kpi-value ' + upDownClass(s.basket_ytd);
+    document.getElementById('kpi-basket-breadth').textContent = (s.basket_breadth||0) + ' of ' + (s.total_members||15) + ' up YTD · equal-weight basket';
+    let k2 = document.getElementById('kpi-benchmark-ytd'); k2.textContent = fmtPct(s.pave_ytd); k2.className = 'kpi-value ' + upDownClass(s.pave_ytd);
+    let k3 = document.getElementById('kpi-alpha-pave'); k3.textContent = fmtPts(s.alpha_pave_ytd); k3.className = 'kpi-value ' + upDownClass(s.alpha_pave_ytd);
+
+    // 6 horizon metric cards — basket return top, PAVE alpha pill bottom.
+    // When HORIZONS is empty (pre-first-run), render skeleton cards with em-dashes
+    // so the grid stays visible instead of collapsing to nothing.
+    let horizonHost = document.getElementById('horizon-cards');
+    if (horizonHost){
+      let windowOrder = ['1D','7D','1M','3M','YTD','1Y'];
+      let byKey = {};
+      HORIZONS.forEach(function(r){ byKey[(r.window||'').toUpperCase()] = r; });
+      horizonHost.innerHTML = windowOrder.map(function(w){
+        let r = byKey[w] || {};
+        let v = r.basket;
+        let paveR = r.pave;
+        let valClass = (v == null ? '' : (v > 0 ? 'up' : (v < 0 ? 'down' : '')));
+        let benchClass = (paveR == null ? 'flat' : (paveR > 0 ? 'up' : (paveR < 0 ? 'down' : 'flat')));
+        return '<div class="horizon-card">'
+          + '<span class="h-win">'+esc(w)+'</span>'
+          + '<span class="h-val '+valClass+'">'+(v==null?'—':fmtPct(v))+'</span>'
+          + '<span class="h-bench '+benchClass+'">PAVE '+(paveR==null?'—':fmtPct(paveR))+'</span>'
+          + '</div>';
+      }).join('');
+    }
+
+    // Equity curve empty-state placeholder
+    if (!EQUITY || !EQUITY.length){
+      let eq = document.getElementById('chart-equity');
+      if (eq) {
+        let ec = echarts.init(eq);
+        ec.setOption({
+          grid:{ top:8, right:8, bottom:28, left:36 },
+          xAxis:Object.assign({ type:'time', show:false }, AX),
+          yAxis:Object.assign({ type:'value', show:false }, AX),
+          graphic:[{ type:'text', left:'center', top:'middle', style:{ text:'Equity curve loads from quant feed (6 PM ET weekdays)', fontFamily:FONT, fontSize:12, fill:'rgba(0,0,0,0.4)' } }]
+        });
+        state.charts.equity = ec;
+        return;
+      }
+    }
+
+    function hoverDot(color){
+      return { symbol:'circle', symbolSize:10, showSymbol:false,
+        emphasis:{ itemStyle:{ borderColor:'#ffffff', borderWidth:1, color:color } } };
+    }
+    let c = echarts.init(document.getElementById('chart-equity'));
+    c.setOption({
+      // Set palette explicitly so tooltip dots match the legend lines.
+      // ECharts pulls tooltip dot color from this array (lineStyle.color
+      // alone only colors the line stroke).
+      color: ['#49a3a6','#ff9800','#5f75c9','#838383'],
+      grid: { top:8, right:8, bottom:8, left:8, containLabel:true },
+      xAxis: Object.assign({ type:'time', boundaryGap:false }, AX),
+      yAxis: Object.assign({ type:'value', scale:true }, AX, { splitLine:{show:true, lineStyle:{color:'rgba(0,0,0,0.05)', type:'dashed'}} }),
+      tooltip: Object.assign({}, TT, { formatter: mkFmt(function(v){ return Number(v[1]).toFixed(1); }) }),
+      series: [
+        Object.assign({ name:'Basket', type:'line', smooth:0.1, data:EQUITY.map(function(r){return [r.date,r.basket];}),
+          itemStyle:{ color:'#49a3a6' },
+          lineStyle:{ width:1, color:'#49a3a6' },
+          areaStyle:{ color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(73,163,166,0.15)'},{offset:1,color:'rgba(73,163,166,0)'}]) } }, hoverDot('#49a3a6')),
+        Object.assign({ name:'PAVE', type:'line', smooth:0.1, data:EQUITY.map(function(r){return [r.date,r.pave];}), itemStyle:{ color:'#ff9800' }, lineStyle:{ width:1, color:'#ff9800' } }, hoverDot('#ff9800')),
+        Object.assign({ name:'SMH',  type:'line', smooth:0.1, data:EQUITY.map(function(r){return [r.date,r.smh];}),  itemStyle:{ color:'#5f75c9' }, lineStyle:{ width:1, color:'#5f75c9' } }, hoverDot('#5f75c9')),
+        Object.assign({ name:'SPY',  type:'line', smooth:0.1, data:EQUITY.map(function(r){return [r.date,r.spy];}),  itemStyle:{ color:'#838383' }, lineStyle:{ width:1, color:'#838383', type:'dashed' } }, hoverDot('#838383'))
+      ]
+    });
+    state.charts.equity = c;
+
+    let sorted = LAYER_PERF.slice().sort(function(a,b){
+      return LAYER_ORDER.indexOf(a.layer) - LAYER_ORDER.indexOf(b.layer);
+    });
+    let c3 = echarts.init(document.getElementById('chart-layers'));
+    c3.setOption({
+      grid:{ top:8, right:32, bottom:8, left:8, containLabel:true },
+      xAxis:Object.assign({ type:'value' }, AX, { splitLine:{show:true, lineStyle:{color:'rgba(0,0,0,0.05)', type:'dashed'}}, axisLabel:Object.assign({}, AX.axisLabel, { formatter:function(v){ return v+'%'; }}) }),
+      yAxis:Object.assign({ type:'category', data:sorted.map(function(r){return r.layer;}) }, AX, { axisLabel:Object.assign({}, AX.axisLabel, {fontSize:12}) }),
+      tooltip:Object.assign({}, TT, { formatter: mkFmt(function(v){ return (v>=0?'+':'') + Number(v).toFixed(1) + '%'; }) }),
+      series:[{
+        name:'3M perf', type:'bar', barMaxWidth:16, barGap:'8px',
+        data: sorted.map(function(r){ return { value:r.avg_3m, itemStyle:{ color:LAYER_COLORS[r.layer]||'#838383', borderRadius:[0,1,1,0] } }; }),
+        label:{ show:true, position:'right', fontFamily:FONT, fontSize:11, color:'rgba(0,0,0,0.7)', formatter:function(p){ return (p.value>=0?'+':'')+p.value.toFixed(1)+'%'; } }
+      }]
+    });
+    state.charts.layers = c3;
+  }
+
+  // ═══ BASKET ═══
+  function buildBasket(){
+    let table = document.getElementById('basket-table');
+    if (!BASKET || !BASKET.length){
+      table.innerHTML = '<div class="empty">Basket loads from the quant feed (6 PM ET weekdays). Members, layer assignments, and per-name price history will populate on the next run.</div>';
+      // also clear the scatter chart
+      let sc = document.getElementById('chart-scatter');
+      if (sc) {
+        let sc2 = echarts.init(sc);
+        sc2.setOption({
+          grid:{ top:16, right:24, bottom:40, left:40 },
+          xAxis:Object.assign({ type:'value', min:0, max:100, show:false }, AX),
+          yAxis:Object.assign({ type:'value', show:false }, AX),
+          graphic:[{ type:'text', left:'center', top:'middle', style:{ text:'Valuation scatter loads from the quant feed', fontFamily:FONT, fontSize:12, fill:'rgba(0,0,0,0.4)' } }]
+        });
+        state.charts.scatter = sc2;
+      }
+      return;
+    }
+    let rows = [];
+    rows.push(
+      '<div class="table-row table-header">'
+      + '<div class="table-cell">Ticker</div>'
+      + '<div class="table-cell">Name</div>'
+      + '<div class="table-cell">Layer</div>'
+      + '<div class="table-cell num">Mkt Cap</div>'
+      + '<div class="table-cell num">Fwd P/E</div>'
+      + '<div class="table-cell num">1Y</div>'
+      + '<div class="table-cell num">α vs PAVE</div>'
+      + '<div class="table-cell num">α vs SMH</div>'
+      + '<div class="table-cell">Valuation</div>'
+      + '<div class="table-cell caret-cell"></div>'
+      + '</div>'
+    );
+    let sorted = BASKET.slice().sort(function(a,b){
+      let la = LAYER_ORDER.indexOf(a.layer), lb = LAYER_ORDER.indexOf(b.layer);
+      if (la !== lb) return la - lb;
+      return (b.mcap||0) - (a.mcap||0);
+    });
+    sorted.forEach(function(b, i){
+      let layerClass = 'tag-layer ' + (b.layer||'').toLowerCase();
+      let valClass = 'tag-' + (b.val || 'fair');
+      let valLabel = (b.val || 'fair').charAt(0).toUpperCase() + (b.val || 'fair').slice(1);
+      rows.push(
+        '<div class="table-row table-body-row expandable" data-row="'+i+'" data-id="'+esc(b.id)+'">'
+        + '<div class="table-cell" style="font-weight:500;color:var(--main-m1)">'+esc(b.id)+'</div>'
+        + '<div class="table-cell" style="color:var(--text-n7)">'+esc(b.name)+'</div>'
+        + '<div class="table-cell"><span class="tag '+layerClass+'">'+esc(b.layer)+'</span></div>'
+        + '<div class="table-cell num">'+fmtMcap(b.mcap)+'</div>'
+        + '<div class="table-cell num">'+(b.fpe==null?'—':fmtNum(b.fpe,0))+'</div>'
+        + '<div class="table-cell num '+upDownClass(b.ret_1y)+'">'+fmtPct(b.ret_1y)+'</div>'
+        + '<div class="table-cell num '+upDownClass(b.alpha_pave)+'">'+fmtPts(b.alpha_pave)+'</div>'
+        + '<div class="table-cell num '+upDownClass(b.alpha_smh)+'">'+fmtPts(b.alpha_smh)+'</div>'
+        + '<div class="table-cell"><span class="tag '+valClass+'">'+valLabel+'</span></div>'
+        + '<div class="table-cell caret-cell"><span class="expand-caret"></span></div>'
+        + '</div>'
+        + '<div class="expand-panel" data-exp="'+i+'" style="display:none">'
+        +   '<div class="basket-expand-grid">'
+        +     '<div class="widget-card" style="min-height:260px;">'
+        +       '<div class="widget-title"><span class="widget-title-text">1-year price chart</span></div>'
+        +       '<div class="chart-body chart-dotted-background" style="flex:1;height:0;min-height:200px;border-radius:var(--radius-ct-s);">'
+        +         '<div id="rx-chart-'+b.id+'" class="chart-container"></div>'
+        +         '<div class="alva-watermark"><img src="https://alva-ai-static.b-cdn.net/icons/alva-watermark.svg" alt="Alva"></div>'
+        +       '</div>'
+        +     '</div>'
+        +     '<div class="widget-card">'
+        +       '<div class="widget-title"><span class="widget-title-text">Why it&rsquo;s in the basket</span></div>'
+        +       '<div class="ft-card" style="padding:var(--spacing-m);display:flex;flex-direction:column;gap:var(--spacing-xxs);flex:1;">'
+        +         '<div><h3>Theme role</h3><p>'+esc(b.role)+'</p></div>'
+        +         '<div><h3>Why now</h3><p>'+esc(b.why)+'</p></div>'
+        +         '<div><h3>What the market may be missing</h3><p>'+esc(b.miss)+'</p></div>'
+        +         '<div><h3>What breaks this expression</h3><p>'+esc(b.breaks)+'</p></div>'
+        +       '</div>'
+        +     '</div>'
+        +   '</div>'
+        + '</div>'
+      );
+    });
+    table.innerHTML = rows.join('');
+
+    table.querySelectorAll('.table-body-row').forEach(function(row){
+      row.addEventListener('click', function(){
+        let i = row.getAttribute('data-row');
+        let exp = table.querySelector('[data-exp="'+i+'"]');
+        if (!exp) return;
+        let isOpen = row.classList.contains('open');
+        if (isOpen) {
+          row.classList.remove('open');
+          exp.style.display = 'none';
+        } else {
+          row.classList.add('open');
+          exp.style.display = '';
+          if (!exp.dataset.rendered) {
+            let id = row.getAttribute('data-id');
+            setTimeout(function(){ renderExpandChart(id); }, 20);
+            exp.dataset.rendered = '1';
+          }
+        }
+      });
+    });
+
+    if (typeof initTableAlignment === 'function') initTableAlignment(table);
+
+    let scatterData = BASKET.map(function(b){
+      let vp = (b.pe_pct != null) ? b.pe_pct : 50;
+      let color = (b.val === 'cheap' ? '#2a9b7d' : (b.val === 'fair' ? '#838383' : '#e05357'));
+      // Bubble size: cbrt of market cap with cap + floor so NVDA/TSM don't
+      // swallow the chart. Ranges ~8px for a $2B micro-cap to ~38px for NVDA.
+      let size = Math.max(8, Math.min(38, Math.cbrt(b.mcap||8) * 3.5));
+      return { name:b.id, value:[vp, b.ret_1y, size], itemStyle:{ color: color, opacity: 0.75 } };
+    });
+    let sc = echarts.init(document.getElementById('chart-scatter'));
+    sc.setOption({
+      grid:{ top:16, right:24, bottom:8, left:8, containLabel:true },
+      xAxis:Object.assign({ type:'value', name:'5Y P/E percentile', nameLocation:'middle', nameGap:28, min:0, max:100, nameTextStyle:{fontSize:10, color:'rgba(0,0,0,0.5)', fontFamily:FONT} }, AX, { splitLine:{show:true, lineStyle:{color:'rgba(0,0,0,0.05)', type:'dashed'}}, axisLabel:Object.assign({}, AX.axisLabel, { formatter: function(v){ return v+'%'; }}) }),
+      yAxis:Object.assign({ type:'value', name:'1Y return', nameLocation:'middle', nameGap:42, nameTextStyle:{fontSize:10, color:'rgba(0,0,0,0.5)', fontFamily:FONT} }, AX, { splitLine:{show:true, lineStyle:{color:'rgba(0,0,0,0.05)', type:'dashed'}}, axisLabel:Object.assign({}, AX.axisLabel, { formatter: function(v){ return v+'%'; }}) }),
+      tooltip:Object.assign({}, TT, { trigger:'item', formatter: function(p){
+        let b = BASKET.filter(function(x){return x.id===p.name;})[0];
+        let peTxt = (b && b.fpe != null) ? b.fpe.toFixed(1) : '—';
+        return '<div style="font-size:12px;color:'+TT_COLORS.title+';margin-bottom:6px;">'+p.name+'</div>'
+          + '<div>5Y P/E %ile · '+p.value[0]+'% (fwd P/E '+peTxt+')</div>'
+          + '<div>1Y return · '+fmtPct(p.value[1])+'</div>';
+      }}),
+      series:[{
+        type:'scatter', data: scatterData, symbolSize:function(v){ return v[2]; },
+        label:{ show:true, formatter:function(p){ return p.name; }, fontFamily:FONT, fontSize:10, color:'rgba(0,0,0,0.7)', position:'right' },
+        markArea:{
+          silent:true, itemStyle:{ color:'rgba(42,155,125,0.05)' },
+          data:[[{xAxis:0, yAxis:0}, {xAxis:30, yAxis:'max'}]]
+        }
+      }]
+    });
+    state.charts.scatter = sc;
+  }
+
+  function renderExpandChart(id){
+    let el = document.getElementById('rx-chart-'+id); if (!el) return;
+    if (echarts.getInstanceByDom(el)) return;
+    let b = BASKET.filter(function(x){ return x.id === id; })[0];
+    let data = (b && Array.isArray(b.prices)) ? b.prices : [];
+    let c = echarts.init(el);
+    if (!data.length){
+      c.setOption({
+        grid:{ top:12, right:12, bottom:24, left:36 },
+        xAxis:Object.assign({ type:'time', boundaryGap:false, show:false }, AX),
+        yAxis:Object.assign({ type:'value', show:false }, AX),
+        graphic:[{ type:'text', left:'center', top:'middle', style:{ text:'Price history loads from quant feed', fontFamily:FONT, fontSize:12, fill:'rgba(0,0,0,0.4)' } }]
+      });
+      return;
+    }
+    c.setOption({
+      grid:{ top:12, right:12, bottom:8, left:8, containLabel:true },
+      xAxis:Object.assign({ type:'time', boundaryGap:false }, AX),
+      yAxis:Object.assign({ type:'value', scale:true }, AX, { splitLine:{show:true, lineStyle:{color:'rgba(0,0,0,0.05)', type:'dashed'}} }),
+      tooltip:Object.assign({}, TT, { formatter: mkFmt(function(v){ return '$' + Number(v[1]).toFixed(2); }) }),
+      series:[{ name:id, type:'line', smooth:0.1, symbol:'circle', symbolSize:10, showSymbol:false,
+        emphasis:{ itemStyle:{ borderColor:'#ffffff', borderWidth:1, color:'#49a3a6' } },
+        data:data,
+        itemStyle:{ color:'#49a3a6' },
+        lineStyle:{ width:1, color:'#49a3a6' },
+        areaStyle:{ color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(73,163,166,0.15)'},{offset:1,color:'rgba(73,163,166,0)'}]) } }]
+    });
+  }
+
+  // ═══ CATALYSTS ═══
+  // Per template v1.6.0: "Only Tab 1's TLDR card is time-scrubbable. Tabs
+  // 2/3/4/5 read latest snapshot." So Catalysts always shows the LATEST
+  // narrative record's catalysts, regardless of the TLDR date picker.
+  function buildCatalysts(){
+    let rec = state.narrativeList[0]; if (!rec) return;
+    let cat = parseJson(rec.catalystsJson) || [];
+    if (!Array.isArray(cat)) cat = [];
+    let upcoming = cat.filter(function(e){ return (e.status||'').toLowerCase() === 'upcoming'; })
+      .sort(function(a,b){ return String(a.date||'zzz').localeCompare(String(b.date||'zzz')); });  // ascending — soonest first
+    let delivered = cat.filter(function(e){ return (e.status||'').toLowerCase() === 'delivered'; })
+      .sort(function(a,b){ return String(b.date||'').localeCompare(String(a.date||'')); });  // descending — most recent first
+    let missed = cat.filter(function(e){ return (e.status||'').toLowerCase() === 'missed'; })
+      .sort(function(a,b){ return String(b.date||'').localeCompare(String(a.date||'')); });
+    document.getElementById('cat-n-upcoming').textContent = upcoming.length;
+    document.getElementById('cat-n-delivered').textContent = delivered.length;
+    document.getElementById('cat-n-missed').textContent = missed.length;
+
+    let host = document.getElementById('cat-timeline');
+    let list = (state.catSub === 'upcoming') ? upcoming : (state.catSub === 'delivered' ? delivered : missed);
+    if (!list.length){ host.innerHTML = '<div class="empty">No tracked catalysts in this window.</div>'; return; }
+    host.innerHTML = list.map(function(e, i){
+      let statusTag = (state.catSub === 'delivered') ? '<span class="tag tag-status-done">Delivered ✓</span>'
+                    : (state.catSub === 'missed')    ? '<span class="tag tag-status-miss">Missed ✗</span>'
+                    : '<span class="tag tag-status-up">Upcoming</span>';
+      let sent = (e.sentiment || 'Neutral').toLowerCase();
+      let past = (state.catSub !== 'upcoming') ? ' past' : '';
+      let rel = Array.isArray(e.relatedNews) ? e.relatedNews : [];
+      let relPill = rel.length ? '<span class="related-pill" data-cat-related="'+i+'">'+rel.length+' related</span>' : '';
+      let relExp = rel.length ? '<div class="related-list" data-cat-rel-list="'+i+'" style="display:none;margin-top:var(--spacing-s)">'
+        + rel.slice(0,5).map(function(it){ return renderRelatedItem(it); }).join('')
+        + '</div>' : '';
+      return '<div class="event-card'+past+'">'
+        + '<div class="event-head">'
+        +   '<span class="e-date">'+esc(e.date)+'</span>'
+        +   statusTag
+        +   '<span class="tag tag-sent '+sent+'">'+esc(e.sentiment||'Neutral')+'</span>'
+        +   (relPill ? '<span style="margin-left:auto"></span>' + relPill : '')
+        + '</div>'
+        + '<div class="event-title">'+escMd(e.title)+'</div>'
+        + (e.pillar ? '<div class="event-pillar">Pillar · '+esc(e.pillar)+'</div>' : '')
+        + '<div class="event-notes">'+escMd(e.notes||'')+'</div>'
+        + (e.ids && e.ids.length ? '<div class="event-ids">'+e.ids.map(function(t){ return '<span class="tag tag-id">'+esc(t)+'</span>'; }).join('')+'</div>' : '')
+        + relExp
+        + '</div>';
+    }).join('');
+
+    host.querySelectorAll('.related-pill').forEach(function(p){
+      p.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        let idx = p.getAttribute('data-cat-related');
+        let exp = host.querySelector('[data-cat-rel-list="'+idx+'"]');
+        if (exp) exp.style.display = exp.style.display === 'none' ? '' : 'none';
+      });
+    });
+  }
+
+  // ═══ RISKS ═══
+  // Per template v1.6.0: always reads latest narrative record (not scrubbed).
+  function buildRisks(){
+    let rec = state.narrativeList[0]; if (!rec) return;
+    let risks = parseJson(rec.risksJson) || [];
+    if (!Array.isArray(risks)) risks = [];
+    let host = document.getElementById('risks-table');
+    if (!risks.length){ host.innerHTML = '<div class="empty">No risks recorded for this date.</div>'; return; }
+    let order = { High:0, Medium:1, Low:2 };
+    risks = risks.slice().sort(function(a,b){ return (order[a.priority]||9) - (order[b.priority]||9); });
+    // Columns per template v1.6.0:
+    // Category | Pillar+thesisClaim | Description | Divergence | Exit trigger | If triggered | Priority | Related
+    let html = [
+      '<div class="table-row table-header">'
+      + '<div class="table-cell">Category</div>'
+      + '<div class="table-cell">Pillar</div>'
+      + '<div class="table-cell">Description</div>'
+      + '<div class="table-cell">Divergence</div>'
+      + '<div class="table-cell">Exit trigger</div>'
+      + '<div class="table-cell">If triggered</div>'
+      + '<div class="table-cell">Priority</div>'
+      + '<div class="table-cell"></div>'
+      + '</div>'
+    ];
+    risks.forEach(function(r, i){
+      let rel = Array.isArray(r.relatedNews) ? r.relatedNews : [];
+      let relPill = rel.length ? '<span class="related-pill" data-related="risk-'+i+'">'+rel.length+' related</span>' : '';
+      let thesisClaim = r.thesisClaim ? '<div class="risk-thesis-claim" title="'+esc(r.thesisClaim)+'">'+esc(r.thesisClaim)+'</div>' : '';
+      let pillarCell = r.pillar ? '<span class="d-pillar">'+esc(r.pillar)+'</span>' : '<span style="color:var(--text-n5)">—</span>';
+      html.push(
+        '<div class="table-row table-body-row" data-risk="'+i+'">'
+        + '<div class="table-cell"><span class="risk-cat-tag">'+esc(r.category||'')+'</span></div>'
+        + '<div class="table-cell risk-pillar-cell">'+pillarCell+thesisClaim+'</div>'
+        + '<div class="table-cell risk-desc-cell" title="'+esc(r.description||'')+'">'+escMd(r.description||'')+'</div>'
+        + '<div class="table-cell"><span class="tag tag-divergence">'+esc(r.divergenceType||'—')+'</span></div>'
+        + '<div class="table-cell risk-long-cell" title="'+esc(r.exitTrigger||'')+'">'+escMd(r.exitTrigger||'—')+'</div>'
+        + '<div class="table-cell risk-long-cell" title="'+esc(r.ifTriggered||'')+'">'+escMd(r.ifTriggered||'—')+'</div>'
+        + '<div class="table-cell"><span class="tag tag-priority '+(r.priority||'Low').toLowerCase()+'">'+esc((r.priority||'Low').toUpperCase())+'</span></div>'
+        + '<div class="table-cell" style="justify-content:flex-end">'+relPill+'</div>'
+        + '</div>'
+      );
+      if (rel.length){
+        html.push(
+          '<div class="row-expand" data-risk-exp="'+i+'" style="display:none">'
+          +   '<div class="related-list">'
+          +     rel.slice(0,5).map(function(it){ return renderRelatedItem(it); }).join('')
+          +   '</div>'
+          + '</div>'
+        );
+      }
+    });
+    host.innerHTML = html.join('');
+
+    host.querySelectorAll('.related-pill').forEach(function(p){
+      p.addEventListener('click', function(e){
+        e.stopPropagation();
+        let key = p.getAttribute('data-related');
+        let exp = host.querySelector('[data-risk-exp="'+key.replace('risk-','')+'"]');
+        if (exp) exp.style.display = exp.style.display === 'none' ? '' : 'none';
+      });
+    });
+
+    if (typeof initTableAlignment === 'function') initTableAlignment(host);
+  }
+
+  function renderRelatedItem(it){
+    let icon = (it.type === 'social' || it.type === 'x') ? 'X' : 'N';
+    return '<a class="related-item" href="'+esc(it.url||'#')+'" target="_blank" rel="noopener noreferrer">'
+      + '<span class="related-icon">'+icon+'</span>'
+      + '<span class="related-body">'
+      +   '<span class="related-title">'+esc(it.title||'')+'</span>'
+      +   (it.snippet ? '<span class="related-snippet">'+esc(it.snippet)+'</span>' : '')
+      + '</span>'
+      + '</a>';
+  }
+
+  // ═══ FEED ═══
+  function faviconUrl(source, url) {
+    // Derive favicon from article URL domain first, fall back to source string
+    var domain = '';
+    try { domain = new URL(url || '').hostname; } catch(e) {}
+    if (!domain && source) {
+      // Try to parse source as a known domain shorthand
+      var knownDomains = {
+        'reuters': 'reuters.com', 'bloomberg': 'bloomberg.com',
+        'ft': 'ft.com', 'wsj': 'wsj.com', 'cnbc': 'cnbc.com',
+        'nikkei': 'nikkei.com', 'barrons': 'barrons.com',
+        'theregister': 'theregister.com', 'techcrunch': 'techcrunch.com',
+        'electrek': 'electrek.co', 'utilitydive': 'utilitydive.com',
+        'datacenterdynamics': 'datacenterdynamics.com',
+        'semianalysis': 'semianalysis.com', 'seekingalpha': 'seekingalpha.com'
+      };
+      var key = (source || '').toLowerCase().replace(/\s+/g,'');
+      domain = knownDomains[key] || (key + '.com');
+    }
+    return 'https://www.google.com/s2/favicons?domain=' + encodeURIComponent(domain) + '&sz=32';
+  }
+
+  function buildFeedItemNews(x) {
+    var sent = (x.sentiment || 'Neutral').toLowerCase();
+    var sentLabel = x.sentiment || 'Neutral';
+    var dateStr = formatDateLabel(x.time);
+    var ago = agoHours(x.time);
+    var favicon = faviconUrl(x.source, x.url);
+    var ids = x.ids && x.ids.length
+      ? '<div class="feed-ids">' + x.ids.map(function(t){ return '<span class="tag tag-id">'+esc(t)+'</span>'; }).join('') + '</div>'
+      : '';
+    var thumbHtml = x.imageUrl
+      ? '<div class="feed-thumb"><img src="'+esc(x.imageUrl)+'" alt="" loading="lazy" onerror="this.parentNode.style.display=\'none\'"></div>'
+      : '';
+    return '<a class="feed-item" href="'+esc(x.url||'#')+'" target="_blank" rel="noopener noreferrer">'
+      + '<div class="feed-item-main">'
+      +   '<div class="feed-header">'
+      +     '<div class="feed-avatar">'
+      +       '<img src="'+esc(favicon)+'" alt="" onerror="this.style.display=\'none\'">'
+      +     '</div>'
+      +     '<div class="feed-title">'+esc(x.title)+'</div>'
+      +     '<span class="tag tag-sent '+esc(sent)+'">'+esc(sentLabel)+'</span>'
+      +   '</div>'
+      +   '<div class="feed-content">'
+      +     '<div class="feed-text">'+esc(x.snippet||'')+'</div>'
+      +     '<div class="feed-info">'
+      +       '<span>'+esc(x.source||'')+'</span>'
+      +       '<span>·</span><span>'+dateStr+'</span>'
+      +       '<span>·</span><span>'+ago+'</span>'
+      +     '</div>'
+      +     ids
+      +   '</div>'
+      + '</div>'
+      + thumbHtml
+      + '</a>';
+  }
+
+  function buildFeedItemSocial(x) {
+    var sent = (x.sentiment || 'Neutral').toLowerCase();
+    var sentLabel = x.sentiment || 'Neutral';
+    var dateStr = formatDateLabel(x.time);
+    // author may be stored as x.author, x.handle, or x.source
+    var displayName = x.author || x.source || 'X User';
+    var handle = x.handle ? '@'+x.handle : '';
+    var avatarUrl = x.avatar || '';
+    var ids = x.ids && x.ids.length
+      ? '<div class="feed-ids">' + x.ids.map(function(t){ return '<span class="tag tag-id">'+esc(t)+'</span>'; }).join('') + '</div>'
+      : '';
+    var avatarHtml = avatarUrl
+      ? '<img src="'+esc(avatarUrl)+'" alt="" onerror="this.style.display=\'none\'">'
+      : '<div class="feed-avatar-fallback" style="background:var(--text-n3);width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;">'
+          + esc(displayName.charAt(0).toUpperCase())
+        + '</div>';
+    var actionsHtml = '';
+    if (x.likes || x.retweets || x.replies) {
+      actionsHtml = '<div class="feed-actions">';
+      if (x.replies != null) actionsHtml += '<div class="feed-action"><img class="feed-action-icon" src="https://alva-ai-static.b-cdn.net/icons/social-reply-l.svg" alt=""><span>'+esc(String(x.replies))+'</span></div>';
+      if (x.retweets != null) actionsHtml += '<div class="feed-action"><img class="feed-action-icon" src="https://alva-ai-static.b-cdn.net/icons/social-repost-l.svg" alt=""><span>'+esc(String(x.retweets))+'</span></div>';
+      if (x.likes != null) actionsHtml += '<div class="feed-action"><img class="feed-action-icon" src="https://alva-ai-static.b-cdn.net/icons/social-like-l.svg" alt=""><span>'+esc(String(x.likes))+'</span></div>';
+      actionsHtml += '</div>';
+    }
+    return '<a class="feed-item" href="'+esc(x.url||'#')+'" target="_blank" rel="noopener noreferrer">'
+      + '<div class="feed-item-main">'
+      +   '<div class="feed-header">'
+      +     '<div class="feed-avatar has-badge">'
+      +       avatarHtml
+      +       '<div class="feed-avatar-badge">'
+      +         '<img src="https://alva-ai-static.b-cdn.net/icons/logo-feed-x.svg" alt="">'
+      +       '</div>'
+      +     '</div>'
+      +     '<div class="feed-header-meta">'
+      +       '<span class="feed-display-name">'+esc(displayName)+'</span>'
+      +       (handle ? '<span class="feed-handle">'+esc(handle)+'</span>' : '')
+      +       '<span class="feed-meta-sep">·</span>'
+      +       '<span class="feed-meta-date">'+dateStr+'</span>'
+      +     '</div>'
+      +     '<span class="tag tag-sent '+esc(sent)+'">'+esc(sentLabel)+'</span>'
+      +   '</div>'
+      +   '<div class="feed-content">'
+      +     '<div class="feed-text">'+esc(x.snippet||x.title||'')+'</div>'
+      +     (actionsHtml || '<div class="feed-info"><span>'+esc(displayName)+'</span><span>·</span><span>'+dateStr+'</span></div>')
+      +     ids
+      +   '</div>'
+      + '</div>'
+      + '</a>';
+  }
+
+  function buildFeed(){
+    var all = NEWS.map(function(n){ return Object.assign({}, n, { kind:'news' }); })
+      .concat(SOCIAL.map(function(s){ return Object.assign({}, s, { kind:'social' }); }))
+      .sort(function(a,b){ return b.time - a.time; });
+    document.getElementById('feed-n-all').textContent = all.length;
+    document.getElementById('feed-n-news').textContent = NEWS.length;
+    document.getElementById('feed-n-social').textContent = SOCIAL.length;
+    var list = state.feedFilter === 'all' ? all : (state.feedFilter === 'news' ? all.filter(function(x){return x.kind==='news';}) : all.filter(function(x){return x.kind==='social';}));
+    var host = document.getElementById('feed-list');
+    if (!list.length){ host.innerHTML = '<div class="feed-empty">No items.</div>'; return; }
+    host.innerHTML = list.map(function(x){
+      return x.kind === 'social' ? buildFeedItemSocial(x) : buildFeedItemNews(x);
+    }).join('');
+  }
+
+  // ═══ METHODOLOGY ═══
+  // Methodology is now structured HTML in the modal directly (template v1.6.2
+  // using screener's .method-section classes) — no markdown rendering needed.
+  function buildMethodology(){ /* no-op — content is static HTML */ }
+
+  // ═══ TABS ═══
+  function setupTabs(){
+    let tabs = document.querySelectorAll('#tabs .tab-item');
+    let panels = document.querySelectorAll('.tab-panel');
+    tabs.forEach(function(t){
+      t.addEventListener('click', function(){
+        let target = t.getAttribute('data-tab');
+        tabs.forEach(function(x){ x.classList.remove('active'); });
+        t.classList.add('active');
+        panels.forEach(function(p){ p.style.display = (p.getAttribute('data-panel') === target) ? '' : 'none'; });
+        let active = document.querySelector('.tab-panel[data-panel="'+target+'"]'); if (!active) return;
+        active.querySelectorAll('[_echarts_instance_]').forEach(function(el){
+          let inst = echarts.getInstanceByDom(el); if (inst) inst.resize();
+        });
+        // Re-compute table columns now that the panel is actually visible
+        active.querySelectorAll('.table-card').forEach(function(t){ if (typeof initTableAlignment === 'function') initTableAlignment(t); });
+      });
+    });
+
+    let catSub = document.querySelectorAll('#cat-subtabs .tab-item');
+    catSub.forEach(function(b){
+      b.addEventListener('click', function(){
+        catSub.forEach(function(x){ x.classList.remove('active'); });
+        b.classList.add('active');
+        state.catSub = b.getAttribute('data-sub');
+        buildCatalysts();
+      });
+    });
+
+    let feedFilters = document.querySelectorAll('#feed-filters .tab-item');
+    feedFilters.forEach(function(b){
+      b.addEventListener('click', function(){
+        feedFilters.forEach(function(x){ x.classList.remove('active'); });
+        b.classList.add('active');
+        state.feedFilter = b.getAttribute('data-filter');
+        buildFeed();
+      });
+    });
+
+    // Modal delegation — template uses data-modal-open / data-modal-close so the
+    // shared platform shell wires it without per-page JS. We re-implement locally
+    // for the self-contained playbook while honoring the same attribute contract.
+    document.querySelectorAll('[data-modal-open]').forEach(function(el){
+      el.addEventListener('click', function(){
+        let m = document.getElementById(el.getAttribute('data-modal-open'));
+        if (m) m.classList.add('open');
+      });
+    });
+    document.querySelectorAll('[data-modal-close]').forEach(function(el){
+      el.addEventListener('click', function(){
+        let m = document.getElementById(el.getAttribute('data-modal-close'));
+        if (m) m.classList.remove('open');
+      });
+    });
+    document.querySelectorAll('.modal-overlay').forEach(function(m){
+      m.addEventListener('click', function(e){ if (e.target === m) m.classList.remove('open'); });
+    });
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(function(m){ m.classList.remove('open'); });
+    });
+  }
+
+  // ═══ INIT ═══
+  async function init(){
+    try { await loadLive(); } catch (e) { console.warn('Live hydration failed, rendering seed:', e); }
+    renderHero();
+    buildThesis();
+    renderAttribution();
+    buildBasket();
+    renderChangelog();
+    // Tabs 2-5 always read the latest narrative record; render once at init
+    // and never tie them to the TLDR picker. Template v1.6.0 §scrubbing rule.
+    buildCatalysts();
+    buildRisks();
+    buildFeed();
+    buildMethodology();
+    setupTabs();
+
+    window.addEventListener('resize', function(){
+      Object.keys(state.charts).forEach(function(k){ if (state.charts[k]) state.charts[k].resize(); });
+      document.querySelectorAll('.table-card').forEach(function(t){ if (typeof initTableAlignment === 'function') initTableAlignment(t); });
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+
+})();
+</script>
+
+</body>
+</html>
