@@ -19,8 +19,6 @@
 
 ### Specification
 
-- Hover and Selected share the same teal tint background.
-- Selected state additionally gets rounded corners (`--radius-ct-m`) and the text (`.list-item-text`) switches to `--main-m1`. Hover leaves text color unchanged.
 - No check icon — selection is conveyed by the rounded tinted pill alone.
 
 ### CSS
@@ -159,7 +157,7 @@ tags, and scoped CSS maps them to the Alva design spec.
   </script>
 </div>
 
-<!-- Size modifiers: markdown-container--m (Medium), markdown-container--s (Small) -->
+<!-- Default size is Medium. Modifiers: markdown-container--l (Large), markdown-container--s (Small) -->
 ```
 
 ### Required JS (add once at page bottom)
@@ -194,7 +192,7 @@ tags, and scoped CSS maps them to the Alva design spec.
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-m);
+  gap: var(--spacing-xs);
 }
 .markdown-container * {
   box-sizing: border-box;
@@ -218,25 +216,30 @@ tags, and scoped CSS maps them to the Alva design spec.
   margin: 0;
   width: 100%;
 }
-.markdown-container h1,
-.markdown-container h2 {
-  font-size: 20px;
-  line-height: 30px;
-  letter-spacing: 0.2px;
-  padding-top: var(--spacing-xs);
-}
-.markdown-container h3 {
+.markdown-container h1 {
   font-size: 18px;
   line-height: 28px;
   letter-spacing: 0.18px;
-  padding-top: var(--spacing-xxs);
+  padding-top: var(--spacing-xxxs);
+}
+.markdown-container h2 {
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: 0.16px;
+  padding-top: var(--spacing-xxxs);
+}
+.markdown-container h3 {
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+  padding-top: 0;
 }
 .markdown-container h4,
 .markdown-container h5,
 .markdown-container h6 {
-  font-size: 16px;
-  line-height: 26px;
-  letter-spacing: 0.16px;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
 }
 
 /* ── Paragraph ── */
@@ -246,9 +249,9 @@ tags, and scoped CSS maps them to the Alva design spec.
     -apple-system,
     BlinkMacSystemFont,
     sans-serif;
-  font-size: 16px;
-  line-height: 26px;
-  letter-spacing: 0.16px;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
   color: var(--text-n9);
   margin: 0;
   white-space: pre-wrap;
@@ -259,7 +262,7 @@ tags, and scoped CSS maps them to the Alva design spec.
 .markdown-container ol {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-xxs);
   list-style: none;
   margin: 0;
   padding: 0;
@@ -270,18 +273,18 @@ tags, and scoped CSS maps them to the Alva design spec.
     -apple-system,
     BlinkMacSystemFont,
     sans-serif;
-  font-size: 16px;
-  line-height: 26px;
-  letter-spacing: 0.16px;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
   color: var(--text-n9);
   position: relative;
-  padding-left: var(--spacing-xl);
+  padding-left: var(--spacing-l);
 }
 .markdown-container ul > li::before {
   content: "";
   position: absolute;
-  left: 9.5px;
-  top: 10.5px;
+  left: 7.5px;
+  top: 8.5px;
   width: 5px;
   height: 5px;
   border-radius: 50%;
@@ -298,10 +301,10 @@ tags, and scoped CSS maps them to the Alva design spec.
   position: absolute;
   left: 0;
   top: 0;
-  width: 24px;
+  width: 20px;
   text-align: center;
-  font-size: 16px;
-  line-height: 26px;
+  font-size: 14px;
+  line-height: 22px;
   color: var(--text-n9);
 }
 
@@ -320,14 +323,14 @@ tags, and scoped CSS maps them to the Alva design spec.
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.12px;
-  padding: var(--spacing-xxxs) var(--spacing-xs);
+  padding: 1px var(--spacing-xs);
   margin: 0 var(--spacing-xxs);
 }
 .markdown-container pre {
   border: 1px solid var(--line-l07);
-  font-size: 14px;
-  line-height: 22px;
-  letter-spacing: 0.14px;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
   padding: var(--spacing-s) var(--spacing-m);
   margin: 0;
   overflow-x: auto;
@@ -355,14 +358,12 @@ tags, and scoped CSS maps them to the Alva design spec.
 /* ── Table ── follows Table Card rules (design-widgets.md) */
 .markdown-container table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: var(--spacing-m) 0;
-  margin: 0 calc(var(--spacing-m) * -1);
+  border-collapse: collapse;
+  margin: 0;
 }
 .markdown-container th,
 .markdown-container td {
-  padding: var(--spacing-s) 0;
-  border-bottom: 1px solid var(--line-l07);
+  padding: 10px var(--spacing-xs);
   font-family:
     "Delight",
     -apple-system,
@@ -374,15 +375,26 @@ tags, and scoped CSS maps them to the Alva design spec.
   letter-spacing: 0.14px;
   color: var(--text-n9);
   text-align: left;
-  max-height: 180px;
+  min-height: 176px;
+}
+.markdown-container tr {
+  border-bottom: 1px solid var(--line-l07);
+}
+.markdown-container tr:last-child {
+  border-bottom: none;
 }
 .markdown-container th {
   color: var(--text-n7);
   padding-top: 0;
-  padding-bottom: var(--spacing-s);
+  padding-bottom: 10px;
 }
-.markdown-container tr:last-child td {
-  border-bottom: none;
+.markdown-container th:first-child,
+.markdown-container td:first-child {
+  padding-left: 0;
+}
+.markdown-container th:last-child,
+.markdown-container td:last-child {
+  padding-right: 0;
 }
 .markdown-container td code {
   margin: 0;
@@ -395,7 +407,7 @@ tags, and scoped CSS maps them to the Alva design spec.
   text-decoration-style: dotted;
   text-decoration-color: var(--text-n5);
   text-decoration-thickness: 8%;
-  text-underline-offset: 30%;
+  text-underline-offset: 35%;
   text-decoration-skip-ink: none;
   transition: color 0.15s ease;
 }
@@ -405,8 +417,8 @@ tags, and scoped CSS maps them to the Alva design spec.
 }
 .markdown-container a::after {
   content: "";
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   background: currentColor;
   mask: url("https://alva-ai-static.b-cdn.net/icons/go-l.svg") center / contain
     no-repeat;
@@ -416,76 +428,69 @@ tags, and scoped CSS maps them to the Alva design spec.
   flex-shrink: 0;
 }
 
-/* ── Medium ── */
-.markdown-container--m {
-  gap: var(--spacing-xs);
+/* ── Large ── */
+.markdown-container--l {
+  gap: var(--spacing-m);
 }
-.markdown-container--m h1 {
+.markdown-container--l h1,
+.markdown-container--l h2 {
+  font-size: 20px;
+  line-height: 30px;
+  letter-spacing: 0.2px;
+  padding-top: var(--spacing-xs);
+}
+.markdown-container--l h3 {
   font-size: 18px;
   line-height: 28px;
   letter-spacing: 0.18px;
-  padding-top: var(--spacing-xxxs);
+  padding-top: var(--spacing-xxs);
 }
-.markdown-container--m h2 {
+.markdown-container--l h4,
+.markdown-container--l h5,
+.markdown-container--l h6 {
   font-size: 16px;
   line-height: 26px;
   letter-spacing: 0.16px;
-  padding-top: var(--spacing-xxxs);
 }
-.markdown-container--m h3 {
+.markdown-container--l p,
+.markdown-container--l li {
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: 0.16px;
+}
+.markdown-container--l li {
+  padding-left: var(--spacing-xl);
+}
+.markdown-container--l ul > li::before {
+  left: 9.5px;
+  top: 10.5px;
+}
+.markdown-container--l ol > li::before {
+  font-size: 16px;
+  line-height: 26px;
+  width: 24px;
+}
+.markdown-container--l ul,
+.markdown-container--l ol {
+  gap: var(--spacing-xs);
+}
+.markdown-container--l th,
+.markdown-container--l td {
+  padding: var(--spacing-s) var(--spacing-xs);
+  min-height: auto;
+  max-height: 180px;
+}
+.markdown-container--l code {
+  padding: var(--spacing-xxxs) var(--spacing-xs);
+}
+.markdown-container--l pre {
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
-  padding-top: 0;
 }
-.markdown-container--m h4,
-.markdown-container--m h5,
-.markdown-container--m h6 {
-  font-size: 14px;
-  line-height: 22px;
-  letter-spacing: 0.14px;
-}
-.markdown-container--m p,
-.markdown-container--m li {
-  font-size: 14px;
-  line-height: 22px;
-  letter-spacing: 0.14px;
-}
-.markdown-container--m li {
-  padding-left: var(--spacing-l);
-}
-.markdown-container--m ul > li::before {
-  left: 7.5px;
-  top: 8.5px;
-}
-.markdown-container--m ol > li::before {
-  font-size: 14px;
-  line-height: 22px;
-  width: 20px;
-}
-.markdown-container--m ul,
-.markdown-container--m ol {
-  gap: var(--spacing-xxs);
-}
-.markdown-container--m th,
-.markdown-container--m td {
-  font-size: 14px;
-  line-height: 22px;
-  letter-spacing: 0.14px;
-  padding: 10px var(--spacing-xs);
-  min-height: 176px;
-}
-.markdown-container--m code {
-  padding: 1px var(--spacing-xs);
-}
-.markdown-container--m pre {
-  font-size: 12px;
-  line-height: 20px;
-  letter-spacing: 0.12px;
-}
-.markdown-container--m a::after {
-  width: 14px;
-  height: 14px;
+.markdown-container--l a::after {
+  width: 16px;
+  height: 16px;
 }
 
 /* ── Small ── */
@@ -1433,18 +1438,11 @@ state; typed text matches the filled state.
 
 ## Tab
 
-2 styles (Pill, Underline) × 3 sizes (L, M, S) = 6 variants.
+3 styles (Underline, Segmented, Pill) × 3 sizes (L, M, S) = 9 variants.
 
+- **Underline**: 1px container bottom divider; selected item has a 2px bottom indicator that overlaps the divider.
+- **Segmented**: items share a tinted rounded container; active item is highlighted with a contrasting tile.
 - **Pill**: rounded rectangles, background changes on select.
-- **Underline**: no background, selected item has a 2px bottom indicator line.
-
-### Underline + Container Border Alignment
-
-When an Underline Tab is placed inside a container with a bottom border (e.g.
-`1px solid var(--line-l07)`), the active indicator and the container border
-should sit on the **same line**. Apply `margin-bottom: -1px` to `.tab-item` so
-the 2px indicator overlaps the 1px border, and inactive tabs show the container
-border through their transparent border.
 
 ### CSS
 
@@ -1471,6 +1469,91 @@ border through their transparent border.
   height: 0;
   display: block;
   overflow: hidden;
+}
+
+/* Underline */
+.tab-underline {
+  gap: var(--spacing-m);
+  border-bottom: 1px solid var(--line-l07);
+}
+.tab-underline .tab-item {
+  padding-bottom: var(--spacing-xxs);
+  margin-bottom: -1px;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+  color: var(--text-n7);
+  border-bottom: 2px solid transparent;
+}
+.tab-underline .tab-item.active {
+  color: var(--text-n9);
+  font-weight: 500;
+  border-bottom-color: var(--main-m1);
+}
+
+/* Underline — Size L */
+.tab-underline.tab-l {
+  gap: var(--spacing-l);
+}
+.tab-underline.tab-l .tab-item {
+  padding-bottom: 6px;
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: 0.16px;
+}
+
+/* Underline — Size S */
+.tab-underline.tab-s {
+  gap: var(--spacing-s);
+}
+.tab-underline.tab-s .tab-item {
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
+}
+
+/* Segmented */
+.tab-segmented {
+  gap: 0;
+  background: var(--b-r05);
+  padding: var(--spacing-xxxs);
+  border-radius: var(--radius-ct-m);
+}
+.tab-segmented .tab-item {
+  padding: 6px var(--spacing-s);
+  border-radius: var(--radius-btn-s);
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.14px;
+  color: var(--text-n7);
+  background: transparent;
+}
+.tab-segmented .tab-item.active {
+  background: var(--b0-container);
+  color: var(--text-n9);
+  font-weight: 500;
+}
+
+/* Segmented — Size L */
+.tab-segmented.tab-l {
+  padding: var(--spacing-xxs);
+  border-radius: var(--radius-ct-l);
+}
+.tab-segmented.tab-l .tab-item {
+  padding: 6px var(--spacing-m);
+  border-radius: var(--radius-btn-m);
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: 0.16px;
+}
+
+/* Segmented — Size S */
+.tab-segmented.tab-s .tab-item {
+  padding: var(--spacing-xxs) 10px;
+  border-radius: var(--radius-btn-xs);
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
 }
 
 /* Pill */
@@ -1513,52 +1596,13 @@ border through their transparent border.
   line-height: 20px;
   letter-spacing: 0.12px;
 }
-
-/* Underline */
-.tab-underline {
-  gap: var(--spacing-m);
-}
-.tab-underline .tab-item {
-  padding-bottom: var(--spacing-xxs);
-  font-size: 14px;
-  line-height: 22px;
-  letter-spacing: 0.14px;
-  color: var(--text-n7);
-  border-bottom: 2px solid transparent;
-}
-.tab-underline .tab-item.active {
-  color: var(--text-n9);
-  font-weight: 500;
-  border-bottom-color: var(--main-m1);
-}
-
-/* Underline — Size L */
-.tab-underline.tab-l {
-  gap: var(--spacing-l);
-}
-.tab-underline.tab-l .tab-item {
-  padding-bottom: 6px;
-  font-size: 16px;
-  line-height: 26px;
-  letter-spacing: 0.16px;
-}
-
-/* Underline — Size S */
-.tab-underline.tab-s {
-  gap: var(--spacing-s);
-}
-.tab-underline.tab-s .tab-item {
-  font-size: 12px;
-  line-height: 20px;
-  letter-spacing: 0.12px;
-}
 ```
 
 ### HTML
 
 ```html
-<!-- Pill M -->
-<div class="tab tab-pill" data-tab-group="demo">
+<!-- Underline M -->
+<div class="tab tab-underline" data-tab-group="demo">
   <div class="tab-item active" data-tab="tab1" data-text="Tab 1">Tab 1</div>
   <div class="tab-item" data-tab="tab2" data-text="Tab 2">Tab 2</div>
   <div class="tab-item" data-tab="tab3" data-text="Tab 3">Tab 3</div>
