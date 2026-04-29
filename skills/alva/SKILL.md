@@ -425,6 +425,13 @@ the right API for a task, use the `alva skills` CLI (public, no auth):
    The token is verified during preflight (see [Arrays JWT Check](#4-arrays-jwt-check));
    if a call returns 401, re-run `alva arrays token ensure`. Do not use `X-API-Key` header.
 
+#### Coverage Overview
+
+Data skills span spot and derivatives markets across stocks, ETFs, options,
+and crypto; equity fundamentals, estimates, events, and ownership flows;
+on-chain metrics and exchange flows; macro and economic indicators; news;
+and prediction markets. Run `alva skills list` for the live catalog.
+
 **Data skill doc lookup is mandatory.** Always fetch the endpoint detail before
 writing code that calls it. Do not guess paths, parameter names, or response
 shapes from memory. The doc lookup ensures you use the correct endpoint and
