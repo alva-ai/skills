@@ -1,167 +1,251 @@
 # What-If Playbook Template
 
-For "what-if I bought/sold X when Y happens" analysis.
+For requests like: "what if I bought / sold / avoided / compared X after Y happened?"
 
-> **Highest-priority standard — strictly follow. Template iterates; always work from the latest version of this file.**
+> **Highest-priority standard — strictly follow. Always work from the latest version of this file.**
 
-## 0. Design System Compliance (READ FIRST)
+Build an editorial financial artifact, not a dashboard. It should feel polished, compact, evidence-backed, financially credible, Alva-native, and worth opening even when the user could ask AI for a short answer.
 
-**MANDATORY — strictly follow the Alva skill design guideline. Non-negotiable.**
+Show the verdict, evidence, historical texture, and audit trail. Keep methodology and references in README, not the main scroll. Do not build tabs, filters, dropdowns, selectors, optimization controls, portfolio dashboards, or strategy-monitor views.
 
-Before writing HTML, read from the Alva skill:
+## 0. Design System Compliance
 
-- [references/design-system.md](../../references/design-system.md) — copy `.playbook-container` rule verbatim (max-width 2048px, 28px horizontal padding)
-- [references/design-widgets.md](../../references/design-widgets.md) — metric cards / charts / tables specs
-- [references/design-tokens.css](../../references/design-tokens.css) — use spacing/color tokens as-is, do NOT override
+Before writing HTML, read and follow:
 
-**Do NOT** apply `design-playbook-trading-strategy.md` — that doc is for trading-strategy dashboards with Overview/Analytics/Strategy/Feed tabs. What-if is a narrative, not a dashboard.
+- [references/design-system.md](../../references/design-system.md)
+- [references/design-widgets.md](../../references/design-widgets.md)
+- [references/design-tokens.css](../../references/design-tokens.css)
 
-## 0a. Backtest engine — use Alva's Altra, not local compute
+Use these as the source of truth for layout, typography, widget cards, chart styling, tokens, responsive grid, watermark, and page container behavior. Do not invent a separate visual system.
 
-**MANDATORY — all backtest / event-study computation runs on Alva's Altra engine on Alva Cloud.** Never run backtests locally or hand-roll return / streak / aggregation logic in a feed script when Altra already exposes it.
+Do **not** apply `design-playbook-trading-strategy.md`; What-if is narrative, not a trading-strategy dashboard.
 
-- Express the trigger rule and entry logic as an **Altra strategy definition** (`skills/alva/references/altra-trading.md`, `skills/alva/references/api/trading.md`). Altra handles event detection, forward-return computation, portfolio stats, and look-ahead-bias guards — all on Alva Cloud.
-- If the question genuinely cannot fit a strategy shape (e.g. joining news headlines or macro-calendar data to event timestamps for display context), use an **Alva SDK module + thin feed wrapper** that shapes SDK output for the HTML layer (≤ ~80 lines; do NOT re-implement aggregations).
-- Custom feed computation is a last resort — flag it explicitly so the choice can be double-checked before shipping.
+## 0a. Showcase Example Alignment
 
-**Operations that MUST run on Altra — never in a feed-side `for` loop:**
-- Event onset detection (first threshold cross, first close below a trailing high, etc.)
-- Forward-return computation at any horizon
-- Hit rate / win rate / median / mean / distribution quantiles across an event set
-- Drawdown depth + recovery-time
-- Cross-asset or cross-ticker cohort comparisons conditioned on an event
+Before building, look for approved What-If showcase examples available in the current skill or sandbox context.
 
-The playbook HTML reads the computed output via runtime `fetch()` from the deployed feed path — never hardcoded data literals.
+Use them to align page density, vertical rhythm, section order, chart treatment, card compactness, historical texture style, and audit ledger proportion.
 
-## 1. Title
+Do not copy example data, claims, titles, or topic-specific conclusions. Examples are style and structure references only.
 
-Format: `[Asset] [After/Before] [Trigger]`
+If examples conflict with this template, follow this template’s required page flow and trust rules first.
 
-Recommended longer form including lookback: `[Asset] [After/Before] [Trigger] — [Lookback] What-If`
-e.g. "SPY After a Golden Cross (50MA × 200MA) — 15-Year What-If"
+## 0b. Calculation and Trust Rules
 
-No description paragraph under the title. The verdict-hero card (section 2) replaces the prose description — it conveys the same framing, but with live numbers instead of static text.
+All event-study / backtest computation must run on Alva's Altra engine on Alva Cloud whenever the request fits an Altra strategy or event-study shape.
 
-**3-second rule:** a reader must understand what the playbook is about within 3 seconds, without reading any paragraph. Title + verdict hero together must deliver this.
+Express trigger and entry logic as an Altra strategy definition (`skills/alva/references/altra-trading.md`, `skills/alva/references/api/trading.md`). Never hand-roll these in feed-side loops or front-end code:
 
-**Widget spec**
+- event onset detection
+- forward returns
+- hit rate / win rate
+- median / mean / quantiles
+- drawdown or recovery calculations
+- cross-asset conditional comparisons
 
-- Title text: `font-size: 20px; font-weight: 400;` — 16px margin to the verdict hero below.
-- **Title row container:** single flex row, `justify-content: space-between; align-items: center;`. Title on the left, README chip on the right.
-- **README chip** reuses the Screener shared chassis `.tab-chip.tab-readme` — height 24px, `font-size:12px`, icon 14px (`researcher-l1.svg`) + "README" label, `data-modal-open="methodology-modal"`. Copy the chip CSS verbatim from the Screener template; do not re-skin.
+The HTML reads computed output via runtime `fetch()` from deployed feed paths. Do not hardcode quantitative results.
 
-## 2. Verdict Hero (required, first widget after title)
+Avoid look-ahead bias. The trigger must be observable before entry. Deduplicate ongoing events: for threshold events, count the first trigger after reset, not every day while the condition remains true.
 
-A single full-width card that answers "did this work?" before the reader scrolls. Data-driven — no hardcoded prose.
+If a claim says "edge", "beat", "lagged", "worked", "better", or "worse", include comparison against normal periods or relevant peers.
 
-One sentence, ≤45 words, conclusion-first. Carries 2-3 headline numbers — no more. Don't open with `Here's how X has moved…` / `Here's the distribution…`; lead with the number. No disclaimer eyebrow (`Verdict — historical observation only` and similar) — legal text, if any, goes in the Methodology modal, not on the card.
+Sample language:
+- `n < 10`: thin. Use counts, not percentages as the main claim. Avoid "reliable", "proven", or "usually".
+- `10 <= n < 25`: limited. Percentages may appear with counts nearby; keep confidence qualified.
+- `n >= 25`: adequate. Still show sample count and avoid certainty language.
 
-**Widget:** Free Text Card with `markdown-container--m` (Medium). See `references/design-widgets.md` → Free Text Card and `references/design-components.md` → Markdown.
+If Altra, SDK coverage, or validated BYOD data cannot support the study, reduce scope or report the blocker. Do not fabricate events, samples, or returns.
 
-### 2a. Counter-narrative card (optional)
+## 1. Before Building
 
-A second card under the hero is only allowed when it carries a counter-narrative that can't fit in the main sentence. The single most memorable counter-intuitive finding, if one exists, belongs here — never buried in methodology.
+Silently identify:
 
-**Widget** — pick by content type:
+- target asset or asset group
+- trigger event
+- action: buy, sell, avoid, compare, or observe
+- study shape: single-asset time study or cross-asset comparison
+- main horizon
+- comparison need
+- sample quality
+- main visual that best explains the result without misleading the reader
 
-- **Numeric finding** (one headline number with a short label): **Metric Card**.
-- **Narrative finding** (one short paragraph of context): **Free Text Card** with `markdown-container--s` (Small).
+Do not show this planning object on the page.
 
-## 3. Layout (single-page scroll, results first)
+## 2. Required Page Flow
 
-One vertically-scrolling page. Top-to-bottom order:
+Use one vertically scrolling page. **Keep this module order stable. Do not rename, reorder, merge, or invent top-level sections.**
 
-1. **Title** (section 1) — title text + README chip (right-aligned) on the same row.
-2. **Verdict hero** (section 2) — one full-width card, data-driven. **Widget:** Free Text Card (`markdown-container--m`).
-3. **Summary cards** — typically 3–6 cards (4 is the default), more if the dimension has that many meaningful buckets. Metric Cards are auto-height and wrap, so the row stack can extend to a second/third row. Every card across all rows shares ONE cutting dimension (see §3a); don't mix returns, hit rates, and per-ticker picks. **Time is one valid dimension, not the default** — choose whichever best answers the crowd question. **Widget:** Metric Card.
-4. **Supporting charts** — one or more visualizations that contextualize the metrics. Typical options: distribution bar+range, normalized price trajectory overlay, per-event heatmap, win-rate comparison, baseline comparison (if the strategy explicitly needs one). Pick whichever combination best tells the story; order them from most summary to most granular. **Widget:** Chart Card for all chart types.
-5. **Event / row detail table** — one row per event, basket member, or regime bucket, with the key per-row metric columns. **Widget:** Table Card.
-6. **References** — trigger source + data source. **Widget:** Free Text Card.
+1. **Title row** — concise title + README chip on the right
+2. **Verdict hero** — direct answer to the user's question
+3. **Belief vs history** — two balanced cards or one balanced two-column block
+4. **Main evidence** — one primary visual, with optional readout rail when helpful
+5. **What to remember** — compact takeaway cards using one consistent dimension
+6. **Historical texture** — case cards or one compact supporting visual when it adds non-repeated evidence
+7. **Audit ledger** — matched events table or equivalent audit view
+8. **README modal** — methodology, references, data sources, date range, and sample count
 
-Methodology does not live on the scroll — it lives in a modal opened by the README chip in the title row (see §1 and [Methodology modal](#methodology-modal)).
+Canonical flow: clear question → direct verdict → belief/history context → main visual evidence → memorable takeaways → historical audit trail.
 
-No tabs, no hidden panels other than the Methodology modal — everything else is on the single scroll.
+## 3. Title Row and Verdict Hero
 
-**Canonical reasoning flow:** headline → aggregate slice (across chosen dimension) → aggregate spread → reliability → per-event / per-member paths → historical context → raw rows. Each step answers the objection raised by the previous. Methodology is available on-demand via the README chip, not inline in the flow.
+Use a concise question-style or result-oriented title.
 
-### 3a. Cutting dimensions for the summary cards row
+- Single-asset studies: `[Asset] [After/Before] [Trigger]`
+- Comparison studies: prefer trigger-first titles like `What Moves After [Trigger]?`
+- Longer form: `[Title] — [Lookback] What-If`
 
-Pick ONE based on the crowd question:
+Title + hero must explain the playbook within 3 seconds.
 
-| Dimension | Use when the question is | Example cards |
-|---|---|---|
-| **Time** | "How long does X last / take?" | 1W / 1M / 3M / 6M / 1Y forward return + win rate |
-| **Asset** | "What moves most after event X?" | hit rate + median for SPY / TLT / GLD / DXY / XLE |
-| **Ticker** | "Which basket members moved?" | per-ticker median reaction across the event set |
-| **Regime** | "Is Y different in state A vs B?" | mean / median side-by-side per regime |
-| **Magnitude** | "Does bigger X mean bigger Y?" | small / medium / large event buckets |
-| **Recovery** | "How long does it take to heal?" | median / fastest / % within 3M / % within 1Y |
-| **Event-specific** | "What happened in the key past case?" | 4-5 recognizable events, each its own card |
+Title row:
+- title text: `font-size: 20px; font-weight: 400`
+- single flex row, title left, README chip right
+- README chip reuses `.tab-chip.tab-readme` and opens `#methodology-modal`
 
-The big number on each card is the observable outcome, not a sample count (sample counts go in the small footer).
+Verdict hero:
+- full-width Free Text Card with `markdown-container--m`
+- conclusion-first
+- one sentence or short paragraph
+- 2–3 headline numbers only
+- say whether history looked favorable, unfavorable, mixed, thin, or inconclusive
+- no legal disclaimer in the main flow
 
-**Grid layout** — `references/design-widgets.md` → Widget Layout (8-col web / 4-col mweb). Metric Cards are auto-height and wrap via flex-wrap, so additional rows are fine as long as every card in the row-stack shares the same cutting dimension.
+Optional counter-narrative card only when it adds one memorable finding that cannot fit in the hero.
 
-| Card count | Preferred layout |
+## 4. Evidence Structure
+
+### Belief vs history
+
+Use exactly two balanced ideas:
+- the belief / intuition being tested
+- what history showed
+
+This may be two compact cards or one two-column block. It should not become methodology.
+
+### Main evidence
+
+Include one primary visual that most directly answers the question. The chart type is adaptive, but the section role is fixed.
+
+Prefer a **path / indexed line chart** when the question is how outcomes unfolded over time and real path observations exist. Use another chart type when it is clearer or more honest:
+
+- **grouped bar or ranking chart** for horizon comparison or cross-asset comparison
+- **distribution, range, or case-bar view** for breadth, dispersion, or outlier-driven results
+- **heatmap or case map** when historical episode texture is central
+
+Do not default to grouped bars unless they are truly the clearest explanation. Do not draw a path or line chart unless real observations across time exist. Never connect sparse horizon summary points as if they were a continuous path.
+
+Optional readout rail:
+- allowed only inside the Main evidence block
+- use 2–3 short interpretation cards when they improve clarity
+- keep rail cards compact; do not create tall empty blocks
+- do not duplicate takeaway cards
+
+### What to remember
+
+Use one consistent cutting dimension.
+
+| Dimension | Use when the question is |
 |---|---|
-| 3 | `.col-thirds` (equal thirds) |
-| 4 | `.col-2` × 4 (25% each) — the canonical default |
-| 5 | `.col-2` × 4 on row 1 + `.col-2` × 1 on row 2, **or** single `.col-8` Metric Card with 4 vertical dividers (`.divider-v`) if the slices are tightly related |
-| 6 | `.col-2` × 4 on row 1 + `.col-2` × 2 on row 2, or `.col-thirds` × 2 rows |
-| 7–8+ | Continue wrapping with `.col-2`; keep every row aligned to the same dimension |
+| **Time** | "What happened later?" |
+| **Asset** | "What moved most after event X?" |
+| **Ticker** | "Which basket members moved?" |
+| **State** | "Is Y different in state A vs B?" |
+| **Magnitude** | "Does bigger X mean bigger Y?" |
+| **Recovery** | "How long does it take to heal?" |
+| **Event-specific** | "What happened in key past cases?" |
 
-No hard ceiling — add rows as the analysis needs. Preference is still to pick the tightest set of slices that answers the question (4 is the cleanest default), but a third or fourth row is legitimate when the dimension genuinely has that many meaningful buckets.
+The big number on each card is the observable outcome, not the sample count. If a card does not extend the hero claim, cut it.
 
-### 3b. Each card extends a specific hero atom (no orthogonal angles)
+### Historical texture
 
-For every card, articulate "this shows the [tail / reliability / long-horizon] of [hero atom X]". If the hero doesn't name the underlying quantity, a card about its derivative doesn't belong here.
+Use only when it adds depth beyond the main visual and takeaways. Prefer one of:
+- three compact case cards
+- one compact supporting visual
+- one case range block
 
-| Hero atom | Card extends into |
-|---|---|
-| average X% | **tail** — biggest single-event X |
-| median took N days | **reliability** — how often within window |
-| recovered by day Y | **long-horizon** — hit rate at 1Y / 2Y |
-| event rate R% | **tail** — biggest single case |
-| across N events | **distribution** — per-decade / per-regime split |
+Do not add both a large supporting chart and multiple extra card rows unless the story genuinely needs it. Do not repeat the same metrics.
 
-Failure pattern: hero "oil spike fades in 2 weeks" paired with a card about market-volatility moves on fade days — market volatility was not in the hero, reject.
+### Audit ledger
 
-### 3c. Chart Card — widget spec
+Show enough historical detail for trust. Use a compact matched-events table or equivalent audit view. The ledger is the audit layer, not the visual centerpiece.
 
-Every chart in the supporting-charts layer (§3 step 4) is a **Chart Card**. Follow `references/design-widgets.md` → Chart Card verbatim (CSS, Chart Rules, Axis Rules, Mark Line, Tooltip, Line Chart / Bar Chart specifics). Do not re-define any of those here.
+## 5. Compact Layout and Chart Sizing
 
-**One override for this template:** Chart Card height = **560px** (the design-widgets default is 320px). Per-event charts in What-If carry more horizon and more individual paths than a typical dashboard tile, so they need the extra vertical room. All charts on the page — including side-by-side pairs (`.col-4` × 2) — use 560px.
+Follow `references/design-widgets.md` for Widget Layout, Metric Cards, Chart Cards, Table Cards, ECharts rules, axis rules, mark lines, and tooltips. Do not redefine those rules here.
 
-### 3d. Plain language (every user-visible surface)
+Default card layouts:
+- 3 cards: `.col-thirds`
+- 4 cards: `.col-2` x 4
+- 5+ cards: wrap consistently with the same cutting dimension
 
-Applies to cards, chart titles, axis labels, table headers, tooltips, and methodology — not just cards. LLM defaults trend toward trading-desk jargon; override them.
+The page should be compact, not sparse:
+- keep section spacing modest and consistent
+- avoid large blank gaps between title, hero, cards, and charts
+- keep card content concise so card height follows content
+- avoid oversized readout cards
+- avoid stretching charts or cards to fill empty space
+- aim for a dense but readable first screen
 
-- **Tickers**: first mention only, in parens after the plain name ("the S&P 500 (SPY)"). Typically in the hero; for basket playbooks, in the first card introducing each member. Never in chart titles, axis labels, table headers, or tooltips. Default map: SPY → "the S&P 500", USO → "oil", TLT → "long-dated Treasury bonds", GLD → "gold", QQQ → "the Nasdaq (100)", VIX → "market volatility", DXY / UUP → "the US dollar"; company tickers → company names.
-- **Time horizons and telegraphic codes**: "a month later" / "a year later" / "sixty trading days after the event". Never `+1M` / `+1Y` / `D+10` / `D+60` / `d21` / `fwd_3m` / `N=15` / bare `21 trading days`.
-- **Banned jargon**: `drawdown`, `cohort`, `regime`, `baseline`, `dispersion`, `reaction`, `realization`, `persistency`, `cumulative return`, `IQR`, `whiskers`, `outliers`, `realized volatility`, `R-squared`. Prefer: "biggest dip", "group", "state", "typical outcome", "range between biggest and smallest past cases", "middle half of past outcomes", "daily price swings", "almost no relationship between the two".
-- **Explain cutoffs inline**: every `since YYYY` / sample filter / threshold carries a one-clause reason on first mention ("since 2011 — that's when this ETF started trading"; "20% volatility threshold — the level that typically flags an early sell-off").
-- **Methodology** (inside the modal) = two short plain paragraphs: "how we picked events" + "how we measured returns". No formulas, no `consensus EPS` / `recovery date` / `sample period`. Any legal disclaimer goes at the bottom of this modal, not on the page.
+Chart height is based on information density and visual balance:
+- low-density charts: compact height
+- medium-density charts: medium height
+- high-density charts, such as real path charts, dense heatmaps, or rich distributions: taller only when readability improves
 
-## 4. Data presentation
+The primary evidence chart should feel important but proportionate. If a chart looks sparse, reduce its height or choose a more compact visual.
 
-- **Number is the visual hero.** Big numerical value, small descriptive label underneath. Never the other way around.
-- **Every chart** pairs a short title with a small-text methodology subtitle (e.g. "rebased to 100 at event day, −60d to +252d").
-- **Consistent color semantics** across cards, charts, and tables: positive = teal/cyan token, negative = red token, neutral/reference = grey token. Same meaning everywhere.
-- **Reference lines** on comparison charts (e.g. dashed 50% line on win-rate chart) to anchor interpretation at a glance.
-- **Aggregate → individual.** At least one chart must show per-event detail (not just averages), so the reader can judge dispersion and clustering.
-- **Footer = observable context.** Card footers carry a specific date, delta, or bucket label — never a method description. Method lives once, in the Methodology modal.
+## 6. Visual and Chart Integrity
 
-## 5. Hard rules
+Use compact composition, clear hierarchy, Alva-compatible colors, muted references, direct labels where useful, short chart titles, compact subtitles, and clean tables.
 
-- **No** "last updated / refreshed / as of" timestamp anywhere on the page.
-- **No** filters, dropdowns, selectors.
-- **Only interactivity allowed:** chart hover tooltips, and the README chip opening the Methodology modal.
+Avoid default-looking charts, clutter, excessive grey boxes, too many lines, tiny labels, over-explained legends, repeated metrics, decorative charts, and large empty areas.
 
-## 6. Methodology modal
+Chart integrity comes before visual ambition.
 
-Triggered by the README chip in the title row (§1). Mirrors the Screener template's Methodology modal pattern — reuse the same modal chassis (`.modal-overlay` / `.modal-panel`) and the same `data-modal-open` / `data-modal-close` wiring.
+- Keep comparison meaning consistent across title, hero, chart, cards, and table.
+- For cross-asset playbooks, keep labels and ordering coherent enough that the page reads as one analysis.
+- If a positive return lags normal periods, keep the return positive-colored and show the negative gap separately.
+- At least one chart or audit view should show per-event detail when event-level data exists.
+- No "last updated / refreshed / as of" timestamp anywhere on the page.
 
-- README chip carries `data-modal-open="methodology-modal"`; the modal root has `id="methodology-modal"`.
-- Modal panel `max-width: 896px` (narrower than the 960px base — methodology content is prose, not wide tables).
-- Body content = the two plain paragraphs defined in §3d ("how we picked events" + "how we measured returns"). Legal disclaimer, if any, goes at the bottom of this body.
-- Closed by default on page load — methodology is rarely the first thing a reader wants.
+## 7. Plain Language
+
+Use plain English on every visible surface.
+
+- Tickers: first mention only, in parens after the plain name. Prefer "the S&P 500", "oil", "gold", "airline stocks", "market volatility", etc.
+- Time horizons: use "a month later", "a year later", or "sixty trading days after the event". Avoid `+1M`, `+1Y`, `D+10`, `fwd_3m`, `N=15`.
+- Avoid trading-desk jargon unless requested. Prefer "normal periods", "past cases", "typical outcome", "strongest case", "weakest case", and "history was mixed".
+- Explain cutoffs inline on first mention.
+
+## 8. README Modal
+
+README chip opens `#methodology-modal`. Reuse the Screener modal chassis and `data-modal-open` / `data-modal-close` wiring.
+
+Keep methodology and references out of the main page flow. Put them in README.
+
+Modal content:
+1. how events were picked
+2. how returns were measured
+3. trigger source, market data source, date range, and sample count
+4. legal or cautionary note, if needed
+
+Closed by default. Must be keyboard-openable and closable via button, overlay click, and Escape.
+
+## 9. Quality Bar
+
+Revise before shipping if:
+
+- the required page flow is broken, renamed, or rearranged
+- the answer is not clear in the first screen
+- the page could be replaced by three sentences with little loss
+- the main visual does not answer the question
+- the chart is generic, confusing, misleading, sparse, or badly proportioned
+- a low-density chart is stretched into a dominant block
+- cards or rails create large empty areas
+- metrics repeat without adding interpretation
+- the table dominates the page
+- sample language is overconfident
+- the page feels like a dashboard
+- the design does not look aligned with Alva
+
+A strong playbook should feel like:
+
+> clear question → direct verdict → belief/history context → visual evidence → memorable takeaways → historical audit trail.
