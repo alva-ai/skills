@@ -8,9 +8,16 @@ of social follow:
 - Following a playbook elsewhere will compound-subscribe automatically
   (the row is restored if previously unsubscribed).
 
-`PLAYBOOK` is the only target type supported today; `FEED` is reserved
-for a future phase. Auth gating (public/paid/private) happens upstream
-in the gRPC layer — callers must be able to read the playbook.
+Two target types are supported:
+
+- **PLAYBOOK** — fires for any feed of that playbook.
+- **FEED** — fires for the specified feed regardless of which
+  playbook(s) consume it. When the feed is shared across playbooks
+  (e.g. via remix), the subscriber receives one push per playbook
+  context, rendered with that playbook's display name.
+
+Auth gating (public/paid/private) happens upstream in the gRPC layer —
+callers must be able to read the target.
 
 ## Subscribe to a Playbook
 
@@ -52,6 +59,47 @@ alva push-subscriptions unsubscribe-playbook --username alice --name btc-dashboa
 # → {"ok": true}
 ```
 
+## Subscribe to a Feed
+
+```bash
+alva push-subscriptions subscribe-feed --username USER --name NAME
+```
+
+| Flag       | Type   | Required | Description                |
+| ---------- | ------ | -------- | -------------------------- |
+| --username | string | yes      | Feed owner's username      |
+| --name     | string | yes      | URL-safe feed name         |
+
+Idempotent. Fires for that specific feed regardless of which
+playbook(s) consume it; if the feed is shared across playbooks the
+subscriber receives one push per playbook context.
+
+```bash
+alva push-subscriptions subscribe-feed --username alice --name btc-ema-cross
+# → {
+#     "subscription": {
+#       "target": {"type": "FEED", "id": "8117"},
+#       "subscribed": true,
+#       "created_at_ms": 1777355703123,
+#       "updated_at_ms": 1777355703123
+#     },
+#     "feed_path": "/alva/home/alice/feeds/btc-ema-cross"
+#   }
+```
+
+## Unsubscribe from a Feed
+
+```bash
+alva push-subscriptions unsubscribe-feed --username USER --name NAME
+```
+
+Soft-disable; same semantics as the playbook variant.
+
+```bash
+alva push-subscriptions unsubscribe-feed --username alice --name btc-ema-cross
+# → {"ok": true}
+```
+
 ## List My Subscriptions
 
 ```bash
@@ -68,7 +116,7 @@ Each row:
 
 | Field         | Type    | Description                                                          |
 | ------------- | ------- | -------------------------------------------------------------------- |
-| target.type   | string  | `"PLAYBOOK"` (or `"FEED"` once supported)                            |
+| target.type   | string  | `"PLAYBOOK"` or `"FEED"`                                              |
 | target.id     | string  | Numeric id of the target as a string                                 |
 | subscribed    | boolean | `true` if active. `false` only when `include_history=true` is passed |
 | created_at_ms | int64   | Milliseconds since epoch when first subscribed                       |
@@ -87,8 +135,9 @@ alva push-subscriptions list
 
 ## Notes
 
-- `NOT_FOUND` covers both "playbook does not exist" and "exists but the
-  caller cannot read it" — by design (no namespace enumeration).
+- `NOT_FOUND` covers both "target does not exist" and "exists but the
+  caller cannot read it" — by design (no namespace enumeration). Same
+  for both playbook and feed routes.
 - Push delivery still depends on the user having a connected channel
   (e.g. Telegram). If `telegram_username` is null on the user record
   (`alva user info`), push will silently no-op even when subscribed.
