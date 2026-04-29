@@ -27,6 +27,9 @@ Before writing HTML, read from the Alva skill:
 - [`../../references/design-components.md`](../../references/design-components.md) — Tab / Dropdown / Pill / Markdown primitives
 - [`../../references/design-system.md`](../../references/design-system.md) — `.playbook-container`, `.playbook-header` base rules
 
+Default to the existing Alva light-theme tokens. Do not introduce dark mode,
+black/slate page backgrounds, glow effects, gradients, or custom color palettes.
+
 **Do NOT** apply `design-playbook-trading-strategy.md` — that's for trading
 dashboards with Overview/Analytics/Strategy/Feed tabs. AI Digest is a
 **timeline**, not a dashboard.
@@ -41,8 +44,8 @@ design system — never re-spec a token or base that already exists.
 A working timeline UI lives at `example/index.html` next to this file —
 **copy it directly.** Change `USERNAME` + `FEED_PATH` + `playbook-config`
 JSON + the title; leave the rest. It already encodes the design system,
-markdown-it body rendering, README modal, source-icon resolver, day
-separators, and pushed/skipped cards. §10 and §11 only document what's
+safe markdown rendering, source resolver, day separators, and pushed/skipped
+cards. §10 and §11 only document what's
 AI Digest-unique on top — do not re-derive the layout from them.
 
 The feed-side scaffold lives in §14, built around a single
@@ -400,7 +403,7 @@ All three are Feed SDK time-series
 | `body` | string | Markdown with inline `[N]` reference markers. `""` on grounding failure |
 | `citations` | `[{ref, claim, url, source, source_ref}]` | One entry per `[N]` marker. `source_ref` is a match URL, `match.meta.event_key`, or, when using enrichment, `context_facts[].ref_id`. `[]` when body is `""` |
 | `matches` | `[{source, url, title, ts, snippet, meta}]` | All matches considered this fire (post-relevance, post-dedupe) |
-| `context_facts` | `[{ref_id, source, label, value, ts, evidence, url}]` | Optional structured Alva/BYOD/upstream facts used for materiality and grounding. `[]` in the lightweight default path. |
+| `context_facts` | `[{ref_id, source, label, value, ts, evidence, url}]` | Optional structured Alva/BYOD/upstream facts used for materiality and grounding. Render cited facts as structured fact rows under Sources; do not fake them as news/social sources. `[]` in the lightweight default path. |
 | `dedupe_keys` | `Array<{key: string}>` | Hashes consumed by this record. Feed SDK's `arr()` helper can't describe primitive-string arrays; each entry is wrapped as `{key: hash}`. Declare: `arr("dedupe_keys", [str("key")])`. |
 | `source` | `"alvaask" \| "fallback"` | `"fallback"` when body is `""` |
 
@@ -415,13 +418,17 @@ always; let `delivery.pushed` drive rendering.**
 
 When `audience: "followers"`, also append one record to `signal/targets` per
 pushed fire. Format follows Altra's target schema (see `references/feed-sdk.md`
-Pattern D); the platform reads `meta.reason` as the push body:
+Pattern D); the platform reads `meta.reason` as the push body and truncates it
+to 500 chars. Always pass the released playbook URL so the compact push can
+reserve the final link line:
 
 ```javascript
+const PLAYBOOK_URL = "https://<user>.playbook.alva.ai/<playbook>/<version>/index.html";
+
 await ctx.self.ts("signal", "targets").append([{
   date: now,
   instruction: { type: "allocate", weights: [] },   // no-op — this is notify-only
-  meta: { reason: composePushPayload(event) },       // ≤ 500 chars; see §9
+  meta: { reason: composePushPayload(event, PLAYBOOK_URL) }, // ≤ 500 chars; see §9
 }]);
 ```
 
@@ -445,10 +452,12 @@ When `audience: "owner"`, write to `notify/message` instead. No FeedAltra
 requirement; plain `Feed` suffices.
 
 ```javascript
+const PLAYBOOK_URL = "https://<user>.playbook.alva.ai/<playbook>/<version>/index.html";
+
 await ctx.self.ts("notify", "message").append([{
   date: now,
   title: `${CONFIG.topic.name} · ${fmtEst(now)}`,
-  text: composePushPayload(event),
+  text: composePushPayload(event, PLAYBOOK_URL),
 }]);
 ```
 
@@ -792,21 +801,153 @@ On failure: write the event with `body: ""`, `push_line: ""`, `citations:
 
 ## 9. Push plumbing
 
-### `composePushPayload(event)`
+### `composePushPayload(event, playbookUrl)`
 
 The push body is derived deterministically from the event record — one
-`ask()` per fire, one payload shape. Telegram caps `signal/targets` at
-500 chars; budget ≤ 450 to leave headroom.
+`ask()` per fire, one payload shape. Keep Telegram copy compact but not
+headline-only: treat it as the playbook page TLDR. Preserve the core point,
+key numbers, and why-it-matters sentence from the playbook body. Prefer natural
+prose for short/medium bodies, switch to concise bullet points only when the
+body is already list-shaped or long and data-dense. Bullet count is not fixed;
+fit as many meaningful short points as the remaining budget allows, then always
+reserve room for the playbook link. Do **not** list sources in the Telegram
+push; citations and full source rows live in the playbook. The hard budget is
+500 chars because `/data/signal/targets` truncates at 500.
 
 ```javascript
 function composePushPayload(event, playbookUrl) {
-  const topSources = (event.citations || [])
-    .slice(0, 3).map(c => c.source).filter(Boolean).join(", ");
+  const MAX_PUSH_CHARS = 500;
+  const HEADLINE_CHARS = 140;
+  const TLDR_BUDGET_CHARS = 330;
+  const SHORT_BODY_CHARS = 180;
+  const NATURAL_POINT_CHARS = 150;
+  const BULLET_THRESHOLD_CHARS = 330;
+  const MAX_BULLETS = 5;
+  const MIN_BULLET_LINE_CHARS = 48;
+  const BULLET_CHARS = 105;
+  const linkLine = `Full update → ${playbookUrl}`;
+
+  const stripMarkdown = (s) => String(s || "")
+    .replace(/\[[0-9]+\]/g, "")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/[`*_>#]/g, "")
+    .replace(/\s+/g, " ")
+    .replace(/\s+([.,!?;:。！？])/g, "$1")
+    .trim();
+  const tidyTruncation = (s) => String(s || "")
+    .replace(/\s+\b(?:but|and|or|because|while|with|without|that|which|as|to|of|by|for|the|is|are)\s*…$/i, "…")
+    .replace(/[,;:]\s*…$/, "…");
+  const trimPoint = (s, limit) => {
+    const clean = stripMarkdown(s);
+    return clean.length > limit
+      ? tidyTruncation(clean.slice(0, limit).replace(/\s+\S*$/, "") + "…")
+      : clean;
+  };
+  const trimBlock = (s, limit) => {
+    const clean = String(s || "").trim();
+    return clean.length > limit
+      ? tidyTruncation(clean.slice(0, limit).replace(/\s+\S*$/, "") + "…")
+      : clean;
+  };
+  const fitSummary = (summary, limit) => {
+    const clean = String(summary || "").trim();
+    if (!clean || clean.length <= limit) return clean;
+    if (!clean.includes("\n• ")) return trimBlock(clean, limit);
+
+    const fitted = [];
+    let used = 0;
+    for (const line of clean.split("\n")) {
+      const separator = fitted.length ? 1 : 0;
+      const available = limit - used - separator;
+      if (available <= 0) break;
+      if (line.length <= available) {
+        fitted.push(line);
+        used += separator + line.length;
+      } else if (fitted.length < 2 && available >= 48) {
+        fitted.push(trimBlock(line, available));
+        break;
+      } else {
+        break;
+      }
+    }
+    return fitted.join("\n");
+  };
+  const sentencePoints = (body) => stripMarkdown(body)
+    .split(/(?<=[.!?。！？])\s*/)
+    .map(s => s.trim())
+    .filter(Boolean);
+  const bulletPoints = (body) => String(body || "")
+    .split("\n")
+    .map(s => s.trim())
+    .filter(s => /^[-*•]\s+/.test(s))
+    .map(s => s.replace(/^[-*•]\s+/, ""));
+  const hasData = (s) => /[$€¥%]|\d|bps?\b|x\b|million|billion|trillion/i.test(s);
+  const hasImpact = (s) =>
+    /\b(guidance|margin|revenue|capex|inventory|orders?|shipments?|lead time|pricing|demand|supply|backlog|export|risk|watch|implies|means|matters|beat|miss|raise|cut)\b/i.test(s);
+  const selectKeyPoints = (points, maxPoints = MAX_BULLETS) => {
+    const cleaned = points.map(stripMarkdown).filter(Boolean);
+    if (cleaned.length <= maxPoints) return cleaned;
+    const selected = new Set([0]);
+    const ranked = cleaned.slice(1).map((text, offset) => {
+      const index = offset + 1;
+      const score = (hasData(text) ? 3 : 0) + (hasImpact(text) ? 2 : 0) + (text.length <= 220 ? 1 : 0);
+      return { index, score };
+    }).sort((a, b) => b.score - a.score || a.index - b.index);
+    for (const item of ranked) {
+      if (selected.size >= maxPoints) break;
+      selected.add(item.index);
+    }
+    return [...selected].sort((a, b) => a - b).map(index => cleaned[index]);
+  };
+  const bulletSummary = (points, budget) => {
+    const selected = selectKeyPoints(points, MAX_BULLETS);
+    const lines = [];
+    let used = 0;
+    for (const point of selected) {
+      const separator = lines.length ? 1 : 0;
+      const available = budget - used - separator;
+      if (available < MIN_BULLET_LINE_CHARS) break;
+      const lineLimit = Math.min(BULLET_CHARS, available - 2);
+      const line = `• ${trimPoint(point, lineLimit)}`;
+      if (line.length > available) break;
+      lines.push(line);
+      used += separator + line.length;
+    }
+    return lines.length >= 2 ? lines.join("\n") : trimPoint(selected[0] || "", budget);
+  };
+
+  function summarizeTldr(body, budget) {
+    const compact = stripMarkdown(body);
+    if (!compact) return "";
+    const bullets = bulletPoints(body);
+    const points = bullets.length >= 2 ? bullets : sentencePoints(body);
+    const shouldUseBullets = bullets.length >= 2
+      || (compact.length >= BULLET_THRESHOLD_CHARS && points.length >= 4 && points.filter(hasData).length >= 2);
+    if (!shouldUseBullets && (compact.length < SHORT_BODY_CHARS || points.length < 2)) {
+      return trimPoint(compact, TLDR_BUDGET_CHARS);
+    }
+    if (!shouldUseBullets) {
+      return selectKeyPoints(points, 2)
+        .map(p => trimPoint(p, NATURAL_POINT_CHARS))
+        .join(" ");
+    }
+    return bulletSummary(points, budget);
+  }
+
+  const headline = trimPoint(event.push_line, HEADLINE_CHARS);
+  const reserved = [headline, linkLine].filter(Boolean).join("\n").length + 2;
+  const summaryBudget = Math.max(0, Math.min(TLDR_BUDGET_CHARS, MAX_PUSH_CHARS - reserved));
+  const summary = fitSummary(summarizeTldr(event.body, summaryBudget), summaryBudget);
+  const prefix = [
+    headline,
+    summary,
+  ].filter(Boolean).join("\n");
+  const prefixBudget = Math.max(0, MAX_PUSH_CHARS - linkLine.length - 1);
+
   return [
-    event.push_line,
-    topSources && `Sources: ${topSources}`,
-    `Full update → ${playbookUrl}`,
-  ].filter(Boolean).join("\n").slice(0, 450);
+    prefix.slice(0, prefixBudget).trim(),
+    linkLine,
+  ].filter(Boolean).join("\n");
 }
 ```
 
@@ -858,13 +999,11 @@ The rules the example already encodes — keep them when you adapt:
 - Container: `.playbook-container` on top of `design-tokens.css`.
 - Reverse chronological; today on top, older days below; day separators
   in EST (`Today` / `Yesterday` / `Mon, Apr 14`).
-- Read `<group>/<doc>/@last/N` on initial render (example uses
-  `notifications/events/@last/50`). No live recomputation — the HTML is
+- Read `digest/events/@last/N` on initial render. No live recomputation — the HTML is
   a view over stored records.
 - No in-page header chrome above the feed. The outer playbook shell owns
-  title, subscription, and metadata. If you need methodology, render it
-  through the README modal already wired in `example/index.html`, not as a
-  banner above the timeline.
+  title, subscription, metadata, and any methodology/about surface. Keep
+  `example/index.html` to the timeline only.
 
 To adapt: change `USERNAME`, `FEED_PATH`, `<title>`, and the
 `#playbook-config` JSON block. Leave the rest.
@@ -881,17 +1020,17 @@ This section names them and notes the contract — don't re-spec the styles.
   the same event record.
 - **Cite refs** (`.cite-ref`) — inline `[N]` anchors generated by
   replacing `[N]` markers in the rendered markdown body. Hover tooltip
-  shows `citations[N].source` + `claim`; link to `citations[N].url` when
-  present.
-- **Sources toggle** (`.notif-sources-toggle` / `.notif-matches`) — click
-  to expand the match list under each pushed card.
+  shows `citations[N].source` + `claim`; link to `citations[N].url` only
+  when it is an `http:` or `https:` URL. Empty or structured-fact citations
+  render as non-link refs.
+- **Sources toggle** (`.notif-sources-toggle` / `.notif-sources`) — click
+  to expand content matches plus cited `context_facts[]` under each pushed card.
 - **Match row** (`.match-row`) — grid: source icon + label, title, and
   relative timestamp. Source-icon resolver (`sourceIcon()` in
   `example/index.html`) handles X/podcast/youtube/news favicons.
+- **Fact row** (`.fact-row`) — structured fact row for cited
+  `context_facts[]`, showing source, label/value, and timestamp.
 - **Day separator** (`.day-separator`) — one per calendar day (EST).
-- **README modal** (`.readme-modal`) — methodology surface for the
-  outer shell to open. Body content can be derived from
-  `#playbook-config` JSON (topic, sources, cadence, angle, models).
 
 Everything else reuses the shared design system and
 `design-components.md` (markdown container, pills, typography). Do not
@@ -994,8 +1133,10 @@ const { Feed, feedPath, makeDoc, str, num, bool, obj, arr } = require("@alva/fee
 const { ask } = require("@alva/alvaask");
 
 const feed = new Feed({ path: feedPath("<your-playbook-name>") });
-feed.def("notifications", { events: makeDoc("AI Digest Events", "", [/* see example */]) });
-feed.def("signal",        { targets: makeDoc("Push Signal", "",      [/* see example */]) });
+const PLAYBOOK_URL = "https://<user>.playbook.alva.ai/<playbook>/<version>/index.html";
+
+feed.def("digest", { events: makeDoc("AI Digest Events", "", [/* see §6 */]) });
+feed.def("signal", { targets: makeDoc("Push Signal", "",      [/* see §6 */]) });
 
 (async () => {
   await feed.run(async (ctx) => {
@@ -1020,11 +1161,11 @@ feed.def("signal",        { targets: makeDoc("Push Signal", "",      [/* see exa
     // always write event; push only when material
     const record = { date: now, /* …push_line, body, citations, matches, dedupe_keys… */
       delivery: { pushed: !allOldDup && !tooStale, reason: ... } };
-    await ctx.self.ts("notifications", "events").append([record]);
+    await ctx.self.ts("digest", "events").append([record]);
     if (record.delivery.pushed) {
       await ctx.self.ts("signal", "targets").append([{ date: now,
         instruction: { type: "allocate", weights: [] },
-        meta: { reason: `${record.push_line}\n\n→ ${PLAYBOOK_URL}` } }]);
+        meta: { reason: composePushPayload(record, PLAYBOOK_URL) } }]);
     }
 
     // persist dedupe + throttle
