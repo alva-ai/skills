@@ -570,11 +570,11 @@ function filterRelevanceBatch(matches, topic, relevanceModel) {
       slice.map((m, j) =>
         `[${j}] title: ${m.title}\n    snippet: ${(m.snippet || "").slice(0, 200)}`
       ).join("\n\n") +
-      `\n\nReturn strict JSON only: {"answers": ["yes"|"no", ...]} — one per item, in order.`;
+      `\n\nReturn strict JSON only: {"answers": {"0": "yes"|"no", ..., "${slice.length - 1}": "yes"|"no"}} — keyed by the [n] index of each item.`;
     const { text } = ask(prompt, { model: relevanceModel });
     try {
       const { answers } = JSON.parse(text.replace(/^```(?:json)?\s*|\s*```$/g, ""));
-      slice.forEach((m, j) => { if (/^yes/i.test(answers[j] || "")) out.push(m); });
+      slice.forEach((m, j) => { if (/^yes/i.test(answers[String(j)] || "")) out.push(m); });
     } catch (e) {
       // On parse failure, pass through un-filtered — better than dropping everything.
       out.push(...slice);
