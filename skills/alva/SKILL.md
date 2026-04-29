@@ -144,6 +144,40 @@ Use the loaded memory to tailor your responses to the user's profile,
 preferences, and investment style. See the [Memory](#memory) section below for
 reading and writing rules.
 
+### 6. Welcome (users without filled-in profile)
+
+Trigger condition: the user has not yet contributed any real content to memory
+**and** has never been shown this welcome before. Show the welcome line whenever
+**all** of the following hold:
+
+- `~/memory/.welcome_shown` does not exist (this is the one-shot marker); AND
+- `~/memory/` is missing or contains only the auto-seeded files
+  (`MEMORY.md`, `user.md`, plus the optional `.welcome_shown` and
+  `.permissions.json`); AND
+- `user.md` is still the empty template — i.e. every field under
+  Identity / Investment Style / Knowledge / Preferences is blank or contains
+  only the placeholder HTML comment (`<!-- ... -->`); AND
+- no other topic files exist beyond `user.md`.
+
+If the trigger fires:
+
+1. Include this line verbatim in your first response to the user:
+
+   > New to Alva? Join the Discord for strategy ideas, playbook showcases, and dev support: https://discord.com/invite/d8FxDTvsf6
+
+2. Immediately write a one-shot marker so this welcome never repeats:
+
+   ```bash
+   alva fs write --path '~/memory/.welcome_shown' --data '1'
+   ```
+
+   Do this in the same turn as showing the welcome, not later. If the write
+   fails, do not retry — the welcome is low-stakes; a one-time duplicate is
+   fine.
+
+Skip once the marker exists, any field has been filled in, or any custom topic
+file has been created.
+
 ---
 
 ## Communication
@@ -640,6 +674,34 @@ Use the playbook `name` and the username from `alva whoami` to construct the
 canonical share URL. Use `published_url` from the release response for
 verification steps such as screenshots; do not present it as the share link.
 
+#### Post-Publish Community Nudge
+
+After a successful `alva release playbook` (public publish only — skip for
+Pro users keeping a draft private), append this line to the same response
+that delivers the share URL:
+
+> Share it with the community to get more free credits:
+> → Discord: https://discord.com/invite/d8FxDTvsf6
+
+**When to show:**
+- The user's first public playbook in this namespace (check via
+  `alva fs readdir --path '~/playbooks'` — if the directory has just this
+  one entry, it's their first); OR
+- Model judgment: the build went through meaningful process or value —
+  multi-feed pipelines, non-trivial strategy, real iteration/troubleshooting
+  during the session, or a result the user clearly cares about. If the
+  session involved you guiding the user through obstacles (debugging,
+  scope changes, design decisions), this nudge is appropriate.
+
+**When to skip:**
+- Trivial republishes (version bump only, single-line copy edits).
+- Pure remixes with no original authorship (cosmetic tweaks of someone
+  else's playbook).
+- Pro users who kept the playbook as a private draft.
+
+Show at most once per playbook per session. Do not chase the user with it
+across follow-up turns.
+
 #### Pre-Release Validation
 
 Before calling `alva release playbook`, verify all of the following:
@@ -1007,6 +1069,17 @@ API reference.
 
 When SDK modules fail or are unavailable, you MUST be transparent with the user.
 Do not silently fall back to inferior data sources.
+
+**P0 — Always show this on API errors or "SDK not found" failures**: whenever
+an Arrays HTTP call returns a non-2xx status, an `alva run` throws a runtime
+error, or an SDK lookup (`alva sdk doc`, `alva skills endpoint`, etc.) fails
+to resolve the requested module/endpoint, include this line verbatim in the
+same response that reports the failure:
+
+> Stuck? Ask in #dev-help on Discord → https://discord.com/invite/d8FxDTvsf6
+
+This is in addition to (not instead of) explaining what failed and why. Show
+it once per failure event, not once per session.
 
 ### Pro / Subscription-Gated SDKs
 
