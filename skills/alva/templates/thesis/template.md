@@ -77,11 +77,19 @@ playbook families. The example already conforms — keep it that way.
 - Do all mechanical renames in one `sed -i` pass (benchmarks, layer/pillar
   names + CSS slugs + colors map, feed names, `USER`, API endpoint).
   `grep -nE` after to catch stragglers.
+- Schema field renames are radioactive: one benchmark rename (e.g. `pave_ytd` →
+  `spy_ytd`) propagates across quant feed schema, narrative fallback copy, HTML
+  KPI cards, horizon cards, equity chart series, and attribution filters — 3
+  feeds + 2500-line HTML in lockstep. Always `sed -i` the bulk rename across all
+  files first, then do a single `Read` pass to verify, then use `Edit` only for
+  narrative prose that `sed` cannot safely touch. Never rename field-by-field
+  with `Edit` — every mid-rename `Read` will see a half-dirty file and the Edit
+  tool will report the file as modified.
 - Don't read the HTML linearly. `grep -n` the marker, then `Read` with
   `offset` + `limit` on that section only.
-- The three feeds' `grant` / `deploy create` / `release feed` have no
-  cross-dependencies — issue them in parallel. Only `draft` → `release playbook`
-  is strictly serial.
+- Your three feeds' `grant` / `deploy create` / `release feed` have no
+  cross-dependencies — issue them in parallel (use your own feed names, not the
+  example's). Only `draft` → `release playbook` is strictly serial.
 - Draft all basket members' prose in one pass, polish after. Voice converges
   only when you see them side-by-side.
 - Spend disproportionate time on the ADK `systemPrompt` and the news-feed
