@@ -187,6 +187,8 @@ If the user's message contains a `/use-template:<name>` directive (e.g. `/use-te
 
 **Content arrangement.** A template's default sections are a floor, not a ceiling. Lead with whatever carries the user's core question, proactively add sections the request demands, and cut or fold near-empty sections into neighbors rather than padding them.
 
+**Push-driven requests** — if the user's primary outcome is a recurring push (digest, threshold tracker, stream watch, periodic alert), the [ai-digest template](templates/ai-digest/template.md) is purpose-built for that shape and worth offering during Guided Planning. Push can also be added to any other playbook via Step 9 — the template is one good option, not a requirement.
+
 No `/use-template:` directive → skip this step and proceed to Guided Planning normally.
 
 ### Guided Planning
@@ -551,6 +553,21 @@ The platform reads `/data/notify/message/@last/1` and pushes `title` + `text`
 to the owner on all connected channels (Telegram, Discord, Web). No playbook
 or followers required.
 
+**Two-step deploy is mandatory for Pattern E.** `--push-notify` alone is not
+enough; without `alva release feed` the platform fires the push but the body
+arrives empty. Always pair them:
+
+```bash
+alva deploy create --name <feed> --path '~/feeds/<feed>/v1/src/index.js' \
+  --cron "<expr>" --push-notify
+alva release feed --name <feed> --version 1.0.0 \
+  --cronjob-id <ID_FROM_DEPLOY> --description "<one-sentence purpose>"
+```
+
+Pattern D (followers, `signal/targets`) needs only `--push-notify`, but it
+also needs at least one playbook follower — a subscribed playbook with no
+followers pushes to nobody.
+
 See **Step 9** below for the full post-release subscription flow.
 
 ### 6. Build the Playbook Web App
@@ -679,14 +696,11 @@ If no feed qualifies, skip this flow entirely.
 
 #### Check Telegram binding
 
-Read `telegram_username` from the session (Pre-flight Step 3):
-
-- **Connected** (non-null) → proceed to recommend.
-- **Not connected** (null) → tell the user:
-  "To receive push notifications, connect your Telegram at
-  <https://alva.ai/settings>. After connecting, I can set up push alerts for
-  [specific feed description]."
-  Then skip the rest of this flow. The user can return to this later.
+Read `telegram_username` from the session (Pre-flight Step 3). If null, tell
+the user:
+"To receive push notifications, connect your Telegram at
+<https://alva.ai/settings>. After connecting, I can set up push alerts for
+[specific feed description]." Then skip the rest of this flow.
 
 #### Recommend specific feeds
 
@@ -696,15 +710,33 @@ Present a concrete recommendation, not a generic "want push?":
 > alerts when the trend flips. Want to enable Telegram push notifications
 > for it?"
 
-- **User says yes** → add `signal/targets` output to the feed (see
-  [feed-sdk.md](references/feed-sdk.md) Pattern D), set `push_notify: true`
-  on the cronjob, and confirm.
+- **User says yes** → configure end-to-end (see "Configure and verify" below).
+  Do not stop after toggling the flag.
 - **User says no** → accept and move on. Do not ask again.
-- **User requests push for a different feed** → honor their choice and
-  configure accordingly.
+- **User requests push for a different feed** → honor their choice.
 
 If the feed already has `signal/targets` and `push_notify: true`, skip — it's
 already configured.
+
+#### Configure and verify
+
+A push is "set up" only after every step below succeeds. Stopping early is
+the most common cause of "configured but nothing arrives" — do not skip
+verification.
+
+1. **Add `signal/targets` output to the feed script** (see
+   [feed-sdk.md](references/feed-sdk.md) Pattern D). `meta.reason` is the
+   text followers receive.
+2. **Enable the flag on the cronjob:** `alva deploy update --id <ID> --push-notify`.
+3. **Verify a real run produced push content:** trigger a run (or wait for
+   the next cron fire) and read `@last/1` of `signal/targets`. Confirm the
+   record is fresh and `meta.reason` is non-empty.
+4. **Confirm to the user** with the specifics: which feed, what the next
+   push will say, when it will fire.
+
+If Step 3 returns no record or an empty body, **do not claim push is set
+up** — diagnose (missing output write, wrong path, run failure) and fix
+before reporting success.
 
 ---
 
