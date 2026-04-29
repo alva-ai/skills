@@ -23,9 +23,9 @@ platform quirks" — scan that table before writing code.
 
 Before writing HTML, read from the Alva skill:
 
-- `references/design-tokens.css` — use spacing/color tokens as-is, do NOT override
-- `references/design-components.md` — Tab / Dropdown / Pill / Markdown primitives
-- `references/design-system.md` — `.playbook-container`, `.playbook-header` base rules
+- [`../../references/design-tokens.css`](../../references/design-tokens.css) — use spacing/color tokens as-is, do NOT override
+- [`../../references/design-components.md`](../../references/design-components.md) — Tab / Dropdown / Pill / Markdown primitives
+- [`../../references/design-system.md`](../../references/design-system.md) — `.playbook-container`, `.playbook-header` base rules
 
 **Do NOT** apply `design-playbook-trading-strategy.md` — that's for trading
 dashboards with Overview/Analytics/Strategy/Feed tabs. AI Digest is a
