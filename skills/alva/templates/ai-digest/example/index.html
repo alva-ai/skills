@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Chip Supply Chain — Notification Playbook</title>
+<link rel="stylesheet" href="https://alva-ai-static.b-cdn.net/design-system/design-tokens.css" />
+<script src="https://cdn.jsdelivr.net/npm/markdown-it@13/dist/markdown-it.min.js"></script>
+<style>
+  /* ── @font-face (Fix #1: load Delight from CDN) ── */
+  @font-face {
+    font-family: "Delight";
+    src: url("https://alva-ai-static.b-cdn.net/fonts/Delight-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Delight";
+    src: url("https://alva-ai-static.b-cdn.net/fonts/Delight-Medium.ttf") format("truetype");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  html { height:100%; overflow:hidden; }
+  body {
+    height:100%; overflow-y:auto; overflow-x:hidden;
+    margin:0; background:var(--b0-page); color:var(--text-n9);
+    font-family:"Delight", -apple-system, BlinkMacSystemFont, "OPPO Sans 4.0", sans-serif;
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    text-rendering:optimizeLegibility;
+  }
+  body.modal-open { overflow: hidden; }
+  * {
+    box-sizing: border-box;
+    -ms-overflow-style:none; scrollbar-width:none;
+  }
+  *::-webkit-scrollbar { display:none; }
+
+  strong, b { font-weight: 500; }
+
+  /* ── Fix #2: container top padding → --spacing-xs ── */
+  .playbook-container {
+    width:100%; max-width:980px; margin:0 auto;
+    padding: var(--spacing-xs) var(--spacing-xxl) var(--spacing-xxxxl);
+  }
+  @media (max-width: 768px) {
+    .playbook-container { padding: var(--spacing-m); }
+  }
+
+  /* ── Topic meta row (single header bar) ── */
+  .topic-meta-row {
+    display:flex; flex-wrap:wrap; gap:var(--spacing-xs);
+    align-items:center; margin-bottom:var(--spacing-l);
+  }
+  .topic-meta-spacer { flex: 1 1 auto; min-width: 0; }
+
+  /* README chip — secondary, tab-bar style */
+  .readme-btn {
+    display: inline-flex; align-items: center; gap: var(--spacing-xxs);
+    height: 24px;
+    padding: var(--spacing-xxxs) var(--spacing-xs);
+    background: var(--b-r02);
+    border: 0.5px solid var(--line-l2);
+    border-radius: var(--radius-ct-s);
+    font-family: inherit;
+    font-size: 12px; line-height: 20px; letter-spacing: 0.12px;
+    color: var(--text-n9); cursor: pointer;
+    transition: background .15s, border-color .15s;
+  }
+  .readme-btn:hover,
+  .readme-btn:active {
+    background: var(--b-r03);
+    border-color: var(--line-l9);
+  }
+  .readme-btn-icon {
+    width: 14px; height: 14px; flex-shrink: 0;
+    background-color: currentColor;
+    -webkit-mask: url("https://alva-ai-static.b-cdn.net/icons/researcher-l1.svg") center / contain no-repeat;
+            mask: url("https://alva-ai-static.b-cdn.net/icons/researcher-l1.svg") center / contain no-repeat;
+  }
+  .pill {
+    display:inline-flex; align-items:center; gap:var(--spacing-xxs);
+    padding:2px var(--spacing-s); border-radius: var(--radius-ct-s);
+    font-size:12px; line-height:20px;
+  }
+  .pill.source { background: var(--b-r05); color: var(--text-n7); }
+  .pill.cadence { background: var(--main-m1-10); color: var(--main-m1); }
+
+  /* ── Subscribe button (primary CTA) ── */
+  .subscribe-cta {
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    height: 32px; padding: 6px var(--spacing-m);
+    background: var(--main-m1); color: var(--b-common-white);
+    border: none; border-radius: var(--radius-btn-s);
+    font-family: inherit; font-weight: 500;
+    font-size: 12px; line-height: 20px; letter-spacing: 0.12px;
+    cursor: pointer; text-decoration: none;
+    transition: all 0.2s ease-in-out;
+  }
+  .subscribe-cta:hover { background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)); }
+  .subscribe-cta:active { background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)); }
+
+  /* ── Timeline ── */
+  .day-separator {
+    display:flex; align-items:center; gap: var(--spacing-m);
+    margin: var(--spacing-xl) 0;
+  }
+  .day-separator::before, .day-separator::after {
+    content:''; flex:1; height:1px; background: var(--line-l07);
+  }
+  .day-separator-label {
+    font-size:11px; text-transform:uppercase; letter-spacing:0.5px;
+    color: var(--text-n5);
+  }
+
+  /* ── Fix #3 & #4 & #5: widget-card structure, no border, grey-g01 bg ── */
+  .widget-card {
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: visible;
+  }
+
+  .notif-card {
+    background: var(--grey-g01);
+    border: none;
+    border-radius: var(--radius-ct-s);
+    padding: var(--spacing-l) var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+    transition: background .15s;
+  }
+  .notif-card:hover { background: var(--b-r02); }
+  .notif-card-header {
+    display:flex; align-items:center; gap: var(--spacing-s);
+    font-size:12px; color: var(--text-n5);
+    margin-bottom: var(--spacing-s);
+  }
+  .notif-time { font-variant-numeric: tabular-nums; }
+  .notif-status {
+    display: inline-flex; align-items: center; gap: var(--spacing-xxs);
+    margin-left: auto;
+  }
+  .notif-status-dot { width:8px; height:8px; border-radius:50%; }
+  .status-pushed { background: var(--main-m3); }
+  .status-skipped { background: var(--text-n3); }
+  .notif-mode { text-transform: lowercase; letter-spacing: 0.12px; }
+  .notif-push-line {
+    font-family: 'Delight', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 16px; line-height: 26px; letter-spacing: 0.16px;
+    font-weight: 500; color: var(--text-n9);
+    margin: 0 0 var(--spacing-s); padding-top: 2px;
+  }
+  /* Citation pill — override markdown-container link styles */
+  .notif-body .cite-ref {
+    color: var(--main-m1); margin-left: 2px;
+    font-size: 11px; vertical-align: super; line-height: 1;
+    text-decoration: none;
+  }
+  .notif-body .cite-ref::after { display: none; }
+  .notif-body .cite-ref:hover { color: var(--main-m1); text-decoration: underline; }
+
+  .notif-cite-row {
+    margin-top: var(--spacing-s); padding-top: var(--spacing-s);
+    border-top: 1px solid var(--line-l05);
+  }
+  .notif-sources-toggle {
+    background:transparent; border:none; cursor:pointer;
+    font-size:12px; color: var(--text-n5); padding:0;
+    font-family: inherit;
+    display:inline-flex; align-items:center; gap: var(--spacing-xxs);
+  }
+  .notif-sources-toggle:hover { color: var(--main-m1); }
+  .notif-sources-arrow {
+    width: 12px; height: 12px; flex-shrink: 0;
+    background-color: currentColor;
+    -webkit-mask: url("https://alva-ai-static.b-cdn.net/icons/arrow-right-l2.svg") center / contain no-repeat;
+            mask: url("https://alva-ai-static.b-cdn.net/icons/arrow-right-l2.svg") center / contain no-repeat;
+  }
+  .notif-sources-toggle[aria-expanded="true"] .notif-sources-arrow {
+    -webkit-mask-image: url("https://alva-ai-static.b-cdn.net/icons/arrow-down-l2.svg");
+            mask-image: url("https://alva-ai-static.b-cdn.net/icons/arrow-down-l2.svg");
+  }
+  .notif-matches {
+    margin-top: var(--spacing-s); display:flex; flex-direction:column;
+    gap: var(--spacing-xxs); font-size:12px;
+  }
+  .notif-matches.hidden { display:none; }
+  .match-row {
+    display:grid; grid-template-columns: 76px 1fr auto;
+    gap: var(--spacing-s); align-items:center;
+    padding: var(--spacing-xxs) var(--spacing-s);
+    margin: 0 calc(-1 * var(--spacing-s));
+    border-radius: var(--radius-ct-s);
+    text-decoration:none; color: var(--text-n7);
+    transition: background .15s;
+  }
+  .match-row:hover { background: var(--b-r02); color: var(--text-n9); }
+  .match-source {
+    display:inline-flex; align-items:center; gap: var(--spacing-xxs);
+    font-size:10px; text-transform:uppercase; letter-spacing:0.5px;
+    color: var(--text-n5);
+  }
+  .match-source-icon {
+    width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+    object-fit: cover; background: var(--b-r02);
+  }
+  .match-source-icon.no-radius { border-radius: 0; background: transparent; }
+  .match-title {
+    font-size:12px; line-height:18px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .match-ts {
+    font-size:11px; color: var(--text-n5);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Skipped card — muted background, condensed padding ── */
+  .notif-card--skipped {
+    background: var(--b-r02);
+    padding: var(--spacing-s) var(--spacing-m);
+  }
+  .notif-card--skipped:hover { background: var(--b-r03); }
+  .notif-card--skipped .notif-push-line,
+  .notif-card--skipped .notif-body,
+  .notif-card--skipped .notif-cite-row { display: none; }
+  .notif-card--skipped .notif-card-header { color: var(--text-n3); margin-bottom: 0; }
+
+  .loading, .empty {
+    padding: var(--spacing-xxl) 0;
+    text-align:center; color: var(--text-n5); font-size: 13px;
+  }
+
+  .error-banner {
+    background: var(--main-m4-10, rgba(224,83,87,0.1));
+    color: var(--main-m4, #e05357);
+    padding: var(--spacing-s) var(--spacing-m);
+    border-radius: var(--radius-ct-s);
+    font-size: 12px; margin-bottom: var(--spacing-m);
+  }
+
+  /* ── README Modal ── */
+  .readme-modal {
+    position: fixed; inset: 0; z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+    padding: var(--spacing-m);
+  }
+  .readme-modal[hidden] { display: none; }
+  .readme-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(10, 15, 24, 0.45); backdrop-filter: blur(2px);
+  }
+  .readme-dialog {
+    position: relative; max-width: 680px; width: 100%;
+    max-height: 85vh; overflow-y: auto;
+    background: var(--b0-container, #fff);
+    border-radius: var(--radius-ct-l);
+    box-shadow: var(--shadow-l, 0 16px 48px rgba(10,15,24,0.2));
+    padding: var(--spacing-xl) var(--spacing-xxl) var(--spacing-xxl);
+  }
+  .readme-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: var(--spacing-m);
+  }
+  .readme-title {
+    font-size: 18px; line-height: 26px; font-weight: 500;
+    color: var(--text-n9); margin: 0; letter-spacing: 0.18px;
+  }
+  .readme-close {
+    width: 18px; height: 18px; flex-shrink: 0;
+    border: none; background-color: var(--text-n9); padding: 0;
+    cursor: pointer;
+    -webkit-mask: url("https://alva-ai-static.b-cdn.net/icons/close-l1.svg") center / contain no-repeat;
+            mask: url("https://alva-ai-static.b-cdn.net/icons/close-l1.svg") center / contain no-repeat;
+    transition: opacity .15s ease;
+  }
+  .readme-close:hover { opacity: 0.6; }
+
+  /* ════════════════════════════════════════════════════════════
+     Alva Markdown — verbatim from design-components.md
+     ════════════════════════════════════════════════════════════ */
+  .markdown-container {
+    width: 100%;
+    display: flex; flex-direction: column;
+    gap: 16px;
+  }
+  .markdown-container * { box-sizing: border-box; }
+
+  /* Headings */
+  .markdown-container h1,
+  .markdown-container h2,
+  .markdown-container h3,
+  .markdown-container h4,
+  .markdown-container h5,
+  .markdown-container h6 {
+    font-family: 'Delight', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 500; font-style: normal;
+    color: var(--text-n9);
+    margin: 0; width: 100%;
+  }
+  .markdown-container h1,
+  .markdown-container h2 {
+    font-size: 20px; line-height: 30px; letter-spacing: 0.2px; padding-top: 8px;
+  }
+  .markdown-container h3 {
+    font-size: 18px; line-height: 28px; letter-spacing: 0.18px; padding-top: 4px;
+  }
+  .markdown-container h4,
+  .markdown-container h5,
+  .markdown-container h6 {
+    font-size: 16px; line-height: 26px; letter-spacing: 0.16px;
+  }
+
+  /* Paragraph */
+  .markdown-container p {
+    font-family: 'Delight', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 16px; line-height: 26px; letter-spacing: 0.16px;
+    color: var(--text-n9);
+    margin: 0; white-space: pre-wrap;
+  }
+
+  /* Lists */
+  .markdown-container ul,
+  .markdown-container ol {
+    display: flex; flex-direction: column; gap: 8px;
+    list-style: none; margin: 0; padding: 0;
+  }
+  .markdown-container li {
+    font-family: 'Delight', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 16px; line-height: 26px; letter-spacing: 0.16px;
+    color: var(--text-n9);
+    position: relative; padding-left: 24px;
+  }
+  .markdown-container ul > li::before {
+    content: ''; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--text-n9);
+    position: absolute; left: 9.5px; top: 10.5px;
+  }
+  .markdown-container ol { counter-reset: md-ol; }
+  .markdown-container ol > li { counter-increment: md-ol; }
+  .markdown-container ol > li::before {
+    content: counter(md-ol) '.';
+    position: absolute; left: 0; top: 0;
+    width: 24px; text-align: center;
+    font-size: 16px; line-height: 26px;
+    color: var(--text-n9);
+  }
+
+  /* Code */
+  .markdown-container code,
+  .markdown-container pre {
+    background: var(--b-r02); border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-n7);
+  }
+  .markdown-container code {
+    display: inline-block; vertical-align: middle;
+    box-shadow: inset 0 0 0 1px var(--line-l07);
+    font-size: 12px; line-height: 20px; letter-spacing: 0.12px;
+    padding: 2px 8px; margin: 0 4px;
+  }
+  .markdown-container pre {
+    border: 1px solid var(--line-l07);
+    font-size: 14px; line-height: 22px; letter-spacing: 0.14px;
+    padding: 12px 16px; margin: 0; overflow-x: auto;
+  }
+  .markdown-container pre code {
+    display: inline; vertical-align: baseline;
+    font-size: inherit; line-height: inherit; letter-spacing: inherit;
+    box-shadow: none; padding: 0; margin: 0; background: none;
+  }
+
+  /* Inline emphasis */
+  .markdown-container em { font-style: italic; }
+  .markdown-container strong { font-weight: 500; }
+
+  /* Divider */
+  .markdown-container hr {
+    height: 1px; background: var(--line-l07);
+    border: none; margin: 4px 0;
+  }
+
+  /* Table */
+  .markdown-container table {
+    width: 100%; border-collapse: separate;
+    border-spacing: 16px 0; margin: 0 -16px;
+  }
+  .markdown-container th,
+  .markdown-container td {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line-l07);
+    font-family: 'Delight', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 400;
+    font-size: 14px; line-height: 22px; letter-spacing: 0.14px;
+    color: var(--text-n9); text-align: left;
+    max-height: 180px;
+  }
+  .markdown-container th {
+    color: var(--text-n7); padding-top: 0; padding-bottom: 12px;
+  }
+  .markdown-container tr:last-child td { border-bottom: none; }
+  .markdown-container td code { margin: 0; }
+
+  /* Link */
+  .markdown-container a {
+    color: var(--text-n7);
+    text-decoration-line: underline;
+    text-decoration-style: dotted;
+    text-decoration-color: var(--text-n5);
+    text-decoration-thickness: 8%;
+    text-underline-offset: 30%;
+    text-decoration-skip-ink: none;
+    transition: color 0.15s ease;
+  }
+  .markdown-container a:hover {
+    color: var(--main-m1);
+    text-decoration-color: var(--main-m1);
+  }
+  .markdown-container a::after {
+    content: '';
+    width: 16px; height: 16px;
+    background: currentColor;
+    mask: url('https://alva-ai-static.b-cdn.net/icons/go-l.svg') center / contain no-repeat;
+    -webkit-mask: url('https://alva-ai-static.b-cdn.net/icons/go-l.svg') center / contain no-repeat;
+    display: inline-block; vertical-align: middle;
+    margin-left: 4px; flex-shrink: 0;
+  }
+
+  /* Medium size modifier */
+  .markdown-container--m { gap: 8px; }
+  .markdown-container--m h1 {
+    font-size: 18px; line-height: 28px; letter-spacing: 0.18px; padding-top: 2px;
+  }
+  .markdown-container--m h2 {
+    font-size: 16px; line-height: 26px; letter-spacing: 0.16px; padding-top: 2px;
+  }
+  .markdown-container--m h3 {
+    font-size: 14px; line-height: 22px; letter-spacing: 0.14px; padding-top: 0;
+  }
+  .markdown-container--m h4,
+  .markdown-container--m h5,
+  .markdown-container--m h6 {
+    font-size: 14px; line-height: 22px; letter-spacing: 0.14px;
+  }
+  .markdown-container--m p,
+  .markdown-container--m li {
+    font-size: 14px; line-height: 22px; letter-spacing: 0.14px;
+  }
+  .markdown-container--m li { padding-left: var(--spacing-l); }
+  .markdown-container--m ul > li::before { left: 7.5px; top: 8.5px; }
+  .markdown-container--m ol > li::before {
+    font-size: 14px; line-height: 22px; width: 20px;
+  }
+  .markdown-container--m ul,
+  .markdown-container--m ol { gap: 4px; }
+  .markdown-container--m th,
+  .markdown-container--m td {
+    font-size: 14px; line-height: 22px; letter-spacing: 0.14px;
+    padding: 10px 8px;
+  }
+  .markdown-container--m code { padding: 1px 8px; }
+  .markdown-container--m pre {
+    font-size: 12px; line-height: 20px; letter-spacing: 0.12px;
+  }
+  .markdown-container--m a::after { width: 14px; height: 14px; }
+</style>
+</head>
+<body>
+<div class="playbook-container">
+
+
+  <div id="timeline">
+    <div class="loading">Loading timeline...</div>
+  </div>
+
+</div>
+
+<!-- ── README Modal ── -->
+<div class="readme-modal" id="readme-modal" hidden>
+  <div class="readme-backdrop" data-readme-close></div>
+  <div class="readme-dialog" role="dialog" aria-modal="true" aria-labelledby="readme-title">
+    <header class="readme-header">
+      <h2 id="readme-title" class="readme-title">About this playbook</h2>
+      <button class="readme-close" data-readme-close aria-label="Close"></button>
+    </header>
+    <div class="readme-body markdown-container markdown-container--m" id="readme-body"></div>
+  </div>
+</div>
+
+<script type="application/json" id="playbook-config">
+{
+  "topic": {
+    "name": "AI Chip Supply Chain",
+    "description": "Monitoring TSMC, SMIC, HBM memory, AI accelerator capacity, and delivery timelines. Emphasis on supply-chain disruption (sanctions, fires, geopolitics, capacity planning) rather than daily share-price moves."
+  },
+  "sources": [
+    { "type": "news",    "query": "TSMC OR SMIC OR HBM memory OR AI chip supply", "lookback_hours": 24 },
+    { "type": "social",  "query": "TSMC capacity OR SMIC sanctions OR HBM shortage", "lookback_hours": 24 },
+    { "type": "podcast", "query": "semiconductor supply chain", "lookback_hours": 168 }
+  ],
+  "cadence": { "mode": "digest", "cron": "0 12 * * *", "quiet_day_policy": "ping" },
+  "audience": "followers",
+  "angle": "Focus on macro supply-chain disruption and capacity signals. Opinionated — tell the reader what to watch next, not just what happened. Every factual claim must cite its source. No buy/sell/price targets.",
+  "output_style": { "length": "medium", "tone": "opinionated", "must_cite": true, "model": "claude-sonnet-4-6" },
+  "relevance_filter": { "mode": "hybrid", "semantic_model": "claude-haiku-4-5", "batch_size": 15 },
+  "dedupe_window_hours": 48
+}
+</script>
+
+<script>
+(async function () {
+  const md = window.markdownit({ html: true, linkify: true, breaks: false });
+  const USERNAME = "leoz";
+  const FEED_PATH = `/alva/home/${USERNAME}/feeds/ai-chip-supply-chain-deep/v1/data/notifications/events/@last/50`;
+  const endpoint = (typeof ALVA_ENDPOINT !== "undefined" && ALVA_ENDPOINT)
+    ? ALVA_ENDPOINT
+    : "https://api-llm.prd.alva.ai";
+  const url = `${endpoint}/api/v1/fs/read?path=${encodeURIComponent(FEED_PATH)}`;
+
+
+  // ── Timeline ──
+  const timelineEl = document.getElementById("timeline");
+  let events;
+  try {
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    events = await resp.json();
+  } catch (e) {
+    timelineEl.innerHTML = `<div class="error-banner">Failed to load timeline: ${e.message}</div>`;
+    return;
+  }
+  if (!Array.isArray(events) || events.length === 0) {
+    timelineEl.innerHTML = `<div class="empty">No notifications yet. First fire at 12:00 UTC.</div>`;
+    return;
+  }
+  events.reverse();
+
+  function fmtEst(ms) {
+    const d = new Date(ms);
+    return d.toLocaleString("en-US", {
+      timeZone: "America/New_York",
+      hour: "numeric", minute: "2-digit", hour12: true,
+    }) + " ET";
+  }
+  function dayLabel(ms) {
+    const d = new Date(ms);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const dd = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    if (dd === today) return "Today";
+    if (dd === today - 86400_000) return "Yesterday";
+    return d.toLocaleDateString("en-US", { weekday:"short", month:"short", day:"numeric" });
+  }
+  function fmtRelative(ms) {
+    const diff = Date.now() - ms;
+    const h = Math.floor(diff / 3600_000);
+    if (h < 24) return `${h}h ago`;
+    return `${Math.floor(h / 24)}d ago`;
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;",
+    }[c]));
+  }
+  function sourceIcon(source, url) {
+    const s = String(source || "").toLowerCase();
+    if (s === "social" || s === "x" || s === "twitter") {
+      return { src: "https://alva-ai-static.b-cdn.net/icons/logo-feed-x.svg", noRadius: false };
+    }
+    if (s === "podcast") {
+      return { src: "https://alva-ai-static.b-cdn.net/icons/logo-social-podcast.svg", noRadius: false };
+    }
+    if (s === "youtube") {
+      return { src: "https://alva-ai-static.b-cdn.net/icons/logo-social-youtube.svg", noRadius: true };
+    }
+    if (s === "news") {
+      try {
+        const host = new URL(url).hostname;
+        return { src: `https://www.google.com/s2/favicons?domain=${host}&sz=64`, noRadius: false };
+      } catch (e) { return { src: "", noRadius: false }; }
+    }
+    return { src: "", noRadius: false };
+  }
+  function renderBodyWithCites(body, citations) {
+    const citMap = new Map(citations.map(c => [c.ref, c]));
+    const html = md.render(body);
+    return html.replace(/\[(\d+)\]/g, (m, n) => {
+      const c = citMap.get(+n);
+      if (!c) return m;
+      const title = escapeHtml(`${c.source}: ${(c.claim || '').slice(0, 140)}`);
+      return `<a class="cite-ref" href="${c.url}" target="_blank" rel="noopener noreferrer" title="${title}">[${n}]</a>`;
+    });
+  }
+
+  let lastDay = null;
+  let html = "";
+  for (const ev of events) {
+    const label = dayLabel(ev.date);
+    if (label !== lastDay) {
+      html += `<div class="day-separator"><span class="day-separator-label">${label}</span></div>`;
+      lastDay = label;
+    }
+
+    const pushed = ev.delivery && ev.delivery.pushed;
+    const reason = ev.delivery && ev.delivery.reason;
+    if (!pushed) {
+      html += `<article class="widget-card notif-card notif-card--skipped">
+        <header class="notif-card-header">
+          <time class="notif-time">${fmtEst(ev.date)}</time>
+          <span class="notif-status">
+            <span class="notif-status-dot status-skipped"></span>
+            <span class="notif-mode">${ev.trigger_mode || "digest"} · skipped (${reason || "n/a"})</span>
+          </span>
+        </header>
+      </article>`;
+      continue;
+    }
+
+    const bodyHtml = renderBodyWithCites(ev.body || "", ev.citations || []);
+    const matches = ev.matches || [];
+    const matchesHtml = matches.slice(0, 20).map(m => {
+      const ic = sourceIcon(m.source, m.url);
+      const iconHtml = ic.src
+        ? `<img class="match-source-icon${ic.noRadius ? ' no-radius' : ''}" src="${ic.src}" alt="" onerror="this.style.visibility='hidden'">`
+        : "";
+      return `
+      <a class="match-row" href="${m.url}" target="_blank" rel="noopener noreferrer">
+        <span class="match-source">${iconHtml}<span>${m.source}</span></span>
+        <span class="match-title">${escapeHtml(m.title)}</span>
+        <time class="match-ts">${fmtRelative(m.ts)}</time>
+      </a>`;
+    }).join("");
+
+    html += `<article class="widget-card notif-card">
+      <header class="notif-card-header">
+        <time class="notif-time">${fmtEst(ev.date)}</time>
+        <span class="notif-status">
+          <span class="notif-status-dot status-pushed"></span>
+          <span class="notif-mode">${ev.trigger_mode || "digest"} · pushed</span>
+        </span>
+      </header>
+      <h2 class="notif-push-line">${escapeHtml(ev.push_line || "")}</h2>
+      <div class="notif-body markdown-container markdown-container--m">${bodyHtml}</div>
+      <footer class="notif-cite-row">
+        <button class="notif-sources-toggle" type="button" aria-expanded="false" onclick="const m=this.nextElementSibling; m.classList.toggle('hidden'); this.setAttribute('aria-expanded', String(!m.classList.contains('hidden')));">
+          <span>Sources (${matches.length})</span>
+          <span class="notif-sources-arrow" aria-hidden="true"></span>
+        </button>
+        <div class="notif-matches hidden">${matchesHtml}</div>
+      </footer>
+    </article>`;
+  }
+  timelineEl.innerHTML = html;
+})();
+</script>
+</body>
+</html>

@@ -12,7 +12,7 @@ replay** of past pushes — not an analytical dashboard.
 > **Highest-priority standard — strictly follow. Template iterates; always
 > work from the latest version of this file.**
 
-Gotchas that bite first-time implementors are codified in §14.1 "Known
+Gotchas that bite first-time implementors are codified in §14.7 "Known
 platform quirks" — scan that table before writing code.
 
 ---
@@ -36,6 +36,26 @@ design system — never re-spec a token or base that already exists.
 
 ---
 
+## 0.1 Reference implementation (start here)
+
+A working timeline UI lives at `example/index.html` next to this file —
+**copy it directly.** Change `USERNAME` + `FEED_PATH` + `playbook-config`
+JSON + the title; leave the rest. It already encodes the design system,
+markdown-it body rendering, README modal, source-icon resolver, day
+separators, and pushed/skipped cards. §10 and §11 only document what's
+AI Digest-unique on top — do not re-derive the layout from them.
+
+The feed-side scaffold lives in §14, built around a single
+`@alva/alvaask` call with live-search tools (the model does its own
+fetch + relevance + grounding, guided by a strict prompt). §6–§9 are
+the behavior contract; §14 shows the smallest shape that satisfies it.
+
+The §7 multi-stage pipeline is still valid for cases where you need
+explicit source adapters or upstream feeds — pick whichever fits your
+sources, but ship the §14 shape unless you have a reason to fork.
+
+---
+
 ## Component Index
 
 Read in this order:
@@ -56,7 +76,7 @@ Read in this order:
 - [Push plumbing](#9-push-plumbing) — deterministic payload derivation.
 - [Page Layout](#10-page-layout) and [Components](#11-components-ai-digest-unique)
   — feed-first timeline UI.
-- [Hard Rules](#13-hard-rules) and [Known platform quirks](#141-known-platform-quirks-v1-test-findings-codified)
+- [Hard Rules](#13-hard-rules) and [Known platform quirks](#147-known-platform-quirks-v1-test-findings-codified)
   — scan before implementation.
 
 ---
@@ -828,202 +848,54 @@ for followers, `alva release feed` is mandatory or pushes arrive empty.
 
 ## 10. Page Layout
 
-**Single vertical scroll.** No tabs. No filters. No snapshot picker. The
-timeline *is* the navigation.
+**Use `example/index.html` directly.** It's the canonical layout; do not
+re-derive it from this section.
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│ ─── Today ───────────────────────────────────────────        │
-│ ┌─────────────────────────────────────────────┐              │
-│ │ 12:00 EST · 🟢 pushed · digest              │              │
-│ │ ## <push_line>                              │              │
-│ │ <body rendered as markdown>                 │              │
-│ │ <citations row: [1] [2] [3] …>              │              │
-│ │ Sources ⌄                                   │              │
-│ └─────────────────────────────────────────────┘              │
-│                                                              │
-│ ─── Yesterday ───────────────────────────────────            │
-│ ┌ 12:00 EST · ⚪ skipped (quiet day) ⌄ ┐                     │
-│ └────────────────────────────────────────┘                   │
-│                                                              │
-│ … Load more (infinite scroll or explicit button)             │
-└──────────────────────────────────────────────────────────────┘
-```
+The rules the example already encodes — keep them when you adapt:
 
-- Container: `.playbook-container` from `design-system.md` (no re-spec).
-- Reverse chronological; today on top, load older on scroll.
-- Read `digest/events/@last/50` on initial render; paginate with
-  additional `@last/N` reads.
-- **No live recomputation.** The HTML is a view over stored records — if
-  nothing in the feed changed, the page renders identically.
-- **No in-page header chrome.** Do not add a template-owned topic header,
-  source-pill row, cadence badge, README button, or methodology block before
-  the feed. The outer playbook shell owns title, subscription, and metadata
-  surfaces. If methodology is needed, expose it through that secondary surface,
-  not above the timeline.
+- Single vertical scroll. No tabs, filters, or snapshot picker. The
+  timeline *is* the navigation.
+- Container: `.playbook-container` on top of `design-tokens.css`.
+- Reverse chronological; today on top, older days below; day separators
+  in EST (`Today` / `Yesterday` / `Mon, Apr 14`).
+- Read `<group>/<doc>/@last/N` on initial render (example uses
+  `notifications/events/@last/50`). No live recomputation — the HTML is
+  a view over stored records.
+- No in-page header chrome above the feed. The outer playbook shell owns
+  title, subscription, and metadata. If you need methodology, render it
+  through the README modal already wired in `example/index.html`, not as a
+  banner above the timeline.
+
+To adapt: change `USERNAME`, `FEED_PATH`, `<title>`, and the
+`#playbook-config` JSON block. Leave the rest.
 
 ---
 
 ## 11. Components (AI Digest-unique)
 
-Everything else reuses the shared design system and `design-components.md` —
-do not re-spec markdown containers, pill primitives, or typography.
+The full markup and CSS for these components live in `example/index.html`.
+This section names them and notes the contract — don't re-spec the styles.
 
-### AI Digest Card
+- **Notification card** (`.notif-card`) — primary component, two states:
+  `pushed` (full body) and `skipped` (collapsed header). Both render from
+  the same event record.
+- **Cite refs** (`.cite-ref`) — inline `[N]` anchors generated by
+  replacing `[N]` markers in the rendered markdown body. Hover tooltip
+  shows `citations[N].source` + `claim`; link to `citations[N].url` when
+  present.
+- **Sources toggle** (`.notif-sources-toggle` / `.notif-matches`) — click
+  to expand the match list under each pushed card.
+- **Match row** (`.match-row`) — grid: source icon + label, title, and
+  relative timestamp. Source-icon resolver (`sourceIcon()` in
+  `example/index.html`) handles X/podcast/youtube/news favicons.
+- **Day separator** (`.day-separator`) — one per calendar day (EST).
+- **README modal** (`.readme-modal`) — methodology surface for the
+  outer shell to open. Body content can be derived from
+  `#playbook-config` JSON (topic, sources, cadence, angle, models).
 
-The primary component. Two states: `pushed` (full body) and `skipped`
-(collapsed header only). Both render from the same `digest/events`
-record.
-
-```html
-<article class="digest-card digest-card--pushed">
-  <header class="digest-card-header">
-    <time class="digest-time">12:00 EST</time>
-    <span class="digest-status-dot status-pushed"></span>
-    <span class="digest-mode">digest</span>
-  </header>
-  <h3 class="digest-push-line">{{push_line}}</h3>
-  <div class="digest-body markdown-container --m">{{rendered body with [N] anchors}}</div>
-  <footer class="digest-cite-row">
-    <button class="digest-sources-toggle">Sources <span class="caret">⌄</span></button>
-    <div class="digest-matches hidden">…match list…</div>
-  </footer>
-</article>
-```
-
-The rendered body replaces each `[N]` marker with an inline anchor:
-
-```html
-<sup class="cite-ref" data-ref="1" tabindex="0">[1]</sup>
-```
-
-On hover / focus, a popover shows `citations[N].source` + `claim`; link to
-`citations[N].url` only when present. For structured facts, show
-`citations[N].source_ref` instead. Keyboard-accessible via `tabindex`.
-
-```css
-.digest-card { background: var(--b0-container); border: 0.5px solid var(--line-l2);
-  border-radius: var(--radius-ct-l); padding: var(--spacing-l) var(--spacing-xl);
-  margin-bottom: var(--spacing-m); transition: border-color .15s; }
-.digest-card:hover { border-color: var(--line-l07); }
-.digest-card-header { display:flex; align-items:center; gap: var(--spacing-s);
-  font-size:12px; color: var(--text-n5); margin-bottom: var(--spacing-s); }
-.digest-time { font-variant-numeric: tabular-nums; }
-.digest-status-dot { width:8px; height:8px; border-radius:50%; }
-.status-pushed  { background: var(--main-m3); }
-.status-skipped { background: var(--text-n3); }
-.digest-mode { text-transform: lowercase; letter-spacing: 0.12px; }
-
-.digest-push-line { font-size:16px; line-height:24px; font-weight:500;
-  color: var(--text-n9); margin: 0 0 var(--spacing-s); letter-spacing: 0.16px; }
-
-.digest-body { font-size:14px; line-height:22px; color: var(--text-n8);
-  letter-spacing: 0.14px; }
-.digest-body .cite-ref { color: var(--main-m1); margin-left:2px; cursor:pointer;
-  font-size:11px; vertical-align: super; line-height:1; }
-.digest-body .cite-ref:hover { text-decoration: underline; }
-
-.digest-cite-row { margin-top: var(--spacing-s); padding-top: var(--spacing-s);
-  border-top: 1px dashed var(--line-l07); }
-.digest-sources-toggle { background:transparent; border:none; cursor:pointer;
-  font-size:12px; color: var(--text-n5); padding:0; display:inline-flex;
-  align-items:center; gap: var(--spacing-xxs); }
-.digest-sources-toggle:hover { color: var(--main-m1); }
-.digest-matches { margin-top: var(--spacing-s); display:flex; flex-direction:column;
-  gap: var(--spacing-xxs); font-size:12px; }
-.digest-matches.hidden { display:none; }
-
-/* Skipped state: dimmed, collapsed to header only */
-.digest-card--skipped { background: transparent; border-style: dashed;
-  padding: var(--spacing-s) var(--spacing-m); }
-.digest-card--skipped .digest-push-line,
-.digest-card--skipped .digest-body,
-.digest-card--skipped .digest-cite-row { display: none; }
-.digest-card--skipped .digest-card-header { color: var(--text-n3); margin-bottom: 0; }
-.digest-card--skipped .digest-card-header::after {
-  content: attr(data-skip-reason); color: var(--text-n3);
-  font-size: 11px; margin-left: auto; }
-```
-
-### Match Popover
-
-On "Sources" click, toggle `.digest-matches.hidden`. Each row:
-
-```html
-<a class="match-row" href="{{match.url}}" target="_blank" rel="noopener">
-  <span class="match-source">news</span>
-  <span class="match-title">{{match.title}}</span>
-  <time class="match-ts">{{fmtRelative(match.ts)}}</time>
-</a>
-```
-
-```css
-.match-row { display:grid; grid-template-columns: 60px 1fr auto;
-  gap: var(--spacing-s); align-items:center;
-  padding: var(--spacing-xxs) var(--spacing-xs); border-radius: var(--radius-ct-s);
-  text-decoration:none; color: var(--text-n7); transition: background .15s; }
-.match-row:hover { background: var(--grey-g01); color: var(--text-n9); }
-.match-source { font-size:10px; text-transform:uppercase;
-  letter-spacing:0.5px; color: var(--text-n5); }
-.match-title { font-size:12px; line-height:18px;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.match-ts { font-size:11px; color: var(--text-n5); font-variant-numeric: tabular-nums; }
-```
-
-### Day Separator
-
-One divider per calendar day (EST) — thin rule + day label. Today's
-separator reads `Today`; yesterday's `Yesterday`; older days `Mon, Apr 14`.
-
-```css
-.day-separator { display:flex; align-items:center; gap: var(--spacing-m);
-  margin: var(--spacing-xl) 0 var(--spacing-m); }
-.day-separator::before,
-.day-separator::after { content:''; flex:1; height:1px; background: var(--line-l07); }
-.day-separator-label { font-size:11px; text-transform:uppercase; letter-spacing:0.5px;
-  color: var(--text-n5); }
-```
-
-### About content (secondary surface only)
-
-If the outer playbook shell exposes an "about" or README surface, derive its
-content from `CONFIG`. Do not render this block above or below the main feed.
-
-```
-## About this playbook
-
-An AI Digest tracking <topic.name>.
-<topic.description>
-
-### Sources
-- **news** — <news source details>
-- **social** — <social source details>
-- **podcast** — <podcast source details>
-- (…)
-
-### Optional entities & enrichment
-Only render this section when `CONFIG.entities` or `CONFIG.enrichment` exists.
-- Entities: <entity aliases from CONFIG.entities>
-- Context facts: <enrichment sources and thresholds from CONFIG.enrichment / push_policy>
-
-### Cadence
-<humanized cron> · quiet-day policy: <quiet_day_policy> · dedupe: <dedupe_window_hours> h
-
-### Angle
-<angle verbatim>
-
-### How it works
-Every run: fetch → optionally enrich with Alva context facts → relevance filter
-(keyword + batched semantic yes/no) → dedupe against the configured window →
-materiality check → daily push-cap check → generate opinionated digest via
-<generation_model> → grounding check (every number traces to a match or
-optional context fact, every claim carries [N]) → write the configured delivery
-sidecar.
-
-### Models
-- Generation: `<generation_model>`
-- Relevance filter: `<relevance_model>` (batched 15 items / call)
-```
+Everything else reuses the shared design system and
+`design-components.md` (markdown container, pills, typography). Do not
+re-spec what those already provide.
 
 ---
 
@@ -1069,75 +941,109 @@ claim sub-minute delivery guarantees.
 
 ---
 
-## 14. Minimal feed-script scaffold
+## 14. Feed-script scaffold — single-call `@alva/alvaask`
 
-Reference shape — copy, trim, adapt. **No `FeedAltra`, no `@alva/adk`.**
-All LLM calls go through `@alva/alvaask`'s `ask()` (§8).
+The lowest-code AI Digest is **one `ask()` call per fire**: the model
+runs its own search, filters, and writes grounded JSON, guided by a
+strict prompt. Use this shape unless you need explicit source adapters
+or structured numbers (§14.3).
+
+### 14.1 The `ask()` contract
 
 ```javascript
-const { Feed, feedPath, makeDoc, str, num, bool, obj, arr, fld } = require("@alva/feed");
 const { ask } = require("@alva/alvaask");
-const http = require("net/http");
-const { getSerperSearch } = require("@arrays/data/search/serper-search:v1.0.0");
-const { searchGrokX }    = require("@arrays/data/search/search-grok-x:v1.0.0");
-
-const CONFIG = { /* … see §4 … */ };
-
-const feed = new Feed({ path: feedPath("<playbook-name>") });
-
-feed.def("digest", {
-  events: makeDoc("AI Digest Events", "One record per cron fire", [
-    obj("delivery", [bool("pushed"), str("reason")]),
-    obj("materiality", [bool("is_material"), str("reason")]),
-    str("push_line"),
-    str("body"),
-    arr("citations", [num("ref"), str("claim"), str("url"), str("source"), str("source_ref")]),
-    arr("matches", [str("source"), str("url"), str("title"), num("ts"), str("snippet"), fld("meta", "object")]),
-    // Optional §5 enrichment. Keep the field so event records stay stable;
-    // write [] in the lightweight default path.
-    arr("context_facts", [
-      str("ref_id"), str("source"), str("label"), str("value"),
-      num("ts"), str("evidence"), str("url"),
-    ]),
-    arr("dedupe_keys", [str("key")]),        // NOTE: wrapped; Feed SDK arr() can't take primitives
-    str("source"),
-  ]),
+const { text } = ask(userPrompt, {
+  system: "<persona + must-use-live-search + JSON-only>",
+  model: "claude-sonnet-4-6",   // full Alva ID; "sonnet" / dated IDs rejected
 });
-// When audience: "followers":
-feed.def("signal", {
-  targets: makeDoc("Signal Targets", "Push payload for followers", [
-    obj("instruction", [str("type"), arr("weights", [str("symbol"), num("weight")])]),
-    obj("meta", [str("reason")]),
-  ]),
-});
+```
+
+- **Synchronous.** Do not `await`. Parallelism = multiple call sites, not `Promise.all`.
+- **`text` is raw.** May come fenced as ```` ```json ```` or with stray prose. Extract tolerantly:
+  ```javascript
+  const fence = text.match(/```(?:json)?\s*\n([\s\S]*?)\n```/);
+  const parsed = JSON.parse(fence ? fence[1] : text);
+  ```
+- **Live search is on by default.** The system prompt MUST mandate tool use and forbid training-data recall — otherwise the digest silently cites year-old articles.
+- **No `@alva/adk`.** `ask()` is the only LLM path for this template (relevance batching in §7.2 and digest generation both).
+
+### 14.2 Prompt shape
+
+Five sections, in order: (1) ISO `now` + lookback window, (2) scope +
+named entities, (3) sourcing rules with **year discipline** — every
+`match.ts` must fall in the window; older items are disqualified even
+if topical, (4) exact JSON schema in a fenced code block with word
+budgets and citation discipline spelled out, (5) a final self-check
+("count words, verify citations are 1-indexed and contiguous"). The
+self-check goes last because models follow checklists best when they
+sit immediately before the output instruction.
+
+### 14.3 Server-side gates after `ask()`
+
+The model will sometimes cite stale items or repeat yesterday's news.
+Three gates run in JS before writing the record:
+
+1. **Freshness** — drop `match.ts < now - 48h`; if < 3 fresh remain, swap to a "quiet day" body.
+2. **Dedupe** — 7-day rolling `dedupe_keys` in `ctx.kv`. All-seen → write `delivery.pushed=false`, no push.
+3. **Throttle** — `lastRunMs` in `ctx.kv` short-circuits replays/double-deploys.
+
+### 14.4 Skeleton
+
+```javascript
+const { Feed, feedPath, makeDoc, str, num, bool, obj, arr } = require("@alva/feed");
+const { ask } = require("@alva/alvaask");
+
+const feed = new Feed({ path: feedPath("<your-playbook-name>") });
+feed.def("notifications", { events: makeDoc("AI Digest Events", "", [/* see example */]) });
+feed.def("signal",        { targets: makeDoc("Push Signal", "",      [/* see example */]) });
 
 (async () => {
   await feed.run(async (ctx) => {
-    const now = (ctx.args && ctx.args.now) ? Number(ctx.args.now) : Date.now();
+    const now = Date.now();
 
-    // 1. FETCH
-    const matches = await fetchAllSources(CONFIG.sources, now);
+    // throttle
+    const lastRun = Number(await ctx.kv.load("lastRunMs")) || 0;
+    if (lastRun && now - lastRun < 6 * 3600_000) return;
 
-    // 2. ENRICH  (optional; leave [] unless CONFIG.enrichment is enabled — see §5)
-    const contextFacts = CONFIG.enrichment
-      ? await enrichContextFacts(CONFIG.enrichment, now)
-      : [];
+    // one LLM call — model fetches, filters, grounds, writes JSON
+    const { text } = ask(buildPrompt(now), { system: SYSTEM_PROMPT, model: "claude-sonnet-4-6" });
+    const parsed = extractJson(text);
 
-    // 3. RELEVANCE FILTER  (batched ask() — see §7.2)
-    const relevant = matches.length
-      ? filterRelevanceBatch(matches, CONFIG.topic, CONFIG.relevance_model)
-      : [];
+    // freshness + dedupe gates (§14.3)
+    const fresh = (parsed.matches || []).filter(m => Number(m.ts) >= now - 48 * 3600_000);
+    const seen = JSON.parse((await ctx.kv.load("seenKeys")) || "{}");
+    const allOldDup = (parsed.dedupe_keys || []).length > 0
+      && (parsed.dedupe_keys || []).every(d => seen[d.key]);
+    const tooStale = fresh.length < 3;
+    if (tooStale) Object.assign(parsed, quietDayPayload());
 
-    // 4. DEDUPE  (ctx.self.ts(...).last(n), NOT .read({limit}))
-    const { newMatches, dedupeKeys } = await dedupe(ctx, relevant, now);
+    // always write event; push only when material
+    const record = { date: now, /* …push_line, body, citations, matches, dedupe_keys… */
+      delivery: { pushed: !allOldDup && !tooStale, reason: ... } };
+    await ctx.self.ts("notifications", "events").append([record]);
+    if (record.delivery.pushed) {
+      await ctx.self.ts("signal", "targets").append([{ date: now,
+        instruction: { type: "allocate", weights: [] },
+        meta: { reason: `${record.push_line}\n\n→ ${PLAYBOOK_URL}` } }]);
+    }
 
-    // 5-9. MATERIALITY + RATE LIMIT + GENERATE + GROUND + WRITE/DELIVER  (see §7.4, §8, §9)
-    await dispatch(ctx, { newMatches, contextFacts, dedupeKeys, now });
+    // persist dedupe + throttle
+    for (const d of parsed.dedupe_keys || []) seen[d.key] = now;
+    await ctx.kv.put("seenKeys", JSON.stringify(seen));
+    await ctx.kv.put("lastRunMs", String(now));
   });
 })();
 ```
 
-**Deploy (followers push):**
+### 14.5 When to leave the single-call shape
+
+Layer adapters in front of `ask()` and pass results as `INPUT_MATCHES` /
+`CONTEXT_FACTS` (§8) when you need: fixed-handle subscriptions web
+search misses (KOL feeds, subreddits, podcast RSS), structured Alva
+numbers that must be quoted verbatim (§5), or threshold watches where
+the trigger is a deterministic JS check.
+
+### 14.6 Deploy
 
 ```bash
 alva fs grant --path '~/feeds/<name>' --subject 'special:user:*' --permission read
@@ -1147,7 +1053,7 @@ alva release feed --name <name> --version 1.0.0 --cronjob-id <ID> \
   --description "<one-sentence playbook purpose>"
 ```
 
-### 14.1 Known platform quirks (v1 test findings, codified)
+### 14.7 Known platform quirks (v1 test findings, codified)
 
 Surface of practical issues that surprised v1 implementors — if any bite
 you during build, it's a template bug, not your bug.
@@ -1161,9 +1067,3 @@ you during build, it's a template bug, not your bug.
 | FeedAltra | Pure AI Digest feeds use plain `Feed` even when writing `signal/targets` (see §6). |
 | Outbound HTTP | Runtime's outbound proxy occasionally resets external fetches (iTunes, Serper). Wrap source adapters in a 1-retry loop; treat a failed source as "no matches", not fatal. |
 | SDK discovery | Always `alva sdk doc --name <module>` before writing a new source adapter. Function names drift (e.g. `getSerperSearch`, not `searchSerper`). |
-
-Full reference implementation will live in
-`templates/ai-digest/reference-playbook/` once the first real
-AI Digest ships — treat that as the living example, and update
-few-shot packs + the `dispatch` orchestration there rather than in this
-template file.
