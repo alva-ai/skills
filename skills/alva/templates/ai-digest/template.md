@@ -125,11 +125,49 @@ that materially affect the feed:
 | Decision | Ask for | Why it matters |
 |---|---|---|
 | Topic boundary | What should this track, and what should it exclude? | Prevents broad keyword slop. |
-| Sources | Topic search, fixed handles/channels, upstream feeds, market signals, or a mix? | Chooses `unified_search` vs `feed_widgets` and adapters. |
+| Sources | Optional but useful: paste sources you already trust — RSS feeds, newsletters, podcasts, YouTube channels, websites, X handles, subreddits, upstream Alva feeds, or plain text source names. If skipped, the agent researches a source plan first. | Makes the digest match the user's actual information diet, and chooses `unified_search` vs `feed_widgets` and adapters. |
 | Cadence / trigger | How often should it summarize or check? For thresholds, what exact condition matters? | Sets cron and materiality. |
 | Audience | Followers or owner only? | Chooses `signal/targets` vs `notify/message`. |
 | Angle | What kind of take should the update have? | Drives the generation prompt and voice. |
 | Worth-pushing bar | What counts as material enough to notify? | Reduces noisy pushes. |
+
+### Source Preference Contract — optional, not a blocker
+
+Ask once, gently. Do not turn source collection into a required form. Good
+wording:
+
+> Optional but useful: paste sources you already check. Any shape is fine —
+> RSS/blog URLs, podcast or YouTube links, websites, newsletters, X handles,
+> subreddits, Telegram/channel names, upstream Alva feeds, or just names. If
+> you skip this, I will research and propose sources first.
+
+Classify user-provided sources into the CONFIG draft instead of asking the user
+to speak schema:
+
+- `must_include`: check this source on every run when technically possible.
+- `prioritize`: prefer this source when relevant, but do not force off-topic
+  items into the digest.
+- `background`: useful context, not a required source every run.
+- `exclude`: domains/accounts/topics the user does not want.
+
+Only mark a source as `provided_by_user: true` when the user actually supplied
+it. Model-researched sources should keep `provided_by_user: false` or omit the
+field. This distinction matters later: user-provided sources are a preference
+signal, not proof that every item from that source is material or correct.
+
+Use broad news/social search for recall, but prefer sources likely to carry
+original signal. Ranking order:
+
+1. User-provided `must_include` / `prioritize` sources, when fresh and relevant.
+2. Primary or owned sources: official blogs, docs, filings, newsroom RSS,
+   research notes, project/company updates.
+3. Specialist recurring sources: RSS/newsletters, podcasts, YouTube channels,
+   analyst blogs, niche sites, subreddits with strong moderation.
+4. Mainstream news and broad web search.
+5. Social search, mainly for discovery, sentiment, and early chatter.
+
+Do not over-trust source class alone. A stale podcast episode, promotional
+YouTube recap, or SEO repost still loses to a fresh primary document.
 
 ### Skip path — model plans first, user confirms
 
@@ -149,8 +187,9 @@ Default assumptions for the skip path:
 
 - `entities`: infer only obvious tickers/assets/companies/protocols/series;
   do not ask for or add entities just to make the config look richer.
-- `sources`: start with `news` + `social`; add `podcast`, `youtube`, `reddit`,
-  or `feed_widgets` only when the topic clearly benefits from them.
+- `sources`: apply the Source Preference Contract above. Preserve user-provided
+  sources with `provided_by_user: true`; otherwise research durable high-signal
+  sources before falling back to broad `news` + `social`.
 - `enrichment`: leave empty by default. Add structured Alva data only when it
   changes push quality: price/volume moves, fundamentals, earnings/filings,
   funding/open interest, on-chain flows, macro releases, or an upstream feed.
@@ -170,6 +209,8 @@ End intake with a short, reviewable `CONFIG` draft using the exact key shape in
 §4. Include only the decisions that matter: topic boundary, source list,
 cadence + quiet-day policy, audience, angle, and any non-default model choice.
 Show optional entities/enrichment only when they materially improve the push.
+For sources, include `provided_by_user` and `priority` only when they add useful
+provenance or weighting; do not clutter every generic search source with flags.
 
 Do not turn intake into a long questionnaire. The purpose is to make the
 AI Digest useful, not to collect perfect requirements.
@@ -212,10 +253,17 @@ const CONFIG = {
   },
 
   // Every source produces a normalized match: {source, url, title, ts, snippet, ...meta}
+  // Add provided_by_user: true only when the user pasted or named that source.
+  // priority is optional: "must_include" | "prioritize" | "background".
   sources: [
+    { type: "rss",     url: "https://www.semianalysis.com/feed", label: "SemiAnalysis", lookback_hours: 72 },
+    { type: "youtube", url: "https://www.youtube.com/@Asianometry", label: "Asianometry", lookback_hours: 168 },
     { type: "news",    query: "TSMC OR SMIC OR HBM3 OR NVIDIA supply", lookback_hours: 24 },
-    { type: "social",  query: "$NVDA capacity OR shortage",            lookback_hours: 24, min_engagement: 50 },
-    { type: "podcast", query: "AI chip supply chain OR semiconductor capacity", lookback_hours: 72 },
+    { type: "social",  query: "$NVDA capacity OR shortage", lookback_hours: 24, min_engagement: 50 },
+  ],
+
+  source_exclusions: [
+    "low-quality repost sites",
   ],
 
   cadence: {
@@ -252,11 +300,15 @@ Optional fields, used only when they materially improve the push:
   protocols, people, or macro series.
 - `enrichment`: structured Alva/BYOD/upstream facts that enter grounding as
   `context_facts[]`; keep it lean.
+- `source_exclusions`: short list of domains, accounts, source classes, or
+  topic traps to avoid when the user names them. Keep exclusions human-readable;
+  implement concrete domain/account filters in source adapters.
 
-Additional source types (`reddit` via Brave/Serper, `youtube` via Serper
+Additional source types (`rss` via direct feed fetch, `web` / `website` via
+Serper or Brave, `reddit` via Brave/Serper, `youtube` via Serper
 `site:youtube.com`, fixed-handle `feed_widgets`) follow the same shape — see
-§7.1 for the adapter map. Structured financial context belongs in
-`enrichment`, unless the data point itself is the event being monitored.
+§7.1 for the adapter map. Structured financial context belongs in `enrichment`,
+unless the data point itself is the event being monitored.
 
 Watch-style triggers should change the minimum surface:
 
@@ -276,6 +328,11 @@ Watch-style triggers should change the minimum surface:
 - **Duplicate source types are allowed** (two `news` entries with different
   queries). Dedup happens at the match layer via URL hash, not at
   source-config layer.
+- **User source provenance is optional but valuable.** Use
+  `provided_by_user: true` only for pasted/user-named sources, and add
+  `priority` only when it changes source weighting. Do not force an irrelevant
+  user source into the digest just because it is `must_include`; stale/off-topic
+  items still fail freshness and relevance gates.
 - **Entities are optional.** If inferred during skip-path intake, keep aliases
   conservative and expose them only in secondary metadata, not the main feed.
 - **Enrichment is optional context, not dashboarding.** Add enough Alva data to
@@ -300,8 +357,8 @@ Use the lightest useful combination of:
 
 - **Entities** — tickers, assets, companies, protocols, people, macro series,
   geographies, aliases.
-- **Content matches** — news, social, Reddit, YouTube, podcasts, web, fixed
-  handles/channels.
+- **Content matches** — news, social, RSS, specialist websites, Reddit,
+  YouTube, podcasts, web, fixed handles/channels.
 - **Context facts** — structured Alva data that makes the push smarter:
   price/volume, fundamentals, filings, earnings, funding/open interest,
   on-chain flows, macro releases, or upstream feed records.
@@ -312,7 +369,7 @@ Use the lightest useful combination of:
 | Need | Use | Output |
 |---|---|---|
 | Current narratives, news, social reaction | `unified_search` (`searchGrokX`, Serper, Brave, scrape-url) | `matches[]` |
-| Fixed accounts/channels/subreddits/podcasts | `feed_widgets` | `matches[]` from subscribed streams |
+| Fixed accounts/channels/subreddits/podcasts/RSS-like streams | `feed_widgets` | `matches[]` from subscribed streams |
 | Equity / ETF / crypto market context | Alva data SDKs / Arrays APIs | `context_facts[]` |
 | Macro, rates, inflation, GDP, Treasury context | Alva macro SDKs / Arrays APIs | `context_facts[]` |
 | On-chain, DeFi, funding, exchange-flow context | Alva crypto/on-chain SDKs / Arrays APIs | `context_facts[]` |
@@ -338,6 +395,10 @@ type ContextFact = {
   ts: number;          // epoch ms for the observation
   evidence: string;    // exact text/value used for grounding
   url?: string;        // optional source URL or Alva feed/playbook URL
+
+  // Required when the fact is derived/calculated rather than a raw observation.
+  method?: string;      // concise calculation recipe, e.g. "1d close-to-close return"
+  rationale?: string;   // why this fact was used for materiality/reasoning
 };
 ```
 
@@ -347,6 +408,12 @@ answer one of two questions:
 
 1. Is this run worth pushing?
 2. What grounded number/context should the digest mention?
+
+For raw observations, `label + value + evidence` is enough. For derived facts
+used in calculation or reasoning, fill `method` and usually `rationale` so the
+Sources panel can explain not only where the number came from, but how it was
+computed and why it mattered. Keep both fields short; they are provenance, not
+a second analysis section.
 
 ### 5.3 Materiality policy
 
@@ -403,7 +470,7 @@ All three are Feed SDK time-series
 | `body` | string | Markdown with inline `[N]` reference markers. `""` on grounding failure |
 | `citations` | `[{ref, claim, url, source, source_ref}]` | One entry per `[N]` marker. `source_ref` is a match URL, `match.meta.event_key`, or, when using enrichment, `context_facts[].ref_id`. `[]` when body is `""` |
 | `matches` | `[{source, url, title, ts, snippet, meta}]` | All matches considered this fire (post-relevance, post-dedupe) |
-| `context_facts` | `[{ref_id, source, label, value, ts, evidence, url}]` | Optional structured Alva/BYOD/upstream facts used for materiality and grounding. Render cited facts as structured fact rows under Sources; do not fake them as news/social sources. `[]` in the lightweight default path. |
+| `context_facts` | `[{ref_id, source, label, value, ts, evidence, url, method?, rationale?}]` | Optional structured Alva/BYOD/upstream facts used for materiality and grounding. Use `method` / `rationale` for derived calculations so cited facts explain the calculation and why it mattered. Render cited facts as structured fact rows under Sources; do not fake them as news/social sources. `[]` in the lightweight default path. |
 | `dedupe_keys` | `Array<{key: string}>` | Hashes consumed by this record. Feed SDK's `arr()` helper can't describe primitive-string arrays; each entry is wrapped as `{key: hash}`. Declare: `arr("dedupe_keys", [str("key")])`. |
 | `source` | `"alvaask" \| "fallback"` | `"fallback"` when body is `""` |
 
@@ -502,7 +569,7 @@ Normalize every source to a common match shape:
 
 ```typescript
 type Match = {
-  source: "news" | "social" | "market" | "feed" | "podcast" | "youtube";
+  source: "news" | "social" | "market" | "feed" | "rss" | "web" | "podcast" | "youtube";
   url: string;
   title: string;
   ts: number;          // epoch ms — real publish time, NOT index time
@@ -516,11 +583,16 @@ type Match = {
 | Partition | When to use | Shape |
 |---|---|---|
 | `unified_search` | Topic-keyword search for this run — "find items about X right now" | `getSerperSearch({q, type, tbs})` / `searchGrokX({query, from_date})` / `searchBrave({...})` — one-shot queries |
-| `feed_widgets` | Subscribed stream of a **specific handle, channel, or subreddit** — "everything from @Acquired, even off-topic" | Declarative `targets[]` stream; results arrive as typed feed items over time |
+| `feed_widgets` | Subscribed stream of a **specific handle, channel, subreddit, podcast, or YouTube/RSS-style feed** — "everything from @Acquired, even off-topic" | Declarative `targets[]` stream; results arrive as typed feed items over time |
 
 **AI Digest defaults to `unified_search`** because the user's
 primary intent is topic-tracking. Only switch to `feed_widgets` when the
-config names specific handles/channels/subreddits to subscribe to.
+config names specific recurring sources to subscribe to: handles, channels,
+subreddits, podcasts, RSS feeds, or upstream Alva feeds.
+
+Apply the Source Preference Contract from §2 when ranking source results. Broad
+news/social search is useful for recall; it should not crowd out fresh primary,
+specialist, or user-provided sources.
 
 ### Module paths and function names (authoritative)
 
@@ -534,8 +606,10 @@ shown here may drift.
 | `social` | `@arrays/data/search/search-grok-x:v1.0.0` | `searchGrokX({query, from_date, to_date, max_search_results})` |
 | `market` | Alva Stock/Crypto SDKs (see `references/api/sdk.md`) | Emit a synthetic match only when the market signal itself is the event; otherwise use optional `context_facts` enrichment |
 | `feed` | Feed SDK upstream or direct ALFS read | Each upstream record becomes one match |
-| `podcast` | iTunes Search API via `net/http.fetch` | `https://itunes.apple.com/search?term=<encoded>&media=podcast&entity=podcastEpisode&limit=20` — title + description only |
-| `youtube` | `@arrays/data/search/serper-search:v1.0.0` with `site:youtube.com` in `q` | Video metadata only; no transcript fetching in v1 |
+| `rss` | Direct RSS/Atom URL via `net/http.fetch` | Parse `<item>` / `<entry>` into title, permalink, publish time, description. If parsing fails, fall back to `web` search for the source domain. |
+| `web` / `website` | `@arrays/data/search/serper-search:v1.0.0` or Brave with `site:<domain>` when a specific site is named | Use for specialist sites, newsletters without public RSS, docs, and official blogs. |
+| `podcast` | iTunes Search API via `net/http.fetch`; if the user names a specific show, prefer the show's RSS/feed page or show notes URL first | `https://itunes.apple.com/search?term=<encoded>&media=podcast&entity=podcastEpisode&limit=20` — title + description only unless show notes are fetched. |
+| `youtube` | `@arrays/data/search/serper-search:v1.0.0` with `site:youtube.com` in `q`; if the user names a channel, scope to channel/handle first | Video metadata only; no transcript fetching in v1 unless a dedicated transcript adapter is available. |
 
 **Gotchas** (drawn from v1 testing and `references/search.md`):
 
@@ -691,6 +765,8 @@ RULES
   "[N]" referencing an entry in the citations array.
 - DO NOT invent facts or numbers. If a claim lacks a source in INPUT_MATCHES
   or optional CONTEXT_FACTS, drop the claim. Empty body beats invention.
+- If a CONTEXT_FACT is derived or calculated, use its `method` / `rationale`
+  when explaining why it matters; do not invent calculation steps.
 - No buy/sell/hold recommendations; no price targets. Observation + framing.
 - push_line ≤ 160 chars, plain text (no markdown), leads with the observation.
 - body ≤ <<BODY_MAX_CHARS>> chars, markdown allowed.
@@ -705,7 +781,8 @@ MATERIALITY
 INPUT_MATCHES   // relevance-filtered, deduped
 <<MATCHES_JSON>>
 
-CONTEXT_FACTS   // optional structured Alva/BYOD/upstream facts from §5; [] by default
+CONTEXT_FACTS   // optional structured Alva/BYOD/upstream facts from §5; [] by default.
+                // Derived facts should include method/rationale.
 <<CONTEXT_FACTS_JSON>>
 
 Output strict JSON only, no preamble:
@@ -780,7 +857,7 @@ function passesGrounding(result, matches, contextFacts) {
   const numbers = [...body.matchAll(/-?\d+(\.\d+)?%?/g)].map(m => m[0]);
   const corpus = [
     matches.map(m => `${m.title}\n${m.snippet}`).join("\n"),
-    contextFacts.map(f => `${f.label}\n${f.value}\n${f.evidence}`).join("\n"),
+    contextFacts.map(f => `${f.label}\n${f.value}\n${f.evidence}\n${f.method || ""}\n${f.rationale || ""}`).join("\n"),
   ].join("\n");
   for (const n of numbers) if (!corpus.includes(n)) return false;
 
@@ -968,22 +1045,23 @@ For `audience: "followers"` the output is the `meta.reason` of a
 Skipped events appear in the timeline as dimmed/collapsed rows — useful
 for retro. Don't silently drop them.
 
-### Deploy command
+### Deploy + release command
 
 ```bash
-# Followers push (signal/targets on plain Feed; no FeedAltra)
+# Create the cron job. Same command for followers and owner-only digests;
+# CONFIG.audience controls whether the feed writes signal/targets or notify/message.
 alva deploy create --name <playbook-name> \
   --path '~/feeds/<name>/v1/src/index.js' \
   --cron "<CONFIG.cadence.cron>" --push-notify
 
-# Owner push (notify/message) — same command; platform reads notify/message too
+# Release the feed. Required for follower pushes and normal published playback.
 alva release feed --name <playbook-name> --version 1.0.0 \
   --cronjob-id <ID_FROM_DEPLOY> \
   --description "<one-sentence playbook purpose>"
 ```
 
 See `references/feed-sdk.md` Patterns D and E for the full release flow;
-for followers, `alva release feed` is mandatory or pushes arrive empty.
+for followers, the release step is mandatory or pushes arrive empty.
 
 ---
 
@@ -1029,7 +1107,8 @@ This section names them and notes the contract — don't re-spec the styles.
   relative timestamp. Source-icon resolver (`sourceIcon()` in
   `example/index.html`) handles X/podcast/youtube/news favicons.
 - **Fact row** (`.fact-row`) — structured fact row for cited
-  `context_facts[]`, showing source, label/value, and timestamp.
+  `context_facts[]`, showing source, label/value, timestamp, and optional
+  `method` / `rationale` for calculated facts.
 - **Day separator** (`.day-separator`) — one per calendar day (EST).
 
 Everything else reuses the shared design system and
@@ -1075,6 +1154,9 @@ claim sub-minute delivery guarantees.
 - **If you use structured Alva numbers, route them through `context_facts`.**
   Do not paste SDK output into prose without a fact record that grounding can
   verify.
+- **If a structured fact is calculated or used for materiality, include
+  `method` and usually `rationale`.** Sources should explain the calculation
+  path, not only the final value.
 - **Honor `max_pushes_per_day` before generation.** Rate limiting is part of the
   user promise, not a UI preference.
 
@@ -1103,28 +1185,67 @@ const { text } = ask(userPrompt, {
   const fence = text.match(/```(?:json)?\s*\n([\s\S]*?)\n```/);
   const parsed = JSON.parse(fence ? fence[1] : text);
   ```
-- **Live search is on by default.** The system prompt MUST mandate tool use and forbid training-data recall — otherwise the digest silently cites year-old articles.
+- **Live search is on by default.** The system prompt MUST mandate tool use,
+  forbid training-data recall, and instruct the model to look for high-signal
+  recurring sources (RSS/blogs, podcasts, YouTube, specialist websites,
+  official docs) before generic news/social — otherwise the digest silently
+  cites year-old or low-quality articles.
 - **No `@alva/adk`.** `ask()` is the only LLM path for this template (relevance batching in §7.2 and digest generation both).
 
 ### 14.2 Prompt shape
 
-Five sections, in order: (1) ISO `now` + lookback window, (2) scope +
-named entities, (3) sourcing rules with **year discipline** — every
-`match.ts` must fall in the window; older items are disqualified even
-if topical, (4) exact JSON schema in a fenced code block with word
-budgets and citation discipline spelled out, (5) a final self-check
-("count words, verify citations are 1-indexed and contiguous"). The
-self-check goes last because models follow checklists best when they
-sit immediately before the output instruction.
+Six sections, in order: (1) ISO `now` + lookback window, (2) scope +
+named entities, (3) user-provided source preferences, (4) sourcing rules
+with **year discipline** — every `match.ts` must fall in the window; older
+items are disqualified even if topical, (5) exact JSON schema in a fenced
+code block with word budgets and citation discipline spelled out, (6) a
+final self-check ("count words, verify citations are 1-indexed and
+contiguous"). The self-check goes last because models follow checklists best
+when they sit immediately before the output instruction.
+
+The source-preference section should include:
+
+```text
+USER_PROVIDED_SOURCES
+  <<JSON array of sources where provided_by_user=true, or []>>
+
+SOURCE_EXCLUSIONS
+  <<JSON array from CONFIG.source_exclusions, or []>>
+```
+
+The sourcing rules should explicitly bias the model toward high-signal
+recurring sources before generic search:
+
+```text
+SOURCING RULES
+- Use live search/tools. Do not rely on memory or training data.
+- Check USER_PROVIDED_SOURCES first when present. Treat them as preference,
+  not as automatic truth: stale or off-topic items must still be rejected.
+- Prefer the §2 Source Preference Contract order: user-provided, primary,
+  specialist recurring sources, mainstream web/news, then social.
+- Use broad news, web, and social search as recall/backstop, or when they
+  surface fresher primary sources.
+- Exclude SOURCE_EXCLUSIONS. Avoid SEO reposts, quote-farm summaries, and
+  low-context social repeats unless they are the event being monitored.
+- For each match, set meta.source_origin to "user" or "model" and
+  meta.source_quality to one of "primary", "specialist", "mainstream",
+  "social", or "unknown".
+```
+
+Keep this as prompt guidance, not a hard quota. The model should not pad the
+digest with podcasts or YouTube just because those classes are preferred; they
+must be fresh, relevant, and citeable.
 
 ### 14.3 Server-side gates after `ask()`
 
 The model will sometimes cite stale items or repeat yesterday's news.
 Three gates run in JS before writing the record:
 
-1. **Freshness** — drop `match.ts < now - 48h`; if < 3 fresh remain, swap to a "quiet day" body.
+1. **Freshness** — drop `match.ts < runAt - 48h`; then run materiality on the
+   remaining matches and context facts. Do not use a fixed minimum count: one
+   fresh official/user-provided/specialist item or threshold event can be enough.
 2. **Dedupe** — 7-day rolling `dedupe_keys` in `ctx.kv`. All-seen → write `delivery.pushed=false`, no push.
-3. **Throttle** — `lastRunMs` in `ctx.kv` short-circuits replays/double-deploys.
+3. **Throttle** — `lastRunMs` in `ctx.kv` short-circuits non-replay double-deploys.
 
 ### 14.4 Skeleton
 
@@ -1139,39 +1260,47 @@ feed.def("digest", { events: makeDoc("AI Digest Events", "", [/* see §6 */]) })
 feed.def("signal", { targets: makeDoc("Push Signal", "",      [/* see §6 */]) });
 
 (async () => {
-  await feed.run(async (ctx) => {
-    const now = Date.now();
+  await feed.run(async (ctx, args = {}) => {
+    const replayNow = Number(args.now);
+    const isReplay = Number.isFinite(replayNow) && replayNow > 0;
+    const runAt = isReplay ? replayNow : Date.now();  // use args.now for replay/missed-run windows
+    const wallNow = Date.now();
 
     // throttle
     const lastRun = Number(await ctx.kv.load("lastRunMs")) || 0;
-    if (lastRun && now - lastRun < 6 * 3600_000) return;
+    if (!isReplay && lastRun && wallNow - lastRun < 6 * 3600_000) return;
 
     // one LLM call — model fetches, filters, grounds, writes JSON
-    const { text } = ask(buildPrompt(now), { system: SYSTEM_PROMPT, model: "claude-sonnet-4-6" });
+    const { text } = ask(buildPrompt(runAt), { system: SYSTEM_PROMPT, model: "claude-sonnet-4-6" });
     const parsed = extractJson(text);
 
-    // freshness + dedupe gates (§14.3)
-    const fresh = (parsed.matches || []).filter(m => Number(m.ts) >= now - 48 * 3600_000);
+    // freshness + materiality + dedupe gates (§14.3)
+    const fresh = (parsed.matches || []).filter(m => Number(m.ts) >= runAt - 48 * 3600_000);
+    const materiality = assessMateriality({
+      matches: fresh,
+      contextFacts: parsed.context_facts || [],
+      config: CONFIG,
+    });
     const seen = JSON.parse((await ctx.kv.load("seenKeys")) || "{}");
     const allOldDup = (parsed.dedupe_keys || []).length > 0
       && (parsed.dedupe_keys || []).every(d => seen[d.key]);
-    const tooStale = fresh.length < 3;
-    if (tooStale) Object.assign(parsed, quietDayPayload());
+    if (!materiality.is_material) Object.assign(parsed, quietDayPayload(materiality.reason));
 
     // always write event; push only when material
-    const record = { date: now, /* …push_line, body, citations, matches, dedupe_keys… */
-      delivery: { pushed: !allOldDup && !tooStale, reason: ... } };
+    const record = { date: runAt, /* …push_line, body, citations, matches: fresh, dedupe_keys… */
+      materiality,
+      delivery: { pushed: !allOldDup && materiality.is_material, reason: allOldDup ? "all_deduped" : materiality.reason } };
     await ctx.self.ts("digest", "events").append([record]);
     if (record.delivery.pushed) {
-      await ctx.self.ts("signal", "targets").append([{ date: now,
+      await ctx.self.ts("signal", "targets").append([{ date: runAt,
         instruction: { type: "allocate", weights: [] },
         meta: { reason: composePushPayload(record, PLAYBOOK_URL) } }]);
     }
 
     // persist dedupe + throttle
-    for (const d of parsed.dedupe_keys || []) seen[d.key] = now;
+    for (const d of parsed.dedupe_keys || []) seen[d.key] = runAt;
     await ctx.kv.put("seenKeys", JSON.stringify(seen));
-    await ctx.kv.put("lastRunMs", String(now));
+    if (!isReplay) await ctx.kv.put("lastRunMs", String(wallNow));
   });
 })();
 ```
