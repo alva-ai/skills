@@ -101,12 +101,63 @@
   }
   /* Citation pill — override markdown-container link styles */
   .notif-body .cite-ref {
-    color: var(--main-m1); margin-left: 2px;
+    position: relative; display: inline-flex; align-items: center;
+    justify-content: center; color: var(--main-m1); margin-left: 2px;
     font-size: 11px; vertical-align: super; line-height: 1;
     text-decoration: none;
   }
   .notif-body .cite-ref::after { display: none; }
-  .notif-body .cite-ref:hover { color: var(--main-m1); text-decoration: underline; }
+  .notif-body .cite-ref:hover,
+  .notif-body .cite-ref:focus-visible { color: var(--main-m1); text-decoration: underline; }
+  .notif-body .cite-ref:focus-visible {
+    outline: 1px solid var(--main-m1);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  .cite-ref-tooltip {
+    position: absolute; z-index: 20; left: 50%; bottom: calc(100% + 8px);
+    width: max-content; max-width: min(280px, calc(100vw - 32px));
+    transform: translate(-50%, 4px);
+    padding: 8px 10px;
+    background: var(--b0-container, #fff);
+    border: 1px solid var(--line-l07);
+    border-radius: var(--radius-ct-s);
+    box-shadow: var(--shadow-m, 0 8px 24px rgba(15, 23, 42, 0.12));
+    color: var(--text-n9);
+    font-size: 12px; line-height: 18px; font-weight: 400;
+    text-align: left; white-space: normal;
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity .12s ease, transform .12s ease, visibility .12s ease;
+  }
+  .cite-ref-tooltip::after {
+    content: "";
+    position: absolute; left: 50%; top: 100%;
+    width: 8px; height: 8px;
+    transform: translate(-50%, -4px) rotate(45deg);
+    background: var(--b0-container, #fff);
+    border-right: 1px solid var(--line-l07);
+    border-bottom: 1px solid var(--line-l07);
+  }
+  .notif-body .cite-ref:hover .cite-ref-tooltip,
+  .notif-body .cite-ref:focus-visible .cite-ref-tooltip {
+    opacity: 1; visibility: visible; transform: translate(-50%, 0);
+  }
+  .cite-ref-source {
+    display: block; margin-bottom: 2px;
+    color: var(--text-n7); font-weight: 500;
+  }
+  .cite-ref-claim {
+    display: block; color: var(--text-n9);
+  }
+  @media (max-width: 480px) {
+    .cite-ref-tooltip {
+      left: auto; right: 0; transform: translate(0, 4px);
+      max-width: calc(100vw - 48px);
+    }
+    .cite-ref-tooltip::after { left: auto; right: 10px; transform: translate(0, -4px) rotate(45deg); }
+    .notif-body .cite-ref:hover .cite-ref-tooltip,
+    .notif-body .cite-ref:focus-visible .cite-ref-tooltip { transform: translate(0, 0); }
+  }
 
   .notif-cite-row {
     margin-top: var(--spacing-s); padding-top: var(--spacing-s);
@@ -161,6 +212,14 @@
   .fact-title {
     font-size:12px; line-height:18px;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .fact-main { min-width: 0; }
+  .fact-title { display: block; }
+  .fact-detail {
+    display: block; margin-top: 2px;
+    font-size: 11px; line-height: 16px;
+    color: var(--text-n5); font-weight: 400;
+    white-space: normal;
   }
   .match-ts,
   .fact-ts,
@@ -511,10 +570,12 @@
     return html.replace(/\[(\d+)\]/g, (m, n) => {
       const c = citMap.get(+n);
       if (!c) return m;
-      const title = escapeHtml(`${c.source}: ${(c.claim || '').slice(0, 140)}`);
+      const source = escapeHtml(c.source || "Source");
+      const claim = escapeHtml((c.claim || "Supporting evidence").slice(0, 180));
+      const tooltip = `<span class="cite-ref-tooltip" role="tooltip" aria-hidden="true"><span class="cite-ref-source">${source}</span><span class="cite-ref-claim">${claim}</span></span>`;
       const href = safeHttpUrl(c.url);
-      if (!href) return `<span class="cite-ref cite-ref--static" tabindex="0" title="${title}">[${n}]</span>`;
-      return `<a class="cite-ref" href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer" title="${title}">[${n}]</a>`;
+      if (!href) return `<span class="cite-ref cite-ref--static" tabindex="0" aria-label="${source}: ${claim}">[${n}]${tooltip}</span>`;
+      return `<a class="cite-ref" href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer" aria-label="${source}: ${claim}">[${n}]${tooltip}</a>`;
     });
   }
   function renderMatchRow(m) {
@@ -535,9 +596,14 @@
     const href = safeHttpUrl(fact.url);
     const label = fact.label || fact.ref_id || "Context fact";
     const value = fact.value ? ` · ${fact.value}` : "";
+    const details = [
+      fact.method ? `Method: ${fact.method}` : "",
+      fact.rationale ? `Why: ${fact.rationale}` : "",
+    ].filter(Boolean).join(" · ");
+    const detailsHtml = details ? `<span class="fact-detail">${escapeHtml(details)}</span>` : "";
     const content = `
         <span class="fact-source">${escapeHtml(fact.source || "context")}</span>
-        <span class="fact-title">${escapeHtml(label + value)}</span>
+        <span class="fact-main"><span class="fact-title">${escapeHtml(label + value)}</span>${detailsHtml}</span>
         <time class="fact-ts">${fmtRelative(Number(fact.ts) || Date.now())}</time>`;
     return href
       ? `<a class="fact-row" href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${content}</a>`
