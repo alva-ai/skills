@@ -13,7 +13,7 @@ swap in your thesis.
 
 The example is the source of truth for **all implementation detail** — CSS,
 widget chassis, ECharts options, sticky behavior, table column alignment, modal
-scaffolding, date-picker wiring, grounding regex, fallback string, push-trigger
+scaffolding, date-picker wiring, grounding regex, error handling, push-trigger
 conditions, methodology copy structure. Do not re-derive any of that from this
 template; read the file.
 
@@ -25,7 +25,7 @@ Files:
   feed: basket, prices, fundamentals, alpha snapshot, hero-push signal.
 - [`example/feeds/ai-bottleneck-narrative.js`](./example/feeds/ai-bottleneck-narrative.js)
   — ADK narrative feed: TLDR + pushLine + deltas + catalysts + risks per day,
-  grounding check, fallback path.
+  grounding check, and thrown errors for failed runs.
 - [`example/feeds/ai-bottleneck-news.js`](./example/feeds/ai-bottleneck-news.js)
   — news + social feed and the post-processing matcher that attaches items to
   catalysts/risks.
@@ -78,7 +78,7 @@ playbook families. The example already conforms — keep it that way.
   names + CSS slugs + colors map, feed names, `USER`, API endpoint).
   `grep -nE` after to catch stragglers.
 - Schema field renames are radioactive: one benchmark rename (e.g. `pave_ytd` →
-  `spy_ytd`) propagates across quant feed schema, narrative fallback copy, HTML
+  `spy_ytd`) propagates across quant feed schema, narrative copy, HTML
   KPI cards, horizon cards, equity chart series, and attribution filters — 3
   feeds + 2500-line HTML in lockstep. Always `sed -i` the bulk rename across all
   files first, then do a single `Read` pass to verify, then use `Edit` only for
@@ -120,7 +120,7 @@ Tab 5.
 
 Implementation lives in `feeds/ai-bottleneck-narrative.js` and
 `feeds/ai-bottleneck-news.js` — read those for the prompt shape, grounding check,
-fallback handling, and matcher rules. Do not re-derive from prose.
+error handling, and matcher rules. Do not re-derive from prose.
 
 ---
 
@@ -152,7 +152,7 @@ recordDate    str   "YYYY-MM-DD"
 generatedAt   int   epoch ms when the agent produced this record
 thesis        str   markdown TLDR body
 pushLine      str   plain-text headline, ≤ 160 chars, used verbatim by push
-source        str   "adk" | "fallback"  — "fallback" blanks thesis & pushLine
+source        str   "adk"
 deltasJson    str   JSON-encoded array of Delta objects
 catalystsJson str   JSON-encoded array of Catalyst objects
 risksJson     str   JSON-encoded array of Risk objects
@@ -293,7 +293,7 @@ has no pillars list; a default-scored basket has no factor weights table):
 - **Thesis pillars** (multi-pillar only) — for each pillar: id, name, one-sentence
   claim, the daily signal that would verify or contradict it.
 - **News matching** — ticker overlap + keyword similarity; unmatched flow to Tab 5.
-- **TLDR generation** — four-question framework, grounding rule, fallback, how
+- **TLDR generation** — four-question framework, grounding rule, thrown errors, how
   `pushLine` is written. Include 1-2 gold few-shot TLDRs (each a `{thesis,
   pushLine}` pair).
 - **Basket selection** — every name by layer; inclusion criteria; change-log

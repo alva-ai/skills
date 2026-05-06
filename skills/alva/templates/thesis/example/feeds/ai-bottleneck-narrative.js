@@ -13,8 +13,7 @@ const env = require("env");
 //   4. What's the next catalyst to watch?
 //
 // Every number cited must be traceable to the input snapshot (grounding).
-// If grounding fails, we write a deterministic fallback one-liner and flag
-// source="fallback". Push only fires when there's real signal.
+// If grounding fails, throw so the sandbox surfaces the failed run.
 
 const feed = new Feed({ path: feedPath("ai-bottleneck-narrative") });
 
@@ -25,7 +24,7 @@ feed.def("narrative", {
     str("recordDate"),               // "YYYY-MM-DD"
     str("thesis"),                   // markdown TLDR body, 3-5 sentences active / 1-2 quiet
     str("pushLine"),                 // plain-text headline, ≤160 chars
-    str("source"),                   // "adk" | "fallback"
+    str("source"),                   // "adk"
     str("deltasJson"),               // JSON array of Delta objects
     str("catalystsJson"),            // JSON array of Catalyst objects
     str("risksJson"),                // JSON array of Risk objects
@@ -46,22 +45,16 @@ feed.def("signal", {
 
 async function readFeed(feedName, group, series, count) {
   const path = `/alva/home/${env.username}/feeds/${feedName}/v1/data/${group}/${series}/@last/${count||1}`;
-  try {
-    const txt = await alfs.readFile(path);
-    if (!txt) return null;
-    return JSON.parse(String(txt));
-  } catch (e) { return null; }
+  const txt = await alfs.readFile(path);
+  if (!txt) throw new Error(`Empty upstream feed read: ${path}`);
+  return JSON.parse(String(txt));
 }
 
-function safeParse(s){ try { return JSON.parse(s); } catch (e) { return null; } }
+function safeParse(s){ return s ? JSON.parse(s) : null; }
 function parseJson(s){
-  if (!s) return null;
+  if (!s) throw new Error("ADK returned empty content");
   const cleaned = s.replace(/^```(?:json)?/, "").replace(/```$/, "").trim();
-  try { return JSON.parse(cleaned); } catch (e) {
-    const m = cleaned.match(/\{[\s\S]*\}/);
-    if (m) { try { return JSON.parse(m[0]); } catch (e2) { return null; } }
-    return null;
-  }
+  return JSON.parse(cleaned);
 }
 
 // Grounding: extract every number-like token from the output and verify it
@@ -302,80 +295,62 @@ function clampEnum(val, enumMap, fallback){
     let catalysts = [];
     let risks = [];
 
-    if (!parsed) {
-      log(`ADK returned non-JSON. Raw: ${(result.content || "").slice(0, 400)}`);
-      source = "fallback";
-    } else {
-      thesis = parsed.thesis || "";
-      pushLine = (parsed.pushLine || "").slice(0, 240);
-      deltas = Array.isArray(parsed.deltas) ? parsed.deltas : [];
-      catalysts = Array.isArray(parsed.catalysts) ? parsed.catalysts : [];
-      risks = Array.isArray(parsed.risks) ? parsed.risks : [];
+    thesis = parsed.thesis || "";
+    pushLine = (parsed.pushLine || "").slice(0, 240);
+    deltas = Array.isArray(parsed.deltas) ? parsed.deltas : [];
+    catalysts = Array.isArray(parsed.catalysts) ? parsed.catalysts : [];
+    risks = Array.isArray(parsed.risks) ? parsed.risks : [];
 
-      // ─── Enum validation (safety net — clamp any free-text labels to template enums) ───
-      deltas = deltas.map((d)=> Object.assign({}, d, {
-          sentiment: clampEnum(d.sentiment, SENTIMENTS_3, "Neutral"),
-          category: clampEnum(d.category, DELTA_CATEGORIES, "News"),
-          pillar: d.pillar ? clampEnum(d.pillar, PILLARS, null) : null,
-        }));
-      catalysts = catalysts.map((c)=> Object.assign({}, c, {
-          status: clampEnum(c.status, CATALYST_STATUSES, "Upcoming"),
-          sentiment: clampEnum(c.sentiment, SENTIMENTS_4, "Ambiguous"),
-          pillar: c.pillar ? clampEnum(c.pillar, PILLARS, null) : null,
-          ids: Array.isArray(c.ids) ? c.ids : [],
-        }));
-      risks = risks.map((r)=> Object.assign({}, r, {
-          category: clampEnum(r.category, RISK_CATEGORIES, "Execution"),
-          divergenceType: clampEnum(r.divergenceType, DIVERGENCE_TYPES, "Fundamental"),
-          priority: clampEnum(r.priority, PRIORITIES, "Medium"),
-          pillar: r.pillar ? clampEnum(r.pillar, PILLARS, null) : null,
-        }));
+    // ─── Enum validation (safety net — clamp any free-text labels to template enums) ───
+    deltas = deltas.map((d)=> Object.assign({}, d, {
+        sentiment: clampEnum(d.sentiment, SENTIMENTS_3, "Neutral"),
+        category: clampEnum(d.category, DELTA_CATEGORIES, "News"),
+        pillar: d.pillar ? clampEnum(d.pillar, PILLARS, null) : null,
+      }));
+    catalysts = catalysts.map((c)=> Object.assign({}, c, {
+        status: clampEnum(c.status, CATALYST_STATUSES, "Upcoming"),
+        sentiment: clampEnum(c.sentiment, SENTIMENTS_4, "Ambiguous"),
+        pillar: c.pillar ? clampEnum(c.pillar, PILLARS, null) : null,
+        ids: Array.isArray(c.ids) ? c.ids : [],
+      }));
+    risks = risks.map((r)=> Object.assign({}, r, {
+        category: clampEnum(r.category, RISK_CATEGORIES, "Execution"),
+        divergenceType: clampEnum(r.divergenceType, DIVERGENCE_TYPES, "Fundamental"),
+        priority: clampEnum(r.priority, PRIORITIES, "Medium"),
+        pillar: r.pillar ? clampEnum(r.pillar, PILLARS, null) : null,
+      }));
 
-      // Grounding check: every number in thesis + pushLine must exist in context.
-      const combined = `${thesis} ${pushLine}`;
-      const nums = extractNumbers(combined);
-      let grounded = true;
-      for (let i=0;i<nums.length;i++){
-        if (!isGrounded(nums[i].value, contextJson)) {
-          log(`Grounding fail: ${nums[i].raw} not found in snapshot`);
-          grounded = false;
-          break;
-        }
+    // Grounding check: every number in thesis + pushLine must exist in context.
+    const combined = `${thesis} ${pushLine}`;
+    const nums = extractNumbers(combined);
+    for (let i=0;i<nums.length;i++){
+      if (!isGrounded(nums[i].value, contextJson)) {
+        throw new Error(`Grounding failed: ${nums[i].raw} not found in snapshot`);
       }
-      if (!grounded) source = "fallback";
-
-      // ─── Post-processing: match relatedNews to catalysts and risks ───
-      // Template: "Post-processing populates as [{type, title, url, snippet}]"
-      // Always attach as an array (empty OK) — UI expects the field.
-      const allItems = (news || []).concat(social || []);
-      catalysts = catalysts.map((c)=> {
-        let matched = [];
-        if (allItems.length){
-          const target = `${c.title || ""} ${c.notes || ""}`;
-          matched = matchRelatedNews(target, c.ids || [], allItems, 5);
-        }
-        c.relatedNews = matched;
-        return c;
-      });
-      risks = risks.map((r)=> {
-        let matched = [];
-        if (allItems.length){
-          const target = `${r.description || ""} ${r.exitTrigger || ""}`;
-          matched = matchRelatedNews(target, [], allItems, 5);
-        }
-        r.relatedNews = matched;
-        return r;
-      });
     }
 
-    // Deterministic fallback one-liner if grounding fails.
-    if (source === "fallback") {
-      const s = (summary?.[0]) ? summary[0] : {};
-      const fbPush = `Basket ${s.basket_ytd >= 0 ? "+" : ""}${(s.basket_ytd || 0).toFixed(1)}% YTD vs PAVE ${s.pave_ytd >= 0 ? "+" : ""}${(s.pave_ytd || 0).toFixed(1)}% · alpha ${s.alpha_pave_ytd >= 0 ? "+" : ""}${(s.alpha_pave_ytd || 0).toFixed(1)} pp. Narrative refresh pending.`;
-      pushLine = fbPush.slice(0, 240);
-      thesis = `Narrative generation did not produce a grounded record today. Quant tabs remain live. ${fbPush}`;
-      deltas = []; catalysts = []; risks = [];
-    }
+    // ─── Post-processing: match relatedNews to catalysts and risks ───
+    // Template: "Post-processing populates as [{type, title, url, snippet}]"
+    // Always attach as an array (empty OK) — UI expects the field.
+    const allItems = (news || []).concat(social || []);
+    catalysts = catalysts.map((c)=> {
+      let matched = [];
+      if (allItems.length){
+        const target = `${c.title || ""} ${c.notes || ""}`;
+        matched = matchRelatedNews(target, c.ids || [], allItems, 5);
+      }
+      c.relatedNews = matched;
+      return c;
+    });
+    risks = risks.map((r)=> {
+      let matched = [];
+      if (allItems.length){
+        const target = `${r.description || ""} ${r.exitTrigger || ""}`;
+        matched = matchRelatedNews(target, [], allItems, 5);
+      }
+      r.relatedNews = matched;
+      return r;
+    });
 
     await ctx.self.ts("narrative","records").append([{
       date: todayMs,
@@ -395,8 +370,6 @@ function clampEnum(val, enumMap, fallback){
     //   any catalyst status flipped vs prior           → send
     //   risks.length changed vs prior                  → send
     //   High-priority risk count changed vs prior      → send
-    //   fallback source + no signals                   → skip push (avoid noise)
-    //   fallback source + signals                      → send deterministic substitute
     const priorCatalysts = prior ? (safeParse(prior.catalystsJson) || []) : [];
     const priorRisks = prior ? (safeParse(prior.risksJson) || []) : [];
     function catalystSig(arr){ return (arr||[]).map((c)=> `${c.title||''}|${c.status||''}`).sort().join('##'); }
@@ -415,28 +388,16 @@ function clampEnum(val, enumMap, fallback){
     else if (catalystFlipped) { shouldPush = true; pushReason = "catalyst_flip"; }
     else if (riskCountChanged) { shouldPush = true; pushReason = "risk_count_change"; }
     else if (highChanged) { shouldPush = true; pushReason = "high_risk_change"; }
-    if (source === "fallback" && !(deltas?.length) && !catalystFlipped && !riskCountChanged && !highChanged) {
-      shouldPush = false;
-    }
 
     if (shouldPush) {
       const dateLabel = recordDate.slice(5).replace("-","/");
       const title = `The Next AI Bottleneck · ${dateLabel}`;
       let pushText;
-      if (source === "fallback" || !pushLine) {
-        // Deterministic substitute when grounding failed but signals exist.
-        const sParts = [];
-        if (catalystFlipped) sParts.push("catalyst status flip");
-        if (riskCountChanged) sParts.push(`risk count changed (${priorRisks.length}→${risks.length})`);
-        if (highChanged) sParts.push(`High-priority risks ${highCount(priorRisks)}→${highCount(risks)}`);
-        if (deltas?.length) sParts.push(`${deltas.length} new deltas`);
-        pushText = `${title}\n\n${sParts.length ? sParts.join(" · ") : "Narrative refresh pending"}`;
-      } else {
-        pushText = `${title}\n\n${pushLine}`;
-        if (deltas.length) {
-          const d0 = deltas[0];
-          pushText += `\n\n→ ${d0.label || ""}${d0.body ? ` — ${d0.body}` : ""}`;
-        }
+      if (!pushLine) throw new Error("Push requested but ADK returned an empty pushLine");
+      pushText = `${title}\n\n${pushLine}`;
+      if (deltas.length) {
+        const d0 = deltas[0];
+        pushText += `\n\n→ ${d0.label || ""}${d0.body ? ` — ${d0.body}` : ""}`;
       }
       if (pushText.length > 490) pushText = `${pushText.slice(0, 487)}…`;
 
@@ -447,7 +408,7 @@ function clampEnum(val, enumMap, fallback){
       }]);
       log(`Push fired (${pushReason}): ${pushText.length} chars`);
     } else {
-      log("Push suppressed (no signal, fallback + quiet day).");
+      log("Push suppressed (no signal).");
     }
 
     log(`ai-bottleneck narrative: source=${source}, ${deltas.length} deltas, ${catalysts.length} catalysts, ${risks.length} risks.`);

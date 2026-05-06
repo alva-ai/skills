@@ -397,15 +397,15 @@ All three are Feed SDK time-series
 | key | type | notes |
 |---|---|---|
 | `date` | number (ms) | Cron-fire timestamp. Append it on every record; Feed SDK time-series may treat it as the built-in timestamp field rather than a declared schema field. |
-| `delivery` | `{pushed: bool, reason: string}` | `pushed=false` carries a short `reason` (`quiet_day_skipped`, `grounding_failed`, `no_matches`, `all_deduped`, `not_material`, `rate_limited` — freeform, kept short) |
+| `delivery` | `{pushed: bool, reason: string}` | `pushed=false` carries a short `reason` (`quiet_day_skipped`, `no_matches`, `all_deduped`, `not_material`, `rate_limited` — freeform, kept short) |
 | `materiality` | `{is_material: bool, reason: string}` | Deterministic pre-generation decision derived from `CONFIG.push_policy`, matches, and optional context facts |
-| `push_line` | string | ≤ 160 chars plain text. `""` on grounding failure |
-| `body` | string | Markdown with inline `[N]` reference markers. `""` on grounding failure |
-| `citations` | `[{ref, claim, url, source, source_ref}]` | One entry per `[N]` marker. `source_ref` is a match URL, `match.meta.event_key`, or, when using enrichment, `context_facts[].ref_id`. `[]` when body is `""` |
+| `push_line` | string | ≤ 160 chars plain text. |
+| `body` | string | Markdown with inline `[N]` reference markers. |
+| `citations` | `[{ref, claim, url, source, source_ref}]` | One entry per `[N]` marker. `source_ref` is a match URL, `match.meta.event_key`, or, when using enrichment, `context_facts[].ref_id`. |
 | `matches` | `[{source, url, title, ts, snippet, meta}]` | All matches considered this fire (post-relevance, post-dedupe) |
 | `context_facts` | `[{ref_id, source, label, value, ts, evidence, url}]` | Optional structured Alva/BYOD/upstream facts used for materiality and grounding. Render cited facts as structured fact rows under Sources; do not fake them as news/social sources. `[]` in the lightweight default path. |
 | `dedupe_keys` | `Array<{key: string}>` | Hashes consumed by this record. Feed SDK's `arr()` helper can't describe primitive-string arrays; each entry is wrapped as `{key: hash}`. Declare: `arr("dedupe_keys", [str("key")])`. |
-| `source` | `"alvaask" \| "fallback"` | `"fallback"` when body is `""` |
+| `source` | `"alvaask"` | Generation failures throw instead of writing fallback records. |
 
 ### Why every fire writes a record (even when `pushed=false`)
 
@@ -581,13 +581,11 @@ function filterRelevanceBatch(matches, topic, relevanceModel) {
       ).join("\n\n") +
       `\n\nReturn strict JSON only: {"answers": {"0": "yes"|"no", ..., "${slice.length - 1}": "yes"|"no"}} — keyed by the [n] index of each item.`;
     const { text } = ask(prompt, { model: relevanceModel });
-    try {
-      const { answers } = JSON.parse(text.replace(/^```(?:json)?\s*|\s*```$/g, ""));
-      slice.forEach((m, j) => { if (/^yes/i.test(answers[String(j)] || "")) out.push(m); });
-    } catch (e) {
-      // On parse failure, pass through un-filtered — better than dropping everything.
-      out.push(...slice);
+    const { answers } = JSON.parse(text.replace(/^```(?:json)?\s*|\s*```$/g, ""));
+    if (!answers || typeof answers !== "object") {
+      throw new Error("Relevance filter returned JSON without answers");
     }
+    slice.forEach((m, j) => { if (/^yes/i.test(answers[String(j)] || "")) out.push(m); });
   }
   return out;
 }
@@ -732,7 +730,8 @@ function generate({ newMatches, contextFacts, materiality }) {
     { system: systemPrompt(), model: CONFIG.generation_model },
   );
   const clean = (text || "").replace(/^```(?:json)?\s*|\s*```$/gm, "").trim();
-  try { return JSON.parse(clean); } catch { return null; }
+  if (!clean) throw new Error("Digest generation returned empty content");
+  return JSON.parse(clean);
 }
 ```
 
@@ -750,7 +749,7 @@ harvest 2–3 outputs the author liked and paste them into a local
 
 ### 8.2 Grounding check (all-or-nothing)
 
-Three gates; any failure → fallback. Quiet-day mode (`matches: []` and
+Three gates; any failure → throw so the sandbox exposes the failed run. Quiet-day mode (`matches: []` and
 `context_facts: []`) bypasses Gates B and C after the basic result shape check.
 
 ```javascript
@@ -793,9 +792,8 @@ is **not** a grounding gate — the model's claim field drifts too easily
 from body wording to be enforced byte-wise, and A + B + C already block
 the real failure modes.
 
-On failure: write the event with `body: ""`, `push_line: ""`, `citations:
-[]`, `source: "fallback"`, `delivery: { pushed: false, reason:
-"grounding_failed" }`. **Do not push.** All-or-nothing beats partial prose.
+On failure: throw and let the sandbox expose the failed run. Do not write an
+empty fallback event and do not push partial prose.
 
 ---
 
@@ -961,7 +959,7 @@ For `audience: "followers"` the output is the `meta.reason` of a
 |---|---|---|
 | Quiet day + `quiet_day_policy: "skip"` | `quiet_day_skipped` | No `ask()` call; record still appended. |
 | Below materiality bar | `not_material` | Deterministic materiality check rejected the run before generation. |
-| Grounding failed | `grounding_failed` | Model output rejected; record appended with empty body. |
+| Grounding failed | n/a | Throw; do not append an empty fallback record. |
 | All new matches were deduped | `all_deduped` | Record appended, `pushed=false`. |
 | Daily push cap reached | `rate_limited` | Enforce `CONFIG.push_policy.max_pushes_per_day` before generation. |
 
@@ -1064,12 +1062,13 @@ claim sub-minute delivery guarantees.
 
 ## 13. Hard Rules
 
-- **Every cron fire appends one `digest/events` record** — even
-  when `pushed=false`. The dedupe + retro workflow depends on it.
+- **Every successful cron fire appends one `digest/events` record** — even
+  when `pushed=false`. Unexpected failures throw before writing a fallback
+  record.
 - **Every number in body must appear verbatim in a match or optional context fact**
   (grounding Gate C). Prevents LLM-fabricated figures.
 - **Use plain `Feed`, not `FeedAltra`, for AI Digest feeds.** See §6 for the
-  full `signal/targets` reasoning and fallback path.
+  full `signal/targets` reasoning.
 - **Use `@alva/alvaask` only for LLM calls.** Relevance and generation both go
   through synchronous `ask()`; see §8 for call-site details.
 - **If you use structured Alva numbers, route them through `context_facts`.**
