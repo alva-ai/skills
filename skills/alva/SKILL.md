@@ -829,6 +829,13 @@ See [feed-sdk.md](references/feed-sdk.md) for full details.
 Feeds are persistent data pipelines that store time series data, readable via
 filesystem paths.
 
+**Feed error handling is fail-fast.** Do not wrap feed data fetches, upstream
+feed reads, LLM parsing, or `ctx.self.ts().append()` calls in `catch` blocks
+that log and continue with empty arrays, nulls, fallback records, or partial
+outputs. Let unexpected failures throw; the sandbox captures thrown errors and
+exposes the failed run. Use normal conditionals only for expected business
+states such as "no new records since the last watermark."
+
 ```javascript
 const { Feed, feedPath, makeDoc, num } = require("@alva/feed");
 const http = require("net/http");

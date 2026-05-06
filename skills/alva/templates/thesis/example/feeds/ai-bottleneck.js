@@ -178,35 +178,39 @@ function r1(v){ return Math.round(v*10)/10; }
 function r0(v){ return Math.round(v); }
 
 async function loadDaily(ticker, startSec, endSec) {
-  try {
-    const j = await arraysGet("/api/v1/stocks/kline", {
-      symbol: ticker, start_time: startSec, end_time: endSec, interval: "1d", limit: 10000,
+  const j = await arraysGet("/api/v1/stocks/kline", {
+    symbol: ticker, start_time: startSec, end_time: endSec, interval: "1d", limit: 10000,
+  });
+  if (!j || !Array.isArray(j.data)) {
+    throw new Error(`Invalid OHLCV response for ${ticker}`);
+  }
+  // HTTP returns newest-first; reverse to oldest-first
+  const out = [];
+  for (let i = j.data.length - 1; i >= 0; i--) {
+    const b = j.data[i];
+    out.push({
+      date: b.time_open * 1000,
+      endTime: b.time_close * 1000,
+      open: b.price_open,
+      high: b.price_high,
+      low: b.price_low,
+      close: b.price_close,
+      volume: b.volume_traded,
     });
-    if (!j || !Array.isArray(j.data)) return [];
-    // HTTP returns newest-first; reverse to oldest-first
-    const out = [];
-    for (let i = j.data.length - 1; i >= 0; i--) {
-      const b = j.data[i];
-      out.push({
-        date: b.time_open * 1000,
-        endTime: b.time_close * 1000,
-        open: b.price_open,
-        high: b.price_high,
-        low: b.price_low,
-        close: b.price_close,
-        volume: b.volume_traded,
-      });
-    }
-    return out;
-  } catch (e) { console.log(`OHLCV err ${ticker}: ${e.message}`); return []; }
+  }
+  return out;
 }
 
 async function metricSeries(path, params) {
-  try {
-    const j = await arraysGet(path, params);
-    if (!j || !Array.isArray(j.data) || !j.data.length) return [];
-    return j.data[0].values || [];
-  } catch (e) { console.log(`metric err ${path}: ${e.message}`); return []; }
+  const j = await arraysGet(path, params);
+  if (!j || !Array.isArray(j.data)) {
+    throw new Error(`Invalid metric response for ${path}`);
+  }
+  if (!j.data.length) return [];
+  if (!Array.isArray(j.data[0].values)) {
+    throw new Error(`Invalid metric values for ${path}`);
+  }
+  return j.data[0].values;
 }
 
 async function latestMarketMetric(symbol, indicator, startMs, endMs) {
@@ -280,6 +284,10 @@ function classifyValByPct(pePct) {
     const barsArr = await Promise.all(ALL.map(t => loadDaily(t, startSec, nowSec)));
     const bars = {};
     for (let i = 0; i < ALL.length; i++) bars[ALL[i]] = barsArr[i];
+    const missingBars = ALL.filter((t) => !bars[t] || bars[t].length < 2);
+    if (missingBars.length) {
+      throw new Error(`Missing OHLCV bars for: ${missingBars.join(", ")}`);
+    }
 
     // ─── Fundamentals + P/E percentile in parallel ───
     const m30ms = now - 30*86400*1000;

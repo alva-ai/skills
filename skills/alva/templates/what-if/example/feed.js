@@ -56,7 +56,7 @@ async function fetchDaily(symbol, startSec) {
   const j = await arraysGet("/api/v1/stocks/kline", {
     symbol, start_time: startSec, end_time: endSec, interval: "1d", limit: 10000,
   });
-  if (!j || !Array.isArray(j.data)) return [];
+  if (!j || !Array.isArray(j.data)) throw new Error(`Invalid OHLCV response for ${symbol}`);
   const out = [];
   for (let i = j.data.length - 1; i >= 0; i--) {
     const b = j.data[i];
@@ -85,7 +85,7 @@ function eraFor(isoDate) {
 
     console.log("CPER bars:", cperBars.length, "GLD bars:", gldBars.length, "SPY bars:", spyBars.length);
     if (!cperBars.length || !gldBars.length || !spyBars.length) {
-      console.log("ERROR: missing bars"); return;
+      throw new Error("Missing required bars for CPER, GLD, or SPY");
     }
 
     function toMap(bars) {
