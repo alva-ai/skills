@@ -100,7 +100,7 @@ function clamp01(x) { return Math.max(0, Math.min(1, x)); }
     }
     const midCapSize = Object.keys(universe).length;
     console.log("screened=" + universeSize + " mid_cap=" + midCapSize);
-    if (midCapSize === 0) { console.log("empty universe — abort"); return; }
+    if (midCapSize === 0) throw new Error("Empty mid-cap universe");
 
     // ── Fetch fundamentals in parallel (2yr window, all tickers) ──
     const [gmRes, omRes, rvRes, crRes] = await Promise.all([
@@ -145,7 +145,7 @@ function clamp01(x) { return Math.max(0, Math.min(1, x)); }
 
     const eligible = Object.values(universe).filter(u => !u._drop);
     console.log("eligible after hard filter=" + eligible.length);
-    if (eligible.length < 5) { console.log("Warning: <5 eligible — abort"); return; }
+    if (eligible.length < 5) throw new Error(`Too few eligible stocks: ${eligible.length}`);
 
     // ── Min-max normalize each factor ──
     const growthVals = eligible.map(s => s.revGrowth);
@@ -188,15 +188,13 @@ function clamp01(x) { return Math.max(0, Math.min(1, x)); }
 
     // ── Enrich with company names in parallel ──
     await Promise.all(top.map(async (s) => {
-      try {
-        const d = await arraysGet("/api/v1/stocks/company/detail", { symbol: s.ticker });
-        const c = d.data && d.data.length ? d.data[0] : null;
-        if (c) {
-          s.name = c.name || s.ticker;
-          s.sector = c.sector || "Unknown";
-          s.industry = c.industry || "Unknown";
-        } else { s.name = s.ticker; s.sector = "Unknown"; s.industry = "Unknown"; }
-      } catch (e) { s.name = s.ticker; s.sector = "Unknown"; s.industry = "Unknown"; }
+      const d = await arraysGet("/api/v1/stocks/company/detail", { symbol: s.ticker });
+      const c = d.data && d.data.length ? d.data[0] : null;
+      if (c) {
+        s.name = c.name || s.ticker;
+        s.sector = c.sector || "Unknown";
+        s.industry = c.industry || "Unknown";
+      } else { s.name = s.ticker; s.sector = "Unknown"; s.industry = "Unknown"; }
     }));
 
     // ── Basket percentiles for soft flags ──
@@ -282,23 +280,19 @@ function clamp01(x) { return Math.max(0, Math.min(1, x)); }
           : klState[s.ticker];
         const startSec = wmSec + 1;
         if (startSec >= nowSec) return { ticker: s.ticker, wmSec, bars: [] };
-        try {
-          const kr = await arraysGet("/api/v1/stocks/kline", {
-            symbol: s.ticker, start_time: startSec, end_time: nowSec, interval: "1d", limit: 10000,
-          });
-          // stocks/kline returns newest-first; reverse to oldest-first
-          const bars = (kr.data || []).slice().reverse().filter(b => b.time_open > wmSec);
-          return { ticker: s.ticker, wmSec, bars, ok: true };
-        } catch (e) {
-          return { ticker: s.ticker, wmSec, bars: [], err: true };
-        }
+        const kr = await arraysGet("/api/v1/stocks/kline", {
+          symbol: s.ticker, start_time: startSec, end_time: nowSec, interval: "1d", limit: 10000,
+        });
+        if (!kr || !Array.isArray(kr.data)) throw new Error(`Invalid kline response for ${s.ticker}`);
+        // stocks/kline returns newest-first; reverse to oldest-first
+        const bars = kr.data.slice().reverse().filter(b => b.time_open > wmSec);
+        return { ticker: s.ticker, wmSec, bars, ok: true };
       }));
 
       const klineRecords = [];
       const newKlState = {};
-      let klSuccess = 0, klFail = 0;
+      let klSuccess = 0;
       for (const res of klResults) {
-        if (res.err) { newKlState[res.ticker] = res.wmSec; klFail++; continue; }
         if (!res.bars.length) { newKlState[res.ticker] = res.wmSec; continue; }
         let maxSec = res.wmSec;
         for (const b of res.bars) {
@@ -315,7 +309,7 @@ function clamp01(x) { return Math.max(0, Math.min(1, x)); }
 
       if (klineRecords.length > 0) await ctx.self.ts("screener", "klines").append(klineRecords);
       await ctx.kv.put("klState", JSON.stringify(newKlState));
-      console.log("K-line bars appended: " + klineRecords.length + " (ok=" + klSuccess + " fail=" + klFail + ")");
+      console.log("K-line bars appended: " + klineRecords.length + " (ok=" + klSuccess + ")");
     }
 
     console.log("Done! Top 5: " + top.slice(0, 5).map(s => s.ticker + "=" + s.score).join(", "));

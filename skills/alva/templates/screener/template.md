@@ -205,10 +205,10 @@ delta           {new_ids, dropped_ids}    vs prior snapshot; first run: both []
 
 ```
 date         int
-body         str   ADK-generated markdown — bullets, prose, or one line. "" on grounding failure.
-push_line    str   ADK-generated standalone headline, ≤ 160 chars plain text. "" on grounding failure.
+body         str   ADK-generated markdown — bullets, prose, or one line.
+push_line    str   ADK-generated standalone headline, ≤ 160 chars plain text.
 churn_line   str   deterministic "🆕 X · 👋 Y", always present, may be ""
-source       str   "adk" | "fallback"
+source       str   "adk"
 ```
 
 ### Three bedrock rules
@@ -226,8 +226,8 @@ source       str   "adk" | "fallback"
 - `< 2` snapshots in history → hide the basket trend chart entirely; show the
   `.trend-empty` hint.
 - Only 1 snapshot in history → hide the snapshot picker entirely.
-- `tldr.source === "fallback"` → render `churn_line` only (no body); skip
-  push when churn is also empty.
+- If TLDR generation or grounding fails, throw so the sandbox exposes the
+  failed run.
 
 ---
 
@@ -352,9 +352,8 @@ ADK prompt. Without it, output drifts to research-report tone within a week.
 - Output is structured JSON: `{body: "<markdown>", push_line: "<plain>"}`.
 - Length caps: `push_line ≤ 160` chars; `body ≤ ~800` chars rendered.
 - **Numeric grounding** — extract every number (regex `-?\d+(\.\d+)?%?`) from
-  both fields. If **any** unverified number appears, mark the whole digest
-  as fallback (`body: ""`, `push_line: ""`, `source: "fallback"`) and let the
-  UI render `churn_line` alone. All-or-nothing beats patching partial prose.
+  both fields. If **any** unverified number appears, throw and let the sandbox
+  expose the failed run. All-or-nothing beats patching partial prose.
 - Persist per snapshot to `screener/tldr`. Regenerate only when a new snapshot
   appears.
 
@@ -382,8 +381,9 @@ line 3:  Full snapshot → <playbook URL>
   churn in top-N, new flags, a factor driver swap.
 - Basket variant with both churn sides empty → **do not send** "nothing
   happened" pings.
-- `tldr.source === "fallback"` and churn empty → skip.
-- `push_line === ""` (fallback) → omit line 1; push is churn line + URL only.
+- Empty churn → skip.
+- `push_line === ""` is invalid when a push is requested; throw instead of
+  sending a partial notification.
 
 Length budget: lines 1+2 ≤ 280 chars combined — the 160-char `push_line` cap
 in the digest prompt guarantees the fit.

@@ -176,67 +176,65 @@ const TAG_MAP = {
     // News via Brave
     for (let i=0;i<NEWS_QUERIES.length;i++){
       const q = NEWS_QUERIES[i];
-      try {
-        const r = searchBrave({ query: q.q, freshness: "pw", count: 10 });
-        if (r.success && r.response) {
-          const items = (r.response.news_results?.length) ? r.response.news_results : (r.response.data || []);
-          for (let j=0;j<items.length;j++){
-            const it = items[j];
-            if (!it.url || seenNewsUrls[it.url]) continue;
-            seenNewsUrls[it.url] = true;
-            const desc = (it.description || "").replace(/<[^>]+>/g, "");
-            newsRecords.push({
-              date: it.date || now,
-              title: (it.title || "").slice(0, 240),
-              snippet: desc.slice(0, 400),
-              url: it.url,
-              source: domainOf(it.url) || "web",
-              ids: q.ids.join(","),
-              engagement: 0,
-              sentiment: sentimentGuess(`${it.title||""} ${desc}`),
-              thumbnail: "",
-            });
-          }
-        }
-      } catch (e) { log(`News err ${q.q}: ${e.message}`); }
+      const r = searchBrave({ query: q.q, freshness: "pw", count: 10 });
+      if (!r.success || !r.response) {
+        throw new Error(`Brave news search failed for "${q.q}": ${JSON.stringify(r).slice(0, 500)}`);
+      }
+      const items = (r.response.news_results?.length) ? r.response.news_results : (r.response.data || []);
+      for (let j=0;j<items.length;j++){
+        const it = items[j];
+        if (!it.url || seenNewsUrls[it.url]) continue;
+        seenNewsUrls[it.url] = true;
+        const desc = (it.description || "").replace(/<[^>]+>/g, "");
+        newsRecords.push({
+          date: it.date || now,
+          title: (it.title || "").slice(0, 240),
+          snippet: desc.slice(0, 400),
+          url: it.url,
+          source: domainOf(it.url) || "web",
+          ids: q.ids.join(","),
+          engagement: 0,
+          sentiment: sentimentGuess(`${it.title||""} ${desc}`),
+          thumbnail: "",
+        });
+      }
     }
 
     // Social via GrokX
     const combinedSocialQuery = "AI bottleneck: $NVDA Blackwell allocation, $AVGO custom ASIC, $MU HBM, $TSM CoWoS, $ASML EUV, $GEV turbine backlog, $CEG nuclear PPA, $VST ERCOT, $ETN switchgear, $PWR EPC crews, $FIX data center HVAC, $EQIX renewal spreads — supply constraint power compute deployment";
-    try {
-      const r = searchGrokX({ query: combinedSocialQuery, from_date: from, max_search_results: 25 });
-      if (r.success && r.response) {
-        if (r.response.summary) summaries.push({ query: combinedSocialQuery, summary: r.response.summary });
-        const tweets = r.response.data || r.response.tweets || [];
-        for (let j=0;j<tweets.length;j++){
-          const tw = tweets[j];
-          const id = tw.id || tw.url;
-          if (!id || seenSocialIds[id]) continue;
-          seenSocialIds[id] = true;
-          const likes = tw.like_count||0;
-          const rts = tw.retweet_count||0;
-          const reps = tw.reply_count||0;
-          const eng = likes + rts + reps;
-          if (eng === 0 && !tw.author_verified) continue;
-          const lowerC = (tw.content || "").toLowerCase();
-          const hits = [];
-          for (const key in TAG_MAP){ if (lowerC.indexOf(key) >= 0 && hits.indexOf(TAG_MAP[key]) < 0) hits.push(TAG_MAP[key]); }
-          socialRecords.push({
-            date: tw.created_at || tw.date || now,
-            content: (tw.content || "").slice(0, 600),
-            url: tw.url || "",
-            author_name: tw.author_name || "",
-            author_handle: tw.author_username || "",
-            followers: tw.author_followers_count || 0,
-            verified: tw.author_verified ? 1 : 0,
-            ids: hits.length ? hits.join(",") : "",
-            engagement: eng,
-            sentiment: sentimentGuess(tw.content),
-            likes: likes, retweets: rts, replies: reps,
-          });
-        }
-      }
-    } catch (e) { log(`Social err: ${e.message}`); }
+    const r = searchGrokX({ query: combinedSocialQuery, from_date: from, max_search_results: 25 });
+    if (!r.success || !r.response) {
+      throw new Error(`GrokX social search failed: ${JSON.stringify(r).slice(0, 500)}`);
+    }
+    if (r.response.summary) summaries.push({ query: combinedSocialQuery, summary: r.response.summary });
+    const tweets = r.response.data || r.response.tweets || [];
+    for (let j=0;j<tweets.length;j++){
+      const tw = tweets[j];
+      const id = tw.id || tw.url;
+      if (!id || seenSocialIds[id]) continue;
+      seenSocialIds[id] = true;
+      const likes = tw.like_count||0;
+      const rts = tw.retweet_count||0;
+      const reps = tw.reply_count||0;
+      const eng = likes + rts + reps;
+      if (eng === 0 && !tw.author_verified) continue;
+      const lowerC = (tw.content || "").toLowerCase();
+      const hits = [];
+      for (const key in TAG_MAP){ if (lowerC.indexOf(key) >= 0 && hits.indexOf(TAG_MAP[key]) < 0) hits.push(TAG_MAP[key]); }
+      socialRecords.push({
+        date: tw.created_at || tw.date || now,
+        content: (tw.content || "").slice(0, 600),
+        url: tw.url || "",
+        author_name: tw.author_name || "",
+        author_handle: tw.author_username || "",
+        followers: tw.author_followers_count || 0,
+        verified: tw.author_verified ? 1 : 0,
+        ids: hits.length ? hits.join(",") : "",
+        engagement: eng,
+        sentiment: sentimentGuess(tw.content),
+        likes: likes, retweets: rts, replies: reps,
+      });
+    }
 
     newsRecords.sort((a,b)=> b.date - a.date);
     socialRecords.sort((a,b)=> b.engagement - a.engagement);
@@ -249,47 +247,42 @@ const TAG_MAP = {
     socialRecords = socialRecords.slice(0, 40);
 
     // LLM sentiment pass — AI bottleneck lens
-    try {
-      const items = [];
-      for (let i=0;i<newsRecords.length;i++) items.push({ kind:"news", id:i, text: `${newsRecords[i].title||""} — ${(newsRecords[i].snippet||"").slice(0,180)}` });
-      for (let j=0;j<socialRecords.length;j++) items.push({ kind:"social", id:j, text: (socialRecords[j].content||"").slice(0,220) });
+    const items = [];
+    for (let i=0;i<newsRecords.length;i++) items.push({ kind:"news", id:i, text: `${newsRecords[i].title||""} — ${(newsRecords[i].snippet||"").slice(0,180)}` });
+    for (let j=0;j<socialRecords.length;j++) items.push({ kind:"social", id:j, text: (socialRecords[j].content||"").slice(0,220) });
 
-      if (items.length) {
-        const sysPrompt = [
-          "You tag items for an AI-buildout bottleneck tracker. Thesis: AI deployment is constrained across three supply-side dimensions — Power (turbines, nuclear, grid, switchgear), Compute (GPUs, HBM, fab capacity, EUV), and Deployment (EPC crews, data-center real estate, permits).",
-          "",
-          "For each item return one label (Title Case):",
-          "  Bull = supply is getting tighter or slower: backlogs extending, lead times lengthening, allocation tightening, PPAs signed, skilled-trades scarcity, fab capacity oversubscribed, data-center renewal spreads widening.",
-          "  Bear = supply is loosening or delivering: capacity adds, second sources, substitution, permits fast-tracked, CoWoS capacity expanding faster than expected, hyperscaler capex pause.",
-          "  Neutral = general commentary, macro, demand-side news without supply-behavior signal.",
-          "",
-          "Default to Neutral when uncertain. A demand-growth headline is Neutral, not Bull. We trade supply behavior only.",
-          "",
-          "Return ONLY a JSON array of {\"i\":<index>,\"s\":\"Bull|Bear|Neutral\"}. No prose.",
-        ].join("\n");
-        const userPrompt = `Items (index → text):\n${items.map((it,idx)=> `${idx}. ${it.text}`).join("\n")}`;
+    if (items.length) {
+      const sysPrompt = [
+        "You tag items for an AI-buildout bottleneck tracker. Thesis: AI deployment is constrained across three supply-side dimensions — Power (turbines, nuclear, grid, switchgear), Compute (GPUs, HBM, fab capacity, EUV), and Deployment (EPC crews, data-center real estate, permits).",
+        "",
+        "For each item return one label (Title Case):",
+        "  Bull = supply is getting tighter or slower: backlogs extending, lead times lengthening, allocation tightening, PPAs signed, skilled-trades scarcity, fab capacity oversubscribed, data-center renewal spreads widening.",
+        "  Bear = supply is loosening or delivering: capacity adds, second sources, substitution, permits fast-tracked, CoWoS capacity expanding faster than expected, hyperscaler capex pause.",
+        "  Neutral = general commentary, macro, demand-side news without supply-behavior signal.",
+        "",
+        "Default to Neutral when uncertain. A demand-growth headline is Neutral, not Bull. We trade supply behavior only.",
+        "",
+        "Return ONLY a JSON array of {\"i\":<index>,\"s\":\"Bull|Bear|Neutral\"}. No prose.",
+      ].join("\n");
+      const userPrompt = `Items (index → text):\n${items.map((it,idx)=> `${idx}. ${it.text}`).join("\n")}`;
 
-        const res = await adk.agent({ system: sysPrompt, prompt: userPrompt, tools: [], maxTurns: 1 });
-        const raw = (res?.content) ? res.content.replace(/^```(?:json)?/,"").replace(/```$/,"").trim() : "";
-        const m = raw.match(/\[[\s\S]*\]/);
-        if (m) {
-          let labels;
-          try { labels = JSON.parse(m[0]); } catch(e) { labels = null; }
-          if (Array.isArray(labels)) {
-            for (const l of labels) {
-              const idx = l && typeof l.i === "number" ? l.i : -1;
-              const s = l && typeof l.s === "string" ? l.s : "";
-              if (idx < 0 || idx >= items.length) continue;
-              if (s !== "Bull" && s !== "Bear" && s !== "Neutral") continue;
-              const item = items[idx];
-              if (item.kind === "news") newsRecords[item.id].sentiment = s;
-              else socialRecords[item.id].sentiment = s;
-            }
-            log(`LLM sentiment: re-scored ${labels.length} of ${items.length} items`);
-          }
-        }
+      const res = await adk.agent({ system: sysPrompt, prompt: userPrompt, tools: [], maxTurns: 1 });
+      const raw = (res?.content) ? res.content.replace(/^```(?:json)?/,"").replace(/```$/,"").trim() : "";
+      const m = raw.match(/\[[\s\S]*\]/);
+      if (!m) throw new Error(`LLM sentiment returned non-array JSON: ${raw.slice(0, 400)}`);
+      const labels = JSON.parse(m[0]);
+      if (!Array.isArray(labels)) throw new Error("LLM sentiment JSON is not an array");
+      for (const l of labels) {
+        const idx = l && typeof l.i === "number" ? l.i : -1;
+        const s = l && typeof l.s === "string" ? l.s : "";
+        if (idx < 0 || idx >= items.length) continue;
+        if (s !== "Bull" && s !== "Bear" && s !== "Neutral") continue;
+        const item = items[idx];
+        if (item.kind === "news") newsRecords[item.id].sentiment = s;
+        else socialRecords[item.id].sentiment = s;
       }
-    } catch (e) { log(`LLM sentiment pass failed: ${e.message}`); }
+      log(`LLM sentiment: re-scored ${labels.length} of ${items.length} items`);
+    }
 
     if (newsRecords.length) await ctx.self.ts("items","news").append(newsRecords);
     if (socialRecords.length) await ctx.self.ts("items","social").append(socialRecords);

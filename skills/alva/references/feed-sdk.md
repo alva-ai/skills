@@ -313,6 +313,25 @@ offset workarounds needed.
 
 ## Feed Class API
 
+### Error Handling
+
+Feed scripts should let unexpected failures throw. Do not wrap data fetches,
+upstream feed reads, LLM parsing, or feed writes in catch blocks that log and
+continue with empty arrays, nulls, or fallback records. The sandbox captures
+thrown errors and exposes the failed run, which makes broken data sources and
+bad response shapes visible during development and operations.
+
+Use ordinary conditionals only for expected business states, such as "no new
+records since the last watermark." For required inputs, validate the response
+shape and throw a clear error:
+
+```javascript
+const result = getDataSource({ symbol: "BTCUSDT" });
+if (!result.success || !Array.isArray(result.response?.data)) {
+  throw new Error("getDataSource returned an invalid response");
+}
+```
+
 ### Constructor
 
 ```javascript
