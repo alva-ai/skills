@@ -58,7 +58,27 @@ One sentence, ≤45 words, conclusion-first. Carries 2-3 headline numbers — no
 
 **Widget:** Free Text Card with `markdown-container--m` (Medium). See `references/design-widgets.md` → Free Text Card and `references/design-components.md` → Markdown.
 
-### 2a. Counter-narrative card (optional)
+### 2a. Hero chips
+
+The hero starts with exactly three compact chips. Keep them mechanical; do not use interpretive labels such as `Trend intact`, `Short-term edge`, `Strong setup`, or `Risk-on`.
+
+Format:
+
+1. **Asset chip** — the shortest recognizable asset or market label.
+2. **Trigger chip** — the shortest readable trigger label.
+3. **Case count chip** — fixed as `Cases: {n_events}`.
+
+Examples:
+
+- `SPY` / `50D reclaim` / `Cases: 44`
+- `QQQ` / `3 down days` / `Cases: 71`
+- `S&P 500` / `Golden cross` / `Cases: 38`
+- `Gold` / `New high` / `Cases: 52`
+- `VIX` / `Above 30` / `Cases: 29`
+
+Keep the first two chips to 1–3 words each. The asset chip should not include `Asset:` and the trigger chip should not add `signal` unless the trigger would otherwise be unclear.
+
+### 2b. Counter-narrative card (optional)
 
 A second card under the hero is only allowed when it carries a counter-narrative that can't fit in the main sentence. The single most memorable counter-intuitive finding, if one exists, belongs here — never buried in methodology.
 
@@ -72,21 +92,25 @@ A second card under the hero is only allowed when it carries a counter-narrative
 One vertically-scrolling page. Top-to-bottom order:
 
 1. **Title** (section 1) — title text + README chip (right-aligned) on the same row.
-2. **Verdict hero** (section 2) — one full-width card, data-driven. **Widget:** Free Text Card (`markdown-container--m`).
-3. **Summary cards** — typically 3–6 cards (4 is the default), more if the dimension has that many meaningful buckets. Metric Cards are auto-height and wrap, so the row stack can extend to a second/third row. Every card across all rows shares ONE cutting dimension (see §3a); don't mix returns, hit rates, and per-ticker picks. **Time is one valid dimension, not the default** — choose whichever best answers the crowd question. **Widget:** Metric Card.
-4. **Supporting charts** — one or more visualizations that contextualize the metrics. Typical options: distribution bar+range, normalized price trajectory overlay, per-event heatmap, win-rate comparison, baseline comparison (if the strategy explicitly needs one). Pick whichever combination best tells the story; order them from most summary to most granular. **Widget:** Chart Card for all chart types.
-5. **Event / row detail table** — one row per event, basket member, or regime bucket, with the key per-row metric columns. **Widget:** Table Card.
-6. **References** — trigger source + data source. **Widget:** Free Text Card.
+2. **Verdict hero** (section 2) — one full-width card with the three hero chips, conclusion sentence, and one support sentence. **Widget:** Free Text Card (`markdown-container--m`).
+3. **Belief cards** — two half-width cards: `Common expectation` and `What history showed`. They translate the signal into plain language before the charts.
+4. **Main path chart + readout rail** — normalized event path chart on the left (`.col-5`), three-card readout rail on the right (`.col-3`).
+5. **Four horizon cards** — exactly four metric cards (`.col-2` × 4): a week, a month, three months, and a year later.
+6. **One-year case bar chart + past-case range** — bar chart on the left (`.col-5`), range rail on the right (`.col-3`).
+7. **Featured case cards** — three equal cards: strongest case, softest case, latest complete case.
+8. **Historical audit ledger** — one row per event, default-collapsed for large samples. **Widget:** Table Card.
 
-Methodology does not live on the scroll — it lives in a modal opened by the README chip in the title row (see §1 and [Methodology modal](#methodology-modal)).
+Methodology and references do not live on the scroll — they live in a modal opened by the README chip in the title row (see §1 and [Methodology modal](#methodology-modal)). Do not add a bottom `References` section.
 
-No tabs, no hidden panels other than the Methodology modal — everything else is on the single scroll.
+No tabs, no hidden panels other than the Methodology modal and the audit-ledger expand/collapse behavior — everything else is on the single scroll.
 
 **Canonical reasoning flow:** headline → aggregate slice (across chosen dimension) → aggregate spread → reliability → per-event / per-member paths → historical context → raw rows. Each step answers the objection raised by the previous. Methodology is available on-demand via the README chip, not inline in the flow.
 
 ### 3a. Cutting dimensions for the summary cards row
 
 Pick ONE based on the crowd question:
+
+For the default what-if event-study layout, use **Time** and render only the four canonical horizon cards: a week, a month, three months, and a year later. The hero and readout rail choose their headline horizon from those same four cards, so the headline always has a visible supporting card. Use other dimensions only when the user's question explicitly requires them.
 
 | Dimension | Use when the question is | Example cards |
 |---|---|---|
@@ -132,6 +156,22 @@ Every chart in the supporting-charts layer (§3 step 4) is a **Chart Card**. Fol
 
 **One override for this template:** Chart Card height = **560px** (the design-widgets default is 320px). Per-event charts in What-If carry more horizon and more individual paths than a typical dashboard tile, so they need the extra vertical room. All charts on the page — including side-by-side pairs (`.col-4` × 2) — use 560px.
 
+**Main path chart rules**
+
+- Rebase signal day to 100.
+- Do not draw every past case as a full-opacity line. Show only a representative sample of past paths and add a subtle middle-half band.
+- Show the typical-after-signal line and the normal-period line.
+- Tooltip hides helper/sampled-path series and shows only useful readout lines.
+
+**One-year case chart rules**
+
+- Must be a bar chart, one bar per completed case.
+- Do not label every case on the x-axis.
+- Show sparse year anchors only: first year, last year, and roughly every other calendar year.
+- Exact signal date and value belong in hover tooltip.
+- Green bars are positive, red bars are negative.
+- Keep the zero line and median line, but avoid text labels that can clip.
+
 ### 3d. Plain language (every user-visible surface)
 
 Applies to cards, chart titles, axis labels, table headers, tooltips, and methodology — not just cards. LLM defaults trend toward trading-desk jargon; override them.
@@ -155,7 +195,15 @@ Applies to cards, chart titles, axis labels, table headers, tooltips, and method
 
 - **No** "last updated / refreshed / as of" timestamp anywhere on the page.
 - **No** filters, dropdowns, selectors.
-- **Only interactivity allowed:** chart hover tooltips, and the README chip opening the Methodology modal.
+- **Only interactivity allowed:** chart hover tooltips, the README chip opening the Methodology modal, and the audit-ledger expand/collapse button when event count is high.
+
+**Audit ledger collapse rule**
+
+- If event count is 12 or fewer, show all rows.
+- If event count is above 12, show the latest 8 rows by default.
+- Add one compact `Show all N cases` button in the ledger title row.
+- When expanded, the button becomes `Show latest 8`.
+- Use the row-first flex table and `initTableAlignment`; do not use a native HTML table.
 
 ## 6. Methodology modal
 
@@ -163,5 +211,5 @@ Triggered by the README chip in the title row (§1). Mirrors the Screener templa
 
 - README chip carries `data-modal-open="methodology-modal"`; the modal root has `id="methodology-modal"`.
 - Modal panel `max-width: 896px` (narrower than the 960px base — methodology content is prose, not wide tables).
-- Body content = the two plain paragraphs defined in §3d ("how we picked events" + "how we measured returns"). Legal disclaimer, if any, goes at the bottom of this body.
+- Body content = the two plain paragraphs defined in §3d ("how we picked events" + "how we measured returns"), followed by references for trigger source and return source. Legal disclaimer, if any, goes at the bottom of this body.
 - Closed by default on page load — methodology is rarely the first thing a reader wants.
