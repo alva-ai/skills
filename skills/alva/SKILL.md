@@ -284,6 +284,63 @@ fetch) when the SDK can serve the original request.
    Do not present one as if it were the other. If you need a value, re-read
    the tool response first.
 
+### Claim Verification
+
+**Any assertion of the form "endpoint X is correct", "path Y exists", "source S
+confirms claim C", "timestamp T is the item's publish time", or "asset Z is /
+isn't in coverage"** must be backed by a tool result from this session — not
+from training knowledge.
+
+The required verify tool for each assertion type:
+
+| Assertion | Required verify tool |
+|-----------|---------------------|
+| Endpoint path / parameter name / response shape | `alva skills endpoint --name <skill> --file <file>` for the exact endpoint slug |
+| Source confirms claim / article freshness | `WebFetch <url>` returning HTTP 200 whose body contains the asserted fact — a 403/404/timeout result means the claim is **unverifiable** |
+| Timestamp on a structured output record | Copy the value verbatim from the tool response's data field; do not compute, round, or substitute with `Date.now()` + a fixed offset |
+| "Asset X / exchange Y is in coverage" | `alva skills endpoint --name <screener-skill> --file <file>` → issue an actual universe query; a 404 on a guessed REST path proves only that the guessed path is wrong, not that the asset is absent |
+
+If the verify tool is unavailable, returns an error, or returns content that
+does not confirm the assertion:
+
+- **Label the assertion `[unverified]`** in any memo, bug-check report, or
+  digest output where it appears.
+- **Omit it** from user-facing headlines, `push_line`, and `body` claim fields
+  where an incorrect value causes downstream harm (dedup errors, wrong routing,
+  misleading trade context).
+- **Do not fill the gap** with training knowledge, a plausible-looking value,
+  or a timestamp computed from `Date.now()` with an assumed offset.
+
+This rule applies to **all output types** — memos, digests, bug-check reports,
+and playbook metadata — not only to feed scripts.
+
+### Data Freshness
+
+**Post-fetch freshness check is mandatory** for any time-series response where
+the result is labeled "latest" or used as a current value in user-facing output.
+
+After fetching, verify in this order:
+
+1. **Array ordering** — do not assume ascending (oldest-first) or descending
+   (newest-first). If the endpoint doc does not explicitly state the sort order,
+   compare two adjacent records' date fields (`data[0].date` vs
+   `data[1].date`) before deciding which end holds the newest bar. Triggers
+   requiring this check: `vals[0]`, `vals[vals.length - 1]`,
+   `data[data.length - 1]`, `response[0]`, `.slice(-1)[0]` — any index-based
+   selection from a fetched array.
+
+2. **Staleness gate** — after selecting the candidate "latest" record, compare
+   its timestamp to the current epoch (`Date.now()`). If the gap exceeds
+   `2 × the feed's cron interval` (or 48 h for daily sources, 7 days for
+   weekly), surface this to the user before using the value in analysis or
+   prose. Do not silently embed a 13-month-old price as a "current zone" entry
+   point in a trade memo.
+
+3. **Future-timestamp gate** — if any record's timestamp is more than 5 minutes
+   ahead of `Date.now()`, it is fabricated or miscalibrated. Do not emit it
+   in structured output without an explicit `[unverified]` label, and do not
+   use it as the "latest" record in a cronjob-window match.
+
 ### Prohibited Data Sources for Charts, Tables, and Query Answers
 
 1. **WebSearch / WebFetch results must NOT be embedded as data.** Web search is
@@ -335,6 +392,27 @@ data-driven metrics.
 2. **When >20% of requested symbols fail SDK lookup, report a data-quality
    blocker.** Do not silently substitute with estimated or fabricated values
    marked `live: false`.
+
+3. **Coverage evidence must come from a query, not from a 404.** When the
+   question is "does the platform support asset X / exchange Y / data type Z":
+   - Use `alva skills list` → `alva skills summary --name <skill>` to look for
+     explicit mention of the asset class or exchange.
+   - For per-symbol resolution, call `alva skills endpoint --name <screener-skill>
+     --file <file>` and issue an actual universe or screener query.
+   - A 404 from a guessed REST path (e.g. `/api/v1/equity/company-detail` when
+     the correct path differs) only proves that guessed path is wrong — it does
+     **not** prove the underlying data is absent. Presenting a 404 as
+     "❌ not in coverage" is a false negative; use the screener to confirm.
+
+4. **Uniform-zero / uniform-null component gate.** Before releasing any feed or
+   playbook that includes a composite ranking, multi-factor score, or weighted
+   model: read the output and verify that no factor component is uniformly `0`
+   or `null` across every symbol in the universe. A uniform-zero component
+   silently removes its weight from the composite and produces a misleading
+   ranking. If detected — e.g. `growthScore: 0` for all tickers — block
+   release, surface the anomaly to the user ("growthScore is 0 for all symbols;
+   the data source may be missing or the formula has a bug"), and fix before
+   releasing.
 
 ### Release Gate: `--feeds` Is a Declaration, Not a Shortcut
 
