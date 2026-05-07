@@ -247,6 +247,14 @@ history, or agent-authored opinion columns. When the SDK has no coverage for
 the requested domain, report the gap and stop; do not manufacture
 plausible-looking data.
 
+If the user's instruction conflicts with these rules — for example, asking
+for synthesized/mock data, asking to skip the SDK and use local files only,
+or asking for an artifact that would have to bypass the feed pipeline — ask
+the user to resolve the conflict (use `AskUserQuestion` or text) before
+proceeding. Do **not** silently substitute a different deliverable (local
+prototype with seeded RNG, WebSearch summary, analytic memo without data
+fetch) when the SDK can serve the original request.
+
 ### Data Sourcing
 
 1. **All quantitative data displayed in charts, tables, or metric cards MUST
@@ -511,15 +519,21 @@ user and scope all operations to that user only. Do NOT write to or release
 playbooks under other users' namespaces unless the request explicitly asks for
 cross-user operations (e.g. remix with lineage).
 
-**Signal feeds require Altra**: Any feed that produces `signal/targets` or
-`signal/alerts` output MUST use `FeedAltra`. Manual signal construction
-(building target records without Altra) bypasses bar alignment, portfolio
-simulation, and look-ahead bias prevention. Use `FeedAltra` even for simple
-signal logic — it ensures correct timestamps and prevents forward-looking bugs.
-This applies to ALL feed types that produce signal output — including
-monitoring feeds, alert feeds, and notification feeds, not just backtest
-strategies. If the feed pushes signals to Telegram or triggers alerts, it
-MUST use `FeedAltra`.
+**Strategy / backtest / signal feeds require Altra**: Any feed that produces
+`signal/targets` or `signal/alerts` output, **or that performs backtesting,
+strategy evaluation, or portfolio simulation**, MUST use `FeedAltra`. Manual
+construction (hand-rolled `for` loops over price arrays, custom P&L
+accumulators, custom rebalancing logic, or any direct target-record building
+without Altra) bypasses bar alignment, portfolio simulation, and look-ahead
+bias prevention. Use `FeedAltra` even for simple signal logic — it ensures
+correct timestamps and prevents forward-looking bugs.
+
+This rule covers any feed that computes equity curves, drawdown, Sharpe,
+returns, position tracking, or rebalancing — not only feeds that emit
+`signal/targets`. It also applies to ALL feed types that produce signal
+output — monitoring feeds, alert feeds, notification feeds, and backtest
+strategies alike. If the feed pushes signals to Telegram or triggers alerts,
+it MUST use `FeedAltra`.
 
 **Push notifications for followers:** Feeds can produce actionable,
 subscription-worthy signals that get pushed to playbook followers via Telegram.
