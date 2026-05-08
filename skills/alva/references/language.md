@@ -1,27 +1,42 @@
 # Language
 
-Canonical vocabulary for user-facing responses. Use these terms exactly —
-don't expose internal platform names, Unix infrastructure jargon, or
-implementation details. Consistent language is the point; don't drift into
-synonyms or technical equivalents.
+Canonical vocabulary for user-facing responses. Use product terms exactly:
+do not expose internal platform names, Unix infrastructure jargon, producer
+objects, or implementation details. Consistent language is the point; do not
+drift into synonyms or technical equivalents.
 
 ## Terms
 
 **Automation**
-A deployed, scheduled feed script that runs on Alva Cloud on a defined
-interval (e.g. every hour, every day). The user experiences this as a feed
-that updates automatically.
-_Avoid_: cronjob, cron job, scheduled job, deploy job.
-
-**Feed**
-A data pipeline on Alva Cloud that fetches, transforms, and stores financial
-data as a time series. Feeds are the data source for playbooks.
-_Avoid_: data feed script, pipeline job, worker, script.
+A recurring Alva task that refreshes data, checks market conditions, or sends
+updates on a schedule. This is the default user-facing label for the thing that
+keeps a playbook, alert, or Agent-created monitor current.
+_Avoid_: feed, feed major, cronjob, cron job, scheduled job, deploy job,
+pipeline job, worker.
 
 **Playbook**
-A hosted web app on Alva that visualizes feed data and delivers analysis or
+A hosted investing app on Alva that shows analysis, dashboards, screeners, or
 trading signals to the user and their followers.
 _Avoid_: app, report (unless the playbook is literally a report).
+
+**Alert / Notification**
+A delivered update from Alva Agent, a playbook, or an automation. Use this when
+the user cares that something was sent or will be sent.
+_Avoid_: push payload, fanout, notification event, dispatch event.
+
+**Agent**
+The user's ongoing Alva assistant relationship across Web, Telegram, and
+Discord. Use this for conversation continuity, memory, persona, and proactive
+follow-up.
+_Avoid_: bot runtime, channel session, worker.
+
+**Feed**
+Internal or diagnostic term for the underlying data source behind an automation
+or playbook release. Do not introduce it in normal user-facing prose. Use it
+only when the user is looking at logs, raw data, API fields, release references,
+or an Automation detail that already exposes the term. Define it once as "the
+underlying data source for this automation."
+_Avoid as default user wording_: feed, feed major, feed producer.
 
 **Script**
 JavaScript code that runs on Alva Cloud. Use this when explaining what the
@@ -33,6 +48,9 @@ implementation details invisible to the user.
 
 - **Match the user's expertise.** If they ask "what is X?", assume they do not
   know the internal model and give the shortest useful explanation.
+- **Users see product outcomes.** Default to playbook, automation, alert,
+  notification, Agent, portfolio, trade, refresh, and analysis. Keep feed,
+  cronjob, storage, scheduler, and runtime terms behind the product surface.
 - **Say what it does, not how it works.** "Your automation runs every hour"
   not "your cronjob executes on a 1h cron schedule."
 - **Expose outcomes, not mechanics.** "Your playbook updates automatically"
@@ -46,6 +64,9 @@ implementation details invisible to the user.
   the page shows, what changed, what stayed the same, what happens next.
 - **Define unavoidable jargon once.** If an internal term is necessary because
   the user is looking at logs, code, or raw data, add a one-clause explanation.
+- **Feed stays behind Automation.** Say "automation", "underlying data source",
+  "latest refresh", or "run history" unless the user is explicitly debugging
+  feed-level details.
 - **Do not teach the storage model by default.** Avoid buckets, dedupe,
   latest-wins, filesystem paths, epoch milliseconds, UTC day boundaries,
   scheduler expressions, cache keys, and raw record shapes unless needed.
@@ -61,6 +82,8 @@ Examples:
 - "Refresh time" instead of "write timestamp" or a raw timestamp field.
 - "Analysis date" instead of a day key, partition key, or date field.
 - "Next refresh" instead of a scheduler expression or trigger name.
+- "Underlying data source" instead of "feed" when the user only needs to
+  understand where the playbook data comes from.
 - "Latest version for that day" instead of same-key overwrite, dedupe, or
   latest-wins.
 - "The source data barely changed" instead of no-op run, unchanged snapshot, or

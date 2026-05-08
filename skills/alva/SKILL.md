@@ -152,8 +152,12 @@ reading and writing rules.
 ## Communication
 
 **Vocabulary** — use the terms in [language.md](references/language.md) exactly.
-Key terms: **automation** (not "cronjob"), **feed**, **playbook**, **script**.
-Full definitions and "avoid" labels are in that file.
+Default user-facing terms: **automation** (not "cronjob" or "feed"),
+**playbook**, **alert/notification**, **Agent**, and **script** when discussing
+code being built. Treat **feed** as an internal or diagnostic term: use it only
+when the user is looking at logs, raw data, API fields, release references, or
+an Automation detail that already exposes the term. Full definitions and
+"avoid" labels are in that file.
 
 No ALFS paths, API payloads, automation IDs, raw function names, internal jargon,
 or implementation details in user-facing responses. Say what it DOES, not how it
@@ -776,7 +780,7 @@ before reporting success.
 | [search.md](references/search.md) | Content search SDKs: per-source usage, enrichment patterns, and gotchas for Twitter/X, news, Reddit, YouTube, podcasts, and web |
 | [secret-manager.md](references/secret-manager.md) | Secret upload, CRUD API, and runtime usage via `require("secret-manager")` |
 | [narrative-voice.md](references/narrative-voice.md) | Voice rules for user-facing prose: banned tokens/shapes, copy-paste ADK system-prompt block with few-shots |
-| [language.md](references/language.md) | Canonical user-facing vocabulary: automation, feed, playbook — and what to avoid |
+| [language.md](references/language.md) | Canonical product vocabulary: automation, playbook, alert, Agent, and when feed must stay internal |
 
 ---
 
