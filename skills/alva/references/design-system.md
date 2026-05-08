@@ -118,7 +118,7 @@ body {
   width: 100%;
   max-width: 2048px;
   margin: 0 auto;
-  padding: var(--spacing-l) var(--spacing-xxl) var(--spacing-xxxxl);
+  padding: var(--spacing-xl) var(--spacing-xxl) var(--spacing-xxxxl);
 }
 
 @media (max-width: 768px) {
