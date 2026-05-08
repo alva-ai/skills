@@ -72,30 +72,39 @@ inspect — each entry carries both `feed_name` (for ALFS paths) and
 
 ---
 
-## Step 2 — Read UI Layer (HTML Source)
+## Step 2 — Download UI Layer (HTML Source)
+
+**Download to a local file — do not regenerate from memory.** Redirect
+`alva fs read` output into a local file so you can edit it in place
+(e.g. with the `Edit` tool). Reconstructing the HTML from what you
+remember of the read output drops layout details, comments, and working
+code that the user expects to inherit.
 
 ```bash
-alva fs read --path '/alva/home/{owner}/playbooks/{name}/index.html'
+alva fs read --path '/alva/home/{owner}/playbooks/{name}/index.html' > ./index.html
 ```
 
-This returns the full HTML source of the playbook dashboard — the ECharts
-charts, metric cards, layout, and data-fetching logic. Use this as the template for
-the new playbook's UI.
+This is the full HTML source of the playbook dashboard — the ECharts
+charts, metric cards, layout, and data-fetching logic. Edit this local
+file directly in Step 5; do not rewrite it from scratch.
 
 ---
 
-## Step 3 — Read Code Layer (Feed Scripts)
+## Step 3 — Download Code Layer (Feed Scripts)
 
-Each entry in `releases[0].feeds` carries `feed_name` — use it to read
-the feed's script source directly:
+Each entry in `releases[0].feeds` carries `feed_name` — download each
+feed's script source the same way:
 
 ```bash
-alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v1/src/index.js'
+alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v1/src/index.js' > ./{feed_name}.js
 ```
 
-This contains the strategy logic, data fetching, and indicator computations.
+This contains the strategy logic, data fetching, and indicator
+computations. As with the HTML, **modify the downloaded file in place**
+rather than re-typing the script from your reading of it.
 
-Optionally, read sample feed output to understand the data schema:
+Optionally, read sample feed output to understand the data schema (this
+one stays in stdout — it's reference, not a file you'll edit):
 
 ```bash
 alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v1/data/{group}/{output}/@last/5'
@@ -118,15 +127,22 @@ re-release a source whose data layer was never legitimate.
 
 ## Step 5 — Deploy as New Playbook
 
-Follow the standard playbook creation flow (see SKILL.md):
+Follow the standard playbook creation flow (see SKILL.md), starting from
+the local files you downloaded in Steps 2–3. **Edit those files in
+place** with the `Edit` tool — change strategy parameters, swap data
+paths to your own namespace, apply the user's customization request —
+and only then upload them. Do not write fresh files from scratch.
 
-1. **Write feed script** to `'~/feeds/{new-name}/v1/src/index.js'`
+1. **Edit local feed script** (the `./{feed_name}.js` from Step 3) and
+   upload to ALFS:
+   `alva fs write --path '~/feeds/{new-name}/v1/src/index.js' --file ./{feed_name}.js --mkdir-parents`
 2. **Test** via `alva run --entry-path '~/feeds/{new-name}/v1/src/index.js'`
 3. **Grant** public read: `alva fs grant --path '~/feeds/{new-name}' --subject "special:user:*" --permission read`
 4. **Deploy cronjob**: `alva deploy create --name {new-name} --path '~/feeds/{new-name}/v1/src/index.js' --cron "..."`
 5. **Release feed**: `alva release feed --name {new-name} --version 1.0.0 --cronjob-id ID --description "..."`
-6. **Write HTML** to `'~/playbooks/{new-name}/index.html'` (update data paths to
-   point to your own feed)
+6. **Edit local HTML** (the `./index.html` from Step 2 — update data
+   paths to point to your own feed) and upload:
+   `alva fs write --path '~/playbooks/{new-name}/index.html' --file ./index.html --mkdir-parents`
 7. **Draft playbook**: `alva release playbook-draft --name {new-name} --display-name "..." --feeds '[{"feed_id":ID}]'`
 8. **Release playbook**: `alva release playbook --name {new-name} --version v1.0.0 --feeds '[{"feed_id":ID}]' --changelog "..."`
 
@@ -161,26 +177,27 @@ Add a summary section at the bottom.
 
 Extracted: owner = `alice`, name = `btc-momentum`.
 
-Agent reads:
+Agent downloads sources to local files (so they can be edited in place,
+not retyped):
 
 ```bash
 # 1. Metadata — releases[0].feeds carries feed_name + feed_id per ref
 alva fs read --path '/alva/home/alice/playbooks/btc-momentum/playbook.json'
 
-# 2. HTML source
-alva fs read --path '/alva/home/alice/playbooks/btc-momentum/index.html'
+# 2. HTML source — saved locally for in-place editing
+alva fs read --path '/alva/home/alice/playbooks/btc-momentum/index.html' > ./index.html
 
-# 3. Feed source code (use feed_name from playbook.json)
-alva fs read --path '/alva/home/alice/feeds/btc-momentum/v1/src/index.js'
+# 3. Feed source code (use feed_name from playbook.json) — saved locally
+alva fs read --path '/alva/home/alice/feeds/btc-momentum/v1/src/index.js' > ./btc-momentum.js
 
-# 4. (Optional) Sample data for schema understanding
+# 4. (Optional) Sample data for schema understanding — reference only, no redirect
 alva fs read --path '/alva/home/alice/feeds/btc-momentum/v1/data/market/ohlcv/@last/3'
 ```
 
-Agent then runs the content-legitimacy audit on the source HTML and feed
-scripts (Step 4), modifies the feed script and HTML, deploys under the
-user's own namespace with a new name (e.g. `my-btc-strategy`), and
-releases.
+Agent then runs the content-legitimacy audit on `./index.html` and
+`./btc-momentum.js` (Step 4), edits those local files in place to apply
+the user's customization, then uploads them under the user's own
+namespace with a new name (e.g. `my-btc-strategy`) and releases.
 
 Save lineage (assuming current user is `bob`, new playbook name is `my-btc-strategy`):
 
