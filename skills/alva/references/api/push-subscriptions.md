@@ -59,7 +59,8 @@ Row shape: `{ target: {type, id}, subscribed, created_at_ms, updated_at_ms }`.
 
 - `NOT_FOUND` covers both "doesn't exist" and "exists but caller can't
   read it" (no namespace enumeration).
-- Push delivery requires a connected channel (e.g. Telegram). Without
-  `telegram_username` on the user record, push silently no-ops.
+- Push delivery always supports Alva web notifications. External DM delivery
+  requires `active_channel` to be `telegram` or `discord` with the matching
+  `telegram_username` or `discord_username` set.
 - Producer side (making a feed *capable* of pushing) is separate — see
   Section 9 of SKILL.md and `--push-notify` on `alva deploy`.

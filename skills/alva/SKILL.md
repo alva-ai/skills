@@ -110,7 +110,7 @@ alva whoami
 ```
 
 ```json
-{"id":1, "subscription_tier":"free", "telegram_username":"alice_tg", "username":"alice"}
+{"id":1, "username":"alice", "subscription_tier":"free", "active_channel":"discord", "telegram_username":"alice_tg", "discord_username":"alice"}
 ```
 
 Session variables:
@@ -118,8 +118,11 @@ Session variables:
 - **`username`** — for public URLs and ALFS paths.
 - **`subscription_tier`** — `"pro"` or `"free"` (default). Determines release
   flow (Step 7): pro can keep playbooks private.
-- **`telegram_username`** — if set, recommend push-enabled feeds; if null,
-  guide user to connect Telegram first.
+- **`active_channel`** — `"telegram"`, `"discord"`, or null. Web notifications
+  are always available; this controls external DM delivery.
+- **`telegram_username`** / **`discord_username`** — connected IM displays.
+  For external DM delivery, `active_channel` must point to a matching non-empty
+  display field.
 
 ### 4. Arrays JWT Check
 
@@ -708,21 +711,25 @@ Scan the feeds backing this playbook and classify each:
 
 If no feed qualifies, skip this flow entirely.
 
-#### Check Telegram binding
+#### Check delivery channel
 
-Read `telegram_username` from the session (Pre-flight Step 3). If null, tell
-the user:
-"To receive push notifications, connect your Telegram at
-<https://alva.ai/settings>. After connecting, I can set up push alerts for
-[specific feed description]." Then skip the rest of this flow.
+Web notifications are always available, so do not block push setup on Telegram
+or Discord. For external DM delivery, read `active_channel`,
+`telegram_username`, and `discord_username` from the session:
+
+- **Active IM channel** (`active_channel` is `"telegram"` with
+  `telegram_username`, or `"discord"` with `discord_username`) → proceed to
+  recommend the push.
+- **No active IM channel** → recommend the push, and tell the user:
+  "Web notifications will work immediately. To also receive this in Telegram or
+  Discord, connect and activate a channel at <https://alva.ai/settings>."
 
 #### Recommend specific feeds
 
 Present a concrete recommendation, not a generic "want push?":
 
 > "This playbook's **BTC EMA crossover signal** feed produces actionable
-> alerts when the trend flips. Want to enable Telegram push notifications
-> for it?"
+> alerts when the trend flips. Want to enable push notifications for it?"
 
 - **User says yes** → configure end-to-end (see "Configure and verify" below).
   Do not stop after toggling the flag.
