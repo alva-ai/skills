@@ -72,11 +72,20 @@ playbook families. The example already conforms — keep it that way.
 
 ## Build workflow
 
-- `cp` example files then mutate in place. Don't `Write` whole files back
-  when 70%+ is identical.
-- Do all mechanical renames in one `sed -i` pass (benchmarks, layer/pillar
-  names + CSS slugs + colors map, feed names, `USER`, API endpoint).
-  `grep -nE` after to catch stragglers.
+- Stage to a writable workdir on first touch, then `Edit` / `sed -i`
+  against the staged copy. `example/` is read-only reference (it lives
+  under `.claude/skills/.../templates/`, which the SDK's config-file
+  safety gate blocks writes to — and a blocked write stalls the
+  session instead of erroring cleanly):
+    ```sh
+    PB=/tmp/<playbook-slug>
+    mkdir -p "$PB" && cp -r .claude/skills/alva/templates/thesis/example/. "$PB"/
+    ```
+  Now `$PB/index.html` and `$PB/feeds/...` are yours. Prefer `Edit`
+  over `Write` when 70%+ of a file is identical.
+- Do all mechanical renames in one `sed -i` pass against `$PB/`
+  (benchmarks, layer/pillar names + CSS slugs + colors map, feed names,
+  `USER`, API endpoint). `grep -nE` after to catch stragglers.
 - Schema field renames are radioactive: one benchmark rename (e.g. `pave_ytd` →
   `spy_ytd`) propagates across quant feed schema, narrative copy, HTML
   KPI cards, horizon cards, equity chart series, and attribution filters — 3

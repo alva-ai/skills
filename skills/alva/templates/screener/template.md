@@ -76,11 +76,20 @@ playbook families. The example already conforms — keep it that way.
   the test-debug loop on field-name mismatches disappears. The temptation is
   "my screener is special, one camelCase field won't hurt"; it will, because
   it pushes you back into adapter-shimming the renderers.
-- `cp` example files then mutate in place. Don't `Write` whole files back
-  when 70%+ is identical.
-- Do all mechanical renames in one `sed -i` pass (screener name, theme color +
-  CSS slugs, factor names, feed name, `USER`, API endpoint). `grep -nE` after
-  to catch stragglers.
+- Stage to a writable workdir on first touch, then `Edit` / `sed -i`
+  against the staged copy. `example/` is read-only reference (it lives
+  under `.claude/skills/.../templates/`, which the SDK's config-file
+  safety gate blocks writes to — and a blocked write stalls the
+  session instead of erroring cleanly):
+    ```sh
+    PB=/tmp/<playbook-slug>
+    mkdir -p "$PB" && cp -r .claude/skills/alva/templates/screener/example/. "$PB"/
+    ```
+  Now `$PB/index.html` and `$PB/feeds/...` are yours. Prefer `Edit`
+  over `Write` when 70%+ of a file is identical.
+- Do all mechanical renames in one `sed -i` pass against `$PB/`
+  (screener name, theme color + CSS slugs, factor names, feed name,
+  `USER`, API endpoint). `grep -nE` after to catch stragglers.
 - Don't read the HTML linearly. `grep -n` the marker, then `Read` with
   `offset` + `limit` on that section only.
 - Single feed: `grant` and `deploy create` have no cross-dependencies —
