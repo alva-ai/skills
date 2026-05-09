@@ -9,11 +9,19 @@ backfill its history), use the `feed_widgets` partition instead. The search SDKs
 | SDK | Module | Best for |
 | --- | ------ | -------- |
 | `searchGrokX` | `@arrays/data/search/search-grok-x:v1.0.0` | Twitter/X — returns engagement directly |
+| `searchPerplexityFinance` | `@arrays/data/search/search-perplexity-finance:v1.0.0` | Live finance search — quotes, market data, filings, and financial facts with sources |
 | `searchSerper` | `@arrays/data/search/serper-search:v1.0.0` | Google index: News, YouTube, Reddit, Web |
 | `searchBrave` | `@arrays/data/search/search-brave:v1.0.0` | Independent index, good Reddit coverage |
 | `scrapeUrl` | `@arrays/data/search/scrape-url:v1.0.0` | Scrape any page to markdown for enrichment |
 
 ## Sources
+
+### Finance Search
+
+- **Search**: `searchPerplexityFinance` for live financial quotes, market data, company facts, filings, and sourced finance answers.
+- **Best fit**: use when the user asks for current price, valuation, financial facts, or market-data answers that benefit from sourced live lookup.
+- **Fields**: `summary`, `data`/`arrays` result blocks, `tickers`, `sources`, and provider `usage` metadata when available.
+- **Gotcha**: This is a live search/answer tool, not a historical time-series endpoint. For deterministic OHLCV, fundamentals, earnings, or macro series, prefer the structured Alva data SDKs first and use finance search for current context or source-backed enrichment.
 
 ### Twitter/X
 
