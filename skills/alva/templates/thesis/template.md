@@ -281,29 +281,11 @@ matched to a catalyst or risk show a tag indicating which one. No pagination —
 
 ## Methodology Modal
 
-Always include — explains how the playbook works. The example wires up the trigger
-/ overlay / panel / close behaviors / lazy-render. Only the **content** changes
-per thesis.
+The README chip in the tab-right group opens the methodology modal. The
+example wires up the trigger / overlay / panel / close behaviors and
+lazy-renders the body — only the **content** changes per thesis.
 
-Pick subsections that apply; skip ones that don't fit (a single-pillar thesis
-has no pillars list; a default-scored basket has no factor weights table):
-
-- **How this playbook works** — quant + ADK pipelines, post-processing matcher,
-  cadence in ET, exact list of inputs fed to the narrative agent.
-- **Thesis pillars** (multi-pillar only) — for each pillar: id, name, one-sentence
-  claim, the daily signal that would verify or contradict it.
-- **News matching** — ticker overlap + keyword similarity; unmatched flow to Tab 5.
-- **TLDR generation** — four-question framework, grounding rule, thrown errors, how
-  `pushLine` is written. Include 1-2 gold few-shot TLDRs (each a `{thesis,
-  pushLine}` pair).
-- **Basket selection** — every name by layer; inclusion criteria; change-log
-  policy. If composite scoring: factor table (name, measure, normalization,
-  weight), composite formula, band thresholds, flag definitions, a worked
-  example re-deriving the current #1.
-- **Computation rules** — every derived field: alpha definition, risk priority
-  matrix, delta surfacing rules, etc.
-- **Data sources** — OHLCV + fundamentals (Alva SDK); macro (FRED / World Bank /
-  etc.); news (Alva News SDK); social (GrokX or equivalent); narrative (ADK agent
-  + tools).
-- **Blind spots** — honest list of what this does NOT capture.
-- **Glossary** — thesis-specific terms.
+Modal content = the playbook's
+[`README.md`](../../references/api/release.md#playbook-readme), rendered
+into the modal body. There is one source of truth for what the playbook
+explains; do not maintain a separate per-template content list here.

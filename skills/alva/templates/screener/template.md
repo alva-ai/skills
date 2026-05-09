@@ -392,36 +392,18 @@ in the digest prompt guarantees the fit.
 
 ## Methodology Modal
 
-Always include — explain how the screener works. Triggered by the README chip
-in the tab-right group. The example wires up the trigger / overlay / panel /
-close behaviors / lazy-render. Only the **content** changes per screener.
+The README chip in the tab-right group opens the methodology modal. The
+example wires up the trigger / overlay / panel / close behaviors and
+lazy-renders the body — only the **content** changes per screener.
 
-Pick subsections that apply; skip ones that don't (a momentum screener has no
-factor weights; a pure-filter screener has no scoring formula):
+Modal content = the playbook's
+[`README.md`](../../references/api/release.md#playbook-readme), rendered
+into the modal body. There is one source of truth for what the playbook
+explains; do not maintain a separate per-template content list here.
 
-- **One-paragraph overview** (always) — plain English: what the screener
-  ranks / filters and why.
-- **Filter rules** (basket / hard filters) — every threshold, every excluded
-  category. The senate example excludes ETFs and requires ≥ 2 distinct
-  senators + ≥ $50K total — that level of specificity.
-- **Factor weights + scoring formula** (scored only) — factor name, raw
-  measure, normalization, weight. State the formula exactly.
-- **Worked example** (scored only) — re-derive the current #1 from raw
-  inputs. Header (id + name + rank + band) plus monospace per-factor rows
-  (`name | raw / 100 × weight% = pts`) plus a total. The verify badge states
-  the actual relationship: if the displayed score is the factor-weighted
-  sum, it equals the total; if the display is a rescaling (like the senate
-  example's `45 + 50 * normalized composite`), state that honestly so users
-  can reconcile. Don't claim equality you can't deliver.
-- **Score bands** — score ranges → tier label.
-- **Flag definitions** — for each flag: label, tier, exact threshold.
-- **Data sources & freshness** — which SDKs / endpoints, when each updates.
-- **Blind spots** — honest list of what this does NOT capture.
-- **Glossary** — domain-specific terms.
-
-**Performance** — lazy-render the modal body the first time it opens, not on
-page load; methodology is rarely the first thing a user wants. The example
-does this.
+**Performance** — lazy-render the modal body the first time it opens, not
+on page load; methodology is rarely the first thing a user wants. The
+example does this.
 
 ---
 
