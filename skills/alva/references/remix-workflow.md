@@ -146,7 +146,7 @@ and only then upload them. Do not write fresh files from scratch.
 7. **Write README** (mandatory) — adapt the source playbook's README to
    your data sources and methodology, then upload:
    `alva fs write --path '~/playbooks/{new-name}/README.md' --file ./README.md --mkdir-parents`.
-   See [SKILL.md → README content shape](../SKILL.md#readme-content-shape).
+   See [release.md → Playbook README](api/release.md#playbook-readme).
 8. **Draft playbook**: `alva release playbook-draft --name {new-name} --display-name "..." --feeds '[{"feed_id":ID}]'`
 9. **Release playbook**: `alva release playbook --name {new-name} --version v1.0.0 --feeds '[{"feed_id":ID}]' --changelog "..." --readme-url "{new-name}/README.md"`
 
