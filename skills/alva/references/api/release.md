@@ -76,7 +76,7 @@ alva release playbook-draft --name btc-dashboard --display-name "BTC Trend Dashb
 ## Release Playbook
 
 ```
-alva release playbook --name NAME --version VERSION --feeds '[{"feed_id":100}]' --changelog "text"
+alva release playbook --name NAME --version VERSION --feeds '[{"feed_id":100}]' --changelog "text" --readme-url "NAME/README.md"
 ```
 
 Release an existing playbook for public hosting. Reads the playbook HTML from
@@ -84,12 +84,18 @@ Release an existing playbook for public hosting. Reads the playbook HTML from
 
 Changelog lives on the release, not the draft — set it when publishing.
 
-| Flag        | Type   | Required | Description                                 |
-| ----------- | ------ | -------- | ------------------------------------------- |
-| --name      | string | yes      | URL-safe playbook name (must already exist) |
-| --version   | string | yes      | SemVer (e.g. `v1.0.0`)                      |
-| --feeds     | array  | yes      | Feed references `[{feed_id, feed_major?}]`  |
-| --changelog | string | yes      | Release changelog                           |
+`--readme-url` is required: it declares the ALFS location of the playbook's
+README and the server validates the value against a fixed convention (see
+**README declaration** below). Write the README to that path **before**
+calling this command.
+
+| Flag         | Type   | Required | Description                                                                                |
+| ------------ | ------ | -------- | ------------------------------------------------------------------------------------------ |
+| --name       | string | yes      | URL-safe playbook name (must already exist)                                                |
+| --version    | string | yes      | SemVer (e.g. `v1.0.0`)                                                                     |
+| --feeds      | array  | yes      | Feed references `[{feed_id, feed_major?}]`                                                 |
+| --changelog  | string | yes      | Release changelog                                                                          |
+| --readme-url | string | yes      | Owner-attested README location. See **README declaration** for the two accepted forms.     |
 
 Feed reference fields:
 
@@ -98,10 +104,31 @@ Feed reference fields:
 | feed_id    | int64 | yes      | Feed ID (own or others' feed)            |
 | feed_major | int32 | no       | Major version (defaults to feed default) |
 
+### README declaration
+
+The server only accepts two forms for `--readme-url`:
+
+1. **Relative** (preferred): `<name>/README.md` — e.g. `btc-dashboard/README.md`.
+2. **Absolute**: `/alva/home/<username>/playbooks/<name>/README.md` —
+   e.g. `/alva/home/alice/playbooks/btc-dashboard/README.md`. Use this only
+   when you cannot avoid hard-coding the username.
+
+Any other value is rejected with `InvalidArgument`. The server does **not**
+write the README file — the owner must place it at
+`~/playbooks/<name>/README.md` on ALFS before calling `alva release playbook`.
+Both URL forms point to that same path; only the spelling differs.
+
 ```
-alva release playbook --name btc-dashboard --version v1.0.0 --feeds '[{"feed_id": 100, "feed_major": 1}]' --changelog "Initial release"
+# 1. Write README to ALFS first.
+alva fs write --path '~/playbooks/btc-dashboard/README.md' --file ./README.md --mkdir-parents
+
+# 2. Then release, declaring the README location.
+alva release playbook --name btc-dashboard --version v1.0.0 --feeds '[{"feed_id": 100, "feed_major": 1}]' --changelog "Initial release" --readme-url "btc-dashboard/README.md"
 → {"playbook_id": 99, "version": "v1.0.0", "published_url": "https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html", "playbook_path": "/alva/home/alice/playbooks/btc-dashboard"}
 ```
+
+See [Step 7 in SKILL.md](../../SKILL.md#7-release) for the full release
+flow including required README content shape.
 
 After a successful release, output the alva.ai playbook link to the user:
 `https://alva.ai/u/<username>/playbooks/<playbook_name>`

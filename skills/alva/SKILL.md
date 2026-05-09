@@ -617,7 +617,13 @@ outputs read at runtime (no inline literals for data).
 #### Common steps (all users)
 
 1. **Write HTML to ALFS**: `alva fs write --path '~/playbooks/{name}/index.html' --file ./index.html --mkdir-parents`
-2. **Create playbook draft**: `alva release playbook-draft` — creates DB
+2. **Write README to ALFS** *(mandatory)*:
+   `alva fs write --path '~/playbooks/{name}/README.md' --file ./README.md --mkdir-parents`.
+   Every released playbook must ship a README at this exact path. See
+   [README content shape](#readme-content-shape) below for what to put in
+   it. The README is what the platform surfaces in the "How does this
+   work?" modal — releasing without one leaves the playbook unexplained.
+3. **Create playbook draft**: `alva release playbook-draft` — creates DB
    records, writes draft files and `playbook.json` to ALFS automatically.
    This request must include both the URL-safe `name` and the human-readable
    `display_name`. Use `[subject/theme] [analysis angle/strategy logic]`, put
@@ -630,7 +636,7 @@ outputs read at runtime (no inline literals for data).
    resolves each symbol to a full trading pair object and stores the result
    in the playbook metadata. Max 50 symbols per request. Unknown symbols
    are silently skipped.
-3. **Screenshot**: Take a screenshot to verify the released playbook renders
+4. **Screenshot**: Take a screenshot to verify the released playbook renders
    correctly from the deployed published URL (for example,
    `https://<username>.playbook.alva.ai/<playbook_name>/v1.0.0/index.html`):
 
@@ -640,6 +646,62 @@ outputs read at runtime (no inline literals for data).
 
    The CLI handles authentication automatically. See
    [screenshot.md](references/api/screenshot.md) for full parameter details.
+
+When calling `alva release playbook`, always pass
+`--readme-url '{name}/README.md'` (the relative form). The server validates
+this against the README path you wrote in step 2 and rejects any other
+value with `InvalidArgument`. See [release.md](references/api/release.md#release-playbook)
+for the absolute-form alternative and the full validation rules.
+
+#### README content shape
+
+The README is a markdown file at `~/playbooks/{name}/README.md`. It is a
+standalone document — not a copy of `display_name` or `description`. The
+target reader is someone deciding whether to trust this playbook's
+numbers, not someone browsing for ideas.
+
+Reuse the methodology-modal shape from the playbook templates as the
+canonical structure (see
+[screener template § Methodology Modal](templates/screener/template.md#methodology-modal)
+and the [what-if](templates/what-if/template.md) and
+[thesis](templates/thesis/template.md) templates' methodology sections).
+Pick the subsections that apply; skip ones that don't.
+
+Required sections (every playbook):
+
+- **Overview** — one paragraph in plain English: what the playbook
+  computes, on what universe, and the question it answers. Same scope
+  bound as the methodology modal's overview.
+- **Data sources** — every feed/SDK/BYOD source the playbook reads, with
+  the relevant specifics (symbol, interval, exchange, indicator
+  parameters). Match the sources actually called by the feed scripts —
+  do not list aspirational sources.
+- **Methodology** — the rules, formula, or signal logic. For
+  filter/screener-shaped playbooks: every threshold and every excluded
+  category. For scored playbooks: factor list, normalization, weights,
+  and scoring formula stated exactly. For event-study/what-if: the
+  trigger definition, the cutting dimension, and the horizon set.
+- **Update cadence** — cron schedule of the backing feeds and what
+  "fresh" means for this playbook (e.g. "updates every hour, 6am-10pm
+  ET"). Must match the deployed cronjobs; do not claim a cadence the
+  cronjob doesn't enforce.
+- **Limits & blind spots** — known data gaps, sample-size caveats,
+  survivorship issues, regime sensitivity, anything that would change
+  how a reader weighs the output. If there are none, write "None known"
+  — do not omit the section.
+
+Optional sections (include when the shape applies):
+
+- **Worked example** — re-derive the current top result from raw inputs
+  (especially for scored screeners and event studies, where the formula
+  is otherwise opaque).
+- **Reference / further reading** — links to source studies or canonical
+  references the methodology relies on.
+
+Voice: same rules as all other user-facing prose
+([narrative-voice.md](references/narrative-voice.md)). No marketing
+language, no claims unsupported by the feeds, no future tense for
+behavior that isn't already wired up.
 
 #### Pro users (`subscription_tier = "pro"`)
 
@@ -692,6 +754,13 @@ Before calling `alva release playbook`, verify all of the following:
    status. Data source claims match actual SDK/BYOD calls in the feed script.
 6. **Target user is correct**: The playbook is being released under the
    requesting user's namespace (see user scope enforcement above).
+7. **README is present and accurate**: `~/playbooks/{name}/README.md` exists
+   on ALFS, covers all required sections (Overview, Data sources,
+   Methodology, Update cadence, Limits & blind spots — see
+   [README content shape](#readme-content-shape)), and its source/cadence
+   claims match the actual feed scripts and deployed cronjobs. The
+   `--readme-url` flag must be passed on `alva release playbook` and must
+   match this exact path (relative form `{name}/README.md` is preferred).
 
 ### 8. Remix (Create from Existing Playbook)
 
@@ -1029,6 +1098,10 @@ verify these prerequisites:
    confirm HTTP 200 (not 403).
 3. **HTML check** (playbook only) — confirm the playbook HTML file exists in
    ALFS at the expected path.
+4. **README check** (playbook only) — confirm `~/playbooks/{name}/README.md`
+   exists in ALFS and follows the
+   [README content shape](#readme-content-shape). The publish call must
+   pass `--readme-url '{name}/README.md'`.
 
 If the build was interrupted and resumed, re-run this checklist from the top.
 Do not assume prior steps completed successfully.

@@ -143,8 +143,12 @@ and only then upload them. Do not write fresh files from scratch.
 6. **Edit local HTML** (the `./index.html` from Step 2 — update data
    paths to point to your own feed) and upload:
    `alva fs write --path '~/playbooks/{new-name}/index.html' --file ./index.html --mkdir-parents`
-7. **Draft playbook**: `alva release playbook-draft --name {new-name} --display-name "..." --feeds '[{"feed_id":ID}]'`
-8. **Release playbook**: `alva release playbook --name {new-name} --version v1.0.0 --feeds '[{"feed_id":ID}]' --changelog "..."`
+7. **Write README** (mandatory) — adapt the source playbook's README to
+   your data sources and methodology, then upload:
+   `alva fs write --path '~/playbooks/{new-name}/README.md' --file ./README.md --mkdir-parents`.
+   See [SKILL.md → README content shape](../SKILL.md#readme-content-shape).
+8. **Draft playbook**: `alva release playbook-draft --name {new-name} --display-name "..." --feeds '[{"feed_id":ID}]'`
+9. **Release playbook**: `alva release playbook --name {new-name} --version v1.0.0 --feeds '[{"feed_id":ID}]' --changelog "..." --readme-url "{new-name}/README.md"`
 
 **Important**: The new playbook must use a unique name in your user space. The
 feed scripts must use **your own** ALFS paths (not the original owner's) for
