@@ -459,6 +459,15 @@ you MUST have completed `alva skills endpoint --name <skill> --file <file>` for
 that endpoint in this session (passing the **File** column value, not the Path). If the call fails with an unexpected shape,
 re-fetch the endpoint detail rather than guessing.
 
+**Failure and fallback guardrail**: If an Arrays endpoint returns 403, 404, or
+an unexpected empty/irrelevant result, do not immediately tell the user to
+upgrade or use BYOD. First re-check `alva skills summary --name <skill>` for the
+same data domain and look for a semantically equivalent endpoint. For
+congressional trading questions about a specific politician, prefer endpoint
+details that support politician name and date filters (for example
+`senate-trade`) before broader "recent trades" feeds. Report BYOD as a final
+fallback only after same-domain Alva endpoints cannot answer the question.
+
 #### Runtime Libraries
 
 Built-in modules that run inside the jagent V8 runtime via `require()`. These
