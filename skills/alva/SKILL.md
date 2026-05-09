@@ -548,44 +548,23 @@ This rule covers any feed that computes equity curves, drawdown, Sharpe,
 returns, position tracking, or rebalancing — not only feeds that emit
 `signal/targets`. It also applies to ALL feed types that produce signal
 output — monitoring feeds, alert feeds, notification feeds, and backtest
-strategies alike. If the feed pushes signals to Telegram or triggers alerts,
-it MUST use `FeedAltra`.
+strategies alike. If the feed produces `signal/targets`, it MUST use
+`FeedAltra`.
 
-**Push notifications for followers:** Feeds can produce actionable,
-subscription-worthy signals that get pushed to playbook followers via Telegram.
-To make a feed push-capable:
+**Push notification streams:** Subscriptions target feed/playbook resources,
+not output paths. The output path only chooses the notification event:
 
-1. Add a `signal/targets` output to the feed script (see
-   [feed-sdk.md](references/feed-sdk.md) Pattern D) and write signal records
-   using the Altra target format (`{date, instruction, meta}`), where
-   `meta.reason` is the human-readable message followers will see.
-2. Set `--push-notify` in the `alva deploy create` command, or
-   update the existing cronjob with `alva deploy update --id ID --push-notify`.
+| Output stream | Event | Use for | Recipients |
+| --- | --- | --- | --- |
+| `signal/targets` | `playbook_data_ready` | Playbook/follower signals | Playbook followers and groups subscribed to the playbook |
+| `notify/message` | `feed_run_complete` | Feed results, AlvaAsk reports, heartbeat checks, proactive alerts | Feed owner and groups subscribed to the feed |
 
-The platform reads `/data/signal/targets` after each successful
-execution and pushes the signal content to all eligible followers.
+Rules:
 
-**AlvaAsk + owner notifications:** Feeds can use `@alva/alvaask` to call
-Alva's agent and push the result to the feed owner — useful for scheduled
-reports, heartbeat monitoring, and proactive alerts. Write to
-`notify/message` (see [feed-sdk.md](references/feed-sdk.md) Pattern E):
-
-```javascript
-const result = ask("Brief crypto market update with key levels.");
-await ctx.self.ts("notify", "message").append([{
-  date: Date.now(),
-  title: "Daily Briefing",
-  text: result.text,
-}]);
-```
-
-The platform reads `/data/notify/message/@last/1` and pushes `title` + `text`
-to the owner on all connected channels (Telegram, Discord, Web). No playbook
-or followers required.
-
-**Two-step deploy is mandatory for Pattern E.** `--push-notify` alone is not
-enough; without `alva release feed` the platform fires the push but the body
-arrives empty. Always pair them:
+- Do not require `signal/targets` for feed group delivery. A group subscribed
+  to a feed can receive `feed_run_complete` from `notify/message`.
+- A push-capable feed needs `--push-notify` and a feed release bound to the
+  cronjob:
 
 ```bash
 alva deploy create --name <feed> --path '~/feeds/<feed>/v1/src/index.js' \
@@ -594,11 +573,8 @@ alva release feed --name <feed> --version 1.0.0 \
   --cronjob-id <ID_FROM_DEPLOY> --description "<one-sentence purpose>"
 ```
 
-Pattern D (followers, `signal/targets`) needs only `--push-notify`, but it
-also needs at least one playbook follower — a subscribed playbook with no
-followers pushes to nobody.
-
-See **Step 9** below for the full post-release subscription flow.
+Keep schema examples in [feed-sdk.md](references/feed-sdk.md) Patterns D/E.
+See **Step 9** below for the post-release subscription flow.
 
 ### 6. Build the Playbook Web App
 
@@ -749,8 +725,9 @@ Present a concrete recommendation, not a generic "want push?":
 - **User says no** → accept and move on. Do not ask again.
 - **User requests push for a different feed** → honor their choice.
 
-If the feed already has `signal/targets` and `push_notify: true`, skip — it's
-already configured.
+If the feed already has the right push sidecar for the intended event
+(`signal/targets` for playbook signals, `notify/message` for feed completion)
+and `push_notify: true`, skip — it's already configured.
 
 #### Configure and verify
 
@@ -758,13 +735,13 @@ A push is "set up" only after every step below succeeds. Stopping early is
 the most common cause of "configured but nothing arrives" — do not skip
 verification.
 
-1. **Add `signal/targets` output to the feed script** (see
-   [feed-sdk.md](references/feed-sdk.md) Pattern D). `meta.reason` is the
-   text followers receive.
+1. **Add the intended push sidecar** to the feed script:
+   `signal/targets` for playbook signals (Pattern D), or `notify/message` for
+   feed completion / AlvaAsk reports (Pattern E).
 2. **Enable the flag on the cronjob:** `alva deploy update --id <ID> --push-notify`.
 3. **Verify a real run produced push content:** trigger a run (or wait for
-   the next cron fire) and read `@last/1` of `signal/targets`. Confirm the
-   record is fresh and `meta.reason` is non-empty.
+   the next cron fire) and read `@last/1` of the configured sidecar. Confirm
+   the record is fresh and the message body is non-empty.
 4. **Confirm to the user** with the specifics: which feed, what the next
    push will say, when it will fire.
 
