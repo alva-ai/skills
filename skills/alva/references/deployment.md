@@ -13,8 +13,9 @@ The deployment workflow:
 1. **Write** a script (feed or task) and upload it to the filesystem
 2. **Test** it manually via `alva run`
 3. **Deploy** it as a cronjob via `alva deploy create`
-4. **Monitor** the cronjob status via `alva deploy list` / `alva deploy get`
-5. **Debug** execution history via `alva deploy runs` / `alva deploy run-logs`
+4. **Verify** the deployment via `alva deploy trigger` (one out-of-schedule run)
+5. **Monitor** the cronjob status via `alva deploy list` / `alva deploy get`
+6. **Debug** execution history via `alva deploy runs` / `alva deploy run-logs`
 
 Cronjobs execute the script through the same jagent runtime as `alva run`.
 The script receives the same environment (`require("env").args` contains the
@@ -105,6 +106,31 @@ alva deploy resume --id 42
 ```
 
 Both return the updated cronjob object.
+
+### Trigger an Out-of-Schedule Run
+
+Fire the cronjob once, immediately. Returns the Hatchet workflow run id
+at enqueue — async; the `cronjob_runs` row appears only after the worker
+finishes the run.
+
+```bash
+alva deploy trigger --id 42
+# { "workflow_run_id": "hatchet-wf-..." }
+```
+
+To verify completion, poll `runs` and match by `workflow_run_id`:
+
+```bash
+WF=$(alva deploy trigger --id 42 | jq -r .workflow_run_id)
+while ! ROW=$(alva deploy runs --id 42 --first 5 \
+               | jq -e ".runs[] | select(.workflow_run_id==\"$WF\")"); do
+  sleep 5
+done
+echo "$ROW" | jq '{id, status, error}'
+```
+
+Use *after* deploy to confirm the full cronjob path is wired correctly.
+For iterating on script logic without Hatchet, use `alva run` instead.
 
 ### Debugging Runs
 
