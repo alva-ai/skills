@@ -162,13 +162,13 @@ await feed.run(async (ctx) => {
 
 Read `@last/N` (where N >= batch size) to get the most recent batch.
 
-### Pattern D: Signal / Push Notification
+### Pattern D: Signal / Playbook Push Notification
 
-For feeds that produce actionable signals worth pushing to playbook followers.
-Write signal records to the **`signal`** group with a **`targets`** output --
-the resulting path `~/feeds/{name}/v{major}/data/signal/targets` is the
-convention the platform reads when notifying followers via Telegram (or other
-push channels).
+For feeds that produce actionable signals worth pushing to playbook followers
+or groups subscribed to a playbook. Write signal records to the **`signal`**
+group with a **`targets`** output -- the resulting path
+`~/feeds/{name}/v{major}/data/signal/targets` is the convention the platform
+reads when dispatching the `playbook_data_ready` notification event.
 
 The target format follows the same structure used by Altra trading strategies:
 
@@ -178,7 +178,7 @@ const { Feed, feedPath, makeDoc, str, num, obj, arr, fld } = require("@alva/feed
 const feed = new Feed({ path: feedPath("my-signal") });
 
 feed.def("signal", {
-  targets: makeDoc("Signal Targets", "Actionable signals for followers", [
+  targets: makeDoc("Signal Targets", "Actionable signals for playbook notifications", [
     obj("instruction", [
       str("type"),       // "allocate" | "orders"
       arr("weights", [   // for type: "allocate"
@@ -217,32 +217,34 @@ await feed.run(async (ctx) => {
 ```
 
 When this feed runs as a cronjob, the platform reads
-`/data/signal/targets` and pushes the signal content (truncated to
-500 chars) to all playbook followers who have enabled Telegram notifications.
+`/data/signal/targets` and dispatches the signal content (truncated to
+500 chars) as `playbook_data_ready` to eligible playbook notification targets.
 
 **Key points:**
 
 - The group **must** be named `signal` and the output **must** be named
   `targets` -- this is the path the notification system looks for.
 - Use `meta.reason` to provide a human-readable message -- this is what
-  followers see in their push notification.
+  recipients see in their push notification.
 - One record per run is typical; the platform reads `@last/1`.
 - Altra strategies write to this path automatically. Use this pattern only for
   non-Altra feeds that want to produce push-worthy signals.
 
-### Pattern E: AlvaAsk + Owner Notification (notify/message)
+### Pattern E: AlvaAsk + Feed Notification (notify/message)
 
 **Preferred pattern for scheduled tasks.** Use `@alva/alvaask` instead of
 ADK for cronjob feeds — it's simpler (no sandbox/session management) and
 the `ask()` call handles tool use, web search, and ALFS access automatically.
 
-For feeds that use `@alva/alvaask` to call Alva's agent and push the result
-to the feed owner. Common use cases: scheduled market reports, periodic
-research summaries, heartbeat monitoring, and proactive alerts.
+For feeds that use `@alva/alvaask` to call Alva's agent and publish the result
+as a feed completion notification. Common use cases: scheduled market reports,
+periodic research summaries, heartbeat monitoring, and proactive alerts.
 
 Write the agent's response to the **`notify`** group with a **`message`**
-output. When the cronjob completes, the platform reads this path and pushes
-the content to the owner on all connected channels (Telegram, Discord, Web).
+output. When the cronjob completes, the platform reads this path and dispatches
+`feed_run_complete` to the feed owner via Web and any active IM channel, and
+to groups subscribed to this feed with
+`/alva subscribe feed <feed_id>`.
 
 ```javascript
 const { ask } = require("@alva/alvaask");
@@ -295,8 +297,10 @@ alva release feed --name daily-briefing --version 1.0.0 \
 - `text` is the notification body (required for content push).
 - **`alva release feed` is required** — without it, push notifications
   will not be delivered.
-- Does **not** require a playbook or followers — works for any feed.
-- Combine with Pattern D if you want to push to both owner AND followers.
+- Does **not** require a playbook or followers for owner delivery — works for
+  any feed. Group delivery requires the group to subscribe to that feed.
+- Combine with Pattern D if you want both feed completion notifications and
+  playbook/follower signal notifications.
 
 ### Deduplication
 

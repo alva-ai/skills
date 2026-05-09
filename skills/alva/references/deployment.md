@@ -39,12 +39,12 @@ alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js
 | --cron          | string | yes      | Standard cron expression                               |
 | --name          | string | yes      | Job name (1–63 lowercase alphanumeric or hyphens, no leading/trailing hyphen) |
 | --args          | JSON   | no       | JSON passed to `require("env").args` on each execution |
-| --push-notify   | flag   | no       | Enable push notifications for playbook followers       |
+| --push-notify   | flag   | no       | Enable push fanout after successful feed runs          |
 
 When `--push-notify` is set, every successful cronjob execution triggers a
-notification fan-out: the platform reads the feed's
-`/data/signal/targets/@last/1`, and pushes the signal content to all playbook
-followers who have enabled Telegram notifications.
+notification fanout. `signal/targets` dispatches `playbook_data_ready`;
+`notify/message` dispatches `feed_run_complete` to the owner and any groups
+subscribed to that feed.
 
 The CLI validates that the entry path exists on the filesystem before creating
 the cronjob.

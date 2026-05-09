@@ -26,10 +26,12 @@ alva deploy create \
 | --path        | string | yes      | Path to entry script (home-relative or absolute)                              |
 | --cron        | string | yes      | Standard cron expression (min interval: 1 minute)                             |
 | --args        | JSON   | no       | JSON passed to `require("env").args` on each execution                        |
-| --push-notify | flag   | no       | Enable push notifications for playbook followers                              |
+| --push-notify | flag   | no       | Enable push fanout after successful feed runs                                 |
 
-When `--push-notify` is set, every successful execution reads the feed's
-`/data/signal/targets/@last/1` and pushes it to playbook followers (Telegram).
+When `--push-notify` is set, every successful execution checks the feed's push
+sidecars: `signal/targets` dispatches `playbook_data_ready`, while
+`notify/message` dispatches `feed_run_complete` to the owner and groups
+subscribed to that feed.
 
 Response:
 

@@ -5,8 +5,10 @@ surface is an **AI-generated push digest**, not a dashboard. User can provide
 either a rough topic or a full source plan; the agent researches the topic,
 drafts a `CONFIG`, selects the smallest useful set of Alva search/feed/data inputs,
 runs on cron, generates an opinionated grounded take via `@alva/alvaask`, and
-pushes it to Telegram (via `signal/targets` for followers, or
-`notify/message` for the owner). The HTML playbook is a **light feed-stream
+pushes it through Alva notifications (via `signal/targets` for
+playbook/follower signals, or `notify/message` for feed completion
+notifications to the owner and feed-subscribed groups). The HTML playbook is a
+**light feed-stream
 replay** of past pushes — not an analytical dashboard.
 
 > **Highest-priority standard — strictly follow. Template iterates; always
@@ -127,7 +129,7 @@ that materially affect the feed:
 | Topic boundary | What should this track, and what should it exclude? | Prevents broad keyword slop. |
 | Sources | Optional but useful: paste sources you already trust — RSS feeds, newsletters, podcasts, YouTube channels, websites, X handles, subreddits, upstream Alva feeds, or plain text source names. If skipped, the agent researches a source plan first. | Makes the digest match the user's actual information diet, and chooses `unified_search` vs `feed_widgets` and adapters. |
 | Cadence / trigger | How often should it summarize or check? For thresholds, what exact condition matters? | Sets cron and materiality. |
-| Audience | Followers or owner only? | Chooses `signal/targets` vs `notify/message`. |
+| Audience | Playbook signal or feed notification? | Chooses `signal/targets` for playbook/follower signals or `notify/message` for owner plus feed-subscribed groups. |
 | Angle | What kind of take should the update have? | Drives the generation prompt and voice. |
 | Worth-pushing bar | What counts as material enough to notify? | Reduces noisy pushes. |
 
@@ -198,8 +200,8 @@ Default assumptions for the skip path:
   `mode: "watch"` with a tighter cron. Do not ask the user to choose a mode.
 - `quiet_day_policy`: `"ping"` for paid/subscriber-facing briefs where silence
   is confusing; `"skip"` for noisy topics where no-news days should stay quiet.
-- `audience`: `"followers"` for released playbooks; `"owner"` for private
-  prototypes or platform environments where follower push is not available.
+- `audience`: `"followers"` for playbook/follower signals; `"owner"` for
+  feed completion notifications using `notify/message`.
 - `angle`: opinionated, but no buy/sell/hold calls, no price targets, no
   uncited numerical claims.
 
@@ -272,7 +274,7 @@ const CONFIG = {
     quiet_day_policy: "ping",        // "ping" (default) | "skip"
   },
 
-  audience: "followers",             // "followers" (signal/targets) | "owner" (notify/message)
+  audience: "followers",             // "followers" = signal/targets; "owner" = notify/message to owner + feed-subscribed groups
 
   push_policy: {
     materiality: `Push when there is a fresh supply-chain disruption,
@@ -481,7 +483,7 @@ Retro analysis of quiet periods needs a record. The HTML timeline can show
 skipped fires dimmed-and-collapsed for author-facing transparency. **Append
 always; let `delivery.pushed` drive rendering.**
 
-### `signal/targets` (followers) — Altra format
+### `signal/targets` (playbook/follower signals) — Altra format
 
 When `audience: "followers"`, also append one record to `signal/targets` per
 pushed fire. Format follows Altra's target schema (see `references/feed-sdk.md`
@@ -513,10 +515,12 @@ await ctx.self.ts("signal", "targets").append([{
 > switch `audience` to `"owner"` and write to `notify/message` (Pattern E)
 > — that path is never FeedAltra-gated.
 
-### `notify/message` (owner) — title + text
+### `notify/message` (feed completion notification) — title + text
 
 When `audience: "owner"`, write to `notify/message` instead. No FeedAltra
-requirement; plain `Feed` suffices.
+requirement; plain `Feed` suffices. Despite the historical `owner` label in
+this template, `notify/message` dispatches `feed_run_complete`: the feed owner
+receives it directly, and groups subscribed to the feed can receive it too.
 
 ```javascript
 const PLAYBOOK_URL = "https://<user>.playbook.alva.ai/<playbook>/<version>/index.html";
@@ -750,7 +754,7 @@ Use verbatim; only the slots vary. Run with `model: CONFIG.generation_model`
 
 ```text
 You are writing today's update for the "<<TOPIC_NAME>>" AI Digest playbook.
-Output feeds a Telegram push and an HTML timeline card.
+Output feeds a push notification and an HTML timeline card.
 
 TOPIC
   <<TOPIC_DESCRIPTION>>
@@ -879,14 +883,14 @@ empty fallback event and do not push partial prose.
 ### `composePushPayload(event, playbookUrl)`
 
 The push body is derived deterministically from the event record — one
-`ask()` per fire, one payload shape. Keep Telegram copy compact but not
+`ask()` per fire, one payload shape. Keep notification copy compact but not
 headline-only: treat it as the playbook page TLDR. Preserve the core point,
 key numbers, and why-it-matters sentence from the playbook body. Prefer natural
 prose for short/medium bodies, switch to concise bullet points only when the
 body is already list-shaped or long and data-dense. Bullet count is not fixed;
 fit as many meaningful short points as the remaining budget allows, then always
-reserve room for the playbook link. Do **not** list sources in the Telegram
-push; citations and full source rows live in the playbook. The hard budget is
+reserve room for the playbook link. Do **not** list sources in the push;
+citations and full source rows live in the playbook. The hard budget is
 500 chars because `/data/signal/targets` truncates at 500.
 
 ```javascript
@@ -1028,7 +1032,8 @@ function composePushPayload(event, playbookUrl) {
 
 For `audience: "followers"` the output is the `meta.reason` of a
 `signal/targets` record (§6). For `audience: "owner"` it's the `text` of a
-`notify/message` record with `title = "${CONFIG.topic.name} · <date EST>"`.
+`notify/message` record with `title = "${CONFIG.topic.name} · <date EST>"`;
+that feed event can also fan out to groups subscribed to the feed.
 
 ### When to skip pushing
 
@@ -1046,20 +1051,20 @@ for retro. Don't silently drop them.
 ### Deploy + release command
 
 ```bash
-# Create the cron job. Same command for followers and owner-only digests;
+# Create the cron job. Same command for playbook signals and feed notifications;
 # CONFIG.audience controls whether the feed writes signal/targets or notify/message.
 alva deploy create --name <playbook-name> \
   --path '~/feeds/<name>/v1/src/index.js' \
   --cron "<CONFIG.cadence.cron>" --push-notify
 
-# Release the feed. Required for follower pushes and normal published playback.
+# Release the feed. Required for push fanout content and normal published playback.
 alva release feed --name <playbook-name> --version 1.0.0 \
   --cronjob-id <ID_FROM_DEPLOY> \
   --description "<one-sentence playbook purpose>"
 ```
 
 See `references/feed-sdk.md` Patterns D and E for the full release flow;
-for followers, the release step is mandatory or pushes arrive empty.
+the release step is mandatory or pushes arrive empty.
 
 ---
 
