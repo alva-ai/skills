@@ -772,6 +772,8 @@ RULES
   acknowledgement; only cite facts you actually mention.
 - If INPUT_MATCHES and CONTEXT_FACTS are empty: write one short sentence
   acknowledging the quiet day, empty citations array.
+- Anchor relative time words to NOW; if an event is >12h before NOW, use
+  its absolute date instead of a relative frame.
 
 MATERIALITY
 <<MATERIALITY_JSON>>
@@ -782,6 +784,9 @@ INPUT_MATCHES   // relevance-filtered, deduped
 CONTEXT_FACTS   // optional structured Alva/BYOD/upstream facts from §5; [] by default.
                 // Derived facts should include method/rationale.
 <<CONTEXT_FACTS_JSON>>
+
+NOW
+  <<NOW_ISO_UTC>>
 
 Output strict JSON only, no preamble:
 {
@@ -802,8 +807,9 @@ Output strict JSON only, no preamble:
 const { ask } = require("@alva/alvaask");
 
 function generate({ newMatches, contextFacts, materiality }) {
+  const now = new Date().toISOString();
   const { text } = ask(
-    userBlock({ newMatches, contextFacts, materiality }),
+    userBlock({ now, newMatches, contextFacts, materiality }),
     { system: systemPrompt(), model: CONFIG.generation_model },
   );
   const clean = (text || "").replace(/^```(?:json)?\s*|\s*```$/gm, "").trim();

@@ -571,13 +571,18 @@ reports, heartbeat monitoring, and proactive alerts. Write to
 `notify/message` (see [feed-sdk.md](references/feed-sdk.md) Pattern E):
 
 ```javascript
-const result = ask("Brief crypto market update with key levels.");
+const result = ask(
+  `Brief crypto market update with key levels.\n\nNOW: ${new Date().toISOString()}`,
+);
 await ctx.self.ts("notify", "message").append([{
   date: Date.now(),
   title: "Daily Briefing",
   text: result.text,
 }]);
 ```
+
+Cron-driven `ask()` must append `NOW: <ISO UTC>` so the model can anchor
+relative time words; for events >12h before NOW, prefer absolute dates.
 
 The platform reads `/data/notify/message/@last/1` and pushes `title` + `text`
 to the owner on all connected channels (Telegram, Discord, Web). No playbook
