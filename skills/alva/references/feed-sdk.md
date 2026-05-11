@@ -217,8 +217,10 @@ await feed.run(async (ctx) => {
 ```
 
 When this feed runs as a cronjob, the platform reads
-`/data/signal/targets` and dispatches the signal content (truncated to
-500 chars) as `playbook_data_ready` to eligible playbook notification targets.
+`/data/signal/targets` and dispatches the signal content as
+`playbook_data_ready` to eligible playbook notification targets. Telegram
+delivery chunks long messages at the platform's per-message limit; the feed SDK
+does not require a 500-character summary.
 
 **Key points:**
 
@@ -226,6 +228,9 @@ When this feed runs as a cronjob, the platform reads
   `targets` -- this is the path the notification system looks for.
 - Use `meta.reason` to provide a human-readable message -- this is what
   recipients see in their push notification.
+- Keep `meta.reason` close to the user-facing feed output when the feed is
+  notification-native. Use a push-safe projection only when a channel has a
+  real hard limit or cannot render the feed's richer format.
 - One record per run is typical; the platform reads `@last/1`.
 - Altra strategies write to this path automatically. Use this pattern only for
   non-Altra feeds that want to produce push-worthy signals.
