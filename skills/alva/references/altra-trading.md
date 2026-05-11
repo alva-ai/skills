@@ -748,6 +748,11 @@ All output data is also persisted under the feed's ALFS path (quote in CLI, e.g.
 └── perf/metrics            -- Performance report
 ```
 
+`signal/targets` makes the feed push-capable, but delivery still requires the
+cronjob to be created or updated with `--push-notify` and the feed release to be
+bound to that cronjob. See `references/deployment.md` for the deploy/release
+flow.
+
 ---
 
 ## Point-In-Time (PIT) Compliance
