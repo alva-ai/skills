@@ -4,6 +4,50 @@ For "what-if I bought/sold X when Y happens" analysis.
 
 > **Highest-priority standard — strictly follow. Template iterates; always work from the latest version of this file.**
 
+## 0i. Pre-flight budget (mandatory — context-conserving)
+
+Before writing any feed code, the agent must respect a **bounded
+pre-flight protocol**. Unbounded shape-checking exhausts the context
+window and produces sessions that complete `stream_status` without
+ever writing a feed (eval-issues#398, #399, #489 — including session
+2052689368756080640 where 35 pre-flight tool calls left $8.58 / $10
+budget unused but no playbook). The bound:
+
+- **Data-validation `alva run` probes**: at most **3** targeted probes
+  per session. One per critical assumption (e.g. "VIX endpoint
+  resolves", "SPY symbol resolves on the chosen exchange", "FeedAltra
+  accepts the trigger shape"). If more validation is needed, batch
+  the probes into one `alva run` call that returns all results, not
+  three separate `alva run` calls. A 4th probe should make you ask
+  whether the build can proceed without it — and usually the answer
+  is yes.
+- **Reference-doc reads**: read each design-doc reference at most
+  **once per session**, and read only the **section(s) relevant to
+  what you are about to write**. Use `Read --offset --limit` to scope
+  to the section, or `Grep` for the specific anchor — do not re-read
+  the entire `design-components.md` in chunks just to refresh memory.
+  If you find yourself reading the same file twice in a session, you
+  are over-consuming context.
+- **Template re-reads**: this template file must be read at most
+  **once** per session. After the first read, refer to it from memory
+  or re-read only the specific section needed (with `--offset`
+  / `--limit`). Do not chunk-read the whole template a second time.
+- **Naming-conflict checks**: `alva fs readdir ~/feeds; ~/playbooks`
+  once at the start, not after every code-write. Cache the result in
+  short-term memory.
+
+The rule is a **context budget**, not a behavioral preference: every
+chunk-read of a ref doc and every `alva run` probe consumes ~2-8k
+tokens of accumulated tool-result context. A 20-call pre-flight
+session can exhaust the available context before any user-visible
+artifact is produced. Stay under ~8k tokens of pre-flight tool output
+unless the question genuinely cannot proceed without further probing.
+
+If you find yourself approaching this budget without having written
+a single line of feed code, **stop, summarize what you have, and
+proceed to feed code with the assumptions made explicit** — partial
+delivery with clear caveats beats no delivery at all.
+
 ## 0. Design System Compliance (READ FIRST)
 
 **MANDATORY — strictly follow the Alva skill design guideline. Non-negotiable.**
