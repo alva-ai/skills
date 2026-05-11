@@ -1091,6 +1091,42 @@ pairs, which are not in the Data Skills catalog), state the limitation upfront
 rather than discovering it through failed searches. Suggest BYOD alternatives
 if a public API exists.
 
+### Infra / Connectivity Failures
+
+A single failed network probe is **not** evidence of an outage and is **not** a
+license to abandon a build. Connectivity failures must be confirmed across
+distinct runtime surfaces, and a clear build-intent request must always ship at
+least a degraded artifact.
+
+1. **Two-surface rule before declaring infra down.** A raw `require("net/http")`
+   call to a hardcoded data endpoint is one surface. Before concluding "infra
+   blocked," you MUST also fail on a second, independent surface — a proper
+   `arrays-data-api-*` skill invocation discovered via `alva skills list` /
+   `alva skills endpoint`, OR an `alva sdk doc` lookup followed by the
+   skill-prescribed call path. One probe = one data point; do not extrapolate
+   to a global outage.
+2. **Same domain ≠ same blast radius.** `data-tools.prd.space.id` failing under
+   raw `syncFetch` does not imply that the post-#282 `arrays-data-api-*` skill
+   path is also blocked — they exit the sandbox via different code paths and
+   may hit different egress policies. Re-probe through the skill, not through
+   the same hand-rolled URL.
+3. **Build-intent requests must ship something.** When the request carries a
+   `/use-template:<name>` directive or otherwise has unambiguous build intent
+   (the user has already committed to scope), `clarification_pending` with only
+   a memory write is a failed delivery. If live data fetch is genuinely blocked
+   after the two-surface check, ship a **degraded artifact**: a skeleton
+   playbook / static plan doc / offline-draft with a documented resume hook
+   that wires up data on the next run. Disclose the degradation explicitly in
+   the artifact and in the assistant message — never silent.
+4. **Memory-write is not a delivery.** Updating memory with options A/B/C and
+   waiting for a user ping does not count as shipping. Memory captures intent;
+   artifacts capture work. A build session that writes only memory has not
+   built anything.
+5. **Probe-signal-confirmed ≠ build-impossible.** Even when the probe failure
+   matches a prior-memory infra fingerprint, that confirms the *probe path* is
+   blocked, not that *every* path is blocked and not that *no* artifact can be
+   shipped. Separate the two conclusions.
+
 ---
 
 ## Debugging Feeds
