@@ -262,6 +262,25 @@ proceeding. Do **not** silently substitute a different deliverable (local
 prototype with seeded RNG, WebSearch summary, analytic memo without data
 fetch) when the SDK can serve the original request.
 
+**The prohibition on RNG / synthesized data is data-layer, not
+delivery-surface.** It applies wherever the pipeline runs — V8 feed
+script, local sandbox Python/Node, ad-hoc `alva run --code`, query-mode
+REPL — and to every downstream value the agent reports back to the user
+(scores, correlations, Sharpe ratios, drawdowns, rankings, regime
+commentary). A "SYNTHETIC PROTOTYPE" badge, a README footnote, or
+framing the run as "local-only" / "demo" / "scaffold" does **not**
+exempt the output: if a quantitative value derived from `random.*`,
+`np.random.*`, `Math.random`, a seeded shock model, or any other
+non-source-grounded generator surfaces in chat, in an HTML artifact, or
+in a file the user is told to read, it is a content-legitimacy
+violation. "Fetch or synthesize" phrasing from the user is **not** a
+license to synthesize when the requested universe is in SDK coverage —
+redirect to the SDK and confirm before any RNG-based data layer is
+written. Synthesized inputs are only acceptable when they are inputs to
+*pipeline code* the user is reviewing (unit-test fixtures, schema
+examples, plumbing smoke tests) and **no derived statistic from them is
+reported as a finding**.
+
 ### Data Sourcing
 
 1. **All quantitative data displayed in charts, tables, or metric cards MUST
