@@ -420,6 +420,25 @@ the host machine's filesystem, environment variables, or processes. The runtime
 has access to ALFS, data skills via HTTP, runtime libraries, LLM access, and
 the Feed SDK.
 
+**Absent globals — do not use:**
+
+- `process.*` — no `process` object exists. For output use `console.log`
+  (not `process.stdout.write`); for env vars use
+  `secret.loadPlaintext('NAME')` (not `process.env`); to abort use
+  `throw new Error(...)` (not `process.exit`).
+- `setTimeout` / `setInterval` / `clearTimeout` — no timer globals.
+  Use a synchronous busy-wait helper or restructure to await-driven flow;
+  see `references/snippets/sleep.md` if it exists.
+- `URLSearchParams` — not in scope. Build query strings manually,
+  e.g. `Object.entries(p).map(([k,v]) => k+'='+encodeURIComponent(v)).join('&')`,
+  or use the helper your data skill exposes.
+- `fetch` (global) — must `require('net/http')` and use `http.fetch`.
+- Top-level `await` — wrap in `(async () => { ... })()`.
+
+If a script throws `ReferenceError: <X> is not defined`, the runtime
+does not expose `<X>` — do not retry the same call; rewrite to one of
+the patterns above.
+
 ### 3. Data Skills
 
 Financial data APIs across 16+ domains, served by the Arrays backend
