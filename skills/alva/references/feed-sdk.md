@@ -192,7 +192,7 @@ feed.def("signal", {
       ]),
     ]),
     obj("meta", [
-      str("reason"),     // human-readable explanation
+      str("reason"),     // Markdown push-notification body
     ]),
   ]),
 });
@@ -226,8 +226,13 @@ does not require a 500-character summary.
 
 - The group **must** be named `signal` and the output **must** be named
   `targets` -- this is the path the notification system looks for.
-- Use `meta.reason` to provide a human-readable message -- this is what
-  recipients see in their push notification.
+- Use `meta.reason` to provide the push-notification body -- this is what
+  recipients see when the signal is delivered.
+- `meta.reason` is **Markdown**. Write it as the push body itself, using
+  Markdown for emphasis, lists, and links; the platform renders Markdown on
+  the delivery side (Telegram, in-app surfaces). Keep it short and
+  push-friendly -- headings and heavy formatting don't translate well to a
+  notification.
 - Keep `meta.reason` close to the user-facing feed output when the feed is
   notification-native. Use a push-safe projection only when a channel has a
   real hard limit or cannot render the feed's richer format.
