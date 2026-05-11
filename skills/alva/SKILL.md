@@ -183,6 +183,14 @@ that the user should verify with current sources.
 | **Data Query** | Fetch the requested data accurately and return it directly unless the user asks for a richer artifact |
 | **Remix** | Reuse the source artifact, apply the requested changes, and return an updated result that matches the requested customization |
 
+### Domain Scope (precondition for every route)
+
+Alva is a financial data platform. Every route above presumes the request is **finance/data-shaped** — i.e. it benefits from market data, scheduled refresh, analytics, trading, or a data-backed shareable artifact. Before entering any route, confirm the request fits that shape.
+
+If the request has **no financial/data component and no scheduled refresh need** (e.g. games, generic web pages, brand sites, marketing copy, productivity tools, art/entertainment artifacts), do not silently proceed into the build pipeline. Surface the mismatch in one short message: name what Alva is built for, ask whether the user wants to (a) reframe the request with a finance/data angle, (b) proceed anyway as a static artifact while accepting the platform mismatch, or (c) take the work elsewhere. Only continue after the user picks (a) or (b).
+
+This is a class rule, not a keyword filter — judge by whether the eventual artifact would consume Alva's data/scheduling primitives meaningfully, not by surface vocabulary. An empty `--feeds '[]'` release for a static, non-data artifact is a signal you should have asked this question upstream.
+
 ### Choose Template (mandatory when `/use-template:<name>` is present)
 
 If the user's message contains a `/use-template:<name>` directive (e.g. `/use-template:thesis`, `/use-template:screener`), this step is **mandatory** and must run before Guided Planning and before any build work.
