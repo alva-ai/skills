@@ -76,7 +76,7 @@ alva release playbook-draft --name btc-dashboard --display-name "BTC Trend Dashb
 ## Release Playbook
 
 ```
-alva release playbook --name NAME --version VERSION --feeds '[{"feed_id":100}]' --changelog "text" --readme-url "NAME/README.md"
+alva release playbook --name NAME --version VERSION --feeds '[{"feed_id":100}]' --changelog "text" --readme-url '~/playbooks/NAME/README.md'
 ```
 
 Release an existing playbook for public hosting. Reads the playbook HTML from
@@ -84,8 +84,9 @@ Release an existing playbook for public hosting. Reads the playbook HTML from
 
 Changelog lives on the release, not the draft — set it when publishing.
 
-`--readme-url` is required: it declares the ALFS location of the playbook's
-README and the server validates the value against a fixed convention (see
+`--readme-url` is a **required CLI flag**: the command fails argument
+parsing if it is missing. It declares the ALFS location of the playbook's
+README, and the server validates the value against a fixed convention (see
 [Playbook README](#playbook-readme) below). Write the README to that path
 **before** calling this command.
 
@@ -108,8 +109,8 @@ Feed reference fields:
 # 1. Write README to ALFS first (see Playbook README below for content shape).
 alva fs write --path '~/playbooks/btc-dashboard/README.md' --file ./README.md --mkdir-parents
 
-# 2. Then release, declaring the README location.
-alva release playbook --name btc-dashboard --version v1.0.0 --feeds '[{"feed_id": 100, "feed_major": 1}]' --changelog "Initial release" --readme-url "btc-dashboard/README.md"
+# 2. Then release, passing the same ALFS path you wrote to as --readme-url.
+alva release playbook --name btc-dashboard --version v1.0.0 --feeds '[{"feed_id": 100, "feed_major": 1}]' --changelog "Initial release" --readme-url '~/playbooks/btc-dashboard/README.md'
 → {"playbook_id": 99, "version": "v1.0.0", "published_url": "https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html", "playbook_path": "/alva/home/alice/playbooks/btc-dashboard"}
 ```
 
@@ -126,13 +127,20 @@ copy.
 
 ### Path and `--readme-url` forms
 
-The owner writes the README to ALFS before publish; the server does not
-write the file. The server only accepts two forms for `--readme-url`:
+The flow is: **first** write the README to ALFS, **then** pass that same
+ALFS path verbatim as `--readme-url`. The server does not write the file —
+it only validates that the value matches the canonical README location.
 
-1. **Relative** (preferred): `<name>/README.md` — e.g. `btc-dashboard/README.md`.
+The server accepts two forms for `--readme-url`:
+
+1. **Relative** (preferred): `~/playbooks/<name>/README.md` — e.g.
+   `~/playbooks/btc-dashboard/README.md`. This matches the same `~/playbooks/...`
+   shorthand used by `alva fs write`, so the publish call mirrors the path
+   you wrote to. Quote it in the shell (`'~/playbooks/<name>/README.md'`)
+   to prevent local `~` expansion.
 2. **Absolute**: `/alva/home/<username>/playbooks/<name>/README.md` — e.g.
    `/alva/home/alice/playbooks/btc-dashboard/README.md`. Use this only
-   when hard-coding the username is unavoidable.
+   when hard-coding the username is unavoidable (e.g. cross-user references).
 
 Both forms point to the same ALFS path. Any other value is rejected with
 `InvalidArgument`.
