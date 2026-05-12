@@ -11,7 +11,7 @@ description: >-
   Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v1.7.0
+  version: v1.8.0
 ---
 
 # Alva
@@ -183,20 +183,24 @@ that the user should verify with current sources.
 | **Data Query** | Fetch the requested data accurately and return it directly unless the user asks for a richer artifact |
 | **Remix** | Reuse the source artifact, apply the requested changes, and return an updated result that matches the requested customization |
 
-### Choose Template (mandatory when `/use-template:<name>` is present)
+### Choose Skill (mandatory when `/use-skill:<username>/<name>` is present)
 
-If the user's message contains a `/use-template:<name>` directive (e.g. `/use-template:thesis`, `/use-template:screener`), this step is **mandatory** and must run before Guided Planning and before any build work.
+If the user's message contains a `/use-skill:<username>/<name>` directive (e.g. `/use-skill:alva/thesis`, `/use-skill:alice/btc-momentum`), this step is **mandatory** and must run before Guided Planning and before any build work.
 
-1. Resolve `<name>` to `skills/alva/templates/<name>/template.md` (relative to this skill).
-2. **Read that template file** via the filesystem — do not proceed from memory of a prior session. If the file does not exist, list the directories under `templates/` and ask the user which to use.
-3. Treat the template as the authoritative blueprint for layout, sections, widgets, data contracts, and cadence. Deviate only where the user explicitly overrides it.
-4. State the template choice and any intentional deviations in your Guided Planning plan. The `/use-template:` directive is a **strong build directive** — combined with a concrete topic, present the plan **once** and build; do not also stack clarifying multi-choice questions on top. Treat `/use-template:` + concrete topic the same as "just do it": a single short plan, then build.
+The directive gives the full catalog id (`<username>/<name>`). Skills live in the playbook-skills catalog on the gateway and are fetched via the `alva skills` CLI (use `alva skills --help` for the full surface). They can be published by any user — do not assume the `alva/` namespace.
 
-**Content arrangement.** A template's default sections are a floor, not a ceiling. Lead with whatever carries the user's core question, proactively add sections the request demands, and cut or fold near-empty sections into neighbors rather than padding them.
+1. **Inspect**: `alva skills get <username>/<name>` returns the file listing with sizes. Confirm a blueprint file is present — convention is `template.md`. If absent, look for `README.md` or ask the user which file is the blueprint.
+   - **On 404 / not found** (typo, deleted, or moved): run `alva skills list` and look for close matches **leniently** — case-insensitive, substring on both halves of the id, ignore separator differences. If exactly one obvious candidate, proceed with it and tell the user you corrected the id (e.g. "interpreting `/use-skill:Alva/AI-Digest` as `alva/ai-digest`"). If multiple plausible candidates, show them and ask. If nothing close, show the filtered list (use `--tag` if the user hinted at a topic) and ask the user to pick.
+2. **Read the blueprint**: `alva skills file <username>/<name> template.md` (or the file from step 1). Do not proceed from memory of a prior session — fetch it fresh.
+3. **Pull other files on demand**: when building, fetch additional files progressively as needed (e.g. `alva skills file <username>/<name> src/index.js` only if you intend to mirror the strategy logic). Do not bulk-download.
+4. Treat the blueprint as authoritative for layout, sections, widgets, data contracts, and cadence. Deviate only where the user explicitly overrides it.
+5. State the skill choice and any intentional deviations in your Guided Planning plan. The `/use-skill:` directive is a **strong build directive** — combined with a concrete topic, present the plan **once** and build; do not also stack clarifying multi-choice questions on top. Treat `/use-skill:` + concrete topic the same as "just do it": a single short plan, then build.
 
-**Push-driven requests** — if the user's primary outcome is a recurring push (digest, threshold tracker, stream watch, periodic alert), the [ai-digest template](templates/ai-digest/template.md) is purpose-built for that shape and worth offering during Guided Planning. Push can also be added to any other playbook via Step 9 — the template is one good option, not a requirement.
+**Content arrangement.** A skill's default sections are a floor, not a ceiling. Lead with whatever carries the user's core question, proactively add sections the request demands, and cut or fold near-empty sections into neighbors rather than padding them.
 
-No `/use-template:` directive → skip this step and proceed to Guided Planning normally.
+**Push-driven requests** — if the user's primary outcome is a recurring push (digest, threshold tracker, stream watch, periodic alert), the `alva/ai-digest` skill is purpose-built for that shape and worth offering during Guided Planning. Push can also be added to any other playbook via Step 9 — the skill is one good option, not a requirement.
+
+No `/use-skill:` directive → skip this step and proceed to Guided Planning normally.
 
 ### Guided Planning
 
@@ -221,11 +225,11 @@ afterward.
    there are real strategic alternatives. Lead with your recommendation. Skip
    when the template or request already pins the approach.
 3. **Confirm the plan** — When step 1 was skipped (request already clear, or
-   `/use-template:` directive specifies the shape), present a single 5-8 line
+   `/use-skill:` directive specifies the shape), present a single 5-8 line
    plan listing the specific feeds and widgets, then build after approval.
-   State the template (if any) and the key defaults you are using.
+   State the skill (if any) and the key defaults you are using.
 
-If the user says "just do it" at any point — or used `/use-template:<name>`
+If the user says "just do it" at any point — or used `/use-skill:<username>/<name>`
 together with a concrete topic — skip clarifying questions for the rest of the
 session and present a single short plan, then build.
 
@@ -460,14 +464,14 @@ the patterns above.
 
 Financial data APIs across 16+ domains, served by the Arrays backend
 (`$ARRAYS_ENDPOINT`, defaults to `https://data-tools.prd.space.id`). To find
-the right API for a task, use the `alva skills` CLI (public, no auth):
+the right API for a task, use the `alva data-skills` CLI (public, no auth):
 
-1. **Discover available data skills**: `alva skills list` — returns all data
+1. **Discover available data skills**: `alva data-skills list` — returns all data
    skills with their names and descriptions. Use this to find the skill that
    matches your data need.
-2. **Fetch the skill summary**: `alva skills summary --name <skill>` — returns
+2. **Fetch the skill summary**: `alva data-skills summary <skill>` — returns
    the endpoints table for that domain.
-3. **Fetch endpoint detail**: `alva skills endpoint --name <skill> --file <file>`
+3. **Fetch endpoint detail**: `alva data-skills endpoint <skill> <file>`
    — use the **File** value from the summary endpoints table (e.g. `rates`,
    `macro-index-historical`, `earnings-calendar`) to get full parameters,
    response fields, and examples. The `File` column is the endpoint slug;
@@ -483,7 +487,7 @@ the right API for a task, use the `alva skills` CLI (public, no auth):
 Data skills span spot and derivatives markets across stocks, ETFs, options,
 and crypto; equity fundamentals, estimates, events, and ownership flows;
 on-chain metrics and exchange flows; macro and economic indicators; news;
-and prediction markets. Run `alva skills list` for the live catalog.
+and prediction markets. Run `alva data-skills list` for the live catalog.
 
 **Data skill doc lookup is mandatory.** Always fetch the endpoint detail before
 writing code that calls it. Do not guess paths, parameter names, or response
@@ -491,13 +495,13 @@ shapes from memory. The doc lookup ensures you use the correct endpoint and
 handle the actual response format.
 
 **Enforcement**: Before any Arrays data HTTP call or `alva run` that hits one,
-you MUST have completed `alva skills endpoint --name <skill> --file <file>` for
+you MUST have completed `alva data-skills endpoint <skill> <file>` for
 that endpoint in this session (passing the **File** column value, not the Path). If the call fails with an unexpected shape,
 re-fetch the endpoint detail rather than guessing.
 
 **Failure and fallback guardrail**: If an Arrays endpoint returns 403, 404, or
 an unexpected empty/irrelevant result, do not immediately tell the user to
-upgrade or use BYOD. First re-check `alva skills summary --name <skill>` for the
+upgrade or use BYOD. First re-check `alva data-skills summary <skill>` for the
 same data domain and look for a semantically equivalent endpoint. For
 congressional trading questions about a specific politician, prefer endpoint
 details that support politician name and date filters (for example
