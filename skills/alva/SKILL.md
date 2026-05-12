@@ -11,7 +11,7 @@ description: >-
   Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v1.8.0
+  version: v1.9.0
 ---
 
 # Alva
@@ -194,7 +194,7 @@ If the user's message contains a `/use-template:<name>` directive (e.g. `/use-te
 
 **Content arrangement.** A template's default sections are a floor, not a ceiling. Lead with whatever carries the user's core question, proactively add sections the request demands, and cut or fold near-empty sections into neighbors rather than padding them.
 
-**Push-driven requests** — if the user's primary outcome is a recurring push (digest, threshold tracker, stream watch, periodic alert), the [ai-digest template](templates/ai-digest/template.md) is purpose-built for that shape and worth offering during Guided Planning. Push can also be added to any other playbook via Step 9 — the template is one good option, not a requirement.
+**Push-driven requests** — if the user's primary outcome is a recurring push (digest, threshold tracker, stream watch, periodic alert), the [ai-digest template](templates/ai-digest/template.md) is purpose-built for that shape and worth offering during Guided Planning. Push can also be added to any other playbook via Step 10 — the template is one good option, not a requirement.
 
 No `/use-template:` directive → skip this step and proceed to Guided Planning normally.
 
@@ -606,7 +606,7 @@ alva release feed --name <feed> --version 1.0.0 \
 ```
 
 Keep schema examples in [feed-sdk.md](references/feed-sdk.md) Patterns D/E.
-See **Step 9** below for the post-release subscription flow.
+See **Step 10** below for the post-release subscription flow.
 
 ### 6. Build the Playbook Web App
 
@@ -733,7 +733,57 @@ Before calling `alva release playbook`, verify all of the following:
    and must match this exact path — preferred form is the relative ALFS
    shorthand `~/playbooks/{name}/README.md` (quote it in the shell).
 
-### 8. Remix (Create from Existing Playbook)
+### 8. Browse Playbook Skills (Catalog Discovery)
+
+Playbook **skills** are reusable starting points for new playbooks — system-seeded
+ones (e.g. `alva/ai-digest`, `alva/screener`) plus community-contributed ones.
+They live in the alva-backend catalog and surface through the gateway. Use them
+to discover inspiration before building or as remix sources for Step 9.
+
+Namespaced as `<username>/<name>` (e.g. `alva/ai-digest`, `alice/btc-momentum`).
+System skills use username `alva`.
+
+**Discovery commands** (require `alva auth login` first — these routes are
+user-auth-gated):
+
+1. **List the catalog**: `alva skills list` — name, description, tags, and
+   last-updated timestamp for every skill. Optional filters: `--tag <tag>`,
+   `--username <user>`.
+2. **Browse tags**: `alva skills tags` — distinct tag set across all skills.
+3. **Inspect a skill**: `alva skills get <username>/<name>` — metadata plus
+   the file listing with sizes (no content). Use this to see the shape of a
+   skill before pulling files.
+4. **Fetch a single file**: `alva skills file <username>/<name> <path>` —
+   one file's content. **Progressive loading**: pull one file at a time as
+   you need it (e.g. `template.md` first to read the description;
+   `src/index.js` only if you decide to remix). The bulk-files endpoint
+   exists on the gateway but is intentionally not exposed at the CLI to
+   keep loading progressive.
+
+All `alva skills *` commands default to a pretty-printed view; add `--json`
+for the raw envelope. `alva skills file` writes raw content to stdout, so
+redirect to a file: `alva skills file alice/btc-momentum src/index.js > out.js`.
+
+**When to use vs `/use-template:<name>`:**
+
+- `/use-template:<name>` reads from the **local bundled** templates shipped
+  with this skill (`skills/alva/templates/`). Fast, offline, fixed set:
+  `ai-digest`, `screener`, `thesis`, `what-if`.
+- `alva skills *` queries the **live catalog**. Wider, growing set, each call
+  hits the network. Use for: community discovery, finding remix sources,
+  browsing by tag, fetching the latest version of a system template.
+
+**Examples:**
+
+```bash
+alva skills list --tag research              # research-focused skills
+alva skills list --username alva             # all system skills
+alva skills get alva/screener                # see file tree before deciding
+alva skills file alva/screener template.md   # read the description first
+alva skills file alice/btc-momentum src/index.js > /tmp/src.js
+```
+
+### 9. Remix (Create from Existing Playbook)
 
 Users can remix any published playbook to create a customized version. The Remix
 prompt uses the format `@{owner}/{name}` to identify the source playbook — e.g.
@@ -742,11 +792,15 @@ scripts (strategy logic) and HTML (dashboard UI), customizes them per the user's
 request, and deploys a new playbook under their own namespace. If the user does
 not specify what to change, the agent should ask before proceeding.
 
+If the user has not picked a source playbook yet, use Step 8's `alva skills`
+commands to browse the catalog (filter by tag / username) and surface
+candidates before remixing.
+
 See [remix-workflow.md](references/remix-workflow.md) for the full step-by-step
 guide. `alva remix` commands are exclusively for lineage registration — to
 read any playbook's files, use `alva fs read`.
 
-### 9. Post-release push notification flow
+### 10. Post-release push notification flow
 
 After a playbook is **released or kept as draft** (Step 7 complete), proactively
 evaluate whether any deployed feeds produce push-worthy content. Do not wait for
