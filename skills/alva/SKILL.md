@@ -492,17 +492,17 @@ shapes from memory. The doc lookup ensures you use the correct endpoint and
 handle the actual response format.
 
 **Enforcement**: Before any Arrays data HTTP call or `alva run` that hits one,
-you MUST have completed `alva data-skills endpoint <skill> <file>` for
-that endpoint in this session (passing the **File** column value, not the Path). If the call fails with an unexpected shape,
-re-fetch the endpoint detail rather than guessing.
+you MUST have completed the full `list` → `summary` → `endpoint` pipeline for
+that endpoint in this session. `<skill>` must come from `list` output and
+`<file>` must come from the `summary` endpoints table — never from memory or
+a guess. If the call fails with an unexpected shape, re-fetch the endpoint
+detail rather than guessing.
 
 **Failure and fallback guardrail**: If an Arrays endpoint returns 403, 404, or
 an unexpected empty/irrelevant result, do not immediately tell the user to
 upgrade or use BYOD. First re-check `alva data-skills summary <skill>` for the
-same data domain and look for a semantically equivalent endpoint. For
-congressional trading questions about a specific politician, prefer endpoint
-details that support politician name and date filters (for example
-`senate-trade`) before broader "recent trades" feeds. Report BYOD as a final
+same skill and look for a semantically equivalent endpoint; if `<skill>` itself
+was guessed, re-run `list` to recover the correct id. Report BYOD as a final
 fallback only after same-domain Alva endpoints cannot answer the question.
 
 #### Runtime Libraries
