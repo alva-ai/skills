@@ -181,6 +181,7 @@ that the user should verify with current sources.
 | **Dashboard / Playbook** | Identify the needed data sources, validate the data flow, and produce a usable dashboard or playbook when the user wants a shareable artifact |
 | **Backtest / Strategy** | Use Altra, run the backtest correctly, and always produce a visual playbook (equity curve, trade log, metrics) alongside the text summary. Optionally deploy as live paper trading. |
 | **Data Query** | Fetch the requested data accurately and return it directly unless the user asks for a richer artifact |
+| **How-to / UI question** | **Answer the how-to directly** by referencing the playbook's existing UI elements (subscribe button, alert toggle, README modal, push opt-in). Do not interpret a how-to as a remix request. Remix only when the user explicitly asks ("build me one", "帮我 remix", "based on this make ..."). |
 | **Remix** | Reuse the source artifact, apply the requested changes, and return an updated result that matches the requested customization |
 
 ### Choose Template (mandatory when `/use-template:<name>` is present)
@@ -355,6 +356,24 @@ data-driven metrics.
 2. **When >20% of requested symbols fail SDK lookup, report a data-quality
    blocker.** Do not silently substitute with estimated or fabricated values
    marked `live: false`.
+
+3. **Single transient failure ≠ abandonment.** When a hand-rolled HTTP
+   probe, a single SDK call, or a one-off `WebFetch` returns a transient
+   error (connection reset, `408`, `502`, `503`, network timeout), **do
+   not abandon the build on the first failure**. Required minimum
+   recovery before declaring a class of data unreachable:
+
+   - Retry the same call **2-3 times** with short backoff (200ms, 1s, 3s).
+   - Try at least **one alternative path** — a sibling SDK skill listed
+     by `alva skills list`, a different endpoint shape, or a documented
+     fallback module.
+   - Surface the multi-attempt failure to the user (or as a degraded-
+     mode option: skeleton plan, draft HTML with resume hook, static
+     deliverable) before giving up entirely.
+
+   Abandoning a build after a single probe failure without trying any
+   alternative path is the antipattern that motivated this rule
+   (eval-issues#306).
 
 ### Release Gate: `--feeds` Is a Declaration, Not a Shortcut
 
