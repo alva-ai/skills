@@ -323,3 +323,22 @@ Schema: {"insights":[{"sentiment":"up|down|neutral","title":"...","text":"..."}]
 });
 const parsed = parseJson(result.content);
 ```
+
+### Timestamp Source for Extracted Records
+
+When ADK extracts records destined for a timeseries column or user-visible card
+(news, events, articles, filings, posts), the **content's own date** is part of
+the contract — not the crawl time.
+
+- Schema must include `published_at_iso` (ISO 8601 from the source's
+  `published_at`/`pubDate`, or an explicit date extracted from the title/summary)
+  and `date_confidence` (`source_published_at | extracted_from_summary | unknown`).
+- Feed code: `date = Date.parse(it.published_at_iso) || null`. **Never**
+  `date: Date.now()` or `now + i` (the 1ms-spread anti-pattern). Put crawl time
+  in a separate `crawled_at` field if useful.
+- HTML: when `date_confidence === "unknown"` or `date == null`, render
+  `Date unknown` — not the crawl date silently labeled as the content's date.
+
+A card showing `$300B · 2026-05-11` for an event that happened a year earlier is
+a content-legitimacy violation (parallel to "no training-data fill"), not just
+a UX bug.
