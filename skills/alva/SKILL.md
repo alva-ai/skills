@@ -190,7 +190,7 @@ If the user's message contains a `/use-template:<name>` directive (e.g. `/use-te
 1. Resolve `<name>` to `skills/alva/templates/<name>/template.md` (relative to this skill).
 2. **Read that template file** via the filesystem — do not proceed from memory of a prior session. If the file does not exist, list the directories under `templates/` and ask the user which to use.
 3. Treat the template as the authoritative blueprint for layout, sections, widgets, data contracts, and cadence. Deviate only where the user explicitly overrides it.
-4. The `/use-template:` directive is itself a **strong build directive** — the user has already chosen the shape and is asking you to deliver. **Skip Guided Planning entirely**: do not stack clarifying questions or a "Review and confirm before I build" gate on top of an explicit template invocation. Proceed to building with sensible defaults; state the template choice and the key defaults you are using in your first post-build status update, not in a pre-build approval gate. Exception: ask the user only when (a) the template requires a parameter that has no reasonable default for this request (e.g. template needs a ticker and the request mentions none) **or** (b) the request directly conflicts with the template's contract (e.g. user asked for synthesized data — see Content Legitimacy Rules).
+4. State the template choice and any intentional deviations in your Guided Planning plan. The `/use-template:` directive is a **strong build directive** — combined with a concrete topic, present the plan **once** and build; do not also stack clarifying multi-choice questions on top. Treat `/use-template:` + concrete topic the same as "just do it": a single short plan, then build.
 
 **Content arrangement.** A template's default sections are a floor, not a ceiling. Lead with whatever carries the user's core question, proactively add sections the request demands, and cut or fold near-empty sections into neighbors rather than padding them.
 
@@ -205,36 +205,29 @@ Even seemingly clear requests ("build a BTC dashboard") have real choices —
 which data, timeframe, widgets — that are cheaper to resolve upfront than to
 rebuild.
 
-**Skip Guided Planning entirely when ANY of these hold:**
+**Exactly one blocking question per session.** Pick a single path through the
+steps below — do not run step 1 clarifications AND a step 3 plan confirmation
+in the same session. Whichever you use is the gate; the user's answer or
+approval counts as approval to build, and you go directly to building
+afterward.
 
-- The user prefixed with `/use-template:<name>` (see Choose Template above — the directive is itself approval to build).
-- The user said "just do it", "go ahead", "build it", "ship it", or any equivalent terminal-mode phrase at any point in the session.
-- The request is a remix of an existing playbook with no parameter changes.
-- The request specifies all of asset, output type, and a clear concrete topic — proceed with sensible defaults for unspecified secondary parameters (cadence, indicator set, etc.) and state them in your first post-build status update.
+1. **Understand intent** — When key parameters are missing (asset, scope,
+   output type, purpose) and have no obvious default, ask clarifying questions
+   **one at a time**, prefer multiple-choice. Skip this step if the request
+   already specifies these, or if the missing parameters have a single obvious
+   default. **If you ran this step, do not also run step 3** — the answers
+   are the approval to build.
+2. **Propose approaches** — Offer 2-3 concrete options with trade-offs when
+   there are real strategic alternatives. Lead with your recommendation. Skip
+   when the template or request already pins the approach.
+3. **Confirm the plan** — When step 1 was skipped (request already clear, or
+   `/use-template:` directive specifies the shape), present a single 5-8 line
+   plan listing the specific feeds and widgets, then build after approval.
+   State the template (if any) and the key defaults you are using.
 
-When Guided Planning **does** apply:
-
-1. **Understand intent** — Ask clarifying questions **one at a time**, prefer
-   multiple-choice. Focus on what's missing: asset, scope, output type, or
-   purpose. Skip this step if the request already specifies all of these,
-   **or** if the missing parameters have a single obvious default.
-2. **Propose approaches** — Offer 2-3 concrete options with trade-offs. Lead
-   with your recommendation. Skip this step if step 1 was skipped (you already
-   have what you need).
-3. **Confirm the plan** — List the specific feeds and widgets (5-8 lines, no
-   implementation details). Build only after approval.
-
-**Do not stack gates.** A single Guided Planning pass produces **at most one
-blocking question to the user**, not a step-1 clarification AND a step-3 plan
-confirmation. Once step 1's answers come in, treat them as the user's approval
-to build — go directly to building; do not re-present the plan and ask "Good to
-go?" again. If your step 1 collects every choice you need, do not run step 3.
-The combined pattern of "AskUserQuestion → user answers → 'Review and confirm
-before I build' → wait for second approval" is over-confirmation and routinely
-causes session abandonment.
-
-If the user says "just do it" at any point, skip planning for the rest of the
-session.
+If the user says "just do it" at any point — or used `/use-template:<name>`
+together with a concrete topic — skip clarifying questions for the rest of the
+session and present a single short plan, then build.
 
 ### Completion Gate
 
