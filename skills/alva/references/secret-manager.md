@@ -129,6 +129,17 @@ When helping a user build with external providers:
 - write runtime code that fails clearly when the secret is missing
 - keep the secret name consistent across instructions, code, and deployment
 
+### Do not read secret files proactively
+
+Tool-result content persists in the session JSONL. Reading raw credentials
+pollutes that record. On a vague directory-explore prompt ("how about
+workspace/.claude"), `ls` and report filenames only — do not `cat`.
+
+Treat as no-read paths: `*.env`, `*.key`, `*.pem`, `id_rsa*`, `credentials*`,
+`*.token`, anything under `secrets/`, anything under `.claude/skills/*/.env`.
+If the user explicitly names a secret file, prefer a redacted view
+(`head -c 200 file.env | sed 's/=.*/=<REDACTED>/g'`) over raw `cat`.
+
 Example:
 
 ```javascript
