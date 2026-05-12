@@ -681,21 +681,22 @@ above so anonymous viewers can load feed output without authentication.
    The CLI handles authentication automatically. See
    [screenshot.md](references/api/screenshot.md) for full parameter details.
 
-`alva release playbook` **requires** `--readme-url`. The flow is: first
-write the README to ALFS at `~/playbooks/{name}/README.md`, then pass
-that **same path** as `--readme-url` (quote it in the shell to prevent
-local `~` expansion):
+`alva release playbook` **requires** `--readme-url`, and it must be the
+absolute ALFS path `/alva/home/<username>/playbooks/<name>/README.md`
+(the relative `<name>/README.md` shorthand is **no longer accepted**).
+Resolve `<username>` once via `alva whoami`. The flow is: first write
+the README to ALFS, then pass the absolute path as `--readme-url`:
 
 ```bash
 alva fs write --path '~/playbooks/{name}/README.md' --file ./README.md --mkdir-parents
-alva release playbook ... --readme-url '~/playbooks/{name}/README.md'
+alva release playbook ... --readme-url '/alva/home/<username>/playbooks/{name}/README.md'
 ```
 
 Omitting the flag fails CLI argument parsing; passing any value other
-than the canonical README path fails server validation with
+than the absolute README path fails server validation with
 `InvalidArgument`. See
-[release.md](references/api/release.md#playbook-readme) for the absolute
-form, full validation rules, and the canonical content shape.
+[release.md](references/api/release.md#playbook-readme) for full
+validation rules and the canonical content shape.
 
 #### Pro users (`subscription_tier = "pro"`)
 
@@ -753,8 +754,9 @@ Before calling `alva release playbook`, verify all of the following:
    [Playbook README in release.md](references/api/release.md#playbook-readme)).
    Its source / cadence claims match the actual feed scripts and deployed
    cronjobs. The `--readme-url` flag must be passed on `alva release playbook`
-   and must match this exact path — preferred form is the relative ALFS
-   shorthand `~/playbooks/{name}/README.md` (quote it in the shell).
+   as the absolute ALFS path
+   `/alva/home/<username>/playbooks/{name}/README.md` (resolve `<username>`
+   via `alva whoami`); the relative shorthand is no longer accepted.
 
 ### 8. Remix (Create from Existing Playbook)
 
@@ -1096,8 +1098,9 @@ verify these prerequisites:
 4. **README check** (playbook only) — confirm `~/playbooks/{name}/README.md`
    exists in ALFS and follows the
    [Playbook README content shape](references/api/release.md#playbook-readme).
-   The publish call must pass `--readme-url '~/playbooks/{name}/README.md'`
-   (quoted to prevent local `~` expansion).
+   The publish call must pass `--readme-url` as the absolute ALFS path
+   `/alva/home/<username>/playbooks/{name}/README.md` (resolve `<username>`
+   via `alva whoami`); the relative shorthand is no longer accepted.
 
 If the build was interrupted and resumed, re-run this checklist from the top.
 Do not assume prior steps completed successfully.
@@ -1471,8 +1474,9 @@ alva release playbook-draft --name btc-dashboard --display-name "BTC Trend Dashb
 alva fs write --path '~/playbooks/btc-dashboard/README.md' --file ./README.md --mkdir-parents
 
 # 4. Release playbook (reads HTML from ALFS, uploads to CDN, writes release files automatically).
-#    --readme-url is required and must match the README path written above.
-alva release playbook --name btc-dashboard --version v1.0.0 --feeds '[{"feed_id":100}]' --changelog "Initial release" --readme-url '~/playbooks/btc-dashboard/README.md'
+#    --readme-url is required and must be the absolute ALFS path to the README
+#    written above (the relative shorthand is no longer accepted).
+alva release playbook --name btc-dashboard --version v1.0.0 --feeds '[{"feed_id":100}]' --changelog "Initial release" --readme-url '/alva/home/alice/playbooks/btc-dashboard/README.md'
 # → {"playbook_id":99,"version":"v1.0.0","published_url":"https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html"}
 
 # After release, output the canonical share link to the user:

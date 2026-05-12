@@ -148,7 +148,7 @@ and only then upload them. Do not write fresh files from scratch.
    `alva fs write --path '~/playbooks/{new-name}/README.md' --file ./README.md --mkdir-parents`.
    See [release.md → Playbook README](api/release.md#playbook-readme).
 8. **Draft playbook**: `alva release playbook-draft --name {new-name} --display-name "..." --feeds '[{"feed_id":ID}]'`
-9. **Release playbook**: `alva release playbook --name {new-name} --version v1.0.0 --feeds '[{"feed_id":ID}]' --changelog "..." --readme-url '~/playbooks/{new-name}/README.md'` (same ALFS path you wrote to in step 7; quote it to prevent local `~` expansion)
+9. **Release playbook**: `alva release playbook --name {new-name} --version v1.0.0 --feeds '[{"feed_id":ID}]' --changelog "..." --readme-url '/alva/home/<username>/playbooks/{new-name}/README.md'` (absolute ALFS path; resolve `<username>` via `alva whoami` — the relative shorthand is no longer accepted)
 
 **Important**: The new playbook must use a unique name in your user space. The
 feed scripts must use **your own** ALFS paths (not the original owner's) for
