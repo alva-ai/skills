@@ -187,14 +187,17 @@ that the user should verify with current sources.
 
 If the user's message contains a `/use-template:<name>` directive (e.g. `/use-template:thesis`, `/use-template:screener`), this step is **mandatory** and must run before Guided Planning and before any build work.
 
-1. Resolve `<name>` to `skills/alva/templates/<name>/template.md` (relative to this skill).
-2. **Read that template file** via the filesystem — do not proceed from memory of a prior session. If the file does not exist, list the directories under `templates/` and ask the user which to use.
-3. Treat the template as the authoritative blueprint for layout, sections, widgets, data contracts, and cadence. Deviate only where the user explicitly overrides it.
-4. State the template choice and any intentional deviations in your Guided Planning plan. The `/use-template:` directive is a **strong build directive** — combined with a concrete topic, present the plan **once** and build; do not also stack clarifying multi-choice questions on top. Treat `/use-template:` + concrete topic the same as "just do it": a single short plan, then build.
+Templates live in the **playbook-skills catalog** on the gateway (see Step 8 in Capabilities for the full CLI). System templates are seeded under the `alva` namespace. Resolve `/use-template:<name>` to `alva/<name>` and fetch via CLI:
+
+1. **Locate**: `alva skills get alva/<name>` confirms the template exists and returns its file listing. If 404, run `alva skills list --username alva` to surface available system templates and ask the user which one to use.
+2. **Read the blueprint**: `alva skills file alva/<name> template.md` returns the authoritative blueprint. Do not proceed from memory of a prior session — fetch it fresh.
+3. **Pull other files on demand**: when building, fetch additional files progressively as needed (e.g. `alva skills file alva/<name> src/index.js` only if you intend to mirror the strategy logic). Do not bulk-download.
+4. Treat the blueprint as authoritative for layout, sections, widgets, data contracts, and cadence. Deviate only where the user explicitly overrides it.
+5. State the template choice and any intentional deviations in your Guided Planning plan. The `/use-template:` directive is a **strong build directive** — combined with a concrete topic, present the plan **once** and build; do not also stack clarifying multi-choice questions on top. Treat `/use-template:` + concrete topic the same as "just do it": a single short plan, then build.
 
 **Content arrangement.** A template's default sections are a floor, not a ceiling. Lead with whatever carries the user's core question, proactively add sections the request demands, and cut or fold near-empty sections into neighbors rather than padding them.
 
-**Push-driven requests** — if the user's primary outcome is a recurring push (digest, threshold tracker, stream watch, periodic alert), the [ai-digest template](templates/ai-digest/template.md) is purpose-built for that shape and worth offering during Guided Planning. Push can also be added to any other playbook via Step 10 — the template is one good option, not a requirement.
+**Push-driven requests** — if the user's primary outcome is a recurring push (digest, threshold tracker, stream watch, periodic alert), the `alva/ai-digest` template is purpose-built for that shape and worth offering during Guided Planning. Push can also be added to any other playbook via Step 10 — the template is one good option, not a requirement.
 
 No `/use-template:` directive → skip this step and proceed to Guided Planning normally.
 
@@ -733,47 +736,44 @@ Before calling `alva release playbook`, verify all of the following:
    and must match this exact path — preferred form is the relative ALFS
    shorthand `~/playbooks/{name}/README.md` (quote it in the shell).
 
-### 8. Browse Playbook Skills (Catalog Discovery)
+### 8. Playbook Skills (Catalog)
 
-Playbook **skills** are reusable starting points for new playbooks — system-seeded
-ones (e.g. `alva/ai-digest`, `alva/screener`) plus community-contributed ones.
-They live in the alva-backend catalog and surface through the gateway. Use them
-to discover inspiration before building or as remix sources for Step 9.
+Playbook **skills** are the catalog of reusable playbook starting points
+stored on alva-backend and surfaced through the gateway. System templates
+(e.g. `alva/ai-digest`, `alva/screener`, `alva/thesis`, `alva/what-if`)
+are seeded under the `alva` namespace; community contributors publish
+under their own. The `/use-template:<name>` user directive (see [Choose
+Template](#choose-template-mandatory-when-use-templatename-is-present)
+in Request Routing) is one consumer of this catalog — agents can also
+use it for free-form browsing, remix source discovery (Step 9), or
+pulling inspiration before building.
 
-Namespaced as `<username>/<name>` (e.g. `alva/ai-digest`, `alice/btc-momentum`).
-System skills use username `alva`.
+Namespaced as `<username>/<name>`. All `alva skills *` commands require
+`alva auth login` first (routes are user-auth-gated).
 
-**Discovery commands** (require `alva auth login` first — these routes are
-user-auth-gated):
+**Commands**:
 
-1. **List the catalog**: `alva skills list` — name, description, tags, and
-   last-updated timestamp for every skill. Optional filters: `--tag <tag>`,
+1. **List the catalog**: `alva skills list` — name, description, tags,
+   last-updated timestamp for every skill. Filters: `--tag <tag>`,
    `--username <user>`.
-2. **Browse tags**: `alva skills tags` — distinct tag set across all skills.
-3. **Inspect a skill**: `alva skills get <username>/<name>` — metadata plus
-   the file listing with sizes (no content). Use this to see the shape of a
-   skill before pulling files.
+2. **Browse tags**: `alva skills tags` — distinct tag set across the catalog.
+3. **Inspect a skill**: `alva skills get <username>/<name>` — metadata
+   plus the file listing with sizes (no content).
 4. **Fetch a single file**: `alva skills file <username>/<name> <path>` —
-   one file's content. **Progressive loading**: pull one file at a time as
-   you need it (e.g. `template.md` first to read the description;
-   `src/index.js` only if you decide to remix). The bulk-files endpoint
-   exists on the gateway but is intentionally not exposed at the CLI to
-   keep loading progressive.
+   one file's content.
 
-All `alva skills *` commands default to a pretty-printed view; add `--json`
-for the raw envelope. `alva skills file` writes raw content to stdout, so
-redirect to a file: `alva skills file alice/btc-momentum src/index.js > out.js`.
+**Progressive loading.** `get` returns the file tree but no content;
+`file` fetches one file at a time. Pull what you need, when you need it
+(e.g. `template.md` first to read the blueprint; `src/index.js` only if
+you decide to mirror the strategy logic). The bulk-files endpoint exists
+on the gateway but is intentionally not exposed at the CLI to keep
+context budgets tight.
 
-**When to use vs `/use-template:<name>`:**
+All commands default to a pretty-printed view; add `--json` for the raw
+envelope. `alva skills file` writes raw content to stdout — redirect
+with `>` to save a copy.
 
-- `/use-template:<name>` reads from the **local bundled** templates shipped
-  with this skill (`skills/alva/templates/`). Fast, offline, fixed set:
-  `ai-digest`, `screener`, `thesis`, `what-if`.
-- `alva skills *` queries the **live catalog**. Wider, growing set, each call
-  hits the network. Use for: community discovery, finding remix sources,
-  browsing by tag, fetching the latest version of a system template.
-
-**Examples:**
+**Examples**:
 
 ```bash
 alva skills list --tag research              # research-focused skills
