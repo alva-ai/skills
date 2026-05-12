@@ -3,6 +3,10 @@
 Reference structure + screener-specific styling for any ranked-list screener
 (stocks, crypto, etc.).
 
+- **Composite-score ranker:** scores every row in a defined universe and orders the table by total at each daily snapshot
+- **Ranked by weighted named factors** with per-row breakdown surfacing weight, raw value, and points contribution
+- **Snapshot-aware end to end:** picker swaps the digest, table, and expand rows together so any past day is reproducible
+
 ---
 
 ## Design System Compliance (READ FIRST)
