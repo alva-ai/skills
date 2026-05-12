@@ -76,7 +76,7 @@ alva release playbook-draft --name btc-dashboard --display-name "BTC Trend Dashb
 ## Release Playbook
 
 ```
-alva release playbook --name NAME --version VERSION --feeds '[{"feed_id":100}]' --changelog "text" --readme-url '~/playbooks/NAME/README.md'
+alva release playbook --name NAME --version VERSION --feeds '[{"feed_id":100}]' --changelog "text" --readme-url '/alva/home/<username>/playbooks/NAME/README.md'
 ```
 
 Release an existing playbook for public hosting. Reads the playbook HTML from
@@ -96,7 +96,7 @@ README, and the server validates the value against a fixed convention (see
 | --version    | string | yes      | SemVer (e.g. `v1.0.0`)                                                                     |
 | --feeds      | array  | yes      | Feed references `[{feed_id, feed_major?}]`                                                 |
 | --changelog  | string | yes      | Release changelog                                                                          |
-| --readme-url | string | yes      | Owner-attested README location. See [Playbook README](#playbook-readme) for accepted forms. |
+| --readme-url | string | yes      | Owner-attested README location. Must be the absolute ALFS path — see [Playbook README](#playbook-readme). |
 
 Feed reference fields:
 
@@ -109,8 +109,9 @@ Feed reference fields:
 # 1. Write README to ALFS first (see Playbook README below for content shape).
 alva fs write --path '~/playbooks/btc-dashboard/README.md' --file ./README.md --mkdir-parents
 
-# 2. Then release, passing the same ALFS path you wrote to as --readme-url.
-alva release playbook --name btc-dashboard --version v1.0.0 --feeds '[{"feed_id": 100, "feed_major": 1}]' --changelog "Initial release" --readme-url '~/playbooks/btc-dashboard/README.md'
+# 2. Then release, passing the absolute ALFS path as --readme-url.
+#    Resolve <username> via `alva whoami` (here: alice).
+alva release playbook --name btc-dashboard --version v1.0.0 --feeds '[{"feed_id": 100, "feed_major": 1}]' --changelog "Initial release" --readme-url '/alva/home/alice/playbooks/btc-dashboard/README.md'
 → {"playbook_id": 99, "version": "v1.0.0", "published_url": "https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html", "playbook_path": "/alva/home/alice/playbooks/btc-dashboard"}
 ```
 
@@ -125,25 +126,23 @@ HTML's "How does this work?" / methodology modal renders the same content,
 so there is one source of truth — the README — not a separate per-template
 copy.
 
-### Path and `--readme-url` forms
+### Path and `--readme-url` form
 
-The flow is: **first** write the README to ALFS, **then** pass that same
-ALFS path verbatim as `--readme-url`. The server does not write the file —
-it only validates that the value matches the canonical README location.
+The flow is: **first** write the README to ALFS at
+`~/playbooks/<name>/README.md`, **then** pass the **absolute** ALFS path
+as `--readme-url`. The server does not write the file — it only
+validates that the value matches the canonical README location.
 
-The server accepts two forms for `--readme-url`:
+`--readme-url` accepts exactly one form:
 
-1. **Relative** (preferred): `~/playbooks/<name>/README.md` — e.g.
-   `~/playbooks/btc-dashboard/README.md`. This matches the same `~/playbooks/...`
-   shorthand used by `alva fs write`, so the publish call mirrors the path
-   you wrote to. Quote it in the shell (`'~/playbooks/<name>/README.md'`)
-   to prevent local `~` expansion.
-2. **Absolute**: `/alva/home/<username>/playbooks/<name>/README.md` — e.g.
-   `/alva/home/alice/playbooks/btc-dashboard/README.md`. Use this only
-   when hard-coding the username is unavoidable (e.g. cross-user references).
+- `/alva/home/<username>/playbooks/<name>/README.md` — e.g.
+  `/alva/home/alice/playbooks/btc-dashboard/README.md`. Resolve
+  `<username>` once via `alva whoami` and pass the path verbatim
+  (no `~` expansion, no relative shorthand).
 
-Both forms point to the same ALFS path. Any other value is rejected with
-`InvalidArgument`.
+The previously-accepted relative form `<name>/README.md` (and any
+`~/...` shorthand) is **no longer accepted**. Any other value is
+rejected with `InvalidArgument`.
 
 ### Content shape
 
