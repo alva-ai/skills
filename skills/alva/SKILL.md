@@ -281,12 +281,16 @@ fetch) when the SDK can serve the original request.
    originate from Alva feeds** (SDK modules or BYOD via `require("net/http")`).
    Never hardcode data as inline JavaScript literals in playbook HTML.
 
-2. **Playbook HTML MUST fetch data at runtime** from feed output paths:
+2. **Playbook HTML MUST fetch data at runtime** from feed output paths.
+   Published HTML runs in the viewer's browser, so do not use sandbox-only env
+   vars such as `$ALVA_ENDPOINT` and do not guess `https://api.alva.ai`. Use the
+   public anonymous ALFS read gateway:
 
    ```javascript
-   const resp = await fetch(
-     "$ALVA_ENDPOINT/api/v1/fs/read?path=/alva/home/<user>/feeds/<name>/v1/data/<group>/<output>/@last/<n>",
-   );
+   const PUBLIC_ALFS_READ_URL = "https://api-llm.prd.alva.ai/api/v1/fs/read?path=";
+   const feedPath = "/alva/home/<user>/feeds/<name>/v1/data/<group>/<output>/@last/<n>";
+   const resp = await fetch(PUBLIC_ALFS_READ_URL + encodeURIComponent(feedPath));
+   if (!resp.ok) throw new Error(`Failed to load ${feedPath}: HTTP ${resp.status}`);
    const data = await resp.json();
    renderChart(data);
    ```
@@ -619,6 +623,24 @@ static snapshot, default to a live playbook.
 [Content Legitimacy Rules](#content-legitimacy-rules) when building the UI.
 All quantitative data in charts, tables, or metric cards must come from feed
 outputs read at runtime (no inline literals for data).
+
+Use this browser-safe helper for published playbook HTML:
+
+```javascript
+const PUBLIC_ALFS_READ_URL = "https://api-llm.prd.alva.ai/api/v1/fs/read?path=";
+
+async function readAlfsJson(path) {
+  const resp = await fetch(PUBLIC_ALFS_READ_URL + encodeURIComponent(path));
+  if (!resp.ok) {
+    throw new Error(`Failed to load ${path}: HTTP ${resp.status}`);
+  }
+  return resp.json();
+}
+```
+
+`$ALVA_ENDPOINT` is available to sandbox scripts and CLI verification only. Do
+not emit it into browser HTML; published HTML must call the public read gateway
+above so anonymous viewers can load feed output without authentication.
 
 ### 7. Release
 

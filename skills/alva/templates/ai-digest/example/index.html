@@ -476,10 +476,8 @@
   const md = window.markdownit({ html: false, linkify: true, breaks: false });
   const USERNAME = "leoz";
   const FEED_PATH = `/alva/home/${USERNAME}/feeds/ai-chip-supply-chain-deep/v1/data/digest/events/@last/50`;
-  const endpoint = (typeof ALVA_ENDPOINT !== "undefined" && ALVA_ENDPOINT)
-    ? ALVA_ENDPOINT
-    : "https://api-llm.prd.alva.ai";
-  const url = `${endpoint}/api/v1/fs/read?path=${encodeURIComponent(FEED_PATH)}`;
+  const PUBLIC_ALFS_READ_URL = "https://api-llm.prd.alva.ai/api/v1/fs/read?path=";
+  const url = PUBLIC_ALFS_READ_URL + encodeURIComponent(FEED_PATH);
 
 
   // ── Timeline ──
