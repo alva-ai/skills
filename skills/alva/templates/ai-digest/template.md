@@ -290,7 +290,7 @@ const CONFIG = {
   body_max_chars: 1200,              // canonical digest body budget; push reuses this body
 
   // Full Alva model IDs — not short names, not dated Anthropic IDs.
-  generation_model: "claude-sonnet-4-6",
+  generation_model: "claude-opus-4-7",
   relevance_model: "claude-haiku-4-5",
 };
 ```
@@ -637,8 +637,8 @@ A cheap semantic pass is mandatory.
 **SDK choice: `@alva/alvaask`, not `@alva/adk`.** `ask()` is the single LLM
 path for this template — for both the per-item relevance check below and
 the full digest generation in §8. `ask()` is **synchronous** (`{text,
-session_id} = ask(prompt, {system, model})`), and supports the `model`
-option; `adk.agent()` does not.
+session_id} = ask(prompt, {system, model, effort})`), and supports `model`
+and `effort` options; `adk.agent()` does not.
 
 **Batch the calls.** Don't send one `ask()` per item — on 30 items that's
 30 round-trips. Batch 10–20 items into one prompt and return a JSON
@@ -743,7 +743,7 @@ model to decide whether the user has been interrupted too often.
 ## 8. Generation + grounding
 
 All LLM work in this template goes through **`@alva/alvaask`** — `ask()` is
-synchronous, accepts `{system, model}`, and returns `{text, session_id}`.
+synchronous, accepts `{system, model, effort}`, and returns `{text, session_id}`.
 Do **not** use `@alva/adk` here: `adk.agent()` doesn't accept a `model`
 option and pulls in a ReAct loop we don't need. One SDK, two call sites:
 batched yes/no in §7.2 and the structured JSON generation below.
@@ -751,7 +751,8 @@ batched yes/no in §7.2 and the structured JSON generation below.
 ### Prompt skeleton
 
 Use verbatim; only the slots vary. Run with `model: CONFIG.generation_model`
-(full Alva ID, e.g. `"claude-sonnet-4-6"`).
+(full Alva ID, e.g. `"claude-opus-4-7"`). `@alva/alvaask` defaults to
+`model: "claude-opus-4-7"` and `effort: "high"` when omitted.
 
 ```text
 You are writing today's canonical update for the "<<TOPIC_NAME>>" AI Digest
@@ -1188,7 +1189,8 @@ or structured numbers (§14.3).
 const { ask } = require("@alva/alvaask");
 const { text } = ask(userPrompt, {
   system: "<persona + must-use-live-search + JSON-only>",
-  model: "claude-sonnet-4-6",   // full Alva ID; "sonnet" / dated IDs rejected
+  model: "claude-opus-4-7",   // full Alva ID; short names / dated IDs rejected
+  effort: "high",
 });
 ```
 
@@ -1284,7 +1286,7 @@ feed.def("signal", { targets: makeDoc("Push Signal", "",      [/* see §6 */]) }
     if (!isReplay && lastRun && wallNow - lastRun < 6 * 3600_000) return;
 
     // one LLM call — model fetches, filters, grounds, writes JSON
-    const { text } = ask(buildPrompt(runAt), { system: SYSTEM_PROMPT, model: "claude-sonnet-4-6" });
+    const { text } = ask(buildPrompt(runAt), { system: SYSTEM_PROMPT, model: "claude-opus-4-7" });
     const parsed = extractJson(text);
 
     // freshness + materiality + dedupe gates (§14.3)
@@ -1350,7 +1352,7 @@ you during build, it's a template bug, not your bug.
 | Feed SDK schema | `arr("x")` without `fields` throws. Wrap primitive arrays; `dedupe_keys` uses `{key}` records. |
 | Feed SDK read | Use `.last(n)` / `.first(n)` / `.range(from, to)`. There is no `.read({limit})`. |
 | LLM SDK | Use `@alva/alvaask` `ask()` only. It is synchronous; do not `await` it. |
-| Model IDs | Must be full Alva IDs (`claude-sonnet-4-6`, `claude-haiku-4-5`). Short names (`"sonnet"`) and dated Anthropic IDs (`"claude-haiku-4-5-20251001"`) are rejected. |
+| Model IDs | Must be full Alva IDs (`claude-opus-4-7`, `claude-sonnet-4-6`, `claude-haiku-4-5`). Short names (`"opus"`, `"sonnet"`, `"haiku"`) and dated Anthropic IDs (`"claude-haiku-4-5-20251001"`) are rejected. |
 | FeedAltra | Pure AI Digest feeds use plain `Feed` even when writing `signal/targets` (see §6). |
 | Outbound HTTP | Runtime's outbound proxy occasionally resets external fetches (iTunes, Serper). Wrap source adapters in a 1-retry loop; treat a failed source as "no matches", not fatal. |
 | SDK discovery | Always `alva sdk doc --name <module>` before writing a new source adapter. Function names drift (e.g. `getSerperSearch`, not `searchSerper`). |
