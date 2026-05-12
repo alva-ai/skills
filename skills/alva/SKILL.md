@@ -465,35 +465,15 @@ the patterns above.
 Financial data APIs across 16+ domains, served by the Arrays backend
 (`$ARRAYS_ENDPOINT`, defaults to `https://data-tools.prd.space.id`). To find
 the right API for a task, use the `alva data-skills` CLI (public, no auth).
+Follow the pipeline in order; do not skip steps and do not guess inputs.
 
-**The pipeline is strictly ordered: `list` → `summary` → `endpoint`. Do not
-skip steps and do not invent inputs at any step.** Skill names are NOT
-intuitive — every data skill is namespaced `arrays-data-api-*` (e.g.
-`arrays-data-api-stock-metrics`, `arrays-data-api-equity-estimates-and-targets`).
-Short concept names like `stock`, `stock-fundamentals`, or `price-targets`
-do not exist; passing them returns empty output, not a helpful error.
-Endpoint **File** slugs are equally non-obvious (e.g. `stocks-kline`, not
-`quote`; `company-price-target-consensus`, not `price-target-consensus`)
-and must be read from the `File` column of `summary` output, never guessed.
-
-1. **Discover (mandatory first step): `alva data-skills list`** — returns all
-   data skills with their names and descriptions. You MUST run this before
-   `summary` or `endpoint` whenever you don't already have the exact
-   `arrays-data-api-*` id from a prior step in this same session. Never
-   substitute memory or a guessed name for a `list` lookup. If output is
-   long, pipe through `grep` to find candidates by domain keyword
-   (e.g. `alva data-skills list | grep -i stock`).
-2. **Fetch the skill summary (mandatory before `endpoint`): `alva data-skills summary <skill>`** —
-   returns the endpoints table for that domain. The `<skill>` argument must
-   be a full id copied from `list` output. This step is where the valid
-   **File** slugs are revealed; you cannot skip it and jump to `endpoint`
-   with a guessed `<file>`.
-3. **Fetch endpoint detail: `alva data-skills endpoint <skill> <file>`** —
-   use the **File** value from the summary endpoints table (e.g. `rates`,
-   `macro-index-historical`, `earnings-calendar`) to get full parameters,
-   response fields, and examples. The `File` column is the endpoint slug;
-   the `Path` column is the REST URL path and is NOT accepted here (e.g. for
-   treasury rates, use `<file> = rates`, not `<file> = macro/treasury-rates`).
+1. **`alva data-skills list`** — every skill id is namespaced `arrays-data-api-*`
+   and is not predictable from concept words, so always start here. Pipe
+   through `grep` to filter (e.g. `alva data-skills list | grep -i stock`).
+2. **`alva data-skills summary <skill>`** — reveals the endpoint table.
+   `<file>` slugs come from its `File` column and are not guessable.
+3. **`alva data-skills endpoint <skill> <file>`** — full parameters, response
+   fields, and examples. `<file>` is the `File` column value, not the `Path`.
 4. **Call Arrays data endpoints** with `Authorization: Bearer <ARRAYS_JWT>`.
    In runtime code, load the token via `secret.loadPlaintext('ARRAYS_JWT')`.
    The token is verified during preflight (see [Arrays JWT Check](#4-arrays-jwt-check));
