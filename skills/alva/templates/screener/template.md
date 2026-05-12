@@ -66,6 +66,10 @@ This template shares its shell (tab bar + README chip + methodology modal)
 with the thesis template; matching surfaces stay visually identical across
 playbook families. The example already conforms — keep it that way.
 
+- **Composite-score ranker:** scores every row in a defined universe and orders the table by total at each daily snapshot
+- **Ranked by weighted named factors** with per-row breakdown surfacing weight, raw value, and points contribution
+- **Snapshot-aware end to end:** picker swaps the digest, table, and expand rows together so any past day is reproducible
+
 ---
 
 ## Build workflow
