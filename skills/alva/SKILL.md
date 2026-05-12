@@ -464,19 +464,16 @@ the patterns above.
 
 Financial data APIs across 16+ domains, served by the Arrays backend
 (`$ARRAYS_ENDPOINT`, defaults to `https://data-tools.prd.space.id`). To find
-the right API for a task, use the `alva data-skills` CLI (public, no auth):
+the right API for a task, use the `alva data-skills` CLI (public, no auth).
+Follow the pipeline in order; do not skip steps and do not guess inputs.
 
-1. **Discover available data skills**: `alva data-skills list` — returns all data
-   skills with their names and descriptions. Use this to find the skill that
-   matches your data need.
-2. **Fetch the skill summary**: `alva data-skills summary <skill>` — returns
-   the endpoints table for that domain.
-3. **Fetch endpoint detail**: `alva data-skills endpoint <skill> <file>`
-   — use the **File** value from the summary endpoints table (e.g. `rates`,
-   `macro-index-historical`, `earnings-calendar`) to get full parameters,
-   response fields, and examples. The `File` column is the endpoint slug;
-   the `Path` column is the REST URL path and is NOT accepted here (e.g. for
-   treasury rates, use `--file rates`, not `--file macro/treasury-rates`).
+1. **`alva data-skills list`** — every skill id is namespaced `arrays-data-api-*`
+   and is not predictable from concept words, so always start here. Pipe
+   through `grep` to filter (e.g. `alva data-skills list | grep -i stock`).
+2. **`alva data-skills summary <skill>`** — reveals the endpoint table.
+   `<file>` slugs come from its `File` column and are not guessable.
+3. **`alva data-skills endpoint <skill> <file>`** — full parameters, response
+   fields, and examples. `<file>` is the `File` column value, not the `Path`.
 4. **Call Arrays data endpoints** with `Authorization: Bearer <ARRAYS_JWT>`.
    In runtime code, load the token via `secret.loadPlaintext('ARRAYS_JWT')`.
    The token is verified during preflight (see [Arrays JWT Check](#4-arrays-jwt-check));
@@ -495,17 +492,17 @@ shapes from memory. The doc lookup ensures you use the correct endpoint and
 handle the actual response format.
 
 **Enforcement**: Before any Arrays data HTTP call or `alva run` that hits one,
-you MUST have completed `alva data-skills endpoint <skill> <file>` for
-that endpoint in this session (passing the **File** column value, not the Path). If the call fails with an unexpected shape,
-re-fetch the endpoint detail rather than guessing.
+you MUST have completed the full `list` → `summary` → `endpoint` pipeline for
+that endpoint in this session. `<skill>` must come from `list` output and
+`<file>` must come from the `summary` endpoints table — never from memory or
+a guess. If the call fails with an unexpected shape, re-fetch the endpoint
+detail rather than guessing.
 
 **Failure and fallback guardrail**: If an Arrays endpoint returns 403, 404, or
 an unexpected empty/irrelevant result, do not immediately tell the user to
 upgrade or use BYOD. First re-check `alva data-skills summary <skill>` for the
-same data domain and look for a semantically equivalent endpoint. For
-congressional trading questions about a specific politician, prefer endpoint
-details that support politician name and date filters (for example
-`senate-trade`) before broader "recent trades" feeds. Report BYOD as a final
+same skill and look for a semantically equivalent endpoint; if `<skill>` itself
+was guessed, re-run `list` to recover the correct id. Report BYOD as a final
 fallback only after same-domain Alva endpoints cannot answer the question.
 
 #### Runtime Libraries
