@@ -11,7 +11,7 @@ description: >-
   Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v1.9.0
+  version: v1.8.0
 ---
 
 # Alva
@@ -187,17 +187,21 @@ that the user should verify with current sources.
 
 If the user's message contains a `/use-template:<name>` directive (e.g. `/use-template:thesis`, `/use-template:screener`), this step is **mandatory** and must run before Guided Planning and before any build work.
 
-Templates live in the **playbook-skills catalog** on the gateway (see Step 8 in Capabilities for the full CLI). System templates are seeded under the `alva` namespace. Resolve `/use-template:<name>` to `alva/<name>` and fetch via CLI:
+Templates live in the **playbook-skills catalog** on the gateway (see Step 8 in Capabilities for the full CLI). `<name>` is just the skill name half — catalog ids are `<username>/<name>`, and templates can be published by any user, not only under the `alva` namespace. Do not assume `alva/<name>` exists; resolve via listing.
 
-1. **Locate**: `alva skills get alva/<name>` confirms the template exists and returns its file listing. If 404, run `alva skills list --username alva` to surface available system templates and ask the user which one to use.
-2. **Read the blueprint**: `alva skills file alva/<name> template.md` returns the authoritative blueprint. Do not proceed from memory of a prior session — fetch it fresh.
-3. **Pull other files on demand**: when building, fetch additional files progressively as needed (e.g. `alva skills file alva/<name> src/index.js` only if you intend to mirror the strategy logic). Do not bulk-download.
-4. Treat the blueprint as authoritative for layout, sections, widgets, data contracts, and cadence. Deviate only where the user explicitly overrides it.
-5. State the template choice and any intentional deviations in your Guided Planning plan. The `/use-template:` directive is a **strong build directive** — combined with a concrete topic, present the plan **once** and build; do not also stack clarifying multi-choice questions on top. Treat `/use-template:` + concrete topic the same as "just do it": a single short plan, then build.
+1. **Discover**: run `alva skills list` (optionally `--tag <topic>` if the user mentioned one) and scan entries whose `name` field equals `<name>`.
+   - **Exactly one match** (e.g. `alva/thesis` is the only `thesis`) → use that `<username>/<name>` id.
+   - **Multiple matches** (e.g. `alva/thesis` and `alice/thesis`) → show the user the candidates with their descriptions and tags, and ask which to use.
+   - **No match** → present the available list (filtered by `--tag` if helpful) and ask the user to pick one or refine the name. Do NOT silently default to anything.
+2. **Inspect**: `alva skills get <username>/<name>` returns the file listing with sizes. Confirm a blueprint file is present — convention is `template.md`. If absent, look for `README.md` or ask the user which file is the blueprint.
+3. **Read the blueprint**: `alva skills file <username>/<name> template.md` (or the file from step 2). Do not proceed from memory of a prior session — fetch it fresh.
+4. **Pull other files on demand**: when building, fetch additional files progressively as needed (e.g. `alva skills file <username>/<name> src/index.js` only if you intend to mirror the strategy logic). Do not bulk-download.
+5. Treat the blueprint as authoritative for layout, sections, widgets, data contracts, and cadence. Deviate only where the user explicitly overrides it.
+6. State the template choice and any intentional deviations in your Guided Planning plan. The `/use-template:` directive is a **strong build directive** — combined with a concrete topic, present the plan **once** and build; do not also stack clarifying multi-choice questions on top. Treat `/use-template:` + concrete topic the same as "just do it": a single short plan, then build.
 
 **Content arrangement.** A template's default sections are a floor, not a ceiling. Lead with whatever carries the user's core question, proactively add sections the request demands, and cut or fold near-empty sections into neighbors rather than padding them.
 
-**Push-driven requests** — if the user's primary outcome is a recurring push (digest, threshold tracker, stream watch, periodic alert), the `alva/ai-digest` template is purpose-built for that shape and worth offering during Guided Planning. Push can also be added to any other playbook via Step 10 — the template is one good option, not a requirement.
+**Push-driven requests** — if the user's primary outcome is a recurring push (digest, threshold tracker, stream watch, periodic alert), the `ai-digest` template (system-seeded as `alva/ai-digest`) is purpose-built for that shape and worth offering during Guided Planning. Push can also be added to any other playbook via Step 10 — the template is one good option, not a requirement.
 
 No `/use-template:` directive → skip this step and proceed to Guided Planning normally.
 
