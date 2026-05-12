@@ -187,7 +187,7 @@ that the user should verify with current sources.
 
 If the user's message contains a `/use-skill:<username>/<name>` directive (e.g. `/use-skill:alva/thesis`, `/use-skill:alice/btc-momentum`), this step is **mandatory** and must run before Guided Planning and before any build work.
 
-The directive gives the full catalog id (`<username>/<name>`). Skills live in the playbook-skills catalog on the gateway (see Step 8 in Capabilities for the full CLI). They can be published by any user — do not assume the `alva/` namespace.
+The directive gives the full catalog id (`<username>/<name>`). Skills live in the playbook-skills catalog on the gateway and are fetched via the `alva skills` CLI (use `alva skills --help` for the full surface). They can be published by any user — do not assume the `alva/` namespace.
 
 1. **Inspect**: `alva skills get <username>/<name>` returns the file listing with sizes. Confirm a blueprint file is present — convention is `template.md`. If absent, look for `README.md` or ask the user which file is the blueprint.
    - **On 404 / not found** (typo, deleted, or moved): run `alva skills list` and look for close matches **leniently** — case-insensitive, substring on both halves of the id, ignore separator differences. If exactly one obvious candidate, proceed with it and tell the user you corrected the id (e.g. "interpreting `/use-skill:Alva/AI-Digest` as `alva/ai-digest`"). If multiple plausible candidates, show them and ask. If nothing close, show the filtered list (use `--tag` if the user hinted at a topic) and ask the user to pick.
@@ -198,7 +198,7 @@ The directive gives the full catalog id (`<username>/<name>`). Skills live in th
 
 **Content arrangement.** A skill's default sections are a floor, not a ceiling. Lead with whatever carries the user's core question, proactively add sections the request demands, and cut or fold near-empty sections into neighbors rather than padding them.
 
-**Push-driven requests** — if the user's primary outcome is a recurring push (digest, threshold tracker, stream watch, periodic alert), the `alva/ai-digest` skill is purpose-built for that shape and worth offering during Guided Planning. Push can also be added to any other playbook via Step 10 — the skill is one good option, not a requirement.
+**Push-driven requests** — if the user's primary outcome is a recurring push (digest, threshold tracker, stream watch, periodic alert), the `alva/ai-digest` skill is purpose-built for that shape and worth offering during Guided Planning. Push can also be added to any other playbook via Step 9 — the skill is one good option, not a requirement.
 
 No `/use-skill:` directive → skip this step and proceed to Guided Planning normally.
 
@@ -610,7 +610,7 @@ alva release feed --name <feed> --version 1.0.0 \
 ```
 
 Keep schema examples in [feed-sdk.md](references/feed-sdk.md) Patterns D/E.
-See **Step 10** below for the post-release subscription flow.
+See **Step 9** below for the post-release subscription flow.
 
 ### 6. Build the Playbook Web App
 
@@ -737,54 +737,7 @@ Before calling `alva release playbook`, verify all of the following:
    and must match this exact path — preferred form is the relative ALFS
    shorthand `~/playbooks/{name}/README.md` (quote it in the shell).
 
-### 8. Playbook Skills (Catalog)
-
-Playbook **skills** are the catalog of reusable playbook starting points
-stored on alva-backend and surfaced through the gateway. System templates
-(e.g. `alva/ai-digest`, `alva/screener`, `alva/thesis`, `alva/what-if`)
-are seeded under the `alva` namespace; community contributors publish
-under their own. The `/use-skill:<username>/<name>` user directive (see [Choose
-Skill](#choose-skill-mandatory-when-use-skillusernamename-is-present)
-in Request Routing) is one consumer of this catalog — agents can also
-use it for free-form browsing, remix source discovery (Step 9), or
-pulling inspiration before building.
-
-Namespaced as `<username>/<name>`. All `alva skills *` commands require
-`alva auth login` first (routes are user-auth-gated).
-
-**Commands**:
-
-1. **List the catalog**: `alva skills list` — name, description, tags,
-   last-updated timestamp for every skill. Filters: `--tag <tag>`,
-   `--username <user>`.
-2. **Browse tags**: `alva skills tags` — distinct tag set across the catalog.
-3. **Inspect a skill**: `alva skills get <username>/<name>` — metadata
-   plus the file listing with sizes (no content).
-4. **Fetch a single file**: `alva skills file <username>/<name> <path>` —
-   one file's content.
-
-**Progressive loading.** `get` returns the file tree but no content;
-`file` fetches one file at a time. Pull what you need, when you need it
-(e.g. `template.md` first to read the blueprint; `src/index.js` only if
-you decide to mirror the strategy logic). The bulk-files endpoint exists
-on the gateway but is intentionally not exposed at the CLI to keep
-context budgets tight.
-
-All commands default to a pretty-printed view; add `--json` for the raw
-envelope. `alva skills file` writes raw content to stdout — redirect
-with `>` to save a copy.
-
-**Examples**:
-
-```bash
-alva skills list --tag research              # research-focused skills
-alva skills list --username alva             # all system skills
-alva skills get alva/screener                # see file tree before deciding
-alva skills file alva/screener template.md   # read the description first
-alva skills file alice/btc-momentum src/index.js > /tmp/src.js
-```
-
-### 9. Remix (Create from Existing Playbook)
+### 8. Remix (Create from Existing Playbook)
 
 Users can remix any published playbook to create a customized version. The Remix
 prompt uses the format `@{owner}/{name}` to identify the source playbook — e.g.
@@ -793,15 +746,11 @@ scripts (strategy logic) and HTML (dashboard UI), customizes them per the user's
 request, and deploys a new playbook under their own namespace. If the user does
 not specify what to change, the agent should ask before proceeding.
 
-If the user has not picked a source playbook yet, use Step 8's `alva skills`
-commands to browse the catalog (filter by tag / username) and surface
-candidates before remixing.
-
 See [remix-workflow.md](references/remix-workflow.md) for the full step-by-step
 guide. `alva remix` commands are exclusively for lineage registration — to
 read any playbook's files, use `alva fs read`.
 
-### 10. Post-release push notification flow
+### 9. Post-release push notification flow
 
 After a playbook is **released or kept as draft** (Step 7 complete), proactively
 evaluate whether any deployed feeds produce push-worthy content. Do not wait for
