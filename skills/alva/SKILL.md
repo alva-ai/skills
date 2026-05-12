@@ -11,7 +11,7 @@ description: >-
   Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v1.7.0
+  version: v1.8.0
 ---
 
 # Alva
@@ -456,14 +456,14 @@ the patterns above.
 
 Financial data APIs across 16+ domains, served by the Arrays backend
 (`$ARRAYS_ENDPOINT`, defaults to `https://data-tools.prd.space.id`). To find
-the right API for a task, use the `alva skills` CLI (public, no auth):
+the right API for a task, use the `alva data-skills` CLI (public, no auth):
 
-1. **Discover available data skills**: `alva skills list` — returns all data
+1. **Discover available data skills**: `alva data-skills list` — returns all data
    skills with their names and descriptions. Use this to find the skill that
    matches your data need.
-2. **Fetch the skill summary**: `alva skills summary --name <skill>` — returns
+2. **Fetch the skill summary**: `alva data-skills summary <skill>` — returns
    the endpoints table for that domain.
-3. **Fetch endpoint detail**: `alva skills endpoint --name <skill> --file <file>`
+3. **Fetch endpoint detail**: `alva data-skills endpoint <skill> <file>`
    — use the **File** value from the summary endpoints table (e.g. `rates`,
    `macro-index-historical`, `earnings-calendar`) to get full parameters,
    response fields, and examples. The `File` column is the endpoint slug;
@@ -479,7 +479,7 @@ the right API for a task, use the `alva skills` CLI (public, no auth):
 Data skills span spot and derivatives markets across stocks, ETFs, options,
 and crypto; equity fundamentals, estimates, events, and ownership flows;
 on-chain metrics and exchange flows; macro and economic indicators; news;
-and prediction markets. Run `alva skills list` for the live catalog.
+and prediction markets. Run `alva data-skills list` for the live catalog.
 
 **Data skill doc lookup is mandatory.** Always fetch the endpoint detail before
 writing code that calls it. Do not guess paths, parameter names, or response
@@ -487,13 +487,13 @@ shapes from memory. The doc lookup ensures you use the correct endpoint and
 handle the actual response format.
 
 **Enforcement**: Before any Arrays data HTTP call or `alva run` that hits one,
-you MUST have completed `alva skills endpoint --name <skill> --file <file>` for
+you MUST have completed `alva data-skills endpoint <skill> <file>` for
 that endpoint in this session (passing the **File** column value, not the Path). If the call fails with an unexpected shape,
 re-fetch the endpoint detail rather than guessing.
 
 **Failure and fallback guardrail**: If an Arrays endpoint returns 403, 404, or
 an unexpected empty/irrelevant result, do not immediately tell the user to
-upgrade or use BYOD. First re-check `alva skills summary --name <skill>` for the
+upgrade or use BYOD. First re-check `alva data-skills summary <skill>` for the
 same data domain and look for a semantically equivalent endpoint. For
 congressional trading questions about a specific politician, prefer endpoint
 details that support politician name and date filters (for example
