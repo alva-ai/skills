@@ -190,7 +190,7 @@ If the user's message contains a `/use-template:<name>` directive (e.g. `/use-te
 1. Resolve `<name>` to `skills/alva/templates/<name>/template.md` (relative to this skill).
 2. **Read that template file** via the filesystem — do not proceed from memory of a prior session. If the file does not exist, list the directories under `templates/` and ask the user which to use.
 3. Treat the template as the authoritative blueprint for layout, sections, widgets, data contracts, and cadence. Deviate only where the user explicitly overrides it.
-4. In the plan you present during Guided Planning, state which template is being used and call out any intentional deviations.
+4. State the template choice and any intentional deviations in your Guided Planning plan. The `/use-template:` directive is a **strong build directive** — combined with a concrete topic, present the plan **once** and build; do not also stack clarifying multi-choice questions on top. Treat `/use-template:` + concrete topic the same as "just do it": a single short plan, then build.
 
 **Content arrangement.** A template's default sections are a floor, not a ceiling. Lead with whatever carries the user's core question, proactively add sections the request demands, and cut or fold near-empty sections into neighbors rather than padding them.
 
@@ -200,21 +200,34 @@ No `/use-template:` directive → skip this step and proceed to Guided Planning 
 
 ### Guided Planning
 
-For all routes except **Data Query**, present a plan and get user approval
-before building. Even seemingly clear requests ("build a BTC dashboard") have
-real choices — which data, timeframe, widgets — that are cheaper to resolve
-upfront than to rebuild.
+For all routes except **Data Query**, present a plan **once** before building.
+Even seemingly clear requests ("build a BTC dashboard") have real choices —
+which data, timeframe, widgets — that are cheaper to resolve upfront than to
+rebuild.
 
-1. **Understand intent** — Ask clarifying questions **one at a time**, prefer
-   multiple-choice. Focus on what's missing: asset, scope, output type, or
-   purpose. Skip this step if the request already specifies all of these.
-2. **Propose approaches** — Offer 2-3 concrete options with trade-offs. Lead
-   with your recommendation.
-3. **Confirm the plan** — List the specific feeds and widgets (5-8 lines, no
-   implementation details). Build only after approval.
+**Exactly one blocking question per session.** Pick a single path through the
+steps below — do not run step 1 clarifications AND a step 3 plan confirmation
+in the same session. Whichever you use is the gate; the user's answer or
+approval counts as approval to build, and you go directly to building
+afterward.
 
-If the user says "just do it" at any point, skip planning for the rest of the
-session.
+1. **Understand intent** — When key parameters are missing (asset, scope,
+   output type, purpose) and have no obvious default, ask clarifying questions
+   **one at a time**, prefer multiple-choice. Skip this step if the request
+   already specifies these, or if the missing parameters have a single obvious
+   default. **If you ran this step, do not also run step 3** — the answers
+   are the approval to build.
+2. **Propose approaches** — Offer 2-3 concrete options with trade-offs when
+   there are real strategic alternatives. Lead with your recommendation. Skip
+   when the template or request already pins the approach.
+3. **Confirm the plan** — When step 1 was skipped (request already clear, or
+   `/use-template:` directive specifies the shape), present a single 5-8 line
+   plan listing the specific feeds and widgets, then build after approval.
+   State the template (if any) and the key defaults you are using.
+
+If the user says "just do it" at any point — or used `/use-template:<name>`
+together with a concrete topic — skip clarifying questions for the rest of the
+session and present a single short plan, then build.
 
 ### Completion Gate
 
