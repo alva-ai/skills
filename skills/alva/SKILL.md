@@ -11,7 +11,7 @@ description: >-
   Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v1.8.1
+  version: v1.8.2
 ---
 
 # Alva
@@ -711,17 +711,39 @@ validation rules and the canonical content shape.
 
 #### Free users (`subscription_tier = "free"`)
 
+**One-playbook cap.** Free accounts may hold **at most one published
+playbook**. The cap is enforced server-side at release time — a second
+`alva release playbook` call will fail until the existing playbook is
+deleted by the user.
+
 1. **Publish directly**: Call `alva release playbook` — free playbooks
    are always public. Output the public URL:
    `https://alva.ai/u/<username>/playbooks/<playbook_name>`
-2. **Upsell only on friction**: Do **not** proactively suggest upgrading.
+2. **If the user already has a published playbook and wants to publish
+   a new one**, stop before calling `alva release playbook`. Tell the
+   user the existing playbook must be deleted first, and ask which path
+   they want:
+   - **Delete the old playbook** — direct the user to remove their
+     existing playbook from the Alva dashboard, then resume. Do not
+     attempt to "rename around" the cap, reuse the old playbook's
+     name without an explicit deletion, or assume any in-app replace
+     flow will migrate `display_name`, feeds, or cronjobs cleanly —
+     it currently does not, and the old public URL can end up showing
+     the new playbook's HTML with stale metadata.
+   - **Keep both** — only possible on Pro. Offer the upgrade path at
+     <https://alva.ai/pricing>.
+
+   After the user confirms the deletion, re-run the full release
+   pipeline (draft → README → release) for the new playbook from
+   scratch under a fresh `name`.
+3. **Upsell only on friction**: Do **not** proactively suggest upgrading.
    But when the user's experience is degraded because of free-tier
-   limitations — wanting private playbooks, hitting the cronjob cap,
+   limitations — wanting private playbooks, hitting the one-playbook cap,
    resource limits, or any other pro-gated feature — acknowledge the
    limitation and offer the upgrade path:
    "This feature is available on the Pro plan. You can upgrade at
    <https://alva.ai/pricing> to [specific benefit, e.g. keep playbooks
-   private / deploy more cronjobs / ...]."
+   private / publish multiple playbooks / ...]."
 
 Use the playbook `name` and the username from `alva whoami` to construct the
 canonical share URL. Use `published_url` from the release response for
