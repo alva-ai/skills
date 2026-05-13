@@ -250,6 +250,57 @@ Must Do After Completion Gate:
 
 - [ ] Summarize the whole process and what is delivered to the user.
 
+#### Final-block placement (frontend renders only the last text block)
+
+The cloud frontend renders **only the last text block of each assistant
+turn** as the user-visible answer. Any text written before a `tool_use`
+within the same turn is collapsed into the steps accordion — invisible
+unless the user clicks to expand. If the user's substantive deliverable
+(playbook URL, ranked list, screenshot, summary table, context
+acknowledgment) lives in such a buried block, the user effectively
+"got nothing" even though the agent produced everything.
+
+**Class rule**: When the assistant produces a user-visible artifact in
+a turn — URL, list, summary, table, screenshot, context recognition —
+the **final text block of that turn must come AFTER all subsequent
+tool calls** in that turn (memory writes, post-release reads,
+diagnostic `alva run` calls, screenshot retries, `AskUserQuestion`
+text-only fallbacks, follow-up reads).
+
+Triggers requiring an explicit final-block re-emit:
+
+- After `alva release playbook` returns a `published_url`: the **last**
+  text block of the turn must contain that URL verbatim, even if more
+  tool calls follow (memory updates, screenshots, post-release
+  verifications). Do not let a memory-update notice or a diagnostic
+  table become the user-visible final text.
+- After `alva fs read --path ~/memory/...` or `alva fs write
+  ~/memory/...` that you decide to run AFTER producing a deliverable:
+  re-emit the deliverable's text in a fresh final text block following
+  the memory tool call. A trailing line like `📌 Memory updated: …` is
+  not a deliverable.
+- After `AskUserQuestion` returns a text-only-channel fallback: re-emit
+  any preceding **context acknowledgment text** (playbook detected,
+  file shared, version updated, etc.) in the same final markdown turn
+  as the question. Do not end the turn with a `tool_use` block
+  swallowing the context.
+- After `alva screenshot` (whether it succeeds, fails, or hits a
+  retry): the final text block must still contain the canonical share
+  URL.
+- After a multi-artifact session (more than one `alva release ...`):
+  the final text block must reference **all** modified or released
+  artifacts, not just the last one.
+- In `answer_only` / list-query sessions: when the answer is a set of
+  items (companies, tickers, articles), the final text block must
+  contain the **full enumerated list** before any sub-analysis. A
+  deep-dive on one item is not a substitute for the list.
+
+If you find yourself about to end a turn with a memory-update line, a
+diagnostic table, an AskUserQuestion fallback, or a single-item
+deep-dive while a substantive artifact lives in an earlier text block,
+**stop and re-emit a clean final text block** that contains the
+artifact (URL, list, summary) as the last content the user will see.
+
 ---
 
 ## Content Legitimacy Rules
