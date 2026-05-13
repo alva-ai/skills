@@ -43,32 +43,36 @@ Format: `[Asset] [After/Before] [Trigger]` — keep it short, concrete, no time-
 
 ✗ **Do NOT append `— [N]-Year What-If`** (or any other lookback suffix). The lookback is a methodology detail, not a title element. The reader does not need it to understand the playbook in 3 seconds.
 
-✗ **Do NOT include the word "What-If"** in any user-facing copy: title, `display_name`, URL slug, hero card, modal header. The playbook category is communicated by the playbook chrome around the HTML; repeating it inside the HTML is noise.
+✗ **Do NOT include the word "What-If"** in any user-facing copy: title, `display_name`, URL slug, hero card, README. The playbook category is communicated by the playbook chrome around the HTML; repeating it inside the HTML is noise.
 
-### 1b. Naming rules across the three surfaces
+### 1b. Where the title lives — chrome only, never inside the HTML
 
-The same subject appears in three places — keep them aligned, NOT duplicated:
+The playbook subject appears in exactly two places — keep them aligned, NOT duplicated:
 
 | Surface | Rule | Example |
 |---|---|---|
-| **`display_name`** (playbook chrome) | The concrete subject, ≤40 chars, no `What-If` suffix | `S&P 500 After a 10% Drawdown` |
+| **`display_name`** (playbook chrome — rendered by the platform above the HTML iframe) | The concrete subject, ≤40 chars, no `What-If` suffix | `S&P 500 After a 10% Drawdown` |
 | **URL slug** (`name` in release CLI) | Lowercase, hyphens, no `whatif`/`what-if` suffix, no lookback | `spx-after-10-drop` |
-| **HTML `.section-title-text`** | The same subject as `display_name` | `S&P 500 After a 10% Drawdown` |
 
-✗ **Do NOT use an HTML `<h1>` named `.playbook-title`.** That selector belongs to a different page chrome and creates a visual second title above the first widget. Use `.section-title` containing `.section-title-text` + `.section-readme-btn` — see §3 step 1 for the exact widget.
+✗ **Do NOT add any heading inside the HTML.** Not `<h1>`, not `<h2>`, not a `.playbook-title` row, not a `.section-title` row. The platform chrome already renders the `display_name` directly above the HTML; any heading inside the HTML is a duplicate title and pushes the hero card below the fold.
 
-### 1c. README chip placement
+The HTML body starts directly with the first `<div class="widget-grid">` carrying the hero card (§2 / §3 step 1). Nothing above it.
 
-The README chip is the **only** non-data UI element on the page (alongside chart tooltips). It lives at the right end of the `.section-title` row, opens the Methodology modal (§6).
+### 1c. README and methodology — attached file, not in-HTML modal
 
-**Widget spec:**
-- Reuse the Screener shared chassis `.section-readme-btn` — height 24px, 12px font, 14px icon (`researcher-l1.svg`) + "README" label.
-- Carries `data-modal-open="methodology-modal"`.
-- Copy the CSS verbatim; do not re-skin.
+Methodology is **not** rendered inside the playbook HTML. There is no in-HTML `README` chip, no modal trigger, no methodology card. The platform surfaces the playbook's `README.md` automatically above or beside the iframe.
+
+How to attach it:
+
+1. Write the methodology as a Markdown file (sections like "How we picked events", "How we measured what came next", "Sample size and what it means", "Data and refresh", and a one-line legal eyebrow).
+2. Upload to ALFS at `'~/playbooks/<name>/README.md'`.
+3. Pass `--readme-url '/alva/home/<username>/playbooks/<name>/README.md'` to `alva release playbook`. The path must be an absolute ALFS path.
+
+The bottom References card inside the HTML (§3 step 6) is **not** the methodology — it is a two-sentence data-source eyebrow only. Do not duplicate.
 
 ### 1d. 3-second rule
 
-A reader must understand what the playbook is about within 3 seconds, without reading any paragraph. The `display_name` (in the playbook chrome) and the section-title (inside the HTML) deliver this. Below the section-title, the **hero card and the four horizon cards must be visible without scrolling** — see §3 First-fold rule.
+A reader must understand what the playbook is about within 3 seconds, without reading any paragraph. The `display_name` in the chrome carries the topic; the hero card carries the verdict; the four horizon cards carry the headline numbers. All three must be visible without scrolling — see §3 First-fold rule.
 
 ## 2. Verdict Hero (required, first widget after section-title)
 
@@ -76,15 +80,17 @@ A single full-width Free Text Card that answers "did this work?" before the read
 
 **One prose paragraph**, ≤80 words, conclusion-first, with the headline numbers **inline** and color-coded via `.pos` / `.neg` markdown spans (not in chips, not in separate metric cards). Don't open with `Here's how X has moved…` / `Here's the distribution…`; lead with the number.
 
-No disclaimer eyebrow (`Verdict — historical observation only` and similar) — legal text, if any, goes in the Methodology modal, not on the card.
+No disclaimer eyebrow (`Verdict — historical observation only` and similar) — legal text, if any, goes in the playbook README (§1c), not on the card.
 
 **Widget:** Free Text Card with `markdown-container--m` (Medium). See `references/design-widgets.md` → Free Text Card and `references/design-components.md` → Markdown.
 
-**Inline number coloring** — use the markdown-container spans:
+**Inline number coloring and emphasis** — use the markdown-container spans:
 - `<span class="pos">+15.5%</span>` for positive headline numbers
 - `<span class="neg">−39%</span>` for negative headline numbers
 - Plain text for neutral values (counts, dates, durations)
 - Use `<strong>` sparingly for non-numeric emphasis (e.g. **every single case**)
+
+**Bold weight rule:** any `<strong>` / `<b>` / `font-weight` for emphasis must resolve to **`font-weight: 500`** (Medium). Never `700` (Bold). Add the global CSS override `strong, b { font-weight: 500; }` to defeat the browser default. The same applies to `.pos` / `.neg` color-emphasis spans — they should be `font-weight: 500`.
 
 **Example hero:**
 > Across the past 25 years the S&P 500 has dropped 10% from a peak <span class="pos">8 times</span>. The first-week bounce held in **every single case** (median <span class="pos">+4.6%</span>); a year later the index was higher <span class="pos">5 of 8</span> times, with a median gain of <span class="pos">+15.5%</span> — even after counting the <span class="neg">−39%</span> scar of 2008. Every drawdown eventually clawed back to its prior high, in a median of 11 months.
@@ -111,30 +117,29 @@ Earlier versions of this template allowed a separate counter-narrative card unde
 
 ## 3. Layout (single-page scroll, results first)
 
-One vertically-scrolling page. Top-to-bottom order:
+One vertically-scrolling page. The HTML body starts directly with the first `.widget-grid` — no heading row, no section-title, no chips above it. Top-to-bottom order:
 
-1. **Section-title row** — `.section-title` containing `.section-title-text` (the page subject from §1b) on the left and `.section-readme-btn` (the README chip from §1c) on the right. **Not** a widget card. Lives directly inside `.playbook-container`, before the first `.widget-grid`.
-2. **Verdict hero** (section 2) — one full-width Free Text Card (`.col-8`, `markdown-container--m`). Single paragraph with inline colored numbers.
-3. **Four horizon cards** — exactly four metric cards (`.col-2` × 4). See §3a for which four. **These must sit directly under the hero** (no intervening widgets) so they stay in the first fold.
-4. **Main path chart** (`.col-8`) — Chart Card. Normalized event paths overlay (rebased to 100 at event day), median line + middle-half band + a representative sample of past paths + a non-event "typical year" reference line. See §3c.
-5. **Two side-by-side analysis charts** (`.col-4` + `.col-4`) — both Chart Cards.
+1. **Verdict hero** (section 2) — one full-width Free Text Card (`.col-8`, `markdown-container--m`). Single paragraph with inline colored numbers. This is the first widget on the page.
+2. **Four horizon cards** — exactly four metric cards (`.col-2` × 4). See §3a for which four. **These must sit directly under the hero** (no intervening widgets) so they stay in the first fold.
+3. **Main path chart** (`.col-8`) — Chart Card. Normalized event paths overlay (rebased to 100 at event day), median line + a representative sample of past paths + a non-event "typical year" reference line. See §3c.
+4. **Two side-by-side analysis charts** (`.col-4` + `.col-4`) — both Chart Cards.
    - **Left:** "Typical move at each horizon, event vs plain historical average". Paired bars per horizon: event mean vs unconditional baseline mean.
    - **Right:** "How [asset] moved [headline horizon] after each past event". One bar per past event, sorted best-to-worst, green/red by sign, dashed line at zero.
-6. **Audit ledger** (`.col-8`) — one row per event, **newest first**. Use the row-first flex table and `initTableAlignment`. See §5 audit ledger collapse rule.
-7. **References card** (`.col-8`) — Free Text Card with two short paragraphs:
+5. **Audit ledger** (`.col-8`) — one row per event, **newest first**. Use the row-first flex table and `initTableAlignment`. See §5 audit ledger collapse rule.
+6. **References card** (`.col-8`) — Free Text Card with two short paragraphs:
    - **Trigger source:** how events are identified, in plain language. One sentence on the re-arm rule when relevant.
    - **Data source:** which SDK / symbol / interval, what the forward-move horizons are in trading days, what is and is not included (dividends, transaction costs), and how often the pipeline refreshes.
 
-Methodology lives in the Modal (§6, opened by the README chip). The bottom References card is a short data-source eyebrow — it is **not** the methodology. Do not duplicate.
+Methodology lives in the attached `README.md` (§1c), not inside the HTML. The bottom References card is a short data-source eyebrow — it is **not** the methodology. Do not duplicate.
 
-No tabs, no hidden panels other than the Methodology modal and the audit-ledger expand/collapse behavior — everything else is on the single scroll.
+No tabs, no hidden panels other than the audit-ledger expand/collapse behavior — everything else is on the single scroll.
 
 ### 3. First-fold rule (very strict)
 
-On a 1440 × 900 viewport, the first fold must contain:
-**section-title row + hero card + four horizon cards** — and nothing else from the section-title row down.
+On a 1440 × 900 viewport, the first fold (measured from the top of the HTML iframe) must contain:
+**hero card + four horizon cards** — and nothing else.
 
-This is what enforces the "results in 3 seconds" promise. Any widget that lives between the hero and the horizon cards (counter-narrative card, belief cards, eyebrow callouts, etc.) is rejected — they have all been removed from this template. The next-fold content starts with the main path chart (§3 step 4).
+This is what enforces the "results in 3 seconds" promise. Any widget or element that lives between the hero and the horizon cards (counter-narrative card, belief cards, eyebrow callouts, an in-HTML title row, etc.) is rejected — they have all been removed from this template. The next-fold content starts with the main path chart (§3 step 3).
 
 **Canonical reasoning flow:** headline (hero) → headline numbers per horizon (4 cards) → typical price path (main chart) → event vs baseline + per-event distribution (two side-by-side) → raw rows (audit ledger) → data provenance (references). Each step answers the objection raised by the previous. Methodology is available on-demand via the README chip.
 
@@ -178,15 +183,16 @@ Every chart on the page is a **Chart Card**. Follow `references/design-widgets.m
 
 **Two overrides for this template:**
 
-1. **Chart Card height = 560px.** The design-widgets default is 320px; per-event charts in What-If carry more horizon and more individual paths than a typical dashboard tile, so they need the extra vertical room. All charts on the page — including the side-by-side `.col-4` pair — use 560px.
+1. **Chart Card chart-container height = 432px** (excluding the `widget-title` and any `widget-subtitle`). The design-widgets default is 320px; per-event charts in What-If carry more horizon and more individual paths than a typical dashboard tile, so they need a bit more vertical room. All charts on the page — including the side-by-side `.col-4` pair — use 432px. Do not exceed 432 without an explicit reason; taller charts push the audit ledger and References card too far down.
 2. **Every Chart Card has a `widget-subtitle`** — one line of small grey text directly under the widget-title, before the chart body. It explains *what the chart shows* in plain prose, including what colored marks mean (e.g. "Teal bars: the average move after past −10% drawdowns. Grey bars: the S&P 500's plain historical average over the same period from any non-event start day. Dashed line is zero."). This pairs with the title to set context without making the reader hover for hints.
 
 **Main path chart rules**
 
-- Rebase signal day to 100.
-- Do not draw every past case as a full-opacity line. Show only a representative sample of past paths and add a subtle middle-half band.
-- Show the typical-after-signal line and the typical-non-event-year reference line.
-- Tooltip hides helper / sampled-path series and shows only useful readout lines.
+- Rebase the signal day to 100.
+- Do not draw every past case as a full-opacity line. Show only a small representative sample of past paths (typically 3: the strongest 1Y, the softest 1Y, and the most recent complete case), each at lineWidth 1 and opacity ≈ 0.55.
+- **Do not draw a Q1–Q3 band / middle-half shaded area.** When the event set contains extreme outliers (e.g. 2008), the Q1–Q3 spread on a rebased path grows so wide that the band visually swallows the chart. The sample lines already convey dispersion; the band adds noise, not signal.
+- Show the typical-after-signal line (median) and the typical-non-event-year reference line (dashed grey).
+- Tooltip should show the readout lines (median, sample lines, reference) clearly; do not pollute it with helper series.
 
 **One-event-per-bar chart rules** (the right side-by-side chart)
 
@@ -219,10 +225,13 @@ Applies to cards, chart titles, widget subtitles, axis labels, table headers, to
 
 - **No** "last updated / refreshed / as of" timestamp anywhere on the page.
 - **No** filters, dropdowns, selectors.
-- **No** second h1 / repeated title above the section-title row.
-- **No** "What-If" label anywhere user-facing (title, slug, hero, modal header, chips).
+- **No** in-HTML heading, title row, or section-title above the first widget-grid. The platform chrome renders the `display_name` above the iframe — the HTML adds none of its own. Hero card is the first widget on the page.
+- **No** in-HTML README chip, methodology modal, or "?" trigger. Methodology lives in the attached `README.md` file (§1c), surfaced by the platform chrome.
+- **No** "What-If" label anywhere user-facing (title, slug, `display_name`, hero, README, chips).
+- **No** Q1–Q3 / middle-half shaded band on the main path chart. Sample lines only (§3c).
 - **No** counter-narrative card, belief cards, featured-case cards, readout rail — any element that sits between the hero and the four horizon cards and pushes them below the fold is forbidden. Earlier template versions allowed these; they are now explicitly removed.
-- **Only interactivity allowed:** chart hover tooltips, the README chip opening the Methodology modal, and the audit-ledger expand/collapse button when event count is high.
+- **Font weight 500 only for emphasis.** All `<strong>`, `<b>`, `.pos`, `.neg` use `font-weight: 500`. The browser default for `<strong>`/`<b>` is `700`, which violates the Alva design-system rule "Regular (400) and Medium (500) only". Add `strong, b { font-weight: 500; }` globally in every playbook's CSS.
+- **Only interactivity allowed:** chart hover tooltips and the audit-ledger expand/collapse button when event count is high.
 
 **Audit ledger collapse rule**
 
@@ -232,13 +241,28 @@ Applies to cards, chart titles, widget subtitles, axis labels, table headers, to
 - When expanded, the button becomes `Show latest 8`.
 - Use the row-first flex table and `initTableAlignment`; do not use a native HTML table.
 
-## 6. Methodology modal
+## 6. Methodology — attached README.md, not in-HTML modal
 
-Triggered by the README chip in the section-title row (§1c). Mirrors the Screener template's Methodology modal pattern — reuse the same modal chassis (`.modal-overlay` / `.modal-panel`) and the same `data-modal-open` / `data-modal-close` wiring.
+Methodology is **not** rendered inside the playbook HTML. There is no `.modal-overlay`, no `.modal-panel`, no `data-modal-open` trigger, no in-HTML README button. The platform chrome surfaces the playbook's attached `README.md` automatically.
 
-- README chip carries `data-modal-open="methodology-modal"`; the modal root has `id="methodology-modal"`.
-- Modal panel `max-width: 896px` (narrower than the 960px base — methodology content is prose, not wide tables).
-- Body content = the playbook's [`README.md`](../../references/api/release.md#playbook-readme), rendered into the modal body. One source of truth; do not duplicate the content shape here.
-- Closed by default on page load — methodology is rarely the first thing a reader wants.
+### How to ship methodology
 
-**Modal ≠ References card.** The methodology modal is the full explanation (how we picked events, how we measured, sample-size caveats, asset-choice rationale). The References card at the bottom of the scroll (§3 step 7) is a two-sentence data-source eyebrow. They have different audiences (curious / glancing) and different content shapes. Do not duplicate the methodology inside the References card.
+1. **Write** the methodology as a standalone Markdown file. Canonical section shape (see [release.md → Playbook README](../../references/api/release.md#playbook-readme)):
+   - Short intro sentence describing the playbook
+   - `## How we picked events`
+   - `## How we measured what came next`
+   - `## About the path chart`
+   - `## About the side-by-side bar charts`
+   - `## Sample size and what it means`
+   - `## Data and refresh`
+   - Optional legal eyebrow at the bottom (`Historical observation only; not investment advice.`)
+2. **Upload** to ALFS at `'~/playbooks/<name>/README.md'`.
+3. **Attach** with the release CLI: `alva release playbook --readme-url '/alva/home/<username>/playbooks/<name>/README.md'`. The path must be an absolute ALFS path.
+
+### README ≠ References card
+
+The attached README is the full explanation (how we picked events, how we measured, sample-size caveats, asset-choice rationale). The References card at the bottom of the scroll (§3 step 6) is a two-sentence data-source eyebrow. They have different audiences (curious / glancing) and different content shapes. Do not duplicate the methodology inside the References card.
+
+### Legacy modal pattern is removed
+
+Earlier versions of this template instructed building an in-HTML `.modal-overlay` / `.modal-panel` triggered by a `.section-readme-btn`. **That pattern is removed.** The platform chrome owns README rendering; the playbook HTML must not.
