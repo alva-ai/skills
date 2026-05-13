@@ -6,8 +6,8 @@ either a rough topic or a full source plan; the agent researches the topic,
 drafts a `CONFIG`, selects the smallest useful set of Alva search/feed/data inputs,
 runs on cron, generates an opinionated grounded take via `@alva/alvaask`, and
 pushes it through Alva notifications (via `signal/targets` for
-playbook/follower signals, or `notify/message` for feed completion
-notifications to the owner and feed-subscribed groups). The HTML playbook is a
+playbook-scoped subscribers, or `notify/message` for feed-style subscribers).
+The HTML playbook is a
 **light feed-stream
 replay** of past pushes — not an analytical dashboard.
 
@@ -128,7 +128,7 @@ that materially affect the feed:
 | Topic boundary | What should this track, and what should it exclude? | Prevents broad keyword slop. |
 | Sources | Optional but useful: paste sources you already trust — RSS feeds, newsletters, podcasts, YouTube channels, websites, X handles, subreddits, upstream Alva feeds, or plain text source names. If skipped, the agent researches a source plan first. | Makes the digest match the user's actual information diet, and chooses `unified_search` vs `feed_widgets` and adapters. |
 | Cadence / trigger | How often should it summarize or check? For thresholds, what exact condition matters? | Sets cron and materiality. |
-| Audience | Playbook signal or feed notification? | Chooses `signal/targets` for playbook/follower signals or `notify/message` for owner plus feed-subscribed groups. |
+| Audience | Playbook-scoped or feed-scoped notification? | Chooses `signal/targets` for signal-style alerts or `notify/message` for feed-style digests. Either path still requires an explicit push subscription. |
 | Angle | What kind of take should the update have? | Drives the generation prompt and voice. |
 | Worth-pushing bar | What counts as material enough to notify? | Reduces noisy pushes. |
 
@@ -199,8 +199,9 @@ Default assumptions for the skip path:
   `mode: "watch"` with a tighter cron. Do not ask the user to choose a mode.
 - `quiet_day_policy`: `"ping"` for paid/subscriber-facing briefs where silence
   is confusing; `"skip"` for noisy topics where no-news days should stay quiet.
-- `audience`: `"followers"` for playbook/follower signals; `"owner"` for
-  feed completion notifications using `notify/message`.
+- `audience`: `"playbook"` for playbook-scoped signal alerts; `"feed"` for
+  feed-scoped completion/digest alerts using `notify/message`. Both require
+  explicit personal or group subscription after deploy.
 - `angle`: opinionated, but no buy/sell/hold calls, no price targets, no
   uncited numerical claims.
 
@@ -273,7 +274,7 @@ const CONFIG = {
     quiet_day_policy: "ping",        // "ping" (default) | "skip"
   },
 
-  audience: "followers",             // "followers" = signal/targets; "owner" = notify/message to owner + feed-subscribed groups
+  audience: "playbook",              // "playbook" = signal/targets; "feed" = notify/message; both require explicit subscriptions
 
   push_policy: {
     materiality: `Push when there is a fresh supply-chain disruption,
@@ -445,9 +446,9 @@ remixers all agree on what an AI Digest event looks like.
   digest/
     events/    ← append-only, one record per cron fire (pushed OR skipped)
   signal/
-    targets/   ← written WHEN pushed AND audience="followers" (Pattern D)
+    targets/   ← written WHEN pushed AND audience="playbook" (Pattern D)
   notify/
-    message/   ← written WHEN pushed AND audience="owner"    (Pattern E)
+    message/   ← written WHEN pushed AND audience="feed"     (Pattern E)
 ```
 
 `digest/events` is the **source of truth** for the HTML timeline.
@@ -483,9 +484,9 @@ Retro analysis of quiet periods needs a record. The HTML timeline can show
 skipped fires dimmed-and-collapsed for author-facing transparency. **Append
 always; let `delivery.pushed` drive rendering.**
 
-### `signal/targets` (playbook/follower signals) — Altra format
+### `signal/targets` (playbook-scoped signals) — Altra format
 
-When `audience: "followers"`, also append one record to `signal/targets` per
+When `audience: "playbook"`, also append one record to `signal/targets` per
 pushed fire. Format follows Altra's target schema (see `references/feed-sdk.md`
 Pattern D); the platform reads `meta.reason` as the push body. Telegram delivery
 chunks long messages at the platform message limit, so do not impose an
@@ -513,15 +514,16 @@ await ctx.self.ts("signal", "targets").append([{
 > `signal/targets` works end-to-end with `--push-notify` — we verified in
 > v1 testing. **Use plain `Feed` for AI Digest playbooks.** If your
 > environment later enforces the FeedAltra rule at the platform layer,
-> switch `audience` to `"owner"` and write to `notify/message` (Pattern E)
+> switch `audience` to `"feed"` and write to `notify/message` (Pattern E)
 > — that path is never FeedAltra-gated.
 
 ### `notify/message` (feed completion notification) — title + text
 
-When `audience: "owner"`, write to `notify/message` instead. No FeedAltra
-requirement; plain `Feed` suffices. Despite the historical `owner` label in
-this template, `notify/message` dispatches `feed_run_complete`: the feed owner
-receives it directly, and groups subscribed to the feed can receive it too.
+When `audience: "feed"`, write to `notify/message` instead. No FeedAltra
+requirement; plain `Feed` suffices. `notify/message` dispatches the canonical
+`feed_alert_ready` event, but it does not auto-deliver to the feed owner. The
+owner, any other user, or any group must explicitly subscribe to the feed or to
+a playbook that references the feed.
 
 ```javascript
 const PLAYBOOK_URL = "https://<user>.playbook.alva.ai/<playbook>/<version>/index.html";
@@ -1030,16 +1032,16 @@ function fitMeaningfulPoints(points, budget) {
 }
 ```
 
-Follower push rendering currently wraps `meta.reason` with the playbook name and
+Signal push rendering currently wraps `meta.reason` with the playbook name and
 may convert Markdown to Telegram HTML downstream. That wrapper is acceptable;
 the digest content itself should remain the same canonical body. Avoid
 semicolon-delimited mini-summaries in `meta.reason`, because the generic signal
 renderer treats semicolons as bullet separators for trading-style reasons.
 
-For `audience: "followers"` the output is the `meta.reason` of a
-`signal/targets` record (§6). For `audience: "owner"` it's the `text` of a
-`notify/message` record with `title = "${CONFIG.topic.name} · <date EST>"`;
-that feed event can also fan out to groups subscribed to the feed.
+For `audience: "playbook"` the output is the `meta.reason` of a
+`signal/targets` record (§6). For `audience: "feed"` it's the `text` of a
+`notify/message` record with `title = "${CONFIG.topic.name} · <date EST>"`.
+Both paths require an explicit subscription before delivery.
 
 ### When to skip pushing
 
@@ -1070,7 +1072,19 @@ alva release feed --name <playbook-name> --version 1.0.0 \
 ```
 
 See `references/feed-sdk.md` Patterns D and E for the full release flow;
-the release step is mandatory or pushes arrive empty.
+the release step is mandatory or pushes arrive empty. Then subscribe the
+delivery target explicitly:
+
+```bash
+# Personal feed-scoped delivery.
+alva push-subscriptions subscribe-feed --username <user> --name <feed-name>
+
+# Personal playbook-scoped delivery.
+alva push-subscriptions subscribe-playbook --username <user> --name <playbook-name>
+```
+
+For group delivery, run `/alva subscribe feed <feed_id>` or
+`/alva subscribe playbook <playbook_id>` in the target group.
 
 ---
 

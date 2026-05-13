@@ -26,12 +26,13 @@ alva deploy create \
 | --path        | string | yes      | Path to entry script (home-relative or absolute)                              |
 | --cron        | string | yes      | Standard cron expression (min interval: 1 minute)                             |
 | --args        | JSON   | no       | JSON passed to `require("env").args` on each execution                        |
-| --push-notify | flag   | no       | Enable push fanout after successful feed runs                                 |
+| --push-notify | flag   | no       | Let this cronjob emit feed alert events after successful feed runs            |
 
 When `--push-notify` is set, every successful execution checks the feed's push
-sidecars: `signal/targets` dispatches `playbook_data_ready`, while
-`notify/message` dispatches `feed_run_complete` to the owner and groups
-subscribed to that feed.
+sidecars: `signal/targets` and `notify/message` both dispatch
+`feed_alert_ready` with different feed-alert sources. Delivery still requires
+an explicit personal or group subscription to the feed or to a playbook that
+references the feed; `--push-notify` does not subscribe any user or group.
 
 Response:
 

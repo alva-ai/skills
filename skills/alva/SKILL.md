@@ -591,17 +591,18 @@ strategies alike. If the feed produces `signal/targets`, it MUST use
 `FeedAltra`.
 
 **Push notification streams:** Subscriptions target feed/playbook resources,
-not output paths. The output path only chooses the notification event:
+not output paths. The output path only chooses the feed-alert source:
 
-| Output stream | Event | Use for | Recipients |
+| Output stream | Feed-alert source | Use for | Delivery eligibility |
 | --- | --- | --- | --- |
-| `signal/targets` | `playbook_data_ready` | Playbook/follower signals | Playbook followers and groups subscribed to the playbook |
-| `notify/message` | `feed_run_complete` | Feed results, AlvaAsk reports, heartbeat checks, proactive alerts | Feed owner and groups subscribed to the feed |
+| `signal/targets` | `signal/targets` | Playbook signals, trading targets, actionable alerts | Users or groups explicitly subscribed to the feed or to a playbook that references the feed |
+| `notify/message` | `notify/message` | Feed results, AlvaAsk reports, heartbeat checks, proactive alerts | Users or groups explicitly subscribed to the feed or to a playbook that references the feed |
 
 Rules:
 
-- Do not require `signal/targets` for feed group delivery. A group subscribed
-  to a feed can receive `feed_run_complete` from `notify/message`.
+- Both streams dispatch the canonical `feed_alert_ready` event. Do not use the
+  legacy names `playbook_data_ready` or `feed_run_complete` in new docs or
+  agent instructions.
 - A push-capable feed needs `--push-notify` and a feed release bound to the
   cronjob:
 
@@ -611,6 +612,14 @@ alva deploy create --name <feed> --path '~/feeds/<feed>/v1/src/index.js' \
 alva release feed --name <feed> --version 1.0.0 \
   --cronjob-id <ID_FROM_DEPLOY> --description "<one-sentence purpose>"
 ```
+
+- `--push-notify` only marks the feed publisher as capable of emitting alerts.
+  It does **not** subscribe any user or group, and it does not bypass
+  notification preferences.
+- Real delivery always requires an explicit subscription:
+  `alva push-subscriptions subscribe-feed --username <owner> --name <feed>`,
+  `alva push-subscriptions subscribe-playbook --username <owner> --name <playbook>`,
+  or a group `/alva subscribe feed <id>` / `/alva subscribe playbook <id>`.
 
 Keep schema examples in [feed-sdk.md](references/feed-sdk.md) Patterns D/E.
 See **Step 9** below for the post-release subscription flow.
@@ -839,8 +848,10 @@ Present a concrete recommendation, not a generic "want push?":
 - **User requests push for a different feed** → honor their choice.
 
 If the feed already has the right push sidecar for the intended event
-(`signal/targets` for playbook signals, `notify/message` for feed completion)
-and `push_notify: true`, skip — it's already configured.
+(`signal/targets` for signal-style alerts, `notify/message` for feed
+completion / AlvaAsk reports) and `push_notify: true`, the publisher side is
+already configured. Still verify or create the user's/group's explicit
+subscription before claiming notifications are set up.
 
 #### Configure and verify
 
@@ -852,13 +863,18 @@ verification.
    `signal/targets` for playbook signals (Pattern D), or `notify/message` for
    feed completion / AlvaAsk reports (Pattern E).
 2. **Enable the flag on the cronjob:** `alva deploy update --id <ID> --push-notify`.
-3. **Verify a real run produced push content:** trigger a run (or wait for
+3. **Subscribe the delivery target:** for personal push use
+   `alva push-subscriptions subscribe-feed --username <owner> --name <feed>`
+   or `alva push-subscriptions subscribe-playbook --username <owner> --name <playbook>`;
+   for group push, run `/alva subscribe feed <id>` or
+   `/alva subscribe playbook <id>` in that group.
+4. **Verify a real run produced push content:** trigger a run (or wait for
    the next cron fire) and read `@last/1` of the configured sidecar. Confirm
    the record is fresh and the message body is non-empty.
-4. **Confirm to the user** with the specifics: which feed, what the next
-   push will say, when it will fire.
+5. **Confirm to the user** with the specifics: which feed/playbook is
+   subscribed, what the next push will say, and when it will fire.
 
-If Step 3 returns no record or an empty body, **do not claim push is set
+If Step 4 returns no record or an empty body, **do not claim push is set
 up** — diagnose (missing output write, wrong path, run failure) and fix
 before reporting success.
 

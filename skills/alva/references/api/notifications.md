@@ -35,7 +35,7 @@ Each row:
 | Field       | Type   | Description                                          |
 | ----------- | ------ | ---------------------------------------------------- |
 | id          | string | Notification ID                                      |
-| event_type  | string | E.g. `playbook_data_ready`, `feed_run_complete`      |
+| event_type  | string | E.g. `feed_alert_ready`, `order_filled`              |
 | user_id     | string | Recipient user ID                                    |
 | channel     | string | Delivery channel                                     |
 | status      | string | `sent` / `failed` / `filtered`                       |
@@ -48,7 +48,7 @@ Each row:
 ```bash
 alva notifications list-playbook --username alice --name btc-dashboard --first 5
 # → {
-#     "items": [{"id":"24463","event_type":"feed_run_complete","status":"sent",
+#     "items": [{"id":"24463","event_type":"feed_alert_ready","status":"sent",
 #                "created_at":1777355703,"message":"...","feed_id":"8117", ...}, ...],
 #     "next_cursor": "MTc3NzM1NTU4MjIzOTc5NzoyNDQ1OA==",
 #     "playbook_path": "/alva/home/alice/playbooks/btc-dashboard"
