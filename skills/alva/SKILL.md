@@ -11,7 +11,7 @@ description: >-
   Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v1.8.0
+  version: v1.8.1
 ---
 
 # Alva
@@ -187,12 +187,12 @@ that the user should verify with current sources.
 
 If the user's message contains a `/use-skill:<username>/<name>` directive (e.g. `/use-skill:alva/thesis`, `/use-skill:alice/btc-momentum`), this step is **mandatory** and must run before Guided Planning and before any build work.
 
-The directive gives the full catalog id (`<username>/<name>`). Skills live in the playbook-skills catalog on the gateway and are fetched via the `alva skills` CLI (use `alva skills --help` for the full surface). They can be published by any user — do not assume the `alva/` namespace.
+The directive gives the full catalog id (`<username>/<name>`). Skills are curated **methodologies** — opinionated blueprints that encode how to approach a recurring class of finance work (e.g. building a thesis, an AI-curated digest, a momentum tracker). They live in the **Skillhub** catalog on the gateway and are fetched via the `alva skillhub` CLI (use `alva skillhub --help` for the full surface). Alva ships a starter set under the `alva/` namespace, and any user can publish their own — do not assume the `alva/` namespace.
 
-1. **Inspect**: `alva skills get <username>/<name>` returns the file listing with sizes. Confirm a blueprint file is present — convention is `template.md`. If absent, look for `README.md` or ask the user which file is the blueprint.
-   - **On 404 / not found** (typo, deleted, or moved): run `alva skills list` and look for close matches **leniently** — case-insensitive, substring on both halves of the id, ignore separator differences. If exactly one obvious candidate, proceed with it and tell the user you corrected the id (e.g. "interpreting `/use-skill:Alva/AI-Digest` as `alva/ai-digest`"). If multiple plausible candidates, show them and ask. If nothing close, show the filtered list (use `--tag` if the user hinted at a topic) and ask the user to pick.
-2. **Read the blueprint**: `alva skills file <username>/<name> template.md` (or the file from step 1). Do not proceed from memory of a prior session — fetch it fresh.
-3. **Pull other files on demand**: when building, fetch additional files progressively as needed (e.g. `alva skills file <username>/<name> src/index.js` only if you intend to mirror the strategy logic). Do not bulk-download.
+1. **Inspect**: `alva skillhub get <username>/<name>` returns the file listing with sizes. Confirm a blueprint file is present — convention is `template.md`. If absent, look for `README.md` or ask the user which file is the blueprint.
+   - **On 404 / not found** (typo, deleted, or moved): run `alva skillhub list` and look for close matches **leniently** — case-insensitive, substring on both halves of the id, ignore separator differences. If exactly one obvious candidate, proceed with it and tell the user you corrected the id (e.g. "interpreting `/use-skill:Alva/AI-Digest` as `alva/ai-digest`"). If multiple plausible candidates, show them and ask. If nothing close, show the filtered list (use `--tag` if the user hinted at a topic) and ask the user to pick.
+2. **Read the blueprint**: `alva skillhub file <username>/<name> template.md` (or the file from step 1). Do not proceed from memory of a prior session — fetch it fresh.
+3. **Pull other files on demand**: when building, fetch additional files progressively as needed (e.g. `alva skillhub file <username>/<name> src/index.js` only if you intend to mirror the strategy logic). Do not bulk-download.
 4. Treat the blueprint as authoritative for layout, sections, widgets, data contracts, and cadence. Deviate only where the user explicitly overrides it.
 5. State the skill choice and any intentional deviations in your Guided Planning plan. The `/use-skill:` directive is a **strong build directive** — combined with a concrete topic, present the plan **once** and build; do not also stack clarifying multi-choice questions on top. Treat `/use-skill:` + concrete topic the same as "just do it": a single short plan, then build.
 
