@@ -587,7 +587,7 @@ type Match = {
 
 | Partition | When to use | Shape |
 |---|---|---|
-| `unified_search` | Topic-keyword search for this run — "find items about X right now" | `getSerperSearch({q, type, tbs})` / `searchGrokX({query, from_date})` / `searchBrave({...})` — one-shot queries |
+| `unified_search` | Topic-keyword search and fallback live finance search for non-US markets — "find items about X right now" | `getSerperSearch({q, type, tbs})` / `searchGrokX({query, from_date})` / `searchPerplexityFinance({query})` / `searchBrave({...})` — one-shot queries |
 | `feed_widgets` | Subscribed stream of a **specific handle, channel, subreddit, podcast, or YouTube/RSS-style feed** — "everything from @Acquired, even off-topic" | Declarative `targets[]` stream; results arrive as typed feed items over time |
 
 **AI Digest defaults to `unified_search`** because the user's
@@ -609,6 +609,7 @@ shown here may drift.
 | `news` | `@arrays/data/search/serper-search:v1.0.0` | `getSerperSearch({q, type: "news", tbs: "qdr:d", num})` |
 | `news` (alt) | `@arrays/data/search/search-brave:v1.0.0` | `searchBrave({q, freshness})` |
 | `social` | `@arrays/data/search/search-grok-x:v1.0.0` | `searchGrokX({query, from_date, to_date, max_search_results})` |
+| `finance_search` | `@arrays/data/search/search-perplexity-finance:v1.0.0` | `searchPerplexityFinance({query})` — fallback for non-US equities / international markets when structured SDK coverage is insufficient |
 | `market` | Alva Stock/Crypto SDKs (see `references/api/sdk.md`) | Emit a synthetic match only when the market signal itself is the event; otherwise use optional `context_facts` enrichment |
 | `feed` | Feed SDK upstream or direct ALFS read | Each upstream record becomes one match |
 | `rss` | Direct RSS/Atom URL via `net/http.fetch` | Parse `<item>` / `<entry>` into title, permalink, publish time, description. If parsing fails, fall back to `web` search for the source domain. |
