@@ -739,11 +739,11 @@ deleted by the user.
 3. **Upsell only on friction**: Do **not** proactively suggest upgrading.
    But when the user's experience is degraded because of free-tier
    limitations — wanting private playbooks, hitting the one-playbook cap,
-   hitting the cronjob cap, resource limits, or any other pro-gated
-   feature — acknowledge the limitation and offer the upgrade path:
+   resource limits, or any other pro-gated feature — acknowledge the
+   limitation and offer the upgrade path:
    "This feature is available on the Pro plan. You can upgrade at
    <https://alva.ai/pricing> to [specific benefit, e.g. keep playbooks
-   private / publish multiple playbooks / deploy more cronjobs / ...]."
+   private / publish multiple playbooks / ...]."
 
 Use the playbook `name` and the username from `alva whoami` to construct the
 canonical share URL. Use `published_url` from the release response for
