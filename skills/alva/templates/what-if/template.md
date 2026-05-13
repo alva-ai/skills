@@ -33,168 +33,195 @@ Before writing HTML, read from the Alva skill:
 
 The playbook HTML reads the computed output via runtime `fetch()` from the deployed feed path — never hardcoded data literals.
 
-## 1. Title
+## 1. Title and naming
 
-Format: `[Asset] [After/Before] [Trigger]`
+### 1a. Title format
 
-Recommended longer form including lookback: `[Asset] [After/Before] [Trigger] — [Lookback] What-If`
-e.g. "SPY After a Golden Cross (50MA × 200MA) — 15-Year What-If"
+Format: `[Asset] [After/Before] [Trigger]` — keep it short, concrete, no time-window suffix.
 
-No description paragraph under the title. The verdict-hero card (section 2) replaces the prose description — it conveys the same framing, but with live numbers instead of static text.
+✓ Examples: `S&P 500 After a 10% Drawdown`, `Gold After a New All-Time High`, `QQQ After Three Down Days`, `Bitcoin After Halving`.
 
-**3-second rule:** a reader must understand what the playbook is about within 3 seconds, without reading any paragraph. Title + verdict hero together must deliver this.
+✗ **Do NOT append `— [N]-Year What-If`** (or any other lookback suffix). The lookback is a methodology detail, not a title element. The reader does not need it to understand the playbook in 3 seconds.
 
-**Widget spec**
+✗ **Do NOT include the word "What-If"** in any user-facing copy: title, `display_name`, URL slug, hero card, modal header. The playbook category is communicated by the playbook chrome around the HTML; repeating it inside the HTML is noise.
 
-- Title text: `font-size: 20px; font-weight: 400;` — 16px margin to the verdict hero below.
-- **Title row container:** single flex row, `justify-content: space-between; align-items: center;`. Title on the left, README chip on the right.
-- **README chip** reuses the Screener shared chassis `.tab-chip.tab-readme` — height 24px, `font-size:12px`, icon 14px (`researcher-l1.svg`) + "README" label, `data-modal-open="methodology-modal"`. Copy the chip CSS verbatim from the Screener template; do not re-skin.
+### 1b. Naming rules across the three surfaces
 
-## 2. Verdict Hero (required, first widget after title)
+The same subject appears in three places — keep them aligned, NOT duplicated:
 
-A single full-width card that answers "did this work?" before the reader scrolls. Data-driven — no hardcoded prose.
+| Surface | Rule | Example |
+|---|---|---|
+| **`display_name`** (playbook chrome) | The concrete subject, ≤40 chars, no `What-If` suffix | `S&P 500 After a 10% Drawdown` |
+| **URL slug** (`name` in release CLI) | Lowercase, hyphens, no `whatif`/`what-if` suffix, no lookback | `spx-after-10-drop` |
+| **HTML `.section-title-text`** | The same subject as `display_name` | `S&P 500 After a 10% Drawdown` |
 
-One sentence, ≤45 words, conclusion-first. Carries 2-3 headline numbers — no more. Don't open with `Here's how X has moved…` / `Here's the distribution…`; lead with the number. No disclaimer eyebrow (`Verdict — historical observation only` and similar) — legal text, if any, goes in the Methodology modal, not on the card.
+✗ **Do NOT use an HTML `<h1>` named `.playbook-title`.** That selector belongs to a different page chrome and creates a visual second title above the first widget. Use `.section-title` containing `.section-title-text` + `.section-readme-btn` — see §3 step 1 for the exact widget.
+
+### 1c. README chip placement
+
+The README chip is the **only** non-data UI element on the page (alongside chart tooltips). It lives at the right end of the `.section-title` row, opens the Methodology modal (§6).
+
+**Widget spec:**
+- Reuse the Screener shared chassis `.section-readme-btn` — height 24px, 12px font, 14px icon (`researcher-l1.svg`) + "README" label.
+- Carries `data-modal-open="methodology-modal"`.
+- Copy the CSS verbatim; do not re-skin.
+
+### 1d. 3-second rule
+
+A reader must understand what the playbook is about within 3 seconds, without reading any paragraph. The `display_name` (in the playbook chrome) and the section-title (inside the HTML) deliver this. Below the section-title, the **hero card and the four horizon cards must be visible without scrolling** — see §3 First-fold rule.
+
+## 2. Verdict Hero (required, first widget after section-title)
+
+A single full-width Free Text Card that answers "did this work?" before the reader scrolls. Data-driven — no hardcoded prose.
+
+**One prose paragraph**, ≤80 words, conclusion-first, with the headline numbers **inline** and color-coded via `.pos` / `.neg` markdown spans (not in chips, not in separate metric cards). Don't open with `Here's how X has moved…` / `Here's the distribution…`; lead with the number.
+
+No disclaimer eyebrow (`Verdict — historical observation only` and similar) — legal text, if any, goes in the Methodology modal, not on the card.
 
 **Widget:** Free Text Card with `markdown-container--m` (Medium). See `references/design-widgets.md` → Free Text Card and `references/design-components.md` → Markdown.
 
-### 2a. Hero chips
+**Inline number coloring** — use the markdown-container spans:
+- `<span class="pos">+15.5%</span>` for positive headline numbers
+- `<span class="neg">−39%</span>` for negative headline numbers
+- Plain text for neutral values (counts, dates, durations)
+- Use `<strong>` sparingly for non-numeric emphasis (e.g. **every single case**)
 
-The hero starts with exactly three compact chips. Keep them mechanical; do not use interpretive labels such as `Trend intact`, `Short-term edge`, `Strong setup`, or `Risk-on`.
+**Example hero:**
+> Across the past 25 years the S&P 500 has dropped 10% from a peak <span class="pos">8 times</span>. The first-week bounce held in **every single case** (median <span class="pos">+4.6%</span>); a year later the index was higher <span class="pos">5 of 8</span> times, with a median gain of <span class="pos">+15.5%</span> — even after counting the <span class="neg">−39%</span> scar of 2008. Every drawdown eventually clawed back to its prior high, in a median of 11 months.
 
-Format:
+### 2a. Hero chips — optional, default off
 
-1. **Asset chip** — the shortest recognizable asset or market label.
-2. **Trigger chip** — the shortest readable trigger label.
-3. **Case count chip** — fixed as `Cases: {n_events}`.
+Compact asset / trigger / case-count chips at the top of the hero card are **optional and default OFF**. The hero prose already names the asset, the trigger, and the case count inline; chips are pure redundancy in the default case.
 
-Examples:
+Turn chips on **only** when at least one of the following is true:
+- The asset is non-mainstream and the reader may not recognise it (e.g. an industry ETF or non-US index)
+- The trigger needs a compact technical label the prose can't carry cleanly (e.g. `RSI < 20`)
+- The page is being remixed into a screener-like collection and chips help skimming across multiple playbooks
 
-- `SPY` / `50D reclaim` / `Cases: 44`
-- `QQQ` / `3 down days` / `Cases: 71`
-- `S&P 500` / `Golden cross` / `Cases: 38`
-- `Gold` / `New high` / `Cases: 52`
-- `VIX` / `Above 30` / `Cases: 29`
+If chips are used, they must follow the same shape:
+1. **Asset chip** — shortest recognizable label.
+2. **Trigger chip** — shortest readable trigger label (1–3 words).
+3. **Case count chip** — `Cases: {n_events}`.
 
-Keep the first two chips to 1–3 words each. The asset chip should not include `Asset:` and the trigger chip should not add `signal` unless the trigger would otherwise be unclear.
+Keep them mechanical — do not use interpretive labels like `Trend intact`, `Strong setup`, or `Risk-on`.
 
-### 2b. Counter-narrative card (optional)
+### 2b. Counter-narrative card — REMOVED
 
-A second card under the hero is only allowed when it carries a counter-narrative that can't fit in the main sentence. The single most memorable counter-intuitive finding, if one exists, belongs here — never buried in methodology.
-
-**Widget** — pick by content type:
-
-- **Numeric finding** (one headline number with a short label): **Metric Card**.
-- **Narrative finding** (one short paragraph of context): **Free Text Card** with `markdown-container--s` (Small).
+Earlier versions of this template allowed a separate counter-narrative card under the hero. **Do not add one.** The single most memorable counter-intuitive finding belongs **inside the hero paragraph**, not as a second card. Splitting it into a separate card pushes the four horizon cards (§3 step 3) below the fold and breaks the 3-second rule.
 
 ## 3. Layout (single-page scroll, results first)
 
 One vertically-scrolling page. Top-to-bottom order:
 
-1. **Title** (section 1) — title text + README chip (right-aligned) on the same row.
-2. **Verdict hero** (section 2) — one full-width card with the three hero chips, conclusion sentence, and one support sentence. **Widget:** Free Text Card (`markdown-container--m`).
-3. **Belief cards** — two half-width cards: `Common expectation` and `What history showed`. They translate the signal into plain language before the charts.
-4. **Main path chart + readout rail** — normalized event path chart on the left (`.col-5`), three-card readout rail on the right (`.col-3`).
-5. **Four horizon cards** — exactly four metric cards (`.col-2` × 4): a week, a month, three months, and a year later.
-6. **One-year case bar chart + past-case range** — bar chart on the left (`.col-5`), range rail on the right (`.col-3`).
-7. **Featured case cards** — three equal cards: strongest case, softest case, latest complete case.
-8. **Historical audit ledger** — one row per event, default-collapsed for large samples. **Widget:** Table Card.
+1. **Section-title row** — `.section-title` containing `.section-title-text` (the page subject from §1b) on the left and `.section-readme-btn` (the README chip from §1c) on the right. **Not** a widget card. Lives directly inside `.playbook-container`, before the first `.widget-grid`.
+2. **Verdict hero** (section 2) — one full-width Free Text Card (`.col-8`, `markdown-container--m`). Single paragraph with inline colored numbers.
+3. **Four horizon cards** — exactly four metric cards (`.col-2` × 4). See §3a for which four. **These must sit directly under the hero** (no intervening widgets) so they stay in the first fold.
+4. **Main path chart** (`.col-8`) — Chart Card. Normalized event paths overlay (rebased to 100 at event day), median line + middle-half band + a representative sample of past paths + a non-event "typical year" reference line. See §3c.
+5. **Two side-by-side analysis charts** (`.col-4` + `.col-4`) — both Chart Cards.
+   - **Left:** "Typical move at each horizon, event vs plain historical average". Paired bars per horizon: event mean vs unconditional baseline mean.
+   - **Right:** "How [asset] moved [headline horizon] after each past event". One bar per past event, sorted best-to-worst, green/red by sign, dashed line at zero.
+6. **Audit ledger** (`.col-8`) — one row per event, **newest first**. Use the row-first flex table and `initTableAlignment`. See §5 audit ledger collapse rule.
+7. **References card** (`.col-8`) — Free Text Card with two short paragraphs:
+   - **Trigger source:** how events are identified, in plain language. One sentence on the re-arm rule when relevant.
+   - **Data source:** which SDK / symbol / interval, what the forward-move horizons are in trading days, what is and is not included (dividends, transaction costs), and how often the pipeline refreshes.
 
-Methodology and references do not live on the scroll — they live in a modal opened by the README chip in the title row (see §1 and [Methodology modal](#methodology-modal)). Do not add a bottom `References` section.
+Methodology lives in the Modal (§6, opened by the README chip). The bottom References card is a short data-source eyebrow — it is **not** the methodology. Do not duplicate.
 
 No tabs, no hidden panels other than the Methodology modal and the audit-ledger expand/collapse behavior — everything else is on the single scroll.
 
-**Canonical reasoning flow:** headline → aggregate slice (across chosen dimension) → aggregate spread → reliability → per-event / per-member paths → historical context → raw rows. Each step answers the objection raised by the previous. Methodology is available on-demand via the README chip, not inline in the flow.
+### 3. First-fold rule (very strict)
 
-### 3a. Cutting dimensions for the summary cards row
+On a 1440 × 900 viewport, the first fold must contain:
+**section-title row + hero card + four horizon cards** — and nothing else from the section-title row down.
 
-Pick ONE based on the crowd question:
+This is what enforces the "results in 3 seconds" promise. Any widget that lives between the hero and the horizon cards (counter-narrative card, belief cards, eyebrow callouts, etc.) is rejected — they have all been removed from this template. The next-fold content starts with the main path chart (§3 step 4).
 
-For the default what-if event-study layout, use **Time** and render only the four canonical horizon cards: a week, a month, three months, and a year later. The hero and readout rail choose their headline horizon from those same four cards, so the headline always has a visible supporting card. Use other dimensions only when the user's question explicitly requires them.
+**Canonical reasoning flow:** headline (hero) → headline numbers per horizon (4 cards) → typical price path (main chart) → event vs baseline + per-event distribution (two side-by-side) → raw rows (audit ledger) → data provenance (references). Each step answers the objection raised by the previous. Methodology is available on-demand via the README chip.
 
-| Dimension | Use when the question is | Example cards |
+### 3a. Choosing the four horizon cards
+
+The four horizon metric cards always cut **by time**. Pick one of the two canonical sets based on the trigger:
+
+| Set | Use when | Headline framing |
 |---|---|---|
-| **Time** | "How long does X last / take?" | 1W / 1M / 3M / 6M / 1Y forward return + win rate |
-| **Asset** | "What moves most after event X?" | hit rate + median for SPY / TLT / GLD / DXY / XLE |
-| **Ticker** | "Which basket members moved?" | per-ticker median reaction across the event set |
-| **Regime** | "Is Y different in state A vs B?" | mean / median side-by-side per regime |
-| **Magnitude** | "Does bigger X mean bigger Y?" | small / medium / large event buckets |
-| **Recovery** | "How long does it take to heal?" | median / fastest / % within 3M / % within 1Y |
-| **Event-specific** | "What happened in the key past case?" | 4-5 recognizable events, each its own card |
+| **1W / 1M / 3M / 1Y** | The short-term reaction is the story (drawdowns, single-day shocks, sentiment extremes, breadth thrusts) | "Does the bounce hold? Then what?" |
+| **1M / 3M / 6M / 1Y** | A regime / setup whose payoff plays out over months, not days (macro signals, long-base breakouts, slow-building setups) | "Does the trend stick?" |
 
-The big number on each card is the observable outcome, not a sample count (sample counts go in the small footer).
+Pick one set per playbook; **do not mix** (no 1W / 3M / 6M / 1Y).
 
-**Grid layout** — `references/design-widgets.md` → Widget Layout (8-col web / 4-col mweb). Metric Cards are auto-height and wrap via flex-wrap, so additional rows are fine as long as every card in the row-stack shares the same cutting dimension.
+In `forward-return` days: 1W = 5, 1M = 21, 3M = 63, 6M = 126, 1Y = 252 (trading days).
 
-| Card count | Preferred layout |
-|---|---|
-| 3 | `.col-thirds` (equal thirds) |
-| 4 | `.col-2` × 4 (25% each) — the canonical default |
-| 5 | `.col-2` × 4 on row 1 + `.col-2` × 1 on row 2, **or** single `.col-8` Metric Card with 4 vertical dividers (`.divider-v`) if the slices are tightly related |
-| 6 | `.col-2` × 4 on row 1 + `.col-2` × 2 on row 2, or `.col-thirds` × 2 rows |
-| 7–8+ | Continue wrapping with `.col-2`; keep every row aligned to the same dimension |
+Each card carries:
+- Big number = the median forward return for that horizon (signed %, color by sign)
+- One short label above: `A week later` / `A month later` / `Three months later` / `Six months later` / `A year later`
+- Small label below: `Typical (median)`
+- Small footer: `positive in {wins} of {N}` (the win rate, not a method description)
 
-No hard ceiling — add rows as the analysis needs. Preference is still to pick the tightest set of slices that answers the question (4 is the cleanest default), but a third or fourth row is legitimate when the dimension genuinely has that many meaningful buckets.
+### 3b. Two side-by-side analysis charts (§3 step 5)
 
-### 3b. Each card extends a specific hero atom (no orthogonal angles)
+**Left chart — event vs baseline at each horizon:**
+- X-axis: the four horizon labels from §3a (categorical)
+- Two paired bars per horizon: event mean (teal) and unconditional baseline mean (grey)
+- Baseline is the average forward path over the same period from any non-event start day (sampled regularly, e.g. quarterly). Stored in the feed's `normal_path` time series.
+- Dashed line at zero. Tooltip shows both numbers with signed %.
 
-For every card, articulate "this shows the [tail / reliability / long-horizon] of [hero atom X]". If the hero doesn't name the underlying quantity, a card about its derivative doesn't belong here.
-
-| Hero atom | Card extends into |
-|---|---|
-| average X% | **tail** — biggest single-event X |
-| median took N days | **reliability** — how often within window |
-| recovered by day Y | **long-horizon** — hit rate at 1Y / 2Y |
-| event rate R% | **tail** — biggest single case |
-| across N events | **distribution** — per-decade / per-regime split |
-
-Failure pattern: hero "oil spike fades in 2 weeks" paired with a card about market-volatility moves on fade days — market volatility was not in the hero, reject.
+**Right chart — per-event return at the headline horizon:**
+- The headline horizon is the one the hero leans on (typically 1Y).
+- One bar per past event. Sort **best-to-worst** (not by date).
+- X-axis labels: short month-year of the onset (e.g. "Feb 2020"); rotate 30° to avoid clipping.
+- Green bars positive, red bars negative; `borderRadius: [1, 1, 0, 0]` per the design-widgets bar spec.
+- Dashed line at zero. Tooltip shows full date + signed %.
 
 ### 3c. Chart Card — widget spec
 
-Every chart in the supporting-charts layer (§3 step 4) is a **Chart Card**. Follow `references/design-widgets.md` → Chart Card verbatim (CSS, Chart Rules, Axis Rules, Mark Line, Tooltip, Line Chart / Bar Chart specifics). Do not re-define any of those here.
+Every chart on the page is a **Chart Card**. Follow `references/design-widgets.md` → Chart Card verbatim (CSS, Chart Rules, Axis Rules, Mark Line, Tooltip, Line Chart / Bar Chart specifics). Do not re-define any of those here.
 
-**One override for this template:** Chart Card height = **560px** (the design-widgets default is 320px). Per-event charts in What-If carry more horizon and more individual paths than a typical dashboard tile, so they need the extra vertical room. All charts on the page — including side-by-side pairs (`.col-4` × 2) — use 560px.
+**Two overrides for this template:**
+
+1. **Chart Card height = 560px.** The design-widgets default is 320px; per-event charts in What-If carry more horizon and more individual paths than a typical dashboard tile, so they need the extra vertical room. All charts on the page — including the side-by-side `.col-4` pair — use 560px.
+2. **Every Chart Card has a `widget-subtitle`** — one line of small grey text directly under the widget-title, before the chart body. It explains *what the chart shows* in plain prose, including what colored marks mean (e.g. "Teal bars: the average move after past −10% drawdowns. Grey bars: the S&P 500's plain historical average over the same period from any non-event start day. Dashed line is zero."). This pairs with the title to set context without making the reader hover for hints.
 
 **Main path chart rules**
 
 - Rebase signal day to 100.
 - Do not draw every past case as a full-opacity line. Show only a representative sample of past paths and add a subtle middle-half band.
-- Show the typical-after-signal line and the normal-period line.
-- Tooltip hides helper/sampled-path series and shows only useful readout lines.
+- Show the typical-after-signal line and the typical-non-event-year reference line.
+- Tooltip hides helper / sampled-path series and shows only useful readout lines.
 
-**One-year case chart rules**
+**One-event-per-bar chart rules** (the right side-by-side chart)
 
-- Must be a bar chart, one bar per completed case.
-- Do not label every case on the x-axis.
-- Show sparse year anchors only: first year, last year, and roughly every other calendar year.
-- Exact signal date and value belong in hover tooltip.
-- Green bars are positive, red bars are negative.
-- Keep the zero line and median line, but avoid text labels that can clip.
+- One bar per completed past event.
+- Sort by return (best-to-worst), not by date — the visual gradient is the headline.
+- Sparse year anchors on x-axis if dates are used; full date in tooltip.
+- Green positive, red negative.
+- Keep the zero line; avoid label text that can clip.
 
 ### 3d. Plain language (every user-visible surface)
 
-Applies to cards, chart titles, axis labels, table headers, tooltips, and methodology — not just cards. LLM defaults trend toward trading-desk jargon; override them.
+Applies to cards, chart titles, widget subtitles, axis labels, table headers, tooltips, References card, and methodology — not just hero. LLM defaults trend toward trading-desk jargon; override them.
 
-- **Tickers**: first mention only, in parens after the plain name ("the S&P 500 (SPY)"). Typically in the hero; for basket playbooks, in the first card introducing each member. Never in chart titles, axis labels, table headers, or tooltips. Default map: SPY → "the S&P 500", USO → "oil", TLT → "long-dated Treasury bonds", GLD → "gold", QQQ → "the Nasdaq (100)", VIX → "market volatility", DXY / UUP → "the US dollar"; company tickers → company names.
+- **Tickers**: first mention only, in parens after the plain name ("the S&P 500 (SPY)"). Typically in the hero or References card; for basket playbooks, in the first card introducing each member. Never in chart titles, axis labels, table headers, or tooltips. Default map: SPY → "the S&P 500", USO → "oil", TLT → "long-dated Treasury bonds", GLD → "gold", QQQ → "the Nasdaq (100)", VIX → "market volatility", DXY / UUP → "the US dollar"; company tickers → company names.
 - **Time horizons and telegraphic codes**: "a month later" / "a year later" / "sixty trading days after the event". Never `+1M` / `+1Y` / `D+10` / `D+60` / `d21` / `fwd_3m` / `N=15` / bare `21 trading days`.
-- **Banned jargon**: `drawdown`, `cohort`, `regime`, `baseline`, `dispersion`, `reaction`, `realization`, `persistency`, `cumulative return`, `IQR`, `whiskers`, `outliers`, `realized volatility`, `R-squared`. Prefer: "biggest dip", "group", "state", "typical outcome", "range between biggest and smallest past cases", "middle half of past outcomes", "daily price swings", "almost no relationship between the two".
-- **Explain cutoffs inline**: every `since YYYY` / sample filter / threshold carries a one-clause reason on first mention ("since 2011 — that's when this ETF started trading"; "20% volatility threshold — the level that typically flags an early sell-off").
-- **Methodology** (inside the modal) — modal body renders the playbook's `README.md` (see [release.md → Playbook README](../../references/api/release.md#playbook-readme) for the canonical content shape). For what-if, the README's methodology covers "how we picked events" and "how we measured returns" in plain prose — no formulas, no `consensus EPS` / `recovery date` / `sample period` jargon. Any legal disclaimer lives at the bottom of the README.
+- **Banned jargon**: `drawdown` (in body copy — title may use it as a noun if it's the trigger word), `cohort`, `regime`, `baseline` (in body copy — methodology may use it), `dispersion`, `reaction`, `realization`, `persistency`, `cumulative return`, `IQR`, `whiskers`, `outliers`, `realized volatility`, `R-squared`. Prefer: "biggest dip", "group", "state", "plain historical average", "typical outcome", "range between biggest and smallest past cases", "middle half of past outcomes", "daily price swings", "almost no relationship between the two".
+- **Explain cutoffs inline**: every `since YYYY` / sample filter / threshold carries a one-clause reason on first mention ("since 2000 — that's when the daily S&P 500 series starts in our data"; "10% from peak — the textbook threshold for a 'correction'").
+- **Methodology** (inside the modal) — modal body renders the playbook's `README.md` (see [release.md → Playbook README](../../references/api/release.md#playbook-readme) for the canonical content shape). For what-if, the README covers "how we picked events" and "how we measured returns" in plain prose — no formulas, no `consensus EPS` / `recovery date` / `sample period` jargon. Any legal disclaimer lives at the bottom of the README.
 
 ## 4. Data presentation
 
 - **Number is the visual hero.** Big numerical value, small descriptive label underneath. Never the other way around.
-- **Every chart** pairs a short title with a small-text methodology subtitle (e.g. "rebased to 100 at event day, −60d to +252d").
-- **Consistent color semantics** across cards, charts, and tables: positive = teal/cyan token, negative = red token, neutral/reference = grey token. Same meaning everywhere.
-- **Reference lines** on comparison charts (e.g. dashed 50% line on win-rate chart) to anchor interpretation at a glance.
-- **Aggregate → individual.** At least one chart must show per-event detail (not just averages), so the reader can judge dispersion and clustering.
-- **Footer = observable context.** Card footers carry a specific date, delta, or bucket label — never a method description. Method lives once, in the Methodology modal.
+- **Every chart** pairs a short title with a `widget-subtitle` (one-line plain-prose explanation, see §3c).
+- **Consistent color semantics** across cards, charts, and tables: positive = teal/cyan token (`--main-m3`), negative = red token (`--main-m4`), neutral/reference = grey token. Same meaning everywhere. ECharts is Canvas — use raw hex/rgba, not `var(--…)`.
+- **Reference lines** on comparison charts (e.g. dashed zero line on per-event bar chart; dashed median line where helpful) to anchor interpretation at a glance.
+- **Aggregate → individual.** At least one chart must show per-event detail (not just averages), so the reader can judge dispersion and clustering. The right side-by-side chart (§3b) covers this by default.
+- **Footer = observable context.** Card footers carry a specific date, delta, or bucket label (`positive in 5 of 8`) — never a method description. Method lives once, in the Methodology modal and the References card.
 
 ## 5. Hard rules
 
 - **No** "last updated / refreshed / as of" timestamp anywhere on the page.
 - **No** filters, dropdowns, selectors.
+- **No** second h1 / repeated title above the section-title row.
+- **No** "What-If" label anywhere user-facing (title, slug, hero, modal header, chips).
+- **No** counter-narrative card, belief cards, featured-case cards, readout rail — any element that sits between the hero and the four horizon cards and pushes them below the fold is forbidden. Earlier template versions allowed these; they are now explicitly removed.
 - **Only interactivity allowed:** chart hover tooltips, the README chip opening the Methodology modal, and the audit-ledger expand/collapse button when event count is high.
 
 **Audit ledger collapse rule**
@@ -207,9 +234,11 @@ Applies to cards, chart titles, axis labels, table headers, tooltips, and method
 
 ## 6. Methodology modal
 
-Triggered by the README chip in the title row (§1). Mirrors the Screener template's Methodology modal pattern — reuse the same modal chassis (`.modal-overlay` / `.modal-panel`) and the same `data-modal-open` / `data-modal-close` wiring.
+Triggered by the README chip in the section-title row (§1c). Mirrors the Screener template's Methodology modal pattern — reuse the same modal chassis (`.modal-overlay` / `.modal-panel`) and the same `data-modal-open` / `data-modal-close` wiring.
 
 - README chip carries `data-modal-open="methodology-modal"`; the modal root has `id="methodology-modal"`.
 - Modal panel `max-width: 896px` (narrower than the 960px base — methodology content is prose, not wide tables).
 - Body content = the playbook's [`README.md`](../../references/api/release.md#playbook-readme), rendered into the modal body. One source of truth; do not duplicate the content shape here.
 - Closed by default on page load — methodology is rarely the first thing a reader wants.
+
+**Modal ≠ References card.** The methodology modal is the full explanation (how we picked events, how we measured, sample-size caveats, asset-choice rationale). The References card at the bottom of the scroll (§3 step 7) is a two-sentence data-source eyebrow. They have different audiences (curious / glancing) and different content shapes. Do not duplicate the methodology inside the References card.
