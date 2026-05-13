@@ -32,7 +32,7 @@ feed.def("narrative", {
 });
 
 feed.def("signal", {
-  targets: makeDoc("Hero Push", "Daily hero digest for playbook followers", [
+  targets: makeDoc("Hero Push", "Daily hero digest for subscribed playbook viewers", [
     obj("instruction", [
       str("type"),
       arr("weights", [ str("symbol"), num("weight") ]),
@@ -376,7 +376,7 @@ function clampEnum(val, enumMap, fallback){
     function highCount(arr){ return (arr||[]).filter((r)=> r.priority === 'High').length; }
     // Per template v1.6.2: push fires on strict INCREASE of risks.length or
     // High-priority count. Decreases do not trigger a push (the thesis
-    // improving shouldn't spam followers).
+    // improving shouldn't spam subscribers).
     const catalystFlipped = prior && catalystSig(catalysts) !== catalystSig(priorCatalysts);
     const riskCountChanged = prior && risks.length > priorRisks.length;
     const highChanged = prior && highCount(risks) > highCount(priorRisks);

@@ -1,15 +1,15 @@
 # Push Subscriptions
 
-Personal opt-in for DM/web push. Independent of social follow:
-subscribe ≠ follow, unsubscribe ≠ unfollow. Following a playbook
-elsewhere compound-subscribes (and revives a previously-unsubscribed
-row).
+Personal opt-in for DM/web push. Notification preferences are the source of
+truth for delivery. Independent of social follow: subscribe ≠ follow,
+unsubscribe ≠ unfollow. Following a playbook does not create or revive a push
+subscription.
 
 Two target types:
 
-- **PLAYBOOK** — fires for any feed of that playbook.
+- **PLAYBOOK** — fires for alerts from feeds referenced by that playbook.
 - **FEED** — fires for that one feed; if it's used by multiple
-  playbooks (remix), one push per playbook context.
+  playbooks (remix), the caller still receives one push per feed alert.
 
 Auth: caller must be able to read the target (gated upstream).
 
@@ -63,4 +63,5 @@ Row shape: `{ target: {type, id}, subscribed, created_at_ms, updated_at_ms }`.
   requires `active_channel` to be `telegram` or `discord` with the matching
   `telegram_username` or `discord_username` set.
 - Producer side (making a feed *capable* of pushing) is separate — see
-  Section 9 of SKILL.md and `--push-notify` on `alva deploy`.
+  Section 9 of SKILL.md and `--push-notify` on `alva deploy`. Enabling
+  `--push-notify` does not subscribe any user or group.
