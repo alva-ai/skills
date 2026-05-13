@@ -180,7 +180,7 @@ Applies to cards, chart titles, axis labels, table headers, tooltips, and method
 - **Time horizons and telegraphic codes**: "a month later" / "a year later" / "sixty trading days after the event". Never `+1M` / `+1Y` / `D+10` / `D+60` / `d21` / `fwd_3m` / `N=15` / bare `21 trading days`.
 - **Banned jargon**: `drawdown`, `cohort`, `regime`, `baseline`, `dispersion`, `reaction`, `realization`, `persistency`, `cumulative return`, `IQR`, `whiskers`, `outliers`, `realized volatility`, `R-squared`. Prefer: "biggest dip", "group", "state", "typical outcome", "range between biggest and smallest past cases", "middle half of past outcomes", "daily price swings", "almost no relationship between the two".
 - **Explain cutoffs inline**: every `since YYYY` / sample filter / threshold carries a one-clause reason on first mention ("since 2011 — that's when this ETF started trading"; "20% volatility threshold — the level that typically flags an early sell-off").
-- **Methodology** (inside the modal) = two short plain paragraphs: "how we picked events" + "how we measured returns". No formulas, no `consensus EPS` / `recovery date` / `sample period`. Any legal disclaimer goes at the bottom of this modal, not on the page.
+- **Methodology** (inside the modal) — modal body renders the playbook's `README.md` (see [release.md → Playbook README](../../references/api/release.md#playbook-readme) for the canonical content shape). For what-if, the README's methodology covers "how we picked events" and "how we measured returns" in plain prose — no formulas, no `consensus EPS` / `recovery date` / `sample period` jargon. Any legal disclaimer lives at the bottom of the README.
 
 ## 4. Data presentation
 
@@ -211,5 +211,5 @@ Triggered by the README chip in the title row (§1). Mirrors the Screener templa
 
 - README chip carries `data-modal-open="methodology-modal"`; the modal root has `id="methodology-modal"`.
 - Modal panel `max-width: 896px` (narrower than the 960px base — methodology content is prose, not wide tables).
-- Body content = the two plain paragraphs defined in §3d ("how we picked events" + "how we measured returns"), followed by references for trigger source and return source. Legal disclaimer, if any, goes at the bottom of this body.
+- Body content = the playbook's [`README.md`](../../references/api/release.md#playbook-readme), rendered into the modal body. One source of truth; do not duplicate the content shape here.
 - Closed by default on page load — methodology is rarely the first thing a reader wants.

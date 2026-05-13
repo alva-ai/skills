@@ -5,8 +5,10 @@ surface is an **AI-generated push digest**, not a dashboard. User can provide
 either a rough topic or a full source plan; the agent researches the topic,
 drafts a `CONFIG`, selects the smallest useful set of Alva search/feed/data inputs,
 runs on cron, generates an opinionated grounded take via `@alva/alvaask`, and
-pushes it to Telegram (via `signal/targets` for followers, or
-`notify/message` for the owner). The HTML playbook is a **light feed-stream
+pushes it through Alva notifications (via `signal/targets` for
+playbook/follower signals, or `notify/message` for feed completion
+notifications to the owner and feed-subscribed groups). The HTML playbook is a
+**light feed-stream
 replay** of past pushes — not an analytical dashboard.
 
 > **Highest-priority standard — strictly follow. Template iterates; always
@@ -86,9 +88,8 @@ Read in this order:
 
 ## 1. When to use this template
 
-Use AI Digest when the playbook's main job is to **push a concise,
-grounded update** about a topic, fixed stream, upstream feed, or deterministic
-threshold.
+Use AI Digest when the playbook's main job is to **push a grounded digest**
+about a topic, fixed stream, upstream feed, or deterministic threshold.
 
 Good fits:
 
@@ -127,7 +128,7 @@ that materially affect the feed:
 | Topic boundary | What should this track, and what should it exclude? | Prevents broad keyword slop. |
 | Sources | Optional but useful: paste sources you already trust — RSS feeds, newsletters, podcasts, YouTube channels, websites, X handles, subreddits, upstream Alva feeds, or plain text source names. If skipped, the agent researches a source plan first. | Makes the digest match the user's actual information diet, and chooses `unified_search` vs `feed_widgets` and adapters. |
 | Cadence / trigger | How often should it summarize or check? For thresholds, what exact condition matters? | Sets cron and materiality. |
-| Audience | Followers or owner only? | Chooses `signal/targets` vs `notify/message`. |
+| Audience | Playbook signal or feed notification? | Chooses `signal/targets` for playbook/follower signals or `notify/message` for owner plus feed-subscribed groups. |
 | Angle | What kind of take should the update have? | Drives the generation prompt and voice. |
 | Worth-pushing bar | What counts as material enough to notify? | Reduces noisy pushes. |
 
@@ -198,8 +199,8 @@ Default assumptions for the skip path:
   `mode: "watch"` with a tighter cron. Do not ask the user to choose a mode.
 - `quiet_day_policy`: `"ping"` for paid/subscriber-facing briefs where silence
   is confusing; `"skip"` for noisy topics where no-news days should stay quiet.
-- `audience`: `"followers"` for released playbooks; `"owner"` for private
-  prototypes or platform environments where follower push is not available.
+- `audience`: `"followers"` for playbook/follower signals; `"owner"` for
+  feed completion notifications using `notify/message`.
 - `angle`: opinionated, but no buy/sell/hold calls, no price targets, no
   uncited numerical claims.
 
@@ -272,7 +273,7 @@ const CONFIG = {
     quiet_day_policy: "ping",        // "ping" (default) | "skip"
   },
 
-  audience: "followers",             // "followers" (signal/targets) | "owner" (notify/message)
+  audience: "followers",             // "followers" = signal/targets; "owner" = notify/message to owner + feed-subscribed groups
 
   push_policy: {
     materiality: `Push when there is a fresh supply-chain disruption,
@@ -286,10 +287,10 @@ const CONFIG = {
           Opinionated — tell the reader what to watch next, not just what
           happened. Every number must cite its source.`,
 
-  body_max_chars: 1200,              // rendered body budget; push_line capped separately at 160
+  body_max_chars: 1200,              // canonical digest body budget; push reuses this body
 
   // Full Alva model IDs — not short names, not dated Anthropic IDs.
-  generation_model: "claude-sonnet-4-6",
+  generation_model: "claude-opus-4-7",
   relevance_model: "claude-haiku-4-5",
 };
 ```
@@ -451,9 +452,10 @@ remixers all agree on what an AI Digest event looks like.
 
 `digest/events` is the **source of truth** for the HTML timeline.
 `signal/targets` / `notify/message` are delivery sidecars — they hold the
-push payload the platform broadcasts, not the rendered body. One LLM
-generation per fire; the event record stores the canonical body, and the
-delivery sidecar gets a lean projection of it.
+push payload the platform broadcasts, derived from the same canonical event
+body. One LLM generation per fire; the event record stores the canonical body,
+and the delivery sidecar should stay as close to that body as the channel
+allows.
 
 All three are Feed SDK time-series
 (`ctx.self.ts("digest", "events").append(...)`). Do **not** use
@@ -466,7 +468,7 @@ All three are Feed SDK time-series
 | `date` | number (ms) | Cron-fire timestamp. Append it on every record; Feed SDK time-series may treat it as the built-in timestamp field rather than a declared schema field. |
 | `delivery` | `{pushed: bool, reason: string}` | `pushed=false` carries a short `reason` (`quiet_day_skipped`, `no_matches`, `all_deduped`, `not_material`, `rate_limited` — freeform, kept short) |
 | `materiality` | `{is_material: bool, reason: string}` | Deterministic pre-generation decision derived from `CONFIG.push_policy`, matches, and optional context facts |
-| `push_line` | string | ≤ 160 chars plain text. |
+| `push_line` | string | ≤ 160 chars plain text. This is only the headline, not the whole push body. |
 | `body` | string | Markdown with inline `[N]` reference markers. |
 | `citations` | `[{ref, claim, url, source, source_ref}]` | One entry per `[N]` marker. `source_ref` is a match URL, `match.meta.event_key`, or, when using enrichment, `context_facts[].ref_id`. |
 | `matches` | `[{source, url, title, ts, snippet, meta}]` | All matches considered this fire (post-relevance, post-dedupe) |
@@ -481,13 +483,14 @@ Retro analysis of quiet periods needs a record. The HTML timeline can show
 skipped fires dimmed-and-collapsed for author-facing transparency. **Append
 always; let `delivery.pushed` drive rendering.**
 
-### `signal/targets` (followers) — Altra format
+### `signal/targets` (playbook/follower signals) — Altra format
 
 When `audience: "followers"`, also append one record to `signal/targets` per
 pushed fire. Format follows Altra's target schema (see `references/feed-sdk.md`
-Pattern D); the platform reads `meta.reason` as the push body and truncates it
-to 500 chars. Always pass the released playbook URL so the compact push can
-reserve the final link line:
+Pattern D); the platform reads `meta.reason` as the push body. Telegram delivery
+chunks long messages at the platform message limit, so do not impose an
+artificial 500-character cap in the template. Always pass the released playbook
+URL so the push can include the canonical replay link:
 
 ```javascript
 const PLAYBOOK_URL = "https://<user>.playbook.alva.ai/<playbook>/<version>/index.html";
@@ -495,7 +498,7 @@ const PLAYBOOK_URL = "https://<user>.playbook.alva.ai/<playbook>/<version>/index
 await ctx.self.ts("signal", "targets").append([{
   date: now,
   instruction: { type: "allocate", weights: [] },   // no-op — this is notify-only
-  meta: { reason: composePushPayload(event, PLAYBOOK_URL) }, // ≤ 500 chars; see §9
+  meta: { reason: composePushPayload(event, PLAYBOOK_URL) }, // mirrors event.body; see §9
 }]);
 ```
 
@@ -513,10 +516,12 @@ await ctx.self.ts("signal", "targets").append([{
 > switch `audience` to `"owner"` and write to `notify/message` (Pattern E)
 > — that path is never FeedAltra-gated.
 
-### `notify/message` (owner) — title + text
+### `notify/message` (feed completion notification) — title + text
 
 When `audience: "owner"`, write to `notify/message` instead. No FeedAltra
-requirement; plain `Feed` suffices.
+requirement; plain `Feed` suffices. Despite the historical `owner` label in
+this template, `notify/message` dispatches `feed_run_complete`: the feed owner
+receives it directly, and groups subscribed to the feed can receive it too.
 
 ```javascript
 const PLAYBOOK_URL = "https://<user>.playbook.alva.ai/<playbook>/<version>/index.html";
@@ -633,8 +638,8 @@ A cheap semantic pass is mandatory.
 **SDK choice: `@alva/alvaask`, not `@alva/adk`.** `ask()` is the single LLM
 path for this template — for both the per-item relevance check below and
 the full digest generation in §8. `ask()` is **synchronous** (`{text,
-session_id} = ask(prompt, {system, model})`), and supports the `model`
-option; `adk.agent()` does not.
+session_id} = ask(prompt, {system, model, effort})`), and supports `model`
+and `effort` options; `adk.agent()` does not.
 
 **Batch the calls.** Don't send one `ask()` per item — on 30 items that's
 30 round-trips. Batch 10–20 items into one prompt and return a JSON
@@ -739,7 +744,7 @@ model to decide whether the user has been interrupted too often.
 ## 8. Generation + grounding
 
 All LLM work in this template goes through **`@alva/alvaask`** — `ask()` is
-synchronous, accepts `{system, model}`, and returns `{text, session_id}`.
+synchronous, accepts `{system, model, effort}`, and returns `{text, session_id}`.
 Do **not** use `@alva/adk` here: `adk.agent()` doesn't accept a `model`
 option and pulls in a ReAct loop we don't need. One SDK, two call sites:
 batched yes/no in §7.2 and the structured JSON generation below.
@@ -747,11 +752,13 @@ batched yes/no in §7.2 and the structured JSON generation below.
 ### Prompt skeleton
 
 Use verbatim; only the slots vary. Run with `model: CONFIG.generation_model`
-(full Alva ID, e.g. `"claude-sonnet-4-6"`).
+(full Alva ID, e.g. `"claude-opus-4-7"`). `@alva/alvaask` defaults to
+`model: "claude-opus-4-7"` and `effort: "high"` when omitted.
 
 ```text
-You are writing today's update for the "<<TOPIC_NAME>>" AI Digest playbook.
-Output feeds a Telegram push and an HTML timeline card.
+You are writing today's canonical update for the "<<TOPIC_NAME>>" AI Digest
+playbook. The same body powers the Playbook timeline card and the Telegram/Web
+push.
 
 TOPIC
   <<TOPIC_DESCRIPTION>>
@@ -768,6 +775,7 @@ RULES
   when explaining why it matters; do not invent calculation steps.
 - No buy/sell/hold recommendations; no price targets. Observation + framing.
 - push_line ≤ 160 chars, plain text (no markdown), leads with the observation.
+  It is the headline only; do not compress the whole digest into this field.
 - body ≤ <<BODY_MAX_CHARS>> chars, markdown allowed.
 - If MATERIALITY.is_material is false: write one short "nothing material"
   acknowledgement; only cite facts you actually mention.
@@ -880,156 +888,158 @@ empty fallback event and do not push partial prose.
 ### `composePushPayload(event, playbookUrl)`
 
 The push body is derived deterministically from the event record — one
-`ask()` per fire, one payload shape. Keep Telegram copy compact but not
-headline-only: treat it as the playbook page TLDR. Preserve the core point,
-key numbers, and why-it-matters sentence from the playbook body. Prefer natural
-prose for short/medium bodies, switch to concise bullet points only when the
-body is already list-shaped or long and data-dense. Bullet count is not fixed;
-fit as many meaningful short points as the remaining budget allows, then always
-reserve room for the playbook link. Do **not** list sources in the Telegram
-push; citations and full source rows live in the playbook. The hard budget is
-500 chars because `/data/signal/targets` truncates at 500.
+`ask()` per fire, one payload shape. **Default to consistency over compression:**
+the Telegram/Web copy should read like the Playbook feed card, not like a
+separate micro-summary. Keep the same sentence order, key numbers, and
+why-it-matters framing from `event.body`; append the Playbook link as the final
+line.
+
+Do **not** add a 500-character budget here. Current Telegram delivery chunks
+long messages at the platform's per-message limit, and Web uses the same audit
+body. The playbook URL is required; if it is missing, throw instead of sending
+a push with no product re-entry point.
+
+Do **not** list source rows in the Telegram push; citations and full source
+rows live in the Playbook. It is fine to strip inline `[N]` citation markers
+from the push copy while keeping the same claims.
+
+Use a push-safe projection only when the canonical body is genuinely hostile to
+IM/Web notification surfaces: very long output, tables, code fences, embedded
+HTML, images, modals/details, or source-panel material. This projection is not a
+tiny teaser. It should keep the core claims, important numbers, causality, and
+what-to-watch-next intact, using as many sentences or bullets as needed within a
+generous notification budget.
 
 ```javascript
 function composePushPayload(event, playbookUrl) {
-  const MAX_PUSH_CHARS = 500;
-  const HEADLINE_CHARS = 140;
-  const TLDR_BUDGET_CHARS = 330;
-  const SHORT_BODY_CHARS = 180;
-  const NATURAL_POINT_CHARS = 150;
-  const BULLET_THRESHOLD_CHARS = 330;
-  const MAX_BULLETS = 5;
-  const MIN_BULLET_LINE_CHARS = 48;
-  const BULLET_CHARS = 105;
-  const linkLine = `Full update → ${playbookUrl}`;
+  if (!playbookUrl) throw new Error("composePushPayload requires playbookUrl");
+  const full = composeFullPushPayload(event, playbookUrl);
+  return needsPushSafeProjection(event, full)
+    ? composePushSafeProjection(event, playbookUrl)
+    : full;
+}
 
-  const stripMarkdown = (s) => String(s || "")
+function composeFullPushPayload(event, playbookUrl) {
+  const linkLine = playbookUrl ? `Full update -> ${playbookUrl}` : "";
+  const cleanForPush = (s) => String(s || "")
+    .replace(/\[[0-9]+\]/g, "")
+    .replace(/\r\n/g, "\n")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/;/g, ",") // generic signal renderer treats semicolons as bullet separators
+    .replace(/\s+([.,!?;:。！？])/g, "$1")
+    .trim();
+
+  const headline = cleanForPush(event.push_line);
+  const body = cleanForPush(event.body);
+  const parts = [];
+
+  if (headline && !body.toLowerCase().startsWith(headline.toLowerCase())) {
+    parts.push(headline);
+  }
+  if (body) parts.push(body);
+  parts.push(linkLine);
+
+  return parts.filter(Boolean).join("\n\n");
+}
+
+function needsPushSafeProjection(event, fullPayload) {
+  const body = String(event.body || "");
+  const lineCount = body.split("\n").filter(line => line.trim()).length;
+  const complex = [
+    /```/,
+    /^\s*\|.+\|\s*$/m,
+    /!\[[^\]]*\]\(/,
+    /<\s*(details|summary|table|thead|tbody|tr|td|th|iframe|canvas|svg|img|script|style|div)\b/i,
+    /(^|\n)#+\s*(sources?|citations?|methodology)\b/i,
+  ].some(re => re.test(body));
+
+  return fullPayload.length > 3200 || lineCount > 28 || complex;
+}
+
+function composePushSafeProjection(event, playbookUrl) {
+  const linkLine = `Full update -> ${playbookUrl}`;
+  const headline = cleanText(event.push_line);
+  const body = stripPushHostileBlocks(event.body);
+  const points = extractMeaningfulPoints(body);
+  const summary = fitMeaningfulPoints(points, 2400 - linkLine.length - headline.length);
+
+  return [
+    headline,
+    summary,
+    linkLine,
+  ].filter(Boolean).join("\n\n");
+}
+
+function stripPushHostileBlocks(body) {
+  return String(body || "")
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/<details[\s\S]*?<\/details>/gi, "")
+    .replace(/<table[\s\S]*?<\/table>/gi, "")
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, "")
+    .replace(/^\s*\|.+\|\s*$/gm, "")
+    .replace(/\[[0-9]+\]/g, "")
+    .replace(/;/g, ",")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function cleanText(s) {
+  return String(s || "")
     .replace(/\[[0-9]+\]/g, "")
     .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
     .replace(/[`*_>#]/g, "")
+    .replace(/;/g, ",")
     .replace(/\s+/g, " ")
     .replace(/\s+([.,!?;:。！？])/g, "$1")
     .trim();
-  const tidyTruncation = (s) => String(s || "")
-    .replace(/\s+\b(?:but|and|or|because|while|with|without|that|which|as|to|of|by|for|the|is|are)\s*…$/i, "…")
-    .replace(/[,;:]\s*…$/, "…");
-  const trimPoint = (s, limit) => {
-    const clean = stripMarkdown(s);
-    return clean.length > limit
-      ? tidyTruncation(clean.slice(0, limit).replace(/\s+\S*$/, "") + "…")
-      : clean;
-  };
-  const trimBlock = (s, limit) => {
-    const clean = String(s || "").trim();
-    return clean.length > limit
-      ? tidyTruncation(clean.slice(0, limit).replace(/\s+\S*$/, "") + "…")
-      : clean;
-  };
-  const fitSummary = (summary, limit) => {
-    const clean = String(summary || "").trim();
-    if (!clean || clean.length <= limit) return clean;
-    if (!clean.includes("\n• ")) return trimBlock(clean, limit);
+}
 
-    const fitted = [];
-    let used = 0;
-    for (const line of clean.split("\n")) {
-      const separator = fitted.length ? 1 : 0;
-      const available = limit - used - separator;
-      if (available <= 0) break;
-      if (line.length <= available) {
-        fitted.push(line);
-        used += separator + line.length;
-      } else if (fitted.length < 2 && available >= 48) {
-        fitted.push(trimBlock(line, available));
-        break;
-      } else {
-        break;
-      }
-    }
-    return fitted.join("\n");
-  };
-  const sentencePoints = (body) => stripMarkdown(body)
-    .split(/(?<=[.!?。！？])\s*/)
+function extractMeaningfulPoints(body) {
+  const lines = String(body || "").split("\n").map(line => line.trim()).filter(Boolean);
+  const bullets = lines
+    .filter(line => /^[-*•]\s+/.test(line))
+    .map(line => cleanText(line.replace(/^[-*•]\s+/, "")));
+  if (bullets.length >= 2) return bullets;
+
+  return cleanText(body)
+    .split(/(?<=[.!?。！？])\s+/)
     .map(s => s.trim())
     .filter(Boolean);
-  const bulletPoints = (body) => String(body || "")
-    .split("\n")
-    .map(s => s.trim())
-    .filter(s => /^[-*•]\s+/.test(s))
-    .map(s => s.replace(/^[-*•]\s+/, ""));
-  const hasData = (s) => /[$€¥%]|\d|bps?\b|x\b|million|billion|trillion/i.test(s);
-  const hasImpact = (s) =>
-    /\b(guidance|margin|revenue|capex|inventory|orders?|shipments?|lead time|pricing|demand|supply|backlog|export|risk|watch|implies|means|matters|beat|miss|raise|cut)\b/i.test(s);
-  const selectKeyPoints = (points, maxPoints = MAX_BULLETS) => {
-    const cleaned = points.map(stripMarkdown).filter(Boolean);
-    if (cleaned.length <= maxPoints) return cleaned;
-    const selected = new Set([0]);
-    const ranked = cleaned.slice(1).map((text, offset) => {
-      const index = offset + 1;
-      const score = (hasData(text) ? 3 : 0) + (hasImpact(text) ? 2 : 0) + (text.length <= 220 ? 1 : 0);
-      return { index, score };
-    }).sort((a, b) => b.score - a.score || a.index - b.index);
-    for (const item of ranked) {
-      if (selected.size >= maxPoints) break;
-      selected.add(item.index);
-    }
-    return [...selected].sort((a, b) => a - b).map(index => cleaned[index]);
-  };
-  const bulletSummary = (points, budget) => {
-    const selected = selectKeyPoints(points, MAX_BULLETS);
-    const lines = [];
-    let used = 0;
-    for (const point of selected) {
-      const separator = lines.length ? 1 : 0;
-      const available = budget - used - separator;
-      if (available < MIN_BULLET_LINE_CHARS) break;
-      const lineLimit = Math.min(BULLET_CHARS, available - 2);
-      const line = `• ${trimPoint(point, lineLimit)}`;
-      if (line.length > available) break;
-      lines.push(line);
-      used += separator + line.length;
-    }
-    return lines.length >= 2 ? lines.join("\n") : trimPoint(selected[0] || "", budget);
-  };
+}
 
-  function summarizeTldr(body, budget) {
-    const compact = stripMarkdown(body);
-    if (!compact) return "";
-    const bullets = bulletPoints(body);
-    const points = bullets.length >= 2 ? bullets : sentencePoints(body);
-    const shouldUseBullets = bullets.length >= 2
-      || (compact.length >= BULLET_THRESHOLD_CHARS && points.length >= 4 && points.filter(hasData).length >= 2);
-    if (!shouldUseBullets && (compact.length < SHORT_BODY_CHARS || points.length < 2)) {
-      return trimPoint(compact, TLDR_BUDGET_CHARS);
+function fitMeaningfulPoints(points, budget) {
+  const meaningful = points.filter(Boolean);
+  if (!meaningful.length || budget <= 0) return "";
+
+  const selected = [];
+  let used = 0;
+  for (const point of meaningful) {
+    const next = selected.length ? `\n- ${point}` : point;
+    if (used + next.length > budget) {
+      if (selected.length >= 2) break;
+      selected.push(point.slice(0, Math.max(0, budget - used)).replace(/\s+\S*$/, "").trim() + "...");
+      break;
     }
-    if (!shouldUseBullets) {
-      return selectKeyPoints(points, 2)
-        .map(p => trimPoint(p, NATURAL_POINT_CHARS))
-        .join(" ");
-    }
-    return bulletSummary(points, budget);
+    selected.push(point);
+    used += next.length;
   }
 
-  const headline = trimPoint(event.push_line, HEADLINE_CHARS);
-  const reserved = [headline, linkLine].filter(Boolean).join("\n").length + 2;
-  const summaryBudget = Math.max(0, Math.min(TLDR_BUDGET_CHARS, MAX_PUSH_CHARS - reserved));
-  const summary = fitSummary(summarizeTldr(event.body, summaryBudget), summaryBudget);
-  const prefix = [
-    headline,
-    summary,
-  ].filter(Boolean).join("\n");
-  const prefixBudget = Math.max(0, MAX_PUSH_CHARS - linkLine.length - 1);
-
-  return [
-    prefix.slice(0, prefixBudget).trim(),
-    linkLine,
-  ].filter(Boolean).join("\n");
+  if (selected.length === 1) return selected[0];
+  return selected.map(p => `- ${p}`).join("\n");
 }
 ```
 
+Follower push rendering currently wraps `meta.reason` with the playbook name and
+may convert Markdown to Telegram HTML downstream. That wrapper is acceptable;
+the digest content itself should remain the same canonical body. Avoid
+semicolon-delimited mini-summaries in `meta.reason`, because the generic signal
+renderer treats semicolons as bullet separators for trading-style reasons.
+
 For `audience: "followers"` the output is the `meta.reason` of a
 `signal/targets` record (§6). For `audience: "owner"` it's the `text` of a
-`notify/message` record with `title = "${CONFIG.topic.name} · <date EST>"`.
+`notify/message` record with `title = "${CONFIG.topic.name} · <date EST>"`;
+that feed event can also fan out to groups subscribed to the feed.
 
 ### When to skip pushing
 
@@ -1047,20 +1057,20 @@ for retro. Don't silently drop them.
 ### Deploy + release command
 
 ```bash
-# Create the cron job. Same command for followers and owner-only digests;
+# Create the cron job. Same command for playbook signals and feed notifications;
 # CONFIG.audience controls whether the feed writes signal/targets or notify/message.
 alva deploy create --name <playbook-name> \
   --path '~/feeds/<name>/v1/src/index.js' \
   --cron "<CONFIG.cadence.cron>" --push-notify
 
-# Release the feed. Required for follower pushes and normal published playback.
+# Release the feed. Required for push fanout content and normal published playback.
 alva release feed --name <playbook-name> --version 1.0.0 \
   --cronjob-id <ID_FROM_DEPLOY> \
   --description "<one-sentence playbook purpose>"
 ```
 
 See `references/feed-sdk.md` Patterns D and E for the full release flow;
-for followers, the release step is mandatory or pushes arrive empty.
+the release step is mandatory or pushes arrive empty.
 
 ---
 
@@ -1159,6 +1169,11 @@ claim sub-minute delivery guarantees.
   path, not only the final value.
 - **Honor `max_pushes_per_day` before generation.** Rate limiting is part of the
   user promise, not a UI preference.
+- **Keep push copy and feed output aligned.** The Telegram/Web notification body
+  should derive from the canonical `digest/events.body`; do not create a
+  separate short teaser unless a real channel limit requires it.
+- **Every pushed notification must include the released Playbook URL.** Throw
+  before writing `signal/targets` / `notify/message` if the URL is missing.
 
 ---
 
@@ -1175,7 +1190,8 @@ or structured numbers (§14.3).
 const { ask } = require("@alva/alvaask");
 const { text } = ask(userPrompt, {
   system: "<persona + must-use-live-search + JSON-only>",
-  model: "claude-sonnet-4-6",   // full Alva ID; "sonnet" / dated IDs rejected
+  model: "claude-opus-4-7",   // full Alva ID; short names / dated IDs rejected
+  effort: "high",
 });
 ```
 
@@ -1271,7 +1287,7 @@ feed.def("signal", { targets: makeDoc("Push Signal", "",      [/* see §6 */]) }
     if (!isReplay && lastRun && wallNow - lastRun < 6 * 3600_000) return;
 
     // one LLM call — model fetches, filters, grounds, writes JSON
-    const { text } = ask(buildPrompt(runAt), { system: SYSTEM_PROMPT, model: "claude-sonnet-4-6" });
+    const { text } = ask(buildPrompt(runAt), { system: SYSTEM_PROMPT, model: "claude-opus-4-7" });
     const parsed = extractJson(text);
 
     // freshness + materiality + dedupe gates (§14.3)
@@ -1286,15 +1302,19 @@ feed.def("signal", { targets: makeDoc("Push Signal", "",      [/* see §6 */]) }
       && (parsed.dedupe_keys || []).every(d => seen[d.key]);
     if (!materiality.is_material) Object.assign(parsed, quietDayPayload(materiality.reason));
 
-    // always write event; push only when material
+    // Build push payload before writing records so a missing PLAYBOOK_URL fails
+    // without leaving delivery.pushed=true in digest/events.
     const record = { date: runAt, /* …push_line, body, citations, matches: fresh, dedupe_keys… */
       materiality,
       delivery: { pushed: !allOldDup && materiality.is_material, reason: allOldDup ? "all_deduped" : materiality.reason } };
+    const pushPayload = record.delivery.pushed ? composePushPayload(record, PLAYBOOK_URL) : "";
+
+    // always write event; push only when material
     await ctx.self.ts("digest", "events").append([record]);
     if (record.delivery.pushed) {
       await ctx.self.ts("signal", "targets").append([{ date: runAt,
         instruction: { type: "allocate", weights: [] },
-        meta: { reason: composePushPayload(record, PLAYBOOK_URL) } }]);
+        meta: { reason: pushPayload } }]);
     }
 
     // persist dedupe + throttle
@@ -1333,7 +1353,7 @@ you during build, it's a template bug, not your bug.
 | Feed SDK schema | `arr("x")` without `fields` throws. Wrap primitive arrays; `dedupe_keys` uses `{key}` records. |
 | Feed SDK read | Use `.last(n)` / `.first(n)` / `.range(from, to)`. There is no `.read({limit})`. |
 | LLM SDK | Use `@alva/alvaask` `ask()` only. It is synchronous; do not `await` it. |
-| Model IDs | Must be full Alva IDs (`claude-sonnet-4-6`, `claude-haiku-4-5`). Short names (`"sonnet"`) and dated Anthropic IDs (`"claude-haiku-4-5-20251001"`) are rejected. |
+| Model IDs | Must be full Alva IDs (`claude-opus-4-7`, `claude-sonnet-4-6`, `claude-haiku-4-5`). Short names (`"opus"`, `"sonnet"`, `"haiku"`) and dated Anthropic IDs (`"claude-haiku-4-5-20251001"`) are rejected. |
 | FeedAltra | Pure AI Digest feeds use plain `Feed` even when writing `signal/targets` (see §6). |
 | Outbound HTTP | Runtime's outbound proxy occasionally resets external fetches (iTunes, Serper). Wrap source adapters in a 1-retry loop; treat a failed source as "no matches", not fatal. |
 | SDK discovery | Always `alva sdk doc --name <module>` before writing a new source adapter. Function names drift (e.g. `getSerperSearch`, not `searchSerper`). |

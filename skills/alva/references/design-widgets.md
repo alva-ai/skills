@@ -60,8 +60,8 @@
   font-size: 16px;
   font-weight: 400;
   color: var(--text-n9);
-  letter-spacing: 0.14px;
-  line-height: 22px;
+  letter-spacing: 0.16px;
+  line-height: 26px;
 }
 
 .widget-timestamp {

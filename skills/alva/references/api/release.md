@@ -76,7 +76,7 @@ alva release playbook-draft --name btc-dashboard --display-name "BTC Trend Dashb
 ## Release Playbook
 
 ```
-alva release playbook --name NAME --version VERSION --feeds '[{"feed_id":100}]' --changelog "text"
+alva release playbook --name NAME --version VERSION --feeds '[{"feed_id":100}]' --changelog "text" --readme-url '/alva/home/<username>/playbooks/NAME/README.md'
 ```
 
 Release an existing playbook for public hosting. Reads the playbook HTML from
@@ -84,12 +84,19 @@ Release an existing playbook for public hosting. Reads the playbook HTML from
 
 Changelog lives on the release, not the draft — set it when publishing.
 
-| Flag        | Type   | Required | Description                                 |
-| ----------- | ------ | -------- | ------------------------------------------- |
-| --name      | string | yes      | URL-safe playbook name (must already exist) |
-| --version   | string | yes      | SemVer (e.g. `v1.0.0`)                      |
-| --feeds     | array  | yes      | Feed references `[{feed_id, feed_major?}]`  |
-| --changelog | string | yes      | Release changelog                           |
+`--readme-url` is a **required CLI flag**: the command fails argument
+parsing if it is missing. It declares the ALFS location of the playbook's
+README, and the server validates the value against a fixed convention (see
+[Playbook README](#playbook-readme) below). Write the README to that path
+**before** calling this command.
+
+| Flag         | Type   | Required | Description                                                                                |
+| ------------ | ------ | -------- | ------------------------------------------------------------------------------------------ |
+| --name       | string | yes      | URL-safe playbook name (must already exist)                                                |
+| --version    | string | yes      | SemVer (e.g. `v1.0.0`)                                                                     |
+| --feeds      | array  | yes      | Feed references `[{feed_id, feed_major?}]`                                                 |
+| --changelog  | string | yes      | Release changelog                                                                          |
+| --readme-url | string | yes      | Owner-attested README location. Must be the absolute ALFS path — see [Playbook README](#playbook-readme). |
 
 Feed reference fields:
 
@@ -99,10 +106,123 @@ Feed reference fields:
 | feed_major | int32 | no       | Major version (defaults to feed default) |
 
 ```
-alva release playbook --name btc-dashboard --version v1.0.0 --feeds '[{"feed_id": 100, "feed_major": 1}]' --changelog "Initial release"
+# 1. Write README to ALFS first (see Playbook README below for content shape).
+alva fs write --path '~/playbooks/btc-dashboard/README.md' --file ./README.md --mkdir-parents
+
+# 2. Then release, passing the absolute ALFS path as --readme-url.
+#    Resolve <username> via `alva whoami` (here: alice).
+alva release playbook --name btc-dashboard --version v1.0.0 --feeds '[{"feed_id": 100, "feed_major": 1}]' --changelog "Initial release" --readme-url '/alva/home/alice/playbooks/btc-dashboard/README.md'
 → {"playbook_id": 99, "version": "v1.0.0", "published_url": "https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html", "playbook_path": "/alva/home/alice/playbooks/btc-dashboard"}
 ```
 
 After a successful release, output the alva.ai playbook link to the user:
 `https://alva.ai/u/<username>/playbooks/<playbook_name>`
+
+## Playbook README
+
+Every released playbook ships a README at `~/playbooks/<name>/README.md`.
+This is the canonical specification for what that file must contain. The
+HTML's "How does this work?" / methodology modal renders the same content,
+so there is one source of truth — the README — not a separate per-template
+copy.
+
+### Path and `--readme-url` form
+
+The flow is: **first** write the README to ALFS at
+`~/playbooks/<name>/README.md`, **then** pass the **absolute** ALFS path
+as `--readme-url`. The server does not write the file — it only
+validates that the value matches the canonical README location.
+
+`--readme-url` accepts exactly one form:
+
+- `/alva/home/<username>/playbooks/<name>/README.md` — e.g.
+  `/alva/home/alice/playbooks/btc-dashboard/README.md`. Resolve
+  `<username>` once via `alva whoami` and pass the path verbatim
+  (no `~` expansion, no relative shorthand).
+
+The previously-accepted relative form `<name>/README.md` (and any
+`~/...` shorthand) is **no longer accepted**. Any other value is
+rejected with `InvalidArgument`.
+
+### Content shape
+
+The README is a markdown file. It is a standalone document — not a copy of
+`display_name` or `description`. The reader is someone deciding whether
+to trust this playbook's numbers, not someone browsing for ideas.
+
+Structure: required sections (every playbook), then conditional sections
+keyed to playbook shape (screener / thesis / what-if), then optional
+sections.
+
+#### Required (every playbook)
+
+- **One-paragraph overview** — plain English: what the playbook computes,
+  on what universe, the question it answers. Same scope bound as the
+  in-app methodology modal's overview.
+- **Data sources & freshness** — every feed / SDK / BYOD source the
+  playbook reads, with the relevant specifics (symbol, interval, exchange,
+  indicator parameters), plus the cron cadence (in ET) and what "fresh"
+  means for this playbook. Match the sources actually called by the feed
+  scripts and the deployed cronjobs — do not list aspirational sources or
+  cadences the cronjob does not enforce.
+- **Blind spots** — honest list of what this does NOT capture (sample-size
+  caveats, survivorship issues, regime sensitivity, data gaps, anything
+  that would change how a reader weighs the output). If there are none,
+  write "None known" — do not omit the section.
+
+#### Conditional — Screener / filter shape
+
+- **Filter rules** (basket / hard filters) — every threshold, every
+  excluded category. Senate example level of specificity: "excludes ETFs;
+  requires ≥ 2 distinct senators + ≥ $50K total".
+- **Factor weights + scoring formula** (scored only) — factor name, raw
+  measure, normalization, weight. State the formula exactly.
+- **Score bands** (scored only) — score ranges → tier label.
+- **Flag definitions** (when flags exist) — for each flag: label, tier,
+  exact threshold.
+- **Worked example** (scored only) — re-derive the current #1 from raw
+  inputs. Header (id + name + rank + band) plus per-factor rows
+  (`name | raw / 100 × weight% = pts`) plus a total. State the actual
+  display relationship: if the displayed score equals the factor-weighted
+  sum, say so; if it is a rescaling (e.g. `45 + 50 * normalized composite`),
+  state that honestly. Don't claim equality you can't deliver.
+
+#### Conditional — Thesis shape
+
+- **How this playbook works** — quant + ADK pipelines, post-processing
+  matcher, exact list of inputs fed to the narrative agent.
+- **Thesis pillars** (multi-pillar only) — for each pillar: id, name,
+  one-sentence claim, the daily signal that would verify or contradict it.
+- **News matching** — ticker overlap + keyword similarity rules; how
+  unmatched items flow.
+- **TLDR generation** — four-question framework, grounding rule, thrown
+  errors, how `pushLine` is written. Include 1-2 gold few-shot TLDRs
+  (each a `{thesis, pushLine}` pair).
+- **Basket selection** — every name by layer; inclusion criteria;
+  change-log policy. If composite scoring: factor table, composite formula,
+  band thresholds, flag definitions, worked example re-deriving the
+  current #1.
+- **Computation rules** — every derived field: alpha definition, risk
+  priority matrix, delta surfacing rules, etc.
+
+#### Conditional — What-if / event-study shape
+
+- **How we picked events** — the trigger definition: exact rule, lookback,
+  exclusions.
+- **How we measured returns** — the cutting dimension and the horizon set
+  (e.g. 1W / 1M / 3M / 1Y), aggregation rule (mean / median), benchmark.
+- **References** — links to the source for the trigger and the source for
+  the return measurement.
+
+#### Optional
+
+- **Glossary** — domain-specific terms.
+- **Legal disclaimer** — at the bottom, where applicable.
+
+### Voice
+
+Same rules as all other user-facing prose
+([narrative-voice.md](../narrative-voice.md)). No marketing language, no
+claims unsupported by the feeds, no future tense for behavior that is not
+already wired up.
 (use the playbook `name` and the username from `alva whoami`)
