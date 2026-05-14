@@ -26,7 +26,7 @@ alva deploy create \
 | --path        | string | yes      | Path to entry script (home-relative or absolute)                              |
 | --cron        | string | yes      | Standard cron expression (min interval: 1 minute)                             |
 | --args        | JSON   | no       | JSON passed to `require("env").args` on each execution                        |
-| --push-notify | flag   | no       | Let this cronjob emit feed alert events after successful feed runs            |
+| --push-notify | flag   | no       | Let successful feed runs emit feed alert events                              |
 
 When `--push-notify` is set, every successful execution checks the feed's push
 sidecars: `signal/targets` and `notify/message` both dispatch
@@ -92,8 +92,8 @@ alva deploy update --id 42 --cron "0 */2 * * *"
 | ----------------- | ------ | -------------------------------- |
 | --cron            | string | Update schedule                  |
 | --args            | JSON   | Update arguments                 |
-| --push-notify     | flag   | Enable push notification         |
-| --no-push-notify  | flag   | Disable push notification        |
+| --push-notify     | flag   | Enable feed alert emission       |
+| --no-push-notify  | flag   | Disable feed alert emission      |
 
 ## Delete Cronjob
 

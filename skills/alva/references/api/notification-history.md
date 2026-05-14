@@ -1,16 +1,17 @@
-# Notifications
+# Notification History
 
-Read the caller's notification history scoped to a playbook or feed.
-Cursor pagination over `(created_at, id)`.
+Read the caller's notification delivery history scoped to a playbook or feed.
+This is an audit surface, not a subscription toggle. Cursor pagination is over
+`(created_at, id)`.
 
-## List Playbook Notifications
+## List Playbook History
 
 ```bash
-alva notifications list-playbook --username USER --name NAME [--channel C] [--status S] [--since SEC] [--first N] [--cursor TOKEN]
+alva notification-history list-playbook --username USER --name NAME [--channel C] [--status S] [--since SEC] [--first N] [--cursor TOKEN]
 ```
 
-Returns notifications sent to the caller for `(username, name)`. The
-playbook must be `public` or `paid`.
+Returns notification events for the caller and `(username, name)`. The playbook
+must be `public` or `paid`.
 
 | Flag       | Type   | Required | Description                                |
 | ---------- | ------ | -------- | ------------------------------------------ |
@@ -46,7 +47,7 @@ Each row:
 | feed_id     | string | Present when notification is feed-scoped             |
 
 ```bash
-alva notifications list-playbook --username alice --name btc-dashboard --first 5
+alva notification-history list-playbook --username alice --name btc-dashboard --first 5
 # → {
 #     "items": [{"id":"24463","event_type":"feed_alert_ready","status":"sent",
 #                "created_at":1777355703,"message":"...","feed_id":"8117", ...}, ...],
@@ -55,10 +56,10 @@ alva notifications list-playbook --username alice --name btc-dashboard --first 5
 #   }
 ```
 
-## List Feed Notifications
+## List Feed History
 
 ```bash
-alva notifications list-feed --username USER --name NAME [--channel C] [--status S] [--since SEC] [--first N] [--cursor TOKEN]
+alva notification-history list-feed --username USER --name NAME [--channel C] [--status S] [--since SEC] [--first N] [--cursor TOKEN]
 ```
 
 Same shape as above, scoped to a feed. Authorization is alfs read on
@@ -66,7 +67,7 @@ Same shape as above, scoped to a feed. Authorization is alfs read on
 instead of `playbook_path`.
 
 ```bash
-alva notifications list-feed --username alice --name btc-ema --first 5 --status sent
+alva notification-history list-feed --username alice --name btc-ema --first 5 --status sent
 # → {"items": [...], "next_cursor": "...", "feed_path": "/alva/home/alice/feeds/btc-ema"}
 ```
 
