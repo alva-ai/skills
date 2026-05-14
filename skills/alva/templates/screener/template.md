@@ -281,7 +281,9 @@ holdings, on-chain stats). The example has both shapes — read it.
 K-line interval should be ≤ update cadence with enough bars to see the
 pattern the screener cares about (rule of thumb: quarterly fundamentals →
 daily bars / 60–90d window; daily / weekly → daily bars / 30–90d; intraday
-momentum → hourly or 15min / 5–10d; long-cycle macro → weekly bars / 1–2y).
+momentum → hourly or 15min / 5–10d; long-cycle macro → daily/weekly bars /
+1–2y). Do not use 1–2y as an intraday OHLCV window; long stock intraday
+requests must be narrowed or explicitly chunked.
 
 ### Tab 2 — Movers & Trends
 
