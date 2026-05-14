@@ -125,13 +125,47 @@ re-release a source whose data layer was never legitimate.
 
 ---
 
+## Scope of Changes — Default Is Data, Not Design
+
+A remix is a **data/topic swap on top of an existing design**, not a
+redesign. Before editing anything, classify what the user asked for:
+
+| Layer                   | Default in a remix | When it's allowed to change                                       |
+| ----------------------- | ------------------ | ----------------------------------------------------------------- |
+| Data sources / symbols  | **Change**         | Always — this is the point of a remix                             |
+| Strategy parameters     | **Change**         | Always (thresholds, windows, cron frequency, namespace paths)     |
+| Topic / domain wording  | **Change**         | Always (titles, copy, README narrative — to fit the new subject)  |
+| **Tab names + order**   | **Preserve**       | Only if the user explicitly says so                               |
+| **Section structure**   | **Preserve**       | Only if the user explicitly says so                               |
+| **Card / chart layout** | **Preserve**       | Only if the user explicitly says so                               |
+| **README outline**      | **Preserve**       | Only if the user explicitly says so                               |
+
+"Customize it based on my preferences", "make a semiconductor version",
+"do one for healthcare" are **topic swaps** — they do **not** authorize
+restructuring tabs, sections, or layout. Only explicit structural
+requests do, e.g. "drop the Risks tab", "add a Summary section at the
+bottom", "merge News and Social into one tab".
+
+If the source structure conflicts with the new topic (e.g. source has a
+"News & Social" tab but the new topic has no usable news feed), **ask
+the user** whether to leave the tab empty/hidden or remove it. Do not
+silently restructure.
+
+Concretely, before uploading the edited HTML, diff its tab list and
+top-level section headings against the source. If they don't match and
+the user didn't ask for the change, revert the structure and re-apply
+only the data swap.
+
+---
+
 ## Step 5 — Deploy as New Playbook
 
 Follow the standard playbook creation flow (see SKILL.md), starting from
 the local files you downloaded in Steps 2–3. **Edit those files in
-place** with the `Edit` tool — change strategy parameters, swap data
-paths to your own namespace, apply the user's customization request —
-and only then upload them. Do not write fresh files from scratch.
+place** with the `Edit` tool — swap data paths to your own namespace,
+adjust strategy parameters, and apply the user's customization request
+**within the scope defined above** (data/topic by default; structure
+only on explicit request). Do not write fresh files from scratch.
 
 1. **Edit local feed script** (the `./{feed_name}.js` from Step 3) and
    upload to ALFS:
@@ -218,6 +252,6 @@ alva remix --child-username bob --child-name my-btc-strategy --parents '[{"usern
 | -------------- | ---------------------------- | ------------------------------------------ |
 | SDK discovery  | Search partitions, read docs | Already chosen in source feed              |
 | Data modeling  | Design schema from scratch   | Reuse source feed's `def()` schema         |
-| HTML structure | Build per design system      | Adapt source HTML, change data paths       |
+| HTML structure | Build per design system      | **Preserve tabs/sections/layout**, change only data paths and topic copy |
 | Strategy logic | Write from requirements      | Modify existing logic per user preferences |
 | Feed name      | User decides                 | Must be unique, distinct from source       |
