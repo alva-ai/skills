@@ -266,6 +266,45 @@ goal. When a shareable playbook was part of the task, verify:
 Must Do After Completion Gate:
 
 - [ ] Summarize the whole process and what is delivered to the user.
+- [ ] Surface any non-fatal CLI errors that occurred during the flow (e.g.
+  `ALREADY_EXISTS` on a re-release, screenshot API error, pro-gating
+  substitution, version-count or path mismatch). Do not silently bury them —
+  the final summary must list anything that produced incomplete state.
+
+### Scope Discipline
+
+The agent's task is to deliver **what the user asked for**, not what the agent
+finds interesting. Before substituting topic, asset, format, scope, or output
+type, **stop and confirm via `AskUserQuestion`**.
+
+Triggers requiring a consent gate (non-exhaustive):
+
+- Implementing a different strategy than the user named because the user's
+  strategy failed to build (e.g. user said Pine Script Checklist; agent
+  delivered RSI(2)).
+- Pivoting from the user's stated subject to the agent's preferred subject
+  (e.g. user asked about defense stocks; agent delivered semi-LEAP recs).
+- Expanding scope (chart → full playbook; doc query → infra changes).
+- Overriding a user-specified parameter (color, ticker, universe size).
+- Claiming a capability that doesn't exist (e.g. "I'll set up Telegram
+  delivery" when no such feature path is implemented).
+- Resolving an ambiguous reference (ticker symbol, partial slug) without
+  asking which one.
+
+For **Backtest/Strategy** flows: once the user has answered the configuration
+`AskUserQuestion` approving the build, the agent proceeds autonomously through
+the full pipeline (deploy → release feed → write HTML → playbook-draft →
+release playbook → screenshot) in the same turn, without re-asking. Pausing
+after the backtest run for a second approval is wrong — the configuration
+answer was the approval.
+
+### Output Count and Dedup Discipline
+
+Every count or list in the final user-facing summary must reflect **distinct
+entities after dedup**. State the dedup key briefly (e.g. "12 unique articles
+after dedup on `url`"). Counting raw rows before dedup misleads the user
+about coverage. Common mistakes: counting syndicated news as distinct
+sources, KOL count mismatches between intermediate and final tables.
 
 ---
 
