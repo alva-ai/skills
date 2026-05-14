@@ -11,7 +11,7 @@ description: >-
   Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v1.8.2
+  version: v1.8.3
 ---
 
 # Alva
@@ -49,6 +49,32 @@ you can:
 In short: turn your ideas into a forever-running finance agent that gets things
 done for you.
 
+---
+
+## Rule 0: `alva <command> --help` is the source of truth
+
+**Every time you're about to call an `alva` CLI command you have not used
+in this session, run `alva <command> --help` first.** The help text is the
+authoritative, always-up-to-date reference for every subcommand, flag,
+response field, naming convention, and runnable example. Do not guess flag
+names, parameter types, or response shapes from memory — the CLI surface
+evolves, and stale assumptions silently break automations.
+
+```bash
+alva --help              # list all top-level commands
+alva <command> --help    # full per-command surface (read this before calling)
+```
+
+The skill's `references/api/*.md` files exist **only** to record gotchas
+the help text doesn't cover (synth-mount suffix corrections, playbook
+README content shape, `--signal` schema, etc.). For everything else
+— subcommand names, flag names, accepted values, response fields, examples
+— treat `alva <cmd> --help` as canonical. If this doc and `--help`
+disagree on a flag, trust `--help` and tell the user the doc needs an
+update.
+
+---
+
 ## Pre-flight
 
 **Run these checks on first use each session** before doing anything else.
@@ -64,9 +90,10 @@ bash "<this skill's directory>/scripts/version_check.sh"
 
 ### 2. Alva CLI Setup
 
-The `alva` CLI (`@alva-ai/toolkit`) is the required way to interact with the
-Alva platform. It manages authentication, provides self-documenting help for
-every command, and eliminates the need for manual curl/header management.
+The `alva` CLI (`@alva-ai/toolkit`) is the **only** way this skill interacts
+with the Alva platform. It manages authentication, ships self-documenting
+`--help` for every command (see [Rule 0](#rule-0-alva-command---help-is-the-source-of-truth)),
+and eliminates the need for manual curl/header management.
 
 Check whether the CLI is already installed by running `alva --help`.
 
@@ -84,16 +111,6 @@ Check whether the CLI is already installed by running `alva --help`.
   ```
 
 Then check authentication (see step 2a below).
-
-**Discover commands:**
-
-```bash
-alva --help              # list all commands
-alva <command> --help    # detailed usage, flags, and examples for any command
-```
-
-Use `alva <command> --help` to discover usage — the help text includes all
-flags, parameter types, and practical examples.
 
 Third-party vendor secrets belong in Alva Secret Manager
 (`require("secret-manager")`), not in the CLI config.
@@ -689,8 +706,15 @@ above so anonymous viewers can load feed output without authentication.
    alva screenshot --url <published_url> --out /tmp/screenshot.png
    ```
 
-   The CLI handles authentication automatically. See
-   [screenshot.md](references/api/screenshot.md) for full parameter details.
+   The CLI handles authentication automatically. Run `alva screenshot --help`
+   for `--selector`, `--xpath`, and compression flags. Before reading the
+   output, validate it is actually a PNG — a failed capture may save a JSON
+   error blob under the `.png` name, and reading that into the session
+   corrupts conversation history:
+
+   ```bash
+   head -c4 /tmp/screenshot.png | grep -q PNG || echo "SCREENSHOT_FAILED"
+   ```
 
 `alva release playbook` **requires** `--readme-url`, and it must be the
 absolute ALFS path `/alva/home/<username>/playbooks/<name>/README.md`
@@ -884,7 +908,7 @@ before reporting success.
 
 | Document | Contents |
 | --- | --- |
-| `references/api/*.md` | Split REST API reference docs (user info, filesystem, run, deploy, release, SDK, screenshots, trading, and errors) |
+| `references/api/*.md` | Per-command gotchas the CLI help does not cover — see the [CLI Reference](#cli-reference) below |
 | [jagent-runtime.md](references/jagent-runtime.md) | Writing jagent scripts: module system, built-in modules, async model, constraints |
 | [feed-sdk.md](references/feed-sdk.md) | Feed SDK guide: creating data feeds, time series, upstreams, state management |
 | [altra-trading.md](references/altra-trading.md) | Altra backtesting engine: strategies, features, signals, testing, debugging |
@@ -901,25 +925,34 @@ before reporting success.
 
 ## CLI Reference
 
-**Important**: Always read the reference docs before making CLI calls. Use
-`alva <command> --help` for quick flag/usage reminders.
+Per [Rule 0](#rule-0-alva-command---help-is-the-source-of-truth):
+always run `alva <command> --help` before calling a command. The table is
+a routing index — and, for the rows in bold, the linked sub-doc is a
+**mandatory read** (the CLI help is wrong or silent on those surfaces).
 
-Reference docs:
+| Command | Purpose / must-read sub-doc |
+| --- | --- |
+| `whoami` / `user` | Authenticated identity, tier, IM channels, ALFS home. |
+| `fs` | ALFS filesystem (read / write / readdir / grant / revoke / time series). **Must read [filesystem.md](references/api/filesystem.md)** before any feed-data path, `@…` suffix, or `fs grant` on a feed — CLI help wrongly advertises `@now`, `@range/{duration}`, `@all`, `@at`, `@range/@bounds`. |
+| `run` | Execute JS in the Alva V8 runtime. |
+| `deploy` | Cronjob lifecycle (create / list / pause / resume / trigger / runs / run-logs). |
+| `release` | Register feeds, draft and publish playbooks. **Must read [release.md](references/api/release.md#playbook-readme)** before any playbook release — feed `--description` rules + the full README content shape (Overview / Data sources & freshness / Blind spots, plus screener / thesis / what-if). |
+| `secrets` | CRUD on encrypted secrets read by `require("secret-manager")`. |
+| `sdk` | Runtime libraries (50+ technical indicators, search, widgets). |
+| `data-skills` | Discover the 250+ Arrays financial-data endpoints. |
+| `skillhub` | Pull curated methodology blueprints (`/use-skill:` flow). |
+| `comments` | Create / pin / unpin playbook comments. |
+| `push-subscriptions` | Personal push opt-in for playbooks and feeds. |
+| `channel` | Group push subscriptions (Telegram / Discord groups). |
+| `trading` | Accounts, portfolio, orders, signals, risk. **Must read [trading.md](references/api/trading.md)** before `execute`, building a signal JSON, or picking an exchange/symbol — real `--signal` schema is `allocate`/`predict` (not the `{symbol,side,qty}` shape the help example shows), `date` is epoch seconds. |
+| `screenshot` | PNG capture used to verify a released playbook. |
+| `remix` | Record parent-child lineage when remixing a playbook. |
+| `arrays` | Provision / refresh the Arrays JWT (`ARRAYS_JWT` runtime secret). |
+| `auth` / `configure` | Sign in, save API key + endpoint into a named profile. |
 
-- [User Info](references/api/user-info.md) — `alva whoami`
-- [Secrets](references/api/secrets.md) — `alva secrets`
-- [Filesystem](references/api/filesystem.md) — `alva fs`
-- [Run](references/api/run.md) — `alva run`
-- [Deploy Cronjob](references/api/deploy-cronjob.md) — `alva deploy`
-- [Release](references/api/release.md) — `alva release`
-- [Remix](references/api/remix.md) — `alva remix`
-- [SDK](references/api/sdk.md) — `alva sdk`
-- [Playbook Comments](references/api/playbook-comment.md) — `alva comments`
-- [Screenshot](references/api/screenshot.md) — `alva screenshot`
-- [Trading](references/api/trading.md) — `alva trading`
-- [Notification History](references/api/notification-history.md) — `alva notification-history`
-- [Push Subscriptions](references/api/push-subscriptions.md) — `alva push-subscriptions`
-- [Error Responses](references/api/error-responses.md)
+Non-CLI references:
+[notification-history.md](references/api/notification-history.md) — gateway shape for auditing past notifications (CLI not yet wired up). ·
+[error-responses.md](references/api/error-responses.md) — HTTP status → error-code table for programmatic error handling.
 
 ---
 

@@ -120,7 +120,7 @@ the agent more capable and reliable.
 
 ### Historical Reference (Feed as Memory)
 
-Read the agent's own previous output via feed time series paths (`@last/N`, `@range/7d`).
+Read the agent's own previous output via feed time series paths (`@last/N`, `@range/{start}..{end}`).
 
 ```javascript
 const adk = require("@alva/adk");
