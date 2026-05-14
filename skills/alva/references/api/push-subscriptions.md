@@ -27,16 +27,14 @@ alva push-subscriptions unsubscribe-feed     --username USER --name NAME
 | --username | yes      | Target owner's username                  |
 | --name     | yes      | URL-safe playbook or feed name           |
 
-All idempotent. Unsubscribe is soft (row preserved, `subscribed: false`)
-so re-subscribe restores seniority. Subscribe response includes the
-canonical alfs path (`playbook_path` or `feed_path`).
+All commands are idempotent. Subscribe response includes the subscription row
+and canonical ALFS path (`playbook_path` or `feed_path`).
 
 ```bash
 alva push-subscriptions subscribe-feed --username alice --name btc-ema-cross
 # → {
 #     "subscription": {
 #       "target": {"type": "FEED", "id": "8117"},
-#       "subscribed": true,
 #       "created_at_ms": 1777355703123,
 #       "updated_at_ms": 1777355703123
 #     },
@@ -47,13 +45,15 @@ alva push-subscriptions subscribe-feed --username alice --name btc-ema-cross
 ## List
 
 ```bash
-alva push-subscriptions list [--include-history]
+alva push-subscriptions list [--first N] [--cursor TOKEN]
 ```
 
-`--include-history` also returns rows the caller previously
-unsubscribed (default: active rows only).
+Returns the caller's currently active personal feed push subscriptions. Use
+`--first` and `--cursor` for cursor pagination.
 
-Row shape: `{ target: {type, id}, subscribed, created_at_ms, updated_at_ms }`.
+Row shape includes `target`, `created_at_ms`, `updated_at_ms`, `cursor`, and
+feed metadata when available (`feed_name`, `feed_status`, `last_pushed_at_ms`,
+`used_by`, `used_by_total`).
 
 ## Notes
 
