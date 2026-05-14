@@ -505,6 +505,15 @@ same skill and look for a semantically equivalent endpoint; if `<skill>` itself
 was guessed, re-run `list` to recover the correct id. Report BYOD as a final
 fallback only after same-domain Alva endpoints cannot answer the question.
 
+The same rule applies to **successful responses with empty or sparse data**
+(e.g. `body.data` is `[]`, or fewer bars/records than the script needs to
+operate). Do not silently coerce an empty result into a default (`[]`, `null`,
+`0`) that downstream code will then index/aggregate over — that produces
+crashes attributed to "your code" but rooted in upstream data gaps. Either
+adjust the request (broader time window, retry once) or surface the gap
+explicitly via the script-side precondition checks described under Feed SDK
+Quick Reference.
+
 #### Runtime Libraries
 
 Built-in modules that run inside the jagent V8 runtime via `require()`. These
@@ -975,6 +984,42 @@ that log and continue with empty arrays, nulls, fallback records, or partial
 outputs. Let unexpected failures throw; the sandbox captures thrown errors and
 exposes the failed run. Use normal conditionals only for expected business
 states such as "no new records since the last watermark."
+
+**Be explicit about preconditions; throw with a meaningful message.** Fail-fast
+does NOT mean "let a cryptic `TypeError: Cannot read properties of undefined`
+serve as your failure report." When upstream data could be missing, empty, or
+misaligned across symbols/timeframes, **check the precondition and `throw new
+Error(...)` with a message that names what's missing.** Both paths are
+fail-fast — but only the explicit throw is debuggable from `cronjob_runs.error`
+without reading the source.
+
+```javascript
+// ❌ Implicit crash — operator sees only "Cannot read properties of undefined
+//    (reading 'equity')" and has to read the source to find out why.
+const finalEq = equityRecords[equityRecords.length - 1].equity;
+
+// ✅ Explicit precondition + named cause.
+if (equityRecords.length === 0) {
+  throw new Error(
+    "equityRecords is empty — no aligned trading days across [" +
+    TICKERS.join(",") + "]; upstream returned 0 / misaligned bars"
+  );
+}
+const finalEq = equityRecords[equityRecords.length - 1].equity;
+```
+
+Add these checks at the **boundary between upstream fetch and downstream
+computation**:
+
+- After a multi-symbol fetch + alignment pass: throw if 0 symbols passed the
+  minimum-bars filter, naming the filter cutoff.
+- After any `Object.keys(map).filter(...)` / `Array.filter(...)`: throw if the
+  result is empty before you index into it (`xs[0]`, `xs.length - 1`).
+- Before a terminal aggregation that assumes ≥1 record: throw with the
+  collection name and the upstream contributor list.
+
+This rule is consistent with fail-fast (don't catch + continue silently); it
+just requires that the thrown error name the actual missing input.
 
 ```javascript
 const { Feed, feedPath, makeDoc, num } = require("@alva/feed");
