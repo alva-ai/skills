@@ -912,6 +912,7 @@ Reference docs:
 - [Run](references/api/run.md) — `alva run`
 - [Deploy Cronjob](references/api/deploy-cronjob.md) — `alva deploy`
 - [Release](references/api/release.md) — `alva release`
+- [Feed](references/api/feed.md) — `alva feed`
 - [Remix](references/api/remix.md) — `alva remix`
 - [SDK](references/api/sdk.md) — `alva sdk`
 - [Playbook Comments](references/api/playbook-comment.md) — `alva comments`
