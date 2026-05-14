@@ -9,25 +9,26 @@ customizes them per the user's preferences, and deploys a new playbook.
 
 ## Prompt Format
 
-The Remix prompt arrives in this shape:
+The Remix prompt arrives as a `<remix>` tag emitted by the Remix button.
+A typical message looks like:
 
 ```
-Use Alva skill to remix this Playbook(@alice/btc-momentum) into my own version:
-
-1. Customize it based on my preferences
-2. Deploy as a new playbook under my account
-
-If I don't specify what to change, ask me what I'd like to customize.
+<remix title="energy-dashboard" type="playbook" url="/u/henryliu/playbooks/energy-dashboard" playbook-kind="dashboard">Remix Playbook: Deploy as a new playbook under my account</remix>
+hi
 ```
 
-The `@{owner}/{name}` token after "Playbook(" contains the two key fields:
+Parse the tag's attributes:
 
-| Field   | Description                                  | Extracted From        |
-| ------- | -------------------------------------------- | --------------------- |
-| `owner` | Username of the original creator             | Before the `/`        |
-| `name`  | Filesystem name (URL-safe slug used in ALFS) | After the `/`         |
+| Attribute       | Description                                                            | Used For                                  |
+| --------------- | ---------------------------------------------------------------------- | ----------------------------------------- |
+| `url`           | Canonical web path: `/u/{owner}/playbooks/{name}`                      | **Authoritative** source of owner + name  |
+| `title`         | Filesystem name (URL-safe slug, same as `{name}` in `url`)             | Cross-check against `url`                 |
+| `type`          | Resource type — currently always `playbook`                            | Routing (skip if not `playbook`)          |
+| `playbook-kind` | Sub-kind of playbook (e.g. `dashboard`)                                | Context only; doesn't change the workflow |
 
-For the example above: owner = `alice`, name = `btc-momentum`.
+Extract `owner` and `name` from the `url` attribute (between `/u/` and
+`/playbooks/`, and after `/playbooks/`). For the example above: owner =
+`henryliu`, name = `energy-dashboard`.
 
 Together they resolve to the ALFS base path (quote in CLI):
 
@@ -35,9 +36,18 @@ Together they resolve to the ALFS base path (quote in CLI):
 '/alva/home/{owner}/playbooks/{name}/'
 ```
 
-**Behavior note**: If the user's prompt does not specify what to change (only
-the default "Customize it based on my preferences"), the agent should **ask the
-user what they'd like to customize** before proceeding.
+**Behavior note**: The tag's inner text ("Remix Playbook: Deploy as a new
+playbook under my account") is a fixed instruction, **not** the user's
+customization request. The user's actual ask is whatever text they typed
+**outside** the tag (in the example above, just "hi"). If that text is
+empty, a greeting, or otherwise doesn't describe what to customize,
+**ask the user what they'd like to customize** before proceeding —
+do not start editing on the strength of the tag alone.
+
+> Legacy: older sessions may still arrive as
+> `Use Alva skill to remix this Playbook(@{owner}/{name}) ...` plain
+> text. Same two fields (`owner`, `name`) apply; the rest of this
+> workflow is unchanged.
 
 ---
 
@@ -205,15 +215,13 @@ alva remix --child-username {your_username} --child-name {new-name} --parents '[
 Given prompt:
 
 ```
-Use Alva skill to remix this Playbook(@alice/btc-momentum) into my own version:
-
-1. Customize it based on my preferences
-2. Deploy as a new playbook under my account
-
+<remix title="btc-momentum" type="playbook" url="/u/alice/playbooks/btc-momentum" playbook-kind="dashboard">Remix Playbook: Deploy as a new playbook under my account</remix>
 Add a summary section at the bottom.
 ```
 
-Extracted: owner = `alice`, name = `btc-momentum`.
+Extracted from the `url` attribute: owner = `alice`, name =
+`btc-momentum`. The user's customization request is the text after the
+tag: "Add a summary section at the bottom."
 
 Agent downloads sources to local files (so they can be edited in place,
 not retyped):

@@ -794,11 +794,15 @@ Before calling `alva release playbook`, verify all of the following:
 ### 8. Remix (Create from Existing Playbook)
 
 Users can remix any published playbook to create a customized version. The Remix
-prompt uses the format `@{owner}/{name}` to identify the source playbook — e.g.
-`Playbook(@alice/btc-momentum)`. The agent reads the source playbook's feed
-scripts (strategy logic) and HTML (dashboard UI), customizes them per the user's
-request, and deploys a new playbook under their own namespace. If the user does
-not specify what to change, the agent should ask before proceeding.
+prompt arrives as a `<remix>` tag — e.g.
+`<remix url="/u/alice/playbooks/btc-momentum" type="playbook" ...>...</remix>`
+— from which the agent extracts the source `owner` and `name` via the
+`url` attribute. The agent then reads the source playbook's feed scripts
+(strategy logic) and HTML (dashboard UI), customizes them per the user's
+request, and deploys a new playbook under their own namespace. The tag's
+inner text is a fixed instruction, not the user's customization request —
+if the user typed nothing meaningful outside the tag, ask what to
+customize before proceeding.
 
 See [remix-workflow.md](references/remix-workflow.md) for the full step-by-step
 guide. `alva remix` commands are exclusively for lineage registration — to
