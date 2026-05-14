@@ -416,6 +416,162 @@ enum labels, button labels) are exempt.
 
 ---
 
+## Operational Discipline
+
+Small class rules that prevent recurring failure modes. Each is a
+**class rule** — it covers the entire class, not the specific symptom
+that surfaced it.
+
+### Doc-lookup discipline (before any SDK / endpoint claim)
+
+Before asserting (a) an endpoint name / shape / parameter, (b) an SDK
+module's behavior, or (c) that a piece of source code is correct as-is
+in a remix, you **must** have run the corresponding doc-lookup in this
+session:
+
+- Endpoint correctness / shape → `alva skills endpoint --name <skill> --file <file>`
+- SDK module behavior → `alva sdk doc --name <module>` or `alva sdk partition-summary`
+- Remix adaptation → at minimum `alva sdk partition-summary` for each
+  module imported by the source script being adapted. Source code may
+  be stale or use deprecated patterns; the original session's `alva
+  sdk doc` outputs do not survive into your session.
+- Inline `alva run --code` writes → if the code touches an unfamiliar
+  SDK shape, lookup first.
+
+If the doc-lookup is unavailable (404 from the doc API, network
+error), label downstream claims `[unverified]` and surface to the
+user — never substitute training-data recall.
+
+### Auth-probe stop rule
+
+If you have tried 3 distinct auth header / credential variants
+(Bearer token, X-API-Key header, query-string `api_key=`, raw
+cookie, etc.) against an undocumented endpoint without success,
+**stop and surface as a `[platform-coverage-gap]` blocker**. Continue
+trial-and-error past 3 variants only when the user explicitly asks
+you to keep going. Bruting auth on an undocumented endpoint past 3
+attempts is bandaiding around missing documentation, not
+diagnosing.
+
+### Version preflight (no version answer from memory)
+
+When the user asks for the current skill / template / SDK version
+("which version are we on?", "show me the changelog", "what's the
+latest?"), **run `version_check.sh` (or the equivalent CLI version
+probe)** before answering. Never answer the version from session
+memory, project memory, or training knowledge. Versions drift
+between sessions; an answer from memory is fabrication when the
+real version differs.
+
+### Excessive-iteration heuristic
+
+If you have iterated ≥5 times on the same build step (same widget,
+same feed wrapper, same Altra strategy config), **stop and
+re-evaluate** the approach. Check whether the operation belongs in
+a documented Altra rule, an SDK module, or a doc-first template.
+Specifically: when integrating `@alva/algorithm`, `@alva/feed`, or
+`@alva/Altra`, read the relevant `references/<module>.md` before the
+2nd iteration; do not loop on guesses past iteration 5.
+
+### Analytic-ticker routing rule
+
+In `build` / `answer_only` mode, when the user asks an analytic
+question that names specific tickers (e.g. "compare NVDA vs AMD",
+"AAPL's recent earnings beat", "5-ticker portfolio momentum"), you
+**must** either (a) make a data-fetch call (Alva SDK) before
+producing any numeric or factual claim about those tickers, or
+(b) explicitly confirm with the user that they want a no-data
+answer-only response. Skipping discovery and answering from training
+knowledge for ticker queries is the agent-as-data-source antipattern
+(see Content Legitimacy Rules).
+
+### Code-fence discipline (no fence wrapping for structured output)
+
+When the requested output is structured (JSON, CSV, JSONL feed
+data, NDJSON, etc.), do **not** wrap it in a markdown code fence
+(`````json … `````, etc.). The downstream parser expects the raw
+structured content as the message body; a fence breaks parsing.
+This applies to all feed `notify/message` payloads, ADK structured
+responses, and signal payloads. Use prose with embedded values
+instead of code fences when prose is desired.
+
+### Screenshot tool unavailability
+
+When `alva screenshot` is unavailable in the runtime (toolchain
+missing, image-processing service down, OS-level binary missing —
+e.g. ripgrep or sharp not installed) **disclose the gap to the
+user and skip the visual verification step explicitly**. Do not
+retry the screenshot blindly past 1 retry; do not declare release
+success without a working visual verification when the playbook
+contains charts (see Pre-release validation point 4).
+
+### Cron label timezone (DST-aware)
+
+When rendering cron schedules as human-readable labels in playbook
+HTML or feed metadata, use the **current DST-active timezone
+abbreviation** (EDT in summer, EST in winter; CEST / CET; etc.) and
+compute the local hour from `Date.now()` in the target zone, not
+from a fixed offset. The label "0 13,22 * * 1-5" → "08:00 ET +
+17:00 ET" is wrong half the year. Render the abbreviation with
+`Intl.DateTimeFormat(undefined, { timeZoneName: 'short' })` and
+recompute on every render.
+
+### Timestamp unit awareness
+
+API parameters that take a timestamp must explicitly note their
+unit (seconds vs milliseconds vs RFC3339 string). When calling an
+SDK method whose parameter takes a "start time", check the doc
+for the unit before passing; do not assume. A `start_time =
+Date.now()` passed to a seconds-expecting API is 1000× too large
+and the API returns "invalid timestamp - too small / too large".
+When generating feed code that takes user-supplied epoch input,
+the code must validate the input is in the expected unit (e.g.
+`if (start_time > 1e12) start_time = Math.floor(start_time/1000)`).
+
+### Tracker outcome persistence (write-once)
+
+When a tracker / monitoring feed reports the **outcome** of a
+historical signal (e.g. "BTC signal from 2026-04-15: outcome =
++3.2% over 7 days"), the outcome must be **persisted once and
+read on subsequent runs**, not re-computed against current price.
+The signal closes when it closes; "what did this signal achieve"
+is a fixed historical fact. Re-evaluating against today's price
+makes the tracker's history change every day — an obvious
+misleading-data bug.
+
+Persistence shape: store `{signal_id, opened_at, closed_at,
+outcome_pct, outcome_metrics: {...}}` in the feed's data path;
+subsequent runs read this and update only the current open
+signal set, not historical ones.
+
+### Classifier output indexed objects
+
+When emitting LLM-classifier output for an input list (sentiment
+labels for tweets, sector labels for tickers, etc.), emit indexed
+objects `[ {index: 0, input: "...", label: "..."}, ... ]`, not
+positional arrays `[ "label0", "label1", ... ]`. Indexed objects
+let the caller validate `len(output) == len(input)` and detect
+re-ordering; positional arrays silently misalign on the slightest
+LLM ordering drift. The caller should also validate length and
+retry on mismatch.
+
+### Intraday session-window coverage check
+
+When using intraday OHLCV data for a session-window strategy
+(London range, Asia range, pre-market, after-hours), **verify
+that the data source's bar coverage includes the target window**
+before backtesting. Alva spot-market intraday data covers RTH
+(9:30–16:00 ET for US stocks) by default; ETH coverage requires
+an explicit ETH-enabled data source. A strategy whose trigger
+window falls outside the data's coverage hours will produce zero
+signals — verify the bar count in the target window with a
+3-bar probe `alva run --code "..."` before committing to the
+backtest. If the data source does not cover the window, surface
+the coverage gap and propose ETH data or a different asset, do
+not silently produce a zero-signal backtest.
+
+---
+
 ## Capabilities & Common Workflows
 
 ### 1. ALFS (Alva FileSystem)
