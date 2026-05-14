@@ -612,7 +612,7 @@ shown here may drift.
 | `news` (alt) | `@arrays/data/search/search-brave:v1.0.0` | `searchBrave({q, freshness})` |
 | `social` | `@arrays/data/search/search-grok-x:v1.0.0` | `searchGrokX({query, from_date, to_date, max_search_results})` |
 | `finance_search` | `@arrays/data/search/search-perplexity-finance:v1.0.0` | `searchPerplexityFinance({query})` — fallback for non-US equities / international markets when structured SDK coverage is insufficient |
-| `market` | Alva Stock/Crypto SDKs (see `references/api/sdk.md`) | Emit a synthetic match only when the market signal itself is the event; otherwise use optional `context_facts` enrichment |
+| `market` | Alva Stock/Crypto SDKs (run `alva sdk partitions` / `alva sdk doc --name <module>`) | Emit a synthetic match only when the market signal itself is the event; otherwise use optional `context_facts` enrichment |
 | `feed` | Feed SDK upstream or direct ALFS read | Each upstream record becomes one match |
 | `rss` | Direct RSS/Atom URL via `net/http.fetch` | Parse `<item>` / `<entry>` into title, permalink, publish time, description. If parsing fails, fall back to `web` search for the source domain. |
 | `web` / `website` | `@arrays/data/search/serper-search:v1.0.0` or Brave with `site:<domain>` when a specific site is named | Use for specialist sites, newsletters without public RSS, docs, and official blogs. |
