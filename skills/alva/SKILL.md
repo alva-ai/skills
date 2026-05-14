@@ -976,6 +976,21 @@ outputs. Let unexpected failures throw; the sandbox captures thrown errors and
 exposes the failed run. Use normal conditionals only for expected business
 states such as "no new records since the last watermark."
 
+**Throw with a meaningful message; don't let `undefined.x` be the error.**
+When a precondition might fail (empty fetch result, all rows filtered out,
+misaligned bars across symbols), check it and `throw new Error("X empty: Y")`.
+A cryptic `TypeError: Cannot read properties of undefined` is fail-fast in
+name only — operators can't act on it.
+
+```javascript
+// ❌  TypeError: Cannot read properties of undefined (reading 'equity')
+const finalEq = equityRecords[equityRecords.length - 1].equity;
+
+// ✅  Names what's missing.
+if (!equityRecords.length) throw new Error("equityRecords empty: no aligned bars across " + TICKERS);
+const finalEq = equityRecords[equityRecords.length - 1].equity;
+```
+
 ```javascript
 const { Feed, feedPath, makeDoc, num } = require("@alva/feed");
 const http = require("net/http");
