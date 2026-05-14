@@ -117,7 +117,7 @@ body {
 .playbook-container {
   width: 100%;
   margin: 0 auto;
-  padding: var(--spacing-xl) var(--spacing-xxl) var(--spacing-xxxxl);
+  padding: var(--spacing-s) var(--spacing-xxl) var(--spacing-xxxxl);
   /* max-width: 2048px; */
 }
 
