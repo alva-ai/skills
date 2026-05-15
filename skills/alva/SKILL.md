@@ -387,9 +387,8 @@ data-driven metrics.
 renders zero quantitative values at runtime (landing pages, UI-only demos).
 If the HTML shows any numbers, charts, tables, or metric cards, the release
 MUST reference deployed feeds in `--feeds` and the HTML MUST `fetch()` them
-at runtime. `alva run` is a test run of a feed, not a substitute for
-deploying one — if you used `alva run` to source data, deploy that same
-logic as a feed and reference it.
+at runtime. If you used `alva run` to source data, deploy that same logic as
+a feed and reference it.
 
 ### Thematic Ticker Curation
 
@@ -788,15 +787,16 @@ Use the playbook `name` and the username from `alva whoami` to construct the
 canonical share URL. Use `published_url` from the release response for
 verification steps such as screenshots; do not present it as the share link.
 
-#### Pre-Release Validation
+#### Playbook Release Checklist
 
-Before calling `alva release playbook`, verify all of the following:
+Run this before `alva release playbook`, once every backing feed has passed
+the [Feed Release Checklist](#feed-release-checklist). Verify all of the
+following:
 
 1. **Deployment coverage**: Every feed the released playbook reads at runtime
    must have had a successful `alva deploy create` AND its `feed_id` must
-   appear in `--feeds`. `alva run` is a test step, not a deployment — a
-   run-tested but undeployed feed has no data at its public `@last` path and
-   the HTML will fail to read it.
+   appear in `--feeds`. A `run`-tested but undeployed feed has no data at its
+   public `@last` path and the HTML will fail to read it.
 2. **Cronjobs are active**: All feeds referenced by the playbook have
    successfully deployed cronjobs.
 3. **HTML fetches from feeds**: The playbook HTML reads quantitative data from
@@ -814,10 +814,8 @@ Before calling `alva release playbook`, verify all of the following:
    on ALFS and covers the required sections (see
    [Playbook README in release.md](references/api/release.md#playbook-readme)).
    Its source / cadence claims match the actual feed scripts and deployed
-   cronjobs. The `--readme-url` flag must be passed on `alva release playbook`
-   as the absolute ALFS path
-   `/alva/home/<username>/playbooks/{name}/README.md` (resolve `<username>`
-   via `alva whoami`); the relative shorthand is no longer accepted.
+   cronjobs. Pass it via `--readme-url` as an absolute ALFS path (see the
+   `--readme-url` rule in Step 7 above).
 
 ### 8. Remix (Create from Existing Playbook)
 
@@ -1167,6 +1165,13 @@ Every feed follows a 6-step lifecycle including every newly created feed or re-c
    `alva run` is a test step — it does NOT write to the production `@last`
    path. Never skip `alva deploy` below on the assumption that the run
    "already produced the data".
+
+   **The run must succeed before moving on.** If `alva run` throws, returns
+   an error, produces empty output when records were expected, or surfaces
+   a response shape that doesn't match the script's parsing, stop and fix
+   the feed script. Do not proceed to Grant / Deploy / Release on a failed
+   or empty run — a broken feed that is granted and deployed will publish
+   nothing (or stale data) and fail the release checklists later.
 4. **Grant** -- make feed data publicly readable:
 
    ```bash
@@ -1180,23 +1185,20 @@ Every feed follows a 6-step lifecycle including every newly created feed or re-c
 6. **Release** -- `alva release feed` to register the feed in the
    database (requires the `cronjob_id` from the deploy step)
 
-### Pre-Release Verification
+### Feed Release Checklist
 
-Before calling `alva release feed` or `alva release playbook`,
-verify these prerequisites:
+Run this before `alva release feed`, for every feed — standalone feeds and
+feeds that will back a playbook alike. Verify these prerequisites:
 
 1. **Grant check** — confirm `special:user:*` read permission exists on the
    feed path. If missing, run the grant step now.
-2. **Data check** — fetch the feed data path without authentication and
-   confirm HTTP 200 (not 403).
-3. **HTML check** (playbook only) — confirm the playbook HTML file exists in
-   ALFS at the expected path.
-4. **README check** (playbook only) — confirm `~/playbooks/{name}/README.md`
-   exists in ALFS and follows the
-   [Playbook README content shape](references/api/release.md#playbook-readme).
-   The publish call must pass `--readme-url` as the absolute ALFS path
-   `/alva/home/<username>/playbooks/{name}/README.md` (resolve `<username>`
-   via `alva whoami`); the relative shorthand is no longer accepted.
+2. **Public-read check** — fetch the feed data path *without* authentication
+   and confirm HTTP 200 (not 403).
+
+Building a playbook? Every backing feed still runs this checklist first;
+then, before `alva release playbook`, run the
+[Playbook Release Checklist](#playbook-release-checklist) in Step 7 — it
+covers HTML, README, freshness, and feed coverage.
 
 If the build was interrupted and resumed, re-run this checklist from the top.
 Do not assume prior steps completed successfully.
