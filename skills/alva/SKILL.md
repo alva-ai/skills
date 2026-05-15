@@ -1163,6 +1163,13 @@ Every feed follows a 6-step lifecycle including every newly created feed or re-c
    `alva run` is a test step — it does NOT write to the production `@last`
    path. Never skip `alva deploy` below on the assumption that the run
    "already produced the data".
+
+   **The run must succeed before moving on.** If `alva run` throws, returns
+   an error, produces empty output when records were expected, or surfaces
+   a response shape that doesn't match the script's parsing, stop and fix
+   the feed script. Do not proceed to Grant / Deploy / Release on a failed
+   or empty run — a broken feed that is granted and deployed will publish
+   nothing (or stale data) and silently fail Pre-Release Validation later.
 4. **Grant** -- make feed data publicly readable:
 
    ```bash
