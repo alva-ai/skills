@@ -783,9 +783,11 @@ Use the playbook `name` and the username from `alva whoami` to construct the
 canonical share URL. Use `published_url` from the release response for
 verification steps such as screenshots; do not present it as the share link.
 
-#### Pre-Release Validation
+#### Playbook Release Checklist
 
-Before calling `alva release playbook`, verify all of the following:
+Run this before `alva release playbook`, once every backing feed has passed
+the [Feed Release Checklist](#feed-release-checklist). Verify all of the
+following:
 
 1. **Deployment coverage**: Every feed the released playbook reads at runtime
    must have had a successful `alva deploy create` AND its `feed_id` must
@@ -1165,7 +1167,7 @@ Every feed follows a 6-step lifecycle including every newly created feed or re-c
    a response shape that doesn't match the script's parsing, stop and fix
    the feed script. Do not proceed to Grant / Deploy / Release on a failed
    or empty run — a broken feed that is granted and deployed will publish
-   nothing (or stale data) and silently fail Pre-Release Validation later.
+   nothing (or stale data) and fail the release checklists later.
 4. **Grant** -- make feed data publicly readable:
 
    ```bash
@@ -1179,17 +1181,19 @@ Every feed follows a 6-step lifecycle including every newly created feed or re-c
 6. **Release** -- `alva release feed` to register the feed in the
    database (requires the `cronjob_id` from the deploy step)
 
-### Pre-Release Verification
+### Feed Release Checklist
 
-Before calling `alva release feed`, verify these prerequisites:
+Run this before `alva release feed`, for every feed — standalone feeds and
+feeds that will back a playbook alike. Verify these prerequisites:
 
 1. **Grant check** — confirm `special:user:*` read permission exists on the
    feed path. If missing, run the grant step now.
 2. **Public-read check** — fetch the feed data path *without* authentication
    and confirm HTTP 200 (not 403).
 
-Releasing a playbook? Also complete the
-[Pre-Release Validation](#pre-release-validation) checklist in Step 7 — it
+Building a playbook? Every backing feed still runs this checklist first;
+then, before `alva release playbook`, run the
+[Playbook Release Checklist](#playbook-release-checklist) in Step 7 — it
 covers HTML, README, freshness, and feed coverage.
 
 If the build was interrupted and resumed, re-run this checklist from the top.
