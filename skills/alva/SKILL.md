@@ -700,17 +700,21 @@ above so anonymous viewers can load feed output without authentication.
    are silently skipped.
 4. **Screenshot**: Take a screenshot to verify the released playbook renders
    correctly from the deployed published URL (for example,
-   `https://<username>.playbook.alva.ai/<playbook_name>/v1.0.0/index.html`):
+   `https://<username>.playbook.alva.ai/<playbook_name>/v1.0.0/index.html`).
+   Always pass `--compress` (with `--compress-quality` / `--compress-max-width`
+   to shrink further) — PNG output is otherwise easily large enough to exceed
+   the 5 MB session upload cap:
 
    ```bash
-   alva screenshot --url <published_url> --out /tmp/screenshot.png
+   alva screenshot --url <published_url> --out /tmp/screenshot.png \
+     --compress --compress-quality 70 --compress-max-width 1280
    ```
 
    The CLI handles authentication automatically. Run `alva screenshot --help`
-   for `--selector`, `--xpath`, and compression flags. Before reading the
-   output, validate it is actually a PNG — a failed capture may save a JSON
-   error blob under the `.png` name, and reading that into the session
-   corrupts conversation history:
+   for `--selector` and `--xpath`. Before reading the output, validate it is
+   actually a PNG — a failed capture may save a JSON error blob under the
+   `.png` name, and reading that into the session corrupts conversation
+   history:
 
    ```bash
    head -c4 /tmp/screenshot.png | grep -q PNG || echo "SCREENSHOT_FAILED"
