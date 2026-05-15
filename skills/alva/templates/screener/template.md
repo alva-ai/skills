@@ -61,6 +61,12 @@ example doesn't yet ship.
 - Forward-only history accumulation: never call point-in-time SDKs to
   fake-backfill past snapshots — those return *currently revised* data, not
   real historical state.
+- **Per-ticker coverage gaps must be handled via fallback-or-exclude, never
+  silent reweighting.** When `/api/v1/stocks/financial-metrics` returns
+  `INVALID_PARAMETER` for specific tickers, attempt fallback compute from
+  `company/income-statements` + `company/cashflow-statements`; if that
+  also fails, exclude the ticker and emit it into `summary.coverage_gap`.
+  Full policy + formulas in [SKILL.md `Per-Ticker Coverage Gaps`](../../SKILL.md).
 
 This template shares its shell (tab bar + README chip + methodology modal)
 with the thesis template; matching surfaces stay visually identical across
@@ -203,7 +209,19 @@ exit_reason  str|null
 date            int
 universe_size   int
 delta           {new_ids, dropped_ids}    vs prior snapshot; first run: both []
+coverage_gap    [{id, missing_metrics, reason, fallback_attempted}]
+                                          tickers excluded for data coverage; [] when none
 ```
+
+`coverage_gap` is **required** (`[]` when no gaps) — renderers check
+its presence to detect silent-skip. Policy and fallback recipe live in
+[SKILL.md `Per-Ticker Coverage Gaps`](../../SKILL.md); this template only
+specifies the field shape and rendering surface. `reason` is one of
+`"no_coverage"` or `"pre_revenue"` (taxonomy defined in SKILL.md);
+`missing_metrics` is the list of metric IDs that could not be sourced
+(e.g. `["REVENUE_GROWTH_YOY_TTM", "FCF_MARGIN_MRQ"]`);
+`fallback_attempted` records the endpoints tried
+(e.g. `["company/income-statements", "company/cashflow-statements"]`).
 
 `tldr` — one row per snapshot (only if you ship Daily Digest + push):
 
@@ -250,7 +268,8 @@ Per-tab structural notes — for the actual rendering, read the example.
 
 ### Tab 1 — Overview
 
-Top-down: optional Daily Digest card → Ranked Table with expandable rows.
+Top-down: optional Daily Digest card → Ranked Table with expandable rows
+→ **Data Coverage Gap card** (when `summary.coverage_gap.length > 0`).
 
 **Ranked table** uses the Table Card base from `design-widgets.md` verbatim.
 Order columns by importance left-to-right; if there's no Rank/Score, sort by
@@ -286,6 +305,16 @@ K-line interval should be ≤ update cadence with enough bars to see the
 pattern the screener cares about (rule of thumb: quarterly fundamentals →
 daily bars / 60–90d window; daily / weekly → daily bars / 30–90d; intraday
 momentum → hourly or 15min / 5–10d; long-cycle macro → weekly bars / 1–2y).
+
+**Data Coverage Gap card** — when `summary.coverage_gap.length > 0`,
+render a compact card below the ranked table listing each excluded
+ticker with its `reason` (verbatim — `"no_coverage"` or `"pre_revenue"`,
+no synonyms), its `missing_metrics`, and the `fallback_attempted`
+endpoints. Hide the card entirely when the array is empty (no
+"All tickers covered ✓" placeholder — that's noise). The card uses the
+same chassis as the Movers cards; no chart. Its purpose is to make the
+silent-bias mode visible: a user looking at a ranked list of 23 names
+sees that 12 more were considered but excluded, and why.
 
 ### Tab 2 — Movers & Trends
 
@@ -408,6 +437,18 @@ explains; do not maintain a separate per-template content list here.
 **Performance** — lazy-render the modal body the first time it opens, not
 on page load; methodology is rarely the first thing a user wants. The
 example does this.
+
+**Coverage-gap disclosure rule** — when methodology copy or Daily Digest
+narrative references rows that were partially or fully excluded for
+data reasons, it MUST label them with the `reason` value from
+`summary.coverage_gap` verbatim (`"no_coverage"` or `"pre_revenue"`).
+**Never invent categories like "speculative tail" that mix excluded-for-
+data names with genuinely-speculative ones** — those are different
+failure modes (missing data vs. real $0 revenue vs. real-but-risky
+business model) and lumping them misleads users making allocation
+decisions. The taxonomy itself is owned by
+[SKILL.md `Per-Ticker Coverage Gaps`](../../SKILL.md); this rule is the
+template-side enforcement on user-facing prose.
 
 ---
 

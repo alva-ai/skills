@@ -715,6 +715,37 @@
     color: var(--text-n5); line-height: 22px; letter-spacing: 0.14px;
   }
 
+  /* ── Data Coverage Gap card ── */
+  .coverage-gap-card {
+    background: var(--grey-g01); border-radius: var(--radius-ct-l);
+    padding: var(--spacing-m) var(--spacing-l);
+  }
+  .coverage-gap-header { margin-bottom: var(--spacing-s); }
+  .coverage-gap-title {
+    font-size: 14px; font-weight: 400; color: var(--text-n9);
+    letter-spacing: 0.14px; margin-bottom: 2px;
+  }
+  .coverage-gap-sub {
+    font-size: 11px; color: var(--text-n5); letter-spacing: 0.11px;
+  }
+  .coverage-gap-row {
+    display: grid; grid-template-columns: 70px 1fr auto;
+    align-items: center; gap: var(--spacing-s);
+    padding: 8px 0; border-bottom: 1px solid var(--line-l05);
+    font-size: 12px;
+  }
+  .coverage-gap-row:last-child { border-bottom: none; }
+  .coverage-gap-ticker { font-weight: 400; color: var(--main-m1); letter-spacing: 0.12px; }
+  .coverage-gap-detail { font-size: 11px; color: var(--text-n5); }
+  .coverage-gap-reason {
+    font-size: 11px; padding: 2px 8px; border-radius: var(--radius-ct-s);
+    background: var(--main-m4); color: var(--b-common-white);
+    letter-spacing: 0.11px; white-space: nowrap;
+  }
+  .coverage-gap-reason.pre-revenue {
+    background: var(--main-m5);
+  }
+
   /* ── Methodology (Alva typography) ── */
   .method-section { margin-bottom: var(--spacing-xl); }
   .method-section:last-child { margin-bottom: 0; }
@@ -1161,6 +1192,15 @@
       </div>
       <div class="widget-card">
         <div class="table-card" id="rankings-table"></div>
+      </div>
+      <div id="coverage-gap-section" class="widget-card" style="display:none;">
+        <div class="coverage-gap-card">
+          <div class="coverage-gap-header">
+            <div class="coverage-gap-title">Data Coverage Gap</div>
+            <div class="coverage-gap-sub">Tickers excluded from ranking — never silent half-weight. See methodology.</div>
+          </div>
+          <div class="coverage-gap-list" id="coverage-gap-list"></div>
+        </div>
       </div>
     </div>
     <div id="overview-error" class="error-state" style="display:none;"></div>
@@ -1980,6 +2020,35 @@
     });
   }
 
+  function renderCoverageGap(gaps) {
+    var section = document.getElementById('coverage-gap-section');
+    var list = document.getElementById('coverage-gap-list');
+    if (!section || !list) return;
+    if (!Array.isArray(gaps) || gaps.length === 0) {
+      section.style.display = 'none';
+      return;
+    }
+    var REASON_LABEL = { no_coverage: 'no coverage', pre_revenue: 'pre-revenue' };
+    var toList = function(v){
+      if (Array.isArray(v)) return v.join(', ');
+      if (typeof v === 'string') return v.split(',').map(function(x){return x.trim();}).filter(Boolean).join(', ');
+      return '';
+    };
+    list.innerHTML = gaps.map(function(g){
+      var reason = g.reason || 'no_coverage';
+      var reasonCls = reason === 'pre_revenue' ? 'coverage-gap-reason pre-revenue' : 'coverage-gap-reason';
+      var metrics = toList(g.missing_metrics);
+      var attempted = toList(g.fallback_attempted);
+      return '<div class="coverage-gap-row">' +
+        '<div class="coverage-gap-ticker">'+escHTML(g.id || '')+'</div>' +
+        '<div class="coverage-gap-detail">missing: '+escHTML(metrics)+
+          (attempted ? ' &middot; tried: '+escHTML(attempted) : '')+'</div>' +
+        '<div class="'+reasonCls+'">'+escHTML(REASON_LABEL[reason] || reason)+'</div>' +
+      '</div>';
+    }).join('');
+    section.style.display = 'block';
+  }
+
   function renderMoversCards(movers) {
     document.getElementById('entries-count').textContent = movers.entries.length;
     document.getElementById('dropouts-count').textContent = movers.dropouts.length;
@@ -2759,6 +2828,7 @@
           document.getElementById('overview-loading').style.display='none';
           document.getElementById('overview-content').style.display='block';
           renderOverview(curr.stocks, priorMap);
+          renderCoverageGap(curr.summary && curr.summary.coverage_gap);
         };
         TAB_RENDERERS.trends = function(){
           document.getElementById('trends-loading').style.display='none';

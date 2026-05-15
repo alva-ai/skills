@@ -14,7 +14,7 @@
 // Universe: US mid caps via screener (MARKET_CAP $5B–$50B).
 // Hard filter: rev_growth > 0, ≥4 gm quarters, gm acceleration in ≥2 of last 4.
 
-const { Feed, feedPath, makeDoc, num, str } = require("@alva/feed");
+const { Feed, feedPath, makeDoc, num, str, arr } = require("@alva/feed");
 const http = require("net/http");
 const secret = require("secret-manager");
 const envMod = require("env");
@@ -32,6 +32,24 @@ async function arraysGet(path, params) {
   const r = await http.fetch(url, { headers: ARRAYS_HEADERS });
   if (r.status < 200 || r.status >= 300) throw new Error("HTTP " + r.status + " " + path);
   return JSON.parse(await r.text());
+}
+
+// Non-throwing variant for the specific per-ticker INVALID_PARAMETER signature.
+// Whole-endpoint failures (auth, 5xx, schema drift) still throw — preserves
+// fail-fast. See SKILL.md "Per-Ticker Coverage Gaps".
+async function arraysGetMaybe(path, params) {
+  const qs = Object.keys(params)
+    .filter((k) => params[k] !== undefined && params[k] !== null && params[k] !== "")
+    .map((k) => encodeURIComponent(k) + "=" + encodeURIComponent(params[k]))
+    .join("&");
+  const url = ARRAYS_BASE + path + (qs ? "?" + qs : "");
+  const r = await http.fetch(url, { headers: ARRAYS_HEADERS });
+  const body = JSON.parse(await r.text());
+  if (r.status === 400 && body && body.error && body.error.code === "INVALID_PARAMETER") {
+    return { ok: false, body };
+  }
+  if (r.status < 200 || r.status >= 300) throw new Error("HTTP " + r.status + " " + path);
+  return { ok: true, body };
 }
 
 const _args = envMod.args || {};
@@ -55,6 +73,7 @@ feed.def("screener", {
     str("topSector"), str("lastUpdated"),
     num("basketGmDeltaP75"), num("basketRevGrowthP25"),
     num("basketGmDeltaValidCount"), num("basketRevGrowthValidCount"),
+    arr("coverage_gap", [str("id"), str("missing_metrics"), str("reason"), str("fallback_attempted")]),
   ]),
   klines: makeDoc("Daily OHLCV", "60-day daily candlestick bars for top-40 tickers", [
     str("ticker"), num("open"), num("high"), num("low"), num("close"), num("volume"),
@@ -77,6 +96,30 @@ function buildSeriesMap(data) {
 }
 
 function clamp01(x) { return Math.max(0, Math.min(1, x)); }
+
+// Fallback compute: when /financial-metrics has no coverage for a ticker, try
+// to derive the metric from raw quarterly income statements. Demonstrates the
+// pattern in SKILL.md "Per-Ticker Coverage Gaps". Returns one of:
+//   { ok: true,  series: [{observed_at, value}, ...] }    → injectable into gmMap
+//   { ok: false, reason: "no_coverage" | "pre_revenue", attempted: [...] }
+// Only handles GROSS_MARGIN_MRQ here; extend with other ratios per SKILL.md.
+async function fallbackGrossMargin(ticker, startSec, endSec) {
+  const attempted = ["/api/v1/stocks/company/income-statements"];
+  const r = await arraysGetMaybe("/api/v1/stocks/company/income-statements", {
+    symbol: ticker, start_time: startSec, end_time: endSec,
+    period_type: "quarter", time_type: "CALENDAR_END_DATE",
+  });
+  if (!r.ok) return { ok: false, reason: "no_coverage", attempted };
+  const rows = (r.body.data || []).slice().sort((a, b) => a.observed_at - b.observed_at);
+  if (rows.length < 4) return { ok: false, reason: "no_coverage", attempted };
+  const anyRevenue = rows.some(x => x.revenue && x.revenue > 0);
+  if (!anyRevenue) return { ok: false, reason: "pre_revenue", attempted };
+  const series = rows
+    .filter(x => x.gross_profit_ratio != null)
+    .map(x => ({ observed_at: x.observed_at, value: x.gross_profit_ratio }));
+  if (series.length < 4) return { ok: false, reason: "no_coverage", attempted };
+  return { ok: true, series };
+}
 
 (async () => {
   await feed.run(async (ctx) => {
@@ -114,6 +157,29 @@ function clamp01(x) { return Math.max(0, Math.min(1, x)); }
     const rvMap = buildSeriesMap(rvRes.data);
     const crMap = buildSeriesMap(crRes.data);
     console.log("gm=" + Object.keys(gmMap).length + " om=" + Object.keys(omMap).length + " rv=" + Object.keys(rvMap).length + " cr=" + Object.keys(crMap).length);
+
+    // ── Per-ticker coverage-gap fallback (see SKILL.md "Per-Ticker Coverage Gaps") ──
+    // For tickers in the universe but missing from gmMap, try income-statements.
+    // If that also fails, record in coverageGap with reason ∈ {no_coverage, pre_revenue}.
+    const coverageGap = [];
+    const fallbackTickers = Object.keys(universe).filter(t => !gmMap[t]);
+    if (fallbackTickers.length) {
+      const results = await Promise.all(fallbackTickers.map(async (t) => ({
+        t, r: await fallbackGrossMargin(t, twoYrAgoSec, nowSec),
+      })));
+      let rescued = 0;
+      for (const { t, r } of results) {
+        if (r.ok) { gmMap[t] = r.series; rescued++; continue; }
+        coverageGap.push({
+          id: t,
+          missing_metrics: "GROSS_MARGIN_MRQ",
+          reason: r.reason,
+          fallback_attempted: r.attempted.join(","),
+        });
+        // _drop is set below in the main loop via insufficient_gm — same effect.
+      }
+      console.log("fallback gm: rescued=" + rescued + " gap=" + coverageGap.length);
+    }
 
     // ── Compute factors per ticker ──
     for (const t of Object.keys(universe)) {
@@ -262,6 +328,7 @@ function clamp01(x) { return Math.max(0, Math.min(1, x)); }
       basketRevGrowthP25: pct(basketRevGrowthP25),
       basketGmDeltaValidCount: gmDeltasSorted.length,
       basketRevGrowthValidCount: revGrowthsSorted.length,
+      coverage_gap: coverageGap,
     }]);
 
     if (_overrideNow) {

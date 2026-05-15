@@ -364,6 +364,79 @@ data-driven metrics.
    blocker.** Do not silently substitute with estimated or fabricated values
    marked `live: false`.
 
+### Per-Ticker Coverage Gaps
+
+The whole-domain rule above covers "the SDK has no coverage at all." This
+section covers the more common case: **a working endpoint that lacks
+coverage for specific tickers in an otherwise valid universe.** This is
+the silent-bias mode that bit the `ai-buildout-5x` screener — 12 of 35
+curated small/mid-cap names returned `INVALID_PARAMETER` from
+`/api/v1/stocks/financial-metrics` and the playbook quietly scored them
+at half weight without telling the user.
+
+Error signature:
+
+```
+HTTP 400
+{"success":false,"data":null,"error":{
+  "code":"INVALID_PARAMETER",
+  "message":"stock symbol not found: <TICKER>"
+}}
+```
+
+**Operational invariant — fallback-or-exclude, never silent reweighting.**
+When this signature appears on a per-ticker call, the feed MUST:
+
+1. **Attempt fallback compute from raw statements.** The four ratios
+   most commonly requested via `financial-metrics` are derivable from
+   `/api/v1/stocks/company/income-statements` and
+   `/api/v1/stocks/company/cashflow-statements`:
+
+   | Metric | Formula from raw fields |
+   |---|---|
+   | `GROSS_MARGIN_MRQ` | `gross_profit_ratio` (most-recent quarter row) |
+   | `FCF_MARGIN_MRQ` | `(operating_cash_flow − capital_expenditure) / revenue` (MRQ) |
+   | `REVENUE_GROWTH_YOY_TTM` | `sum(revenue, last 4 quarters) / sum(revenue, prior 4 quarters) − 1` |
+   | `REVENUE_GROWTH_QOQ` | `revenue(current_quarter) / revenue(prior_quarter) − 1` |
+
+   Both endpoints are part of `arrays-data-api-equity-fundamentals`;
+   look up the full schema with `alva data-skills endpoint
+   arrays-data-api-equity-fundamentals company-income-statements`.
+   Do not guess paths — the older path `/api/v1/stocks/financials/
+   income-statement` is wrong and returns `ROUTE_NOT_FOUND`.
+
+2. **If fallback succeeds**, the ticker enters the output at full weight.
+   Track per-metric provenance so methodology copy can disclose the mix
+   (e.g. `source ∈ {"metrics_api", "fallback_computed"}`).
+
+3. **If fallback fails** (statements endpoints also return error / empty
+   data / insufficient rows for the formula), **exclude the ticker from
+   the ranked output entirely** and surface it in a `coverage_gap`
+   channel — never include it at reduced weight. The channel shape is
+   template-specific (the screener template defines a `summary.coverage_gap`
+   array; other templates can define their own surfaces — see each
+   template's Feed Contract). What is universal is the policy.
+
+**`reason` taxonomy** — exactly two values, both load-bearing:
+
+- `"no_coverage"` — both `financial-metrics` and the statements
+  fallback failed. True upstream data gap.
+- `"pre_revenue"` — statements returned data but `revenue == 0` for
+  all available quarters (e.g. NNE, early-stage POET). Growth ratios
+  are mathematically undefined; ranking on growth would be a category
+  error.
+
+Methodology / narrative copy MUST use these labels verbatim. **Never
+invent categories like "speculative tail" that conflate
+`no_coverage` with `pre_revenue`** — they are different failure modes
+(missing data vs. real $0 revenue) and lumping them misleads users
+who are making allocation decisions.
+
+This rule scopes the fail-fast invariant (line 1027): whole-endpoint
+failures (auth, 5xx, schema drift) still throw. Only the specific
+per-ticker `INVALID_PARAMETER: stock symbol not found` signature
+triggers the fallback branch.
+
 ### Release Gate: `--feeds` Is a Declaration, Not a Shortcut
 
 `alva release playbook --feeds '[]'` is **only** valid when the released HTML
