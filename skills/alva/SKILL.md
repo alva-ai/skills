@@ -514,6 +514,26 @@ that endpoint in this session. `<skill>` must come from `list` output and
 a guess. If the call fails with an unexpected shape, re-fetch the endpoint
 detail rather than guessing.
 
+**Raw response sampling is mandatory for direct data answers.** For a direct
+answer that fetches Arrays data, or any script that aggregates across one or
+more Arrays endpoints, inspect the actual response before calculating:
+
+- Print a compact sample of the raw response shape in `alva run` logs (first
+  row plus top-level keys is enough). Confirm the nesting, date/timestamp
+  fields, numeric fields, and ordering match the endpoint detail.
+- For time-window or time-series data, derive and log coverage diagnostics
+  before aggregation: requested window, row count, observed dates, latest
+  observation timestamp/date, and rows/volume by date when relevant.
+- For cross-endpoint ratios, comparisons, or directional conclusions, compute
+  explicit provenance sets such as `numerator_dates` and `denominator_dates`.
+  They must be identical before presenting a firm ratio, trend, or "up/down"
+  conclusion. If they differ, either recompute on the common date set and label
+  that scope, or state that the data is incomplete and avoid directional
+  language.
+- Do not collapse validation errors into empty data. Report invalid parameters
+  and retry with documented alternatives only when that still answers the
+  user's question.
+
 **Failure and fallback guardrail**: If an Arrays endpoint returns 403, 404, or
 an unexpected empty/irrelevant result, do not immediately tell the user to
 upgrade or use BYOD. First re-check `alva data-skills summary <skill>` for the
