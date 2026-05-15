@@ -269,6 +269,15 @@ Must Do After Completion Gate:
 
 ---
 
+## Capability Verification
+
+Before saying "Alva doesn't have X" or recommending BYOD/third-party, run
+`alva data-skills list | grep -i <topic>` first. Training memory is not
+authoritative. Decompose compound requests ("darkpool L2 realtime") and
+verify each component independently — never reject the whole as one unit.
+
+---
+
 ## Content Legitimacy Rules
 
 These rules are **non-negotiable**. Violations produce misleading content that
