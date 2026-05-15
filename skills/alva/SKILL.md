@@ -296,6 +296,58 @@ proceeding. Do **not** silently substitute a different deliverable (local
 prototype with seeded RNG, WebSearch summary, analytic memo without data
 fetch) when the SDK can serve the original request.
 
+**The "agent-as-data-source" antipattern is forbidden across all delivery
+modes** — `build`, `answer_only`, remix, edit, follow-up. When the user
+asks about "current", "live", "right now", "today's", or any time-relative
+market state, **do not answer from training knowledge**. Specifically
+forbidden in `answer_only` mode:
+
+- Stating named tickers, sector narratives, market themes, valuations,
+  earnings figures, ratings, or "what is happening now" answers using
+  training-data recall without any SDK / WebFetch / WebSearch call in
+  the session.
+- Adding directional disclaimers ("these are directional takes") to dodge
+  staleness — that addresses data resolution, not staleness. The training
+  cutoff (~9 months out of date at any given time) means "right now"
+  framing on training-derived content is misleading regardless of
+  qualifier wording.
+
+When the user asks "right now" / "current" content:
+
+1. Run an actual data fetch (Alva SDK or WebFetch/AlvaAsk) **before**
+   emitting any ticker, narrative, or quantitative claim. Cite each
+   claim by its tool-result source.
+2. If no data fetch is feasible (e.g. SDK coverage gap), state the
+   coverage gap explicitly and stop — do not fall through to training
+   knowledge with a hedge.
+3. Disclose the training-cutoff age (~9 months) only when the user
+   explicitly asks for a "general background" / "what do you know"
+   answer that is not time-relative.
+
+**The "literalize-instead-of-pipe" antipattern is forbidden as a repair
+pattern.** When a playbook's data path is broken or returning empty:
+
+- Do **not** fetch live data and bake the result as a literal in
+  the playbook HTML's `DATA = { … }` object, even as a "snapshot
+  repair". The snapshot decays silently with every trading day; the
+  rendered playbook becomes confidently wrong.
+- Do **not** scrape the live playbook's rendered HTML for displayed
+  values and hardcode those strings into a feed script's output
+  (`notify/message`, `signal/targets`, etc.) — that bakes a moment in
+  time as the feed's runtime value.
+- Required action when a data path is broken: fix the **pipeline** —
+  the source feed's data fetcher, the ALFS path the playbook reads
+  from, or the SDK call that populated the empty path. If the
+  pipeline cannot be fixed in-session, surface the failure to the
+  user; do not ship a snapshot.
+
+Trigger phrases that should make you stop and re-evaluate: "I'll bake
+the prices in for now", "let me hardcode the latest snapshot",
+"I'll inline the data and we can refresh on next release", "the path
+returns empty so I'll lift the values from the page". Each is a
+content-legitimacy violation regardless of whether the data was fresh
+at repair time.
+
 ### Data Sourcing
 
 1. **All quantitative data displayed in charts, tables, or metric cards MUST
