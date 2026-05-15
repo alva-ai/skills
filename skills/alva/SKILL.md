@@ -275,7 +275,6 @@ Before saying "Alva doesn't have X" or recommending BYOD/third-party, run
 `alva data-skills list | grep -i <topic>` first. Training memory is not
 authoritative. Decompose compound requests ("darkpool L2 realtime") and
 verify each component independently — never reject the whole as one unit.
-This applies even when the request looks impossible.
 
 ---
 
