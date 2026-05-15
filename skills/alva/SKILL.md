@@ -686,6 +686,8 @@ above so anonymous viewers can load feed output without authentication.
    playbook unexplained.
 3. **Create playbook draft**: `alva release playbook-draft` — creates DB
    records, writes draft files and `playbook.json` to ALFS automatically.
+   Run this before every `alva release playbook` to keep the draft
+   updated — including version bumps and re-releases.
    This request must include both the URL-safe `name` and the human-readable
    `display_name`. Use `[subject/theme] [analysis angle/strategy logic]`, put
    the subject/theme first, and keep it within 40 characters. Avoid personal
@@ -1655,9 +1657,10 @@ consistent read pattern (`@last`, `@range`, etc.).
   and safe to call anytime.
 - **Cronjob path must point to an existing script.** The deploy API validates
   the entry_path exists via filesystem stat before creating the cronjob.
-- **Always create a draft before releasing.** `alva release playbook`
-  requires the playbook to already exist (created via
-  `alva release playbook-draft`).
+- **Run `alva release playbook-draft` before every `alva release
+  playbook`.** This holds for every release — first publish, version
+  bumps, and README-only or content-only re-releases of an existing
+  playbook.
 - **Create new playbooks from scratch unless you are doing a version update.**
   Only version updates may refer to an existing playbook. For all other new
   playbooks, do not read existing ones.
