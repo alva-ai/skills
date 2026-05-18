@@ -651,6 +651,25 @@ See **Step 9** below for the post-release subscription flow.
 
 ### 6. Build the Playbook Web App
 
+<HARD-GATE id="before-build-html">
+Before writing or rewriting playbook HTML, read the applicable design guidance
+for this session.
+
+Required evidence:
+- [design-system.md](references/design-system.md) has been read first.
+- The relevant companion reference has been read when applicable:
+  [design-widgets.md](references/design-widgets.md) for widget layouts,
+  [design-components.md](references/design-components.md) for component
+  details, and
+  [design-playbook-trading-strategy.md](references/design-playbook-trading-strategy.md)
+  for strategy/backtest playbooks.
+- If a `/use-skill:` blueprint or template is active, its layout and data
+  contract have been read before HTML work starts.
+
+If this evidence is missing, stop and read the required design/reference file
+before creating or editing HTML. Do not rely on memory of prior sessions.
+</HARD-GATE>
+
 After your data pipelines are deployed and producing data, build the playbook's
 web interface. Create HTML5 pages with Alva Design System that read from Alva's
 data gateway and visualize the results. Follow the Alva Design System for
@@ -695,6 +714,21 @@ above so anonymous viewers can load feed output without authentication.
    playbook unexplained.
 3. **Create playbook draft**: `alva release playbook-draft` — creates DB
    records, writes draft files and `playbook.json` to ALFS automatically.
+
+   <HARD-GATE id="before-playbook-draft">
+   Before running `alva release playbook-draft`, verify:
+   - The HTML has been written to `~/playbooks/{name}/index.html`.
+   - The README has been written to `~/playbooks/{name}/README.md`.
+   - The target `name` and owner namespace match `alva whoami`.
+   - Every feed included in `--feeds` has already passed
+     `before-feed-release`.
+   - The draft metadata (`display_name`, description, tags, trading symbols,
+     and feed list) matches the user's approved plan.
+
+   If any item is missing, do not create the draft. Fix the missing artifact or
+   ask the user for the missing metadata first.
+   </HARD-GATE>
+
    Run this before every `alva release playbook` to keep the draft
    updated — including version bumps and re-releases.
    This request must include both the URL-safe `name` and the human-readable
@@ -800,33 +834,41 @@ verification steps such as screenshots; do not present it as the share link.
 
 #### Playbook Release Checklist
 
-Run this before `alva release playbook`, once every backing feed has passed
-the [Feed Release Checklist](#feed-release-checklist). Verify all of the
-following:
+<HARD-GATE id="before-playbook-release">
+Before running `alva release playbook`, verify every item below. A successful
+draft is necessary but not sufficient: release requires fresh feed coverage,
+README coverage, and HTML/data consistency.
 
-1. **Deployment coverage**: Every feed the released playbook reads at runtime
-   must have had a successful `alva deploy create` AND its `feed_id` must
-   appear in `--feeds`. A `run`-tested but undeployed feed has no data at its
-   public `@last` path and the HTML will fail to read it.
-2. **Cronjobs are active**: All feeds referenced by the playbook have
+Required evidence:
+1. **Backing feed release gates passed**: Every backing feed has passed
+   `before-feed-release`.
+2. **Deployment coverage**: Every feed the released playbook reads at runtime
+   had a successful `alva deploy create`, and its `feed_id` appears in
+   `--feeds`. A run-tested but undeployed feed has no data at its public
+   `@last` path and the HTML will fail to read it.
+3. **Cronjobs are active**: All feeds referenced by the playbook have
    successfully deployed cronjobs.
-3. **HTML fetches from feeds**: The playbook HTML reads quantitative data from
-  feed output paths at runtime (not from inline literals), consistent with the
-  [Content Legitimacy Rules](#content-legitimacy-rules).
-4. **Data is fresh**: Read the latest data point from each referenced feed
-   (via `@last/1`) and check its timestamp. If the latest timestamp is older
-   than 2x the cron interval, warn the user that the playbook will display
-   stale data.
-5. **Description is accurate**: Update frequency claims match actual cronjob
+4. **HTML fetches from feeds**: The playbook HTML reads quantitative data from
+   feed output paths at runtime, not from inline literals, consistent with the
+   [Content Legitimacy Rules](#content-legitimacy-rules).
+5. **Data is fresh**: Read the latest data point from each referenced feed via
+   `@last/1` and check its timestamp. If the latest timestamp is older than 2x
+   the cron interval, warn the user that the playbook will display stale data.
+6. **Description is accurate**: Update frequency claims match actual cronjob
    status. Data source claims match actual SDK/BYOD calls in the feed script.
-6. **Target user is correct**: The playbook is being released under the
+7. **Target user is correct**: The playbook is being released under the
    requesting user's namespace (see user scope enforcement above).
-7. **README is present and accurate**: `~/playbooks/{name}/README.md` exists
+8. **README is present and accurate**: `~/playbooks/{name}/README.md` exists
    on ALFS and covers the required sections (see
    [Playbook README in release.md](references/api/release.md#playbook-readme)).
    Its source / cadence claims match the actual feed scripts and deployed
    cronjobs. Pass it via `--readme-url` as an absolute ALFS path (see the
    `--readme-url` rule in Step 7 above).
+
+If any item fails, do not release. Fix the issue, re-run
+`alva release playbook-draft` if metadata or backing files changed, then
+re-enter this gate.
+</HARD-GATE>
 
 ### 8. Remix (Create from Existing Playbook)
 
@@ -1198,20 +1240,33 @@ Every feed follows a 6-step lifecycle including every newly created feed or re-c
 
 ### Feed Release Checklist
 
-Run this before `alva release feed`, for every feed — standalone feeds and
-feeds that will back a playbook alike. Verify these prerequisites:
+<HARD-GATE id="before-feed-release">
+Before running `alva release feed`, verify the exact feed script that will be
+released has run successfully in this session.
 
-1. **Grant check** — confirm `special:user:*` read permission exists on the
-   feed path. If missing, run the grant step now.
-2. **Public-read check** — fetch the feed data path *without* authentication
-   and confirm HTTP 200 (not 403).
+Required evidence:
+1. **Run check**: `alva run --entry-path '~/feeds/<name>/v1/src/index.js'`
+   completed successfully after the latest source write.
+2. **Output shape check**: The run produced the expected feed output
+   groups/fields for this feed.
+3. **Freshness check**: If the script changed after the run, the evidence is
+   stale. Re-run before release.
+4. **Grant check**: `special:user:*` read permission exists on the feed path.
+   If missing, run the grant step now.
+5. **Public-read check**: Fetch the feed data path without authentication and
+   confirm HTTP 200, not 403.
+6. **HTML backing check**: If the feed backs HTML, at least one public `@last`
+   path that the HTML will read has a non-empty result after grant.
 
-Building a playbook? Every backing feed still runs this checklist first;
-then, before `alva release playbook`, run the
-[Playbook Release Checklist](#playbook-release-checklist) in Step 7 — it
-covers HTML, README, freshness, and feed coverage.
+If this evidence is missing or stale, do not run `alva release feed`. Re-run
+the feed, inspect the output, and only then proceed.
+</HARD-GATE>
 
-If the build was interrupted and resumed, re-run this checklist from the top.
+Building a playbook? Every backing feed still passes this gate first;
+then, before `alva release playbook`, pass `before-playbook-release` in Step 7
+— it covers HTML, README, freshness, and feed coverage.
+
+If the build was interrupted and resumed, re-enter this gate from the top.
 Do not assume prior steps completed successfully.
 
 | Data Type                     | Recommended Schedule     | Rationale                           |
