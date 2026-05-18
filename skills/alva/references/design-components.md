@@ -125,7 +125,7 @@ document.querySelectorAll(".list-item").forEach((item) => {
 ## Markdown
 
 > For font specification, see
-> [design-system.md - Typography & Font](./design-system.md#typography--font).
+> [design.md - Typography & Font](./design.md#typography--font).
 > Headings and body text use Delight with `-apple-system`, `BlinkMacSystemFont`,
 > `sans-serif` fallbacks; code uses JetBrains Mono.
 

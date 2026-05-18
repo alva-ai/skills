@@ -27,7 +27,7 @@ Before writing HTML, read from the Alva skill:
 
 - [`../../references/design-tokens.css`](../../references/design-tokens.css) — use spacing/color tokens as-is, do NOT override
 - [`../../references/design-components.md`](../../references/design-components.md) — Tab / Dropdown / Pill / Markdown primitives
-- [`../../references/design-system.md`](../../references/design-system.md) — `.playbook-container`, `.playbook-header` base rules
+- [`../../references/design.md`](../../references/design.md) — `.playbook-container`, `.playbook-header` base rules
 
 Default to the existing Alva light-theme tokens. Do not introduce dark mode,
 black/slate page backgrounds, glow effects, gradients, or custom color palettes.

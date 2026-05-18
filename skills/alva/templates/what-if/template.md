@@ -10,7 +10,7 @@ For "what-if I bought/sold X when Y happens" analysis.
 
 Before writing HTML, read from the Alva skill:
 
-- [references/design-system.md](../../references/design-system.md) — copy `.playbook-container` rule verbatim (max-width 2048px, 28px horizontal padding)
+- [references/design.md](../../references/design.md) — copy `.playbook-container` rule verbatim (max-width 2048px, 28px horizontal padding)
 - [references/design-widgets.md](../../references/design-widgets.md) — metric cards / charts / tables specs
 - [references/design-tokens.css](../../references/design-tokens.css) — use spacing/color tokens as-is, do NOT override
 
