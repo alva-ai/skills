@@ -177,10 +177,8 @@ module.exports = { strategyFn, initialState };
 ### main.js
 
 ```javascript
-const { FeedAltraModule } = require("@alva/feed");
+const { FeedAltraModule, createArraysOhlcvProvider } = require("@alva/feed");
 const { FeedAltra, e } = FeedAltraModule;
-const { AltraModule } = require("@alva/graph");
-const { createArraysOhlcvProvider } = AltraModule;
 const secret = require("secret-manager");
 
 const { SYMBOL, STRATEGY_INTERVAL } = require("./constants.js");
@@ -227,8 +225,8 @@ altra.setStrategy(strategyFn, {
 ## Imports
 
 Altra is accessed through the `FeedAltraModule` export from `@alva/feed`.
-Field type helpers (`num`, `str`, etc.) are at the `@alva/feed` top level, and
-`createArraysOhlcvProvider` lives on `@alva/graph`'s `AltraModule`:
+Field type helpers (`num`, `str`, etc.) and `createArraysOhlcvProvider` are at
+the `@alva/feed` top level:
 
 ```javascript
 const {
@@ -240,6 +238,7 @@ const {
   arr,
   fld,
   makeDoc,
+  createArraysOhlcvProvider,
 } = require("@alva/feed");
 const {
   FeedAltra,
@@ -250,8 +249,6 @@ const {
   order,
   orders,
 } = FeedAltraModule;
-const { AltraModule } = require("@alva/graph");
-const { createArraysOhlcvProvider } = AltraModule;
 ```
 
 | Export                                    | Source                     | Description                                      |
@@ -264,18 +261,17 @@ const { createArraysOhlcvProvider } = AltraModule;
 | `order` / `orders`                        | `FeedAltraModule`          | Helper to create order targets                   |
 | `num`, `str`, `bool`, `obj`, `arr`, `fld` | `@alva/feed` (top level)   | Field type helpers (same as Feed SDK)            |
 | `makeDoc`                                 | `@alva/feed` (top level)   | Type document helper                             |
-| `createArraysOhlcvProvider`               | `@alva/graph` `AltraModule` | Builds the OHLCV provider used by Altra          |
+| `createArraysOhlcvProvider`               | `@alva/feed` (top level)    | Builds the OHLCV provider used by Altra          |
 
 ---
 
 ## OHLCV Provider
 
 All OHLCV data must come through `createArraysOhlcvProvider()`. Never fabricate
-price data. The provider is exported from `@alva/graph` (not `@alva/feed`).
+price data. The provider is exported from `@alva/feed`.
 
 ```javascript
-const { AltraModule } = require("@alva/graph");
-const { createArraysOhlcvProvider } = AltraModule;
+const { createArraysOhlcvProvider } = require("@alva/feed");
 const secret = require("secret-manager");
 
 const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
@@ -318,8 +314,8 @@ const altra = new FeedAltra(
 | ------------------------------ | ------------------------------------------------------------------------------- |
 | `path`                         | ALFS feed path (e.g. `'~/feeds/my-strategy/v1'`). All output data stored here.   |
 | `startDate`                    | Backtest start timestamp (ms UTC). Use the exact date, never adjust for warmup. |
-| `portfolioOptions.initialCash` | Starting cash (default: 1,000,000)                                              |
-| `portfolioOptions.currency`    | Quote currency (default: "USDT")                                                |
+| `portfolioOptions.initialCash` | Starting cash (default: 100,000)                                                |
+| `portfolioOptions.currency`    | Quote currency (default: "USD")                                                 |
 | `simOptions.simTick`           | Simulation resolution. Must be `"1min"`.                                        |
 | `simOptions.feeRate`           | Fee per trade as fraction (e.g. 0.001 = 0.1%)                                   |
 | `simOptions.slippage`          | Slippage as fraction                                                            |

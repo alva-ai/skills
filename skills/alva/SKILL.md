@@ -1390,10 +1390,8 @@ usually incomplete — see
 See [altra-trading.md](references/altra-trading.md) for full details.
 
 ```javascript
-const { FeedAltraModule } = require("@alva/feed");
+const { FeedAltraModule, createArraysOhlcvProvider } = require("@alva/feed");
 const { FeedAltra, e, Amount } = FeedAltraModule;
-const { AltraModule } = require("@alva/graph");
-const { createArraysOhlcvProvider } = AltraModule;
 const secret = require("secret-manager");
 
 const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
