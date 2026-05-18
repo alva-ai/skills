@@ -663,13 +663,13 @@ trades.
 
 | Weight | Meaning                     |
 | ------ | --------------------------- |
-| `0`    | Sell entire position (exit) |
+| `0`    | Close entire position (exit) |
 | `0.5`  | 50% of equity in this asset |
 | `1.0`  | 100% long (fully invested)  |
 | `-1.0` | 100% short                  |
 | `2.0`  | 200% long target, subject to margin limits |
 
-- Existing positions omitted from `weights` are targeted to `0` and closed
+- Existing positions omitted from `weights` are also targeted to `0` and closed
 - If weights sum to < 1.0, remainder stays as cash
 - Repeating the same target weights rebalances to those weights
 
@@ -702,8 +702,9 @@ Amount.ofPosition(0.5); // 50% of current position size
 Amount.ofEquity(0.05); // 5% of portfolio equity
 ```
 
-Use either an `allocate` instruction or an `orders` instruction in a target;
-they are not combined in one instruction.
+Use either an `allocate` instruction or an `orders` instruction in a target.
+Do not put `orders` inside an `allocate` instruction; current execution only
+uses the `weights` for `allocate` targets.
 
 ---
 
