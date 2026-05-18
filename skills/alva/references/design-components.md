@@ -1561,7 +1561,7 @@ state; typed text matches the filled state.
   gap: var(--spacing-s);
 }
 .tab-pill .tab-item {
-  padding: 6px var(--spacing-m);
+  padding: 6px var(--spacing-s);
   border-radius: var(--radius-btn-s);
   font-size: 14px;
   line-height: 22px;
@@ -1591,7 +1591,7 @@ state; typed text matches the filled state.
   gap: var(--spacing-xs);
 }
 .tab-pill.tab-s .tab-item {
-  padding: var(--spacing-xxs) var(--spacing-xs);
+  padding: var(--spacing-xxs) 10px;
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.12px;
