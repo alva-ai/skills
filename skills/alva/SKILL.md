@@ -1447,8 +1447,8 @@ involves uploading, naming, rotating, listing, or using third-party secrets.
 data alignment, and portfolio simulation automatically. Do not manually loop
 over SDK data (e.g. `getCryptoKline`) to evaluate trading conditions — this
 leads to incorrect timestamps and look-ahead bias. Use Altra for all
-strategies regardless of complexity; it supports any interval (`"1min"` to
-`"1w"`) and any combination of OHLCV + external data via `registerRawData`.
+strategies regardless of complexity; supported OHLCV intervals depend on the
+provider and market, and external data can be added via `registerRawData`.
 
 **After a successful backtest, you should package the results in a form the user
 can use.** That may be a playbook, a dashboard, or a concise analytical summary,
@@ -1459,10 +1459,8 @@ usually incomplete — see
 See [altra-trading.md](references/altra-trading.md) for full details.
 
 ```javascript
-const { FeedAltraModule } = require("@alva/feed");
+const { FeedAltraModule, createArraysOhlcvProvider } = require("@alva/feed");
 const { FeedAltra, e, Amount } = FeedAltraModule;
-const { AltraModule } = require("@alva/graph");
-const { createArraysOhlcvProvider } = AltraModule;
 const secret = require("secret-manager");
 
 const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
@@ -1480,8 +1478,8 @@ const altra = new FeedAltra(
 );
 
 const dg = altra.getDataGraph();
-dg.registerOhlcv("BINANCE_SPOT_BTC_USDT", "1d"); // any interval: "1min" to "1w"
-dg.registerFeature({ name: "rsi" /* ... */ });
+dg.registerOhlcv("BINANCE_SPOT_BTC_USDT", "1d"); // supported interval strings include "1min", "15min", "1d"
+dg.registerFeature(createRsiFeature()); // feature descriptors include description, inputConfig, fields, and fn
 
 altra.setStrategy(strategyFn, {
   trigger: { type: "events", expr: e.ohlcv("BINANCE_SPOT_BTC_USDT", "1d") },
@@ -1655,8 +1653,9 @@ consistent read pattern (`@last`, `@range`, etc.).
 - **Altra `run()` is async.** `FeedAltra.run()` returns a `Promise<RunResult>`.
   Always `await` it: `const result = await altra.run(endDate);`
 - **Altra lookback: feature vs strategy.** Feature lookback controls how many
-  bars the feature computation sees. Strategy lookback controls how many feature
-  outputs the strategy function sees. They are independent.
+  historical records feature computation receives. Strategy lookback controls
+  the OHLCV, raw, and feature records delivered to the strategy, and can extend
+  upstream raw/feature computation ranges so requested records are available.
 - **Quote `~` paths to prevent shell expansion.** The shell expands bare `~` to
   your local home (e.g. `/Users/alice/`), not the ALFS home
   (`'/alva/home/alice/'`). Always quote paths: `--path '~/feeds/...'`.
