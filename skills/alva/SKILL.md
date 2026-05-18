@@ -1574,7 +1574,10 @@ alva release feed --name btc-ema --version 1.0.0 --cronjob-id 42 \
 
 # 2. Create playbook draft (creates DB record + ALFS draft files automatically)
 #    Include trading_symbols when the playbook involves specific assets.
-alva release playbook-draft --name btc-dashboard --display-name "BTC Trend Dashboard" --description "BTC market dashboard" --feeds '[{"feed_id":100}]' --trading-symbols '["BTC"]'
+#    Include --tags with discovery tags (max 10, each up to 32 chars) so the
+#    playbook surfaces under those tags on /explore. Re-running this command
+#    with --tags replaces the playbook's tag set.
+alva release playbook-draft --name btc-dashboard --display-name "BTC Trend Dashboard" --description "BTC market dashboard" --feeds '[{"feed_id":100}]' --trading-symbols '["BTC"]' --tags '["btc","macro"]'
 # → {"playbook_id":99,"playbook_version_id":200}
 
 # 3. Write playbook README to ALFS (required before release).
