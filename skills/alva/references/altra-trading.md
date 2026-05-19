@@ -177,8 +177,10 @@ module.exports = { strategyFn, initialState };
 ### main.js
 
 ```javascript
-const { FeedAltraModule, createArraysOhlcvProvider } = require("@alva/feed");
+const { FeedAltraModule } = require("@alva/feed");
 const { FeedAltra, e } = FeedAltraModule;
+const { AltraModule } = require("@alva/graph");
+const { createArraysOhlcvProvider } = AltraModule;
 const secret = require("secret-manager");
 
 const { SYMBOL, STRATEGY_INTERVAL } = require("./constants.js");
@@ -225,8 +227,8 @@ altra.setStrategy(strategyFn, {
 ## Imports
 
 Altra is accessed through the `FeedAltraModule` export from `@alva/feed`.
-Field type helpers (`num`, `str`, etc.) and `createArraysOhlcvProvider` are at
-the `@alva/feed` top level:
+Field type helpers (`num`, `str`, etc.) are at the `@alva/feed` top level, and
+`createArraysOhlcvProvider` lives on `@alva/graph`'s `AltraModule`:
 
 ```javascript
 const {
@@ -238,7 +240,6 @@ const {
   arr,
   fld,
   makeDoc,
-  createArraysOhlcvProvider,
 } = require("@alva/feed");
 const {
   FeedAltra,
@@ -249,6 +250,8 @@ const {
   order,
   orders,
 } = FeedAltraModule;
+const { AltraModule } = require("@alva/graph");
+const { createArraysOhlcvProvider } = AltraModule;
 ```
 
 | Export                                    | Source                     | Description                                      |
@@ -261,17 +264,18 @@ const {
 | `order` / `orders`                        | `FeedAltraModule`          | Helper to create order targets                   |
 | `num`, `str`, `bool`, `obj`, `arr`, `fld` | `@alva/feed` (top level)   | Field type helpers (same as Feed SDK)            |
 | `makeDoc`                                 | `@alva/feed` (top level)   | Type document helper                             |
-| `createArraysOhlcvProvider`               | `@alva/feed` (top level)    | Builds the OHLCV provider used by Altra          |
+| `createArraysOhlcvProvider`               | `@alva/graph` `AltraModule` | Builds the OHLCV provider used by Altra          |
 
 ---
 
 ## OHLCV Provider
 
-Use an OHLCV provider such as `createArraysOhlcvProvider()`. Never fabricate
-price data. The provider is exported from `@alva/feed`.
+All OHLCV data must come through `createArraysOhlcvProvider()`. Never fabricate
+price data. The provider is exported from `@alva/graph` (not `@alva/feed`).
 
 ```javascript
-const { createArraysOhlcvProvider } = require("@alva/feed");
+const { AltraModule } = require("@alva/graph");
+const { createArraysOhlcvProvider } = AltraModule;
 const secret = require("secret-manager");
 
 const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
@@ -338,9 +342,9 @@ const altra = new FeedAltra(
 | ------------------------------ | ------------------------------------------------------------------------------- |
 | `path`                         | ALFS feed path (e.g. `'~/feeds/my-strategy/v1'`). All output data stored here.   |
 | `startDate`                    | Backtest start timestamp (ms UTC). Use the exact date, never adjust for warmup, but still respect provider data-window limits. |
-| `portfolioOptions.initialCash` | Starting cash (default: 100,000)                                                |
-| `portfolioOptions.currency`    | Quote currency (default: "USD")                                                 |
-| `simOptions.simTick`           | Simulation resolution. Prefer valid tick strings like `"1min"`, `"15min"`, or `"1d"`; numeric ms values must map to a valid tick string. |
+| `portfolioOptions.initialCash` | Starting cash (default: 1,000,000)                                              |
+| `portfolioOptions.currency`    | Quote currency (default: "USDT")                                                |
+| `simOptions.simTick`           | Simulation resolution. Must be `"1min"`.                                        |
 | `simOptions.feeRate`           | Fee per trade as fraction (e.g. 0.001 = 0.1%)                                   |
 | `simOptions.slippage`          | Slippage as fraction                                                            |
 | `perfOptions.timezone`         | `"UTC"` for crypto/mix, `"America/New_York"` for us_stock                       |
@@ -449,7 +453,7 @@ dataGraph.registerFeature({
 dataGraph.registerFeature({
   name: "price_ma_ratio",
   inputConfig: {
-    ohlcvs: [{ id: { pair: SYMBOL, interval: "1d" } }],
+    ohlcvs: [{ id: { pair: SYMBOL, interval: "1d" }, lookback: 0 }],
     features: [{ id: "sma_20" }],
   },
   fields: [num("ratio")],
@@ -593,8 +597,7 @@ e.any(e.ohlcv("BINANCE_SPOT_BTC_USDT", "1h"), e.raw("funding")); // OR
 }
 ```
 
-**LookbackOptions**: `{ count?: number, duration?: number }`; set one or both.
-`duration` is in ms.
+**LookbackOptions**: `{ count: number }` or `{ duration: number }` (in ms).
 
 ### Strategy Function
 
@@ -635,15 +638,12 @@ if (bars.length === 0) return { target: null, state }; // warmup
 
 ### Understanding Lookback
 
-**Feature lookback** and **strategy lookback** are set in different scopes:
+**Feature lookback** and **strategy lookback** are independent:
 
 | Type              | Where Set                | Controls                                                    |
 | ----------------- | ------------------------ | ----------------------------------------------------------- |
-| Feature lookback  | Feature's `inputConfig`  | How many OHLCV, raw, or feature dependency records the feature receives |
-| Strategy lookback | Strategy's `inputConfig` | How many OHLCV, raw, or feature records the strategy sees              |
-
-Strategy lookback can also extend upstream raw/feature computation ranges so the
-requested records are available to the strategy.
+| Feature lookback  | Feature's `inputConfig`  | How many bars the feature function receives for computation |
+| Strategy lookback | Strategy's `inputConfig` | How many feature outputs the strategy function sees         |
 
 **Quick reference**:
 
@@ -652,8 +652,7 @@ requested records are available to the strategy.
 - MACD(12,26,9): Feature lookback `{ count: 25 }`
 - Crossover detection: Strategy lookback `{ count: 1 }` (see 2 values: current +
   previous)
-- Current activation data only: Omit lookback (record count depends on trigger
-  and data frequency)
+- Current value only: Omit lookback (default 0 = see 1 value)
 
 **Never adjust `startDate` for warmup**: Use `lookback` in feature/strategy
 `inputConfig` instead.
@@ -687,15 +686,16 @@ trades.
 
 | Weight | Meaning                     |
 | ------ | --------------------------- |
-| `0`    | Close entire position (exit) |
+| `0`    | Sell entire position (exit) |
 | `0.5`  | 50% of equity in this asset |
 | `1.0`  | 100% long (fully invested)  |
 | `-1.0` | 100% short                  |
-| `2.0`  | 200% long target, subject to margin limits |
+| `2.0`  | 200% long (2x leverage)     |
 
-- Existing positions omitted from `weights` are also targeted to `0` and closed
+- Missing symbols are left unchanged (not sold)
 - If weights sum to < 1.0, remainder stays as cash
-- Repeating the same target weights rebalances to those weights
+- Long positions with same weight are idempotent (no trade)
+- Short positions compound (NOT idempotent)
 
 ### Order-Based Execution
 
@@ -721,14 +721,26 @@ const { Amount } = FeedAltraModule;
 
 Amount.base(0.5); // 0.5 units of base asset (e.g. 0.5 BTC)
 Amount.quote(100); // $100 worth
-Amount.ofCash(0.5); // 50% of available cash (buy orders only)
-Amount.ofPosition(0.5); // 50% of current position size
-Amount.ofEquity(0.05); // 5% of portfolio equity
+Amount.ofCash(0.5); // 50% of available cash (buy/short only)
+Amount.ofPosition(0.5); // 50% of current position (sell only)
 ```
 
-Use either an `allocate` instruction or an `orders` instruction in a target.
-Do not put `orders` inside an `allocate` instruction; current execution only
-uses the `weights` for `allocate` targets.
+### Composite Targets
+
+Combine orders and weights in one target. Orders execute first, then weights
+apply to the updated portfolio.
+
+```javascript
+{
+  date: tick,
+  instruction: {
+    type: "allocate",
+    weights: [{ symbol: SYMBOL, weight: 0.8 }],
+    orders: [{ symbol: SYMBOL, side: "buy", amount: Amount.quote(100) }],
+  },
+  meta: { reason: "Rebalance to 80% + DCA $100" },
+}
+```
 
 ---
 
@@ -905,7 +917,7 @@ Use `@test/suite` for unit testing strategy components.
 
 ```javascript
 const { describe, it, expect, runTests } = require("@test/suite:v1.0.0");
-const { SYMBOL, STRATEGY_INTERVAL, TICK } = require("./constants.js");
+const { SYMBOL, INTERVAL, TICK } = require("./constants.js");
 const { discountFeatureFn } = require("./features.js");
 
 function createMockBars(count, basePrice, startTime) {
@@ -924,7 +936,7 @@ describe("Feature: discount_30d", () => {
   it("returns empty when insufficient bars", () => {
     const mockData = {
       ohlcvs: {
-        [SYMBOL]: { [STRATEGY_INTERVAL]: createMockBars(29, 100000, 1733011200000) },
+        [SYMBOL]: { [INTERVAL]: createMockBars(29, 100000, 1733011200000) },
       },
     };
     const result = discountFeatureFn(mockData, {
@@ -942,7 +954,7 @@ runTests({ verbose: true });
 
 ```javascript
 const { describe, it, expect, runTests } = require("@test/suite:v1.0.0");
-const { SYMBOL, STRATEGY_INTERVAL, TICK } = require("./constants.js");
+const { SYMBOL, INTERVAL, TICK } = require("./constants.js");
 const { strategyFn, initialState } = require("./strategy.js");
 
 function createMockCtx(overrides) {
@@ -951,7 +963,7 @@ function createMockCtx(overrides) {
     data: {
       ohlcvs: {
         [SYMBOL]: {
-          [STRATEGY_INTERVAL]: [
+          [INTERVAL]: [
             { date: 1733011200000, endTime: 1733097600000, close: 90000 },
           ],
         },

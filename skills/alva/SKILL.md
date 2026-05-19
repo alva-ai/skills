@@ -1527,8 +1527,10 @@ usually incomplete — see
 See [altra-trading.md](references/altra-trading.md) for full details.
 
 ```javascript
-const { FeedAltraModule, createArraysOhlcvProvider } = require("@alva/feed");
+const { FeedAltraModule } = require("@alva/feed");
 const { FeedAltra, e, Amount } = FeedAltraModule;
+const { AltraModule } = require("@alva/graph");
+const { createArraysOhlcvProvider } = AltraModule;
 const secret = require("secret-manager");
 
 const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
@@ -1546,8 +1548,8 @@ const altra = new FeedAltra(
 );
 
 const dg = altra.getDataGraph();
-dg.registerOhlcv("BINANCE_SPOT_BTC_USDT", "1d"); // supported interval strings include "1min", "15min", "1d"
-dg.registerFeature(createRsiFeature()); // feature descriptors include description, inputConfig, fields, and fn
+dg.registerOhlcv("BINANCE_SPOT_BTC_USDT", "1d"); // any interval: "1min" to "1w"
+dg.registerFeature({ name: "rsi" /* ... */ });
 
 altra.setStrategy(strategyFn, {
   trigger: { type: "events", expr: e.ohlcv("BINANCE_SPOT_BTC_USDT", "1d") },
@@ -1724,9 +1726,8 @@ consistent read pattern (`@last`, `@range`, etc.).
 - **Altra `run()` is async.** `FeedAltra.run()` returns a `Promise<RunResult>`.
   Always `await` it: `const result = await altra.run(endDate);`
 - **Altra lookback: feature vs strategy.** Feature lookback controls how many
-  historical records feature computation receives. Strategy lookback controls
-  the OHLCV, raw, and feature records delivered to the strategy, and can extend
-  upstream raw/feature computation ranges so requested records are available.
+  bars the feature computation sees. Strategy lookback controls how many feature
+  outputs the strategy function sees. They are independent.
 - **Quote `~` paths to prevent shell expansion.** The shell expands bare `~` to
   your local home (e.g. `/Users/alice/`), not the ALFS home
   (`'/alva/home/alice/'`). Always quote paths: `--path '~/feeds/...'`.
