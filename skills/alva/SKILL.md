@@ -814,19 +814,25 @@ deleted by the user.
    a new one**, stop before calling `alva release playbook`. Tell the
    user the existing playbook must be deleted first, and ask which path
    they want:
-   - **Delete the old playbook** — direct the user to remove their
-     existing playbook from the Alva dashboard, then resume. Do not
-     attempt to "rename around" the cap, reuse the old playbook's
-     name without an explicit deletion, or assume any in-app replace
-     flow will migrate `display_name`, feeds, or cronjobs cleanly —
-     it currently does not, and the old public URL can end up showing
-     the new playbook's HTML with stale metadata.
+   - **Delete the old playbook** — list their existing playbooks and
+     confirm which one to remove, then call the CLI directly:
+     ```bash
+     alva playbook list                        # show what they have
+     alva playbook delete --name <old-name>    # soft-delete (frees the quota immediately)
+     ```
+     Do **not** suggest `alva fs remove --path ~/playbooks/<name>` —
+     that only clears ALFS files; the DB row stays and the quota stays
+     consumed. Do not attempt to "rename around" the cap, reuse the
+     old playbook's name without an explicit deletion, or assume any
+     in-app replace flow will migrate `display_name`, feeds, or
+     cronjobs cleanly — it currently does not, and the old public URL
+     can end up showing the new playbook's HTML with stale metadata.
    - **Keep both** — only possible on Pro. Offer the upgrade path at
      <https://alva.ai/pricing>.
 
-   After the user confirms the deletion, re-run the full release
-   pipeline (draft → README → release) for the new playbook from
-   scratch under a fresh `name`.
+   After the deletion call returns, re-run the full release pipeline
+   (draft → README → release) for the new playbook from scratch under
+   a fresh `name`.
 3. **Upsell only on friction**: Do **not** proactively suggest upgrading.
    But when the user's experience is degraded because of free-tier
    limitations — wanting private playbooks, hitting the one-playbook cap,
