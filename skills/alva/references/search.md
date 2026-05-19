@@ -18,11 +18,12 @@ backfill its history), use the `feed_widgets` partition instead. The search SDKs
 
 ### Finance Search
 
-- **Search**: `searchPerplexityFinance` for live financial quotes, market data, company facts, filings, and sourced finance answers.
-- **Intended role**: fallback for non-US equity / international-market questions, or other finance facts where the structured Alva SDKs do not have enough coverage.
-- **Best fit**: use when the user asks for a current non-US stock quote, valuation, filing, corporate fact, or market-data answer that benefits from sourced live lookup.
+- **Search**: `searchPerplexityFinance` — a live, source-cited finance answer engine covering quotes, company profiles, financial statements and ratios, valuation and pricing, earnings, analyst estimates, segment/KPI metrics, market movers, and ownership/corporate actions.
+- **Intended role**: fallback for non-US equity / international-market questions, or other finance facts the structured Alva SDKs do not cover.
+- **Non-US market coverage**: use this for non-US listings and foreign-company ADRs, which the US-centric structured Alva SDKs cover poorly or not at all. Coverage is web-backed and best-effort, not a guaranteed dataset — depth and freshness track how well a market is reported online, so a large cap on a liquid exchange returns far more than a small cap on a thin one. Disambiguate the listing in the query — local ticker + exchange, or full company name (e.g. "Toyota 7203 on the Tokyo Stock Exchange", "HSBC on the LSE") — and verify the answer against the `sources` it returns.
+- **Query scoping**: state the business question first, then the company or ticker, then an explicit time window (`latest quarter`, `last 30 days`); it answers best when the prompt names the outcome, not the data shape.
 - **Fields**: `summary`, `data`/`arrays` result blocks, `tickers`, `sources`, and provider `usage` metadata when available.
-- **Gotcha**: This is a live search/answer tool, not a historical time-series endpoint. For US equities, deterministic OHLCV, fundamentals, earnings, or macro series, prefer the structured Alva data SDKs first and use finance search only as a fallback for missing coverage, current context, or source-backed enrichment.
+- **Gotcha**: a live search/answer tool, not a historical time-series endpoint. For US equities and deterministic OHLCV, fundamentals, earnings, or macro series, prefer the structured Alva data SDKs first; use finance search only as a fallback for missing coverage, current context, or source-backed enrichment.
 
 ### Twitter/X
 
