@@ -314,16 +314,8 @@ fetch) when the SDK can serve the original request.
 2. **Playbook HTML MUST fetch data at runtime** from feed output paths.
    Published HTML runs in the viewer's browser, so do not use sandbox-only env
    vars such as `$ALVA_ENDPOINT` and do not guess `https://api.alva.ai`. Use the
-   public anonymous ALFS read gateway:
-
-   ```javascript
-   const PUBLIC_ALFS_READ_URL = "https://api-llm.prd.alva.ai/api/v1/fs/read?path=";
-   const feedPath = "/alva/home/<user>/feeds/<name>/v1/data/<group>/<output>/@last/<n>";
-   const resp = await fetch(PUBLIC_ALFS_READ_URL + encodeURIComponent(feedPath));
-   if (!resp.ok) throw new Error(`Failed to load ${feedPath}: HTTP ${resp.status}`);
-   const data = await resp.json();
-   renderChart(data);
-   ```
+   public anonymous ALFS read gateway — see the `readAlfsJson` helper in
+   [Build the Playbook Web App](#6-build-the-playbook-web-app).
 
    Static content (labels, colors, layout config) is fine. Quantitative data is
    not — it must flow through the feed pipeline.
@@ -600,20 +592,14 @@ playbooks under other users' namespaces unless the request explicitly asks for
 cross-user operations (e.g. remix with lineage).
 
 **Strategy / backtest / signal feeds require Altra**: Any feed that produces
-`signal/targets` or `signal/alerts` output, **or that performs backtesting,
-strategy evaluation, or portfolio simulation**, MUST use `FeedAltra`. Manual
-construction (hand-rolled `for` loops over price arrays, custom P&L
-accumulators, custom rebalancing logic, or any direct target-record building
-without Altra) bypasses bar alignment, portfolio simulation, and look-ahead
-bias prevention. Use `FeedAltra` even for simple signal logic — it ensures
-correct timestamps and prevents forward-looking bugs.
-
-This rule covers any feed that computes equity curves, drawdown, Sharpe,
-returns, position tracking, or rebalancing — not only feeds that emit
-`signal/targets`. It also applies to ALL feed types that produce signal
-output — monitoring feeds, alert feeds, notification feeds, and backtest
-strategies alike. If the feed produces `signal/targets`, it MUST use
-`FeedAltra`.
+`signal/targets` or `signal/alerts`, or that performs backtesting, portfolio
+simulation, equity-curve / drawdown / Sharpe computation, position tracking, or
+rebalancing, MUST use `FeedAltra` — even for simple signal logic. Hand-rolled
+`for` loops over price arrays, custom P&L accumulators, and direct
+target-record building bypass bar alignment, portfolio simulation, and
+look-ahead-bias prevention. See the
+[Altra Trading Engine Quick Reference](#altra-trading-engine-quick-reference)
+for the rationale.
 
 **Push notification streams:** Subscriptions target feed/playbook resources,
 not output paths. The output path only chooses the feed-alert source:
@@ -974,9 +960,11 @@ before reporting success.
 | [deployment.md](references/deployment.md) | Deploying scripts as cronjobs for scheduled execution |
 | [design-system.md](references/design-system.md) | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
 | [remix-workflow.md](references/remix-workflow.md) | Remix: create a new playbook from an existing template |
+| [creators-note.md](references/creators-note.md) | Post-release creator's note: composing and posting the pinned author comment |
 | [adk.md](references/adk.md) | Agent Development Kit: `adk.agent()` API, tool calling, ReAct loop, examples |
 | [search.md](references/search.md) | Content search SDKs: per-source usage, enrichment patterns, and gotchas for Twitter/X, news, Reddit, YouTube, podcasts, and web |
 | [secret-manager.md](references/secret-manager.md) | Secret upload, CRUD API, and runtime usage via `require("secret-manager")` |
+| [memory.md](references/memory.md) | Per-user memory: storage layout, `user.md` template, what to save, read/write rules |
 | [narrative-voice.md](references/narrative-voice.md) | Voice rules for user-facing prose: banned tokens/shapes, copy-paste ADK system-prompt block with few-shots |
 | [language.md](references/language.md) | Canonical product vocabulary: automation, playbook, alert, Agent, and when feed must stay internal |
 
@@ -1000,7 +988,7 @@ a routing index — and, for the rows in bold, the linked sub-doc is a
 | `sdk` | Runtime libraries (50+ technical indicators, search, widgets). |
 | `data-skills` | Discover the 250+ Arrays financial-data endpoints. |
 | `skillhub` | Pull curated methodology blueprints (`/use-skill:` flow). |
-| `comments` | Create / pin / unpin playbook comments. |
+| `comments` | Create / pin / unpin playbook comments — see [creators-note.md](references/creators-note.md) for the post-release creator's-note workflow. |
 | `push-subscriptions` | Personal push opt-in for playbooks and feeds. |
 | `channel` | Group push subscriptions (Telegram / Discord groups). |
 | `trading` | Accounts, portfolio, orders, signals, risk. **Must read [trading.md](references/api/trading.md)** before `execute`, building a signal JSON, or picking an exchange/symbol — real `--signal` schema is `allocate`/`predict` (not the `{symbol,side,qty}` shape the help example shows), `date` is epoch seconds. |
@@ -1010,7 +998,6 @@ a routing index — and, for the rows in bold, the linked sub-doc is a
 | `auth` / `configure` | Sign in, save API key + endpoint into a named profile. |
 
 Non-CLI references:
-[notification-history.md](references/api/notification-history.md) — gateway shape for auditing past notifications (CLI not yet wired up). ·
 [error-responses.md](references/api/error-responses.md) — HTTP status → error-code table for programmatic error handling.
 
 ---
@@ -1048,9 +1035,9 @@ with `Authorization: Bearer <ARRAYS_JWT>`.
 `secret.loadPlaintext("OPENAI_API_KEY")`. This returns a string when present or
 `null` when the current user has not uploaded that secret.
 
-**Key constraints**: No top-level `await` (wrap script in
-`(async () => { ... })();`). No Node.js builtins (`fs`, `path`, `http`). Module
-exports are frozen.
+**Key constraints**: Module exports are frozen. For absent globals — no
+top-level `await`, no `process`, no Node.js builtins — see
+[JS Runtime](#2-js-runtime).
 
 ---
 
@@ -1083,56 +1070,9 @@ if (!equityRecords.length) throw new Error("equityRecords empty: no aligned bars
 const finalEq = equityRecords[equityRecords.length - 1].equity;
 ```
 
-```javascript
-const { Feed, feedPath, makeDoc, num } = require("@alva/feed");
-const http = require("net/http");
-const secret = require("secret-manager");
-const { indicators } = require("@alva/algorithm");
-
-const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
-const ARRAYS_BASE = "https://data-tools.prd.space.id";
-
-const feed = new Feed({ path: feedPath("btc-ema") });
-
-feed.def("metrics", {
-  prices: makeDoc("BTC Prices", "Close + EMA10", [num("close"), num("ema10")]),
-});
-
-(async () => {
-  await feed.run(async (ctx) => {
-    const raw = await ctx.kv.load("lastDate");
-    const lastDateMs = raw ? Number(raw) : 0;
-
-    const now = Math.floor(Date.now() / 1000);
-    const start =
-      lastDateMs > 0 ? Math.floor(lastDateMs / 1000) : now - 30 * 86400;
-
-    const resp = await http.fetch(
-      `${ARRAYS_BASE}/api/v1/crypto/ohlcv?symbol=BTCUSDT&start_time=${start}&end_time=${now}&interval=1h&limit=10000`,
-      { headers: { Authorization: "Bearer " + ARRAYS_JWT } }
-    );
-    const bars = JSON.parse(await resp.text()).data.slice().reverse();
-    const closes = bars.map((b) => b.close);
-    const ema10 = indicators.ema(closes, { period: 10 });
-
-    const records = bars
-      .map((b, i) => ({
-        date: b.date,
-        close: b.close,
-        ema10: ema10[i] || null,
-      }))
-      .filter((r) => r.date > lastDateMs);
-
-    if (records.length > 0) {
-      await ctx.self.ts("metrics", "prices").append(records);
-      await ctx.kv.put("lastDate", String(records[records.length - 1].date));
-    }
-  });
-})();
-```
-
-Feed output is readable at (ALFS — quote in CLI):
-`'~/feeds/btc-ema/v1/data/metrics/prices/@last/100'`
+For a complete worked feed (schema, incremental `ctx.kv` watermark, time-series
+append) and the output read path, see the Quick Start in
+[feed-sdk.md](references/feed-sdk.md).
 
 ---
 
@@ -1345,128 +1285,21 @@ alva run --code '(async()=>{const http=require("net/http");const secret=require(
 
 ## Memory
 
-You have a persistent, file-based memory system on ALFS at `'~/memory/'`. This
-directory is created automatically when the user's account is provisioned. Use
-it to accumulate knowledge about the user across conversations — their identity,
-preferences, investment style, and any context that would be useful in future
-sessions.
+Alva gives every user a persistent, file-based memory system on ALFS at
+`'~/memory/'`. Use it to accumulate knowledge about the user across
+conversations — identity, preferences, investment style, and context useful in
+future sessions.
 
-Memory files are **user-visible and editable**. The user can read, modify, or
-delete any memory file through the Alva dashboard or ALFS API. Write memories
-as if the user will read them.
+`'~/memory/MEMORY.md'` is the index; topic files such as `user.md` hold the
+content and are read on demand. Memory files are **user-visible and editable**
+— write them as if the user will read them. Memory is a *claim*, not truth: it
+records what was true when written, so verify any feed, cronjob, or parameter
+it names before acting on it.
 
-### Storage layout
-
-**ALFS paths** — use single quotes in the shell (example: `'~/memory/MEMORY.md'`).
-
-```
-~/memory/
-├── MEMORY.md     # Concise index — read at the start of every conversation
-└── user.md       # User profile, preferences, expertise, investment style
-```
-
-`MEMORY.md` is the entrypoint. Read it at the start of every conversation to
-discover what's stored. Keep it concise — under 200 lines. Each entry is one
-line linking to a topic file:
-
-```markdown
-- [user.md](user.md) — User identity, investment style, knowledge level
-- [market-views.md](market-views.md) — Current macro thesis, conviction trades
-```
-
-Topic files (like `user.md`) hold the actual content. They are read on demand
-when relevant to the user's request.
-
-### user.md — Who is this user
-
-Persistent facts about the user. Update when you learn something new.
-
-```markdown
-# User Profile
-
-> Auto-maintained by Alva Agent. You can edit directly.
-
-## Identity
-
-- Name:
-- Role: <!-- e.g. Independent Trader, PM at Fund, Research Analyst, Student -->
-- Timezone:
-- Language:
-
-## Investment Style
-
-- Markets: <!-- e.g. US Equities, Crypto, Macro, Commodities -->
-- Strategy: <!-- e.g. Momentum, Mean Reversion, Fundamental, Event-driven -->
-- Holding period: <!-- Intraday / Swing / Position / Long-term -->
-- Risk tolerance: <!-- Conservative / Moderate / Aggressive -->
-- Watching:
-
-## Knowledge
-
-- Level: <!-- Beginner / Intermediate / Advanced / Professional -->
-- Strong: <!-- e.g. Technical analysis, On-chain, Macro -->
-- Learning:
-- External tools: <!-- e.g. TradingView, Bloomberg, Dune -->
-
-## Preferences
-
-- Communication style: <!-- e.g. terse / detailed / visual -->
-- Notification channel:
-```
-
-**When to update:** User shares personal info, corrects a preference, reveals
-expertise level, states investment convictions, or you learn something that
-changes how you should work with them.
-
-### Additional topic files
-
-Create new files in `'~/memory/'` for knowledge that doesn't fit in `user.md` —
-market convictions, strategy assumptions, portfolio rules. Add a pointer to
-`MEMORY.md` for each new file.
-
-### What NOT to save
-
-- Ephemeral conversation details (current debugging session, temp state)
-- Things derivable from code or ALFS files
-- Raw data or large outputs (store on ALFS as feed data, not in memory)
-- Anything already in the Alva skill docs
-- Market data that changes every minute (save your *interpretation*, not the
-  data)
-
-### Writing rules
-
-1. **Read `'~/memory/MEMORY.md'` first** — check if a relevant file already exists
-2. **Update existing file** if the topic matches. Don't create duplicates
-3. **Create new file** only if no existing file covers the topic
-4. **Update `MEMORY.md`** — add a one-line entry for each new file
-5. Keep `MEMORY.md` as a concise index — one line per file, under 120 characters
-6. **Every write → confirm in chat:** 📌 Memory updated: {one-sentence summary}
-
-### Reading rules
-
-- **Every conversation start**: Read `'~/memory/MEMORY.md'` via ALFS. Then read
-  `user.md` and any topic files relevant to the user's request.
-- **User references prior work**: "that strategy from last time" / "the rules
-  we discussed" → read the relevant memory file.
-- **User explicitly asks**: "do you remember" / "check my profile" → you
-  **must** read.
-- **User says to ignore memory**: Proceed as if `'~/memory/'` is empty.
-
-### Memory is a claim, not truth
-
-Memory records what was true **when the memory was written**. Before acting on
-a memory:
-
-- Memory names a **feed or playbook** → verify it exists on ALFS before
-  referencing it.
-- Memory names a **cronjob or parameter** → verify current state before
-  recommending changes.
-- Memory records a **market view** → treat as the user's last-known position,
-  not current fact.
-- Memory records **user preferences** → apply directly (these are stable).
-
-If a memory conflicts with what the user just told you, **trust what the user
-says now** — and update the memory.
+Read `MEMORY.md` at the start of every conversation — this is wired into
+[Pre-flight](#5-load-memory). See [memory.md](references/memory.md) for the
+storage layout, the `user.md` profile template, what to save and what not, and
+the full read/write rules.
 
 ---
 
@@ -1736,10 +1569,6 @@ consistent read pattern (`@last`, `@range`, etc.).
   and safe to call anytime.
 - **Cronjob path must point to an existing script.** The deploy API validates
   the entry_path exists via filesystem stat before creating the cronjob.
-- **Run `alva release playbook-draft` before every `alva release
-  playbook`.** This holds for every release — first publish, version
-  bumps, and README-only or content-only re-releases of an existing
-  playbook.
 - **Create new playbooks from scratch unless you are doing a version update.**
   Only version updates may refer to an existing playbook. For all other new
   playbooks, do not read existing ones.
