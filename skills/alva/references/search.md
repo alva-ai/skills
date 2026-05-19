@@ -1,8 +1,11 @@
 # Content Search
 
 Search SDKs for discovering unstructured content across multiple sources.
-For handle-first access (subscribe to an account, or — Twitter only —
-backfill its history), use the `feed_widgets` partition instead. The search SDKs below live in the `unified_search` partition.
+For handle-first access: Twitter/X handle history and rolling feeds are
+served by Arrays Data Skills — see [§3 Data Skills in SKILL.md](../SKILL.md#3-data-skills)
+and follow the discovery pipeline. News, YouTube, Reddit, and podcasts
+handle subscriptions live in the `feed_widgets` partition. The search SDKs
+below live in the `unified_search` partition.
 
 ## SDK Modules
 

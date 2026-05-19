@@ -487,10 +487,12 @@ the patterns above.
 
 ### 3. Data Skills
 
-Financial data APIs across 16+ domains, served by the Arrays backend
-(`$ARRAYS_ENDPOINT`, defaults to `https://data-tools.prd.space.id`). To find
-the right API for a task, use the `alva data-skills` CLI (public, no auth).
-Follow the pipeline in order; do not skip steps and do not guess inputs.
+Structured data endpoints served by the Arrays backend
+(`$ARRAYS_ENDPOINT`, defaults to `https://data-tools.prd.space.id`),
+covering financial markets, on-chain analytics, macro indicators, news, and
+per-handle Twitter/X feeds (history and rolling updates). To find the right
+API for a task, use the `alva data-skills` CLI (public, no auth). Follow
+the pipeline in order; do not skip steps and do not guess inputs.
 
 1. **`alva data-skills list`** — every skill id is namespaced `arrays-data-api-*`
    and is not predictable from concept words, so always start here. Pipe
@@ -509,7 +511,17 @@ Follow the pipeline in order; do not skip steps and do not guess inputs.
 Data skills span spot and derivatives markets across stocks, ETFs, options,
 and crypto; equity fundamentals, estimates, events, and ownership flows;
 on-chain metrics and exchange flows; macro and economic indicators; news;
-and prediction markets. Run `alva data-skills list` for the live catalog.
+prediction markets; and per-handle Twitter/X feeds (history and rolling
+updates). Run `alva data-skills list` for the live catalog.
+
+**Source routing.**
+
+| Need                                                                              | Surface                                                  |
+| --------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| Financial data (markets, fundamentals, on-chain, macro, news, prediction markets) | [`alva data-skills` CLI](#3-data-skills)                 |
+| Twitter/X by handle (history + rolling)                                           | [`alva data-skills` CLI](#3-data-skills)                 |
+| Handle subscriptions for news, YouTube, Reddit, podcasts                          | [`feed_widgets`](#runtime-libraries)                     |
+| Topic/keyword search (Twitter, news, web, etc.)                                   | [`unified_search`](#content-search)                      |
 
 **Data skill doc lookup is mandatory.** Always fetch the endpoint detail before
 writing code that calls it. Do not guess paths, parameter names, or response
@@ -538,7 +550,7 @@ available in every script execution.
 
 | Module group                              | Description                                                               |
 | ----------------------------------------- | ------------------------------------------------------------------------- |
-| `feed_widgets`                            | Per-handle/channel rolling subscriptions — news, Twitter/X, YouTube, Reddit, podcasts (e.g. `getTwitterFeed`). Twitter also has historical backfill over a time window (`getTwitterBackfill`, Pro-gated). For topic/keyword search, use [Content Search](#content-search). |
+| `feed_widgets`                            | Per-handle/channel rolling subscriptions for news, YouTube, Reddit, and podcasts. For Twitter/X handle feeds, use [Data Skills](#3-data-skills). For topic/keyword search, use [Content Search](#content-search). |
 | `unified_search`                          | Web, social, fallback non-US finance search, and URL scraping tools (X/Grok, Perplexity Finance, Google, Brave, serper, decodo) |
 | `technical_indicator_calculation_helpers` | 50+ pure calculation helpers (RSI, MACD, Bollinger, etc.)                 |
 
@@ -997,10 +1009,11 @@ variables, or shell. Host-agent permissions still apply. See
 `alva sdk doc --name "..."`. Module groups: `feed_widgets`,
 `technical_indicator_calculation_helpers`, `unified_search`.
 
-**Data APIs**: Financial data (crypto, stock, macro, ETF) is fetched via HTTP
-from the Arrays backend — see the [Data Skills](#3-data-skills) section. Load
-`ARRAYS_JWT` via `secret.loadPlaintext('ARRAYS_JWT')` and call Arrays endpoints
-with `Authorization: Bearer <ARRAYS_JWT>`.
+**Data APIs**: Structured data (financial markets, on-chain, macro, news,
+per-handle Twitter/X feeds) is fetched via HTTP from the Arrays backend —
+see the [Data Skills](#3-data-skills) section. Load `ARRAYS_JWT` via
+`secret.loadPlaintext('ARRAYS_JWT')` and call Arrays endpoints with
+`Authorization: Bearer <ARRAYS_JWT>`.
 
 **Secret Manager**: use `const secret = require("secret-manager");` then
 `secret.loadPlaintext("OPENAI_API_KEY")`. This returns a string when present or
