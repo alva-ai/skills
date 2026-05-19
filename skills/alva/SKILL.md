@@ -531,7 +531,7 @@ available in every script execution.
 | Module group                              | Description                                                               |
 | ----------------------------------------- | ------------------------------------------------------------------------- |
 | `feed_widgets`                            | Per-handle/channel rolling subscriptions — news, Twitter/X, YouTube, Reddit, podcasts (e.g. `getTwitterFeed`). Twitter also has historical backfill over a time window (`getTwitterBackfill`, Pro-gated). For topic/keyword search, use [Content Search](#content-search). |
-| `unified_search`                          | Web, social, fallback non-US finance search, and URL scraping tools (X/Grok, Perplexity Finance, Google, Brave, serper, decodo) |
+| `unified_search`                          | Web, social, non-US finance search, and URL scraping tools (X/Grok, Perplexity Finance, Google, Brave, serper, decodo) |
 | `technical_indicator_calculation_helpers` | 50+ pure calculation helpers (RSI, MACD, Bollinger, etc.)                 |
 
 To discover available modules and their documentation:
@@ -551,15 +551,16 @@ external HTTP APIs within the runtime.
 
 #### Content Search
 
-Search across Twitter/X, fallback non-US finance data, news, Reddit, YouTube, podcasts, and general web.
+Search across Twitter/X, non-US finance data, news, Reddit, YouTube, podcasts, and general web.
 Use whenever the playbook needs content beyond structured data SDKs — from
 targeted queries ("what are people saying about NVDA earnings") to broad
 discovery ("trending crypto discussions this week"), including social
-discussions, finance-search lookup for non-US equities and off-catalog asset
-classes (forex, traditional index/commodity futures) the structured SDKs do
-not cover, market narratives, news coverage, sentiment, analyst commentary,
-and community reactions. For US equities, crypto, and deterministic
-time-series/fundamental data, prefer the structured Alva data SDKs first.
+discussions, finance search as the primary source for non-US equities and
+the fallback for off-catalog asset classes (forex, traditional
+index/commodity futures), market narratives, news coverage, sentiment,
+analyst commentary, and community reactions. For US equities, crypto, and
+deterministic time-series/fundamental data, prefer the structured Alva data
+SDKs first.
 
 Content search modules live in the `unified_search` runtime-library
 partition. Discover them via the same partition API as the other runtime
