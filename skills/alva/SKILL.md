@@ -514,7 +514,7 @@ on-chain metrics and exchange flows; macro and economic indicators; news;
 prediction markets; and per-handle Twitter/X feeds (history and rolling
 updates). Run `alva data-skills list` for the live catalog.
 
-**Source routing.**
+**Source routing**
 
 | Need                                                                              | Surface                                                  |
 | --------------------------------------------------------------------------------- | -------------------------------------------------------- |
