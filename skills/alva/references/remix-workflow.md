@@ -9,25 +9,26 @@ customizes them per the user's preferences, and deploys a new playbook.
 
 ## Prompt Format
 
-The Remix prompt arrives in this shape:
+The Remix prompt arrives as a `<remix>` tag emitted by the Remix button.
+A typical message looks like:
 
 ```
-Use Alva skill to remix this Playbook(@alice/btc-momentum) into my own version:
-
-1. Customize it based on my preferences
-2. Deploy as a new playbook under my account
-
-If I don't specify what to change, ask me what I'd like to customize.
+<remix title="energy-dashboard" type="playbook" url="/u/henryliu/playbooks/energy-dashboard" playbook-kind="dashboard">Remix Playbook: Deploy as a new playbook under my account</remix>
+hi
 ```
 
-The `@{owner}/{name}` token after "Playbook(" contains the two key fields:
+Parse the tag's attributes:
 
-| Field   | Description                                  | Extracted From        |
-| ------- | -------------------------------------------- | --------------------- |
-| `owner` | Username of the original creator             | Before the `/`        |
-| `name`  | Filesystem name (URL-safe slug used in ALFS) | After the `/`         |
+| Attribute       | Description                                                            | Used For                                  |
+| --------------- | ---------------------------------------------------------------------- | ----------------------------------------- |
+| `url`           | Canonical web path: `/u/{owner}/playbooks/{name}`                      | **Authoritative** source of owner + name  |
+| `title`         | Filesystem name (URL-safe slug, same as `{name}` in `url`)             | Cross-check against `url`                 |
+| `type`          | Resource type — currently always `playbook`                            | Routing (skip if not `playbook`)          |
+| `playbook-kind` | Sub-kind of playbook (e.g. `dashboard`)                                | Context only; doesn't change the workflow |
 
-For the example above: owner = `alice`, name = `btc-momentum`.
+Extract `owner` and `name` from the `url` attribute (between `/u/` and
+`/playbooks/`, and after `/playbooks/`). For the example above: owner =
+`henryliu`, name = `energy-dashboard`.
 
 Together they resolve to the ALFS base path (quote in CLI):
 
@@ -35,9 +36,18 @@ Together they resolve to the ALFS base path (quote in CLI):
 '/alva/home/{owner}/playbooks/{name}/'
 ```
 
-**Behavior note**: If the user's prompt does not specify what to change (only
-the default "Customize it based on my preferences"), the agent should **ask the
-user what they'd like to customize** before proceeding.
+**Behavior note**: The tag's inner text ("Remix Playbook: Deploy as a new
+playbook under my account") is a fixed instruction, **not** the user's
+customization request. The user's actual ask is whatever text they typed
+**outside** the tag (in the example above, just "hi"). If that text is
+empty, a greeting, or otherwise doesn't describe what to customize,
+**ask the user what they'd like to customize** before proceeding —
+do not start editing on the strength of the tag alone.
+
+> Legacy: older sessions may still arrive as
+> `Use Alva skill to remix this Playbook(@{owner}/{name}) ...` plain
+> text. Same two fields (`owner`, `name`) apply; the rest of this
+> workflow is unchanged.
 
 ---
 
@@ -125,13 +135,47 @@ re-release a source whose data layer was never legitimate.
 
 ---
 
+## Scope of Changes — Default Is Data, Not Design
+
+A remix is a **data/topic swap on top of an existing design**, not a
+redesign. Before editing anything, classify what the user asked for:
+
+| Layer                   | Default in a remix | When it's allowed to change                                       |
+| ----------------------- | ------------------ | ----------------------------------------------------------------- |
+| Data sources / symbols  | **Change**         | Always — this is the point of a remix                             |
+| Strategy parameters     | **Change**         | Always (thresholds, windows, cron frequency, namespace paths)     |
+| Topic / domain wording  | **Change**         | Always (titles, copy, README narrative — to fit the new subject)  |
+| **Tab names + order**   | **Preserve**       | Only if the user explicitly says so                               |
+| **Section structure**   | **Preserve**       | Only if the user explicitly says so                               |
+| **Card / chart layout** | **Preserve**       | Only if the user explicitly says so                               |
+| **README outline**      | **Preserve**       | Only if the user explicitly says so                               |
+
+"Customize it based on my preferences", "make a semiconductor version",
+"do one for healthcare" are **topic swaps** — they do **not** authorize
+restructuring tabs, sections, or layout. Only explicit structural
+requests do, e.g. "drop the Risks tab", "add a Summary section at the
+bottom", "merge News and Social into one tab".
+
+If the source structure conflicts with the new topic (e.g. source has a
+"News & Social" tab but the new topic has no usable news feed), **ask
+the user** whether to leave the tab empty/hidden or remove it. Do not
+silently restructure.
+
+Concretely, before uploading the edited HTML, diff its tab list and
+top-level section headings against the source. If they don't match and
+the user didn't ask for the change, revert the structure and re-apply
+only the data swap.
+
+---
+
 ## Step 5 — Deploy as New Playbook
 
 Follow the standard playbook creation flow (see SKILL.md), starting from
 the local files you downloaded in Steps 2–3. **Edit those files in
-place** with the `Edit` tool — change strategy parameters, swap data
-paths to your own namespace, apply the user's customization request —
-and only then upload them. Do not write fresh files from scratch.
+place** with the `Edit` tool — swap data paths to your own namespace,
+adjust strategy parameters, and apply the user's customization request
+**within the scope defined above** (data/topic by default; structure
+only on explicit request). Do not write fresh files from scratch.
 
 1. **Edit local feed script** (the `./{feed_name}.js` from Step 3) and
    upload to ALFS:
@@ -148,7 +192,7 @@ and only then upload them. Do not write fresh files from scratch.
    `alva fs write --path '~/playbooks/{new-name}/README.md' --file ./README.md --mkdir-parents`.
    See [release.md → Playbook README](api/release.md#playbook-readme).
 8. **Draft playbook**: `alva release playbook-draft --name {new-name} --display-name "..." --feeds '[{"feed_id":ID}]'`
-9. **Release playbook**: `alva release playbook --name {new-name} --version v1.0.0 --feeds '[{"feed_id":ID}]' --changelog "..." --readme-url '~/playbooks/{new-name}/README.md'` (same ALFS path you wrote to in step 7; quote it to prevent local `~` expansion)
+9. **Release playbook**: `alva release playbook --name {new-name} --version v1.0.0 --feeds '[{"feed_id":ID}]' --changelog "..." --readme-url '/alva/home/<username>/playbooks/{new-name}/README.md'` (absolute ALFS path; resolve `<username>` via `alva whoami` — the relative shorthand is no longer accepted)
 
 **Important**: The new playbook must use a unique name in your user space. The
 feed scripts must use **your own** ALFS paths (not the original owner's) for
@@ -171,15 +215,13 @@ alva remix --child-username {your_username} --child-name {new-name} --parents '[
 Given prompt:
 
 ```
-Use Alva skill to remix this Playbook(@alice/btc-momentum) into my own version:
-
-1. Customize it based on my preferences
-2. Deploy as a new playbook under my account
-
+<remix title="btc-momentum" type="playbook" url="/u/alice/playbooks/btc-momentum" playbook-kind="dashboard">Remix Playbook: Deploy as a new playbook under my account</remix>
 Add a summary section at the bottom.
 ```
 
-Extracted: owner = `alice`, name = `btc-momentum`.
+Extracted from the `url` attribute: owner = `alice`, name =
+`btc-momentum`. The user's customization request is the text after the
+tag: "Add a summary section at the bottom."
 
 Agent downloads sources to local files (so they can be edited in place,
 not retyped):
@@ -218,6 +260,6 @@ alva remix --child-username bob --child-name my-btc-strategy --parents '[{"usern
 | -------------- | ---------------------------- | ------------------------------------------ |
 | SDK discovery  | Search partitions, read docs | Already chosen in source feed              |
 | Data modeling  | Design schema from scratch   | Reuse source feed's `def()` schema         |
-| HTML structure | Build per design system      | Adapt source HTML, change data paths       |
+| HTML structure | Build per design system      | **Preserve tabs/sections/layout**, change only data paths and topic copy |
 | Strategy logic | Write from requirements      | Modify existing logic per user preferences |
 | Feed name      | User decides                 | Must be unique, distinct from source       |

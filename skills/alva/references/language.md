@@ -16,7 +16,7 @@ pipeline job, worker.
 
 **Playbook**
 A hosted investing app on Alva that shows analysis, dashboards, screeners, or
-trading signals to the user and their followers.
+trading signals to the user and explicitly subscribed viewers.
 _Avoid_: app, report (unless the playbook is literally a report).
 
 **Alert / Notification**

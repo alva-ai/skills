@@ -654,6 +654,10 @@ No `shadowBlur`, no `focus: 'series'`.
   display: flex;
   align-items: center;
 }
+
+/* Gain/loss tinting — use these instead of inline style="color:…" on cells */
+.table-cell.is-bullish { color: var(--main-m3); }
+.table-cell.is-bearish { color: var(--main-m4); }
 ```
 
 ### Template
@@ -698,6 +702,17 @@ No `shadowBlur`, no `focus: 'series'`.
 Body cell: `max-height: 180px`. Column widths are handled by
 `initTableAlignment` — do not set `width` on cells.
 
+### Gain/Loss Tinting
+
+For positive/negative values, use the `.is-bullish` / `.is-bearish` utility
+classes — **do NOT** use inline `style="color:…"` on cells. The class form
+centralizes the bullish/bearish token reference and survives any future
+style-reset logic on cells.
+
+```javascript
+`<div class="table-cell ${v >= 0 ? 'is-bullish' : 'is-bearish'}">${fmtPct(v)}</div>`
+```
+
 ### Column Alignment
 
 Column widths are **proportional to content** and **never narrower than the
@@ -706,7 +721,8 @@ widest item**. Overflow triggers horizontal scroll. Do NOT use inline
 
 **4-phase algorithm**:
 
-1. **Reset** — `removeAttribute('style')` on all cells, clear row `min-width`.
+1. **Reset** — clear `flex` / `min-width` / `width` on cells (keep color/font set
+   by renderers), clear row `min-width`.
 2. **Measure** — `scrollWidth` per column (max across all rows).
 3. **Resolve** — `resolved = max(colWidth, colWidth/total × available)`. Wide
    container → proportional fill. Narrow → lock at content width.
@@ -720,12 +736,15 @@ function initTableAlignment(tableEl) {
   if (rows.length === 0) return;
   var colCount = rows[0].querySelectorAll(".table-cell").length;
 
-  // Phase 1: Reset — nuke all inline styles for clean measurement
+  // Phase 1: Reset — clear layout props only (preserve renderer-set color/font)
   rows.forEach(function (row) {
     row.style.removeProperty("min-width");
     var cells = row.querySelectorAll(".table-cell");
     for (var i = 0; i < cells.length; i++) {
-      cells[i].removeAttribute("style");
+      // Clear only layout props set by Phase 4 — preserve color/font from renderers.
+      cells[i].style.removeProperty("flex");
+      cells[i].style.removeProperty("min-width");
+      cells[i].style.removeProperty("width");
     }
   });
 
@@ -771,9 +790,12 @@ function initTableAlignment(tableEl) {
 
 > **Timing**: Call after populating the table and on `resize`. Idempotent.
 >
-> **Key**: Phase 1 uses `removeAttribute('style')` (not `style.flex=''`) because
-> browsers don't reliably clear flex longhands. Phase 4 sets explicit pixel
-> `min-width` on rows because CSS `min-width:max-content` varies per-row.
+> **Key**: Phase 1 uses `style.removeProperty('flex')` rather than nuking the
+> whole `style` attribute. The shorthand removal also clears the
+> `flex-grow/shrink/basis` longhands set by Phase 4, so the layout reset stays
+> clean while inline `color` set by row renderers (gain/loss tinting) survives.
+> Phase 4 sets explicit pixel `min-width` on rows because CSS
+> `min-width:max-content` varies per-row.
 
 ### Responsive
 

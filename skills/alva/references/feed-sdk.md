@@ -164,11 +164,12 @@ Read `@last/N` (where N >= batch size) to get the most recent batch.
 
 ### Pattern D: Signal / Playbook Push Notification
 
-For feeds that produce actionable signals worth pushing to playbook followers
-or groups subscribed to a playbook. Write signal records to the **`signal`**
-group with a **`targets`** output -- the resulting path
-`~/feeds/{name}/v{major}/data/signal/targets` is the convention the platform
-reads when dispatching the `playbook_data_ready` notification event.
+For feeds that produce actionable signals worth pushing to users or groups
+that explicitly subscribed to the feed, or to a playbook that references the
+feed. Write signal records to the **`signal`** group with a **`targets`**
+output -- the resulting path
+`~/feeds/{name}/v{major}/data/signal/targets` is one source the platform reads
+when dispatching the canonical `feed_alert_ready` notification event.
 
 The target format follows the same structure used by Altra trading strategies:
 
@@ -216,16 +217,22 @@ await feed.run(async (ctx) => {
 });
 ```
 
-When this feed runs as a cronjob, the platform reads
-`/data/signal/targets` and dispatches the signal content as
-`playbook_data_ready` to eligible playbook notification targets. Telegram
-delivery chunks long messages at the platform's per-message limit; the feed SDK
-does not require a 500-character summary.
+When this feed runs as a cronjob with `--push-notify`, the platform reads
+`/data/signal/targets` and dispatches the signal content as `feed_alert_ready`
+to eligible feed/playbook notification subscriptions. Telegram delivery chunks
+long messages at the platform's per-message limit; the feed SDK does not
+require a 500-character summary.
 
 **Key points:**
 
 - The group **must** be named `signal` and the output **must** be named
   `targets` -- this is the path the notification system looks for.
+- `--push-notify` and `alva release feed --cronjob-id ...` only make the feed
+  publisher capable of emitting alerts. They do **not** subscribe any user or
+  group.
+- Real delivery requires an explicit subscription: personal
+  `alva push-subscriptions subscribe-feed` / `subscribe-playbook`, or group
+  `/alva subscribe feed <id>` / `/alva subscribe playbook <id>`.
 - Use `meta.reason` to provide the push-notification body -- this is what
   recipients see when the signal is delivered.
 - `meta.reason` is **Markdown**. Write it as the push body itself, using
@@ -251,10 +258,9 @@ as a feed completion notification. Common use cases: scheduled market reports,
 periodic research summaries, heartbeat monitoring, and proactive alerts.
 
 Write the agent's response to the **`notify`** group with a **`message`**
-output. When the cronjob completes, the platform reads this path and dispatches
-`feed_run_complete` to the feed owner via Web and any active IM channel, and
-to groups subscribed to this feed with
-`/alva subscribe feed <feed_id>`.
+output. When the cronjob completes with `--push-notify`, the platform reads
+this path and dispatches `feed_alert_ready` to users or groups that explicitly
+subscribed to the feed, or to a playbook that references the feed.
 
 ```javascript
 const { ask } = require("@alva/alvaask");
@@ -307,10 +313,14 @@ alva release feed --name daily-briefing --version 1.0.0 \
 - `text` is the notification body (required for content push).
 - **`alva release feed` is required** — without it, push notifications
   will not be delivered.
-- Does **not** require a playbook or followers for owner delivery — works for
-  any feed. Group delivery requires the group to subscribe to that feed.
+- `--push-notify` only enables publisher-side fanout. It does **not** create
+  personal or group subscriptions.
+- Real delivery requires an explicit subscription: personal
+  `alva push-subscriptions subscribe-feed --username <owner> --name <feed>`
+  or `subscribe-playbook`, or group `/alva subscribe feed <feed_id>` /
+  `/alva subscribe playbook <playbook_id>`.
 - Combine with Pattern D if you want both feed completion notifications and
-  playbook/follower signal notifications.
+  signal-style notifications.
 
 ### Deduplication
 
@@ -683,9 +693,9 @@ records if some timestamps have multiple items.
   data/               # Synth mount (auto-created)
     metrics/
       prices/         # Time series output
-        @last/100     # Virtual: last 100 points
-        @range/7d     # Virtual: last 7 days
-        @count        # Virtual: point count
+        @last/100                       # Virtual: last 100 points
+        @range/{start}..{end}           # Virtual: between two timestamps
+        @count                          # Virtual: point count
 ```
 
 ---
