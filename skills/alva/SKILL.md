@@ -1248,10 +1248,11 @@ When an SDK module returns a Pro-only or subscription error:
 
 ### Coverage Limitations
 
-When the user requests data outside Alva's supported asset classes (e.g. forex
-pairs, which are not in the Data Skills catalog), state the limitation upfront
-rather than discovering it through failed searches. Suggest BYOD alternatives
-if a public API exists.
+Some asset classes — e.g. forex pairs and traditional index/commodity
+futures — sit outside Alva's structured Data Skills catalog. State that
+upfront rather than discovering it through failed searches, then fall back to
+`searchPerplexityFinance` (see [search.md](references/search.md)); suggest
+BYOD only if that also falls short and a public API exists.
 
 ---
 
