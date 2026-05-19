@@ -852,6 +852,10 @@ Required evidence:
    Its source / cadence claims match the actual feed scripts and deployed
    cronjobs. Pass it via `--readme-url` as an absolute ALFS path (see the
    `--readme-url` rule in Step 7 above).
+9. **Push feeds are released**: Every cronjob this playbook deploys with
+   `push_notify: true` has a released feed (`alva release feed`, passing
+   `before-feed-release`) — without it the push fires a blank body. Items 1–3
+   only check feeds the HTML reads; a push-only feed is not caught there.
 
 If any item fails, do not release. Fix the issue, re-run
 `alva release playbook-draft` if metadata or backing files changed, then
@@ -920,9 +924,10 @@ Present a concrete recommendation, not a generic "want push?":
 
 If the feed already has the right push sidecar for the intended event
 (`signal/targets` for signal-style alerts, `notify/message` for feed
-completion / AlvaAsk reports) and `push_notify: true`, the publisher side is
-already configured. Still verify or create the user's/group's explicit
-subscription before claiming notifications are set up.
+completion / AlvaAsk reports), `push_notify: true`, and a current
+`alva release feed`, the publisher side is already configured. Still verify or
+create the user's/group's explicit subscription before claiming notifications
+are set up.
 
 #### Configure and verify
 
@@ -933,21 +938,26 @@ verification.
 1. **Add the intended push sidecar** to the feed script:
    `signal/targets` for playbook signals (Pattern D), or `notify/message` for
    feed completion / AlvaAsk reports (Pattern E).
-2. **Enable the flag on the cronjob:** `alva deploy update --id <ID> --push-notify`.
-3. **Subscribe the delivery target:** for personal push use
+2. **Release the feed.** A push script is a feed: its push body is served from
+   the *released* feed, not the cronjob's raw run output. Run the changed
+   script through the [feed lifecycle](#deploying-feeds), `before-feed-release`
+   included.
+3. **Enable the flag on the cronjob:** `alva deploy update --id <ID> --push-notify`.
+4. **Subscribe the delivery target:** for personal push use
    `alva push-subscriptions subscribe-feed --username <owner> --name <feed>`
    or `alva push-subscriptions subscribe-playbook --username <owner> --name <playbook>`;
    for group push, run `/alva subscribe feed <id>` or
    `/alva subscribe playbook <id>` in that group.
-4. **Verify a real run produced push content:** trigger a run (or wait for
-   the next cron fire) and read `@last/1` of the configured sidecar. Confirm
-   the record is fresh and the message body is non-empty.
-5. **Confirm to the user** with the specifics: which feed/playbook is
+5. **Verify the release and a real run:** confirm the feed is released, then
+   trigger a run (or wait for the next cron fire) and read `@last/1` of the
+   configured sidecar. Confirm the record is fresh and the message body is
+   non-empty.
+6. **Confirm to the user** with the specifics: which feed/playbook is
    subscribed, what the next push will say, and when it will fire.
 
-If Step 4 returns no record or an empty body, **do not claim push is set
-up** — diagnose (missing output write, wrong path, run failure) and fix
-before reporting success.
+If Step 5 finds the feed unreleased, or the run returns no record or an empty
+body, **do not claim push is set up** — diagnose (missing release, missing
+output write, wrong path, run failure) and fix before reporting success.
 
 ### 10. Annotation-driven edits
 

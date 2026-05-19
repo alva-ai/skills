@@ -43,10 +43,12 @@ alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js
 
 When `--push-notify` is set, every successful cronjob execution checks the
 feed's push sidecars. `signal/targets` and `notify/message` both dispatch the
-canonical `feed_alert_ready` event with different feed-alert sources. Delivery
-still requires an explicit personal or group subscription to the feed or to a
-playbook that references the feed; `--push-notify` does not subscribe the
-owner, any user, or any group.
+canonical `feed_alert_ready` event with different feed-alert sources. The push
+body is read from the *released* feed: a cronjob with `--push-notify` but no
+`alva release feed` dispatches an empty body. Delivery also requires an
+explicit personal or group subscription to the feed or to a playbook that
+references the feed; `--push-notify` does not subscribe the owner, any user, or
+any group.
 
 The CLI validates that the entry path exists on the filesystem before creating
 the cronjob.
