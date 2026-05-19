@@ -1,8 +1,17 @@
 # Deployment Guide
 
-Deploy scripts as cronjobs for scheduled, automated execution. This is essential
-for feeds that need regular updates (e.g. hourly price data) and recurring
-tasks.
+Deploy scripts as cronjobs for scheduled, automated execution and manage the
+downstream feed / playbook resources they produce. This is essential for feeds
+that need regular updates (e.g. hourly price data), recurring tasks, and for
+cleaning up when a deployment is retired or replaced.
+
+The three lifecycle CLI groups:
+
+| Group           | Manages                              | Common commands                  |
+| --------------- | ------------------------------------ | -------------------------------- |
+| `alva deploy`   | Cronjobs (schedule + entry script)   | `create`, `list`, `update`, `delete`, `runs` |
+| `alva feed`     | Released feed records + active majors | `list`, `delete`                |
+| `alva playbook` | Published playbook records           | `list`, `delete`                 |
 
 ---
 
@@ -155,6 +164,44 @@ execution, useful for tracing errors or verifying output.
 ```bash
 alva deploy run-logs --id 42 --run-id 123
 ```
+
+---
+
+## Feed / Playbook lifecycle — extras not in CLI help
+
+Run `alva feed --help` and `alva playbook --help` for subcommands,
+flags, and response shapes. This section only covers the conceptual
+boundaries and the deletion gotcha — the help text is authoritative
+on flags.
+
+**What each group manages.**
+
+- `alva deploy` — the **cronjob** (schedule + entry script + args). Lives
+  in the `cronjobs` table.
+- `alva feed` — the **released feed record + active majors** (the row
+  written by `alva release feed`, consumed by the push-fanout path).
+  Lives in `feeds` / `feed_majors`.
+- `alva playbook` — the **published playbook** (rendered HTML +
+  display_name + visibility + ACL). Lives in `playbooks` and is
+  surfaced at `https://alva.ai/u/<username>/playbooks/<name>`.
+
+These three move in lockstep at create time (`alva deploy create` →
+`alva release feed` → `alva release playbook`) but each has its own
+lifecycle row. Deleting one does **not** automatically delete the
+others — see the cascade notes in each `--help`.
+
+**Don't use `alva fs remove` to delete a feed or playbook.** It clears
+the ALFS files (the rendered HTML, the data mount), but the
+`playbooks` / `feeds` DB row stays alive. The platform still:
+
+- counts the playbook against the free-tier 1-playbook cap
+- serves the (now empty) public URL with stale metadata
+- fires push fanout for the (now empty) feed
+
+The cap-gate symptom is "the platform still has a playbook record for
+me even after I cleaned the ALFS files". The fix is `alva playbook
+delete --name <X>` (or `alva feed delete --id <X>`), which
+soft-deletes the DB row and frees the quota / ACL immediately.
 
 ---
 
