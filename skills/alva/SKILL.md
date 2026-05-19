@@ -391,6 +391,101 @@ MUST reference deployed feeds in `--feeds` and the HTML MUST `fetch()` them
 at runtime. If you used `alva run` to source data, deploy that same logic as
 a feed and reference it.
 
+### Pre-release validation (must pass before declaring success)
+
+`alva release playbook` and `alva release feed` are not "ship it" buttons.
+A release is only complete after the agent has verified that the artifact
+the user receives actually works. The following gate is mandatory before
+any release-success text block:
+
+1. **Deploy / release call returned success.** `published_url` non-empty
+   and matches the canonical `https://alva.ai/u/<username>/playbooks/...`
+   form (do not present `published_url` as the share link — see Data
+   Sourcing point 3).
+2. **No `--feeds` entry is paused / never-fired.** For each feed listed
+   in `--feeds`, run `alva deploy get --id <feed_id>` (or equivalent) and
+   verify `status != "paused"` and `last_run_at` is recent or scheduled.
+   A release that names a paused feed produces a playbook whose data
+   path is dark from day one. If any feed is paused, **un-pause it or
+   remove it from `--feeds` before releasing**.
+3. **Feed entry script is non-empty and runnable.** A deploy whose
+   entry script is 0 bytes will fast-fail every cronjob fire. Before
+   release, confirm `alva run --entry-path <path>` returns
+   `result != undefined` and `status=completed`. If the feed's
+   release failed with `duplicate key`, `path NOT_FOUND`, or any
+   `is_error: true` field, treat the release as failed — do not
+   bump the version and retry; surface the failure and fix the
+   underlying cause first.
+4. **Visual verification of any chart-bearing playbook.** After
+   `alva screenshot`, **inspect the screenshot before declaring
+   success**. Look for: empty chart containers (axes present but no
+   bars/lines), error overlays, missing-data placeholders, error
+   text inside the page. The screenshot is a verification artifact,
+   not a formality. If anything in the screenshot looks empty / broken
+   / unexpected, treat the release as broken and diagnose before
+   ending the turn — re-run `alva fs read --path '~/feeds/...'` on
+   the feeds, re-run them, check what's reaching the HTML's
+   `fetch()`. A blank chart shipped with confidence is worse than a
+   non-release.
+5. **No "known-failing feed" carve-outs.** If any feed test
+   (`alva run`) failed during the build and the release happened
+   anyway with the broken feed listed, that is a release-without-
+   validation. Either fix the feed and re-release, or remove it from
+   `--feeds` (and remove its dependent widgets from the HTML), or
+   surface the failure to the user and ask. Never release in spite
+   of a known feed failure.
+
+If any of (1)-(5) fail, do not write the "released successfully" text
+block — surface the failure path and stop.
+
+### Canonical fetch URL template (HTML playbook → feed data)
+
+The runtime gateway hostname for HTML-side data fetches **must be read
+from the runtime environment**, not typed from memory:
+
+```javascript
+const resp = await fetch(
+  `${ALVA_ENDPOINT}/api/v1/fs/read?path=/alva/home/<username>/feeds/<name>/v1/data/<group>/<output>/@last/<n>`
+);
+```
+
+In a deployed playbook, `ALVA_ENDPOINT` is injected at render time.
+**Do not** type a hostname literal (`alva-fs.prd.space.id`,
+`api.alva.ai`, or any other guess). The gateway hostname drifts; a
+guessed literal will DNS-fail and every chart will render blank
+without any browser-side error in the rendered HTML.
+
+If the playbook needs to reach the gateway from a runtime where
+`ALVA_ENDPOINT` is not in scope, fetch the value from the runtime
+shell first (`echo $ALVA_ENDPOINT`) and copy the exact string — do
+not hand-edit the host.
+
+### Cross-chat playbook name isolation
+
+When `alva fs readdir ~/playbooks` returns a directory you did not
+create in **this session** (no `alva release playbook-draft` call
+for that name earlier in this session's history), treat it as
+another session's owned artifact. **Do not write to it.**
+
+Rules:
+
+1. If the user references an existing playbook by name with an
+   `@mention` or with explicit text like "the existing
+   `<playbook-name>` one" / "in my previous one", reusing that
+   playbook directory is fine — it's the documented remix /
+   continuation flow.
+2. If the user does **not** explicitly reference the directory by
+   name, and `readdir` happens to surface a similarly-named one,
+   generate a new unique name (append a timestamp, a context word,
+   or a short hash). Do not silently overwrite.
+3. If `alva release playbook` returns a `duplicate key value
+   violates unique constraint "playbook_versions_release_version_idx"`
+   error, that is **not a version-collision to bump past**. It is
+   a signal that the playbook is owned by another session. Stop,
+   reread `alva fs readdir`, and pick a unique name. Bumping
+   `v1.0.0 → v1.0.1 → v1.1.0` blindly through duplicate-key errors
+   is the pattern of cross-chat overwrite.
+
 ### Thematic Ticker Curation
 
 When building sector or thematic dashboards with curated ticker lists:
