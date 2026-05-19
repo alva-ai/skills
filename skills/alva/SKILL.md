@@ -555,9 +555,10 @@ Search across Twitter/X, fallback non-US finance data, news, Reddit, YouTube, po
 Use whenever the playbook needs content beyond structured data SDKs — from
 targeted queries ("what are people saying about NVDA earnings") to broad
 discovery ("trending crypto discussions this week"), including social
-discussions, international-market quote/market-data lookup when structured
-SDK coverage is insufficient, market narratives, news coverage, sentiment,
-analyst commentary, and community reactions. For US equities and deterministic
+discussions, finance-search lookup for non-US equities and off-catalog asset
+classes (forex, traditional index/commodity futures) the structured SDKs do
+not cover, market narratives, news coverage, sentiment, analyst commentary,
+and community reactions. For US equities, crypto, and deterministic
 time-series/fundamental data, prefer the structured Alva data SDKs first.
 
 Content search modules live in the `unified_search` runtime-library
