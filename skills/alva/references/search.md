@@ -9,7 +9,7 @@ backfill its history), use the `feed_widgets` partition instead. The search SDKs
 | SDK | Module | Best for |
 | --- | ------ | -------- |
 | `searchGrokX` | `@arrays/data/search/search-grok-x:v1.0.0` | Twitter/X — returns engagement directly |
-| `searchPerplexityFinance` | `@arrays/data/search/search-perplexity-finance:v1.0.0` | Fallback live finance search for non-US equities and markets not covered well by structured Alva SDKs |
+| `searchPerplexityFinance` | `@arrays/data/search/search-perplexity-finance:v1.0.0` | Primary search for non-US equities; fallback for forex/futures and other structured-SDK gaps |
 | `searchSerper` | `@arrays/data/search/serper-search:v1.0.0` | Google index: News, YouTube, Reddit, Web |
 | `searchBrave` | `@arrays/data/search/search-brave:v1.0.0` | Independent index, good Reddit coverage |
 | `scrapeUrl` | `@arrays/data/search/scrape-url:v1.0.0` | Scrape any page to markdown for enrichment |
@@ -18,11 +18,13 @@ backfill its history), use the `feed_widgets` partition instead. The search SDKs
 
 ### Finance Search
 
-- **Search**: `searchPerplexityFinance` for live financial quotes, market data, company facts, filings, and sourced finance answers.
-- **Intended role**: fallback for non-US equity / international-market questions, or other finance facts where the structured Alva SDKs do not have enough coverage.
-- **Best fit**: use when the user asks for a current non-US stock quote, valuation, filing, corporate fact, or market-data answer that benefits from sourced live lookup.
+- **Search**: `searchPerplexityFinance` — a live, source-cited finance answer engine covering quotes, company profiles, financial statements and ratios, valuation and pricing, earnings, analyst estimates, segment/KPI metrics, market movers, and ownership/corporate actions.
+- **Intended role**: the primary tool for non-US equities, and the fallback for asset classes outside the Alva data catalog (forex, traditional futures).
+- **Non-US equities**: this is the primary path for listings on non-US exchanges — Japan, Korea, India, UK, Brazil, Netherlands, Hong Kong, China A-shares, and others — plus foreign-company ADRs. The structured Alva SDKs are US-centric, so reach for finance search first rather than trying them and falling back. Coverage is web-backed and best-effort, not a guaranteed dataset — depth and freshness track how well a market is reported online, so a large cap on a liquid exchange returns far more than a small cap on a thin one. Disambiguate the listing in the query — local ticker + exchange, or full company name (e.g. "Toyota 7203 on the Tokyo Stock Exchange", "HSBC on the LSE") — and verify the answer against the `sources` it returns.
+- **Forex & traditional futures**: the fallback for forex pairs and traditional index/commodity futures (e.g. S&P, crude, gold) — the structured Alva SDKs' derivatives coverage is crypto futures and equity/ETF options, not these. Crypto itself stays on the structured SDKs (`getCryptoKline`, perpetual-futures OHLCV, funding rates) — never route crypto to finance search.
+- **Query scoping**: state the business question first, then the company or ticker, then an explicit time window (`latest quarter`, `last 30 days`); it answers best when the prompt names the outcome, not the data shape.
 - **Fields**: `summary`, `data`/`arrays` result blocks, `tickers`, `sources`, and provider `usage` metadata when available.
-- **Gotcha**: This is a live search/answer tool, not a historical time-series endpoint. For US equities, deterministic OHLCV, fundamentals, earnings, or macro series, prefer the structured Alva data SDKs first and use finance search only as a fallback for missing coverage, current context, or source-backed enrichment.
+- **Gotcha**: a live search/answer tool, not a historical time-series endpoint. For US equities, crypto, and deterministic OHLCV / fundamentals / earnings / macro series, the structured Alva data SDKs are the source — finance search there adds only current context or source-backed enrichment.
 
 ### Twitter/X
 
