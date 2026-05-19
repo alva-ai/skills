@@ -30,6 +30,11 @@ alva fs read --path '/alva/home/{owner}/playbooks/{name}/index.html' > ./index.h
 Process each `index` as a separate, targeted edit — change only what the
 `instruction` asks of the annotated element, nothing around it.
 
+When the instruction is a bug fix, fix the named defect only — do not change
+what displayed data *means* (its period basis, units, or source) as a side
+effect; and if the correct fix does change a number the user has already seen,
+say so explicitly rather than letting it change silently.
+
 ---
 
 ## Locate the Generator
