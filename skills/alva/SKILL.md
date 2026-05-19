@@ -1502,8 +1502,21 @@ involves uploading, naming, rotating, listing, or using third-party secrets.
 data alignment, and portfolio simulation automatically. Do not manually loop
 over SDK data (e.g. `getCryptoKline`) to evaluate trading conditions — this
 leads to incorrect timestamps and look-ahead bias. Use Altra for all
-strategies regardless of complexity; supported OHLCV intervals depend on the
-provider and market, and external data can be added via `registerRawData`.
+strategies regardless of complexity; external data can be added via
+`registerRawData`. For OHLCV, use only intervals supported
+by `createArraysOhlcvProvider()` (see `altra-trading.md`): stocks support
+`"1min"`, `"2min"`, `"3min"`, `"5min"`, `"10min"`, `"15min"`, `"30min"`,
+`"1h"`, `"2h"`, `"4h"`, `"1d"`, `"1w"`, `"1m"`; crypto supports those plus
+`"45min"` and locally aggregated minute/hour/day multiples such as `"6h"` or
+`"3d"`.
+
+**Stock intraday window guardrail:** Do not directly request multi-year US
+stock intraday (`"1min"`/`"5min"`/`"15min"`/`"30min"`/hourly) backtests as one
+full window. The underlying Arrays/data-tools endpoint rejects large intraday
+windows (for example >~366 days for `"1min"`). If the user asks for 2 years of
+intraday stock data, explain the limit and either narrow the backtest window,
+use daily/weekly bars when appropriate, or use a provider path that explicitly
+chunks the request.
 
 **After a successful backtest, you should package the results in a form the user
 can use.** That may be a playbook, a dashboard, or a concise analytical summary,

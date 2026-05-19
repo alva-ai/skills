@@ -283,6 +283,30 @@ const altra = new FeedAltra(config, ohlcvProvider);
 **Symbol format**: Use the exact format from the system (e.g.
 `"BINANCE_SPOT_BTC_USDT"`, `"XNAS_SPOT_AAPL_USD"`).
 
+**Supported OHLCV intervals**:
+
+- US stocks: `"1min"`, `"2min"`, `"3min"`, `"5min"`, `"10min"`, `"15min"`,
+  `"30min"`, `"1h"`, `"2h"`, `"4h"`, `"1d"`, `"1w"`, `"1m"`.
+- Crypto spot/perp: `"1min"`, `"2min"`, `"3min"`, `"5min"`, `"10min"`,
+  `"15min"`, `"30min"`, `"45min"`, `"1h"`, `"2h"`, `"4h"`, `"1d"`,
+  `"1w"`, `"1m"`, plus locally aggregated minute/hour/day multiples that
+  divide cleanly into a supported base interval (for example `"6h"`, `"8h"`,
+  `"12h"`, `"3d"`).
+- Do not use stock `"45min"`; the provider rejects it. Do not assume arbitrary
+  strings between `"1min"` and `"1w"` are valid for stocks.
+
+**Stock intraday data-window limit**: For US stocks, long intraday windows must
+be chunked. A single full-window request for `"1min"`/`"5min"`/`"15min"`/
+`"30min"`/hourly data can fail when the range is large; the underlying
+Arrays/data-tools endpoint rejects very large intraday windows (for example
+`"1min"` over more than about 366 days).
+
+When a user asks for a multi-year intraday stock backtest, do not blindly set a
+2-year `startDate` with `"1min"`/`"5min"` bars. First narrow the window, switch
+to daily/weekly bars if that still answers the question, or use a provider path
+that explicitly chunks the request. Retrying the same full-window request across
+regions usually does not fix this class of request.
+
 ---
 
 ## Altra Configuration
@@ -313,7 +337,7 @@ const altra = new FeedAltra(
 | Field                          | Description                                                                     |
 | ------------------------------ | ------------------------------------------------------------------------------- |
 | `path`                         | ALFS feed path (e.g. `'~/feeds/my-strategy/v1'`). All output data stored here.   |
-| `startDate`                    | Backtest start timestamp (ms UTC). Use the exact date, never adjust for warmup. |
+| `startDate`                    | Backtest start timestamp (ms UTC). Use the exact date, never adjust for warmup, but still respect provider data-window limits. |
 | `portfolioOptions.initialCash` | Starting cash (default: 100,000)                                                |
 | `portfolioOptions.currency`    | Quote currency (default: "USD")                                                 |
 | `simOptions.simTick`           | Simulation resolution. Prefer valid tick strings like `"1min"`, `"15min"`, or `"1d"`; numeric ms values must map to a valid tick string. |
