@@ -947,6 +947,18 @@ If Step 4 returns no record or an empty body, **do not claim push is set
 up** — diagnose (missing output write, wrong path, run failure) and fix
 before reporting success.
 
+### 10. Annotation-driven edits
+
+A request to tweak one element of a playbook in session context arrives as one
+or more `<annotation>` tags, each naming a target element by CSS `selector` and
+an `instruction` for it. Locate the **generator** behind the element — the CSS
+rule or render function that produces it — and edit that. Never freeze the
+element's rendered output into static text: that hardcodes live feed values and
+breaks on the next data update.
+
+See [annotation-edits.md](references/annotation-edits.md) for the tag format and
+the full locate-and-edit procedure.
+
 ---
 
 **Detailed sub-documents** (read these for in-depth reference):
@@ -960,6 +972,7 @@ before reporting success.
 | [deployment.md](references/deployment.md) | Deploying scripts as cronjobs for scheduled execution |
 | [design-system.md](references/design-system.md) | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
 | [remix-workflow.md](references/remix-workflow.md) | Remix: create a new playbook from an existing template |
+| [annotation-edits.md](references/annotation-edits.md) | Annotation-driven edits: parse `<annotation>` tags, locate the generator behind an element, edit generation logic not rendered output |
 | [creators-note.md](references/creators-note.md) | Post-release creator's note: composing and posting the pinned author comment |
 | [adk.md](references/adk.md) | Agent Development Kit: `adk.agent()` API, tool calling, ReAct loop, examples |
 | [search.md](references/search.md) | Content search SDKs: per-source usage, enrichment patterns, and gotchas for Twitter/X, news, Reddit, YouTube, podcasts, and web |
