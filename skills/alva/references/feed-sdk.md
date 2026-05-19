@@ -311,8 +311,8 @@ alva release feed --name daily-briefing --version 1.0.0 \
 - `title` is optional — if provided, the notification renders as
   `**title**\n\ncontent`.
 - `text` is the notification body (required for content push).
-- **`alva release feed` is required** — without it, push notifications
-  will not be delivered.
+- **`alva release feed` is required** — without it, the push is still
+  dispatched but arrives with an empty body (no `title`/`text`).
 - `--push-notify` only enables publisher-side fanout. It does **not** create
   personal or group subscriptions.
 - Real delivery requires an explicit subscription: personal

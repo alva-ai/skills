@@ -853,9 +853,10 @@ Required evidence:
    cronjobs. Pass it via `--readme-url` as an absolute ALFS path (see the
    `--readme-url` rule in Step 7 above).
 9. **Push feeds are released**: Every cronjob this playbook deploys with
-   `push_notify: true` has a released feed (`alva release feed`, passing
-   `before-feed-release`) — without it the push fires a blank body. Items 1–3
-   only check feeds the HTML reads; a push-only feed is not caught there.
+   `push_notify: true` has a current `alva release feed --cronjob-id <that
+   cronjob>` — run after the cronjob's latest source write and passing
+   `before-feed-release`; otherwise the push dispatches an empty body. Items
+   1–3 only check feeds the HTML reads; a push-only feed is not caught there.
 
 If any item fails, do not release. Fix the issue, re-run
 `alva release playbook-draft` if metadata or backing files changed, then
@@ -948,10 +949,10 @@ verification.
    or `alva push-subscriptions subscribe-playbook --username <owner> --name <playbook>`;
    for group push, run `/alva subscribe feed <id>` or
    `/alva subscribe playbook <id>` in that group.
-5. **Verify the release and a real run:** confirm the feed is released, then
-   trigger a run (or wait for the next cron fire) and read `@last/1` of the
-   configured sidecar. Confirm the record is fresh and the message body is
-   non-empty.
+5. **Verify the release and a real run:** confirm `alva release feed
+   --cronjob-id <this cronjob>` ran after Step 1 added the sidecar. Then trigger
+   a run (or wait for the next cron fire) and read `@last/1` of the configured
+   sidecar: confirm the record is fresh and the message body is non-empty.
 6. **Confirm to the user** with the specifics: which feed/playbook is
    subscribed, what the next push will say, and when it will fire.
 
