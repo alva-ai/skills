@@ -402,6 +402,26 @@ When building sector or thematic dashboards with curated ticker lists:
 3. Remove mismatches before building the feed. A single wrong ticker (e.g. a
    cybersecurity company in a battery segment) can distort the entire analysis.
 
+### Data Convention Alignment
+
+A financial figure is not self-describing: what it *means* is fixed by
+conventions the record encodes as fields — period basis (fiscal vs calendar),
+price adjustment (split / dividend), currency, units, seasonal adjustment,
+point-in-time vs restated. Before charting, tabulating, comparing, or
+answering with any data series:
+
+- Read each convention from the record's own fields — never infer one from
+  your own knowledge of the company or market.
+- Every series in one chart, table, or comparison MUST share the same
+  conventions, and every label MUST state the convention it carries, derived
+  from the record rather than authored.
+
+The fundamentals **fiscal period** is the case with the most depth: fiscal
+quarters are not always calendar quarters (NVDA's fiscal year ends in late
+January). Read [fundamentals-periods.md](references/fundamentals-periods.md)
+before charting or tabulating quarterly/annual fundamentals or computing
+YoY/QoQ.
+
 ### Description and Provenance Accuracy
 
 1. **Playbook descriptions and methodology sections must only list data sources
@@ -981,6 +1001,7 @@ the full locate-and-edit procedure.
 | `references/api/*.md` | Per-command gotchas the CLI help does not cover — see the [CLI Reference](#cli-reference) below |
 | [jagent-runtime.md](references/jagent-runtime.md) | Writing jagent scripts: module system, built-in modules, async model, constraints |
 | [feed-sdk.md](references/feed-sdk.md) | Feed SDK guide: creating data feeds, time series, upstreams, state management |
+| [fundamentals-periods.md](references/fundamentals-periods.md) | Fiscal vs calendar periods for fundamentals: derive period labels from the record, align companies by `calendarEndDate`, compute YoY across matched periods |
 | [altra-trading.md](references/altra-trading.md) | Altra backtesting engine: strategies, features, signals, testing, debugging |
 | [deployment.md](references/deployment.md) | Deploying scripts as cronjobs for scheduled execution |
 | [design-system.md](references/design-system.md) | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
