@@ -22,8 +22,9 @@ Bad: `"BTC EMA"`
 
 ## Trading symbols and tags
 
-- `--trading-symbols` — base asset tickers. The backend resolves each to
-  a trading-pair object; this drives asset routing.
+- `--trading-symbols` — base asset tickers, e.g. `["BTC"]`, `["NVDA",
+  "AAPL"]`. The backend resolves each to a trading-pair object; this
+  drives asset routing.
 - `--tags` — discovery tags. Drives `/explore` surfacing. Re-running
   `playbook-draft` with `--tags` replaces the prior set (no merge).
 
