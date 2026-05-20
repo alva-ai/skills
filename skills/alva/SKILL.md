@@ -11,7 +11,7 @@ description: >-
   Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v1.8.3
+  version: v1.9.0
 ---
 
 # Alva
@@ -676,6 +676,7 @@ Before writing or rewriting playbook HTML, read the applicable design guidance
 for this session.
 
 Required evidence:
+
 - [design-system.md](references/design-system.md) has been read first.
 - The relevant companion reference has been read when applicable:
   [design-widgets.md](references/design-widgets.md) for widget layouts,
@@ -833,10 +834,12 @@ deleted by the user.
    they want:
    - **Delete the old playbook** — list their existing playbooks and
      confirm which one to remove, then call the CLI directly:
+
      ```bash
      alva playbook list                        # show what they have
      alva playbook delete --name <old-name>    # soft-delete (frees the quota immediately)
      ```
+
      Do **not** suggest `alva fs remove --path ~/playbooks/<name>` —
      that only clears ALFS files; the DB row stays and the quota stays
      consumed. Do not attempt to "rename around" the cap, reuse the
@@ -871,6 +874,7 @@ draft is necessary but not sufficient: release requires fresh feed coverage,
 README coverage, and HTML/data consistency.
 
 Required evidence:
+
 1. **Backing feed release gates passed**: Every backing feed has passed
    `before-feed-release`.
 2. **Deployment coverage**: Every feed the released playbook reads at runtime
@@ -1256,6 +1260,7 @@ Before running `alva release feed`, verify the exact feed script that will be
 released has run successfully in this session.
 
 Required evidence:
+
 1. **Run check**: `alva run --entry-path '~/feeds/<name>/v1/src/index.js'`
    completed successfully after the latest source write.
 2. **Output shape check**: The run produced the expected feed output
