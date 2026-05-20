@@ -744,6 +744,8 @@ above so anonymous viewers can load feed output without authentication.
      `before-feed-release`.
    - The draft metadata (`display_name`, description, tags, trading symbols,
      and feed list) matches the user's approved plan.
+   - `--tags` repeats every entity passed to `--trading-symbols` (same
+     tickers, lowercased), plus any topical themes for discovery.
 
    If any item is missing, do not create the draft. Fix the missing artifact or
    ask the user for the missing metadata first.
@@ -756,12 +758,12 @@ above so anonymous viewers can load feed output without authentication.
    the subject/theme first, and keep it within 40 characters. Avoid personal
    markers such as `My`, `Test`, or `V2`, and generic-only titles such as
    `Stock Dashboard` or `Trading Bot`.
-   **Trading symbols**: If the playbook involves specific trading assets,
-   include `"trading_symbols"` in the request — an array of base asset
-   tickers (e.g. `["BTC", "ETH"]`, `["NVDA", "AAPL"]`). The backend
-   resolves each symbol to a full trading pair object and stores the result
-   in the playbook metadata. Max 50 symbols per request. Unknown symbols
-   are silently skipped.
+   **Trading symbols and tags**: if the playbook covers specific assets,
+   pass `--trading-symbols` and make `--tags` repeat the same entities
+   lowercased, alongside any topical themes. See
+   [Trading symbols and tags in release.md](references/api/release.md#trading-symbols-and-tags)
+   for resolution behavior, `/explore` discovery semantics, and why the
+   overlap is required.
 4. **Screenshot**: Take a screenshot to verify the released playbook renders
    correctly from the deployed published URL (for example,
    `https://<username>.playbook.alva.ai/<playbook_name>/v1.0.0/index.html`).
@@ -1048,7 +1050,7 @@ a routing index — and, for the rows in bold, the linked sub-doc is a
 | `fs` | ALFS filesystem (read / write / readdir / grant / revoke / time series). **Must read [filesystem.md](references/api/filesystem.md)** before any feed-data path, `@…` suffix, or `fs grant` on a feed — CLI help wrongly advertises `@now`, `@range/{duration}`, `@all`, `@at`, `@range/@bounds`. |
 | `run` | Execute JS in the Alva V8 runtime. |
 | `deploy` | Cronjob lifecycle (create / list / pause / resume / trigger / runs / run-logs). |
-| `release` | Register feeds, draft and publish playbooks. **Must read [release.md](references/api/release.md#playbook-readme)** before any playbook release — feed `--description` rules + the full README content shape (Overview / Data sources & freshness / Blind spots, plus screener / thesis / what-if). |
+| `release` | Register feeds, draft and publish playbooks. **Must read [release.md](references/api/release.md#playbook-readme)** before any playbook release — feed `--description` rules, the README content shape (Overview / Data sources & freshness / Blind spots, plus screener / thesis / what-if), and the `--trading-symbols` / `--tags` overlap rule. |
 | `secrets` | CRUD on encrypted secrets read by `require("secret-manager")`. |
 | `sdk` | Runtime libraries (50+ technical indicators, search, widgets). |
 | `data-skills` | Discover the 250+ Arrays financial-data endpoints. |
@@ -1517,11 +1519,7 @@ alva release feed --name btc-ema --version 1.0.0 --cronjob-id 42 \
   --description "Fetches BTC/USDT 1h klines from Binance and emits the 20-period EMA as a time series"
 # → {"feed_id":100,"name":"btc-ema","feed_major":1}
 
-# 2. Create playbook draft (creates DB record + ALFS draft files automatically)
-#    Include trading_symbols when the playbook involves specific assets.
-#    Include --tags with discovery tags (max 10, each up to 32 chars) so the
-#    playbook surfaces under those tags on /explore. Re-running this command
-#    with --tags replaces the playbook's tag set.
+# 2. Create playbook draft (creates DB record + ALFS draft files automatically).
 alva release playbook-draft --name btc-dashboard --display-name "BTC Trend Dashboard" --description "BTC market dashboard" --feeds '[{"feed_id":100}]' --trading-symbols '["BTC"]' --tags '["btc","macro"]'
 # → {"playbook_id":99,"playbook_version_id":200}
 

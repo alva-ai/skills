@@ -6,6 +6,8 @@ flags, display-name conventions, and examples. This file covers only:
 1. Feed `--description` wording rules
 2. Playbook README content shape (the big one — referenced by SKILL.md
    and the `--readme-url` flag)
+3. `--trading-symbols` and `--tags` semantics and the required overlap
+   between them
 
 ## Feed `--description` conventions
 
@@ -17,6 +19,27 @@ flags, display-name conventions, and examples. This file covers only:
 
 Good: `"Fetches BTC/USDT 1h klines from Binance and emits the 20-period EMA as a time series"`
 Bad: `"BTC EMA"`
+
+## Trading symbols and tags
+
+`alva release playbook-draft` exposes two related discovery fields:
+
+- `--trading-symbols` — base asset tickers (e.g. `["BTC", "ETH"]`,
+  `["NVDA", "AAPL"]`). The backend resolves each to a full trading-pair
+  object and stores the result in the playbook metadata; this powers
+  asset routing.
+- `--tags` — discovery tags. Drives `/explore` surfacing. Re-running
+  `playbook-draft` with `--tags` replaces the prior set (no merge).
+
+**Required overlap.** `--tags` must repeat every entity passed to
+`--trading-symbols`, lowercased — so `--trading-symbols '["BTC"]'`
+requires `--tags` to include `"btc"`. Topical themes (e.g. `"macro"`,
+`"defi"`) go in `--tags` alongside the entities, never replacing them.
+Omitting the entities from `--tags` hides the playbook from users
+searching that asset on `/explore`, because asset-routing and
+discovery-surfacing read different fields.
+
+Example: `--trading-symbols '["BTC"]' --tags '["btc","macro"]'`.
 
 ## Playbook README
 
