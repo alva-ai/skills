@@ -883,6 +883,12 @@ Required evidence:
    cronjob>` — run after the cronjob's latest source write and passing
    `before-feed-release`; otherwise the push dispatches an empty body. Items
    1–3 only check feeds the HTML reads; a push-only feed is not caught there.
+10. **Design lint passes**: `alva release playbook` runs the design linter
+    against the HTML it's about to release and hard-fails on any error finding
+    (missing `.playbook-container`, page-scroll on the wrong element,
+    font-weight 600/700, unregistered component-modifier classes, etc.). To
+    pre-check: `alva lint playbook ./index.html`. The full ruleset lives in
+    [design-contract.yaml](references/design-contract.yaml).
 
 If any item fails, do not release. Fix the issue, re-run
 `alva release playbook-draft` if metadata or backing files changed, then
@@ -1011,6 +1017,7 @@ the full locate-and-edit procedure.
 | [altra-trading.md](references/altra-trading.md) | Altra backtesting engine: strategies, features, signals, testing, debugging |
 | [deployment.md](references/deployment.md) | Deploying scripts as cronjobs for scheduled execution |
 | [design.md](references/design.md) | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
+| [design-contract.yaml](references/design-contract.yaml) | Machine-readable contract consumed by the design linter that gates `alva release playbook` |
 | [remix-workflow.md](references/remix-workflow.md) | Remix: create a new playbook from an existing template |
 | [annotation-edits.md](references/annotation-edits.md) | Annotation-driven edits: parse `<annotation>` tags, locate the generator behind an element, edit generation logic not rendered output |
 | [creators-note.md](references/creators-note.md) | Post-release creator's note: composing and posting the pinned author comment |
@@ -1037,6 +1044,7 @@ a routing index — and, for the rows in bold, the linked sub-doc is a
 | `run` | Execute JS in the Alva V8 runtime. |
 | `deploy` | Cronjob lifecycle (create / list / pause / resume / trigger / runs / run-logs). |
 | `release` | Register feeds, draft and publish playbooks. **Must read [release.md](references/api/release.md#playbook-readme)** before any playbook release — feed `--description` rules + the full README content shape (Overview / Data sources & freshness / Blind spots, plus screener / thesis / what-if). |
+| `lint playbook <file>` | Design-system lint check; same engine as the `alva release playbook` gate. See [design-contract.yaml](references/design-contract.yaml). |
 | `secrets` | CRUD on encrypted secrets read by `require("secret-manager")`. |
 | `sdk` | Runtime libraries (50+ technical indicators, search, widgets). |
 | `data-skills` | Discover the 250+ Arrays financial-data endpoints. |

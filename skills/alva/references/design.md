@@ -31,6 +31,25 @@ values. Below is a quick reference:
 | Spacing      | `--spacing-xxxs`(2) ~ `--spacing-xxxxxxl`(56)  | Common: xs=8, m=16, xl=24               |
 | Radius       | `--radius-ct-xs`(2) ~ `--radius-ct-l`(8)       | xs=Tag, s=Card, l=Page                  |
 
+## Design Contract
+
+The Alva design system is also expressed as a machine-readable contract for
+the **design linter** that runs inside `alva release playbook`:
+
+- [design-contract.yaml](./design-contract.yaml) — token-free contract: the
+  required global container, scroll/typography/link rules, and the registered
+  components (root class, variants, sizes, states, bindings).
+
+The linter is shipped in the `alva` CLI and runs as a hard gate. To pre-check
+a playbook before release:
+
+```bash
+alva lint playbook ./index.html
+```
+
+`alva release playbook` runs the same lint internally and refuses to release
+if any error-severity finding fires. See SKILL.md §7 Release.
+
 ## Typography & Font
 
 ### General Rules
