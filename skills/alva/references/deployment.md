@@ -57,7 +57,8 @@ body is read from the *released* feed: a cronjob with `--push-notify` but no
 `alva release feed` dispatches an empty body. Delivery also requires an
 explicit personal or group subscription to the feed or to a playbook that
 references the feed; `--push-notify` does not subscribe the owner, any user, or
-any group.
+any group. For `notify/message`, `<|SKIP_NOTIFICATION|>` in `body`/`text`
+skips the user-visible push while advancing fanout.
 
 The CLI validates that the entry path exists on the filesystem before creating
 the cronjob.
