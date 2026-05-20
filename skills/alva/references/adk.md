@@ -6,30 +6,6 @@ A SDK for building LLM-powered agents with tool calling to enable agentic featur
 > delta body, push line, etc.), include the voice block from
 > [narrative-voice.md](narrative-voice.md) verbatim in `system`.
 
-## When to use ADK
-
-ADK is for embedding a fixed LLM reasoning step inside a deterministic,
-reschedulable pipeline. The shape of the work is locked in; only the input
-changes each run.
-
-Use it for:
-
-- A feed cronjob's summarization, classification, or extraction stage (raw
-  fetched items → TLDR, sentiment label, structured note).
-- A scheduled digest, daily push body, "why it matters" headline, or delta
-  rationale generated on each release.
-- A pipeline step where the prompt and tool set are fixed but the upstream
-  data refreshes.
-
-Do **not** use it for:
-
-- One-off research, exploratory analysis, or "help me look into X" the user
-  asks interactively. Answer directly with your own tools; wrapping it in
-  `adk.agent()` adds a sandbox without buying anything.
-- Producing numbers, events, or reports that should come from a real data
-  source. ADK reasons over real data; it does not invent it. See SKILL.md's
-  Content Legitimacy Rules.
-
 ## Quick Start
 
 ```javascript

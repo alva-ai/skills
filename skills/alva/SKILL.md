@@ -1454,15 +1454,19 @@ altra.setStrategy(strategyFn, {
 
 ## ADK (Agent Development Kit) Quick Reference
 
-`@alva/adk` (`adk.agent()`) embeds an LLM reasoning step inside a deterministic,
-reschedulable pipeline — a feed cronjob's summarization stage, a periodic
-digest, a classification step. For one-off research the user asks for
-interactively, answer them directly; do not wrap it in `adk.agent()`.
+`@alva/adk` (`adk.agent()`) embeds a fixed LLM reasoning step inside a
+deterministic, reschedulable pipeline — a feed cronjob's summarization stage,
+a scheduled digest, a "why it matters" headline, a classification step. The
+prompt and tool set are locked in; only the upstream data changes each run.
 
-See [adk.md](references/adk.md) for triggers, the API, tool-calling and memory
-patterns, and examples. The "never fabricate data as if sourced" gate is
-Content Legitimacy Rule #2 above — read that before using ADK to produce any
-user-facing number, event, or report.
+Do **not** use it for one-off research, exploratory analysis, or "help me look
+into X" the user asks interactively — answer directly with your own tools;
+wrapping it in `adk.agent()` adds a sandbox without buying anything. And do
+not use it to produce numbers, events, or reports that should come from a real
+data source (see Content Legitimacy Rule #2 above).
+
+See [adk.md](references/adk.md) for the API, tool-calling and memory patterns,
+and examples.
 
 ---
 
