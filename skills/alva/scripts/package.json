@@ -1,0 +1,13 @@
+{
+  "name": "alva-skill-scripts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "design-contract-sync": "tsx design-contract-sync.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.0.0",
+    "yaml": "^2.0.0"
+  }
+}
