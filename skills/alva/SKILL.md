@@ -661,6 +661,9 @@ alva release feed --name <feed> --version 1.0.0 \
 - `--push-notify` only marks the feed publisher as capable of emitting alerts.
   It does **not** subscribe any user or group, and it does not bypass
   notification preferences.
+- For `notify/message`, `body`/`text` containing `<|SKIP_NOTIFICATION|>`
+  advances fanout without sending a user-visible push. Use it for quiet
+  AlvaAsk, heartbeat, and monitor runs.
 - Real delivery always requires an explicit subscription:
   `alva push-subscriptions subscribe-feed --username <owner> --name <feed>`,
   `alva push-subscriptions subscribe-playbook --username <owner> --name <playbook>`,
@@ -939,7 +942,9 @@ Scan the feeds backing this playbook and classify each:
 
 - **Push-worthy** (recommend): price signals, crossover/breakout alerts,
   trading instructions, anomaly detection, periodic research summaries —
-  anything actionable and time-sensitive.
+  anything actionable and time-sensitive. For heartbeat/watchlist/monitor feeds,
+  recommend quiet-run behavior: notify only on material changes and emit
+  `<|SKIP_NOTIFICATION|>` otherwise.
 - **Not push-worthy** (skip): static fundamentals, historical snapshots,
   low-frequency reference data.
 
@@ -965,6 +970,9 @@ Present a concrete recommendation, not a generic "want push?":
 > "This playbook's **BTC EMA crossover signal** feed produces actionable
 > alerts when the trend flips. Want to enable push notifications for it?"
 
+For monitors, say the quiet behavior up front: "I can notify only on material
+changes; quiet checks will run without pushing you."
+
 - **User says yes** → configure end-to-end (see "Configure and verify" below).
   Do not stop after toggling the flag.
 - **User says no** → accept and move on. Do not ask again.
@@ -986,6 +994,8 @@ verification.
 1. **Add the intended push sidecar** to the feed script:
    `signal/targets` for playbook signals (Pattern D), or `notify/message` for
    feed completion / AlvaAsk reports (Pattern E).
+   - For skippable AlvaAsk feeds, prompt: "If there is no material update worth
+     notifying about, output only `<|SKIP_NOTIFICATION|>`."
 2. **Release the feed.** A push script is a feed: its push body is served from
    the *released* feed, not the cronjob's raw run output. Run the changed
    script through the [feed lifecycle](#deploying-feeds), `before-feed-release`
@@ -999,9 +1009,11 @@ verification.
 5. **Verify the release and a real run:** confirm `alva release feed
    --cronjob-id <this cronjob>` ran after Step 1 added the sidecar. Then trigger
    a run (or wait for the next cron fire) and read `@last/1` of the configured
-   sidecar: confirm the record is fresh and the message body is non-empty.
+   sidecar: confirm the record is fresh and the message body is non-empty or
+   contains `<|SKIP_NOTIFICATION|>` for a successful quiet run.
 6. **Confirm to the user** with the specifics: which feed/playbook is
-   subscribed, what the next push will say, and when it will fire.
+   subscribed, what the next push will say, and when it will fire. For monitor
+   feeds, also say quiet runs skip notifications.
 
 If Step 5 finds the feed unreleased, or the run returns no record or an empty
 body, **do not claim push is set up** — diagnose (missing release, missing
