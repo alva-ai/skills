@@ -8,6 +8,7 @@ flags, display-name conventions, and examples. This file covers only:
    and the `--readme-url` flag)
 3. `--trading-symbols` and `--tags` semantics and the required overlap
    between them
+4. `--skill-id` — when it is required
 
 ## Feed `--description` conventions
 
@@ -34,6 +35,12 @@ Omit the entities and the playbook is invisible to `/explore` searches
 for that asset — asset-routing and discovery read different fields.
 
 Example: `--trading-symbols '["BTC"]' --tags '["BTC","macro"]'`.
+
+## Skill id
+
+`--skill-id` is required whenever a Skillhub skill informed the build —
+i.e. the request carried a `/use-skill:<username>/<name>` directive, or
+the agent ran `alva skillhub get` / `alva skillhub file` during building.
 
 ## Playbook README
 

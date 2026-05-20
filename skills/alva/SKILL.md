@@ -746,6 +746,10 @@ above so anonymous viewers can load feed output without authentication.
      and feed list) matches the user's approved plan.
    - `--tags` and `--trading-symbols` satisfy the overlap rule in
      [release.md](references/api/release.md#trading-symbols-and-tags).
+   - If any Skillhub skill informed this build (`/use-skill:` directive, or
+     any `alva skillhub get` / `alva skillhub file` call), `--skill-id
+     <username>/<name>` is set to that id
+     ([release.md](references/api/release.md#skill-id)).
 
    If any item is missing, do not create the draft. Fix the missing artifact or
    ask the user for the missing metadata first.
