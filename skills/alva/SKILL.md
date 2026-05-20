@@ -422,6 +422,18 @@ January). Read [fundamentals-periods.md](references/fundamentals-periods.md)
 before charting or tabulating quarterly/annual fundamentals or computing
 YoY/QoQ.
 
+### Price Recency for Live Questions
+
+For a current/live/latest-price request, fetch from an intraday kline bar
+(`interval=1min` or `5min`) and read the newest record. Do **not** answer
+from `interval=1d`: during trading hours it returns the previous session's
+close, not the current price. See `alva data-skills summary
+arrays-data-api-spot-market-price-and-volume` for endpoint paths, response
+fields, and ordering; for gaps outside the structured catalog (non-US
+equities, forex, traditional futures) fall back per
+[Coverage Limitations](#coverage-limitations). If the market is closed,
+quote the last trade with its timestamp — never as "live".
+
 ### Description and Provenance Accuracy
 
 1. **Playbook descriptions and methodology sections must only list data sources
