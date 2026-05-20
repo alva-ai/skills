@@ -744,8 +744,8 @@ above so anonymous viewers can load feed output without authentication.
      `before-feed-release`.
    - The draft metadata (`display_name`, description, tags, trading symbols,
      and feed list) matches the user's approved plan.
-   - `--tags` repeats every entity passed to `--trading-symbols` (same
-     tickers, lowercased), plus any topical themes for discovery.
+   - `--tags` and `--trading-symbols` satisfy the overlap rule in
+     [release.md](references/api/release.md#trading-symbols-and-tags).
 
    If any item is missing, do not create the draft. Fix the missing artifact or
    ask the user for the missing metadata first.
@@ -759,11 +759,10 @@ above so anonymous viewers can load feed output without authentication.
    markers such as `My`, `Test`, or `V2`, and generic-only titles such as
    `Stock Dashboard` or `Trading Bot`.
    **Trading symbols and tags**: if the playbook covers specific assets,
-   pass `--trading-symbols` and make `--tags` repeat the same entities
-   lowercased, alongside any topical themes. See
-   [Trading symbols and tags in release.md](references/api/release.md#trading-symbols-and-tags)
-   for resolution behavior, `/explore` discovery semantics, and why the
-   overlap is required.
+   pass `--trading-symbols` and overlap those same entities into `--tags`
+   — see [Trading symbols and tags in release.md](references/api/release.md#trading-symbols-and-tags)
+   for the casing rule, resolution behavior, and `/explore` discovery
+   semantics.
 4. **Screenshot**: Take a screenshot to verify the released playbook renders
    correctly from the deployed published URL (for example,
    `https://<username>.playbook.alva.ai/<playbook_name>/v1.0.0/index.html`).
@@ -1520,7 +1519,7 @@ alva release feed --name btc-ema --version 1.0.0 --cronjob-id 42 \
 # → {"feed_id":100,"name":"btc-ema","feed_major":1}
 
 # 2. Create playbook draft (creates DB record + ALFS draft files automatically).
-alva release playbook-draft --name btc-dashboard --display-name "BTC Trend Dashboard" --description "BTC market dashboard" --feeds '[{"feed_id":100}]' --trading-symbols '["BTC"]' --tags '["btc","macro"]'
+alva release playbook-draft --name btc-dashboard --display-name "BTC Trend Dashboard" --description "BTC market dashboard" --feeds '[{"feed_id":100}]' --trading-symbols '["BTC"]' --tags '["BTC","macro"]'
 # → {"playbook_id":99,"playbook_version_id":200}
 
 # 3. Write playbook README to ALFS (required before release).

@@ -32,14 +32,14 @@ Bad: `"BTC EMA"`
   `playbook-draft` with `--tags` replaces the prior set (no merge).
 
 **Required overlap.** `--tags` must repeat every entity passed to
-`--trading-symbols`, lowercased — so `--trading-symbols '["BTC"]'`
-requires `--tags` to include `"btc"`. Topical themes (e.g. `"macro"`,
-`"defi"`) go in `--tags` alongside the entities, never replacing them.
-Omitting the entities from `--tags` hides the playbook from users
-searching that asset on `/explore`, because asset-routing and
-discovery-surfacing read different fields.
+`--trading-symbols` **verbatim, uppercase** — so `--trading-symbols
+'["BTC"]'` requires `--tags` to include `"BTC"`, not `"btc"`. Topical
+themes (e.g. `"macro"`, `"defi"`) go in `--tags` alongside the entities
+in lowercase, never replacing them. Omitting the entities from `--tags`
+hides the playbook from users searching that asset on `/explore`,
+because asset-routing and discovery-surfacing read different fields.
 
-Example: `--trading-symbols '["BTC"]' --tags '["btc","macro"]'`.
+Example: `--trading-symbols '["BTC"]' --tags '["BTC","macro"]'`.
 
 ## Playbook README
 
