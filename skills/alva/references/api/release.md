@@ -8,6 +8,7 @@ flags, display-name conventions, and examples. This file covers only:
    and the `--readme-url` flag)
 3. `--trading-symbols` and `--tags` semantics and the required overlap
    between them
+4. `--skill-id` — when it is required and why it cannot be added later
 
 ## Feed `--description` conventions
 
@@ -34,6 +35,31 @@ Omit the entities and the playbook is invisible to `/explore` searches
 for that asset — asset-routing and discovery read different fields.
 
 Example: `--trading-symbols '["BTC"]' --tags '["BTC","macro"]'`.
+
+## Skill id
+
+The `--skill-id` flag on `alva release playbook-draft` links the published
+playbook back to the Skillhub skill that informed its build.
+
+**Required whenever a Skillhub skill informed the build.** That means
+any of:
+
+- a `/use-skill:<username>/<name>` directive was present in the request,
+  or
+- the agent ran `alva skillhub get <id>` or `alva skillhub file <id> …`
+  during the build to read a blueprint, examples, or source.
+
+Pass the same `<username>/<name>` (e.g. `alva/screener`) as `--skill-id`
+on the **first** `alva release playbook-draft` for the playbook.
+`alva skillhub list` is the discovery surface for valid ids.
+
+**Set-once.** The link is persisted on the first draft and ignored by
+every subsequent `playbook-draft` call. There is no admin command to
+backfill it — omitting it on the first draft leaves the playbook
+permanently unlinked from the skill that produced it.
+
+Omit `--skill-id` only when nothing from Skillhub was consulted at any
+point in the build.
 
 ## Playbook README
 
