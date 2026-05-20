@@ -22,22 +22,15 @@ Bad: `"BTC EMA"`
 
 ## Trading symbols and tags
 
-`alva release playbook-draft` exposes two related discovery fields:
-
-- `--trading-symbols` — base asset tickers (e.g. `["BTC", "ETH"]`,
-  `["NVDA", "AAPL"]`). The backend resolves each to a full trading-pair
-  object and stores the result in the playbook metadata; this powers
-  asset routing.
+- `--trading-symbols` — base asset tickers. The backend resolves each to
+  a trading-pair object; this drives asset routing.
 - `--tags` — discovery tags. Drives `/explore` surfacing. Re-running
   `playbook-draft` with `--tags` replaces the prior set (no merge).
 
-**Required overlap.** `--tags` must repeat every entity passed to
-`--trading-symbols` **verbatim, uppercase** — so `--trading-symbols
-'["BTC"]'` requires `--tags` to include `"BTC"`, not `"btc"`. Topical
-themes (e.g. `"macro"`, `"defi"`) go in `--tags` alongside the entities
-in lowercase, never replacing them. Omitting the entities from `--tags`
-hides the playbook from users searching that asset on `/explore`,
-because asset-routing and discovery-surfacing read different fields.
+**Required overlap.** Every entity in `--trading-symbols` must appear in
+`--tags` **verbatim, uppercase**, alongside lowercase topical themes.
+Omit the entities and the playbook is invisible to `/explore` searches
+for that asset — asset-routing and discovery read different fields.
 
 Example: `--trading-symbols '["BTC"]' --tags '["BTC","macro"]'`.
 
