@@ -270,7 +270,7 @@ const feed = new Feed({ path: feedPath("daily-briefing") });
 feed.def("notify", {
   message: makeDoc("Notification", "Agent-generated push content", [
     str("title"),
-    str("text"),
+    str("body"),
   ]),
 });
 
@@ -282,7 +282,7 @@ feed.def("notify", {
       {
         date: Date.now(),
         title: "Daily Crypto Briefing",
-        text: result.text,
+        body: result.text,
       },
     ]);
   });
@@ -309,10 +309,14 @@ alva release feed --name daily-briefing --version 1.0.0 \
 - The group **must** be named `notify` and the output **must** be named
   `message` — this is the path the notification system looks for.
 - `title` is optional — if provided, the notification renders as
-  `**title**\n\ncontent`.
-- `text` is the notification body (required for content push).
-- **`alva release feed` is required** — without it, push notifications
-  will not be delivered.
+  `**title**\n\nbody`.
+- `body` is the notification body (required for content push). The
+  legacy field name `text` is still accepted for backwards compatibility,
+  but `body` is the canonical name and matches FCM / APNS / Web Push
+  / HTTP / email convention — prefer `body` in new feeds. If both
+  `body` and `text` are set on the same record, `body` wins.
+- **`alva release feed` is required** — without it, the push is still
+  dispatched but arrives with an empty body (no `title`/`body`).
 - `--push-notify` only enables publisher-side fanout. It does **not** create
   personal or group subscriptions.
 - Real delivery requires an explicit subscription: personal
