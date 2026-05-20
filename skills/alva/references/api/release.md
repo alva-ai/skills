@@ -6,6 +6,8 @@ flags, display-name conventions, and examples. This file covers only:
 1. Feed `--description` wording rules
 2. Playbook README content shape (the big one — referenced by SKILL.md
    and the `--readme-url` flag)
+3. `--trading-symbols` and `--tags` semantics and the required overlap
+   between them
 
 ## Feed `--description` conventions
 
@@ -17,6 +19,21 @@ flags, display-name conventions, and examples. This file covers only:
 
 Good: `"Fetches BTC/USDT 1h klines from Binance and emits the 20-period EMA as a time series"`
 Bad: `"BTC EMA"`
+
+## Trading symbols and tags
+
+- `--trading-symbols` — base asset tickers, e.g. `["BTC"]`, `["NVDA",
+  "AAPL"]`. The backend resolves each to a trading-pair object; this
+  drives asset routing.
+- `--tags` — discovery tags. Drives `/explore` surfacing. Re-running
+  `playbook-draft` with `--tags` replaces the prior set (no merge).
+
+**Required overlap.** Every entity in `--trading-symbols` must appear in
+`--tags` **verbatim, uppercase**, alongside lowercase topical themes.
+Omit the entities and the playbook is invisible to `/explore` searches
+for that asset — asset-routing and discovery read different fields.
+
+Example: `--trading-symbols '["BTC"]' --tags '["BTC","macro"]'`.
 
 ## Playbook README
 
