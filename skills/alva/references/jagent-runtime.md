@@ -23,7 +23,7 @@ via `alva run` (inline code or filesystem entry path) or triggered by cronjobs.
 1. **ALFS files** -- paths ending in `.js` that don't start with `@` (e.g.
    `require("./helper.js")`) -- resolved from the filesystem on ALFS
 2. **Official/system modules** -- `alfs`, `env`, `secret-manager`,
-   `net/http`, `@alva/algorithm`, `@alva/feed`, `@alva/adk`
+   `net/http`, `@alva/algorithm`, `@alva/feed`, `@alva/adk`, `@alva/onnx`
 3. **Runtime library modules** -- versioned modules like
    `require("@alva/technical-indicators/rsi:v1.0.0")`
 
@@ -65,7 +65,7 @@ const home = "/alva/home/" + env.username; // absolute ALFS prefix (e.g. '/alva/
 | Method           | Signature                                     | Description                                             |
 | ---------------- | --------------------------------------------- | ------------------------------------------------------- |
 | readFile         | `readFile(path) → string`                     | Read file content as string                             |
-| readFileBytes    | `readFileBytes(path) → Uint8Array`            | Read file as bytes                                      |
+| readFileBytes    | `readFileBytes(path) → string`                | Read file bytes as base64 string                        |
 | writeFile        | `writeFile(path, content)`                    | Write string content to file (auto-creates parent dirs) |
 | stat             | `stat(path) → {exists, isDir, size}`          | Get file metadata                                       |
 | readDir          | `readDir(path) → [{name, isDir, size}, ...]`  | List directory                                          |
@@ -85,9 +85,9 @@ const home = "/alva/home/" + env.username; // absolute ALFS prefix (e.g. '/alva/
 All methods return Promises (async). Construct paths with your user ID:
 
 ```javascript
-const content = alfs.readFile(home + "/data/config.json");
-alfs.writeFile(home + "/data/output.json", JSON.stringify(result));
-const entries = alfs.readDir(home + "/data");
+const content = await alfs.readFile(home + "/data/config.json");
+await alfs.writeFile(home + "/data/output.json", JSON.stringify(result));
+const entries = await alfs.readDir(home + "/data");
 ```
 
 ### env -- Environment
@@ -170,6 +170,44 @@ const bbands = indicators.bb(closePrices, 20, 2);
 Categories: trend (SMA, EMA, DEMA, TEMA, MACD, Parabolic SAR, etc.), momentum
 (RSI, Stochastic, Williams %R, etc.), volatility (ATR, Bollinger Bands, Keltner
 Channel, etc.), volume (OBV, MFI, VWAP, etc.).
+
+### @alva/onnx -- ONNX Inference
+
+```javascript
+const { InferenceSession, Tensor, TensorDataType } = require("@alva/onnx");
+```
+
+Use this module for supplied/exported `.onnx` model artifacts. Read binary model
+artifacts with `InferenceSession.createFromAlfs({ alfs, path })`, build typed
+input tensors, and await `session.run(...)`.
+
+```javascript
+const alfs = require("alfs");
+const env = require("env");
+const { InferenceSession, Tensor, TensorDataType } = require("@alva/onnx");
+
+(async () => {
+  let session;
+  try {
+    session = await InferenceSession.createFromAlfs({
+      alfs,
+      path: `/alva/home/${env.username}/models/my-model/v1/model.onnx`,
+    });
+    const outputs = await session.run({
+      input: new Tensor(TensorDataType.Float32, new Float32Array([1, 2, 3]), [
+        1,
+        3,
+      ]),
+    });
+    console.log(outputs.score.data[0]);
+  } finally {
+    if (session) await session.release();
+  }
+})();
+```
+
+See [onnx.md](onnx.md) for the model-playbook contract, FeedAltra session
+lifecycle, output convention, and release checks.
 
 ### @test/suite -- Testing
 

@@ -1009,6 +1009,7 @@ the full locate-and-edit procedure.
 | [feed-sdk.md](references/feed-sdk.md) | Feed SDK guide: creating data feeds, time series, upstreams, state management |
 | [fundamentals-periods.md](references/fundamentals-periods.md) | Fiscal vs calendar periods for fundamentals: derive period labels from the record, align companies by `calendarEndDate`, compute YoY across matched periods |
 | [altra-trading.md](references/altra-trading.md) | Altra backtesting engine: strategies, features, signals, testing, debugging |
+| [onnx.md](references/onnx.md) | ONNX model playbooks: uploaded `.onnx` artifacts, `@alva/onnx` inference, FeedAltra patterns, output and release checks |
 | [deployment.md](references/deployment.md) | Deploying scripts as cronjobs for scheduled execution |
 | [design-system.md](references/design-system.md) | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
 | [remix-workflow.md](references/remix-workflow.md) | Remix: create a new playbook from an existing template |
@@ -1071,6 +1072,7 @@ variables, or shell. Host-agent permissions still apply. See
 | @alva/algorithm | `require("@alva/algorithm")` | Statistics                                                              |
 | @alva/feed      | `require("@alva/feed")`      | Feed SDK for persistent data pipelines + FeedAltra trading engine       |
 | @alva/adk       | `require("@alva/adk")`       | Agent SDK for LLM requests — `agent()` for LLM agents with tool calling |
+| @alva/onnx      | `require("@alva/onnx")`      | ONNX inference for supplied model artifacts; see [onnx.md](references/onnx.md) |
 | @test/suite     | `require("@test/suite")`     | Jest-style test framework (`describe`, `it`, `expect`, `runTests`)      |
 
 **Runtime libraries**: Built-in computation modules available via `require()`
@@ -1083,6 +1085,12 @@ variables, or shell. Host-agent permissions still apply. See
 from the Arrays backend — see the [Data Skills](#3-data-skills) section. Load
 `ARRAYS_JWT` via `secret.loadPlaintext('ARRAYS_JWT')` and call Arrays endpoints
 with `Authorization: Bearer <ARRAYS_JWT>`.
+
+**ONNX model inference**: If a user supplies, or plans to upload, an exported
+`.onnx` model artifact, read [onnx.md](references/onnx.md). Use `@alva/onnx` with
+`InferenceSession.createFromAlfs({ alfs, path })`, build tensors from real data,
+write prediction outputs through the Feed SDK, and render the playbook from
+released/granted feed paths.
 
 **Secret Manager**: use `const secret = require("secret-manager");` then
 `secret.loadPlaintext("OPENAI_API_KEY")`. This returns a string when present or
