@@ -1454,42 +1454,19 @@ altra.setStrategy(strategyFn, {
 
 ## ADK (Agent Development Kit) Quick Reference
 
-See [adk.md](references/adk.md) for the full API, tool-calling patterns, memory
-patterns, and implementation examples.
+`@alva/adk` (`adk.agent()`) embeds a fixed LLM reasoning step inside a
+deterministic, reschedulable pipeline — a feed cronjob's summarization stage,
+a scheduled digest, a "why it matters" headline, a classification step. The
+prompt and tool set are locked in; only the upstream data changes each run.
 
-ADK is a universal agent development kit that runs inside the Jagent V8 runtime.
-Use it to build LLM-powered agents that can reason over tasks, call tools,
-gather context from multiple sources, and return structured outputs.
+Do **not** use it for one-off research, exploratory analysis, or "help me look
+into X" the user asks interactively — answer directly with your own tools;
+wrapping it in `adk.agent()` adds a sandbox without buying anything. And do
+not use it to produce numbers, events, or reports that should come from a real
+data source (see Content Legitimacy Rule #2 above).
 
-It is best suited for workflows where the "thinking" step cannot be expressed as
-pure deterministic code, such as research synthesis, document analysis,
-classification, and summarization over real upstream data.
-
-### When to Use ADK
-
-Use ADK when you need an agent to:
-
-- Fetch real data through tools, APIs, SDKs, or files
-- Reason over multiple inputs before producing an answer
-- Synthesize findings into structured notes, summaries, or classifications
-- Power periodic research or analysis workflows that run on a schedule
-- Add an LLM-driven transformation step inside a larger data pipeline
-
-### When NOT to Use ADK
-
-ADK must **never** be used to fabricate data that should come from real sources.
-Specifically:
-
-- Do NOT use ADK to generate hiring statistics, financial events, analyst
-  reports, or any quantitative data that claims to originate from a real data
-  pipeline.
-- Do NOT present ADK-generated content as if it were sourced from SDKs, APIs,
-  or databases.
-- If a data source is unavailable, report the limitation as a blocker — do not
-  use ADK as a fallback data generator.
-
-ADK output that involves reasoning over real data (sentiment classification,
-trend summarization) is fine, but must be labeled as AI-generated analysis.
+See [adk.md](references/adk.md) for the API, tool-calling and memory patterns,
+and examples.
 
 ---
 
