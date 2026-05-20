@@ -212,7 +212,6 @@ The directive gives the full catalog id (`<username>/<name>`). Skills are curate
 3. **Pull other files on demand**: when building, fetch additional files progressively as needed (e.g. `alva skillhub file <username>/<name> src/index.js` only if you intend to mirror the strategy logic). Do not bulk-download.
 4. Treat the blueprint as authoritative for layout, sections, widgets, data contracts, and cadence. Deviate only where the user explicitly overrides it.
 5. State the skill choice and any intentional deviations in your Guided Planning plan. The `/use-skill:` directive is a **strong build directive** — combined with a concrete topic, present the plan **once** and build; do not also stack clarifying multi-choice questions on top. Treat `/use-skill:` + concrete topic the same as "just do it": a single short plan, then build.
-6. **Record the lineage at release.** The first `alva release playbook-draft` for this playbook MUST set `--skill-id <username>/<name>` to the same id used here. The link is persisted set-once on the first draft and cannot be added later (see [references/api/release.md](references/api/release.md)). This rule covers any build informed by a Skillhub skill — including `alva skillhub get` / `alva skillhub file` without an explicit `/use-skill:` directive.
 
 **Content arrangement.** A skill's default sections are a floor, not a ceiling. Lead with whatever carries the user's core question, proactively add sections the request demands, and cut or fold near-empty sections into neighbors rather than padding them.
 
