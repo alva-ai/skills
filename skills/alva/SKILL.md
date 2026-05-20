@@ -664,7 +664,7 @@ Before writing or rewriting playbook HTML, read the applicable design guidance
 for this session.
 
 Required evidence:
-- [design-system.md](references/design-system.md) has been read first.
+- [design.md](references/design.md) has been read first.
 - The relevant companion reference has been read when applicable:
   [design-widgets.md](references/design-widgets.md) for widget layouts,
   [design-components.md](references/design-components.md) for component
@@ -1010,7 +1010,7 @@ the full locate-and-edit procedure.
 | [fundamentals-periods.md](references/fundamentals-periods.md) | Fiscal vs calendar periods for fundamentals: derive period labels from the record, align companies by `calendarEndDate`, compute YoY across matched periods |
 | [altra-trading.md](references/altra-trading.md) | Altra backtesting engine: strategies, features, signals, testing, debugging |
 | [deployment.md](references/deployment.md) | Deploying scripts as cronjobs for scheduled execution |
-| [design-system.md](references/design-system.md) | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
+| [design.md](references/design.md) | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
 | [remix-workflow.md](references/remix-workflow.md) | Remix: create a new playbook from an existing template |
 | [annotation-edits.md](references/annotation-edits.md) | Annotation-driven edits: parse `<annotation>` tags, locate the generator behind an element, edit generation logic not rendered output |
 | [creators-note.md](references/creators-note.md) | Post-release creator's note: composing and posting the pinned author comment |
@@ -1553,7 +1553,7 @@ alva release playbook --name btc-dashboard --version v1.0.0 --feeds '[{"feed_id"
 
 ## Alva Design System
 
-**Always read [design-system.md](references/design-system.md) first** — it covers tokens,
+**Always read [design.md](references/design.md) first** — it covers tokens,
 typography, theme, and page-level layout. Then read only the spec you need:
 
 1. **Generating a widget or chart** →
@@ -1562,7 +1562,7 @@ typography, theme, and page-level layout. Then read only the spec you need:
    [design-components.md](references/design-components.md)
 3. **Building a trading strategy playbook** →
    [design-playbook-trading-strategy.md](references/design-playbook-trading-strategy.md)
-4. **Only need global rules** → stay in design-system.md
+4. **Only need global rules** → stay in design.md
 
 ---
 

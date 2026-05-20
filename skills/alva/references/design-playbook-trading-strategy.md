@@ -1,7 +1,7 @@
 # Trading Strategy Playbook
 
 > Follow this spec strictly for all trading strategy playbooks. Do not invent
-> alternative layouts. Global tokens and rules: [design-system.md](./design-system.md).
+> alternative layouts. Global tokens and rules: [design.md](./design.md).
 
 ---
 
