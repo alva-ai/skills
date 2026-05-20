@@ -7,11 +7,6 @@ signal, or render it in a released playbook. Do not present this as model
 training: Alva prepares data, runs inference, backtests or simulates supplied
 models, and renders results.
 
-This file is ONNX-only. Use [jagent-runtime.md](jagent-runtime.md) for runtime
-and ALFS details, [feed-sdk.md](feed-sdk.md) for feed writes,
-[altra-trading.md](altra-trading.md) for FeedAltra contracts, and
-[api/release.md](api/release.md) for general release gates.
-
 ## Model Handoff From Research
 
 Before writing inference code, confirm the user or upstream training pipeline
@@ -27,9 +22,6 @@ has supplied the research artifacts Alva needs to reproduce scoring:
 - validation evidence: train/test split, metrics, known failure modes, drift
   risks, and intended retraining or re-upload cadence
 
-Training and export are external to Alva. The handoff is successful when Alva can
-rebuild the exact feature vector from real data and feed it into the uploaded
-ONNX graph without guessing.
 
 ## Runtime Inference
 
@@ -106,10 +98,6 @@ const ohlcv = new Tensor(
   [1, bars, 5],
 );
 ```
-
-Only include image-style tensors such as `[1, 3, height, width]` when the user's
-actual ONNX model is image-based. Most Alva investing models should document
-tabular, panel, or time-window shapes instead.
 
 ## Model Artifacts
 
