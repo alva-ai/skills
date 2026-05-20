@@ -124,6 +124,17 @@ components:
       - "active"
     children:
       - "tab-item"
+    required-scripts:
+      - when-also: ["chart-card"]
+        must-contain:
+          - "[_echarts_instance_]"
+          - "echarts.getInstanceByDom"
+          - ".resize()"
+        message: "Hidden ECharts containers report 0×0; when a tab panel becomes visible, resize all ECharts instances inside it. See design-components.md §Tab JS Interaction."
+      - when-also: ["table-card"]
+        must-contain:
+          - "initTableAlignment"
+        message: "Re-align table-card columns when a tab panel becomes visible. See design-components.md §Tab JS Interaction."
 
   tooltip:
     root: "tooltip"
