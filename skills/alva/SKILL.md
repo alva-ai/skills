@@ -422,15 +422,6 @@ January). Read [fundamentals-periods.md](references/fundamentals-periods.md)
 before charting or tabulating quarterly/annual fundamentals or computing
 YoY/QoQ.
 
-For **live prices**, the convention is the bar interval: `interval=1d`
-returns the previous session's close during trading hours, not the current
-price. For current/live/latest-price questions, fetch from an intraday kline
-(`interval=1min`/`5min`) and read the newest record; see `alva data-skills
-summary arrays-data-api-spot-market-price-and-volume` for endpoint paths and
-response fields. For gaps outside the structured catalog (non-US equities,
-forex, traditional futures), fall back per
-[Coverage Limitations](#coverage-limitations).
-
 ### Description and Provenance Accuracy
 
 1. **Playbook descriptions and methodology sections must only list data sources
@@ -1623,6 +1614,9 @@ consistent read pattern (`@last`, `@range`, etc.).
   and safe to call anytime.
 - **Cronjob path must point to an existing script.** The deploy API validates
   the entry_path exists via filesystem stat before creating the cronjob.
+- **Live-price answers must come from an intraday kline.** `interval=1d`
+  returns the previous session's close during trading hours, not the current
+  price — fetch `1min`/`5min` and read the newest record.
 - **Create new playbooks from scratch unless you are doing a version update.**
   Only version updates may refer to an existing playbook. For all other new
   playbooks, do not read existing ones.
