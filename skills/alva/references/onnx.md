@@ -1,27 +1,36 @@
 # ONNX Model
 
-Use this reference when a user supplies, or plans to upload, an exported `.onnx`
-model artifact and wants Alva to run real-data inference, then persist the
-prediction as feed data, use it inside a FeedAltra strategy, emit an actionable
-signal, or render it in a released playbook. Do not present this as model
-training: Alva prepares data, runs inference, backtests or simulates supplied
-models, and renders results.
+This reference covers the boundary between ML research artifacts and Alva
+runtime inference. A request may start from a ready `.onnx` file, or from a
+paper, report, notebook, or third-party methodology that still needs to be made
+runnable before it can become a live playbook.
 
-## Model Handoff From Research
+## From Method To Model
 
-Before writing inference code, confirm the user or upstream training pipeline
-has supplied the research artifacts Alva needs to reproduce scoring:
+If the user provides a method instead of a ready model, first try to reproduce
+the smallest faithful version in the sandbox or local R&D environment. Use real
+Alva data where coverage exists, state source gaps clearly, and avoid treating a
+paper result as a live signal until it passes a point-in-time split or
+walk-forward check. Keep sandbox reproduction CPU-friendly: break the workflow
+into small stages and simplify training before scaling fidelity. If reproduction
+needs packages such as PyTorch, scikit-learn, or ONNX exporters, install them in
+the sandbox and proceed.
 
-- investment thesis: asset/universe, prediction horizon, and decision use
-- label definition: return, class, rank, allocation, or signal target
-- feature recipe: raw fields, rolling windows, z-score/normalization, smoothing,
-  missing-data policy, and timestamp convention
-- tensor contract: input name, dtype, shape, flatten order, output name, and
-  output semantics
-- artifact set: `model.onnx` plus `model_meta.json`
-- validation evidence: train/test split, metrics, known failure modes, drift
-  risks, and intended retraining or re-upload cadence
+Before writing inference code, freeze this handoff:
 
+- thesis: asset/universe, prediction horizon, and decision use
+- label: return, class, rank, allocation, or signal target
+- features: raw fields, rolling windows, normalization, smoothing,
+  missing-data policy, timestamp convention, and asset order
+- tensor: input name, dtype, shape, flatten order, output name, and output
+  semantics
+- artifacts: `model.onnx` plus `model_meta.json`
+- evidence: train/test split, metrics, costs, known failure modes, drift risks,
+  and retraining or re-upload cadence
+
+If the output is a strategy, rebalance rule, allocation model, or
+portfolio-following signal, route the exported model through FeedAltra. Use a
+plain Feed SDK pipeline only for prediction-only inspection.
 
 ## Runtime Inference
 
@@ -48,19 +57,14 @@ const { InferenceSession, Tensor, TensorDataType } = require("@alva/onnx");
 
 Rules:
 
-- Use absolute ALFS paths such as
-  `/alva/home/${env.username}/models/<model>/v1/model.onnx`.
-- `createFromAlfs` delegates to `alfs.readFileBytes`; jagent currently returns
-  base64 for bytes, and `@alva/onnx` decodes it internally. It is also compatible
-  if a future runtime returns raw bytes. Do not hand-roll `atob`, `Uint8Array`,
-  or byte conversion in playbook code.
-- `createFromBase64` is for small demos/tests. Production should use uploaded
-  artifacts through `createFromAlfs`.
-- Tensor dtype, shape, input names, and output names must come from model
-  metadata or the training recipe. Trading vectors are usually
-  `TensorDataType.Float32`, but do not guess.
-- Release every session in `finally`. Sessions belong to the current jagent
-  execution and cannot be persisted across cronjob runs.
+- Store production models under `~/models/<model>/v<major>/model.onnx` with
+  `model_meta.json` beside it.
+- Load production models with `InferenceSession.createFromAlfs({ alfs, path })`.
+  Do not decode model bytes manually.
+- Tensor dtype, shape, input names, and output names must come from
+  `model_meta.json` or the training recipe.
+- Create and release the ONNX session inside each scheduled run; release it in
+  `finally`.
 
 ## Tensor Shapes
 
@@ -77,25 +81,13 @@ Common finance shapes:
 | Regression output | `[1, 1]` | `outputs.<name>.data[0]` |
 | Classification output | `[1, classes]` | `Array.from(outputs.<name>.data)` |
 
-Examples:
+Example:
 
 ```javascript
 const tabular = new Tensor(
   TensorDataType.Float32,
   new Float32Array([f1, f2, f3, f4]),
   [1, 4],
-);
-
-const multiAsset = new Tensor(
-  TensorDataType.Float32,
-  new Float32Array(flatFeatures),
-  [1, assets, features],
-);
-
-const ohlcv = new Tensor(
-  TensorDataType.Float32,
-  new Float32Array(flatOhlcv),
-  [1, bars, 5],
 );
 ```
 
@@ -117,11 +109,10 @@ share the model. Public playbooks expose feed outputs, not the `.onnx` file.
 
 `model_meta.json` should include:
 
-- model name, contract version, artifact hash/version, owner/source, training
-  time, and training data window
-- task type: regression, classification, ranking, or allocation
-- data contract: universe, asset order, interval, timestamp convention,
-  adjusted/unadjusted prices, units/currency, and missing-data policy
+- model identity, contract version, artifact hash/version, source, training
+  window, and task type
+- data contract: universe, asset order, interval, timestamp convention, units,
+  and missing-data policy
 - input contract: input names, dtypes, dims, feature order, lookback, flatten
   order, normalization, scaler fit scope, and imputation policy
 - output contract: output names, dtypes, dims, units/classes, horizon, class
@@ -138,8 +129,7 @@ Use FeedAltra when ONNX output drives a backtest, rebalance, simulation, trading
 signal, or strategy metric. Follow [altra-trading.md](altra-trading.md) for the
 general feature/strategy shape; ONNX adds these constraints:
 
-- Create the session once per jagent execution, not once per bar. A lazy
-  `getSession()` may memoize `sessionPromise`; clear cached state after release.
+- Create the session once per run, not once per bar.
 - Reproduce training exactly: identifiers, intervals, bar-close timestamps,
   lookback, missing-data policy, feature order, scaling, target horizon, labels.
 - The feature timestamp is the time input evidence is available, not the
@@ -182,17 +172,11 @@ If using FeedAltra, its normal `signal`, `sim`, and `perf` outputs are covered b
 [altra-trading.md](altra-trading.md); do not duplicate them unless the playbook
 needs a custom ONNX-specific view.
 
-If released HTML displays ONNX predictions or metrics, it must read released feed
-data at runtime, commonly:
-
-```text
-/alva/home/<username>/feeds/<feed-name>/v1/data/model/summary/@last/1
-/alva/home/<username>/feeds/<feed-name>/v1/data/model/features/@last/500
-```
-
-Preview fixtures must not become the authoritative source or production fallback.
-These names are recommendations, not a required schema; choose the smallest feed
-surface that supports the playbook and downstream consumers.
+If released HTML displays ONNX predictions or metrics, it must read released
+feed data at runtime. Preview fixtures must not become the authoritative source
+or production fallback. These names are recommendations, not a required schema;
+choose the smallest feed surface that supports the playbook and downstream
+consumers.
 
 ## README And Release Additions
 
@@ -203,8 +187,6 @@ Follow the normal README and release rules in `SKILL.md` and
   output meaning, validation evidence, and re-upload or retraining expectation.
 - `alva run` proves the script fetches real data, loads the `.onnx` file from
   ALFS, and builds tensors with the documented shape.
-- Released HTML reads released feed data, not embedded prediction arrays or
-  preview fixtures.
 - Public access should normally be granted to released feed outputs, not the
   model artifact.
 
@@ -214,4 +196,4 @@ Follow the normal README and release rules in `SKILL.md` and
 | --- | --- | --- |
 | Session or tensor error | Reusing a released session, wrong dtype, or `dims` product differs from data length | Create one session per run and rebuild the tensor from `model_meta.json` |
 | Missing graph key | Wrong ONNX input/output name | Use the names from model metadata or runtime introspection, then update code and docs |
-| Local preview works but `alva run` fails | Demo-only base64 or host-file loading leaked into production | Use `InferenceSession.createFromAlfs({ alfs, path })` with absolute ALFS paths |
+| Local preview works but `alva run` fails | Host-file or local-only loading leaked into production | Use `InferenceSession.createFromAlfs({ alfs, path })` with an ALFS model path |
