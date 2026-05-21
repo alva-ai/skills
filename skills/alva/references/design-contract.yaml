@@ -14,7 +14,11 @@ global:
     selector: ".playbook-container"
     must-exist: true
   required-stylesheets:
-    - url: "https://alva-ai-static.b-cdn.net/design-system/design-tokens.css"
+    - any-of:
+        - url: "https://alva-ai-static.b-cdn.net/design-system/design-tokens.css"
+        - url: "https://alva-ai-static.b-cdn.net/design-system/v1/design-system.css"
+  canonical-css-urls:
+    - "https://alva-ai-static.b-cdn.net/design-system/v1/design-system.css"
   scroll:
     sole-scroll-container: ["body", "html"]
   typography:
