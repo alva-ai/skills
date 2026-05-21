@@ -3,7 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "design-contract-sync": "tsx design-contract-sync.ts"
+    "design-contract-sync": "tsx design-contract-sync.ts",
+    "build-design-system-css": "tsx build-design-system-css.ts",
+    "build-design-system-css:check": "tsx build-design-system-css.ts --check"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
