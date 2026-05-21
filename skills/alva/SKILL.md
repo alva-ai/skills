@@ -892,6 +892,9 @@ Required evidence:
     font-weight 600/700, unregistered component-modifier classes, etc.). To
     pre-check: `alva lint playbook ./index.html`. The full ruleset lives in
     [design-contract.yaml](references/design-contract.yaml).
+    For new playbooks, link `v1/design-system.css` per the template in
+    [design.md](references/design.md) — the linter accepts both legacy
+    and v1 URLs.
 
 If any item fails, do not release. Fix the issue, re-run
 `alva release playbook-draft` if metadata or backing files changed, then
@@ -1038,6 +1041,7 @@ the full locate-and-edit procedure.
 | [deployment.md](references/deployment.md) | Deploying scripts as cronjobs for scheduled execution |
 | [design.md](references/design.md) | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
 | [design-contract.yaml](references/design-contract.yaml) | Machine-readable contract consumed by the design linter that gates `alva release playbook` |
+| [css/design-system.css](references/css/design-system.css) | Canonical CSS bundle published to CDN — playbooks `<link>` it instead of inlining component/widget CSS |
 | [remix-workflow.md](references/remix-workflow.md) | Remix: create a new playbook from an existing template |
 | [annotation-edits.md](references/annotation-edits.md) | Annotation-driven edits: parse `<annotation>` tags, locate the generator behind an element, edit generation logic not rendered output |
 | [creators-note.md](references/creators-note.md) | Post-release creator's note: composing and posting the pinned author comment |
