@@ -64,7 +64,7 @@ render function emits, or the component factory it calls — so every render
 keeps the change and stays data-driven.
 
 Editing playbook HTML re-enters the `before-build-html` gate: read
-[build-playbook-web-app.md](build-playbook-web-app.md) before making the
+[playbook-assembly.md](playbook-assembly.md#html-gate) before making the
 change.
 
 ---
@@ -73,4 +73,4 @@ change.
 
 After applying every annotation, write the HTML back to ALFS and re-release.
 A change to an already-released playbook is a version bump: `alva release
-playbook-draft` then `alva release playbook` with the new version (Step 7).
+playbook-draft` then `alva release playbook` with the new version.
