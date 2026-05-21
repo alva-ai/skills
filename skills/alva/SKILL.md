@@ -200,74 +200,11 @@ that the user should verify with current sources.
 | **Data Query** | Fetch the requested data accurately and return it directly unless the user asks for a richer artifact |
 | **Remix** | Reuse the source artifact, apply the requested changes, and return an updated result that matches the requested customization |
 
-### Choose Skill (mandatory when `/use-skill:<username>/<name>` is present)
-
-If the user's message contains a `/use-skill:<username>/<name>` directive (e.g. `/use-skill:alva/thesis`, `/use-skill:alice/btc-momentum`), this step is **mandatory** and must run before Guided Planning and before any build work.
-
-The directive gives the full catalog id (`<username>/<name>`). Skills are curated **methodologies** — opinionated blueprints that encode how to approach a recurring class of finance work (e.g. building a thesis, an AI-curated digest, a momentum tracker). They live in the **Skillhub** catalog on the gateway and are fetched via the `alva skillhub` CLI (use `alva skillhub --help` for the full surface). Alva ships a starter set under the `alva/` namespace, and any user can publish their own — do not assume the `alva/` namespace.
-
-1. **Inspect**: `alva skillhub get <username>/<name>` returns the file listing with sizes. Confirm a blueprint file is present — convention is `template.md`. If absent, look for `README.md` or ask the user which file is the blueprint.
-   - **On 404 / not found** (typo, deleted, or moved): run `alva skillhub list` and look for close matches **leniently** — case-insensitive, substring on both halves of the id, ignore separator differences. If exactly one obvious candidate, proceed with it and tell the user you corrected the id (e.g. "interpreting `/use-skill:Alva/AI-Digest` as `alva/ai-digest`"). If multiple plausible candidates, show them and ask. If nothing close, show the filtered list (use `--tag` if the user hinted at a topic) and ask the user to pick.
-2. **Read the blueprint**: `alva skillhub file <username>/<name> template.md` (or the file from step 1). Do not proceed from memory of a prior session — fetch it fresh.
-3. **Pull other files on demand**: when building, fetch additional files progressively as needed (e.g. `alva skillhub file <username>/<name> src/index.js` only if you intend to mirror the strategy logic). Do not bulk-download.
-4. Treat the blueprint as authoritative for layout, sections, widgets, data contracts, and cadence. Deviate only where the user explicitly overrides it.
-5. State the skill choice and any intentional deviations in your Guided Planning plan. The `/use-skill:` directive is a **strong build directive** — combined with a concrete topic, present the plan **once** and build; do not also stack clarifying multi-choice questions on top. Treat `/use-skill:` + concrete topic the same as "just do it": a single short plan, then build.
-
-**Content arrangement.** A skill's default sections are a floor, not a ceiling. Lead with whatever carries the user's core question, proactively add sections the request demands, and cut or fold near-empty sections into neighbors rather than padding them.
-
-**Push-driven requests** — if the user's primary outcome is a recurring push (digest, threshold tracker, stream watch, periodic alert), the `alva/ai-digest` skill is purpose-built for that shape and worth offering during Guided Planning. Push can also be added to any other playbook through [playbook-assembly.md](references/playbook-assembly.md#assembly-order) — the skill is one good option, not a requirement.
-
-No `/use-skill:` directive → skip this step and proceed to Guided Planning normally.
-
-### Guided Planning
-
-For all routes except **Data Query**, present a plan **once** before building.
-Even seemingly clear requests ("build a BTC dashboard") have real choices —
-which data, timeframe, widgets — that are cheaper to resolve upfront than to
-rebuild.
-
-**Exactly one blocking question per session.** Pick a single path through the
-steps below — do not run step 1 clarifications AND a step 3 plan confirmation
-in the same session. Whichever you use is the gate; the user's answer or
-approval counts as approval to build, and you go directly to building
-afterward.
-
-1. **Understand intent** — When key parameters are missing (asset, scope,
-   output type, purpose) and have no obvious default, ask clarifying questions
-   **one at a time**, prefer multiple-choice. Skip this step if the request
-   already specifies these, or if the missing parameters have a single obvious
-   default. **If you ran this step, do not also run step 3** — the answers
-   are the approval to build.
-2. **Propose approaches** — Offer 2-3 concrete options with trade-offs when
-   there are real strategic alternatives. Lead with your recommendation. Skip
-   when the template or request already pins the approach.
-3. **Confirm the plan** — When step 1 was skipped (request already clear, or
-   `/use-skill:` directive specifies the shape), present a single 5-8 line
-   plan listing the specific feeds and widgets, then build after approval.
-   State the skill (if any) and the key defaults you are using.
-
-If the user says "just do it" at any point — or used `/use-skill:<username>/<name>`
-together with a concrete topic — skip clarifying questions for the rest of the
-session and present a single short plan, then build.
-
-### Completion Gate
-
-For **Dashboard/Playbook** and **Backtest/Strategy** requests, the default goal
-is to leave the user with a result they can actually use. In many cases that
-means a released playbook and a `published_url`, but do not force that path if
-the user only asked for code, analysis, debugging help, or an intermediate
-artifact.
-
-Before finishing, verify that the delivered result matches the user's actual
-goal. When a shareable playbook was part of the task, verify:
-
-- [ ] A playbook was released and a `published_url` was returned
-
-Must Do After Completion Gate:
-
-- [ ] Summarize the whole process and what is delivered to the user.
-
----
+For any request that creates, updates, releases, verifies, or push-enables a
+playbook, immediately route to
+[playbook-assembly.md](references/playbook-assembly.md). It owns Skillhub
+blueprint handling, planning, data/feed assembly, HTML, README, draft/release
+gates, screenshot verification, and post-release push evaluation.
 
 ## Capability Verification
 
@@ -305,30 +242,10 @@ proceeding. Do **not** silently substitute a different deliverable (local
 prototype with seeded RNG, WebSearch summary, analytic memo without data
 fetch) when the SDK can serve the original request.
 
-### Data Sourcing
-
-1. **All quantitative data displayed in charts, tables, or metric cards MUST
-   originate from Alva feeds** (SDK modules or BYOD via `require("net/http")`).
-   Never hardcode data as inline JavaScript literals in playbook HTML.
-
-2. **Playbook HTML MUST fetch data at runtime** from feed output paths.
-   Published HTML runs in the viewer's browser, so do not use sandbox-only env
-   vars such as `$ALVA_ENDPOINT` and do not guess `https://api.alva.ai`. Use the
-   public anonymous ALFS read gateway — see the `readAlfsJson` helper in
-   [playbook-assembly.md](references/playbook-assembly.md#html-gate).
-
-   Static content (labels, colors, layout config) is fine. Quantitative data is
-   not — it must flow through the feed pipeline.
-
-3. **Verification claims and quoted tool outputs must reflect actual tool
-   calls.** Do not describe a screenshot you did not take ("the dashboard
-   looks good"). When citing a tool-returned value such as `published_url`,
-   `feed_id`, or an ALFS path, copy it verbatim from the response. The
-   user-facing share link is the canonical
-   `https://alva.ai/u/<username>/playbooks/<playbook_name>` URL; `published_url`
-   is the deployed HTML URL used for verification steps such as screenshots.
-   Do not present one as if it were the other. If you need a value, re-read
-   the tool response first.
+For playbook creation, update, release, screenshot, push, and feed-wiring
+details, read
+[playbook-assembly.md#data-and-scope-rules](references/playbook-assembly.md#data-and-scope-rules).
+This section keeps only the global source-of-truth constraints.
 
 ### Prohibited Data Sources for Charts, Tables, and Query Answers
 
@@ -350,23 +267,6 @@ fetch) when the SDK can serve the original request.
    the requested data type, report the gap as a blocker. Do not invent data from
    your own knowledge to fill the hole.
 
-### Feed Scope Isolation
-
-**Do not reference other feeds or other playbooks' feeds.** When building a
-playbook, only read from feeds created for this playbook in the current
-session.
-
-Reference an existing feed **only when the user explicitly asks for it** (e.g.
-"reuse my `btc-ema` feed", "pull data from @alice/macro-dashboard"). Otherwise,
-build the playbook's own feeds from scratch so its data lineage is
-self-contained and the playbook remains portable.
-
-Qualitative analysis (ratings, theses, outlook text) is not data and must not
-appear as feed output columns or "data" fields in HTML tables. If the user
-asks for a rating, either compute it from SDK fundamentals with the formula
-shown, or place it in a clearly labelled "AI analysis" section separated from
-data-driven metrics.
-
 ### SDK Coverage Gaps
 
 1. **When an SDK partition lacks the requested data type**, reduce scope:
@@ -381,26 +281,6 @@ data-driven metrics.
 2. **When >20% of requested symbols fail SDK lookup, report a data-quality
    blocker.** Do not silently substitute with estimated or fabricated values
    marked `live: false`.
-
-### Release Gate: `--feeds` Is a Declaration, Not a Shortcut
-
-`alva release playbook --feeds '[]'` is **only** valid when the released HTML
-renders zero quantitative values at runtime (landing pages, UI-only demos).
-If the HTML shows any numbers, charts, tables, or metric cards, the release
-MUST reference deployed feeds in `--feeds` and the HTML MUST `fetch()` them
-at runtime. If you used `alva run` to source data, deploy that same logic as
-a feed and reference it.
-
-### Thematic Ticker Curation
-
-When building sector or thematic dashboards with curated ticker lists:
-
-1. Do NOT rely on agent knowledge for ticker-to-sector mapping.
-2. After assembling the list, cross-check each ticker's sector using an SDK
-   call (e.g. `getStockCompanyDetail`) to verify it belongs to the intended
-   segment.
-3. Remove mismatches before building the feed. A single wrong ticker (e.g. a
-   cybersecurity company in a battery segment) can distort the entire analysis.
 
 ### Data Convention Alignment
 
@@ -421,17 +301,6 @@ quarters are not always calendar quarters (NVDA's fiscal year ends in late
 January). Read [fundamentals-periods.md](references/fundamentals-periods.md)
 before charting or tabulating quarterly/annual fundamentals or computing
 YoY/QoQ.
-
-### Description and Provenance Accuracy
-
-1. **Playbook descriptions and methodology sections must only list data sources
-   that were actually called successfully.** Do not claim "Brave Search",
-   "ClinicalTrials.gov", or any other source unless the feed script actually
-   fetches from it at runtime.
-
-2. **Update frequency claims must match actual deployment.** If cronjob
-   deployment failed, do not claim "updated every N hours" in the playbook
-   description. Either fix the cronjob or remove the claim.
 
 ---
 
@@ -616,111 +485,36 @@ cronjobs on Alva Cloud. They run continuously on your chosen schedule (e.g.
 every hour, every day). All data is private by default; grant public access to
 specific paths so anyone -- or any playbook page -- can read the data.
 
-**User scope enforcement**: All write, deploy, and release operations MUST
-target only the requesting user's namespace. Before any `fs/write`,
-`draft/playbook`, or `release/playbook` call, verify the target path and
-username match the authenticated user (from `alva whoami`). If you have
-access to multiple API keys (e.g. from prior sessions), identify the requesting
-user and scope all operations to that user only. Do NOT write to or release
-playbooks under other users' namespaces unless the request explicitly asks for
-cross-user operations (e.g. remix with lineage).
-
-**Strategy / backtest / signal feeds require Altra**: Any feed that produces
-`signal/targets` or `signal/alerts`, or that performs backtesting, portfolio
-simulation, equity-curve / drawdown / Sharpe computation, position tracking, or
-rebalancing, MUST use `FeedAltra` — even for simple signal logic. Hand-rolled
-`for` loops over price arrays, custom P&L accumulators, and direct
-target-record building bypass bar alignment, portfolio simulation, and
-look-ahead-bias prevention. See the
-[Altra Trading Engine Quick Reference](#altra-trading-engine-quick-reference)
-for the rationale.
-
-**Push notification streams:** Subscriptions target feed/playbook resources,
-not output paths. The output path only chooses the feed-alert source:
-
-| Output stream | Feed-alert source | Use for | Delivery eligibility |
-| --- | --- | --- | --- |
-| `signal/targets` | `signal/targets` | Playbook signals, trading targets, actionable alerts | Users or groups explicitly subscribed to the feed or to a playbook that references the feed |
-| `notify/message` | `notify/message` | Feed results, AlvaAsk reports, heartbeat checks, proactive alerts | Users or groups explicitly subscribed to the feed or to a playbook that references the feed |
-
-Rules:
-
-- Both streams dispatch the canonical `feed_alert_ready` event. Do not use the
-  legacy names `playbook_data_ready` or `feed_run_complete` in new docs or
-  agent instructions.
-- A push-capable feed needs `--push-notify` and a feed release bound to the
-  cronjob:
-
-```bash
-alva deploy create --name <feed> --path '~/feeds/<feed>/v1/src/index.js' \
-  --cron "<expr>" --push-notify
-alva release feed --name <feed> --version 1.0.0 \
-  --cronjob-id <ID_FROM_DEPLOY> --description "<one-sentence purpose>"
-```
-
-- `--push-notify` only marks the feed publisher as capable of emitting alerts.
-  It does **not** subscribe any user or group, and it does not bypass
-  notification preferences.
-- For `notify/message`, `body`/`text` containing `<|SKIP_NOTIFICATION|>`
-  advances fanout without sending a user-visible push. Use it for quiet
-  AlvaAsk, heartbeat, and monitor runs.
-- Real delivery always requires an explicit subscription:
-  `alva push-subscriptions subscribe-feed --username <owner> --name <feed>`,
-  `alva push-subscriptions subscribe-playbook --username <owner> --name <playbook>`,
-  or a group `/alva subscribe feed <id>` / `/alva subscribe playbook <id>`.
-
-Keep schema examples in [feed-sdk.md](references/feed-sdk.md) Patterns D/E.
-See [playbook-assembly.md](references/playbook-assembly.md#assembly-order) for
-post-release push evaluation.
+See [deployment.md](references/deployment.md) for the deployment command
+surface. If the deployment is part of a playbook build, route to
+[playbook-assembly.md](references/playbook-assembly.md) for feed release,
+namespace, Altra, draft/release, and push gates.
 
 ### 6. Assemble and Release Playbooks
 
-Read [playbook-assembly.md](references/playbook-assembly.md) for the complete
-playbook build flow: plan, data sources, feeds, deployment, HTML, README,
-draft, release, screenshot verification, and push evaluation. The rule agents
-most often miss: every quantitative value shown in released HTML must come from
-deployed feed output read at runtime.
-
-Release-specific gotchas stay in [release.md](references/api/release.md):
-README shape, absolute `--readme-url`, `--trading-symbols` / `--tags` overlap,
-and `--skill-id`.
+Read [playbook-assembly.md](references/playbook-assembly.md). It is the single
+source for playbook creation, updates, releases, screenshots, and push setup.
+Release API details stay in [release.md](references/api/release.md).
 
 ### 7. Remix (Create from Existing Playbook)
 
-Users can remix any published playbook to create a customized version. The Remix
-prompt arrives as a `<remix>` tag — e.g.
-`<remix url="/u/alice/playbooks/btc-momentum" type="playbook" ...>...</remix>`
-— from which the agent extracts the source `owner` and `name` via the
-`url` attribute. The agent then reads the source playbook's feed scripts
-(strategy logic) and HTML (dashboard UI), customizes them per the user's
-request, and deploys a new playbook under their own namespace. The tag's
-inner text is a fixed instruction, not the user's customization request —
-if the user typed nothing meaningful outside the tag, ask what to
-customize before proceeding.
+Read [remix-workflow.md](references/remix-workflow.md) when a request arrives
+with a `<remix>` tag or asks to customize an existing playbook. After the remix
+plan is resolved, re-enter [playbook-assembly.md](references/playbook-assembly.md)
+for deployment and release.
 
-See [remix-workflow.md](references/remix-workflow.md) for the full step-by-step
-guide. `alva remix` commands are exclusively for lineage registration — to
-read any playbook's files, use `alva fs read`.
+### 8. Push Notifications
 
-### 8. Post-release push notification flow
-
-After release or private draft completion, use
-[playbook-assembly.md](references/playbook-assembly.md#assembly-order) to decide
-whether push is useful and to verify the complete setup. Push is not configured
-until the sidecar output, `--push-notify`, feed release, subscription, and a
-fresh run all line up.
+Push is a playbook/feed capability. For playbook builds, route to
+[playbook-assembly.md#push-setup](references/playbook-assembly.md#push-setup).
+Feed schema examples stay in [feed-sdk.md](references/feed-sdk.md) Patterns D/E.
 
 ### 9. Annotation-driven edits
 
-A request to tweak one element of a playbook in session context arrives as one
-or more `<annotation>` tags, each naming a target element by CSS `selector` and
-an `instruction` for it. Locate the **generator** behind the element — the CSS
-rule or render function that produces it — and edit that. Never freeze the
-element's rendered output into static text: that hardcodes live feed values and
-breaks on the next data update.
-
-See [annotation-edits.md](references/annotation-edits.md) for the tag format and
-the full locate-and-edit procedure.
+Read [annotation-edits.md](references/annotation-edits.md) when a request
+contains `<annotation>` tags or asks to tweak one element of a playbook in
+session context. Never freeze rendered output; edit the generator and re-enter
+[playbook-assembly.md](references/playbook-assembly.md) for HTML/release gates.
 
 ---
 
@@ -917,77 +711,12 @@ and deduplication behavior.
 
 ---
 
-## Deploying Feeds
+## Feed Deployment Routing
 
-Every feed follows a 6-step lifecycle including every newly created feed or re-created feed:
-
-1. **Write** -- define schema + incremental logic with `ctx.kv`
-2. **Upload** — write script to `'~/feeds/<name>/v1/src/index.js'`
-3. **Test** — `alva run --entry-path '~/feeds/<name>/v1/src/index.js'` to verify output.
-   For SDK modules you haven't used before in this session, first run a
-   shape-check snippet to verify response structure:
-
-   ```js
-   const r = await mod.someFunction({ symbol: "AAPL" });
-   console.log(JSON.stringify(r).slice(0, 500));
-   ```
-
-   Verify the actual response nesting (e.g. `{success, response: {rates:[]}}`
-   vs flat array) matches your feed script's parsing logic before proceeding.
-   `alva run` is a test step — it does NOT write to the production `@last`
-   path. Never skip `alva deploy` below on the assumption that the run
-   "already produced the data".
-
-   **The run must succeed before moving on.** If `alva run` throws, returns
-   an error, produces empty output when records were expected, or surfaces
-   a response shape that doesn't match the script's parsing, stop and fix
-   the feed script. Do not proceed to Grant / Deploy / Release on a failed
-   or empty run — a broken feed that is granted and deployed will publish
-   nothing (or stale data) and fail the release checklists later.
-4. **Grant** -- make feed data publicly readable:
-
-   ```bash
-   alva fs grant --path '~/feeds/<name>' --subject "special:user:*" --permission read
-   ```
-
-   Grant on the feed root path (not on `data/`). Subject format:
-   `special:user:*` (public), `special:user:+` (authenticated only), `user:<id>`
-   (specific user).
-5. **Deploy** -- `alva deploy create` for scheduled execution
-6. **Release** -- `alva release feed` to register the feed in the
-   database (requires the `cronjob_id` from the deploy step)
-
-### Feed Release Checklist
-
-<HARD-GATE id="before-feed-release">
-Before running `alva release feed`, verify the exact feed script that will be
-released has run successfully in this session.
-
-Required evidence:
-
-1. **Run check**: `alva run --entry-path '~/feeds/<name>/v1/src/index.js'`
-   completed successfully after the latest source write.
-2. **Output shape check**: The run produced the expected feed output
-   groups/fields for this feed.
-3. **Freshness check**: If the script changed after the run, the evidence is
-   stale. Re-run before release.
-4. **Grant check**: `special:user:*` read permission exists on the feed path.
-   If missing, run the grant step now.
-5. **Public-read check**: Fetch the feed data path without authentication and
-   confirm HTTP 200, not 403.
-6. **HTML backing check**: If the feed backs HTML, at least one public `@last`
-   path that the HTML will read has a non-empty result after grant.
-
-If this evidence is missing or stale, do not run `alva release feed`. Re-run
-the feed, inspect the output, and only then proceed.
-</HARD-GATE>
-
-Building a playbook? Every backing feed still passes this gate first;
-then, before `alva release playbook`, pass `before-playbook-release` in
-[playbook-assembly.md](references/playbook-assembly.md#release-gate) — it
-covers HTML, README, freshness, and feed coverage.
-
-If the build was interrupted and resumed, re-enter this gate from the top.
+For standalone feed tasks, use [feed-sdk.md](references/feed-sdk.md) and
+[deployment.md](references/deployment.md). For feeds that back a playbook, use
+[playbook-assembly.md#feed-lifecycle](references/playbook-assembly.md#feed-lifecycle);
+that reference owns the feed release gate in the playbook assembly path.
 Do not assume prior steps completed successfully.
 
 | Data Type                     | Recommended Schedule     | Rationale                           |
@@ -1215,40 +944,9 @@ interval: 1 minute.
 lowercase alphanumeric characters or hyphens, and cannot start or end with a
 hyphen (DNS label format). Example: `btc-ema-update`, not `BTC EMA Update`.
 
-After deploying a cronjob, register the feed, create a playbook draft, then
-release the playbook for public hosting. The playbook HTML must already be
-written to ALFS at `'~/playbooks/{name}/index.html'` via `fs/write` before
-releasing.
-
-**Important**: Feed names and playbook names must be unique within your user
-space. Before creating a new feed or playbook, use
-`alva fs readdir --path '~/feeds'` or
-`alva fs readdir --path '~/playbooks'` to check for existing names and avoid
-conflicts.
-
-```bash
-# 1. Release feed (register in DB, link to cronjob)
-alva release feed --name btc-ema --version 1.0.0 --cronjob-id 42 \
-  --description "Fetches BTC/USDT 1h klines from Binance and emits the 20-period EMA as a time series"
-# → {"feed_id":100,"name":"btc-ema","feed_major":1}
-
-# 2. Create playbook draft (creates DB record + ALFS draft files automatically).
-alva release playbook-draft --name btc-dashboard --display-name "BTC Trend Dashboard" --description "BTC market dashboard" --feeds '[{"feed_id":100}]' --trading-symbols '["BTC"]' --tags '["BTC","macro"]'
-# → {"playbook_id":99,"playbook_version_id":200}
-
-# 3. Write playbook README to ALFS (required before release).
-alva fs write --path '~/playbooks/btc-dashboard/README.md' --file ./README.md --mkdir-parents
-
-# 4. Release playbook (reads HTML from ALFS, uploads to CDN, writes release files automatically).
-#    --readme-url is required and must be the absolute ALFS path to the README
-#    written above (the relative shorthand is no longer accepted).
-alva release playbook --name btc-dashboard --version v1.0.0 --feeds '[{"feed_id":100}]' --changelog "Initial release" --readme-url '/alva/home/alice/playbooks/btc-dashboard/README.md'
-# → {"playbook_id":99,"version":"v1.0.0","published_url":"https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html"}
-
-# After release, output the canonical share link to the user:
-# https://alva.ai/u/<username>/playbooks/<playbook_name>
-# e.g. https://alva.ai/u/alice/playbooks/btc-dashboard
-```
+Playbook assembly and release order lives in
+[playbook-assembly.md](references/playbook-assembly.md), not in this framework
+file.
 
 ---
 
@@ -1327,9 +1025,6 @@ consistent read pattern (`@last`, `@range`, etc.).
 - **Live-price answers must come from an intraday kline.** `interval=1d`
   returns the previous session's close during trading hours, not the current
   price — fetch `1min`/`5min` and read the newest record.
-- **Create new playbooks from scratch unless you are doing a version update.**
-  Only version updates may refer to an existing playbook. For all other new
-  playbooks, do not read existing ones.
 - **ECharts: use `type: 'time'` for date axes.** Do not pass raw epoch
   millisecond values as category labels — users will see numbers like
   `1773840600000` instead of dates. Use `type: 'time'` axis, which handles
