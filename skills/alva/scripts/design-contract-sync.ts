@@ -5,6 +5,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
+import { spawnSync } from 'node:child_process';
 import YAML from 'yaml';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -117,8 +118,21 @@ function check(): string[] {
 }
 
 const errors = check();
+
+// CSS freshness check — re-run the design-system.css build and compare
+const cssCheck = spawnSync('tsx', ['build-design-system-css.ts', '--check'], {
+  cwd: __dirname,
+  stdio: 'pipe',
+  encoding: 'utf8',
+});
+if (cssCheck.status !== 0) {
+  errors.push(
+    `design-system.css drift: ${(cssCheck.stderr || '').trim() || 'build --check failed'}`
+  );
+}
+
 if (errors.length === 0) {
-  console.log('design-contract.yaml ⇄ design docs: in sync');
+  console.log('design-contract.yaml ⇄ design docs: in sync\ndesign-system.css: in sync');
   process.exit(0);
 } else {
   console.error('design-contract.yaml ⇄ design docs DRIFT:');
