@@ -315,7 +315,7 @@ fetch) when the SDK can serve the original request.
    Published HTML runs in the viewer's browser, so do not use sandbox-only env
    vars such as `$ALVA_ENDPOINT` and do not guess `https://api.alva.ai`. Use the
    public anonymous ALFS read gateway — see the `readAlfsJson` helper in
-   [Build the Playbook Web App](#6-build-the-playbook-web-app).
+   [build-playbook-web-app.md](references/build-playbook-web-app.md#browser-safe-feed-reads).
 
    Static content (labels, colors, layout config) is fine. Quantitative data is
    not — it must flow through the feed pipeline.
@@ -674,53 +674,11 @@ See **Step 9** below for the post-release subscription flow.
 
 ### 6. Build the Playbook Web App
 
-<HARD-GATE id="before-build-html">
-Before writing or rewriting playbook HTML, read the applicable design guidance
-for this session.
-
-Required evidence:
-
-- [design-system.md](references/design-system.md) has been read first.
-- The relevant companion reference has been read when applicable:
-  [design-widgets.md](references/design-widgets.md) for widget layouts,
-  [design-components.md](references/design-components.md) for component
-  details, and
-  [design-playbook-trading-strategy.md](references/design-playbook-trading-strategy.md)
-  for strategy/backtest playbooks.
-- If a `/use-skill:` blueprint or template is active, its layout and data
-  contract have been read before HTML work starts.
-
-If this evidence is missing, stop and read the required design/reference file
-before creating or editing HTML. Do not rely on memory of prior sessions.
-</HARD-GATE>
-
-After your data pipelines are deployed and producing data, build the playbook's
-web interface. Create HTML5 pages with Alva Design System that read from Alva's
-data gateway and visualize the results. Follow the Alva Design System for
-styling, layout, and component guidelines. Unless the user explicitly asks for a
-static snapshot, default to a live playbook.
-**Data fetching requirement**: Apply the
-[Content Legitimacy Rules](#content-legitimacy-rules) when building the UI.
-All quantitative data in charts, tables, or metric cards must come from feed
-outputs read at runtime (no inline literals for data).
-
-Use this browser-safe helper for published playbook HTML:
-
-```javascript
-const PUBLIC_ALFS_READ_URL = "https://api-llm.prd.alva.ai/api/v1/fs/read?path=";
-
-async function readAlfsJson(path) {
-  const resp = await fetch(PUBLIC_ALFS_READ_URL + encodeURIComponent(path));
-  if (!resp.ok) {
-    throw new Error(`Failed to load ${path}: HTTP ${resp.status}`);
-  }
-  return resp.json();
-}
-```
-
-`$ALVA_ENDPOINT` is available to sandbox scripts and CLI verification only. Do
-not emit it into browser HTML; published HTML must call the public read gateway
-above so anonymous viewers can load feed output without authentication.
+When building or editing playbook HTML, read
+[build-playbook-web-app.md](references/build-playbook-web-app.md) first. The
+rule agents most often miss: published HTML must read quantitative data from
+feed outputs at runtime through the browser-safe public ALFS gateway, not from
+inline literals or sandbox-only endpoints.
 
 ### 7. Release
 
@@ -1043,6 +1001,7 @@ the full locate-and-edit procedure.
 | [fundamentals-periods.md](references/fundamentals-periods.md) | Fiscal vs calendar periods for fundamentals: derive period labels from the record, align companies by `calendarEndDate`, compute YoY across matched periods |
 | [altra-trading.md](references/altra-trading.md) | Altra backtesting engine: strategies, features, signals, testing, debugging |
 | [deployment.md](references/deployment.md) | Deploying scripts as cronjobs for scheduled execution |
+| [build-playbook-web-app.md](references/build-playbook-web-app.md) | Playbook HTML build gate, live-data requirement, and browser-safe ALFS read helper |
 | [design-system.md](references/design-system.md) | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
 | [remix-workflow.md](references/remix-workflow.md) | Remix: create a new playbook from an existing template |
 | [annotation-edits.md](references/annotation-edits.md) | Annotation-driven edits: parse `<annotation>` tags, locate the generator behind an element, edit generation logic not rendered output |
