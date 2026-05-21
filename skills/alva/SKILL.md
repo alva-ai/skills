@@ -206,6 +206,12 @@ playbook, immediately route to
 blueprint handling, planning, data/feed assembly, HTML, README, draft/release
 gates, screenshot verification, and post-release push evaluation.
 
+If the request includes `/use-skill:<username>/<name>`, choosing and reading
+that Skillhub blueprint is mandatory before planning or building. Treat it as
+the active methodology, not optional inspiration; the exact lookup and recovery
+procedure lives in
+[playbook-assembly.md#planning-and-skillhub](references/playbook-assembly.md#planning-and-skillhub).
+
 ## Capability Verification
 
 Before saying "Alva doesn't have X" or recommending BYOD/third-party, run
