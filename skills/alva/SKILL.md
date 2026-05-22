@@ -834,8 +834,7 @@ validation rules and the canonical content shape.
 #### Free users (`subscription_tier = "free"`)
 
 1. **Publish directly**: Call `alva release playbook` — free users can create
-   and publish unlimited public playbooks. Do not assume a 1-playbook or
-   fixed-count cap. Free playbooks are always public. Output the public URL:
+   and publish unlimited public playbooks. Free playbooks are always public. Output the public URL:
    `https://alva.ai/u/<username>/playbooks/<playbook_name>`
 2. **Upsell only on friction**: Do **not** proactively suggest upgrading.
    But when the user's experience is degraded because of free-tier
