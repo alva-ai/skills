@@ -11,7 +11,7 @@ description: >-
   Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v1.9.0
+  version: v1.9.1
 ---
 
 # Alva
@@ -833,47 +833,18 @@ validation rules and the canonical content shape.
 
 #### Free users (`subscription_tier = "free"`)
 
-**One-playbook cap.** Free accounts may hold **at most one published
-playbook**. The cap is enforced server-side at release time — a second
-`alva release playbook` call will fail until the existing playbook is
-deleted by the user.
-
-1. **Publish directly**: Call `alva release playbook` — free playbooks
-   are always public. Output the public URL:
+1. **Publish directly**: Call `alva release playbook` — free users can create
+   and publish unlimited public playbooks. Do not assume a 1-playbook or
+   fixed-count cap. Free playbooks are always public. Output the public URL:
    `https://alva.ai/u/<username>/playbooks/<playbook_name>`
-2. **If the user already has a published playbook and wants to publish
-   a new one**, stop before calling `alva release playbook`. Tell the
-   user the existing playbook must be deleted first, and ask which path
-   they want:
-   - **Delete the old playbook** — list their existing playbooks and
-     confirm which one to remove, then call the CLI directly:
-
-     ```bash
-     alva playbook list                        # show what they have
-     alva playbook delete --name <old-name>    # soft-delete (frees the quota immediately)
-     ```
-
-     Do **not** suggest `alva fs remove --path ~/playbooks/<name>` —
-     that only clears ALFS files; the DB row stays and the quota stays
-     consumed. Do not attempt to "rename around" the cap, reuse the
-     old playbook's name without an explicit deletion, or assume any
-     in-app replace flow will migrate `display_name`, feeds, or
-     cronjobs cleanly — it currently does not, and the old public URL
-     can end up showing the new playbook's HTML with stale metadata.
-   - **Keep both** — only possible on Pro. Offer the upgrade path at
-     <https://alva.ai/pricing>.
-
-   After the deletion call returns, re-run the full release pipeline
-   (draft → README → release) for the new playbook from scratch under
-   a fresh `name`.
-3. **Upsell only on friction**: Do **not** proactively suggest upgrading.
+2. **Upsell only on friction**: Do **not** proactively suggest upgrading.
    But when the user's experience is degraded because of free-tier
-   limitations — wanting private playbooks, hitting the one-playbook cap,
-   resource limits, or any other pro-gated feature — acknowledge the
-   limitation and offer the upgrade path:
+   limitations — wanting private or paid playbooks, hitting the cronjob cap,
+   resource limits, or any other Pro-gated feature — acknowledge the limitation
+   and offer the upgrade path:
    "This feature is available on the Pro plan. You can upgrade at
    <https://alva.ai/pricing> to [specific benefit, e.g. keep playbooks
-   private / publish multiple playbooks / ...]."
+   private / deploy more cronjobs / ...]."
 
 Use the playbook `name` and the username from `alva whoami` to construct the
 canonical share URL. Use `published_url` from the release response for
