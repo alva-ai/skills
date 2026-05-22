@@ -42,6 +42,8 @@ you can:
 - **Release and share** -- turn your work into a hosted playbook web app at
   `https://alva.ai/u/<username>/playbooks/<playbook_name>`, and share it with
   the world.
+- **Discover public playbooks** -- find examples and remix candidates with the
+  agent-friendly `alva playbooks trending` command.
 - **Remix existing playbooks** -- take any published playbook as a template,
   read its feed scripts and HTML source, customize parameters/logic/UI, and
   deploy as your own new playbook.
@@ -934,6 +936,13 @@ inner text is a fixed instruction, not the user's customization request —
 if the user typed nothing meaningful outside the tag, ask what to
 customize before proceeding.
 
+If the user asks to browse, find examples, or pick a source playbook and does
+not provide a specific URL, use `alva playbooks trending` after reading
+`alva playbooks --help`. Filter with `--keyword`, `--tag` / `--tags`,
+`--sort`, and `--limit` as appropriate; use the returned `ref`
+(`username/name`) as the agent-facing identifier and `url_path` when a remix
+source URL is needed.
+
 See [remix-workflow.md](references/remix-workflow.md) for the full step-by-step
 guide. `alva remix` commands are exclusively for lineage registration — to
 read any playbook's files, use `alva fs read`.
@@ -1083,6 +1092,7 @@ a routing index — and, for the rows in bold, the linked sub-doc is a
 | `sdk` | Runtime libraries (50+ technical indicators, search, widgets). |
 | `data-skills` | Discover the 250+ Arrays financial-data endpoints. |
 | `skillhub` | Pull curated methodology blueprints (`/use-skill:` flow). |
+| `playbooks` | Discover public playbooks (`trending`) with compact agent-friendly refs for browsing examples and choosing remix sources. |
 | `comments` | Create / pin / unpin playbook comments — see [creators-note.md](references/creators-note.md) for the post-release creator's-note workflow. |
 | `push-subscriptions` | Personal push opt-in for playbooks and feeds. |
 | `channel` | Group push subscriptions (Telegram / Discord groups). |
