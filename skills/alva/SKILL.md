@@ -783,6 +783,14 @@ above so anonymous viewers can load feed output without authentication.
      --compress --compress-quality 70 --compress-max-width 1280
    ```
 
+   If this compressed screenshot returns `HTTP 500` / `HTTP 403`, prints
+   `SCREENSHOT_FAILED`, or does not create the output file, retry once without
+   compression flags instead of repeating the same compressed command:
+
+   ```bash
+   alva screenshot --url <published_url> --out /tmp/screenshot.png
+   ```
+
    The CLI handles authentication automatically. Run `alva screenshot --help`
    for `--selector` and `--xpath`. Before reading the output, validate it is
    actually a PNG — a failed capture may save a JSON error blob under the
