@@ -6,6 +6,10 @@ A SDK for building LLM-powered agents with tool calling to enable agentic featur
 > delta body, push line, etc.), include the voice block from
 > [narrative-voice.md](narrative-voice.md) verbatim in `system`.
 
+Do not use ADK for one-off research, exploratory analysis, or an interactive
+"help me look into X" request. Use it when the LLM step is fixed inside a
+scheduled, deterministic pipeline.
+
 ## Quick Start
 
 ```javascript

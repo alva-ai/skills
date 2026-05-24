@@ -24,8 +24,8 @@ discover what's stored. Keep it concise — under 200 lines. Each entry is one
 line linking to a topic file:
 
 ```markdown
-- [user.md](user.md) — User identity, investment style, knowledge level
-- [market-views.md](market-views.md) — Current macro thesis, conviction trades
+- `user.md` — User identity, investment style, knowledge level
+- `market-views.md` — Current macro thesis, conviction trades
 ```
 
 Topic files (like `user.md`) hold the actual content. They are read on demand

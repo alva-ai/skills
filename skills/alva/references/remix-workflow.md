@@ -125,7 +125,7 @@ alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v1/data/{group}/{outpu
 ## Step 4 — Content Legitimacy Audit
 
 Remix inherits the source's provenance — don't propagate fabricated content
-into a new namespace. Apply the [Content Legitimacy Rules](../SKILL.md#content-legitimacy-rules)
+into a new namespace. Apply [content-legitimacy.md](content-legitimacy.md)
 to both the source HTML and feed scripts: any value the user will see must
 fetch from a feed at runtime. If the source has hardcoded arrays, inline
 analyst ratings, procedural/RNG output, or pasted-in literals, either

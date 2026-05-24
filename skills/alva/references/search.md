@@ -1,9 +1,14 @@
 # Content Search
 
 Search SDKs for discovering unstructured content across multiple sources.
+For US equities, crypto, and deterministic time-series/fundamental data, prefer
+the structured Alva data path first. Use content search for narrative context,
+source discovery, social/news/community coverage, non-US finance search, and
+off-catalog assets after the structured path is not suitable.
+
 For handle-first access: Twitter/X handle history and rolling feeds are
-served by Arrays Data Skills — see [§3 Data Skills in SKILL.md](../SKILL.md#3-data-skills)
-and follow the discovery pipeline. News, YouTube, Reddit, and podcasts
+served by Arrays Data Skills — read [data-skills.md](data-skills.md) and follow
+the discovery pipeline. News, YouTube, Reddit, and podcasts
 handle subscriptions live in the `feed_widgets` partition. The search SDKs
 below live in the `unified_search` partition.
 

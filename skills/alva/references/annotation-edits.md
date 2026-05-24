@@ -55,7 +55,7 @@ so the target is one of two cases:
 
 Do not copy the element's rendered DOM and paste it back as static HTML with
 the instruction applied. That hardcodes the live feed value into a literal
-(breaking the [Content Legitimacy Rules](../SKILL.md#content-legitimacy-rules)),
+(breaking [content-legitimacy.md](content-legitimacy.md)),
 so the element stops reflowing on the next feed update, and it usually drops
 design-system tokens.
 
@@ -73,4 +73,5 @@ Editing playbook HTML re-enters the `before-build-html` gate: read
 
 After applying every annotation, write the HTML back to ALFS and re-release.
 A change to an already-released playbook is a version bump: `alva release
-playbook-draft` then `alva release playbook` with the new version (Step 7).
+playbook-draft` then `alva release playbook` with the new version. Re-enter the
+draft and release gates in [playbook-release.md](playbook-release.md).

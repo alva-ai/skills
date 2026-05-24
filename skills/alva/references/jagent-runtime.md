@@ -13,6 +13,8 @@ via `alva run` (inline code or filesystem entry path) or triggered by cronjobs.
 - **Heap**: 2 GB per execution
 - **No persistent state between executions**: each `alva run` call starts
   fresh (use `alfs` for persistence)
+- **No process**: there is no `process` object. Use `console.log` for output,
+  Secret Manager for env-like values, and thrown errors to abort.
 
 ---
 

@@ -9,6 +9,10 @@ A trading strategy IS a feed: all output data (targets, portfolio, orders,
 equity, metrics) lives under a single feed's ALFS path.
 
 **Key principle: All decisions are made at bar CLOSE, not bar OPEN.**
+Operations such as event onset detection, forward-return calculation, hit-rate
+or quantile aggregation, drawdown/recovery measurement, and cross-asset cohort
+comparison belong in Altra, never in a feed-side loop that reimplements the
+engine.
 
 ---
 

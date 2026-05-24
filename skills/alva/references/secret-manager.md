@@ -122,6 +122,10 @@ cleanup.
 
 ## Agent Guidance
 
+Do not ask the user to paste sensitive third-party secrets into chat when the
+web upload flow is feasible. Do not hardcode secrets in source code, ALFS files,
+`.env` files, shell snippets, or released playbook assets.
+
 When helping a user build with external providers:
 
 - first identify the exact secret name the code will use

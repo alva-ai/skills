@@ -21,6 +21,9 @@ calendar, and never shift it to a neighboring quarter to match an expectation.
 
 ## `period` is fiscal, not calendar
 
+The period is fiscal, not calendar, unless the record explicitly states
+otherwise.
+
 `fiscalYear` + `period` name the company's fiscal quarter. When a company's
 fiscal year is not the calendar year, its fiscal quarters are offset from
 calendar quarters:

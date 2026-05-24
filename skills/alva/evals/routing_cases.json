@@ -1,0 +1,160 @@
+[
+  {
+    "id": "rule0_preflight_memory",
+    "prompt": "Use Alva to answer a finance question in a new session.",
+    "skill_refs": ["references/preflight.md", "references/memory.md", "references/language.md"],
+    "skill_patterns": ["Rule 0", "alva <command> --help", "version_check.sh", "alva whoami", "~/memory/MEMORY.md"],
+    "corpus_patterns": ["ARRAYS_JWT", "subscription_tier", "Memory is a claim"]
+  },
+  {
+    "id": "skillhub_quant_template",
+    "prompt": "/use-skill:alva/quant-research-lab build a factor research playbook.",
+    "skill_refs": ["references/request-routing.md", "references/api/release.md", "references/altra-trading.md", "references/onnx.md"],
+    "skill_patterns": ["/use-skill:<username>/<name>", "alva skillhub get", "alva skillhub file", "--skill-id"],
+    "corpus_patterns": ["Do not bulk-download", "template.md", "FeedAltra", "ONNX"]
+  },
+  {
+    "id": "skillhub_backtest_template",
+    "prompt": "/use-skill:alva/backtest create a what-if event study.",
+    "skill_refs": ["references/request-routing.md", "references/altra-trading.md", "references/design-system.md", "references/playbook-release.md"],
+    "skill_patterns": ["Backtest / Strategy", "FeedAltra", "design-system.md", "before-build-html"],
+    "corpus_patterns": ["never in a feed-side", "look-ahead", "published_url"]
+  },
+  {
+    "id": "content_legitimacy",
+    "prompt": "Build a dashboard with charts and metrics from market data.",
+    "skill_refs": ["references/content-legitimacy.md", "references/feed-lifecycle.md", "references/fundamentals-periods.md"],
+    "skill_patterns": ["Content Legitimacy", "not to be the data source", "WebSearch", "hardcode"],
+    "corpus_patterns": ["All quantitative data", "feed outputs", "Data Convention Alignment", "Description and Provenance Accuracy"]
+  },
+  {
+    "id": "data_skills_pipeline",
+    "prompt": "Find the right Alva API for equity fundamentals and call it from a feed.",
+    "skill_refs": ["references/data-skills.md", "references/secret-manager.md", "references/jagent-runtime.md"],
+    "skill_patterns": ["alva data-skills list", "summary", "endpoint", "ARRAYS_JWT"],
+    "corpus_patterns": ["Authorization: Bearer", "Do not use X-API-Key", "unexpected shape", "same-domain Alva endpoints"]
+  },
+  {
+    "id": "feed_lifecycle_release_gate",
+    "prompt": "Create and release a scheduled BTC EMA feed.",
+    "skill_refs": ["references/feed-lifecycle.md", "references/feed-sdk.md", "references/deployment.md", "references/api/filesystem.md"],
+    "skill_patterns": ["before-feed-release", "alva run", "alva deploy create", "alva release feed"],
+    "gate_ids": ["before-feed-release"],
+    "corpus_patterns": ["special:user:*", "Public-read check", "Output shape check", "do not proceed"]
+  },
+  {
+    "id": "html_build_gate",
+    "prompt": "Write playbook HTML for a dashboard.",
+    "skill_refs": ["references/playbook-release.md", "references/design-system.md", "references/design-widgets.md", "references/design-components.md"],
+    "skill_patterns": ["before-build-html", "design-system.md", "design-widgets.md", "design-components.md"],
+    "gate_ids": ["before-build-html"],
+    "corpus_patterns": ["PUBLIC_ALFS_READ_URL", "runtime", "no inline literals", "published playbook HTML"]
+  },
+  {
+    "id": "playbook_draft_gate",
+    "prompt": "Create a playbook draft after feeds and HTML are ready.",
+    "skill_refs": ["references/playbook-release.md", "references/api/release.md"],
+    "skill_patterns": ["before-playbook-draft", "playbook-draft", "README.md", "trading-symbols"],
+    "gate_ids": ["before-playbook-draft"],
+    "corpus_patterns": ["display_name", "tags", "skill-id", "absolute ALFS path"]
+  },
+  {
+    "id": "playbook_release_gate",
+    "prompt": "Publish a finished playbook.",
+    "skill_refs": ["references/playbook-release.md", "references/api/release.md", "references/creators-note.md"],
+    "skill_patterns": ["before-playbook-release", "published_url", "screenshot", "readme-url"],
+    "gate_ids": ["before-playbook-release"],
+    "corpus_patterns": ["Deployment coverage", "Data is fresh", "canonical share URL", "creator"]
+  },
+  {
+    "id": "push_notifications",
+    "prompt": "Enable push alerts for a released signal playbook.",
+    "skill_refs": ["references/push-notifications.md", "references/feed-sdk.md", "references/deployment.md"],
+    "skill_patterns": ["push", "signal/targets", "notify/message", "subscribe"],
+    "corpus_patterns": ["feed_alert_ready", "<|SKIP_NOTIFICATION|>", "explicit subscription", "do not claim push is set up"]
+  },
+  {
+    "id": "search_content",
+    "prompt": "Add social/news search context to a market narrative playbook.",
+    "skill_refs": ["references/search.md", "references/data-skills.md", "references/content-legitimacy.md"],
+    "skill_patterns": ["Content Search", "unified_search", "search.md"],
+    "corpus_patterns": ["Twitter/X", "news", "Reddit", "prefer the structured Alva data"]
+  },
+  {
+    "id": "secret_manager",
+    "prompt": "Use a third-party API key in an Alva Cloud script.",
+    "skill_refs": ["references/secret-manager.md", "references/jagent-runtime.md"],
+    "skill_patterns": ["Secret Manager", "loadPlaintext", "apikey"],
+    "corpus_patterns": ["Do not ask the user to paste", "Do not hardcode secrets", "require(\"secret-manager\")"]
+  },
+  {
+    "id": "adk_narrative",
+    "prompt": "Create a scheduled digest that summarizes real feed data.",
+    "skill_refs": ["references/adk.md", "references/narrative-voice.md", "references/content-legitimacy.md"],
+    "skill_patterns": ["@alva/adk", "narrative-voice.md", "do not use it to produce numbers"],
+    "corpus_patterns": ["tool calling", "one-off research", "copy verbatim into ADK system prompts"]
+  },
+  {
+    "id": "jagent_runtime",
+    "prompt": "Write an Alva runtime script that fetches HTTP data and writes ALFS files.",
+    "skill_refs": ["references/jagent-runtime.md", "references/api/filesystem.md"],
+    "skill_patterns": ["jagent", "process", "net/http", "top-level await"],
+    "corpus_patterns": ["no process", "no timer globals", "require(\"alfs\")", "frozen"]
+  },
+  {
+    "id": "altra_strategy",
+    "prompt": "Backtest a crypto allocation strategy and publish results.",
+    "skill_refs": ["references/altra-trading.md", "references/design-playbook-trading-strategy.md", "references/api/trading.md"],
+    "skill_patterns": ["Always use Altra", "FeedAltra", "look-ahead", "visual playbook"],
+    "corpus_patterns": ["PIT", "createArraysOhlcvProvider", "signal/targets", "Testing Strategies"]
+  },
+  {
+    "id": "onnx_model",
+    "prompt": "Deploy a trained ONNX model for scheduled inference.",
+    "skill_refs": ["references/onnx.md", "references/feed-sdk.md", "references/playbook-release.md"],
+    "skill_patterns": ["ONNX", "@alva/onnx", "model artifact"],
+    "corpus_patterns": ["InferenceSession.createFromAlfs", "Tensor", "model_meta.json", "FeedAltra"]
+  },
+  {
+    "id": "remix_workflow",
+    "prompt": "Remix an existing public playbook with a new universe.",
+    "skill_refs": ["references/remix-workflow.md", "references/content-legitimacy.md"],
+    "skill_patterns": ["Remix", "remix-workflow.md", "alva playbooks trending", "alva remix"],
+    "corpus_patterns": ["Content Legitimacy Audit", "Save remix lineage", "source playbook"]
+  },
+  {
+    "id": "annotation_edits",
+    "prompt": "Apply an annotation to change one chart in an existing playbook.",
+    "skill_refs": ["references/annotation-edits.md", "references/design-system.md"],
+    "skill_patterns": ["annotation", "selector", "edit the generator"],
+    "corpus_patterns": ["Never freeze", "Locate the Generator", "Re-release"]
+  },
+  {
+    "id": "fundamentals_periods",
+    "prompt": "Compare quarterly fundamentals for NVDA and AAPL.",
+    "skill_refs": ["references/fundamentals-periods.md", "references/content-legitimacy.md"],
+    "skill_patterns": ["fundamentals-periods.md", "fiscal", "calendar", "YoY/QoQ"],
+    "corpus_patterns": ["calendarEndDate", "derive the label", "period is fiscal"]
+  },
+  {
+    "id": "voice_language_creators_note",
+    "prompt": "Write final user-facing copy and a creator's note for a released playbook.",
+    "skill_refs": ["references/language.md", "references/narrative-voice.md", "references/creators-note.md"],
+    "skill_patterns": ["language.md", "narrative-voice.md", "creators-note.md"],
+    "corpus_patterns": ["automation", "banned", "post", "pin"]
+  },
+  {
+    "id": "api_reference_routing",
+    "prompt": "Use fs, release, and trading CLI commands safely.",
+    "skill_refs": ["references/api/filesystem.md", "references/api/release.md", "references/api/trading.md", "references/api/error-responses.md"],
+    "skill_patterns": ["CLI Reference", "filesystem.md", "release.md", "trading.md", "error-responses.md"],
+    "corpus_patterns": ["@last/{n}", "--signal", "InvalidArgument", "Error Responses"]
+  },
+  {
+    "id": "operational_pitfalls",
+    "prompt": "Debug stale feed data, path issues, and runtime limits.",
+    "skill_refs": ["references/operational-pitfalls.md", "references/api/filesystem.md", "references/jagent-runtime.md"],
+    "skill_patterns": ["Common Pitfalls", "Resource Limits", "Filesystem Layout"],
+    "corpus_patterns": ["@last returns chronological", "Quote ~ paths", "2 GB", "10 MB"]
+  }
+]
