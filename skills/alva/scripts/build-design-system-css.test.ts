@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { extractCssBlocks, buildDesignSystemCss } from './build-design-system-css.js';
+import {
+  extractCssBlocks,
+  buildDesignSystemCss,
+  findOrphanDeclarations,
+  validateInputs,
+} from './build-design-system-css.js';
 
 describe('extractCssBlocks', () => {
   it('extracts all ```css fenced blocks in document order', () => {
@@ -79,5 +84,70 @@ describe('buildDesignSystemCss', () => {
       widgetsMd: '```css\n.chart-container{}\n```',
     };
     expect(buildDesignSystemCss(inputs)).toEqual(buildDesignSystemCss(inputs));
+  });
+});
+
+describe('findOrphanDeclarations', () => {
+  it('returns [] for valid CSS (all declarations nested in selectors)', () => {
+    expect(findOrphanDeclarations('.btn { padding: 8px; color: red; }')).toEqual([]);
+  });
+
+  it('detects bare declarations at top level', () => {
+    const orphans = findOrphanDeclarations(
+      '-webkit-font-smoothing: antialiased;\n-moz-osx-font-smoothing: grayscale;'
+    );
+    expect(orphans).toHaveLength(2);
+    expect(orphans[0]!.property).toBe('-webkit-font-smoothing');
+    expect(orphans[1]!.property).toBe('-moz-osx-font-smoothing');
+  });
+
+  it('mixed: one orphan, one nested', () => {
+    const orphans = findOrphanDeclarations(
+      'color: red;\nbody { padding: 0; }'
+    );
+    expect(orphans).toHaveLength(1);
+    expect(orphans[0]!.property).toBe('color');
+  });
+
+  it('records 1-based line numbers', () => {
+    const orphans = findOrphanDeclarations('\n\ncolor: red;');
+    expect(orphans[0]!.line).toBe(3);
+  });
+});
+
+describe('validateInputs', () => {
+  it('returns [] when every block is valid', () => {
+    const errs = validateInputs({
+      tokensCss: ':root { --x: 1; }',
+      designMd: '```css\nbody { font-family: Delight; }\n```',
+      componentsMd: '```css\n.btn { padding: 8px; }\n```',
+      widgetsMd: '```css\n.chart-container { height: 100%; }\n```',
+    });
+    expect(errs).toEqual([]);
+  });
+
+  it('flags the original anti-aliasing bug: bare declarations in design.md', () => {
+    const errs = validateInputs({
+      tokensCss: ':root {}',
+      designMd:
+        '```css\n-webkit-font-smoothing: antialiased;\n-moz-osx-font-smoothing: grayscale;\ntext-rendering: optimizeLegibility;\n```',
+      componentsMd: '',
+      widgetsMd: '',
+    });
+    expect(errs).toHaveLength(3);
+    expect(errs[0]!.source).toContain('design.md');
+    expect(errs[0]!.property).toBe('-webkit-font-smoothing');
+  });
+
+  it('attributes errors to the right source file + block index', () => {
+    const errs = validateInputs({
+      tokensCss: '',
+      designMd: '```css\nbody { padding: 0; }\n```\n```css\norphan: 1px;\n```',
+      componentsMd: '',
+      widgetsMd: '',
+    });
+    expect(errs).toHaveLength(1);
+    expect(errs[0]!.source).toContain('design.md');
+    expect(errs[0]!.source).toContain('#2');
   });
 });
