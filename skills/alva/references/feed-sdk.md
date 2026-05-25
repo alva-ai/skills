@@ -679,14 +679,6 @@ For playbook HTML, use the browser-safe public read helper from
 Do not emit `$ALVA_ENDPOINT`, sandbox environment variables, or guessed API
 hosts into browser HTML.
 
-```javascript
-const PUBLIC_ALFS_READ_URL = "https://api-llm.prd.alva.ai/api/v1/fs/read?path=";
-const path = "/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/720";
-const resp = await fetch(PUBLIC_ALFS_READ_URL + encodeURIComponent(path));
-const points = await resp.json();
-// points = [{date: 1772658000000, close: 73309.72, ema10: 72447.65}, ...]
-```
-
 ---
 
 ## Grouped Records (Multi-Record Per Date)

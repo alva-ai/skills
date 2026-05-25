@@ -22,27 +22,17 @@ verbatim into `system`.
 ## Runtime Rules
 
 ADK code runs inside the jagent V8 runtime. Before writing code, read
-[jagent-runtime.md](jagent-runtime.md).
+[jagent-runtime.md](jagent-runtime.md); it owns the runtime constraints, module
+imports, async wrapper pattern, and absent globals.
 
-Do:
+ADK-specific deltas:
 
-- wrap async code in `(async () => { ... })();`
-- use `console.log`, not `log`
-- read files through `require("alfs")`
-- fetch HTTP through `require("net/http")`
-- write scheduled outputs through the Feed SDK
-- run the normal feed lifecycle before release
-
-Do not:
-
-- use top-level `await`
-- use Node built-ins, `process`, global `fetch`, or timer globals
-- use legacy `require("@arrays/...")` data modules
-- pass raw secrets, logs, or pasted values into user-visible output
-
-Structured Data Skills are discovered with `alva data-skills list -> summary ->
-endpoint` and called over HTTP with `Authorization: Bearer <ARRAYS_JWT>`; see
-[data-skills.md](data-skills.md).
+- Use `console.log` for debugging ADK results; do not use a nonexistent `log`.
+- Write scheduled ADK outputs through the Feed SDK and run the normal feed
+  lifecycle before release.
+- Do not pass raw secrets, logs, or pasted values into user-visible output.
+- If an ADK tool needs structured financial data, discover the endpoint through
+  [data-skills.md](data-skills.md) and call it from the runtime over HTTP.
 
 ## Quick Start
 
