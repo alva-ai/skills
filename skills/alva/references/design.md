@@ -84,6 +84,7 @@ any text container):
 
 ```css
 body {
+  /* test-only marker for ci auto-sync verification */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
