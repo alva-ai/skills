@@ -116,14 +116,14 @@ body {
 
 .playbook-container {
   width: 100%;
+  max-width: 2048px;
   margin: 0 auto;
-  padding: var(--spacing-s) var(--spacing-xxl) var(--spacing-xxxxl);
-  /* max-width: 2048px; */
+  padding: var(--spacing-m) var(--spacing-xxl) var(--spacing-xxxxl);
 }
 
 @media (max-width: 768px) {
   .playbook-container {
-    padding: var(--spacing-m);
+    padding: 0 var(--spacing-m) var(--spacing-xxxxl);
   }
 }
 ```

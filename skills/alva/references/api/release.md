@@ -46,9 +46,10 @@ the agent ran `alva skillhub get` / `alva skillhub file` during building.
 
 Every released playbook ships a README at `~/playbooks/<name>/README.md`.
 This is the canonical specification for what that file must contain. The
-HTML's "How does this work?" / methodology modal renders the same content,
-so there is one source of truth — the README — not a separate per-template
-copy.
+platform surfaces that README from the playbook chrome. Do not add an in-HTML
+README chip or methodology modal unless the active Skillhub blueprint
+explicitly requires one. Keep one source of truth: the README, not a separate
+per-template copy.
 
 ### Path and `--readme-url` form
 
@@ -82,7 +83,7 @@ sections.
 
 - **One-paragraph overview** — plain English: what the playbook computes,
   on what universe, the question it answers. Same scope bound as the
-  in-app methodology modal's overview.
+  playbook's methodology overview.
 - **Data sources & freshness** — every feed / SDK / BYOD source the
   playbook reads, with the relevant specifics (symbol, interval, exchange,
   indicator parameters), plus the cron cadence (in ET) and what "fresh"

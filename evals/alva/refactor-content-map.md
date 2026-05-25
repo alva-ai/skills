@@ -18,7 +18,7 @@ capability map without losing behavior.
 | Design references | Tokens, layout, widgets, components, strategy UI templates | `design-system.md`, `design-widgets.md`, `design-components.md`, `design-playbook-trading-strategy.md`, `design-tokens.css` |
 | CLI gotcha references | Details the CLI help omits or currently states incorrectly | `api/filesystem.md`, `api/release.md`, `api/trading.md`, `api/error-responses.md` |
 | Voice references | User-facing vocabulary, narrative style, post-release notes | `language.md`, `narrative-voice.md`, `creators-note.md` |
-| Eval artifacts | Regression cases and reports for capability coverage, gates, and full application workflows | `evals/alva/*` |
+| Eval artifacts | Regression cases and reports for capability coverage, gates, full application workflows, and official Skillhub templates | `evals/alva/*` |
 
 ## Dependency chains
 
@@ -33,11 +33,20 @@ reference from the help-first routing table.
 `search.md` → `feed-lifecycle.md` → `playbook-release.md` →
 `design-system.md` plus widget/component reference → `api/release.md`.
 
-### Backtest / strategy
+### What-if / event study
 
-`request-routing.md` → `altra-trading.md` → `feed-lifecycle.md` →
-`design-playbook-trading-strategy.md` → `playbook-release.md` →
-`api/trading.md` if orders/signals/accounts are involved.
+`request-routing.md` official-template route → `alva/backtest` blueprint →
+`altra-trading.md` → `feed-lifecycle.md` → `design-system.md` +
+`design-widgets.md` → `playbook-release.md`.
+
+### Quant research / strategy
+
+`request-routing.md` official-template route →
+`alva/quant-research-lab` blueprint → `altra-trading.md` →
+`onnx.md` when models are exported → `feed-lifecycle.md` →
+`design-playbook-trading-strategy.md` only for strategy dashboards →
+`playbook-release.md` → `api/trading.md` if orders/signals/accounts are
+involved.
 
 ### Push workflow
 
@@ -96,6 +105,7 @@ the canonical file.
 | Fiscal vs calendar fundamentals | `fundamentals-periods.md` | Content legitimacy points here. |
 | Product vocabulary | `language.md` | User-facing prose rules point here. |
 | AI-tell ban and ADK voice block | `narrative-voice.md` | `adk.md` points here for narrative outputs. |
+| Official Skillhub templates for what-if and quant research | `request-routing.md` | Runtime skill points to the official-template route; eval proof lives in `evals/alva/`. |
 
 ## Source-to-destination map
 
@@ -125,6 +135,7 @@ the canonical file.
 | CLI reference table | `preflight.md` command routing and `SKILL.md` compact CLI index |
 | Feed SDK quick reference, data modeling, debugging | `feed-sdk.md`, `feed-lifecycle.md`, `api/filesystem.md` |
 | App-level fresh-context eval for direct data, feed-backed playbooks, release, Altra, push, remix, annotation, secrets, fundamentals, and ADK | `app_workflow_cases.json`, `app_workflow_eval.js`, app workflow reports |
+| Full official Skillhub template eval for `alva/quant-research-lab` and `alva/backtest` | `skillhub_template_cases.json`, `skillhub_template_eval.js`, Skillhub template reports |
 | Error transparency and subscription-gated SDKs | `content-legitimacy.md` |
 | Memory | `memory.md` with preflight pointer |
 | Secret Manager | `secret-manager.md` |

@@ -30,7 +30,8 @@ Required evidence:
   dropdowns, tabs, modals, selects, inputs, markdown, tooltips, or switches.
 - Read
   [design-playbook-trading-strategy.md](design-playbook-trading-strategy.md)
-  for strategy/backtest playbooks.
+  only for strategy dashboards or blueprints that use its
+  Overview/Analytics/Strategy/Feed tab structure.
 - If a Skillhub blueprint is active, read its layout and data contract before
   HTML work starts.
 
@@ -78,7 +79,9 @@ Before a draft or release:
    alva fs write --path '~/playbooks/<name>/README.md' --file ./README.md --mkdir-parents
    ```
 
-Every released playbook must have a README at that exact path. The README
+Every released playbook must have a README at that exact path. The README is
+attached with `--readme-url`; do not add an in-HTML README chip or methodology
+modal unless the active Skillhub blueprint explicitly requires one. The README
 content shape, absolute `--readme-url` requirement, tags, trading symbols, and
 `--skill-id` rules are canonical in [api/release.md](api/release.md).
 

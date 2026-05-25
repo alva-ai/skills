@@ -9,7 +9,8 @@ and completion gates.
 | Request type | Core objective |
 | --- | --- |
 | Dashboard / Playbook | Identify data sources, validate the data flow, and deliver a usable dashboard or playbook when the user wants a shareable artifact. |
-| Backtest / Strategy | Use Altra, run the backtest correctly, and deliver a visual playbook or usable analysis with equity curve, trade log, and metrics. |
+| What-if / Event Study | Use the official what-if blueprint when available, use Altra for event computation, and deliver a narrative results-first playbook or usable visual analysis. |
+| Quant Research / Strategy | Use the official quant blueprint when available, use Altra for strategy metrics, and deliver reproducible research, predictions, or a strategy playbook. |
 | Data Query | Fetch the requested data accurately and answer directly unless the user asks for a richer artifact. |
 | Remix | Reuse the source playbook, apply the requested customization, and deploy or return the updated result under the requesting user's namespace. |
 | Debug / Edit | Locate the actual source of the issue, change the generator or pipeline, and re-run the relevant gate. |
@@ -52,13 +53,94 @@ mandatory before Guided Planning and before build work.
    you intend to mirror strategy logic. Do not bulk-download.
 
 6. Treat the blueprint as authoritative for layout, sections, widgets, data
-   contracts, and cadence unless the user explicitly overrides it.
+   contracts, cadence, and template-specific hard rules unless the user
+   explicitly overrides it.
 
-7. If any Skillhub skill informed the build, pass `--skill-id <username>/<name>`
+7. If the Skillhub entry includes both an instructional blueprint and a source
+   sample, the instructional blueprint wins when they conflict. Source samples
+   can be stale implementation examples; never copy them over a newer blueprint
+   rule. In particular, if a blueprint removes a legacy UI pattern such as an
+   in-HTML README modal, title row, or template label, do not reintroduce it
+   from an attached source file.
+
+8. If any Skillhub skill informed the build, pass `--skill-id <username>/<name>`
    during playbook draft. See [api/release.md](api/release.md#skill-id).
 
 `/use-skill:` plus a concrete topic is a strong build directive. Present one
 short plan, then build after approval; do not stack extra clarification flows.
+
+## Official template route
+
+Before planning non-trivial quant research, factor research, ML signal,
+backtest, or what-if/event-study work, check the official Alva Skillhub
+templates even when the user did not write `/use-skill:`.
+
+1. Run `alva skillhub list --username alva --json`.
+2. Select the matching official template:
+   - `alva/backtest` for what-if, after/before-trigger, drawdown/recovery, or
+     event-study narrative playbooks.
+   - `alva/quant-research-lab` for factor ideas, paper reproduction, ML
+     signals, allocation rules, portfolio analysis, strategy validation, or
+     live quant playbook production.
+3. Run the Skillhub directive gate above for the selected template: `get`, then
+   `file` the blueprint, then apply its hard rules.
+4. If an official template informed the build, pass
+   `--skill-id alva/<name>` during playbook draft.
+
+If no official template matches, continue with normal references. Do not invent
+an `alva/*` id.
+
+### What-if / Event Study template rules
+
+For `alva/backtest`, the blueprint's current layout rules override generic
+strategy-dashboard rules and any stale companion source file.
+
+- Do not apply [design-playbook-trading-strategy.md](design-playbook-trading-strategy.md)
+  unless the blueprint explicitly changes to the Overview/Analytics/Strategy/Feed
+  tab structure.
+- The HTML starts with the hero card and exactly four horizon metric cards;
+  the first fold on 1440 x 900 must contain hero card + four horizon cards and
+  nothing between them.
+- Use a single-scroll narrative layout: path chart, two side-by-side analysis
+  charts, audit ledger, then a short References card.
+- Every chart has a `widget-subtitle`; use
+  [design-widgets.md](design-widgets.md#chart-card).
+- The attached `README.md` is the methodology. Do not add an in-HTML README
+  chip, methodology modal, title row, `What-If` label, Q1-Q3 band,
+  counter-narrative card, filters, dropdowns, or page timestamp unless the
+  fetched blueprint explicitly reintroduces them.
+
+### Quant Research Lab template rules
+
+For `alva/quant-research-lab`, extract the research contract before coding:
+question, thesis, universe, label, horizon, features, model/rule, validation,
+and output. Build raw, cleaned, and feature-ready stages separately; preserve
+source, timestamp, availability, feature order, and missingness.
+
+Default output groups when the research needs them:
+
+- `research/summary`
+- `research/features`
+- `model/predictions`
+- `model/summary`
+- `run/state`
+- `portfolio/analysis`
+- `signal/targets`
+- FeedAltra `sim/*`
+- FeedAltra `perf/*`
+
+Validation rules: run a baseline before complex ML; use chronological,
+walk-forward, or purged splits; never use random splits for financial
+time-series labels; never tune on the final test/backtest; never report only
+the best run; do not present paper results as live performance until reproduced
+with real data. Raw model outputs are not trading instructions until thresholds,
+sizing, and no-trade bands are documented and FeedAltra validates the strategy.
+
+Quant playbooks should preserve these content groups when relevant:
+Performance, Portfolio And Alpha, Prediction Timeline And State, Model And
+Feature Evaluation, and Methodology with README evidence. Prediction-only
+results may use a simpler results-first layout, but keep the same evidence
+groups.
 
 ## Guided planning
 

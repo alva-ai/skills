@@ -220,7 +220,8 @@ and the applicable design references. At minimum read
 [design-widgets.md](references/design-widgets.md) for widgets/charts/tables,
 [design-components.md](references/design-components.md) for UI components, and
 [design-playbook-trading-strategy.md](references/design-playbook-trading-strategy.md)
-for strategy/backtest playbooks.
+only for strategy dashboards or Skillhub blueprints that use the
+Overview/Analytics/Strategy/Feed tab structure.
 </HARD-GATE>
 
 Design capability map:
@@ -230,7 +231,7 @@ Design capability map:
 | Global tokens, typography, theme, page container | [design-system.md](references/design-system.md) |
 | Charts, metric cards, tables, feed cards, free text, group titles | [design-widgets.md](references/design-widgets.md) |
 | Dropdown, Markdown, button, tag, switch, modal, select, input, tab, tooltip | [design-components.md](references/design-components.md) |
-| Trading strategy/backtest UI with Overview/Analytics/Strategy/Feed tabs | [design-playbook-trading-strategy.md](references/design-playbook-trading-strategy.md) |
+| Trading strategy UI with Overview/Analytics/Strategy/Feed tabs | [design-playbook-trading-strategy.md](references/design-playbook-trading-strategy.md) |
 | Token CSS import | [design-tokens.css](references/design-tokens.css) |
 
 ## Playbook Draft And Release
@@ -345,9 +346,11 @@ Open [preflight.md](references/preflight.md) and
 
 ### Skillhub Blueprint
 
-Applies when `/use-skill:<username>/<name>` appears, or when you choose to use a
-catalog methodology.
-Must not miss: fetch the blueprint fresh; a remembered template is stale.
+Applies when `/use-skill:<username>/<name>` appears, or before non-trivial
+what-if, event-study, quant research, factor, ML signal, or strategy work that
+matches an official Alva template.
+Must not miss: fetch the blueprint fresh with `alva skillhub list/get/file`;
+blueprints beat remembered templates and stale companion source files.
 Open [request-routing.md](references/request-routing.md) and
 [api/release.md](references/api/release.md#skill-id).
 
@@ -470,16 +473,32 @@ Must not miss: publisher setup and subscriber setup are separate; do not claim
 success until a real run writes the sidecar.
 Open [push-notifications.md](references/push-notifications.md).
 
-### Backtest / Strategy
+### What-if / Event Study
 
-Applies to event studies, factor tests, allocation rules, target weights,
-portfolio analysis, paper trading, and actionable signals.
-Must not miss: Always use Altra for backtesting and strategy simulation; avoid
-look-ahead bias and deliver a visual playbook or usable visual analysis. Hosted
-or published strategy outputs must still pass feed lifecycle and playbook gates.
-Open [altra-trading.md](references/altra-trading.md) and
-[design-playbook-trading-strategy.md](references/design-playbook-trading-strategy.md);
-open [feed-lifecycle.md](references/feed-lifecycle.md) and
+Applies to "what if I bought/sold X when Y happens", after/before-trigger
+playbooks, drawdown/recovery studies, or event-conditioned forward returns.
+Must not miss: check `alva/backtest`, use Altra for event computation, and
+follow the blueprint's single-scroll narrative layout rather than the generic
+strategy dashboard spec.
+Open [request-routing.md](references/request-routing.md#official-template-route),
+[altra-trading.md](references/altra-trading.md), and
+[design-widgets.md](references/design-widgets.md).
+
+### Quant Research / Strategy
+
+Applies to factor tests, paper reproduction, ML signals, allocation rules,
+target weights, portfolio analysis, paper trading, and actionable signals.
+Must not miss: check `alva/quant-research-lab`, freeze the research contract,
+run time-aware validation, and Always use Altra/FeedAltra for
+strategy/backtest metrics to avoid look-ahead bias; raw model output is not a
+trading instruction, and published work should be a visual playbook or usable
+visual analysis. Open
+[request-routing.md](references/request-routing.md#official-template-route),
+[altra-trading.md](references/altra-trading.md), [onnx.md](references/onnx.md)
+when models are exported, and
+[design-playbook-trading-strategy.md](references/design-playbook-trading-strategy.md)
+only for strategy dashboards or blueprints that request its tab structure. Open
+[feed-lifecycle.md](references/feed-lifecycle.md) and
 [playbook-release.md](references/playbook-release.md) before publishing.
 
 ### Trading Operations

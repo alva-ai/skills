@@ -1,0 +1,222 @@
+[
+  {
+    "id": "skillhub_inventory_all_official_templates",
+    "template": "alva skillhub list --username alva",
+    "evidence": "2026-05-25 list returned alva/quant-research-lab and alva/backtest",
+    "skill_patterns": [
+      "/use-skill:<username>/<name>",
+      "alva skillhub get",
+      "alva skillhub file",
+      "do not bulk-download",
+      "--skill-id <username>/<name>"
+    ],
+    "corpus_patterns": [
+      "Treat the blueprint as authoritative",
+      "template-specific hard rules",
+      "instructional blueprint wins",
+      "source samples can be stale implementation examples"
+    ]
+  },
+  {
+    "id": "quant_research_contract_and_pit_data",
+    "template": "alva/quant-research-lab quant_research_lab_template.md",
+    "evidence": "Data + Methodology sections require real sources, source mapping, feature availability, PIT features, and research contract before coding.",
+    "skill_refs": [
+      "references/content-legitimacy.md",
+      "references/data-skills.md",
+      "references/fundamentals-periods.md",
+      "references/altra-trading.md"
+    ],
+    "corpus_patterns": [
+      "agent builds the pipeline, not to be the data source",
+      "All quantitative data",
+      "point-in-time",
+      "PIT means",
+      "observedAt",
+      "availability",
+      "research contract"
+    ]
+  },
+  {
+    "id": "quant_research_outputs_and_data_contract",
+    "template": "alva/quant-research-lab quant_research_lab_template.md",
+    "evidence": "Outputs include research/summary, research/features, model/predictions, model/summary, run/state, portfolio/analysis, signal/targets, FeedAltra sim/* and perf/*.",
+    "skill_refs": [
+      "references/feed-sdk.md",
+      "references/feed-lifecycle.md",
+      "references/altra-trading.md",
+      "references/onnx.md"
+    ],
+    "corpus_patterns": [
+      "research/summary",
+      "research/features",
+      "model/predictions",
+      "model/summary",
+      "run/state",
+      "portfolio/analysis",
+      "signal/targets",
+      "sim/",
+      "perf/",
+      "model_meta.json"
+    ]
+  },
+  {
+    "id": "quant_validation_and_model_deployability",
+    "template": "alva/quant-research-lab quant_research_lab_template.md",
+    "evidence": "Template bans random splits, tuning on final test/backtest, best-run-only reporting, and model deployment without reproducible features/metadata.",
+    "skill_refs": [
+      "references/altra-trading.md",
+      "references/onnx.md",
+      "references/content-legitimacy.md"
+    ],
+    "corpus_patterns": [
+      "Never use future bars",
+      "walk-forward",
+      "train/validation/test",
+      "feature order",
+      "model_meta.json",
+      "validation evidence",
+      "Raw model outputs are not trading instructions"
+    ],
+    "forbidden_guardrails": [
+      "look-ahead bias",
+      "Do not present paper results as live performance",
+      "Do not hardcode point-in-time values"
+    ]
+  },
+  {
+    "id": "quant_playbook_result_groups",
+    "template": "alva/quant-research-lab quant_research_lab_template.md",
+    "evidence": "Playbook needs performance, portfolio/alpha, prediction timeline/state, model/feature evaluation, methodology/README evidence.",
+    "skill_refs": [
+      "references/design-playbook-trading-strategy.md",
+      "references/playbook-release.md",
+      "references/api/release.md",
+      "references/narrative-voice.md"
+    ],
+    "corpus_patterns": [
+      "Performance",
+      "Portfolio",
+      "Prediction Timeline",
+      "Model And Feature Evaluation",
+      "README evidence",
+      "Data sources & freshness",
+      "Blind spots"
+    ]
+  },
+  {
+    "id": "backtest_template_blueprint_first",
+    "template": "alva/backtest skills/alva/templates/what-if/template.md plus template-design-ui-view-source",
+    "evidence": "The current blueprint removes legacy in-HTML heading, README modal, What-If labels, and counter-narrative cards; attached source still contains stale versions of some of these.",
+    "skill_refs": [
+      "references/request-routing.md",
+      "references/playbook-release.md",
+      "references/api/release.md"
+    ],
+    "corpus_patterns": [
+      "instructional blueprint wins",
+      "Source samples can be stale implementation examples",
+      "in-HTML README modal",
+      "title row",
+      "template label",
+      "do not reintroduce it from an attached source file",
+      "Do not add an in-HTML README chip or methodology modal"
+    ]
+  },
+  {
+    "id": "backtest_whatif_altra_engine_gate",
+    "template": "alva/backtest skills/alva/templates/what-if/template.md",
+    "evidence": "What-if event studies require Altra for event onset, forward-return, hit rate, drawdown/recovery, and cohort comparisons; feed wrapper only for non-strategy joins.",
+    "skill_refs": [
+      "references/altra-trading.md",
+      "references/api/trading.md",
+      "references/feed-lifecycle.md"
+    ],
+    "corpus_patterns": [
+      "event onset detection",
+      "forward-return calculation",
+      "hit-rate",
+      "drawdown/recovery",
+      "cross-asset cohort comparison",
+      "never in a feed-side loop",
+      "A trading strategy IS a feed"
+    ]
+  },
+  {
+    "id": "backtest_whatif_design_not_strategy_tabs",
+    "template": "alva/backtest skills/alva/templates/what-if/template.md",
+    "evidence": "What-if is a narrative scroll layout and explicitly says not to apply design-playbook-trading-strategy.md.",
+    "skill_refs": [
+      "references/design-system.md",
+      "references/design-widgets.md",
+      "references/design-components.md",
+      "references/playbook-release.md"
+    ],
+    "skill_patterns": [
+      "only for strategy dashboards or Skillhub blueprints that use the Overview/Analytics/Strategy/Feed tab structure"
+    ],
+    "corpus_patterns": [
+      "max-width: 2048px",
+      "padding: var(--spacing-m) var(--spacing-xxl) var(--spacing-xxxxl)",
+      "design-tokens.css",
+      "If a Skillhub blueprint is active, read its layout and data contract before HTML work starts"
+    ]
+  },
+  {
+    "id": "backtest_whatif_first_fold_and_layout",
+    "template": "alva/backtest skills/alva/templates/what-if/template.md",
+    "evidence": "Layout is hero first, exactly four horizon cards directly below, then path chart, two analysis charts, audit ledger, references card; first fold must contain hero + four cards only.",
+    "skill_refs": [
+      "references/request-routing.md",
+      "references/design-widgets.md",
+      "references/playbook-release.md"
+    ],
+    "corpus_patterns": [
+      "hero card + four horizon cards",
+      "four horizon metric cards",
+      "widget-subtitle",
+      "initTableAlignment",
+      "Chart Card",
+      "Skillhub template's default sections are a floor, not a ceiling"
+    ]
+  },
+  {
+    "id": "backtest_whatif_language_and_surface_bans",
+    "template": "alva/backtest skills/alva/templates/what-if/template.md",
+    "evidence": "Template bans What-If in user-facing copy, headings inside HTML, filters, timestamps, Q1-Q3 band, counter-narrative/readout rail, and 700 weight emphasis.",
+    "skill_refs": [
+      "references/language.md",
+      "references/narrative-voice.md",
+      "references/design-system.md",
+      "references/design-widgets.md"
+    ],
+    "corpus_patterns": [
+      "Font Weight",
+      "Regular (400) and Medium (500)",
+      "Semibold (600) or Bold (700) is prohibited",
+      "Do not add an in-HTML README chip or methodology modal",
+      "template-specific hard rules"
+    ],
+    "forbidden_guardrails": [
+      "user-facing prose may not use the banned AI-tell shapes"
+    ]
+  },
+  {
+    "id": "backtest_whatif_readme_release_contract",
+    "template": "alva/backtest skills/alva/templates/what-if/template.md",
+    "evidence": "Methodology is attached README.md at ~/playbooks/<name>/README.md and release uses absolute --readme-url; bottom References card is not the methodology.",
+    "skill_refs": [
+      "references/playbook-release.md",
+      "references/api/release.md",
+      "references/content-legitimacy.md"
+    ],
+    "corpus_patterns": [
+      "~/playbooks/<name>/README.md",
+      "/alva/home/<username>/playbooks/<name>/README.md",
+      "Data sources & freshness",
+      "Blind spots",
+      "not a separate per-template copy",
+      "References card"
+    ]
+  }
+]
