@@ -4,6 +4,10 @@ An annotation points at one element of a playbook the user is iterating on and
 asks for a change to it. The request arrives as one or more `<annotation>`
 tags. Find the logic that *generates* that element and edit it there.
 
+Treat the selector as a pointer to a visual region in the rendered DOM. Do not
+edit a screenshot or patch pixels; change the source HTML/CSS/JS generator that
+creates that region.
+
 ---
 
 ## Tag Format
@@ -26,6 +30,18 @@ context, ask which playbook, then read its HTML locally before editing:
 ```bash
 alva fs read --path '/alva/home/{owner}/playbooks/{name}/index.html' > ./index.html
 ```
+
+If the annotated value, label, chart, or table is feed-derived or
+computation-derived, also read the playbook metadata and backing feed script
+before editing:
+
+```bash
+alva fs read --path '/alva/home/{owner}/playbooks/{name}/playbook.json'
+alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v{feed_major}/src/index.js' > ./{feed_name}.js
+```
+
+Fix data/computation bugs in the feed generator, not only in `index.html`, then
+rerun the feed lifecycle and playbook gates.
 
 Process each `index` as a separate, targeted edit — change only what the
 `instruction` asks of the annotated element, nothing around it.

@@ -18,6 +18,7 @@ Every fundamentals record has three period fields:
 A period label shown to the user MUST be derived from these fields of the
 record actually plotted. Never write a label from your own sense of the
 calendar, and never shift it to a neighboring quarter to match an expectation.
+Do not rename fiscal periods to make them look like calendar periods.
 
 ## `period` is fiscal, not calendar
 
@@ -36,6 +37,9 @@ calendar quarters:
   calendar Oct–Dec.
 
 Never present a fiscal `period` as a calendar quarter.
+In comparisons, do not compare raw `period` strings across companies without
+checking `calendarEndDate`, and do not infer a calendar quarter from
+`fiscalYear + period`.
 
 ## Comparing companies in one chart or table
 

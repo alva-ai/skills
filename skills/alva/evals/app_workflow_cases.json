@@ -1,0 +1,384 @@
+[
+  {
+    "id": "fresh_session_finance_answer",
+    "prompt": "In a fresh session, answer a current finance-data question such as NVDA P/E or BTC price.",
+    "task_class": "Direct Alva data answer",
+    "skill_refs": [
+      "references/preflight.md",
+      "references/memory.md",
+      "references/data-skills.md",
+      "references/content-legitimacy.md",
+      "references/language.md"
+    ],
+    "skill_patterns": [
+      "Rule 0",
+      "alva <command> --help",
+      "alva whoami",
+      "~/memory/MEMORY.md",
+      "Data Query"
+    ],
+    "corpus_patterns": [
+      "alva data-skills list",
+      "alva data-skills summary",
+      "alva data-skills endpoint",
+      "Authorization: Bearer <ARRAYS_JWT>",
+      "agent's job is to build the pipeline",
+      "not legitimate data sources"
+    ],
+    "forbidden_guardrails": [
+      "Do not use WebSearch",
+      "Never guess endpoint paths",
+      "memory is a claim, not truth",
+      "do not answer financial figures"
+    ],
+    "outcome_patterns": [
+      "verify any feed, cronjob, preference, or parameter",
+      "could not be fetched"
+    ],
+    "absent_patterns": [
+      "explicitly qualified as an estimate the user should verify"
+    ]
+  },
+  {
+    "id": "feed_backed_playbook_build",
+    "prompt": "Build a market dashboard or playbook backed by fresh Alva data feeds.",
+    "task_class": "Feed-backed playbook creation",
+    "skill_refs": [
+      "references/request-routing.md",
+      "references/content-legitimacy.md",
+      "references/data-skills.md",
+      "references/feed-lifecycle.md",
+      "references/feed-sdk.md",
+      "references/jagent-runtime.md",
+      "references/playbook-release.md",
+      "references/design-system.md",
+      "references/design-widgets.md",
+      "references/api/release.md"
+    ],
+    "skill_patterns": [
+      "Dashboard / playbook",
+      "Feed Build",
+      "Playbook HTML",
+      "before-build-html",
+      "before-playbook-draft"
+    ],
+    "gate_ids": [
+      "before-feed-release",
+      "before-build-html",
+      "before-playbook-draft"
+    ],
+    "corpus_patterns": [
+      "choose the data source, schema, data modeling pattern",
+      "feed.def()",
+      "ctx.self.ts().append()",
+      "no inline literals",
+      "PUBLIC_ALFS_READ_URL",
+      "README.md",
+      "absolute `--readme-url`",
+      "Authorization: Bearer",
+      "ARRAYS_JWT"
+    ],
+    "forbidden_guardrails": [
+      "Do not use WebSearch",
+      "Do not use `alfs.writeFile()` for feed output data",
+      "If any evidence is missing or stale"
+    ],
+    "outcome_patterns": [
+      "canonical share URL",
+      "published_url"
+    ],
+    "absent_patterns": [
+      "\"$ALVA_ENDPOINT/api/v1/fs/read",
+      "const { getCryptoKline } = require(\"@arrays"
+    ]
+  },
+  {
+    "id": "playbook_release_public",
+    "prompt": "Release a completed playbook publicly after feeds, HTML, and metadata are ready.",
+    "task_class": "Public playbook release",
+    "skill_refs": [
+      "references/feed-lifecycle.md",
+      "references/playbook-release.md",
+      "references/api/release.md",
+      "references/creators-note.md"
+    ],
+    "skill_patterns": [
+      "Playbook Draft",
+      "Playbook Release",
+      "Screenshot Verification",
+      "canonical share URL"
+    ],
+    "gate_ids": [
+      "before-feed-release",
+      "before-playbook-draft",
+      "before-playbook-release"
+    ],
+    "corpus_patterns": [
+      "Deployment coverage",
+      "Data is fresh",
+      "HTML reads quantitative data from feed output paths at runtime",
+      "enumerate every feed output path",
+      "every push sidecar",
+      "absolute `--readme-url`",
+      "trading-symbols",
+      "verify the file is really a PNG"
+    ],
+    "forbidden_guardrails": [
+      "do not run `alva release feed`",
+      "Do not present `published_url` as the canonical share link",
+      "If any required release input is missing"
+    ],
+    "outcome_patterns": [
+      "https://alva.ai/u/<username>/playbooks/<playbook_name>",
+      "creator"
+    ]
+  },
+  {
+    "id": "altra_backtest_strategy",
+    "prompt": "Backtest a crypto or equity allocation strategy and publish a usable result.",
+    "task_class": "Altra strategy and backtest",
+    "skill_refs": [
+      "references/altra-trading.md",
+      "references/design-playbook-trading-strategy.md",
+      "references/feed-lifecycle.md",
+      "references/playbook-release.md",
+      "references/api/trading.md"
+    ],
+    "skill_patterns": [
+      "Always use Altra",
+      "FeedAltra",
+      "look-ahead bias",
+      "visual playbook"
+    ],
+    "corpus_patterns": [
+      "PIT compliance",
+      "createArraysOhlcvProvider",
+      "signal/targets",
+      "Overview/Analytics/Strategy/Feed",
+      "After a successful backtest",
+      "A trading strategy is a feed",
+      "feed-lifecycle.md",
+      "playbook-release.md"
+    ],
+    "forbidden_guardrails": [
+      "hand-rolled loops",
+      "look-ahead bias",
+      "not a `{symbol, side, qty}` order shape"
+    ],
+    "outcome_patterns": [
+      "usable result",
+      "visual evidence"
+    ]
+  },
+  {
+    "id": "push_notifications_end_to_end",
+    "prompt": "Enable push alerts for a released signal or digest playbook.",
+    "task_class": "Push notification lifecycle",
+    "skill_refs": [
+      "references/push-notifications.md",
+      "references/feed-sdk.md",
+      "references/deployment.md",
+      "references/playbook-release.md"
+    ],
+    "skill_patterns": [
+      "Push Alerts",
+      "signal/targets",
+      "notify/message",
+      "--push-notify",
+      "real-run `@last/1`"
+    ],
+    "corpus_patterns": [
+      "feed_alert_ready",
+      "explicit subscription",
+      "subscribe-feed",
+      "subscribe-playbook",
+      "<|SKIP_NOTIFICATION|>",
+      "released feed",
+      "current released feed"
+    ],
+    "forbidden_guardrails": [
+      "Do not use legacy event names",
+      "does not subscribe",
+      "do not claim push is set up"
+    ],
+    "outcome_patterns": [
+      "Trigger a real run",
+      "current released feed"
+    ]
+  },
+  {
+    "id": "remix_workflow",
+    "prompt": "Remix an existing public playbook with a new universe or methodology.",
+    "task_class": "Remix",
+    "skill_refs": [
+      "references/remix-workflow.md",
+      "references/content-legitimacy.md",
+      "references/feed-lifecycle.md",
+      "references/playbook-release.md",
+      "references/api/release.md"
+    ],
+    "skill_patterns": [
+      "Remix",
+      "alva playbooks trending",
+      "alva remix",
+      "lineage"
+    ],
+    "corpus_patterns": [
+      "source playbook",
+      "Content Legitimacy Audit",
+      "Save remix lineage",
+      "source playbook files",
+      "read through ALFS",
+      "v{feed_major}",
+      "source README"
+    ],
+    "forbidden_guardrails": [
+      "alva remix is only for lineage",
+      "must pass a content legitimacy audit",
+      "Do not use WebSearch"
+    ],
+    "outcome_patterns": [
+      "Release playbook",
+      "new-name"
+    ]
+  },
+  {
+    "id": "annotation_edit",
+    "prompt": "Apply an annotation targeting one rendered chart or card in an existing playbook.",
+    "task_class": "Annotation-driven edit",
+    "skill_refs": [
+      "references/annotation-edits.md",
+      "references/design-system.md",
+      "references/feed-lifecycle.md",
+      "references/playbook-release.md"
+    ],
+    "skill_patterns": [
+      "Annotation Edit",
+      "selector",
+      "edit the generator",
+      "never freeze"
+    ],
+    "corpus_patterns": [
+      "Locate the Generator",
+      "Never freeze",
+      "Re-release",
+      "live feed values",
+      "visual region",
+      "feed-derived or computation-derived",
+      "playbook.json"
+    ],
+    "forbidden_guardrails": [
+      "Never freeze rendered live feed values",
+      "Do not edit a screenshot",
+      "do not hardcode"
+    ],
+    "outcome_patterns": [
+      "rerun the relevant feed",
+      "release gate"
+    ]
+  },
+  {
+    "id": "secret_api_key_usage",
+    "prompt": "Use a third-party API key inside an Alva Cloud runtime script.",
+    "task_class": "Secret-backed runtime integration",
+    "skill_refs": [
+      "references/secret-manager.md",
+      "references/jagent-runtime.md",
+      "references/content-legitimacy.md"
+    ],
+    "skill_patterns": [
+      "Secret Use",
+      "Secret Manager",
+      "loadPlaintext",
+      "alva.ai/apikey"
+    ],
+    "corpus_patterns": [
+      "Do not ask the user to paste",
+      "Do not hardcode secrets",
+      "require(\"secret-manager\")",
+      "loadPlaintext(name) returns `null`",
+      "throw new Error"
+    ],
+    "forbidden_guardrails": [
+      "never hardcode",
+      "Do not log raw secret values",
+      "Do not read secret values back"
+    ],
+    "outcome_patterns": [
+      "web upload flow",
+      "clear missing-secret error"
+    ]
+  },
+  {
+    "id": "fundamentals_fiscal_period",
+    "prompt": "Compare quarterly fundamentals across companies with different fiscal calendars.",
+    "task_class": "Fundamentals period alignment",
+    "skill_refs": [
+      "references/fundamentals-periods.md",
+      "references/content-legitimacy.md",
+      "references/data-skills.md"
+    ],
+    "skill_patterns": [
+      "fundamentals-periods.md",
+      "fiscal",
+      "calendar",
+      "YoY/QoQ"
+    ],
+    "corpus_patterns": [
+      "calendarEndDate",
+      "derive the label",
+      "period is fiscal",
+      "Align by `calendarEndDate`",
+      "period with `calendarEndDate` shown"
+    ],
+    "forbidden_guardrails": [
+      "Do not rename fiscal periods",
+      "do not compare raw `period` strings",
+      "do not infer a calendar quarter"
+    ],
+    "outcome_patterns": [
+      "ask the user which basis they want",
+      "same `period`, `fiscalYear` differing by 1"
+    ]
+  },
+  {
+    "id": "adk_scheduled_digest",
+    "prompt": "Create a scheduled digest that uses LLM reasoning over real feed data.",
+    "task_class": "ADK in deterministic scheduled pipeline",
+    "skill_refs": [
+      "references/adk.md",
+      "references/narrative-voice.md",
+      "references/content-legitimacy.md",
+      "references/feed-lifecycle.md"
+    ],
+    "skill_patterns": [
+      "ADK Narrative",
+      "@alva/adk",
+      "one-off research",
+      "narrative-voice.md"
+    ],
+    "corpus_patterns": [
+      "tool calling",
+      "copy verbatim into ADK system prompts",
+      "Do not use ADK for one-off interactive research",
+      "do not use it to produce numbers",
+      "content's own date",
+      "prefer the AlvaAsk pattern",
+      "No top-level `await`",
+      "feed summarizer"
+    ],
+    "forbidden_guardrails": [
+      "may not invent factual numbers or events",
+      "not legitimate data sources",
+      "one-off research"
+    ],
+    "outcome_patterns": [
+      "feed summarizer",
+      "deterministic, reschedulable pipeline"
+    ],
+    "absent_patterns": [
+      "require(\"@arrays/data",
+      "log(result.turns)"
+    ]
+  }
+]

@@ -2,26 +2,58 @@
 
 const fs = require("fs");
 const path = require("path");
+const { execFileSync } = require("child_process");
 
 const root = process.cwd();
-const skillPath = path.join(root, "skills/alva/SKILL.md");
+const skillRel = "skills/alva/SKILL.md";
+const refsRel = "skills/alva/references";
+const skillPath = path.join(root, skillRel);
 const casesPath = path.join(root, "skills/alva/evals/routing_cases.json");
 
 function usage() {
-  console.error("Usage: node skills/alva/evals/routing_eval.js [--label NAME] [--out FILE]");
+  console.error("Usage: node skills/alva/evals/routing_eval.js [--label NAME] [--out FILE] [--treeish REF]");
   process.exit(2);
 }
 
 let label = "eval";
 let outPath = null;
+let treeish = null;
 for (let i = 2; i < process.argv.length; i += 1) {
   const arg = process.argv[i];
   if (arg === "--label") {
     label = process.argv[++i];
   } else if (arg === "--out") {
     outPath = process.argv[++i];
+  } else if (arg === "--treeish") {
+    treeish = process.argv[++i];
   } else {
     usage();
+  }
+}
+
+function gitShow(relPath) {
+  try {
+    return execFileSync("git", ["show", `${treeish}:${relPath}`], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    });
+  } catch {
+    return null;
+  }
+}
+
+function gitListRefs() {
+  try {
+    return execFileSync("git", ["ls-tree", "-r", "--name-only", treeish, refsRel], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    })
+      .split(/\r?\n/)
+      .filter((line) => line.endsWith(".md"));
+  } catch {
+    return [];
   }
 }
 
@@ -38,21 +70,34 @@ function listFiles(dir) {
   });
 }
 
+function loadDoc(relPath) {
+  return treeish ? gitShow(relPath) : readText(path.join(root, relPath));
+}
+
+function listRefs() {
+  return treeish
+    ? gitListRefs()
+    : listFiles(path.join(root, refsRel))
+        .filter((file) => file.endsWith(".md"))
+        .map((file) => path.relative(root, file))
+        .sort();
+}
+
 function has(text, pattern) {
   return text.toLowerCase().includes(String(pattern).toLowerCase());
 }
 
-const skill = readText(skillPath);
-const referenceFiles = listFiles(path.join(root, "skills/alva/references"))
-  .filter((file) => file.endsWith(".md"))
-  .sort();
-const corpus = [skillPath, ...referenceFiles].map(readText).join("\n");
+const skill = loadDoc(skillRel) || "";
+const referenceFiles = listRefs();
+const corpus = [skill, ...referenceFiles.map((file) => loadDoc(file) || "")].join("\n");
 const cases = JSON.parse(readText(casesPath));
 
 const results = cases.map((testCase) => {
   const checks = [];
   for (const ref of testCase.skill_refs || []) {
-    const exists = fs.existsSync(path.join(root, "skills/alva", ref));
+    const exists = treeish
+      ? referenceFiles.includes(path.posix.join("skills/alva", ref))
+      : fs.existsSync(path.join(root, "skills/alva", ref));
     const routed = has(skill, ref);
     checks.push({ kind: "skill_ref", value: ref, pass: exists && routed });
   }

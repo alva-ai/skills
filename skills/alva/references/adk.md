@@ -1,229 +1,227 @@
 # @alva/adk — Agent Development Kit
 
-A SDK for building LLM-powered agents with tool calling to enable agentic features.
+Use ADK when a scheduled, deterministic Alva pipeline needs a custom LLM
+tool-loop: classification, synthesis over already-fetched records, structured
+JSON extraction, feed summarizer output, or multi-step reasoning where the tool
+set is fixed.
 
-> **If your ADK call produces user-facing prose** (TLDR, digest, why-it-matters,
-> delta body, push line, etc.), include the voice block from
-> [narrative-voice.md](narrative-voice.md) verbatim in `system`.
+For ordinary scheduled agent digests and proactive notifications, prefer the
+AlvaAsk pattern in [feed-sdk.md](feed-sdk.md#pattern-e-alvaask--feed-notification-notifymessage).
+ADK is the lower-level option when AlvaAsk is not enough.
 
-Do not use ADK for one-off research, exploratory analysis, or an interactive
-"help me look into X" request. Use it when the LLM step is fixed inside a
-scheduled, deterministic pipeline.
+Do not use ADK for one-off interactive research, exploratory analysis, or a
+direct user question. Do not use ADK to invent numbers, events, reports, or
+market facts. Those must come from Data Skills, SDK/feed outputs, search/BYOD
+sources wired into the feed, or user-provided data that passed
+[content-legitimacy.md](content-legitimacy.md).
+
+If ADK produces user-facing prose (TLDR, digest, why-it-matters, delta body,
+push line), copy the voice block from [narrative-voice.md](narrative-voice.md)
+verbatim into `system`.
+
+## Runtime Rules
+
+ADK code runs inside the jagent V8 runtime. Before writing code, read
+[jagent-runtime.md](jagent-runtime.md).
+
+Do:
+
+- wrap async code in `(async () => { ... })();`
+- use `console.log`, not `log`
+- read files through `require("alfs")`
+- fetch HTTP through `require("net/http")`
+- write scheduled outputs through the Feed SDK
+- run the normal feed lifecycle before release
+
+Do not:
+
+- use top-level `await`
+- use Node built-ins, `process`, global `fetch`, or timer globals
+- use legacy `require("@arrays/...")` data modules
+- pass raw secrets, logs, or pasted values into user-visible output
+
+Structured Data Skills are discovered with `alva data-skills list -> summary ->
+endpoint` and called over HTTP with `Authorization: Bearer <ARRAYS_JWT>`; see
+[data-skills.md](data-skills.md).
 
 ## Quick Start
 
+This example lets ADK reason over an existing feed output. The number comes from
+the feed read tool, not from the model.
+
 ```javascript
 const adk = require("@alva/adk");
+const alfs = require("alfs");
+const env = require("env");
 
-const result = await adk.agent({
-  system: "You are a helpful assistant.",
-  prompt: "What is the price of AAPL?",
-  tools: [{
-    name: "getPrice",
-    description: "Get current stock price",
-    parameters: {
-      type: "object",
-      properties: { symbol: { type: "string" } },
-      required: ["symbol"],
-    },
-    fn: async (args) => {
-      const resp = await require("net/http").fetch(`https://api.example.com/price/${args.symbol}`);
-      return resp.json();
-    },
-  }],
-  maxTurns: 5,
-});
+(async () => {
+  const result = await adk.agent({
+    system: `Return JSON only.
+Reply MUST begin with \`{\` and end with \`}\`.
+Schema: {"summary":"...","risk":"low|medium|high"}`,
+    prompt: "Summarize the latest AAPL snapshot.",
+    tools: [{
+      name: "readLatestSnapshot",
+      description: "Read the latest feed-backed AAPL metrics snapshot.",
+      parameters: { type: "object", properties: {} },
+      fn: async () => {
+        const path = `/alva/home/${env.username}/feeds/aapl-snapshot/v1/data/metrics/snapshot/@last/1`;
+        const raw = await alfs.readFile(path);
+        return JSON.parse(raw);
+      },
+    }],
+    maxTurns: 5,
+  });
 
-log(result.content);    // Final text response
-log(result.turns);      // Number of agent loop iterations
-log(result.toolCalls);  // History of all tool calls made
+  console.log(result.content);
+})();
 ```
 
 ## API
 
 ### `adk.agent(config): Promise<AgentResult>`
 
-Single-function entry point. Runs a ReAct loop (reason → act → observe) until the LLM responds without tool calls or `maxTurns` is reached.
+Runs a ReAct loop until the model responds without tool calls or `maxTurns` is
+reached.
 
-### AgentConfig
+| Field | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `prompt` | string | yes | | User prompt/query |
+| `system` | string | no | | System prompt |
+| `tools` | Tool[] | yes | | Tools the agent may call |
+| `maxTurns` | number | no | 10 | Max agent loop iterations |
 
-| Field      | Type     | Required | Default | Description                          |
-| ---------- | -------- | -------- | ------- | ------------------------------------ |
-| `prompt`   | string   | yes      |         | User prompt/query                    |
-| `system`   | string   | no       |         | System prompt                        |
-| `tools`    | Tool[]   | yes      |         | Tools the agent can use              |
-| `maxTurns` | number   | no       | 10      | Max agent loop iterations            |
+Tool fields:
 
-### Tool
+| Field | Type | Description |
+| --- | --- | --- |
+| `name` | string | Tool identifier |
+| `description` | string | What the tool does, shown to the model |
+| `parameters` | object | JSON Schema for tool arguments |
+| `fn` | `(args) => Promise<any>` | Tool implementation |
 
-| Field         | Type                                              | Description                        |
-| ------------- | ------------------------------------------------- | ---------------------------------- |
-| `name`        | string                                            | Tool identifier                    |
-| `description` | string                                            | What the tool does (shown to LLM)  |
-| `parameters`  | object                                            | JSON Schema for tool parameters    |
-| `fn`          | `(args: Record<string, unknown>) => Promise<any>` | Tool implementation                |
+Result fields:
 
-### AgentResult
+| Field | Type | Description |
+| --- | --- | --- |
+| `content` | string | Final text response from the model |
+| `turns` | number | Number of loop iterations |
+| `toolCalls` | ToolCallRecord[] | History of executed tool calls |
 
-| Field       | Type             | Description                       |
-| ----------- | ---------------- | --------------------------------- |
-| `content`   | string           | Final text response from LLM      |
-| `turns`     | number           | Number of agent loop iterations    |
-| `toolCalls` | ToolCallRecord[] | History of all tool calls executed |
-
-### ToolCallRecord
-
-| Field       | Type   | Description                |
-| ----------- | ------ | -------------------------- |
-| `name`      | string | Tool that was called       |
-| `arguments` | object | Arguments passed to tool   |
-| `result`    | any    | Return value from tool     |
-
-## Agent Loop Behavior
-
-1. Build initial messages (optional system + user prompt)
-2. Convert tools to OpenAI function calling schema (strips `fn`)
-3. Loop up to `maxTurns`:
-   - Call LLM with messages + tools
-   - If no `tool_calls` in response → return final text
-   - Execute each tool call via `fn(args)`, append results
-   - Continue loop
-4. If `maxTurns` exhausted → return last assistant content
-
-**Error handling:**
-
-- Unknown tool name → throws
-- Tool execution failure → throws (not swallowed)
-- LLM API errors → throws with status code and body
+Unknown tools, tool failures, and LLM API failures throw; do not swallow them
+and continue with empty output.
 
 ## Tool Design Principles
 
-Tools are how the agent interacts with the world. A well-designed toolset makes
-the agent more capable and reliable.
-
-**Three categories of tools:**
+Tools are the only legitimate way ADK touches facts. A good tool set makes the
+agent reliable.
 
 | Category | Purpose | Examples |
-| -------- | ------- | ------- |
-| **Query** | Fetch upstream data the agent needs to reason over | SDK calls, HTTP APIs, ALFS file reads, feed time series reads |
-| **Memory** | Read/write persistent state across agent runs | ALFS files, `ctx.kv`, feed time series as historical reference |
-| **Action** | Produce side effects or intermediate outputs | Write mid-turn results to a feed, trigger notifications |
+| --- | --- | --- |
+| Query | Fetch upstream data the agent needs | feed time series reads, Data Skills HTTP calls, ALFS file reads |
+| Memory | Read/write persistent state across runs | feed time series, ALFS files, `ctx.kv` |
+| Action | Produce side effects or intermediate outputs | append feed records, save partial results |
 
-**Guidelines:**
+Guidelines:
 
-- One tool = one job. The agent composes them; you don't need a mega-tool.
-- Tool descriptions are the agent's documentation — be specific about what the
-  tool returns and when to use it.
-- Return data the agent can reason over. Avoid returning raw HTML or huge blobs;
-  pre-extract the useful fields in `fn`.
-- Any Alva SDK, ALFS path, or HTTP endpoint can be wrapped as a tool.
+- One tool = one job.
+- Tool descriptions must name the source and returned fields.
+- Return compact structured data, not raw HTML or huge blobs.
+- Validate shapes and throw when required fields are absent.
+- Treat ADK output as interpretation of tool results, not as a data source.
 
----
+## Feed-Backed Scheduled Digest
 
-## Patterns & Examples
-
-### Historical Reference (Feed as Memory)
-
-Read the agent's own previous output via feed time series paths (`@last/N`, `@range/{start}..{end}`).
+Use this when ADK is the right lower-level tool-loop and the result needs to
+become a feed output. The feed can then be deployed, released, and optionally
+push-enabled with [push-notifications.md](push-notifications.md).
 
 ```javascript
+const { Feed, feedPath, makeDoc, str } = require("@alva/feed");
 const adk = require("@alva/adk");
+const alfs = require("alfs");
 const env = require("env");
-const http = require("net/http");
 
-const result = await adk.agent({
-  system: `Stock analyst. Compare current data to previous analysis.
-
-Reply MUST begin with \`{\` and end with \`}\`. No prose, no markdown, no code fences.
-Output is parsed by JSON.parse with no preprocessing.
-
-Schema: {"summary":"...","changes":["..."],"sentiment":"up|down|neutral"}`,
-  prompt: "Analyze AAPL quarterly performance.",
-  tools: [{
-    name: "getIncomeStatements",
-    description: "Fetch quarterly income statements for a stock",
-    parameters: {
-      type: "object",
-      properties: { symbol: { type: "string" } },
-      required: ["symbol"],
-    },
-    fn: async (args) => {
-      const { getCompanyIncomeStatements } = require("@arrays/data/stock/company/income:v1.0.0");
-      return getCompanyIncomeStatements({
-        symbol: args.symbol, period_type: "quarter",
-        start_time: Date.parse("2024-01-01"), end_time: Date.now(), limit: 12,
-      }).response.metrics;
-    },
-  }, {
-    name: "getPreviousAnalysis",
-    description: "Read last analysis this agent produced for a topic",
-    parameters: {
-      type: "object",
-      properties: { topic: { type: "string" } },
-      required: ["topic"],
-    },
-    fn: async (args) => {
-      const path = `/alva/home/${env.username}/feeds/stock-research/v1/data/research/${args.topic}/@last/1`;
-      const resp = await http.fetch(`${env.endpoint}/api/v1/fs/read?path=${encodeURIComponent(path)}`,
-        { headers: { "X-Alva-Api-Key": env.apiKey } });
-      return resp.status === 404 ? null : resp.json();
-    },
-  }],
-  maxTurns: 5,
+const feed = new Feed({ path: feedPath("adk-market-digest") });
+feed.def("notify", {
+  message: makeDoc("Notification", "ADK-generated digest", [
+    str("title"),
+    str("body"),
+  ]),
 });
+
+(async () => {
+  await feed.run(async (ctx) => {
+    const result = await adk.agent({
+      system: `Use the supplied feed rows only. Do not invent numbers.
+Return concise markdown suitable for a notification.`,
+      prompt: "Write the latest market digest.",
+      tools: [{
+        name: "readMarketRows",
+        description: "Read latest market rows from the released feed output.",
+        parameters: { type: "object", properties: {} },
+        fn: async () => {
+          const path = `/alva/home/${env.username}/feeds/market-source/v1/data/metrics/summary/@last/5`;
+          const raw = await alfs.readFile(path);
+          return JSON.parse(raw);
+        },
+      }],
+      maxTurns: 5,
+    });
+
+    await ctx.self.ts("notify", "message").append([{
+      date: Date.now(),
+      title: "Market Digest",
+      body: result.content,
+    }]);
+  });
+})();
 ```
 
-### Multi-Source Synthesis
+After writing the script, run [feed-lifecycle.md](feed-lifecycle.md). If this
+digest backs a playbook, also run [playbook-release.md](playbook-release.md).
 
-Multiple domain tools — agent decides fetch order based on prompt.
+## Data Skills Tool Wrapper
+
+Use this only after running the Data Skills discovery pipeline in the same
+session. Replace `ARRAYS_PATH` and params with the exact values from
+`alva data-skills endpoint <skill> <file>`.
 
 ```javascript
-const tools = [{
-  name: "getOHLCV",
-  description: "Get OHLCV candlestick data for a symbol",
-  parameters: {
-    type: "object",
-    properties: {
-      symbol: { type: "string" }, interval: { type: "string" }, days: { type: "number" },
-    },
-    required: ["symbol"],
-  },
-  fn: async (args) => {
-    const { getCryptoKline } = require("@arrays/crypto/ohlcv:v1.0.0");
-    const now = Math.floor(Date.now() / 1000);
-    return getCryptoKline({
-      symbol: args.symbol, interval: args.interval || "1d",
-      start_time: now - (args.days || 30) * 86400, end_time: now,
-    }).response.data;
-  },
-}, {
-  name: "getMacroIndicator",
-  description: "Get macro indicator (CPI, GDP, fed funds rate, etc.)",
-  parameters: { type: "object", properties: { indicator: { type: "string" } }, required: ["indicator"] },
-  fn: async () => {
-    const { getFedFundsRate } = require("@arrays/data/macro/fed-funds-rate:v1.0.0");
-    return getFedFundsRate({ limit: 12 }).response;
-  },
-}, {
-  name: "getNews",
-  description: "Search recent news articles",
-  parameters: { type: "object", properties: { query: { type: "string" } }, required: ["query"] },
-  fn: async (args) => {
-    const { searchNews } = require("@arrays/data/feed/news:v1.0.0");
-    return searchNews({ query: args.query, limit: 10 }).response.articles;
-  },
-}];
+const http = require("net/http");
+const secret = require("secret-manager");
 
-await adk.agent({
-  system: "Macro-financial analyst. Gather multiple sources before concluding.",
-  prompt: "How is the current rate environment affecting crypto markets?",
-  tools, maxTurns: 8,
-});
+const ARRAYS_BASE = "https://data-tools.prd.space.id";
+const ARRAYS_PATH = "/<discovered-endpoint-path>";
+
+async function callArrays(params) {
+  const jwt = secret.loadPlaintext("ARRAYS_JWT");
+  if (!jwt) {
+    throw new Error("Missing ARRAYS_JWT. Run `alva arrays token ensure` and retry.");
+  }
+  const resp = await http.fetch(ARRAYS_BASE + ARRAYS_PATH, {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + jwt,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(params),
+  });
+  if (!resp.ok) {
+    throw new Error(`Arrays HTTP ${resp.status}: ${await resp.text()}`);
+  }
+  return resp.json();
+}
 ```
 
-### Mid-Turn Feed Output (Progressive Results)
+Wrap `callArrays` as an ADK tool only when the model needs to choose among
+arguments or combine tool results. For simple deterministic fetches, keep the
+fetch outside ADK and pass the result into the prompt or feed code.
 
-Write results to a feed *during* the agent loop. Partial results persist even if `maxTurns` is hit.
+## Mid-Turn Feed Output
+
+ADK tools can persist partial results during the agent loop. Use this for
+longer scans where partial outputs are useful if `maxTurns` is reached.
 
 ```javascript
 const { Feed, feedPath, makeDoc, str, num } = require("@alva/feed");
@@ -231,118 +229,89 @@ const adk = require("@alva/adk");
 
 const feed = new Feed({ path: feedPath("sector-scan") });
 feed.def("scan", {
-  scores: makeDoc("Sector Scores", "Per-sector analysis", [str("sector"), num("score"), str("rationale")]),
+  scores: makeDoc("Sector Scores", "Per-sector analysis", [
+    str("sector"),
+    num("score"),
+    str("rationale"),
+  ]),
 });
 
-await feed.run(async (ctx) => {
-  await adk.agent({
-    system: "Analyze each sector. After each, call saveSectorResult.",
-    prompt: "Score growth outlook 1-10: Technology, Healthcare, Energy, Financials.",
-    tools: [{
-      name: "getSectorData",
-      description: "Get recent performance data for a market sector",
-      parameters: { type: "object", properties: { sector: { type: "string" } }, required: ["sector"] },
-      fn: async (args) => {
-        const { getStockOhlcv } = require("@arrays/data/stock/ohlcv:v1.0.0");
-        const etfs = { Technology: "XLK", Healthcare: "XLV", Energy: "XLE", Financials: "XLF" };
-        return getStockOhlcv({ symbol: etfs[args.sector] || "SPY", interval: "1d", limit: 30 }).response;
-      },
-    }, {
-      name: "saveSectorResult",
-      description: "Store analysis result for one sector",
-      parameters: {
-        type: "object",
-        properties: { sector: { type: "string" }, score: { type: "number" }, rationale: { type: "string" } },
-        required: ["sector", "score", "rationale"],
-      },
-      fn: async (args) => {
-        await ctx.self.ts("scan", "scores").append([{
-          date: Date.now(), sector: args.sector, score: args.score, rationale: args.rationale,
-        }]);
-        return { saved: args.sector };
-      },
-    }],
-    maxTurns: 12,
+(async () => {
+  await feed.run(async (ctx) => {
+    await adk.agent({
+      system: "Score each sector using only tool-provided data. Call saveSectorResult for each sector.",
+      prompt: "Score growth outlook 1-10: Technology, Healthcare, Energy, Financials.",
+      tools: [{
+        name: "saveSectorResult",
+        description: "Store the score and rationale for one sector.",
+        parameters: {
+          type: "object",
+          properties: {
+            sector: { type: "string" },
+            score: { type: "number" },
+            rationale: { type: "string" },
+          },
+          required: ["sector", "score", "rationale"],
+        },
+        fn: async (args) => {
+          await ctx.self.ts("scan", "scores").append([{
+            date: Date.now(),
+            sector: args.sector,
+            score: args.score,
+            rationale: args.rationale,
+          }]);
+          return { saved: args.sector };
+        },
+      }],
+      maxTurns: 12,
+    });
   });
-});
+})();
 ```
 
-### Generic Feed Reader Tool
+Do not let the model create scores from vibes. Add query tools or precomputed
+feed reads when the score depends on real market data.
 
-One tool to read from **any** deployed feed — reusable across agents.
+## Structured Output
 
-```javascript
-{
-  name: "readFeedData",
-  description: "Read recent output from any Alva feed",
-  parameters: {
-    type: "object",
-    properties: {
-      feedName: { type: "string" }, group: { type: "string" },
-      series: { type: "string" }, count: { type: "number" },
-    },
-    required: ["feedName", "group", "series"],
-  },
-  fn: async (args) => {
-    const env = require("env");
-    const path = `/alva/home/${env.username}/feeds/${args.feedName}/v1/data/${args.group}/${args.series}/@last/${args.count || 10}`;
-    const resp = await require("net/http").fetch(
-      `${env.endpoint}/api/v1/fs/read?path=${encodeURIComponent(path)}`,
-      { headers: { "X-Alva-Api-Key": env.apiKey } },
-    );
-    return resp.json();
-  },
-}
-```
-
-### Structured Output
-
-Enforce JSON output via system prompt when result must be parsed by downstream code.
-Use positive framing ("MUST begin with `{`") rather than negative ("no fences") — the
-model has a strong learned prior to wrap JSON in markdown fences that negative
-instructions alone don't reliably override. Pair the prompt with a defensive
-`parseJson` helper: even with the contract below, the model occasionally still
-wraps output in ` ```json ... ``` ` fences, and a naked `JSON.parse` will throw.
+When downstream code parses the ADK result, enforce JSON in the system prompt
+and still parse defensively.
 
 ```javascript
-// Defensive parse — strip optional markdown fences, fall back to inner-object regex.
 function parseJson(s) {
   if (!s) return null;
   const cleaned = s.replace(/^```(?:json)?/, "").replace(/```$/, "").trim();
-  try { return JSON.parse(cleaned); } catch (e) {
+  try {
+    return JSON.parse(cleaned);
+  } catch (e) {
     const m = cleaned.match(/\{[\s\S]*\}/);
-    if (m) { try { return JSON.parse(m[0]); } catch (e2) { return null; } }
-    return null;
+    if (!m) return null;
+    try {
+      return JSON.parse(m[0]);
+    } catch (e2) {
+      return null;
+    }
   }
 }
-
-const result = await adk.agent({
-  system: `Return JSON only.
-Reply MUST begin with \`{\` and end with \`}\`. No prose, no markdown, no code fences.
-Output is parsed by JSON.parse with no preprocessing.
-
-Schema: {"insights":[{"sentiment":"up|down|neutral","title":"...","text":"..."}]}`,
-  prompt: "...",
-  tools: [/* ... */],
-});
-const parsed = parseJson(result.content);
 ```
 
-### Timestamp Source for Extracted Records
+Pair this with a prompt that says: `Reply MUST begin with "{" and end with "}"`.
+If parsing fails, throw and let the feed run fail; do not silently write partial
+or made-up records.
+
+## Timestamp Source For Extracted Records
 
 When ADK extracts records destined for a timeseries column or user-visible card
-(news, events, articles, filings, posts), the **content's own date** is part of
-the contract — not the crawl time.
+(news, events, articles, filings, posts), the content's own date is part of the
+contract, not the crawl time.
 
-- Schema must include `published_at_iso` (ISO 8601 from the source's
-  `published_at`/`pubDate`, or an explicit date extracted from the title/summary)
-  and `date_confidence` (`source_published_at | extracted_from_summary | unknown`).
-- Feed code: `date = Date.parse(it.published_at_iso) || null`. **Never**
-  `date: Date.now()` or `now + i` (the 1ms-spread anti-pattern). Put crawl time
-  in a separate `crawled_at` field if useful.
-- HTML: when `date_confidence === "unknown"` or `date == null`, render
-  `Date unknown` — not the crawl date silently labeled as the content's date.
+- Schema must include `published_at_iso` and `date_confidence`
+  (`source_published_at | extracted_from_summary | unknown`).
+- Feed code should use `date = Date.parse(item.published_at_iso) || null`.
+- Never use `date: Date.now()` or `now + i` for extracted events.
+- Put crawl time in a separate `crawled_at` field if useful.
+- HTML should render `Date unknown` when `date_confidence === "unknown"` or
+  `date == null`.
 
-A card showing `$300B · 2026-05-11` for an event that happened a year earlier is
-a content-legitimacy violation (parallel to "no training-data fill"), not just
-a UX bug.
+A card showing a fresh crawl date for an old event is a content-legitimacy
+violation, not just a UX bug.

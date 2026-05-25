@@ -14,7 +14,7 @@ lean without losing behavior.
 | Design references | Tokens, layout, widgets, components, strategy UI templates | `design-system.md`, `design-widgets.md`, `design-components.md`, `design-playbook-trading-strategy.md`, `design-tokens.css` |
 | CLI gotcha references | Details the CLI help omits or currently states incorrectly | `api/filesystem.md`, `api/release.md`, `api/trading.md`, `api/error-responses.md` |
 | Voice references | User-facing vocabulary, narrative style, post-release notes | `language.md`, `narrative-voice.md`, `creators-note.md` |
-| Eval artifacts | Regression cases and reports for routing and gate coverage | `../evals/*` |
+| Eval artifacts | Regression cases and reports for routing, gates, and full application workflows | `../evals/*` |
 
 ## Dependency chains
 
@@ -39,6 +39,15 @@ reference from the help-first routing table.
 
 `feed-sdk.md` Patterns D/E → `feed-lifecycle.md` →
 `push-notifications.md` → `deployment.md` → `playbook-release.md` item 9.
+
+### Scheduled digest / LLM pipeline
+
+Ordinary scheduled agent digest: `feed-sdk.md` Pattern E (AlvaAsk) →
+`feed-lifecycle.md` → `push-notifications.md` if alerts are enabled.
+
+Custom ADK tool loop: `adk.md` → `jagent-runtime.md` →
+`content-legitimacy.md` → `feed-lifecycle.md` → `playbook-release.md` if a
+playbook publishes the output.
 
 ### Remix / annotation edit
 
@@ -70,11 +79,16 @@ the canonical file.
 | CLI help is authoritative | `preflight.md` | Other files say "run help" but do not copy command surfaces. |
 | Data must come from SDK/feed/BYOD, never agent/search/LLM literals | `content-legitimacy.md` | Design/release refs point here instead of restating all criteria. |
 | Arrays discovery is list → summary → endpoint | `data-skills.md` | `SKILL.md` and feed docs only name the pipeline. |
+| Direct financial answers require a fresh fetch or an explicit could-not-fetch response | `data-skills.md` | Do not preserve estimate-caveat wording elsewhere. |
 | Feed lifecycle and release gate | `feed-lifecycle.md` | `feed-sdk.md` owns SDK API; deployment owns cronjob API. |
+| Browser playbook reads use the public ALFS helper, never `$ALVA_ENDPOINT` | `playbook-release.md` | `feed-sdk.md` points to the same helper for web pages. |
+| Public feed grants are on the feed root, not version or synth data paths | `feed-lifecycle.md`, `api/filesystem.md` | Examples should grant `~/feeds/<name>`. |
 | README, `--readme-url`, tags, `--skill-id` | `api/release.md` | `playbook-release.md` owns when to apply them. |
 | Browser public read helper | `playbook-release.md` | Content legitimacy points here. |
 | Push requires sidecar + feed release + push flag + subscription + real-run verification | `push-notifications.md` | Feed SDK owns output schemas only. |
 | Runtime absent globals and limits | `jagent-runtime.md` | `operational-pitfalls.md` lists common symptoms. |
+| Legacy `require("@arrays/...")` data examples are invalid for new feeds | `data-skills.md` | Feed, deployment, and ADK examples use Data Skills HTTP with `ARRAYS_JWT`. |
+| Ordinary scheduled agent digests prefer AlvaAsk; ADK is for custom tool loops | `adk.md`, `feed-sdk.md` | `SKILL.md` says this once and routes to both. |
 | Fiscal vs calendar fundamentals | `fundamentals-periods.md` | Content legitimacy points here. |
 | Product vocabulary | `language.md` | User-facing prose rules point here. |
 | AI-tell ban and ADK voice block | `narrative-voice.md` | `adk.md` points here for narrative outputs. |
@@ -106,6 +120,7 @@ the canonical file.
 | Detailed sub-documents table | Replaced by `SKILL.md` reference index plus this map |
 | CLI reference table | `preflight.md` command routing and `SKILL.md` compact CLI index |
 | Feed SDK quick reference, data modeling, debugging | `feed-sdk.md`, `feed-lifecycle.md`, `api/filesystem.md` |
+| App-level fresh-context eval for direct data, feed-backed playbooks, release, Altra, push, remix, annotation, secrets, fundamentals, and ADK | `evals/app_workflow_cases.json`, `evals/app_workflow_eval.js`, app workflow reports |
 | Error transparency and subscription-gated SDKs | `content-legitimacy.md` |
 | Memory | `memory.md` with preflight pointer |
 | Secret Manager | `secret-manager.md` |

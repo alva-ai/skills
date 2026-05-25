@@ -24,8 +24,36 @@ filesystem virtual paths (`@last`, `@range`, etc.).
 
 ```javascript
 const { Feed, feedPath, makeDoc, num } = require("@alva/feed");
-const { getCryptoKline } = require("@arrays/crypto/ohlcv:v1.0.0");
 const { indicators } = require("@alva/algorithm");
+const http = require("net/http");
+const secret = require("secret-manager");
+
+// Before writing this script, run:
+// alva data-skills list
+// alva data-skills summary <skill>
+// alva data-skills endpoint <skill> <file>
+// Then fill this with the exact endpoint path and params from that output.
+const ARRAYS_BASE = "https://data-tools.prd.space.id";
+const OHLCV_PATH = "/<discovered-ohlcv-endpoint-path>";
+
+async function fetchArrays(path, params) {
+  const jwt = secret.loadPlaintext("ARRAYS_JWT");
+  if (!jwt) {
+    throw new Error("Missing ARRAYS_JWT. Run `alva arrays token ensure` and retry.");
+  }
+  const resp = await http.fetch(ARRAYS_BASE + path, {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + jwt,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(params),
+  });
+  if (!resp.ok) {
+    throw new Error(`Arrays HTTP ${resp.status}: ${await resp.text()}`);
+  }
+  return resp.json();
+}
 
 const feed = new Feed({ path: feedPath("btc-ema") });
 
@@ -38,14 +66,16 @@ feed.def("metrics", {
 
 (async () => {
   const now = Math.floor(Date.now() / 1000);
-  const bars = getCryptoKline({
+  const result = await fetchArrays(OHLCV_PATH, {
     symbol: "BTCUSDT",
     start_time: now - 30 * 86400,
     end_time: now,
     interval: "1h",
-  })
-    .response.data.slice()
-    .reverse();
+  });
+  const bars = (result.response?.data || result.data || []).slice().reverse();
+  if (!bars.length) {
+    throw new Error("BTCUSDT OHLCV empty; re-check the discovered endpoint shape.");
+  }
 
   const closes = bars.map((b) => b.close);
   const ema10 = indicators.ema(closes, { period: 10 });
@@ -61,6 +91,10 @@ feed.def("metrics", {
   });
 })();
 ```
+
+Do not use legacy `require("@arrays/...")` data modules in new feed examples.
+Structured Data Skills are discovered with the CLI and called over HTTP with
+`Authorization: Bearer <ARRAYS_JWT>`; see [data-skills.md](data-skills.md).
 
 After running, data is readable at:
 `~/feeds/btc-ema/v1/data/metrics/prices/@last/100`
@@ -640,10 +674,15 @@ const points = JSON.parse(data);
 
 ### From a Web Page
 
+For playbook HTML, use the browser-safe public read helper from
+[playbook-release.md#browser-safe-feed-reads](playbook-release.md#browser-safe-feed-reads).
+Do not emit `$ALVA_ENDPOINT`, sandbox environment variables, or guessed API
+hosts into browser HTML.
+
 ```javascript
-const resp = await fetch(
-  "$ALVA_ENDPOINT/api/v1/fs/read?path=/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/720",
-);
+const PUBLIC_ALFS_READ_URL = "https://api-llm.prd.alva.ai/api/v1/fs/read?path=";
+const path = "/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/720";
+const resp = await fetch(PUBLIC_ALFS_READ_URL + encodeURIComponent(path));
 const points = await resp.json();
 // points = [{date: 1772658000000, close: 73309.72, ema10: 72447.65}, ...]
 ```
@@ -714,7 +753,7 @@ records if some timestamps have multiple items.
 Grant public read access so anyone can read the data:
 
 ```bash
-alva fs grant --path '~/feeds/btc-ema/v1' --subject "special:user:*" --permission read
+alva fs grant --path '~/feeds/btc-ema' --subject "special:user:*" --permission read
 ```
 
 Public reads must use absolute paths:
@@ -734,25 +773,31 @@ Where `index.js` contains:
 
 ```javascript
 const { Feed, feedPath, makeDoc, num } = require("@alva/feed");
-const { getCryptoKline } = require("@arrays/crypto/ohlcv:v1.0.0");
 const { indicators } = require("@alva/algorithm");
+const http = require("net/http");
+const secret = require("secret-manager");
 
-const now = Math.floor(Date.now() / 1000);
-const bars = getCryptoKline({
-  symbol: "BTCUSDT",
-  start_time: now - 30 * 86400,
-  end_time: now,
-  interval: "1h",
-}).response.data.slice().reverse();
+const ARRAYS_BASE = "https://data-tools.prd.space.id";
+const OHLCV_PATH = "/<discovered-ohlcv-endpoint-path>";
 
-const closes = bars.map((b) => b.close);
-const ema10 = indicators.ema(closes, { period: 10 });
-
-const records = bars.map((b, i) => ({
-  date: b.date,
-  close: b.close,
-  ema10: ema10[i] || null,
-}));
+async function fetchArrays(path, params) {
+  const jwt = secret.loadPlaintext("ARRAYS_JWT");
+  if (!jwt) {
+    throw new Error("Missing ARRAYS_JWT. Run `alva arrays token ensure` and retry.");
+  }
+  const resp = await http.fetch(ARRAYS_BASE + path, {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + jwt,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(params),
+  });
+  if (!resp.ok) {
+    throw new Error(`Arrays HTTP ${resp.status}: ${await resp.text()}`);
+  }
+  return resp.json();
+}
 
 const feed = new Feed({ path: feedPath("btc-ema") });
 feed.def("metrics", {
@@ -760,6 +805,24 @@ feed.def("metrics", {
 });
 
 (async () => {
+  const now = Math.floor(Date.now() / 1000);
+  const result = await fetchArrays(OHLCV_PATH, {
+    symbol: "BTCUSDT",
+    start_time: now - 30 * 86400,
+    end_time: now,
+    interval: "1h",
+  });
+  const bars = (result.response?.data || result.data || []).slice().reverse();
+  if (!bars.length) throw new Error("BTCUSDT OHLCV empty");
+
+  const closes = bars.map((b) => b.close);
+  const ema10 = indicators.ema(closes, { period: 10 });
+  const records = bars.map((b, i) => ({
+    date: b.date,
+    close: b.close,
+    ema10: ema10[i] || null,
+  }));
+
   await feed.run(async (ctx) => {
     await ctx.self.ts("metrics", "prices").append(records);
   });
@@ -775,7 +838,7 @@ alva run --entry-path '~/feeds/btc-ema/v1/src/index.js'
 ### Step 3: Make it public
 
 ```bash
-alva fs grant --path '~/feeds/btc-ema/v1' --subject "special:user:*" --permission read
+alva fs grant --path '~/feeds/btc-ema' --subject "special:user:*" --permission read
 ```
 
 ### Step 4: Read from any client

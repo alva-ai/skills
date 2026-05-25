@@ -180,10 +180,12 @@ concise analysis with visual evidence, not raw console output.
 ## ADK
 
 Use [adk.md](references/adk.md) when embedding a fixed LLM reasoning step inside
-a deterministic, reschedulable pipeline such as a feed summarizer, digest,
-classification step, or why-it-matters headline. Must not miss: do not use ADK
-for one-off interactive research, and do not use it to produce numbers, events,
-or reports that should come from real data; see
+a deterministic, reschedulable pipeline that specifically needs custom
+ADK/tool-loop behavior. For ordinary scheduled agent digests, prefer the
+AlvaAsk notification pattern in
+[feed-sdk.md](references/feed-sdk.md#pattern-e-alvaask--feed-notification-notifymessage).
+Must not miss: do not use ADK for one-off interactive research, and do not use
+it to produce numbers, events, or reports that should come from real data; see
 [content-legitimacy.md](references/content-legitimacy.md).
 
 For ADK-generated user-facing prose, first read
@@ -351,7 +353,8 @@ Open [request-routing.md](references/request-routing.md) and
 
 Applies when the user asks for a direct price, ratio, market figure, screen, or
 dataset answer.
-Must not miss: every figure needs a fresh Data Skills/BYOD fetch or an explicit
+Must not miss: every figure needs a fresh Data Skills/BYOD fetch or a clear
+"could not fetch" response; do not answer financial figures from memory with an
 estimate caveat.
 Open [data-skills.md](references/data-skills.md) and
 [content-legitimacy.md](references/content-legitimacy.md).
@@ -470,9 +473,12 @@ Open [push-notifications.md](references/push-notifications.md).
 Applies to event studies, factor tests, allocation rules, target weights,
 portfolio analysis, paper trading, and actionable signals.
 Must not miss: Always use Altra for backtesting and strategy simulation; avoid
-look-ahead bias and deliver a visual playbook or usable visual analysis.
+look-ahead bias and deliver a visual playbook or usable visual analysis. Hosted
+or published strategy outputs must still pass feed lifecycle and playbook gates.
 Open [altra-trading.md](references/altra-trading.md) and
-[design-playbook-trading-strategy.md](references/design-playbook-trading-strategy.md).
+[design-playbook-trading-strategy.md](references/design-playbook-trading-strategy.md);
+open [feed-lifecycle.md](references/feed-lifecycle.md) and
+[playbook-release.md](references/playbook-release.md) before publishing.
 
 ### Trading Operations
 
@@ -487,7 +493,8 @@ Open [api/trading.md](references/api/trading.md).
 Applies to scheduled LLM summarization, classification, TLDRs, digests,
 why-it-matters, and feed-backed narrative transforms.
 Must not miss: ADK is not for one-off research and may not invent factual
-numbers or events.
+numbers or events; use AlvaAsk for ordinary scheduled agent digests unless
+custom ADK tool-loop behavior is required.
 Open [adk.md](references/adk.md),
 [narrative-voice.md](references/narrative-voice.md), and
 [content-legitimacy.md](references/content-legitimacy.md).

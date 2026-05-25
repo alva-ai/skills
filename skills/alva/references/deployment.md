@@ -273,7 +273,30 @@ Where `index.js` contains:
 
 ```javascript
 const { Feed, feedPath, makeDoc, num } = require("@alva/feed");
-const { getCryptoKline } = require("@arrays/crypto/ohlcv:v1.0.0");
+const http = require("net/http");
+const secret = require("secret-manager");
+
+const ARRAYS_BASE = "https://data-tools.prd.space.id";
+const OHLCV_PATH = "/<discovered-ohlcv-endpoint-path>";
+
+async function fetchArrays(path, params) {
+  const jwt = secret.loadPlaintext("ARRAYS_JWT");
+  if (!jwt) {
+    throw new Error("Missing ARRAYS_JWT. Run `alva arrays token ensure` and retry.");
+  }
+  const resp = await http.fetch(ARRAYS_BASE + path, {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + jwt,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(params),
+  });
+  if (!resp.ok) {
+    throw new Error(`Arrays HTTP ${resp.status}: ${await resp.text()}`);
+  }
+  return resp.json();
+}
 
 const feed = new Feed({ path: feedPath("btc-hourly") });
 
@@ -291,7 +314,7 @@ feed.def("market", {
     const lastDate = raw ? Number(raw) : 0;
     const start = lastDate > 0 ? Math.floor(lastDate / 1000) : now - 7 * 86400;
 
-    const result = getCryptoKline({
+    const result = await fetchArrays(OHLCV_PATH, {
       symbol: "BTCUSDT",
       start_time: start,
       end_time: now,
@@ -322,7 +345,7 @@ alva run --entry-path '~/feeds/btc-hourly/v1/src/index.js'
 ### 3. Make the output public
 
 ```bash
-alva fs grant --path '~/feeds/btc-hourly/v1' --subject "special:user:*" --permission read
+alva fs grant --path '~/feeds/btc-hourly' --subject "special:user:*" --permission read
 ```
 
 ### 4. Deploy as a cronjob

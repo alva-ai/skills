@@ -99,7 +99,8 @@ A push is set up only after every step succeeds:
    `/alva subscribe playbook <id>` in the group.
 
 5. Verify `alva release feed --cronjob-id <this cronjob>` ran after the sidecar
-   was added.
+   was added. This must be the current released feed for the same cronjob; a
+   previous release before the sidecar change is not enough.
 6. Trigger a real run or wait for the next cron fire, then read `@last/1` of the
    configured sidecar. Confirm the record is fresh and body/text is non-empty or
    contains `<|SKIP_NOTIFICATION|>`.

@@ -77,8 +77,10 @@ Returns JSON with structure:
 
 `releases` is ordered newest-first, so `releases[0]` is the latest
 release. From `releases[0].feeds`, collect the feed refs you need to
-inspect — each entry carries both `feed_name` (for ALFS paths) and
-`feed_id` (for API calls).
+inspect — each entry carries `feed_name` (for ALFS paths), `feed_id` (for API
+calls), and usually `feed_major` (for the versioned ALFS path). Use
+`v{feed_major}` when reading source feed scripts; do not hardcode `v1` unless
+metadata is missing and you have verified that only `v1` exists.
 
 ---
 
@@ -100,29 +102,45 @@ file directly in Step 5; do not rewrite it from scratch.
 
 ---
 
-## Step 3 — Download Code Layer (Feed Scripts)
+## Step 3 — Download README And Code Layer
 
-Each entry in `releases[0].feeds` carries `feed_name` — download each
-feed's script source the same way:
+Download the source README before adapting copy or methodology. Do not
+fabricate the source's rationale from memory.
 
 ```bash
-alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v1/src/index.js' > ./{feed_name}.js
+alva fs read --path '/alva/home/{owner}/playbooks/{name}/README.md' > ./README.md
+```
+
+Update this README during deployment so sources, methodology, cadence, caveats,
+and provenance match the new feed scripts and topic.
+
+## Step 4 — Download Code Layer (Feed Scripts)
+
+Each entry in `releases[0].feeds` carries `feed_name` and usually
+`feed_major` — download each feed's script source the same way:
+
+```bash
+alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v{feed_major}/src/index.js' > ./{feed_name}.js
 ```
 
 This contains the strategy logic, data fetching, and indicator
 computations. As with the HTML, **modify the downloaded file in place**
 rather than re-typing the script from your reading of it.
 
+If `feed_major` is absent, inspect the source feed directory and choose the
+version referenced by the latest release metadata. If you cannot determine the
+version, stop and ask rather than guessing.
+
 Optionally, read sample feed output to understand the data schema (this
 one stays in stdout — it's reference, not a file you'll edit):
 
 ```bash
-alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v1/data/{group}/{output}/@last/5'
+alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v{feed_major}/data/{group}/{output}/@last/5'
 ```
 
 ---
 
-## Step 4 — Content Legitimacy Audit
+## Step 5 — Content Legitimacy Audit
 
 Remix inherits the source's provenance — don't propagate fabricated content
 into a new namespace. Apply [content-legitimacy.md](content-legitimacy.md)
@@ -168,7 +186,7 @@ only the data swap.
 
 ---
 
-## Step 5 — Deploy as New Playbook
+## Step 6 — Deploy as New Playbook
 
 Follow the standard playbook creation flow (see SKILL.md), starting from
 the local files you downloaded in Steps 2–3. **Edit those files in
@@ -187,8 +205,8 @@ only on explicit request). Do not write fresh files from scratch.
 6. **Edit local HTML** (the `./index.html` from Step 2 — update data
    paths to point to your own feed) and upload:
    `alva fs write --path '~/playbooks/{new-name}/index.html' --file ./index.html --mkdir-parents`
-7. **Write README** (mandatory) — adapt the source playbook's README to
-   your data sources and methodology, then upload:
+7. **Write README** (mandatory) — adapt the downloaded source README to your
+   data sources, methodology, cadence, caveats, and provenance, then upload:
    `alva fs write --path '~/playbooks/{new-name}/README.md' --file ./README.md --mkdir-parents`.
    See [release.md → Playbook README](api/release.md#playbook-readme).
 8. **Draft playbook**: `alva release playbook-draft --name {new-name} --display-name "..." --feeds '[{"feed_id":ID}]'`
@@ -200,13 +218,16 @@ data storage — copy the logic, not the paths.
 
 ---
 
-## Step 6 — Save Remix Lineage
+## Step 7 — Save Remix Lineage
 
 After the new playbook is created, record the parent-child relationship:
 
 ```bash
 alva remix --child-username {your_username} --child-name {new-name} --parents '[{"username":"{owner}","name":"{source-playbook-name}"}]'
 ```
+
+alva remix is only for lineage. It does not copy files, validate provenance,
+deploy feeds, draft the playbook, or release anything.
 
 ---
 
@@ -241,14 +262,14 @@ alva fs read --path '/alva/home/alice/feeds/btc-momentum/v1/data/market/ohlcv/@l
 ```
 
 Agent then runs the content-legitimacy audit on `./index.html` and
-`./btc-momentum.js` (Step 4), edits those local files in place to apply
+`./btc-momentum.js` (Step 5), edits those local files in place to apply
 the user's customization, then uploads them under the user's own
 namespace with a new name (e.g. `my-btc-strategy`) and releases.
 
 Save lineage (assuming current user is `bob`, new playbook name is `my-btc-strategy`):
 
 ```bash
-# 6. Save remix lineage
+# 7. Save remix lineage
 alva remix --child-username bob --child-name my-btc-strategy --parents '[{"username":"alice","name":"btc-momentum"}]'
 ```
 

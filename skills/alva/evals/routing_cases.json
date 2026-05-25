@@ -91,7 +91,7 @@
     "id": "adk_narrative",
     "prompt": "Create a scheduled digest that summarizes real feed data.",
     "skill_refs": ["references/adk.md", "references/narrative-voice.md", "references/content-legitimacy.md"],
-    "skill_patterns": ["@alva/adk", "narrative-voice.md", "do not use it to produce numbers"],
+    "skill_patterns": ["@alva/adk", "narrative-voice.md", "may not invent factual"],
     "corpus_patterns": ["tool calling", "one-off research", "copy verbatim into ADK system prompts"]
   },
   {

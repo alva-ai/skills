@@ -110,6 +110,8 @@ modules, follow [content-legitimacy.md](content-legitimacy.md#coverage-gaps-and-
 ## Direct answers
 
 When answering a data query directly, every financial figure must come from a
-fresh SDK/BYOD fetch and be attributed to the source, or be explicitly qualified
-as an estimate the user should verify. Do not answer current market data from
-memory.
+fresh Data Skills, SDK, published-feed, or validated BYOD fetch and be
+attributed to the source. If a required value cannot be fetched, say the value
+could not be fetched and explain the blocker. Do not answer financial figures,
+including current market data, ratios, fundamentals, or screens, from memory
+with an estimate caveat.

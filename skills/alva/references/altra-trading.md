@@ -770,6 +770,12 @@ bound to that cronjob. Actual delivery also requires an explicit personal or
 group subscription to the feed or to a playbook that references it. See
 `references/deployment.md` for the deploy/release flow.
 
+A trading strategy is a feed. If the backtest/strategy result will be hosted,
+scheduled, pushed, or published in a playbook, re-enter
+[feed-lifecycle.md](feed-lifecycle.md) and [playbook-release.md](playbook-release.md)
+after the strategy run. Do not treat a successful `altra.run()` console result
+as a released or public artifact.
+
 ---
 
 ## Point-In-Time (PIT) Compliance

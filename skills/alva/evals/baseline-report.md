@@ -125,7 +125,7 @@ Checks: 7/9
 
 Missing:
 - skill_ref: references/content-legitimacy.md
-- skill_pattern: do not use it to produce numbers
+- skill_pattern: may not invent factual
 
 ### FAIL jagent_runtime
 

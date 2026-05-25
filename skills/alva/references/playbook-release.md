@@ -136,9 +136,10 @@ Before running `alva release playbook`, verify:
 3. All referenced cronjobs are active.
 4. HTML reads quantitative data from feed output paths at runtime, not inline
    literals, consistent with [content-legitimacy.md](content-legitimacy.md).
-5. **Data is fresh**: latest data from each referenced feed via `@last/1` is
-   fresh. If older than 2x the cron interval, warn the user before release or
-   fix freshness.
+5. **Data is fresh**: enumerate every feed output path read by the HTML and
+   every push sidecar (`signal/targets` or `notify/message`). Verify each exact
+   `@last/1` or relevant path is non-empty and fresh. If any output is older
+   than 2x its cron interval, warn the user before release or fix freshness.
 6. Description and README source/cadence claims match actual feed scripts and
    deployed cronjobs.
 7. The target user namespace is correct.
@@ -150,6 +151,8 @@ Before running `alva release playbook`, verify:
 
 If any item fails, do not release. Fix the issue, rerun `playbook-draft` if
 metadata or backing files changed, then re-enter this gate.
+If any required release input is missing, stop here; do not infer metadata,
+reuse stale ids, or publish a partial release.
 
 </HARD-GATE>
 

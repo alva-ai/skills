@@ -65,6 +65,12 @@ Behavior from the runtime implementation:
 - if the secret loader is not configured, the module throws a clear error
 - the JS module is read-only; writes and updates happen outside the runtime
 
+In plain terms: loadPlaintext(name) returns `null` when a secret is missing.
+Throw a clear missing-secret error that names the secret and upload URL. Do not
+log raw secret values, echo them in tool output, or read secret values back just
+to prove they exist.
+Do not read secret values back.
+
 Use this whenever the code needs to call an external service from `alva run`
 or from a deployed cronjob.
 
