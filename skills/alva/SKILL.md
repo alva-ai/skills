@@ -122,6 +122,10 @@ Third-party vendor secrets belong in Alva Secret Manager
 Run `alva whoami`. If it fails (no API key), run `alva auth login` to open
 browser-based login, then re-run `alva whoami` to confirm.
 
+For SSH / container / headless environments where the CLI cannot open a
+browser locally, use `alva auth login --no-browser` — it prints a URL to
+open on any device, then prompts you to paste the code shown on that page.
+
 ### 3. User Profile
 
 ```bash
