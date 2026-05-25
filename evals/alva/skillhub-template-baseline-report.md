@@ -3,8 +3,8 @@
 This evaluation checks every official `alva` Skillhub template against the refactored Alva skill. It verifies that a fresh agent is routed to the right references, preserves template-specific steps and data contracts, and avoids stale attached-source patterns that conflict with the current blueprint.
 
 - Cases: 0/11
-- Checks: 64/115
-- Score: 55.65%
+- Checks: 64/116
+- Score: 55.17%
 
 ## Case Results
 
@@ -14,9 +14,10 @@ Template: alva skillhub list --username alva
 
 Evidence: 2026-05-25 list returned alva/quant-research-lab and alva/backtest
 
-Checks: 6/9
+Checks: 6/10
 
 Missing:
+- skill_routing_pattern: fresh through the Skillhub workflow
 - workflow_step_or_api_detail: template-specific hard rules
 - workflow_step_or_api_detail: instructional blueprint wins
 - workflow_step_or_api_detail: source samples can be stale implementation examples

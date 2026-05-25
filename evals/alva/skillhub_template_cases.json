@@ -5,12 +5,13 @@
     "evidence": "2026-05-25 list returned alva/quant-research-lab and alva/backtest",
     "skill_patterns": [
       "/use-skill:<username>/<name>",
-      "alva skillhub get",
-      "alva skillhub file",
+      "fresh through the Skillhub workflow",
       "do not bulk-download",
       "--skill-id <username>/<name>"
     ],
     "corpus_patterns": [
+      "alva skillhub get",
+      "alva skillhub file",
       "Treat the blueprint as authoritative",
       "template-specific hard rules",
       "instructional blueprint wins",

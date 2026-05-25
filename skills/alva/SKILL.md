@@ -64,15 +64,11 @@ what-if, event-study, quant research, factor, ML signal, or strategy work that
 matches an official Alva template; or when a catalog methodology informs the
 build.
 
-Must not miss: fetch the blueprint fresh with `alva skillhub list/get/file`;
-blueprints beat remembered templates and stale companion source files. Pass
+Must not miss: fetch the blueprint fresh through the Skillhub workflow;
+blueprints beat remembered templates and stale companion source files. Pull
+extra files only on demand; do not bulk-download. Pass
 `--skill-id <username>/<name>` during playbook draft when any Skillhub skill
 informed the build.
-
-Concrete command anchors live in [request-routing.md](references/request-routing.md):
-`alva skillhub get <username>/<name>`, then
-`alva skillhub file <username>/<name> <blueprint>`. Pull extra files only on
-demand; do not bulk-download.
 
 Open [request-routing.md](references/request-routing.md) and
 [api/release.md](references/api/release.md#skill-id). Use

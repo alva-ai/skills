@@ -10,8 +10,8 @@
     "id": "skillhub_quant_template",
     "prompt": "/use-skill:alva/quant-research-lab build a factor research playbook.",
     "skill_refs": ["references/request-routing.md", "references/api/release.md", "references/altra-trading.md", "references/onnx.md"],
-    "skill_patterns": ["/use-skill:<username>/<name>", "alva skillhub get", "alva skillhub file", "--skill-id"],
-    "corpus_patterns": ["Do not bulk-download", "template.md", "FeedAltra", "ONNX"]
+    "skill_patterns": ["/use-skill:<username>/<name>", "fresh through the Skillhub workflow", "--skill-id"],
+    "corpus_patterns": ["alva skillhub get", "alva skillhub file", "Do not bulk-download", "template.md", "FeedAltra", "ONNX"]
   },
   {
     "id": "skillhub_backtest_template",

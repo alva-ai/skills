@@ -1,8 +1,8 @@
 # Alva Skill Capability Map Eval — baseline
 
 - Cases: 4/22
-- Checks: 204/233
-- Score: 87.55%
+- Checks: 204/234
+- Score: 87.18%
 
 ## Case Results
 
@@ -19,10 +19,11 @@ Missing:
 
 Prompt: /use-skill:alva/quant-research-lab build a factor research playbook.
 
-Checks: 11/12
+Checks: 11/13
 
 Missing:
 - skill_ref: references/request-routing.md
+- skill_pattern: fresh through the Skillhub workflow
 
 ### FAIL skillhub_backtest_template
 

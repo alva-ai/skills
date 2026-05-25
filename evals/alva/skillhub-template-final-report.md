@@ -3,7 +3,7 @@
 This evaluation checks every official `alva` Skillhub template against the refactored Alva skill. It verifies that a fresh agent is routed to the right references, preserves template-specific steps and data contracts, and avoids stale attached-source patterns that conflict with the current blueprint.
 
 - Cases: 11/11
-- Checks: 115/115
+- Checks: 116/116
 - Score: 100.00%
 
 ## Case Results
@@ -14,7 +14,7 @@ Template: alva skillhub list --username alva
 
 Evidence: 2026-05-25 list returned alva/quant-research-lab and alva/backtest
 
-Checks: 9/9
+Checks: 10/10
 
 ### PASS quant_research_contract_and_pit_data
 

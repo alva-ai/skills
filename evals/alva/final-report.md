@@ -1,7 +1,7 @@
 # Alva Skill Capability Map Eval — final
 
 - Cases: 22/22
-- Checks: 233/233
+- Checks: 234/234
 - Score: 100.00%
 
 ## Case Results
@@ -16,7 +16,7 @@ Checks: 11/11
 
 Prompt: /use-skill:alva/quant-research-lab build a factor research playbook.
 
-Checks: 12/12
+Checks: 13/13
 
 ### PASS skillhub_backtest_template
 
