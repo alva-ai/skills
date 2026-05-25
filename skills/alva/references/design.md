@@ -83,9 +83,11 @@ Include these anti-aliasing declarations in generated styles (globally, or on
 any text container):
 
 ```css
--webkit-font-smoothing: antialiased;
--moz-osx-font-smoothing: grayscale;
-text-rendering: optimizeLegibility;
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
 ```
 
 - If the project already has a global reset or typography base class, ensure the
