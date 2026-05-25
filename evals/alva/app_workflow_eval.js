@@ -7,11 +7,11 @@ const path = require("path");
 const root = process.cwd();
 const skillRel = "skills/alva/SKILL.md";
 const refsRel = "skills/alva/references";
-const casesPath = path.join(root, "skills/alva/evals/app_workflow_cases.json");
+const casesPath = path.join(root, "evals/alva/app_workflow_cases.json");
 
 function usage() {
   console.error(
-    "Usage: node skills/alva/evals/app_workflow_eval.js [--label NAME] [--out FILE] [--treeish REF]"
+    "Usage: node evals/alva/app_workflow_eval.js [--label NAME] [--out FILE] [--treeish REF]"
   );
   process.exit(2);
 }

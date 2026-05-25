@@ -1,8 +1,12 @@
-# Alva Skill Module Map
+# Alva Skill Refactor Content Map
 
-Read this before editing the Alva skill. It records ownership, dependency
-chains, hard gates, and the source-to-destination map used to keep `SKILL.md`
-as a lean platform capability map without losing behavior.
+This is a repo-level validation artifact for the Alva skill refactor. It is not
+part of the runtime skill surface and should not be loaded for ordinary Alva
+platform tasks.
+
+It records ownership, dependency chains, hard gates, and the
+source-to-destination map used to prove that `SKILL.md` became a lean platform
+capability map without losing behavior.
 
 ## Layer model
 
@@ -14,7 +18,7 @@ as a lean platform capability map without losing behavior.
 | Design references | Tokens, layout, widgets, components, strategy UI templates | `design-system.md`, `design-widgets.md`, `design-components.md`, `design-playbook-trading-strategy.md`, `design-tokens.css` |
 | CLI gotcha references | Details the CLI help omits or currently states incorrectly | `api/filesystem.md`, `api/release.md`, `api/trading.md`, `api/error-responses.md` |
 | Voice references | User-facing vocabulary, narrative style, post-release notes | `language.md`, `narrative-voice.md`, `creators-note.md` |
-| Eval artifacts | Regression cases and reports for capability coverage, gates, and full application workflows | `../evals/*` |
+| Eval artifacts | Regression cases and reports for capability coverage, gates, and full application workflows | `evals/alva/*` |
 
 ## Dependency chains
 
@@ -120,7 +124,7 @@ the canonical file.
 | Detailed sub-documents table | Replaced by `SKILL.md` reference index plus this map |
 | CLI reference table | `preflight.md` command routing and `SKILL.md` compact CLI index |
 | Feed SDK quick reference, data modeling, debugging | `feed-sdk.md`, `feed-lifecycle.md`, `api/filesystem.md` |
-| App-level fresh-context eval for direct data, feed-backed playbooks, release, Altra, push, remix, annotation, secrets, fundamentals, and ADK | `evals/app_workflow_cases.json`, `evals/app_workflow_eval.js`, app workflow reports |
+| App-level fresh-context eval for direct data, feed-backed playbooks, release, Altra, push, remix, annotation, secrets, fundamentals, and ADK | `app_workflow_cases.json`, `app_workflow_eval.js`, app workflow reports |
 | Error transparency and subscription-gated SDKs | `content-legitimacy.md` |
 | Memory | `memory.md` with preflight pointer |
 | Secret Manager | `secret-manager.md` |
@@ -139,7 +143,7 @@ Items intentionally deduplicated:
 
 ## Reference inbound pointers
 
-Every markdown reference must be reachable from `SKILL.md`, this map, or
-another reference. The validation script in `evals/routing_eval.js` checks
-critical capability-map coverage; use `rg` for a full inbound-link pass after
-edits.
+Every runtime markdown reference must be reachable from `SKILL.md` or another
+runtime reference. This file and the eval reports are excluded from that
+runtime-surface rule. The validation script `routing_eval.js` checks critical
+capability-map coverage; use `rg` for a full inbound-link pass after edits.

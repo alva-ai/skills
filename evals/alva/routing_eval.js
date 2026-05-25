@@ -8,10 +8,10 @@ const root = process.cwd();
 const skillRel = "skills/alva/SKILL.md";
 const refsRel = "skills/alva/references";
 const skillPath = path.join(root, skillRel);
-const casesPath = path.join(root, "skills/alva/evals/routing_cases.json");
+const casesPath = path.join(root, "evals/alva/routing_cases.json");
 
 function usage() {
-  console.error("Usage: node skills/alva/evals/routing_eval.js [--label NAME] [--out FILE] [--treeish REF]");
+  console.error("Usage: node evals/alva/routing_eval.js [--label NAME] [--out FILE] [--treeish REF]");
   process.exit(2);
 }
 

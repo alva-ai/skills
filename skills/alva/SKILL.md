@@ -552,7 +552,6 @@ Open [operational-pitfalls.md](references/operational-pitfalls.md).
 
 | Reference | Read when |
 | --- | --- |
-| [module-map.md](references/module-map.md) | Editing or auditing this skill; shows ownership, hard gates, and source-to-destination map |
 | [preflight.md](references/preflight.md) | Starting an Alva session or choosing a CLI/API surface |
 | [request-routing.md](references/request-routing.md) | Planning, `/use-skill:`, Skillhub blueprints, completion gate |
 | [content-legitimacy.md](references/content-legitimacy.md) | Any financial value, feed-backed HTML, provenance, coverage gaps |
