@@ -2,19 +2,19 @@
 
 Read this before editing the Alva skill. It records ownership, dependency
 chains, hard gates, and the source-to-destination map used to keep `SKILL.md`
-lean without losing behavior.
+as a lean platform capability map without losing behavior.
 
 ## Layer model
 
 | Layer | Owns | Files |
 | --- | --- | --- |
-| Routing layer | Capability discovery, when to act, the one must-not-miss rule, and the exact reference to open | `../SKILL.md` |
+| Capability map | Platform panorama, capability discovery, when to act, the one must-not-miss rule, and the exact reference to open | `../SKILL.md` |
 | Workflow references | Ordered procedures, gates, criteria, examples that affect behavior | `preflight.md`, `request-routing.md`, `content-legitimacy.md`, `data-skills.md`, `feed-lifecycle.md`, `playbook-release.md`, `push-notifications.md`, `remix-workflow.md`, `annotation-edits.md` |
 | Module references | API surfaces, runtime/module details, examples, gotchas | `jagent-runtime.md`, `feed-sdk.md`, `altra-trading.md`, `adk.md`, `onnx.md`, `search.md`, `secret-manager.md`, `memory.md` |
 | Design references | Tokens, layout, widgets, components, strategy UI templates | `design-system.md`, `design-widgets.md`, `design-components.md`, `design-playbook-trading-strategy.md`, `design-tokens.css` |
 | CLI gotcha references | Details the CLI help omits or currently states incorrectly | `api/filesystem.md`, `api/release.md`, `api/trading.md`, `api/error-responses.md` |
 | Voice references | User-facing vocabulary, narrative style, post-release notes | `language.md`, `narrative-voice.md`, `creators-note.md` |
-| Eval artifacts | Regression cases and reports for routing, gates, and full application workflows | `../evals/*` |
+| Eval artifacts | Regression cases and reports for capability coverage, gates, and full application workflows | `../evals/*` |
 
 ## Dependency chains
 
@@ -141,4 +141,5 @@ Items intentionally deduplicated:
 
 Every markdown reference must be reachable from `SKILL.md`, this map, or
 another reference. The validation script in `evals/routing_eval.js` checks
-critical routing cases; use `rg` for a full inbound-link pass after edits.
+critical capability-map coverage; use `rg` for a full inbound-link pass after
+edits.

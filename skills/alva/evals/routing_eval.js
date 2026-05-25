@@ -126,7 +126,7 @@ const passedCases = results.filter((result) => result.pass).length;
 const score = totalChecks === 0 ? 0 : passedChecks / totalChecks;
 
 const lines = [];
-lines.push(`# Alva Skill Routing Eval — ${label}`);
+lines.push(`# Alva Skill Capability Map Eval — ${label}`);
 lines.push("");
 lines.push(`- Cases: ${passedCases}/${results.length}`);
 lines.push(`- Checks: ${passedChecks}/${totalChecks}`);

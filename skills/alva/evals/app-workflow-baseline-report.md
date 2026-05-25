@@ -1,6 +1,6 @@
 # Alva App Workflow Eval — baseline (main)
 
-This evaluation checks whether a fresh agent has enough instruction to complete representative Alva application workflows end to end. It is intentionally broader than routing: each case requires the right references, workflow/API details, hard gates, guardrails against incorrect app behavior, and observable completion evidence.
+This evaluation checks whether a fresh agent has enough instruction to complete representative Alva application workflows end to end. It complements the platform capability map by requiring the right references, workflow/API details, hard gates, guardrails against incorrect app behavior, and observable completion evidence.
 
 - Cases: 0/10
 - Checks: 132/222

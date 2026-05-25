@@ -162,7 +162,7 @@ const lines = [];
 lines.push(`# Alva App Workflow Eval — ${sourceLabel}`);
 lines.push("");
 lines.push(
-  "This evaluation checks whether a fresh agent has enough instruction to complete representative Alva application workflows end to end. It is intentionally broader than routing: each case requires the right references, workflow/API details, hard gates, guardrails against incorrect app behavior, and observable completion evidence."
+  "This evaluation checks whether a fresh agent has enough instruction to complete representative Alva application workflows end to end. It complements the platform capability map by requiring the right references, workflow/API details, hard gates, guardrails against incorrect app behavior, and observable completion evidence."
 );
 lines.push("");
 lines.push(`- Cases: ${passedCases}/${results.length}`);

@@ -22,10 +22,11 @@ playbooks. The platform exposes 250+ financial data sources across equities,
 crypto, macro, on-chain, news, social, prediction markets, and custom BYOD
 sources, plus a cloud JavaScript runtime and the Altra trading engine.
 
-This file is the routing layer. It tells you when a capability applies, the one
-rule you must not miss, and exactly which reference to open before acting. Deep
-procedures, examples, API details, gotchas, templates, and long checklists live
-in `references/`.
+This file is the Alva platform capability map and operating entrypoint. It gives
+the full panorama of what Alva can do, when each capability applies, the one
+rule you must not miss before acting, and exactly which reference to open for
+the detailed procedure. Deep examples, API details, gotchas, templates, and
+long checklists live in `references/`.
 
 ## Rule 0 And Preflight
 
@@ -118,7 +119,7 @@ builtins, no global `fetch`, no timer globals, and no top-level await. Use
 `require("net/http")`, absolute ALFS paths through `require("alfs")`, and
 `(async () => { ... })();`.
 
-Runtime module routing:
+Runtime module map:
 
 | Capability | Read before acting |
 | --- | --- |
@@ -222,7 +223,7 @@ and the applicable design references. At minimum read
 for strategy/backtest playbooks.
 </HARD-GATE>
 
-Design routing:
+Design capability map:
 
 | Task | Read |
 | --- | --- |
@@ -328,10 +329,11 @@ quote `~` paths in shell commands, public reads use absolute ALFS paths,
 `@last` is chronological, and resource limits include 2 GB V8 heap, 10 MB write
 payloads, 128 MB HTTP responses, and 1 minute minimum cron interval.
 
-## Capability Cards
+## Platform Capability Map
 
-Use these cards as the quick router. Each card says when it applies, the one
-rule to keep in working memory, and the reference to open before acting.
+Use these cards as the quick platform map. Each card says when a capability
+applies, the one rule to keep in working memory, and the reference to open
+before acting.
 
 ### Session Start
 

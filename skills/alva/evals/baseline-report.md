@@ -1,4 +1,4 @@
-# Alva Skill Routing Eval — baseline
+# Alva Skill Capability Map Eval — baseline
 
 - Cases: 4/22
 - Checks: 204/233
