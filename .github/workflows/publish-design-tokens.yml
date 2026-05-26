@@ -20,6 +20,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      # Guard against publishing a drifted bundle. The sync workflow
+      # commits-back regen on PRs, but PRs can slip through (squash
+      # race, admin merge) and leave main stale. Fail here rather
+      # than serve drift from the CDN — fix via PR.
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: skills/alva/scripts/pnpm-lock.yaml
+
+      - name: Install scripts deps
+        working-directory: skills/alva/scripts
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify design-system.css is in sync with design docs
+        working-directory: skills/alva/scripts
+        run: pnpm design-contract-sync
+
       - name: GCP Auth
         id: auth
         uses: google-github-actions/auth@v1
