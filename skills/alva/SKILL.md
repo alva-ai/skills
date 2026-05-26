@@ -919,8 +919,8 @@ Required evidence:
     design-system violation. Pre-check with `alva lint playbook
     ./index.html` (Step 6); the full ruleset lives in
     [design-contract.yaml](references/design-contract.yaml).
-    Emergency-only escape: `--bypass-lint` proceeds despite errors
-    (findings still printed). For new playbooks, link
+    Use `--bypass-lint` for playbooks that intentionally diverge from
+    the design system (findings still printed). For new playbooks, link
     `v1/design-system.css` per [design.md](references/design.md).
 
 If any item fails, do not release. Fix the issue, re-run
