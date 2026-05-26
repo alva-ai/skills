@@ -129,12 +129,23 @@ components:
     children:
       - "tab-item"
     required-scripts:
+      # Canonical path: chart-card component used → check resize handler.
       - when-also: ["chart-card"]
         must-contain:
           - "[_echarts_instance_]"
           - "echarts.getInstanceByDom"
           - ".resize()"
         message: "Hidden ECharts containers report 0×0; when a tab panel becomes visible, resize all ECharts instances inside it. See design-components.md §Tab JS Interaction."
+      # Semantic-trigger path: any tab playbook that calls echarts.init
+      # — regardless of whether the chart wrapper uses canonical .chart-container
+      # class. Catches playbooks that style charts with ad-hoc wrapper classes
+      # but still need the same resize-on-tab-switch handler.
+      - when-script-contains: ["echarts.init"]
+        must-contain:
+          - "[_echarts_instance_]"
+          - "echarts.getInstanceByDom"
+          - ".resize()"
+        message: "ECharts is in use anywhere in this tab playbook; the canonical resize-on-tab-switch handler is required regardless of which class wraps the chart. See design-components.md §Tab JS Interaction."
       - when-also: ["table-card"]
         must-contain:
           - "initTableAlignment"
