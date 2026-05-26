@@ -1,7 +1,8 @@
-# Playbook UDF Runtime
+# Playbook Browser SDK/API
 
-Use this reference when a playbook needs interactive browser-triggered
-functions. This is the current runtime contract.
+Use this reference when playbook browser HTML needs feed-backed data or
+interactive browser-triggered functions. This is the current browser SDK/API
+runtime contract.
 
 ## Runtime Model
 
@@ -25,7 +26,12 @@ X-Pbsv: 1
 Content-Type: application/json
 ```
 
-## Browser API
+Browser HTML must not call ALFS/FS read endpoints directly, use
+`$ALVA_ENDPOINT`, guess API origins, or load feed data through `client.fs`.
+Expose feed-backed browser data through registered playbook UDFs and call them
+with `window.alva.udf`.
+
+## Browser SDK API
 
 ```html
 <script src="https://unpkg.com/@alva-ai/toolkit/dist/browser.global.js"></script>
@@ -134,6 +140,10 @@ invocation once.
 Do not implement a custom credit authorization modal inside the playbook iframe.
 
 ## Creator Function Registration
+
+Browser HTML calls functions already registered on the current playbook. Do not
+create, update, or delete functions from the iframe. When a playbook needs a new
+function, ensure creator-side registration exists before release.
 
 Creators register or update UDF functions through the service API:
 

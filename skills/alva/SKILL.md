@@ -176,6 +176,11 @@ viewer token and appends it to the iframe URL as `_pbsv`, together with
 
 ### Browser SDK Resources
 
+For playbook HTML, the browser data API is `window.alva.udf`: feed-backed data
+must be exposed through registered UDFs, not through `client.fs` or raw
+ALFS/FS-read REST calls. Read [udf-runtime.md](references/api/udf-runtime.md)
+for browser SDK/API examples before writing playbook browser data access.
+
 `client.user`, `client.fs`, `client.run`, `client.deploy`, `client.release`,
 `client.secrets`, `client.sdk`, `client.comments`, `client.remix`,
 `client.screenshot`
@@ -327,11 +332,12 @@ fetch) when the SDK can serve the original request.
    originate from Alva feeds** (SDK modules or BYOD via `require("net/http")`).
    Never hardcode data as inline JavaScript literals in playbook HTML.
 
-2. **Playbook HTML MUST fetch data at runtime** from feed output paths.
-   Published HTML runs in the viewer's browser, so do not use sandbox-only env
-   vars such as `$ALVA_ENDPOINT` and do not guess `https://api.alva.ai`. Use the
-   public anonymous ALFS read gateway — see the `readAlfsJson` helper in
-   [Build the Playbook Web App](#6-build-the-playbook-web-app).
+2. **Playbook HTML MUST read quantitative data at runtime through registered
+   UDFs.** Published HTML runs in the viewer's browser, so do not use
+   sandbox-only env vars such as `$ALVA_ENDPOINT`, do not guess API origins,
+   and do not call ALFS/FS-read endpoints directly via `client.fs`, raw
+   `fetch()`, or a public read gateway. Use the toolkit browser SDK and
+   `window.alva.udf` — see [udf-runtime.md](references/api/udf-runtime.md).
 
    Static content (labels, colors, layout config) is fine. Quantitative data is
    not — it must flow through the feed pipeline.
@@ -711,44 +717,26 @@ before creating or editing HTML. Do not rely on memory of prior sessions.
 </HARD-GATE>
 
 After your data pipelines are deployed and producing data, build the playbook's
-web interface. Create HTML5 pages with Alva Design System that read from Alva's
-data gateway and visualize the results. Follow the Alva Design System for
-styling, layout, and component guidelines. Unless the user explicitly asks for a
-static snapshot, default to a live playbook.
+web interface. Create HTML5 pages with Alva Design System that call registered
+playbook UDFs for browser-side data access and visualize the results. Follow
+the Alva Design System for styling, layout, and component guidelines. Unless
+the user explicitly asks for a static snapshot, default to a live playbook.
 **Data fetching requirement**: Apply the
 [Content Legitimacy Rules](#content-legitimacy-rules) when building the UI.
 All quantitative data in charts, tables, or metric cards must come from feed
-outputs read at runtime (no inline literals for data).
-
-Use this browser-safe helper for published playbook HTML:
-
-```javascript
-const PUBLIC_ALFS_READ_URL = "https://api-llm.prd.alva.ai/api/v1/fs/read?path=";
-
-async function readAlfsJson(path) {
-  const resp = await fetch(PUBLIC_ALFS_READ_URL + encodeURIComponent(path));
-  if (!resp.ok) {
-    throw new Error(`Failed to load ${path}: HTTP ${resp.status}`);
-  }
-  return resp.json();
-}
-```
-
-`$ALVA_ENDPOINT` is available to sandbox scripts and CLI verification only. Do
-not emit it into browser HTML; published HTML must call the public read gateway
-above so anonymous viewers can load feed output without authentication.
+outputs read at runtime through UDF-backed calls (no inline literals for data,
+and no direct browser ALFS/FS reads).
 
 #### Interactive UDFs in Playbooks
 
-Use UDFs when the playbook needs user-triggered computation from the browser
-after the page has loaded, such as "analyze this ticker", "rebalance with these
-assumptions", or "summarize the selected scenario".
+Use UDFs when the playbook needs browser-side feed reads or user-triggered
+computation after the page has loaded, such as "load latest prices", "analyze
+this ticker", "rebalance with these assumptions", or "summarize the selected
+scenario".
 
-1. **Register creator functions** through the service API before or during
-   release. Each function belongs to one playbook and declares:
-   `playbook_id`, `function_name`, `entry_script_path`, and `params_schema`.
-   Keep `entry_script_path` in creator-controlled ALFS paths; viewers never see
-   it through PBSV reads.
+1. **Ensure functions are registered before release.** Browser HTML calls
+   functions already registered on the current playbook; do not create, update,
+   or delete UDFs from the iframe.
 2. **Load the browser SDK** in the playbook HTML and call:
    `window.alva.udf.list()` for function metadata and
    `window.alva.udf.call(functionName, params)` for invocation.
@@ -926,17 +914,18 @@ Required evidence:
 
 1. **Backing feed release gates passed**: Every backing feed has passed
    `before-feed-release`.
-2. **Deployment coverage**: Every feed the released playbook reads at runtime
-   had a successful `alva deploy create`, and its `feed_id` appears in
+2. **Deployment coverage**: Every feed the released playbook depends on at
+   runtime had a successful `alva deploy create`, and its `feed_id` appears in
    `--feeds`. A run-tested but undeployed feed has no data at its public
-   `@last` path and the HTML will fail to read it.
+   `@last` path and the playbook's UDF-backed data path will fail.
 3. **Cronjobs are active**: All feeds referenced by the playbook have
    successfully deployed cronjobs.
-4. **HTML fetches from feeds**: The playbook HTML reads quantitative data from
-   feed output paths at runtime, not from inline literals, consistent with the
+4. **HTML uses UDF data access**: The playbook HTML reads quantitative data via
+   `window.alva.udf`, not from inline literals or browser-side ALFS/FS-read
+   calls, consistent with the
    [Content Legitimacy Rules](#content-legitimacy-rules).
-5. **UDF runtime is current**: If the playbook includes interactive UDFs, the
-   HTML loads the current toolkit browser SDK and uses `window.alva.udf`.
+5. **Browser SDK runtime is current**: The HTML loads the current toolkit
+   browser SDK before calling `window.alva.udf`.
 6. **Data is fresh**: Read the latest data point from each referenced feed via
    `@last/1` and check its timestamp. If the latest timestamp is older than 2x
    the cron interval, warn the user that the playbook will display stale data.
@@ -1109,7 +1098,7 @@ the full locate-and-edit procedure.
 | [memory.md](references/memory.md) | Per-user memory: storage layout, `user.md` template, what to save, read/write rules |
 | [narrative-voice.md](references/narrative-voice.md) | Voice rules for user-facing prose: banned tokens/shapes, copy-paste ADK system-prompt block with few-shots |
 | [language.md](references/language.md) | Canonical product vocabulary: automation, playbook, alert, Agent, and when feed must stay internal |
-| [udf-runtime.md](references/api/udf-runtime.md) | Playbook browser UDF runtime: PBSV, allowance consent, service endpoints, and `UdfButton` |
+| [udf-runtime.md](references/api/udf-runtime.md) | Playbook browser SDK/API runtime: PBSV, registered UDF calls, allowance consent, service endpoints, and `UdfButton` |
 
 ---
 
@@ -1143,7 +1132,7 @@ a routing index — and, for the rows in bold, the linked sub-doc is a
 
 Non-CLI references:
 [error-responses.md](references/api/error-responses.md) — HTTP status → error-code table for programmatic error handling.
-[udf-runtime.md](references/api/udf-runtime.md) — playbook iframe UDF calls.
+[udf-runtime.md](references/api/udf-runtime.md) — playbook iframe browser SDK/API and UDF calls.
 
 ---
 
@@ -1349,8 +1338,9 @@ Required evidence:
    If missing, run the grant step now.
 5. **Public-read check**: Fetch the feed data path without authentication and
    confirm HTTP 200, not 403.
-6. **HTML backing check**: If the feed backs HTML, at least one public `@last`
-   path that the HTML will read has a non-empty result after grant.
+6. **Playbook backing check**: If the feed backs a playbook, at least one
+   public `@last` path that the playbook UDF will read has a non-empty result
+   after grant.
 
 If this evidence is missing or stale, do not run `alva release feed`. Re-run
 the feed, inspect the output, and only then proceed.

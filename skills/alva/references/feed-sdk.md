@@ -640,13 +640,11 @@ const points = JSON.parse(data);
 
 ### From a Web Page
 
-```javascript
-const resp = await fetch(
-  "$ALVA_ENDPOINT/api/v1/fs/read?path=/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/720",
-);
-const points = await resp.json();
-// points = [{date: 1772658000000, close: 73309.72, ema10: 72447.65}, ...]
-```
+Browser playbook HTML must not call ALFS/FS read endpoints directly, use
+`$ALVA_ENDPOINT`, or guess API origins. Expose feed reads through a registered
+playbook UDF, then call it with `window.alva.udf` from the toolkit browser
+runtime. See [udf-runtime.md](api/udf-runtime.md) for the browser SDK/API
+pattern.
 
 ---
 
@@ -711,7 +709,8 @@ records if some timestamps have multiple items.
 
 ## Making Feeds Public
 
-Grant public read access so anyone can read the data:
+Grant public read access for CLI verification, release checks, and non-browser
+consumers:
 
 ```bash
 alva fs grant --path '~/feeds/btc-ema/v1' --subject "special:user:*" --permission read
@@ -719,6 +718,9 @@ alva fs grant --path '~/feeds/btc-ema/v1' --subject "special:user:*" --permissio
 
 Public reads must use absolute paths:
 `/alva/home/<username>/feeds/btc-ema/v1/data/...`
+
+Browser playbook HTML still reads feed-backed data through UDFs. Do not fetch
+public FS read URLs directly from the page.
 
 ---
 
