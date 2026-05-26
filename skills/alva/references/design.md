@@ -77,6 +77,29 @@ use of Semibold (600) or Bold (700) is prohibited.
 | < 24px     | Regular(400) or Medium(500) | [Delight-Regular.ttf](https://alva-ai-static.b-cdn.net/fonts/Delight-Regular.ttf) or [Delight-Medium.ttf](https://alva-ai-static.b-cdn.net/fonts/Delight-Medium.ttf) |
 | **≥ 24px** | **Regular(400) only**       | [Delight-Regular.ttf](https://alva-ai-static.b-cdn.net/fonts/Delight-Regular.ttf)                                                                                    |
 
+### Font Loading
+
+The Delight TTFs are served from the static CDN. The bundle ships
+`@font-face` declarations so a single `<link>` to `design-system.css` is
+enough — playbooks do not need to add their own `@font-face`:
+
+```css
+@font-face {
+  font-family: "Delight";
+  src: url("https://alva-ai-static.b-cdn.net/fonts/Delight-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Delight";
+  src: url("https://alva-ai-static.b-cdn.net/fonts/Delight-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+```
+
 ### Anti-aliasing Standards
 
 Include these anti-aliasing declarations in generated styles (globally, or on
