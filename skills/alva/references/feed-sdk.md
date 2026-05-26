@@ -275,7 +275,9 @@ feed.def("notify", {
 });
 
 (async () => {
-  const result = ask("Give a brief crypto market update with key levels.");
+  const result = ask(`Give a brief crypto market update with key levels.
+If there is no material update worth notifying about, output only
+<|SKIP_NOTIFICATION|>.`);
 
   await feed.run(async (ctx) => {
     await ctx.self.ts("notify", "message").append([
@@ -315,6 +317,9 @@ alva release feed --name daily-briefing --version 1.0.0 \
   but `body` is the canonical name and matches FCM / APNS / Web Push
   / HTTP / email convention — prefer `body` in new feeds. If both
   `body` and `text` are set on the same record, `body` wins.
+- If `body`/`text` contains `<|SKIP_NOTIFICATION|>`, fanout state advances but
+  no user-visible notification is sent. Teach AlvaAsk to output this sentinel
+  when there is no material update.
 - **`alva release feed` is required** — without it, the push is still
   dispatched but arrives with an empty body (no `title`/`body`).
 - `--push-notify` only enables publisher-side fanout. It does **not** create

@@ -11,7 +11,7 @@ description: >-
   Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v1.8.3
+  version: v1.9.1
 ---
 
 # Alva
@@ -42,6 +42,8 @@ you can:
 - **Release and share** -- turn your work into a hosted playbook web app at
   `https://alva.ai/u/<username>/playbooks/<playbook_name>`, and share it with
   the world.
+- **Discover public playbooks** -- find examples and remix candidates with the
+  agent-friendly `alva playbooks trending` command.
 - **Remix existing playbooks** -- take any published playbook as a template,
   read its feed scripts and HTML source, customize parameters/logic/UI, and
   deploy as your own new playbook.
@@ -499,10 +501,12 @@ the patterns above.
 
 ### 3. Data Skills
 
-Financial data APIs across 16+ domains, served by the Arrays backend
-(`$ARRAYS_ENDPOINT`, defaults to `https://data-tools.prd.space.id`). To find
-the right API for a task, use the `alva data-skills` CLI (public, no auth).
-Follow the pipeline in order; do not skip steps and do not guess inputs.
+Structured data endpoints served by the Arrays backend
+(`$ARRAYS_ENDPOINT`, defaults to `https://data-tools.prd.space.id`),
+covering financial markets, on-chain analytics, macro indicators, news, and
+per-handle Twitter/X feeds (history and rolling updates). To find the right
+API for a task, use the `alva data-skills` CLI (public, no auth). Follow
+the pipeline in order; do not skip steps and do not guess inputs.
 
 1. **`alva data-skills list`** — every skill id is namespaced `arrays-data-api-*`
    and is not predictable from concept words, so always start here. Pipe
@@ -521,7 +525,17 @@ Follow the pipeline in order; do not skip steps and do not guess inputs.
 Data skills span spot and derivatives markets across stocks, ETFs, options,
 and crypto; equity fundamentals, estimates, events, and ownership flows;
 on-chain metrics and exchange flows; macro and economic indicators; news;
-and prediction markets. Run `alva data-skills list` for the live catalog.
+prediction markets; and per-handle Twitter/X feeds (history and rolling
+updates). Run `alva data-skills list` for the live catalog.
+
+**Source routing**
+
+| Need                                                                              | Surface                                                  |
+| --------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| Financial data (markets, fundamentals, on-chain, macro, news, prediction markets) | [`alva data-skills` CLI](#3-data-skills)                 |
+| Twitter/X by handle (history + rolling)                                           | [`alva data-skills` CLI](#3-data-skills)                 |
+| Handle subscriptions for news, YouTube, Reddit, podcasts                          | [`feed_widgets`](#runtime-libraries)                     |
+| Topic/keyword search (Twitter, news, web, etc.)                                   | [`unified_search`](#content-search)                      |
 
 **Data skill doc lookup is mandatory.** Always fetch the endpoint detail before
 writing code that calls it. Do not guess paths, parameter names, or response
@@ -550,7 +564,7 @@ available in every script execution.
 
 | Module group                              | Description                                                               |
 | ----------------------------------------- | ------------------------------------------------------------------------- |
-| `feed_widgets`                            | Per-handle/channel rolling subscriptions — news, Twitter/X, YouTube, Reddit, podcasts (e.g. `getTwitterFeed`). Twitter also has historical backfill over a time window (`getTwitterBackfill`, Pro-gated). For topic/keyword search, use [Content Search](#content-search). |
+| `feed_widgets`                            | Per-handle/channel rolling subscriptions for news, YouTube, Reddit, and podcasts. For Twitter/X handle feeds, use [Data Skills](#3-data-skills). For topic/keyword search, use [Content Search](#content-search). |
 | `unified_search`                          | Web, social, non-US finance search, and URL scraping tools (X/Grok, Perplexity Finance, Google, Brave, serper, decodo) |
 | `technical_indicator_calculation_helpers` | 50+ pure calculation helpers (RSI, MACD, Bollinger, etc.)                 |
 
@@ -649,6 +663,9 @@ alva release feed --name <feed> --version 1.0.0 \
 - `--push-notify` only marks the feed publisher as capable of emitting alerts.
   It does **not** subscribe any user or group, and it does not bypass
   notification preferences.
+- For `notify/message`, `body`/`text` containing `<|SKIP_NOTIFICATION|>`
+  advances fanout without sending a user-visible push. Use it for quiet
+  AlvaAsk, heartbeat, and monitor runs.
 - Real delivery always requires an explicit subscription:
   `alva push-subscriptions subscribe-feed --username <owner> --name <feed>`,
   `alva push-subscriptions subscribe-playbook --username <owner> --name <playbook>`,
@@ -732,6 +749,12 @@ above so anonymous viewers can load feed output without authentication.
      `before-feed-release`.
    - The draft metadata (`display_name`, description, tags, trading symbols,
      and feed list) matches the user's approved plan.
+   - `--tags` and `--trading-symbols` satisfy the overlap rule in
+     [release.md](references/api/release.md#trading-symbols-and-tags).
+   - If any Skillhub skill informed this build (`/use-skill:` directive, or
+     any `alva skillhub get` / `alva skillhub file` call), `--skill-id
+     <username>/<name>` is set to that id
+     ([release.md](references/api/release.md#skill-id)).
 
    If any item is missing, do not create the draft. Fix the missing artifact or
    ask the user for the missing metadata first.
@@ -744,12 +767,11 @@ above so anonymous viewers can load feed output without authentication.
    the subject/theme first, and keep it within 40 characters. Avoid personal
    markers such as `My`, `Test`, or `V2`, and generic-only titles such as
    `Stock Dashboard` or `Trading Bot`.
-   **Trading symbols**: If the playbook involves specific trading assets,
-   include `"trading_symbols"` in the request — an array of base asset
-   tickers (e.g. `["BTC", "ETH"]`, `["NVDA", "AAPL"]`). The backend
-   resolves each symbol to a full trading pair object and stores the result
-   in the playbook metadata. Max 50 symbols per request. Unknown symbols
-   are silently skipped.
+   **Trading symbols and tags**: if the playbook covers specific assets,
+   pass `--trading-symbols` and overlap those same entities into `--tags`
+   — see [Trading symbols and tags in release.md](references/api/release.md#trading-symbols-and-tags)
+   for the casing rule, resolution behavior, and `/explore` discovery
+   semantics.
 4. **Screenshot**: Take a screenshot to verify the released playbook renders
    correctly from the deployed published URL (for example,
    `https://<username>.playbook.alva.ai/<playbook_name>/v1.0.0/index.html`).
@@ -760,6 +782,14 @@ above so anonymous viewers can load feed output without authentication.
    ```bash
    alva screenshot --url <published_url> --out /tmp/screenshot.png \
      --compress --compress-quality 70 --compress-max-width 1280
+   ```
+
+   If this compressed screenshot returns `HTTP 500` / `HTTP 403`, prints
+   `SCREENSHOT_FAILED`, or does not create the output file, retry once without
+   compression flags instead of repeating the same compressed command:
+
+   ```bash
+   alva screenshot --url <published_url> --out /tmp/screenshot.png
    ```
 
    The CLI handles authentication automatically. Run `alva screenshot --help`
@@ -802,45 +832,17 @@ validation rules and the canonical content shape.
 
 #### Free users (`subscription_tier = "free"`)
 
-**One-playbook cap.** Free accounts may hold **at most one published
-playbook**. The cap is enforced server-side at release time — a second
-`alva release playbook` call will fail until the existing playbook is
-deleted by the user.
-
-1. **Publish directly**: Call `alva release playbook` — free playbooks
-   are always public. Output the public URL:
+1. **Publish directly**: Call `alva release playbook` — free users can create
+   and publish unlimited public playbooks. Free playbooks are always public. Output the public URL:
    `https://alva.ai/u/<username>/playbooks/<playbook_name>`
-2. **If the user already has a published playbook and wants to publish
-   a new one**, stop before calling `alva release playbook`. Tell the
-   user the existing playbook must be deleted first, and ask which path
-   they want:
-   - **Delete the old playbook** — list their existing playbooks and
-     confirm which one to remove, then call the CLI directly:
-     ```bash
-     alva playbook list                        # show what they have
-     alva playbook delete --name <old-name>    # soft-delete (frees the quota immediately)
-     ```
-     Do **not** suggest `alva fs remove --path ~/playbooks/<name>` —
-     that only clears ALFS files; the DB row stays and the quota stays
-     consumed. Do not attempt to "rename around" the cap, reuse the
-     old playbook's name without an explicit deletion, or assume any
-     in-app replace flow will migrate `display_name`, feeds, or
-     cronjobs cleanly — it currently does not, and the old public URL
-     can end up showing the new playbook's HTML with stale metadata.
-   - **Keep both** — only possible on Pro. Offer the upgrade path at
-     <https://alva.ai/pricing>.
-
-   After the deletion call returns, re-run the full release pipeline
-   (draft → README → release) for the new playbook from scratch under
-   a fresh `name`.
-3. **Upsell only on friction**: Do **not** proactively suggest upgrading.
+2. **Upsell only on friction**: Do **not** proactively suggest upgrading.
    But when the user's experience is degraded because of free-tier
-   limitations — wanting private playbooks, hitting the one-playbook cap,
-   resource limits, or any other pro-gated feature — acknowledge the
-   limitation and offer the upgrade path:
+   limitations — wanting private or paid playbooks, hitting the cronjob cap,
+   resource limits, or any other Pro-gated feature — acknowledge the limitation
+   and offer the upgrade path:
    "This feature is available on the Pro plan. You can upgrade at
    <https://alva.ai/pricing> to [specific benefit, e.g. keep playbooks
-   private / publish multiple playbooks / ...]."
+   private / deploy more cronjobs / ...]."
 
 Use the playbook `name` and the username from `alva whoami` to construct the
 canonical share URL. Use `published_url` from the release response for
@@ -854,6 +856,7 @@ draft is necessary but not sufficient: release requires fresh feed coverage,
 README coverage, and HTML/data consistency.
 
 Required evidence:
+
 1. **Backing feed release gates passed**: Every backing feed has passed
    `before-feed-release`.
 2. **Deployment coverage**: Every feed the released playbook reads at runtime
@@ -908,6 +911,13 @@ inner text is a fixed instruction, not the user's customization request —
 if the user typed nothing meaningful outside the tag, ask what to
 customize before proceeding.
 
+If the user asks to browse, find examples, or pick a source playbook and does
+not provide a specific URL, use `alva playbooks trending` after reading
+`alva playbooks --help`. Filter with `--keyword`, `--tag` / `--tags`,
+`--sort`, and `--limit` as appropriate; use the returned `ref`
+(`username/name`) as the agent-facing identifier and `url_path` when a remix
+source URL is needed.
+
 See [remix-workflow.md](references/remix-workflow.md) for the full step-by-step
 guide. `alva remix` commands are exclusively for lineage registration — to
 read any playbook's files, use `alva fs read`.
@@ -924,7 +934,9 @@ Scan the feeds backing this playbook and classify each:
 
 - **Push-worthy** (recommend): price signals, crossover/breakout alerts,
   trading instructions, anomaly detection, periodic research summaries —
-  anything actionable and time-sensitive.
+  anything actionable and time-sensitive. For heartbeat/watchlist/monitor feeds,
+  recommend quiet-run behavior: notify only on material changes and emit
+  `<|SKIP_NOTIFICATION|>` otherwise.
 - **Not push-worthy** (skip): static fundamentals, historical snapshots,
   low-frequency reference data.
 
@@ -950,6 +962,9 @@ Present a concrete recommendation, not a generic "want push?":
 > "This playbook's **BTC EMA crossover signal** feed produces actionable
 > alerts when the trend flips. Want to enable push notifications for it?"
 
+For monitors, say the quiet behavior up front: "I can notify only on material
+changes; quiet checks will run without pushing you."
+
 - **User says yes** → configure end-to-end (see "Configure and verify" below).
   Do not stop after toggling the flag.
 - **User says no** → accept and move on. Do not ask again.
@@ -971,6 +986,8 @@ verification.
 1. **Add the intended push sidecar** to the feed script:
    `signal/targets` for playbook signals (Pattern D), or `notify/message` for
    feed completion / AlvaAsk reports (Pattern E).
+   - For skippable AlvaAsk feeds, prompt: "If there is no material update worth
+     notifying about, output only `<|SKIP_NOTIFICATION|>`."
 2. **Release the feed.** A push script is a feed: its push body is served from
    the *released* feed, not the cronjob's raw run output. Run the changed
    script through the [feed lifecycle](#deploying-feeds), `before-feed-release`
@@ -984,9 +1001,11 @@ verification.
 5. **Verify the release and a real run:** confirm `alva release feed
    --cronjob-id <this cronjob>` ran after Step 1 added the sidecar. Then trigger
    a run (or wait for the next cron fire) and read `@last/1` of the configured
-   sidecar: confirm the record is fresh and the message body is non-empty.
+   sidecar: confirm the record is fresh and the message body is non-empty or
+   contains `<|SKIP_NOTIFICATION|>` for a successful quiet run.
 6. **Confirm to the user** with the specifics: which feed/playbook is
-   subscribed, what the next push will say, and when it will fire.
+   subscribed, what the next push will say, and when it will fire. For monitor
+   feeds, also say quiet runs skip notifications.
 
 If Step 5 finds the feed unreleased, or the run returns no record or an empty
 body, **do not claim push is set up** — diagnose (missing release, missing
@@ -1015,6 +1034,7 @@ the full locate-and-edit procedure.
 | [feed-sdk.md](references/feed-sdk.md) | Feed SDK guide: creating data feeds, time series, upstreams, state management |
 | [fundamentals-periods.md](references/fundamentals-periods.md) | Fiscal vs calendar periods for fundamentals: derive period labels from the record, align companies by `calendarEndDate`, compute YoY across matched periods |
 | [altra-trading.md](references/altra-trading.md) | Altra backtesting engine: strategies, features, signals, testing, debugging |
+| [onnx.md](references/onnx.md) | ONNX model playbooks: uploaded `.onnx` artifacts, `@alva/onnx` inference, FeedAltra patterns, output and release checks |
 | [deployment.md](references/deployment.md) | Deploying scripts as cronjobs for scheduled execution |
 | [design.md](references/design.md) | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
 | [design-contract.yaml](references/design-contract.yaml) | Machine-readable contract consumed by the design linter that gates `alva release playbook` |
@@ -1049,6 +1069,7 @@ a routing index — and, for the rows in bold, the linked sub-doc is a
 | `sdk` | Runtime libraries (50+ technical indicators, search, widgets). |
 | `data-skills` | Discover the 250+ Arrays financial-data endpoints. |
 | `skillhub` | Pull curated methodology blueprints (`/use-skill:` flow). |
+| `playbooks` | Discover public playbooks (`trending`) with compact agent-friendly refs for browsing examples and choosing remix sources. |
 | `comments` | Create / pin / unpin playbook comments — see [creators-note.md](references/creators-note.md) for the post-release creator's-note workflow. |
 | `push-subscriptions` | Personal push opt-in for playbooks and feeds. |
 | `channel` | Group push subscriptions (Telegram / Discord groups). |
@@ -1079,6 +1100,7 @@ variables, or shell. Host-agent permissions still apply. See
 | @alva/algorithm | `require("@alva/algorithm")` | Statistics                                                              |
 | @alva/feed      | `require("@alva/feed")`      | Feed SDK for persistent data pipelines + FeedAltra trading engine       |
 | @alva/adk       | `require("@alva/adk")`       | Agent SDK for LLM requests — `agent()` for LLM agents with tool calling |
+| @alva/onnx      | `require("@alva/onnx")`      | ONNX inference for supplied model artifacts; see [onnx.md](references/onnx.md) |
 | @test/suite     | `require("@test/suite")`     | Jest-style test framework (`describe`, `it`, `expect`, `runTests`)      |
 
 **Runtime libraries**: Built-in computation modules available via `require()`
@@ -1087,10 +1109,17 @@ variables, or shell. Host-agent permissions still apply. See
 `alva sdk doc --name "..."`. Module groups: `feed_widgets`,
 `technical_indicator_calculation_helpers`, `unified_search`.
 
-**Data APIs**: Financial data (crypto, stock, macro, ETF) is fetched via HTTP
-from the Arrays backend — see the [Data Skills](#3-data-skills) section. Load
-`ARRAYS_JWT` via `secret.loadPlaintext('ARRAYS_JWT')` and call Arrays endpoints
-with `Authorization: Bearer <ARRAYS_JWT>`.
+**Data APIs**: Structured data (financial markets, on-chain, macro, news,
+per-handle Twitter/X feeds) is fetched via HTTP from the Arrays backend —
+see the [Data Skills](#3-data-skills) section. Load `ARRAYS_JWT` via
+`secret.loadPlaintext('ARRAYS_JWT')` and call Arrays endpoints with
+`Authorization: Bearer <ARRAYS_JWT>`.
+
+**ONNX model inference**: If a user supplies, or plans to upload, an exported
+`.onnx` model artifact, read [onnx.md](references/onnx.md). Use `@alva/onnx` with
+`InferenceSession.createFromAlfs({ alfs, path })`, build tensors from real data,
+write prediction outputs through the Feed SDK, and render the playbook from
+released/granted feed paths.
 
 **Secret Manager**: use `const secret = require("secret-manager");` then
 `secret.loadPlaintext("OPENAI_API_KEY")`. This returns a string when present or
@@ -1246,6 +1275,7 @@ Before running `alva release feed`, verify the exact feed script that will be
 released has run successfully in this session.
 
 Required evidence:
+
 1. **Run check**: `alva run --entry-path '~/feeds/<name>/v1/src/index.js'`
    completed successfully after the latest source write.
 2. **Output shape check**: The run produced the expected feed output
@@ -1462,42 +1492,19 @@ altra.setStrategy(strategyFn, {
 
 ## ADK (Agent Development Kit) Quick Reference
 
-See [adk.md](references/adk.md) for the full API, tool-calling patterns, memory
-patterns, and implementation examples.
+`@alva/adk` (`adk.agent()`) embeds a fixed LLM reasoning step inside a
+deterministic, reschedulable pipeline — a feed cronjob's summarization stage,
+a scheduled digest, a "why it matters" headline, a classification step. The
+prompt and tool set are locked in; only the upstream data changes each run.
 
-ADK is a universal agent development kit that runs inside the Jagent V8 runtime.
-Use it to build LLM-powered agents that can reason over tasks, call tools,
-gather context from multiple sources, and return structured outputs.
+Do **not** use it for one-off research, exploratory analysis, or "help me look
+into X" the user asks interactively — answer directly with your own tools;
+wrapping it in `adk.agent()` adds a sandbox without buying anything. And do
+not use it to produce numbers, events, or reports that should come from a real
+data source (see Content Legitimacy Rule #2 above).
 
-It is best suited for workflows where the "thinking" step cannot be expressed as
-pure deterministic code, such as research synthesis, document analysis,
-classification, and summarization over real upstream data.
-
-### When to Use ADK
-
-Use ADK when you need an agent to:
-
-- Fetch real data through tools, APIs, SDKs, or files
-- Reason over multiple inputs before producing an answer
-- Synthesize findings into structured notes, summaries, or classifications
-- Power periodic research or analysis workflows that run on a schedule
-- Add an LLM-driven transformation step inside a larger data pipeline
-
-### When NOT to Use ADK
-
-ADK must **never** be used to fabricate data that should come from real sources.
-Specifically:
-
-- Do NOT use ADK to generate hiring statistics, financial events, analyst
-  reports, or any quantitative data that claims to originate from a real data
-  pipeline.
-- Do NOT present ADK-generated content as if it were sourced from SDKs, APIs,
-  or databases.
-- If a data source is unavailable, report the limitation as a blocker — do not
-  use ADK as a fallback data generator.
-
-ADK output that involves reasoning over real data (sentiment classification,
-trend summarization) is fine, but must be labeled as AI-generated analysis.
+See [adk.md](references/adk.md) for the API, tool-calling and memory patterns,
+and examples.
 
 ---
 
@@ -1535,12 +1542,8 @@ alva release feed --name btc-ema --version 1.0.0 --cronjob-id 42 \
   --description "Fetches BTC/USDT 1h klines from Binance and emits the 20-period EMA as a time series"
 # → {"feed_id":100,"name":"btc-ema","feed_major":1}
 
-# 2. Create playbook draft (creates DB record + ALFS draft files automatically)
-#    Include trading_symbols when the playbook involves specific assets.
-#    Include --tags with discovery tags (max 10, each up to 32 chars) so the
-#    playbook surfaces under those tags on /explore. Re-running this command
-#    with --tags replaces the playbook's tag set.
-alva release playbook-draft --name btc-dashboard --display-name "BTC Trend Dashboard" --description "BTC market dashboard" --feeds '[{"feed_id":100}]' --trading-symbols '["BTC"]' --tags '["btc","macro"]'
+# 2. Create playbook draft (creates DB record + ALFS draft files automatically).
+alva release playbook-draft --name btc-dashboard --display-name "BTC Trend Dashboard" --description "BTC market dashboard" --feeds '[{"feed_id":100}]' --trading-symbols '["BTC"]' --tags '["BTC","macro"]'
 # → {"playbook_id":99,"playbook_version_id":200}
 
 # 3. Write playbook README to ALFS (required before release).
@@ -1631,6 +1634,9 @@ consistent read pattern (`@last`, `@range`, etc.).
   and safe to call anytime.
 - **Cronjob path must point to an existing script.** The deploy API validates
   the entry_path exists via filesystem stat before creating the cronjob.
+- **Live-price answers must come from an intraday kline.** `interval=1d`
+  returns the previous session's close during trading hours, not the current
+  price — fetch `1min`/`5min` and read the newest record.
 - **Create new playbooks from scratch unless you are doing a version update.**
   Only version updates may refer to an existing playbook. For all other new
   playbooks, do not read existing ones.
