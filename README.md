@@ -86,7 +86,7 @@ Start with a simple prompt:
 Build me an NVDA dashboard with insider trading data and financial metrics
 ```
 
-That's it. Your agent now has full access to the Alva platform. By default, the skill builds live playbooks unless you explicitly ask for a static snapshot. Interactive playbooks use the current PBSV + UDF runtime.
+That's it. Your agent now has full access to the Alva platform. By default, the skill builds live playbooks unless you explicitly ask for a static snapshot. When you explicitly ask for user-callable functions, interactive playbooks use the current PBSV + UDF runtime.
 
 ---
 
@@ -99,7 +99,7 @@ That's it. Your agent now has full access to the Alva platform. By default, the 
 | Trading Strategy | *"Backtest an RSI mean-reversion strategy on BTC with daily rebalancing"*                 |
 | Macro Overview   | *"Build a macro dashboard with CPI, GDP, Treasury rates, and recession probability"*      |
 | Screening Tool   | *"Screen for stocks with PE < 15, ROE > 20%, and positive insider buying"*                |
-| Interactive Tool | *"Create a playbook with a Run analysis button that invokes a UDF for the selected ticker"* |
+| Interactive Tool | *"Register a playbook UDF and expose it through a Run analysis button for the selected ticker"* |
 
 ---
 
@@ -134,7 +134,7 @@ Event-driven backtesting with historical data and live paper trading. Define str
 
 ### Deploy & Share — Playbook Web Apps
 
-Turn your work into a hosted web app at `https://alva.ai/u/<username>/playbooks/<playbook_name>`. Built with the Alva Design System — charts, KPIs, tables, and interactive UDF controls powered by playbook-scoped viewer tokens. You can also remix published playbooks and add a creator's note after release.
+Turn your work into a hosted web app at `https://alva.ai/u/<username>/playbooks/<playbook_name>`. Built with the Alva Design System — charts, KPIs, tables, and optional UDF controls for explicitly requested user-registered functions. You can also remix published playbooks and add a creator's note after release.
 
 ---
 

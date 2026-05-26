@@ -1,7 +1,34 @@
 # Playbook UDF Runtime
 
-Use this reference when a playbook needs interactive browser-triggered
-functions. This is the current runtime contract.
+User-defined functions (UDFs) are functions registered by a playbook creator and
+made available for viewers to invoke from the playbook UI. A UDF flow always has
+two parts:
+
+1. **Registration**: the creator registers a named function, its entry script,
+   and its parameter schema against a playbook.
+2. **Use**: the playbook HTML lists or invokes registered functions through the
+   browser SDK.
+
+Use this reference only when the user strictly asks for a registerable or
+shareable interactive function, such as "register a UDF", "let viewers run this
+analysis", or "add a button that calls my function". Do not use UDFs for
+ordinary dashboards, scheduled data refresh, feed-backed charts, local-only
+helpers, static filters, or interactions that can run entirely in browser state.
+
+## Trigger Boundary
+
+Before adding UDFs, confirm the request needs a user-registered function that
+other users can call from the released playbook. If the request only asks for
+fresh data, recurring computation, or visual interactivity, use feeds and
+browser UI instead.
+
+If the trigger is met, implement both sides:
+
+- register or update the creator function with the service API
+- load the toolkit browser SDK and invoke the function with `window.alva.udf`
+
+Do not build only the browser button without registering the function, and do
+not register a function without wiring the intended viewer-facing use.
 
 ## Runtime Model
 
@@ -26,6 +53,9 @@ Content-Type: application/json
 ```
 
 ## Browser API
+
+The browser API is the viewer-side use surface. It assumes the function has
+already been registered for the playbook.
 
 ```html
 <script src="https://unpkg.com/@alva-ai/toolkit/dist/browser.global.js"></script>

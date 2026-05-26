@@ -166,20 +166,6 @@ Use the loaded memory to tailor your responses to the user's profile,
 preferences, and investment style. See the [Memory](#memory) section below for
 reading and writing rules.
 
-### Playbook Runtime Authentication
-
-Playbook pages hosted on Alva must use the PBSV runtime protocol for
-viewer-scoped browser access. The parent Alva page mints a playbook-scoped
-viewer token and appends it to the iframe URL as `_pbsv`, together with
-`parent_origin` and `api_origin`. Browser code inside the playbook should load
-`@alva-ai/toolkit` and use `window.alva.udf` for interactive UDF calls.
-
-### Browser SDK Resources
-
-`client.user`, `client.fs`, `client.run`, `client.deploy`, `client.release`,
-`client.secrets`, `client.sdk`, `client.comments`, `client.remix`,
-`client.screenshot`
-
 ---
 
 ## Communication
@@ -742,57 +728,21 @@ async function readAlfsJson(path) {
 not emit it into browser HTML; published HTML must call the public read gateway
 above so anonymous viewers can load feed output without authentication.
 
-#### Interactive UDFs in Playbooks
+#### User-Defined Functions in Playbooks
 
-Use UDFs when the playbook needs user-triggered computation from the browser
-after the page has loaded, such as "analyze this ticker", "rebalance with these
-assumptions", or "summarize the selected scenario".
+UDFs are user-registered functions that a playbook owner can expose to other
+users. They have two separate surfaces: creator-side function registration and
+viewer-side invocation from the playbook HTML. Only use this path when the user
+strictly asks for registerable/shareable interactive functions (for example,
+"register a UDF", "let viewers run this function", or "add a button that calls
+my analysis function"). Do not introduce UDFs for ordinary dashboards,
+scheduled data refresh, static filters, or feed-backed charts.
 
-1. **Register creator functions** through the service API before or during
-   release. Each function belongs to one playbook and declares:
-   `playbook_id`, `function_name`, `entry_script_path`, and `params_schema`.
-   Keep `entry_script_path` in creator-controlled ALFS paths; viewers never see
-   it through PBSV reads.
-2. **Load the browser SDK** in the playbook HTML and call:
-   `window.alva.udf.list()` for function metadata and
-   `window.alva.udf.call(functionName, params)` for invocation.
-3. **Use `window.alva.udf.renderButton(...)`** for simple one-click
-   interactions. It disables itself when the viewer is not signed in, invokes
-   with PBSV headers, and emits `alva:udf-button:loading`,
-   `alva:udf-button:result`, and `alva:udf-button:error` DOM events.
-4. **Do not handle bearer headers yourself** in playbook HTML. The SDK reads
-   `_pbsv`, strips it from the URL, accepts parent token refresh messages, and
-   sends `Authorization: Bearer <pbsv>` plus `X-Pbsv: 1`.
-5. **Expect allowance consent**. If the backend returns `CONSENT_REQUIRED`
-   (HTTP 402), the SDK asks the parent Alva page to show the allowance modal,
-   then retries once if the user approves. Do not build your own credit
-   authorization dialog inside the playbook iframe.
-
-Minimal browser pattern:
-
-```html
-<script src="https://unpkg.com/@alva-ai/toolkit/dist/browser.global.js"></script>
-<button id="run-analysis" type="button">Run analysis</button>
-<pre id="udf-output"></pre>
-<script>
-  const button = document.querySelector('#run-analysis');
-  const output = document.querySelector('#udf-output');
-
-  button.addEventListener('click', async () => {
-    try {
-      button.disabled = true;
-      const result = await window.alva.udf.call('analyze', {
-        ticker: 'AAPL',
-      });
-      output.textContent = JSON.stringify(result, null, 2);
-    } catch (error) {
-      output.textContent = error.message || String(error);
-    } finally {
-      button.disabled = false;
-    }
-  });
-</script>
-```
+When the trigger is met, read
+[udf-runtime.md](references/api/udf-runtime.md) before registration or browser
+implementation. The reference covers PBSV browser authentication, service API
+registration, `window.alva.udf`, allowance consent, and release checks. Never
+hand-write bearer headers in playbook HTML; use the browser SDK.
 
 ### 7. Release
 
@@ -939,8 +889,9 @@ Required evidence:
 4. **HTML fetches from feeds**: The playbook HTML reads quantitative data from
    feed output paths at runtime, not from inline literals, consistent with the
    [Content Legitimacy Rules](#content-legitimacy-rules).
-5. **UDF runtime is current**: If the playbook includes interactive UDFs, the
-   HTML loads the current toolkit browser SDK and uses `window.alva.udf`.
+5. **UDF runtime is current**: If the playbook includes user-registered UDFs,
+   [udf-runtime.md](references/api/udf-runtime.md) has been read, the function
+   is registered, and the HTML uses `window.alva.udf`.
 6. **Data is fresh**: Read the latest data point from each referenced feed via
    `@last/1` and check its timestamp. If the latest timestamp is older than 2x
    the cron interval, warn the user that the playbook will display stale data.
@@ -1124,7 +1075,7 @@ the full locate-and-edit procedure.
 | [memory.md](references/memory.md) | Per-user memory: storage layout, `user.md` template, what to save, read/write rules |
 | [narrative-voice.md](references/narrative-voice.md) | Voice rules for user-facing prose: banned tokens/shapes, copy-paste ADK system-prompt block with few-shots |
 | [language.md](references/language.md) | Canonical product vocabulary: automation, playbook, alert, Agent, and when feed must stay internal |
-| [udf-runtime.md](references/api/udf-runtime.md) | Playbook browser UDF runtime: PBSV, allowance consent, service endpoints, and `UdfButton` |
+| [udf-runtime.md](references/api/udf-runtime.md) | User-defined functions for playbooks: strict trigger rule, creator registration, browser invocation, PBSV, allowance consent, and `UdfButton` |
 
 ---
 
@@ -1159,7 +1110,7 @@ a routing index — and, for the rows in bold, the linked sub-doc is a
 
 Non-CLI references:
 [error-responses.md](references/api/error-responses.md) — HTTP status → error-code table for programmatic error handling.
-[udf-runtime.md](references/api/udf-runtime.md) — playbook iframe UDF calls.
+[udf-runtime.md](references/api/udf-runtime.md) — user-defined function registration and playbook iframe calls.
 
 ---
 
