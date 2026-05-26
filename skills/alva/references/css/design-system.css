@@ -1188,6 +1188,7 @@ body {
     sans-serif;
   cursor: pointer;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 /* Reserve Medium-weight width to prevent layout shift when active state flips.
    Only applied where active state changes weight (Underline + Segmented). */
@@ -1205,6 +1206,12 @@ body {
 .tab-underline {
   gap: var(--spacing-m);
   border-bottom: 1px solid var(--line-l07);
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+}
+.tab-underline::-webkit-scrollbar {
+  display: none;
 }
 .tab-underline .tab-item {
   padding-bottom: var(--spacing-xxs);
@@ -1302,6 +1309,7 @@ body {
 /* ── Pill (capsule) ── */
 .tab-pill {
   gap: var(--spacing-s);
+  flex-wrap: wrap;
 }
 .tab-pill .tab-item {
   padding: 6px var(--spacing-s);
