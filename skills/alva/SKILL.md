@@ -1067,8 +1067,6 @@ the full locate-and-edit procedure.
 | [onnx.md](references/onnx.md) | ONNX model playbooks: uploaded `.onnx` artifacts, `@alva/onnx` inference, FeedAltra patterns, output and release checks |
 | [deployment.md](references/deployment.md) | Deploying scripts as cronjobs for scheduled execution |
 | [design.md](references/design.md) | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
-| [design-contract.yaml](references/design-contract.yaml) | Machine-readable contract consumed by the design linter that gates `alva release playbook` |
-| [css/design-system.css](references/css/design-system.css) | Canonical CSS bundle published to CDN — playbooks `<link>` it instead of inlining component/widget CSS |
 | [remix-workflow.md](references/remix-workflow.md) | Remix: create a new playbook from an existing template |
 | [annotation-edits.md](references/annotation-edits.md) | Annotation-driven edits: parse `<annotation>` tags, locate the generator behind an element, edit generation logic not rendered output |
 | [creators-note.md](references/creators-note.md) | Post-release creator's note: composing and posting the pinned author comment |
@@ -1079,6 +1077,14 @@ the full locate-and-edit procedure.
 | [narrative-voice.md](references/narrative-voice.md) | Voice rules for user-facing prose: banned tokens/shapes, copy-paste ADK system-prompt block with few-shots |
 | [language.md](references/language.md) | Canonical product vocabulary: automation, playbook, alert, Agent, and when feed must stay internal |
 | [udf-runtime.md](references/api/udf-runtime.md) | User-defined functions for playbooks: strict trigger rule, creator registration, browser invocation, PBSV, allowance consent, and `UdfButton` |
+
+**Runtime artifacts** (use, don't read as reference — the spec lives in the
+`.md` files above):
+
+| Artifact | Role |
+| --- | --- |
+| [css/design-system.css](references/css/design-system.css) | CDN bundle. Playbook HTML `<link>`s the canonical URL (see [design.md](references/design.md) for the tag). Built from the design `.md` sources — not a spec, do not read for rules. |
+| [design-contract.yaml](references/design-contract.yaml) | The design linter's contract. `alva release playbook` (and `alva lint playbook`) consume it and surface findings. Rules and their "why" live in the design `.md` sources. |
 
 ---
 
