@@ -728,6 +728,11 @@ async function readAlfsJson(path) {
 not emit it into browser HTML; published HTML must call the public read gateway
 above so anonymous viewers can load feed output without authentication.
 
+**Pre-check before release**: once the HTML is ready, run
+`alva lint playbook ./index.html` locally. The same linter gates
+`alva release playbook` (Step 7) — pre-checking surfaces design-system
+violations early so you can fix them before the release HARD-GATE.
+
 #### User-Defined Functions in Playbooks
 
 UDFs are user-registered functions that a playbook owner can expose to other
@@ -910,15 +915,13 @@ Required evidence:
    cronjob>` — run after the cronjob's latest source write and passing
    `before-feed-release`; otherwise the push dispatches an empty body. Items
    1–3 only check feeds the HTML reads; a push-only feed is not caught there.
-10. **Design lint passes**: `alva release playbook` runs the design linter
-    against the HTML it's about to release and hard-fails on any error finding
-    (missing `.playbook-container`, page-scroll on the wrong element,
-    font-weight 600/700, unregistered component-modifier classes, etc.). To
-    pre-check: `alva lint playbook ./index.html`. The full ruleset lives in
+11. **Design lint passes**: `alva release playbook` hard-fails on any
+    design-system violation. Pre-check with `alva lint playbook
+    ./index.html` (Step 6); the full ruleset lives in
     [design-contract.yaml](references/design-contract.yaml).
-    For new playbooks, link `v1/design-system.css` per the template in
-    [design.md](references/design.md) — the linter accepts both legacy
-    and v1 URLs.
+    Emergency-only escape: `--bypass-lint` proceeds despite errors
+    (findings still printed). For new playbooks, link
+    `v1/design-system.css` per [design.md](references/design.md).
 
 If any item fails, do not release. Fix the issue, re-run
 `alva release playbook-draft` if metadata or backing files changed, then
