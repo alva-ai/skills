@@ -100,6 +100,20 @@ enough — playbooks do not need to add their own `@font-face`:
 }
 ```
 
+### Global Font Family
+
+The bundle sets `font-family` on registered component classes (e.g.
+`.btn`, `.tab-item`, `.markdown-container`). Free-flowing HTML outside
+components — bare `<div>`, `<p>`, ad-hoc headings — needs an explicit
+`body` rule so the cascade carries Delight everywhere:
+
+```css
+body {
+  font-family: "Delight", -apple-system, "OPPO Sans 4.0",
+    BlinkMacSystemFont, sans-serif;
+}
+```
+
 ### Anti-aliasing Standards
 
 Include these anti-aliasing declarations in generated styles (globally, or on
