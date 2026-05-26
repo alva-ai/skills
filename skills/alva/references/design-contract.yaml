@@ -14,7 +14,11 @@ global:
     selector: ".playbook-container"
     must-exist: true
   required-stylesheets:
-    - url: "https://alva-ai-static.b-cdn.net/design-system/design-tokens.css"
+    - any-of:
+        - url: "https://alva-ai-static.b-cdn.net/design-system/design-tokens.css"
+        - url: "https://alva-ai-static.b-cdn.net/design-system/v1/design-system.css"
+  canonical-css-urls:
+    - "https://alva-ai-static.b-cdn.net/design-system/v1/design-system.css"
   scroll:
     sole-scroll-container: ["body", "html"]
   typography:
@@ -125,12 +129,23 @@ components:
     children:
       - "tab-item"
     required-scripts:
+      # Canonical path: chart-card component used → check resize handler.
       - when-also: ["chart-card"]
         must-contain:
           - "[_echarts_instance_]"
           - "echarts.getInstanceByDom"
           - ".resize()"
         message: "Hidden ECharts containers report 0×0; when a tab panel becomes visible, resize all ECharts instances inside it. See design-components.md §Tab JS Interaction."
+      # Semantic-trigger path: any tab playbook that calls echarts.init
+      # — regardless of whether the chart wrapper uses canonical .chart-container
+      # class. Catches playbooks that style charts with ad-hoc wrapper classes
+      # but still need the same resize-on-tab-switch handler.
+      - when-script-contains: ["echarts.init"]
+        must-contain:
+          - "[_echarts_instance_]"
+          - "echarts.getInstanceByDom"
+          - ".resize()"
+        message: "ECharts is in use anywhere in this tab playbook; the canonical resize-on-tab-switch handler is required regardless of which class wraps the chart. See design-components.md §Tab JS Interaction."
       - when-also: ["table-card"]
         must-contain:
           - "initTableAlignment"
@@ -143,38 +158,8 @@ components:
       - "tooltip-text"
       - "tooltip-title"
 
-  # ── Widget Layout & Shared Styles (design-widgets.md §Shared Styles) ──────
-  widget-card:
-    root: "widget-card"
-    children:
-      - "widget-title"
-      - "widget-title-text"
-      - "widget-timestamp"
-      - "widget-body"
-      - "widget-grid"
-      - "widget-row"
-    states:
-      - "fill"
-
-  alva-watermark:
-    root: "alva-watermark"
-
-  divider:
-    root: "divider-h"
-    variants:
-      - "divider-v"
-
-  grid:
-    root: "col-2"
-    variants:
-      - "col-3"
-      - "col-4"
-      - "col-5"
-      - "col-6"
-      - "col-8"
-      - "col-thirds"
-
   # ── Chart Card (design-widgets.md §Chart Card) ────────────────────────────
+  # Kept because tab.required-scripts references chart-card via when-also.
   chart-card:
     root: "chart-container"
     children:
@@ -182,20 +167,8 @@ components:
       - "chart-legend"
       - "chart-dotted-background"
 
-  legend:
-    root: "legend-item"
-    variants:
-      - "legend-line"
-      - "legend-rect"
-      - "legend-dot"
-
-  # ── Metric Card (design-widgets.md §Metric Card) ──────────────────────────
-  metric-card:
-    root: "metric-column"
-    children:
-      - "metric-card"
-
   # ── Table Card (design-widgets.md §Table Card) ────────────────────────────
+  # Kept because tab.required-scripts references table-card via when-also.
   table-card:
     root: "table-card"
     children:
@@ -204,10 +177,6 @@ components:
     states:
       - "is-bullish"
       - "is-bearish"
-
-  # ── Free Text Card (design-widgets.md §Free Text Card) ────────────────────
-  free-text-card:
-    root: "free-text-body"
 
   # ── Feed Card (design-widgets.md §Feed Card) ──────────────────────────────
   feed-card:
@@ -236,19 +205,3 @@ components:
     states:
       - "has-badge"
       - "no-radius"
-
-  yt-modal:
-    root: "yt-modal"
-    children:
-      - "yt-modal-inner"
-      - "yt-modal-close"
-    states:
-      - "open"
-
-  # ── Group Title (design-widgets.md §Group Title) ──────────────────────────
-  group-title:
-    root: "section-title"
-    children:
-      - "section-title-icon"
-      - "section-title-text"
-      - "section-title-sub"

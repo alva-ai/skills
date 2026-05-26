@@ -537,6 +537,11 @@ updates). Run `alva data-skills list` for the live catalog.
 | Handle subscriptions for news, YouTube, Reddit, podcasts                          | [`feed_widgets`](#runtime-libraries)                     |
 | Topic/keyword search (Twitter, news, web, etc.)                                   | [`unified_search`](#content-search)                      |
 
+**Direct latest-price queries**: use structured intraday kline data for covered
+US equities and crypto; use `searchPerplexityFinance` first for non-US equities
+such as A-shares, HK stocks, and exchange-suffixed tickers (see
+[search.md](references/search.md)).
+
 **Data skill doc lookup is mandatory.** Always fetch the endpoint detail before
 writing code that calls it. Do not guess paths, parameter names, or response
 shapes from memory. The doc lookup ensures you use the correct endpoint and
@@ -723,6 +728,27 @@ async function readAlfsJson(path) {
 not emit it into browser HTML; published HTML must call the public read gateway
 above so anonymous viewers can load feed output without authentication.
 
+**Pre-check before release**: once the HTML is ready, run
+`alva lint playbook ./index.html` locally. The same linter gates
+`alva release playbook` (Step 7) — pre-checking surfaces design-system
+violations early so you can fix them before the release HARD-GATE.
+
+#### User-Defined Functions in Playbooks
+
+UDFs are user-registered functions that a playbook owner can expose to other
+users. They have two separate surfaces: creator-side function registration and
+viewer-side invocation from the playbook HTML. Only use this path when the user
+strictly asks for registerable/shareable interactive functions (for example,
+"register a UDF", "let viewers run this function", or "add a button that calls
+my analysis function"). Do not introduce UDFs for ordinary dashboards,
+scheduled data refresh, static filters, or feed-backed charts.
+
+When the trigger is met, read
+[udf-runtime.md](references/api/udf-runtime.md) before registration or browser
+implementation. The reference covers PBSV browser authentication, service API
+registration, `window.alva.udf`, allowance consent, and release checks. Never
+hand-write bearer headers in playbook HTML; use the browser SDK.
+
 ### 7. Release
 
 #### Common steps (all users)
@@ -868,30 +894,34 @@ Required evidence:
 4. **HTML fetches from feeds**: The playbook HTML reads quantitative data from
    feed output paths at runtime, not from inline literals, consistent with the
    [Content Legitimacy Rules](#content-legitimacy-rules).
-5. **Data is fresh**: Read the latest data point from each referenced feed via
+5. **UDF runtime is current**: If the playbook includes user-registered UDFs,
+   [udf-runtime.md](references/api/udf-runtime.md) has been read, the function
+   is registered, and the HTML uses `window.alva.udf`.
+6. **Data is fresh**: Read the latest data point from each referenced feed via
    `@last/1` and check its timestamp. If the latest timestamp is older than 2x
    the cron interval, warn the user that the playbook will display stale data.
-6. **Description is accurate**: Update frequency claims match actual cronjob
+7. **Description is accurate**: Update frequency claims match actual cronjob
    status. Data source claims match actual SDK/BYOD calls in the feed script.
-7. **Target user is correct**: The playbook is being released under the
+8. **Target user is correct**: The playbook is being released under the
    requesting user's namespace (see user scope enforcement above).
-8. **README is present and accurate**: `~/playbooks/{name}/README.md` exists
+9. **README is present and accurate**: `~/playbooks/{name}/README.md` exists
    on ALFS and covers the required sections (see
    [Playbook README in release.md](references/api/release.md#playbook-readme)).
    Its source / cadence claims match the actual feed scripts and deployed
    cronjobs. Pass it via `--readme-url` as an absolute ALFS path (see the
    `--readme-url` rule in Step 7 above).
-9. **Push feeds are released**: Every cronjob this playbook deploys with
+10. **Push feeds are released**: Every cronjob this playbook deploys with
    `push_notify: true` has a current `alva release feed --cronjob-id <that
    cronjob>` — run after the cronjob's latest source write and passing
    `before-feed-release`; otherwise the push dispatches an empty body. Items
    1–3 only check feeds the HTML reads; a push-only feed is not caught there.
-10. **Design lint passes**: `alva release playbook` runs the design linter
-    against the HTML it's about to release and hard-fails on any error finding
-    (missing `.playbook-container`, page-scroll on the wrong element,
-    font-weight 600/700, unregistered component-modifier classes, etc.). To
-    pre-check: `alva lint playbook ./index.html`. The full ruleset lives in
+11. **Design lint passes**: `alva release playbook` hard-fails on any
+    design-system violation. Pre-check with `alva lint playbook
+    ./index.html` (Step 6); the full ruleset lives in
     [design-contract.yaml](references/design-contract.yaml).
+    Use `--bypass-lint` for playbooks that intentionally diverge from
+    the design system (findings still printed). For new playbooks, link
+    `v1/design-system.css` per [design.md](references/design.md).
 
 If any item fails, do not release. Fix the issue, re-run
 `alva release playbook-draft` if metadata or backing files changed, then
@@ -1038,6 +1068,7 @@ the full locate-and-edit procedure.
 | [deployment.md](references/deployment.md) | Deploying scripts as cronjobs for scheduled execution |
 | [design.md](references/design.md) | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
 | [design-contract.yaml](references/design-contract.yaml) | Machine-readable contract consumed by the design linter that gates `alva release playbook` |
+| [css/design-system.css](references/css/design-system.css) | Canonical CSS bundle published to CDN — playbooks `<link>` it instead of inlining component/widget CSS |
 | [remix-workflow.md](references/remix-workflow.md) | Remix: create a new playbook from an existing template |
 | [annotation-edits.md](references/annotation-edits.md) | Annotation-driven edits: parse `<annotation>` tags, locate the generator behind an element, edit generation logic not rendered output |
 | [creators-note.md](references/creators-note.md) | Post-release creator's note: composing and posting the pinned author comment |
@@ -1047,6 +1078,7 @@ the full locate-and-edit procedure.
 | [memory.md](references/memory.md) | Per-user memory: storage layout, `user.md` template, what to save, read/write rules |
 | [narrative-voice.md](references/narrative-voice.md) | Voice rules for user-facing prose: banned tokens/shapes, copy-paste ADK system-prompt block with few-shots |
 | [language.md](references/language.md) | Canonical product vocabulary: automation, playbook, alert, Agent, and when feed must stay internal |
+| [udf-runtime.md](references/api/udf-runtime.md) | User-defined functions for playbooks: strict trigger rule, creator registration, browser invocation, PBSV, allowance consent, and `UdfButton` |
 
 ---
 
@@ -1081,6 +1113,7 @@ a routing index — and, for the rows in bold, the linked sub-doc is a
 
 Non-CLI references:
 [error-responses.md](references/api/error-responses.md) — HTTP status → error-code table for programmatic error handling.
+[udf-runtime.md](references/api/udf-runtime.md) — user-defined function registration and playbook iframe calls.
 
 ---
 
@@ -1634,9 +1667,10 @@ consistent read pattern (`@last`, `@range`, etc.).
   and safe to call anytime.
 - **Cronjob path must point to an existing script.** The deploy API validates
   the entry_path exists via filesystem stat before creating the cronjob.
-- **Live-price answers must come from an intraday kline.** `interval=1d`
-  returns the previous session's close during trading hours, not the current
-  price — fetch `1min`/`5min` and read the newest record.
+- **Covered US equities and crypto**: live-price answers must come from an
+  intraday kline. `interval=1d` returns the previous session's close during
+  trading hours, not the current price — fetch `1min`/`5min` and read the
+  newest record.
 - **Create new playbooks from scratch unless you are doing a version update.**
   Only version updates may refer to an existing playbook. For all other new
   playbooks, do not read existing ones.

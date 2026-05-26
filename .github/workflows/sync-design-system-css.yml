@@ -1,0 +1,77 @@
+name: Sync design-system.css
+
+on:
+  pull_request:
+    paths:
+      - 'skills/alva/references/design-tokens.css'
+      - 'skills/alva/references/design.md'
+      - 'skills/alva/references/design-components.md'
+      - 'skills/alva/references/design-widgets.md'
+      - 'skills/alva/references/css/design-system.css'
+      - 'skills/alva/references/design-contract.yaml'
+      - 'skills/alva/scripts/build-design-system-css.ts'
+      - 'skills/alva/scripts/design-contract-sync.ts'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    # Forks can't be pushed to via GITHUB_TOKEN. alva-ai PRs are internal;
+    # this guard prevents the job from failing silently on the rare fork PR.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: skills/alva/scripts/pnpm-lock.yaml
+
+      - name: Install scripts deps
+        working-directory: skills/alva/scripts
+        run: pnpm install --frozen-lockfile
+
+      # build-design-system-css runs validateInputs first; bails on any
+      # orphan declaration in the .md sources. If the .md is malformed,
+      # the workflow fails here and the auto-sync below never runs.
+      - name: Build design-system.css
+        working-directory: skills/alva/scripts
+        run: pnpm build-design-system-css
+
+      - name: Commit regenerated CSS if drift
+        run: |
+          if [[ -n "$(git status --porcelain skills/alva/references/css/design-system.css)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add skills/alva/references/css/design-system.css
+            git commit -m "build(alva): regenerate design-system.css [skip ci]"
+            if ! git push; then
+              echo "::warning::Push failed — likely a race with a concurrent push. Will retry on next CI run."
+              exit 0
+            fi
+            echo "::notice::Pushed regenerated design-system.css to PR branch."
+          else
+            echo "design-system.css already in sync."
+          fi
+
+      # Final guard: design-contract-sync also re-runs build --check, so this
+      # passes iff our auto-sync above worked. If a race left things stale,
+      # this would fail and surface it on the PR — the next push fixes it.
+      - name: Doc-sync final check
+        working-directory: skills/alva/scripts
+        run: pnpm design-contract-sync
