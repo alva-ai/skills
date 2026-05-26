@@ -1444,11 +1444,11 @@ state; typed text matches the filled state.
 
 ## Tab
 
-3 styles (Underline, Segmented, Pill) × 3 sizes (L, M, S) = 9 variants.
+3 styles (Underline, Segmented, Pill). Underline ships 4 sizes (XL/L/M/S); Segmented and Pill ship 3 sizes (L/M/S). 10 variants total.
 
-- **Underline**: 1px container bottom divider; selected item has a 2px bottom indicator that overlaps the divider.
-- **Segmented**: items share a tinted rounded container; active item is highlighted with a contrasting tile.
-- **Pill**: rounded rectangles, background changes on select.
+- **Underline**: 1px container bottom divider; active item has a 2px bottom bar in `--main-m1` that overlaps the divider. Active text is Medium.
+- **Segmented**: items share a tinted rounded container (`--b-r05`); active item is a contrasting white tile. Active text is Medium.
+- **Pill**: capsule-shaped items, each with its own subtle background (`--b-r03`); active item is a dark capsule (`rgba(0,0,0,0.7)`) with white text. **Active text stays Regular** (no weight change).
 
 ### CSS
 
@@ -1467,8 +1467,10 @@ state; typed text matches the filled state.
   cursor: pointer;
   transition: all 0.15s ease;
 }
-/* Prevent width jump when font-weight changes */
-.tab-item::after {
+/* Reserve Medium-weight width to prevent layout shift when active state flips.
+   Only applied where active state changes weight (Underline + Segmented). */
+.tab-underline .tab-item::after,
+.tab-segmented .tab-item::after {
   content: attr(data-text);
   font-weight: 500;
   visibility: hidden;
@@ -1477,7 +1479,7 @@ state; typed text matches the filled state.
   overflow: hidden;
 }
 
-/* Underline */
+/* ── Underline ── */
 .tab-underline {
   gap: var(--spacing-m);
   border-bottom: 1px solid var(--line-l07);
@@ -1518,7 +1520,19 @@ state; typed text matches the filled state.
   letter-spacing: 0.12px;
 }
 
-/* Segmented */
+/* Underline — Size XL */
+.tab-underline.tab-xl {
+  gap: var(--spacing-l);
+}
+.tab-underline.tab-xl .tab-item {
+  padding-top: var(--spacing-s);
+  padding-bottom: 10px; /* 12 − 2px border = matches inactive py-12 */
+  font-size: 18px;
+  line-height: 28px;
+  letter-spacing: 0.18px;
+}
+
+/* ── Segmented ── */
 .tab-segmented {
   gap: 0;
   background: var(--b-r05);
@@ -1527,7 +1541,7 @@ state; typed text matches the filled state.
 }
 .tab-segmented .tab-item {
   padding: 6px var(--spacing-s);
-  border-radius: var(--radius-btn-s);
+  border-radius: var(--radius-ct-s); /* 4px */
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
@@ -1543,32 +1557,33 @@ state; typed text matches the filled state.
 /* Segmented — Size L */
 .tab-segmented.tab-l {
   padding: var(--spacing-xxs);
-  border-radius: var(--radius-ct-l);
 }
 .tab-segmented.tab-l .tab-item {
   padding: 6px var(--spacing-m);
-  border-radius: var(--radius-btn-m);
   font-size: 16px;
   line-height: 26px;
   letter-spacing: 0.16px;
 }
 
 /* Segmented — Size S */
+.tab-segmented.tab-s {
+  border-radius: var(--radius-ct-s); /* 4px */
+}
 .tab-segmented.tab-s .tab-item {
   padding: var(--spacing-xxs) 10px;
-  border-radius: var(--radius-btn-xs);
+  border-radius: var(--radius-ct-xs); /* 2px */
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.12px;
 }
 
-/* Pill */
+/* ── Pill (capsule) ── */
 .tab-pill {
   gap: var(--spacing-s);
 }
 .tab-pill .tab-item {
   padding: 6px var(--spacing-s);
-  border-radius: var(--radius-btn-s);
+  border-radius: 999px; /* capsule */
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
@@ -1576,15 +1591,12 @@ state; typed text matches the filled state.
   color: var(--text-n7);
 }
 .tab-pill .tab-item.active {
-  background: rgba(73, 163, 166, 0.2);
-  color: var(--text-n9);
-  font-weight: 500;
+  /* Fixed dark bg + white text; intentionally not flipped in dark mode */
+  background: rgba(0, 0, 0, 0.7);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 /* Pill — Size L */
-.tab-pill.tab-l {
-  gap: var(--spacing-m);
-}
 .tab-pill.tab-l .tab-item {
   padding: var(--spacing-xs) var(--spacing-m);
   font-size: 16px;

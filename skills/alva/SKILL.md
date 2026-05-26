@@ -537,6 +537,11 @@ updates). Run `alva data-skills list` for the live catalog.
 | Handle subscriptions for news, YouTube, Reddit, podcasts                          | [`feed_widgets`](#runtime-libraries)                     |
 | Topic/keyword search (Twitter, news, web, etc.)                                   | [`unified_search`](#content-search)                      |
 
+**Direct latest-price queries**: use structured intraday kline data for covered
+US equities and crypto; use `searchPerplexityFinance` first for non-US equities
+such as A-shares, HK stocks, and exchange-suffixed tickers (see
+[search.md](references/search.md)).
+
 **Data skill doc lookup is mandatory.** Always fetch the endpoint detail before
 writing code that calls it. Do not guess paths, parameter names, or response
 shapes from memory. The doc lookup ensures you use the correct endpoint and
@@ -1638,9 +1643,10 @@ consistent read pattern (`@last`, `@range`, etc.).
   and safe to call anytime.
 - **Cronjob path must point to an existing script.** The deploy API validates
   the entry_path exists via filesystem stat before creating the cronjob.
-- **Live-price answers must come from an intraday kline.** `interval=1d`
-  returns the previous session's close during trading hours, not the current
-  price — fetch `1min`/`5min` and read the newest record.
+- **Covered US equities and crypto**: live-price answers must come from an
+  intraday kline. `interval=1d` returns the previous session's close during
+  trading hours, not the current price — fetch `1min`/`5min` and read the
+  newest record.
 - **Create new playbooks from scratch unless you are doing a version update.**
   Only version updates may refer to an existing playbook. For all other new
   playbooks, do not read existing ones.

@@ -15,9 +15,6 @@ permissions:
 
 jobs:
   publish:
-    # Public skills repo is not authorized for the org self-hosted runner
-    # group (jobs queue indefinitely with runner_group_id=0). Match main's
-    # #433 fix and use github-hosted.
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
