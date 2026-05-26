@@ -1443,6 +1443,7 @@ state; typed text matches the filled state.
 - **Underline**: 1px container bottom divider; active item has a 2px bottom bar in `--main-m1` that overlaps the divider. Active text is Medium.
 - **Segmented**: items share a tinted rounded container (`--b-r05`); active item is a contrasting white tile. Active text is Medium.
 - **Pill**: capsule-shaped items, each with its own subtle background (`--b-r03`); active item is a dark capsule (`rgba(0,0,0,0.7)`) with white text. **Active text stays Regular** (no weight change).
+- **Overflow**: tab item text never wraps. When items exceed container width — Underline scrolls horizontally (scrollbar hidden); Pill wraps to the next row.
 
 ### CSS
 
@@ -1460,6 +1461,7 @@ state; typed text matches the filled state.
     sans-serif;
   cursor: pointer;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 /* Reserve Medium-weight width to prevent layout shift when active state flips.
    Only applied where active state changes weight (Underline + Segmented). */
@@ -1477,6 +1479,12 @@ state; typed text matches the filled state.
 .tab-underline {
   gap: var(--spacing-m);
   border-bottom: 1px solid var(--line-l07);
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+}
+.tab-underline::-webkit-scrollbar {
+  display: none;
 }
 .tab-underline .tab-item {
   padding-bottom: var(--spacing-xxs);
@@ -1574,6 +1582,7 @@ state; typed text matches the filled state.
 /* ── Pill (capsule) ── */
 .tab-pill {
   gap: var(--spacing-s);
+  flex-wrap: wrap;
 }
 .tab-pill .tab-item {
   padding: 6px var(--spacing-s);
