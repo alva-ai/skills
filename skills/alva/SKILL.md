@@ -763,7 +763,9 @@ hand-write bearer headers in playbook HTML; use the browser SDK.
    Blind spots, plus shape-specific sections for screener / thesis /
    what-if). The README is the single source of truth for the playbook's
    "How does this work?" surface — releasing without one leaves the
-   playbook unexplained.
+   playbook unexplained. For version bumps and re-releases, regenerate the
+   README from the current implementation and upload it again before release;
+   see [release.md](references/api/release.md#freshness-and-version-updates).
 3. **Create playbook draft**: `alva release playbook-draft` — creates DB
    records, writes draft files and `playbook.json` to ALFS automatically.
 
@@ -908,9 +910,11 @@ Required evidence:
 9. **README is present and accurate**: `~/playbooks/{name}/README.md` exists
    on ALFS and covers the required sections (see
    [Playbook README in release.md](references/api/release.md#playbook-readme)).
-   Its source / cadence claims match the actual feed scripts and deployed
-   cronjobs. Pass it via `--readme-url` as an absolute ALFS path (see the
-   `--readme-url` rule in Step 7 above).
+   For every release, including version bumps and re-releases, regenerate it
+   from the current HTML, feeds, metadata, and blind spots, then upload it
+   again before release. Its source / cadence claims match the actual feed
+   scripts and deployed cronjobs. Pass it via `--readme-url` as an absolute
+   ALFS path (see the `--readme-url` rule in Step 7 above).
 10. **Push feeds are released**: Every cronjob this playbook deploys with
    `push_notify: true` has a current `alva release feed --cronjob-id <that
    cronjob>` — run after the cronjob's latest source write and passing

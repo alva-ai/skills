@@ -50,6 +50,18 @@ HTML's "How does this work?" / methodology modal renders the same content,
 so there is one source of truth — the README — not a separate per-template
 copy.
 
+### Freshness and version updates
+
+Every `alva release playbook` call needs a freshly reviewed README for the
+version being released. Initial releases, version bumps, and re-releases all
+follow the same rule: regenerate the README from the current HTML, feed
+scripts, feed ids, cron cadences, metadata, and known blind spots, then
+upload it again to `~/playbooks/<name>/README.md` before release.
+
+Do not point `--readme-url` at a README copied from a prior version. A README
+may keep the same wording only if you have re-checked it against the current
+implementation and re-uploaded the reviewed file for this release.
+
 ### Path and `--readme-url` form
 
 The flow is: **first** write the README to ALFS at
