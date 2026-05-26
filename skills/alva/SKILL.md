@@ -728,6 +728,22 @@ async function readAlfsJson(path) {
 not emit it into browser HTML; published HTML must call the public read gateway
 above so anonymous viewers can load feed output without authentication.
 
+#### User-Defined Functions in Playbooks
+
+UDFs are user-registered functions that a playbook owner can expose to other
+users. They have two separate surfaces: creator-side function registration and
+viewer-side invocation from the playbook HTML. Only use this path when the user
+strictly asks for registerable/shareable interactive functions (for example,
+"register a UDF", "let viewers run this function", or "add a button that calls
+my analysis function"). Do not introduce UDFs for ordinary dashboards,
+scheduled data refresh, static filters, or feed-backed charts.
+
+When the trigger is met, read
+[udf-runtime.md](references/api/udf-runtime.md) before registration or browser
+implementation. The reference covers PBSV browser authentication, service API
+registration, `window.alva.udf`, allowance consent, and release checks. Never
+hand-write bearer headers in playbook HTML; use the browser SDK.
+
 ### 7. Release
 
 #### Common steps (all users)
@@ -873,20 +889,23 @@ Required evidence:
 4. **HTML fetches from feeds**: The playbook HTML reads quantitative data from
    feed output paths at runtime, not from inline literals, consistent with the
    [Content Legitimacy Rules](#content-legitimacy-rules).
-5. **Data is fresh**: Read the latest data point from each referenced feed via
+5. **UDF runtime is current**: If the playbook includes user-registered UDFs,
+   [udf-runtime.md](references/api/udf-runtime.md) has been read, the function
+   is registered, and the HTML uses `window.alva.udf`.
+6. **Data is fresh**: Read the latest data point from each referenced feed via
    `@last/1` and check its timestamp. If the latest timestamp is older than 2x
    the cron interval, warn the user that the playbook will display stale data.
-6. **Description is accurate**: Update frequency claims match actual cronjob
+7. **Description is accurate**: Update frequency claims match actual cronjob
    status. Data source claims match actual SDK/BYOD calls in the feed script.
-7. **Target user is correct**: The playbook is being released under the
+8. **Target user is correct**: The playbook is being released under the
    requesting user's namespace (see user scope enforcement above).
-8. **README is present and accurate**: `~/playbooks/{name}/README.md` exists
+9. **README is present and accurate**: `~/playbooks/{name}/README.md` exists
    on ALFS and covers the required sections (see
    [Playbook README in release.md](references/api/release.md#playbook-readme)).
    Its source / cadence claims match the actual feed scripts and deployed
    cronjobs. Pass it via `--readme-url` as an absolute ALFS path (see the
    `--readme-url` rule in Step 7 above).
-9. **Push feeds are released**: Every cronjob this playbook deploys with
+10. **Push feeds are released**: Every cronjob this playbook deploys with
    `push_notify: true` has a current `alva release feed --cronjob-id <that
    cronjob>` — run after the cronjob's latest source write and passing
    `before-feed-release`; otherwise the push dispatches an empty body. Items
@@ -1056,6 +1075,7 @@ the full locate-and-edit procedure.
 | [memory.md](references/memory.md) | Per-user memory: storage layout, `user.md` template, what to save, read/write rules |
 | [narrative-voice.md](references/narrative-voice.md) | Voice rules for user-facing prose: banned tokens/shapes, copy-paste ADK system-prompt block with few-shots |
 | [language.md](references/language.md) | Canonical product vocabulary: automation, playbook, alert, Agent, and when feed must stay internal |
+| [udf-runtime.md](references/api/udf-runtime.md) | User-defined functions for playbooks: strict trigger rule, creator registration, browser invocation, PBSV, allowance consent, and `UdfButton` |
 
 ---
 
@@ -1090,6 +1110,7 @@ a routing index — and, for the rows in bold, the linked sub-doc is a
 
 Non-CLI references:
 [error-responses.md](references/api/error-responses.md) — HTTP status → error-code table for programmatic error handling.
+[udf-runtime.md](references/api/udf-runtime.md) — user-defined function registration and playbook iframe calls.
 
 ---
 
