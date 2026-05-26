@@ -701,10 +701,11 @@ before creating or editing HTML. Do not rely on memory of prior sessions.
 </HARD-GATE>
 
 After your data pipelines are deployed and producing data, build the playbook's
-web interface. Create HTML5 pages with Alva Design System that read from Alva's
-data gateway and visualize the results. Follow the Alva Design System for
-styling, layout, and component guidelines. Unless the user explicitly asks for a
-static snapshot, default to a live playbook.
+web interface. Create HTML5 pages that read from Alva's data gateway and
+visualize the results. In `<head>`, `<link>` the Alva Design System bundle —
+canonical tag in [design.md](references/design.md); the linter's
+`required-stylesheets` rule blocks release if missing. Unless the user
+explicitly asks for a static snapshot, default to a live playbook.
 **Data fetching requirement**: Apply the
 [Content Legitimacy Rules](#content-legitimacy-rules) when building the UI.
 All quantitative data in charts, tables, or metric cards must come from feed
@@ -920,8 +921,7 @@ Required evidence:
     ./index.html` (Step 6); the full ruleset lives in
     [design-contract.yaml](references/design-contract.yaml).
     Use `--bypass-lint` for playbooks that intentionally diverge from
-    the design system (findings still printed). For new playbooks, link
-    `v1/design-system.css` per [design.md](references/design.md).
+    the design system (findings still printed).
 
 If any item fails, do not release. Fix the issue, re-run
 `alva release playbook-draft` if metadata or backing files changed, then
