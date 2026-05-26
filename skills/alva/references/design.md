@@ -10,12 +10,18 @@ Full token definitions (colors, spacing, radius, theme) are in
 [design-tokens.css](./design-tokens.css). Always read that file for exact
 token values.
 
-In generated HTML, import tokens from the CDN — do not copy token values
-inline:
+In generated HTML, link the canonical design-system stylesheet from the CDN.
+**For new playbooks, use the v1 bundle** — one file contains tokens + global
+rules + components + widgets:
 
 ```html
-<link rel="stylesheet" href="https://alva-ai-static.b-cdn.net/design-system/design-tokens.css" />
+<link rel="stylesheet" href="https://alva-ai-static.b-cdn.net/design-system/v1/design-system.css" />
 ```
+
+Existing playbooks that only link the legacy `design-tokens.css` URL continue
+to work (the linter accepts both forms). For new playbooks, prefer the v1
+bundle so component and widget CSS comes from the CDN instead of inlined per
+playbook.
 
 Always reference tokens via `var(--token-name)` — never hardcode hex or rgba
 values. Below is a quick reference:
@@ -30,6 +36,29 @@ values. Below is a quick reference:
 | Shadow       | `--shadow-xs/s/l`                              | Floating surfaces only (dropdown/tooltip) |
 | Spacing      | `--spacing-xxxs`(2) ~ `--spacing-xxxxxxl`(56)  | Common: xs=8, m=16, xl=24               |
 | Radius       | `--radius-ct-xs`(2) ~ `--radius-ct-l`(8)       | xs=Tag, s=Card, l=Page                  |
+
+## Design Contract
+
+The Alva design system is also expressed as a machine-readable contract for
+the **design linter** that runs inside `alva release playbook`:
+
+- [design-contract.yaml](./design-contract.yaml) — token-free contract: the
+  required global container, scroll/typography/link rules, and the registered
+  components (root class, variants, sizes, states, bindings).
+- [css/design-system.css](./css/design-system.css) — the canonical CSS bundle
+  (tokens + globals + components + widgets) generated from this doc's
+  ```css blocks plus design-components.md / design-widgets.md. Published
+  to the CDN; new playbooks `<link>` it to get all canonical styling.
+
+The linter is shipped in the `alva` CLI and runs as a hard gate. To pre-check
+a playbook before release:
+
+```bash
+alva lint playbook ./index.html
+```
+
+`alva release playbook` runs the same lint internally and refuses to release
+if any error-severity finding fires. See SKILL.md §7 Release.
 
 ## Typography & Font
 
@@ -54,9 +83,11 @@ Include these anti-aliasing declarations in generated styles (globally, or on
 any text container):
 
 ```css
--webkit-font-smoothing: antialiased;
--moz-osx-font-smoothing: grayscale;
-text-rendering: optimizeLegibility;
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
 ```
 
 - If the project already has a global reset or typography base class, ensure the

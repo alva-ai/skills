@@ -64,7 +64,7 @@ render function emits, or the component factory it calls — so every render
 keeps the change and stays data-driven.
 
 Editing playbook HTML re-enters the `before-build-html` gate: read
-[design-system.md](design-system.md), plus
+[design.md](design.md), plus
 [design-components.md](design-components.md) for component-level changes.
 
 ---

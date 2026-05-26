@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'skills/alva/references/design-tokens.css'
+      - 'skills/alva/references/design-contract.yaml'
+      - 'skills/alva/references/css/design-system.css'
   workflow_dispatch:
 
 permissions:
@@ -13,7 +15,7 @@ permissions:
 
 jobs:
   publish:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -34,6 +36,24 @@ jobs:
         with:
           path: skills/alva/references/design-tokens.css
           destination: alva-ai-stg-ssr-cdn-bucket/design-system/
+          parent: false
+          headers: |
+            cache-control: public,max-age=3600
+
+      - name: Upload design contract to GCS
+        uses: google-github-actions/upload-cloud-storage@v1
+        with:
+          path: skills/alva/references/design-contract.yaml
+          destination: alva-ai-stg-ssr-cdn-bucket/design-system/
+          parent: false
+          headers: |
+            cache-control: public,max-age=3600
+
+      - name: Upload v1 design-system bundle to GCS
+        uses: google-github-actions/upload-cloud-storage@v1
+        with:
+          path: skills/alva/references/css/design-system.css
+          destination: alva-ai-stg-ssr-cdn-bucket/design-system/v1/
           parent: false
           headers: |
             cache-control: public,max-age=3600

@@ -551,6 +551,11 @@ updates). Run `alva data-skills list` for the live catalog.
 | Handle subscriptions for news, YouTube, Reddit, podcasts                          | [`feed_widgets`](#runtime-libraries)                     |
 | Topic/keyword search (Twitter, news, web, etc.)                                   | [`unified_search`](#content-search)                      |
 
+**Direct latest-price queries**: use structured intraday kline data for covered
+US equities and crypto; use `searchPerplexityFinance` first for non-US equities
+such as A-shares, HK stocks, and exchange-suffixed tickers (see
+[search.md](references/search.md)).
+
 **Data skill doc lookup is mandatory.** Always fetch the endpoint detail before
 writing code that calls it. Do not guess paths, parameter names, or response
 shapes from memory. The doc lookup ensures you use the correct endpoint and
@@ -695,8 +700,7 @@ Before writing or rewriting playbook HTML, read the applicable design guidance
 for this session.
 
 Required evidence:
-
-- [design-system.md](references/design-system.md) has been read first.
+- [design.md](references/design.md) has been read first.
 - The relevant companion reference has been read when applicable:
   [design-widgets.md](references/design-widgets.md) for widget layouts,
   [design-components.md](references/design-components.md) for component
@@ -955,6 +959,15 @@ Required evidence:
    cronjob>` — run after the cronjob's latest source write and passing
    `before-feed-release`; otherwise the push dispatches an empty body. Items
    1–3 only check feeds the HTML reads; a push-only feed is not caught there.
+10. **Design lint passes**: `alva release playbook` runs the design linter
+    against the HTML it's about to release and hard-fails on any error finding
+    (missing `.playbook-container`, page-scroll on the wrong element,
+    font-weight 600/700, unregistered component-modifier classes, etc.). To
+    pre-check: `alva lint playbook ./index.html`. The full ruleset lives in
+    [design-contract.yaml](references/design-contract.yaml).
+    For new playbooks, link `v1/design-system.css` per the template in
+    [design.md](references/design.md) — the linter accepts both legacy
+    and v1 URLs.
 
 If any item fails, do not release. Fix the issue, re-run
 `alva release playbook-draft` if metadata or backing files changed, then
@@ -1099,7 +1112,9 @@ the full locate-and-edit procedure.
 | [altra-trading.md](references/altra-trading.md) | Altra backtesting engine: strategies, features, signals, testing, debugging |
 | [onnx.md](references/onnx.md) | ONNX model playbooks: uploaded `.onnx` artifacts, `@alva/onnx` inference, FeedAltra patterns, output and release checks |
 | [deployment.md](references/deployment.md) | Deploying scripts as cronjobs for scheduled execution |
-| [design-system.md](references/design-system.md) | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
+| [design.md](references/design.md) | Alva Design System entry point: tokens, typography, layout; links to widget, component, and playbook specs |
+| [design-contract.yaml](references/design-contract.yaml) | Machine-readable contract consumed by the design linter that gates `alva release playbook` |
+| [css/design-system.css](references/css/design-system.css) | Canonical CSS bundle published to CDN — playbooks `<link>` it instead of inlining component/widget CSS |
 | [remix-workflow.md](references/remix-workflow.md) | Remix: create a new playbook from an existing template |
 | [annotation-edits.md](references/annotation-edits.md) | Annotation-driven edits: parse `<annotation>` tags, locate the generator behind an element, edit generation logic not rendered output |
 | [creators-note.md](references/creators-note.md) | Post-release creator's note: composing and posting the pinned author comment |
@@ -1126,7 +1141,8 @@ a routing index — and, for the rows in bold, the linked sub-doc is a
 | `fs` | ALFS filesystem (read / write / readdir / grant / revoke / time series). **Must read [filesystem.md](references/api/filesystem.md)** before any feed-data path, `@…` suffix, or `fs grant` on a feed — CLI help wrongly advertises `@now`, `@range/{duration}`, `@all`, `@at`, `@range/@bounds`. |
 | `run` | Execute JS in the Alva V8 runtime. |
 | `deploy` | Cronjob lifecycle (create / list / pause / resume / trigger / runs / run-logs). |
-| `release` | Register feeds, draft and publish playbooks. **Must read [release.md](references/api/release.md#playbook-readme)** before any playbook release — feed `--description` rules, the README content shape (Overview / Data sources & freshness / Blind spots, plus screener / thesis / what-if), and the `--trading-symbols` / `--tags` overlap rule. |
+| `release` | Register feeds, draft and publish playbooks. **Must read [release.md](references/api/release.md#playbook-readme)** before any playbook release — feed `--description` rules + the full README content shape (Overview / Data sources & freshness / Blind spots, plus screener / thesis / what-if). |
+| `lint playbook <file>` | Design-system lint check; same engine as the `alva release playbook` gate. See [design-contract.yaml](references/design-contract.yaml). |
 | `secrets` | CRUD on encrypted secrets read by `require("secret-manager")`. |
 | `sdk` | Runtime libraries (50+ technical indicators, search, widgets). |
 | `data-skills` | Discover the 250+ Arrays financial-data endpoints. |
@@ -1627,7 +1643,7 @@ alva release playbook --name btc-dashboard --version v1.0.0 --feeds '[{"feed_id"
 
 ## Alva Design System
 
-**Always read [design-system.md](references/design-system.md) first** — it covers tokens,
+**Always read [design.md](references/design.md) first** — it covers tokens,
 typography, theme, and page-level layout. Then read only the spec you need:
 
 1. **Generating a widget or chart** →
@@ -1636,7 +1652,7 @@ typography, theme, and page-level layout. Then read only the spec you need:
    [design-components.md](references/design-components.md)
 3. **Building a trading strategy playbook** →
    [design-playbook-trading-strategy.md](references/design-playbook-trading-strategy.md)
-4. **Only need global rules** → stay in design-system.md
+4. **Only need global rules** → stay in design.md
 
 ---
 
@@ -1697,9 +1713,10 @@ consistent read pattern (`@last`, `@range`, etc.).
   and safe to call anytime.
 - **Cronjob path must point to an existing script.** The deploy API validates
   the entry_path exists via filesystem stat before creating the cronjob.
-- **Live-price answers must come from an intraday kline.** `interval=1d`
-  returns the previous session's close during trading hours, not the current
-  price — fetch `1min`/`5min` and read the newest record.
+- **Covered US equities and crypto**: live-price answers must come from an
+  intraday kline. `interval=1d` returns the previous session's close during
+  trading hours, not the current price — fetch `1min`/`5min` and read the
+  newest record.
 - **Create new playbooks from scratch unless you are doing a version update.**
   Only version updates may refer to an existing playbook. For all other new
   playbooks, do not read existing ones.

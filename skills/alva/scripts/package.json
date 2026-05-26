@@ -1,0 +1,18 @@
+{
+  "name": "alva-skill-scripts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "design-contract-sync": "tsx design-contract-sync.ts",
+    "build-design-system-css": "tsx build-design-system-css.ts",
+    "build-design-system-css:check": "tsx build-design-system-css.ts --check"
+  },
+  "devDependencies": {
+    "@types/css-tree": "^2.3.11",
+    "@types/node": "^20.0.0",
+    "css-tree": "^3.2.1",
+    "tsx": "^4.0.0",
+    "vitest": "^2.0.0",
+    "yaml": "^2.0.0"
+  }
+}
