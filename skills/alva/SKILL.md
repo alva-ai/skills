@@ -499,6 +499,16 @@ If a script throws `ReferenceError: <X> is not defined`, the runtime
 does not expose `<X>` — do not retry the same call; rewrite to one of
 the patterns above.
 
+**Heap override**: each run gets a 256 MB V8 heap by default. Raise it with
+`--max-heap-size-mb <mb>` (1–2048, default 256) for memory-heavy scripts:
+
+```bash
+alva run --entry-path '~/feeds/<name>/v1/src/index.js' --max-heap-size-mb 1024
+```
+
+If a run is killed with an out-of-memory error, retry with a larger
+`--max-heap-size-mb` (up to 2048).
+
 ### 3. Data Skills
 
 Structured data endpoints served by the Arrays backend
@@ -1297,7 +1307,9 @@ Every feed follows a 6-step lifecycle including every newly created feed or re-c
    a response shape that doesn't match the script's parsing, stop and fix
    the feed script. Do not proceed to Grant / Deploy / Release on a failed
    or empty run — a broken feed that is granted and deployed will publish
-   nothing (or stale data) and fail the release checklists later.
+   nothing (or stale data) and fail the release checklists later. One
+   exception: if the run fails with an out-of-memory error, re-run with a
+   larger `--max-heap-size-mb` (up to 2048) rather than editing the script.
 4. **Grant** -- make feed data publicly readable:
 
    ```bash
@@ -1707,9 +1719,9 @@ consistent read pattern (`@last`, `@range`, etc.).
 
 ## Resource Limits
 
-| Resource              | Limit                 |
-| --------------------- | --------------------- |
-| V8 heap per execution | 2 GB                  |
-| Write payload         | 10 MB max per request |
-| HTTP response body    | 128 MB max            |
-| Min cron interval     | 1 minute              |
+| Resource              | Limit                                                           |
+| --------------------- | --------------------------------------------------------------- |
+| V8 heap per execution | 256 MB default (override via `max_heap_size_mb`, up to 2048 MB) |
+| Write payload         | 10 MB max per request                                           |
+| HTTP response body    | 128 MB max                                                      |
+| Min cron interval     | 1 minute                                                        |

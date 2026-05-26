@@ -10,9 +10,14 @@ via `alva run` (inline code or filesystem entry path) or triggered by cronjobs.
 - **Engine**: V8 with strict mode enabled
 - **Isolation**: Each execution runs in a separate subprocess with its own V8
   isolate
-- **Heap**: 2 GB per execution
+- **Heap**: 256 MB per execution by default, overridable per run via
+  `max_heap_size_mb` (1–2048 MB) — `--max-heap-size-mb <mb>` on `alva run`,
+  `max_heap_size_mb` in the `/api/v1/run` body / SDK
 - **No persistent state between executions**: each `alva run` call starts
   fresh (use `alfs` for persistence)
+
+If a run exceeds its heap it is killed with an explicit out-of-memory error;
+retry with a higher `max_heap_size_mb` (up to 2048 MB).
 
 ---
 
