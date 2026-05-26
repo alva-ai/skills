@@ -1,0 +1,254 @@
+# skills/alva/references/design-contract.yaml
+# Machine-readable contract for the Alva playbook design system.
+# Source of truth for the design linter shipped in @alva-ai/toolkit.
+# Run skills/alva/scripts/design-contract-sync.ts to verify this stays
+# in sync with design-components.md.
+
+version: 1
+description: |
+  Alva playbook design system contract — global structural rules + the
+  registered component class registry used by the design linter.
+
+global:
+  required-container:
+    selector: ".playbook-container"
+    must-exist: true
+  required-stylesheets:
+    - url: "https://alva-ai-static.b-cdn.net/design-system/design-tokens.css"
+  scroll:
+    sole-scroll-container: ["body", "html"]
+  typography:
+    font-family-root-must-include: "Delight"
+    font-weight-allowed: [400, 500]
+    # design.md §Typography: ≥24px must be Regular(400) only
+    font-weight-restrictions:
+      - min-font-size-px: 24
+        allowed: [400]
+  links:
+    anchor-required-attrs: ["target", "rel"]
+    # design.md §Links: rel must contain noopener noreferrer
+    rel-must-contain: ["noopener", "noreferrer"]
+  # design.md §Typography → Anti-aliasing Standards
+  anti-aliasing:
+    required-declarations:
+      - "-webkit-font-smoothing: antialiased"
+      - "-moz-osx-font-smoothing: grayscale"
+      - "text-rendering: optimizeLegibility"
+
+components:
+  dropdown:
+    root: "dropdown"
+    children:
+      - "dropdown-border"
+      - "list-item"
+      - "list-item-inner"
+      - "list-item-text"
+    states:
+      - "selected"
+
+  markdown:
+    root: "markdown-container"
+    sizes:
+      - "markdown-container--l"
+      - "markdown-container--s"
+
+  button:
+    root: "btn"
+    variants:
+      - "btn-primary"
+      - "btn-secondary"
+    sizes:
+      - "btn-large"
+      - "btn-medium"
+      - "btn-small"
+      - "btn-extra-small"
+    states:
+      - "btn-disabled"
+      - "btn-loading"
+    bindings:
+      - selector: "button"
+        require-class: "btn"
+
+  tag:
+    root: "tag"
+    sizes:
+      - "tag-md"
+      - "tag-xs"
+
+  switch:
+    root: "switch"
+    sizes:
+      - "switch-sm"
+      - "switch-lg"
+    states:
+      - "on"
+      - "disabled"
+    children:
+      - "switch-thumb"
+
+  modal:
+    root: "modal-close"
+
+  select:
+    root: "select"
+    sizes:
+      - "select-lg"
+      - "select-sm"
+    states:
+      - "filled"
+      - "open"
+    children:
+      - "select-border"
+      - "select-text"
+      - "select-icon"
+
+  input:
+    root: "input"
+    sizes:
+      - "input-lg"
+      - "input-sm"
+    children:
+      - "input-border"
+      - "input-field"
+
+  tab:
+    root: "tab"
+    variants:
+      - "tab-underline"
+      - "tab-segmented"
+      - "tab-pill"
+    sizes:
+      - "tab-l"
+      - "tab-s"
+    states:
+      - "active"
+    children:
+      - "tab-item"
+    required-scripts:
+      - when-also: ["chart-card"]
+        must-contain:
+          - "[_echarts_instance_]"
+          - "echarts.getInstanceByDom"
+          - ".resize()"
+        message: "Hidden ECharts containers report 0×0; when a tab panel becomes visible, resize all ECharts instances inside it. See design-components.md §Tab JS Interaction."
+      - when-also: ["table-card"]
+        must-contain:
+          - "initTableAlignment"
+        message: "Re-align table-card columns when a tab panel becomes visible. See design-components.md §Tab JS Interaction."
+
+  tooltip:
+    root: "tooltip"
+    children:
+      - "tooltip-border"
+      - "tooltip-text"
+      - "tooltip-title"
+
+  # ── Widget Layout & Shared Styles (design-widgets.md §Shared Styles) ──────
+  widget-card:
+    root: "widget-card"
+    children:
+      - "widget-title"
+      - "widget-title-text"
+      - "widget-timestamp"
+      - "widget-body"
+      - "widget-grid"
+      - "widget-row"
+    states:
+      - "fill"
+
+  alva-watermark:
+    root: "alva-watermark"
+
+  divider:
+    root: "divider-h"
+    variants:
+      - "divider-v"
+
+  grid:
+    root: "col-2"
+    variants:
+      - "col-3"
+      - "col-4"
+      - "col-5"
+      - "col-6"
+      - "col-8"
+      - "col-thirds"
+
+  # ── Chart Card (design-widgets.md §Chart Card) ────────────────────────────
+  chart-card:
+    root: "chart-container"
+    children:
+      - "chart-body"
+      - "chart-legend"
+      - "chart-dotted-background"
+
+  legend:
+    root: "legend-item"
+    variants:
+      - "legend-line"
+      - "legend-rect"
+      - "legend-dot"
+
+  # ── Metric Card (design-widgets.md §Metric Card) ──────────────────────────
+  metric-card:
+    root: "metric-column"
+    children:
+      - "metric-card"
+
+  # ── Table Card (design-widgets.md §Table Card) ────────────────────────────
+  table-card:
+    root: "table-card"
+    children:
+      - "table-row"
+      - "table-cell"
+    states:
+      - "is-bullish"
+      - "is-bearish"
+
+  # ── Free Text Card (design-widgets.md §Free Text Card) ────────────────────
+  free-text-card:
+    root: "free-text-body"
+
+  # ── Feed Card (design-widgets.md §Feed Card) ──────────────────────────────
+  feed-card:
+    root: "feed-body"
+    children:
+      - "feed-item"
+      - "feed-item-main"
+      - "feed-header"
+      - "feed-header-meta"
+      - "feed-avatar"
+      - "feed-avatar-badge"
+      - "feed-title"
+      - "feed-display-name"
+      - "feed-handle"
+      - "feed-meta-date"
+      - "feed-meta-sep"
+      - "feed-content"
+      - "feed-post-title"
+      - "feed-text"
+      - "feed-info"
+      - "feed-actions"
+      - "feed-action"
+      - "feed-action-icon"
+      - "feed-thumb"
+      - "feed-thumb-play"
+    states:
+      - "has-badge"
+      - "no-radius"
+
+  yt-modal:
+    root: "yt-modal"
+    children:
+      - "yt-modal-inner"
+      - "yt-modal-close"
+    states:
+      - "open"
+
+  # ── Group Title (design-widgets.md §Group Title) ──────────────────────────
+  group-title:
+    root: "section-title"
+    children:
+      - "section-title-icon"
+      - "section-title-text"
+      - "section-title-sub"
