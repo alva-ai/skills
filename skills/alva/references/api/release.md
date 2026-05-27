@@ -6,8 +6,8 @@ flags, display-name conventions, and examples. This file covers only:
 1. Feed `--description` wording rules
 2. Playbook README content shape (the big one — referenced by SKILL.md
    and the `--readme-url` flag)
-3. `--trading-symbols` and `--tags` semantics and the required overlap
-   between them
+3. `--trading-symbols` and `--tags` semantics, person-name discovery tags,
+   and the required overlap between trading symbols and tags
 4. `--skill-id` — when it is required
 
 ## Feed `--description` conventions
@@ -34,7 +34,16 @@ Bad: `"BTC EMA"`
 Omit the entities and the playbook is invisible to `/explore` searches
 for that asset — asset-routing and discovery read different fields.
 
-Example: `--trading-symbols '["BTC"]' --tags '["BTC","macro"]'`.
+**Related people.** If the playbook's thesis, screen, or catalyst logic depends
+on named people, include those names in `--tags` using the most recognizable
+public name. Cover investors, company executives / market-famous company
+figures, government-linked officials or policymakers, and Twitter / X KOLs
+whose posts or views materially affect the playbook.
+
+Examples:
+
+- `--trading-symbols '["BTC"]' --tags '["BTC","macro"]'`.
+- `--trading-symbols '["TSLA"]' --tags '["TSLA","Elon Musk","EV"]'`.
 
 ## Skill id
 
