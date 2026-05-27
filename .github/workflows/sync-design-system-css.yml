@@ -3,14 +3,13 @@ name: Sync design-system.css
 on:
   pull_request:
     paths:
-      - 'skills/alva/references/design-tokens.css'
-      - 'skills/alva/references/design.md'
-      - 'skills/alva/references/design-components.md'
-      - 'skills/alva/references/design-widgets.md'
-      - 'skills/alva/references/css/design-system.css'
-      - 'skills/alva/references/design-contract.yaml'
-      - 'skills/alva/scripts/build-design-system-css.ts'
-      - 'skills/alva/scripts/design-contract-sync.ts'
+      - "skills/alva/references/design-tokens.css"
+      - "skills/alva/references/design.md"
+      - "skills/alva/references/design-components.md"
+      - "skills/alva/references/design-widgets.md"
+      - "skills/alva/references/css/design-system.css"
+      - "skills/alva/references/design-contract.yaml"
+      - "tools/alva-design-system/**"
   workflow_dispatch:
 
 permissions:
@@ -40,17 +39,17 @@ jobs:
         with:
           node-version: 20
           cache: pnpm
-          cache-dependency-path: skills/alva/scripts/pnpm-lock.yaml
+          cache-dependency-path: tools/alva-design-system/pnpm-lock.yaml
 
-      - name: Install scripts deps
-        working-directory: skills/alva/scripts
+      - name: Install design-system tool deps
+        working-directory: tools/alva-design-system
         run: pnpm install --frozen-lockfile
 
       # build-design-system-css runs validateInputs first; bails on any
       # orphan declaration in the .md sources. If the .md is malformed,
       # the workflow fails here and the auto-sync below never runs.
       - name: Build design-system.css
-        working-directory: skills/alva/scripts
+        working-directory: tools/alva-design-system
         run: pnpm build-design-system-css
 
       - name: Commit regenerated CSS if drift
@@ -73,5 +72,5 @@ jobs:
       # passes iff our auto-sync above worked. If a race left things stale,
       # this would fail and surface it on the PR — the next push fixes it.
       - name: Doc-sync final check
-        working-directory: skills/alva/scripts
+        working-directory: tools/alva-design-system
         run: pnpm design-contract-sync

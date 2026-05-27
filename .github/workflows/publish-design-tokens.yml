@@ -4,9 +4,9 @@ on:
   push:
     branches: [main]
     paths:
-      - 'skills/alva/references/design-tokens.css'
-      - 'skills/alva/references/design-contract.yaml'
-      - 'skills/alva/references/css/design-system.css'
+      - "skills/alva/references/design-tokens.css"
+      - "skills/alva/references/design-contract.yaml"
+      - "skills/alva/references/css/design-system.css"
   workflow_dispatch:
 
 permissions:
@@ -34,26 +34,27 @@ jobs:
         with:
           node-version: 20
           cache: pnpm
-          cache-dependency-path: skills/alva/scripts/pnpm-lock.yaml
+          cache-dependency-path: tools/alva-design-system/pnpm-lock.yaml
 
-      - name: Install scripts deps
-        working-directory: skills/alva/scripts
+      - name: Install design-system tool deps
+        working-directory: tools/alva-design-system
         run: pnpm install --frozen-lockfile
 
       - name: Verify design-system.css is in sync with design docs
-        working-directory: skills/alva/scripts
+        working-directory: tools/alva-design-system
         run: pnpm design-contract-sync
 
       - name: GCP Auth
         id: auth
         uses: google-github-actions/auth@v1
         with:
-          credentials_json: ${{ secrets.GCS_ALVA_AI_INTERNAL_ARTIFACTS_SA_JSON }}
+          credentials_json:
+            ${{ secrets.GCS_ALVA_AI_INTERNAL_ARTIFACTS_SA_JSON }}
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
         with:
-          version: '>= 363.0.0'
+          version: ">= 363.0.0"
 
       - name: Upload design tokens to GCS
         uses: google-github-actions/upload-cloud-storage@v1

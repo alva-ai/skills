@@ -1,20 +1,20 @@
-// skills/alva/scripts/design-contract-sync.ts
+// tools/alva-design-system/design-contract-sync.ts
 // Verifies that design-contract.yaml agrees with the design system docs
 // (design-components.md + design-widgets.md).
-// Run: `pnpm design-contract-sync` from skills/alva/scripts/.
-import * as fs from 'fs';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
-import { spawnSync } from 'node:child_process';
-import YAML from 'yaml';
-import * as csstree from 'css-tree';
+// Run: `pnpm design-contract-sync` from tools/alva-design-system/.
+import * as fs from "fs";
+import * as path from "path";
+import { fileURLToPath } from "url";
+import { spawnSync } from "node:child_process";
+import YAML from "yaml";
+import * as csstree from "css-tree";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REFERENCES = path.resolve(__dirname, '../references');
-const CONTRACT_PATH = path.join(REFERENCES, 'design-contract.yaml');
+const REFERENCES = path.resolve(__dirname, "../../skills/alva/references");
+const CONTRACT_PATH = path.join(REFERENCES, "design-contract.yaml");
 const DOC_PATHS = [
-  path.join(REFERENCES, 'design-components.md'),
-  path.join(REFERENCES, 'design-widgets.md'),
+  path.join(REFERENCES, "design-components.md"),
+  path.join(REFERENCES, "design-widgets.md"),
 ];
 
 interface Comp {
@@ -23,20 +23,20 @@ interface Comp {
   sizes?: string[];
   states?: string[];
   children?: string[];
-  bindings?: { selector: string; 'require-class': string }[];
+  bindings?: { selector: string; "require-class": string }[];
 }
 
 interface RawContract {
   components: Record<string, Comp>;
   global?: {
     typography?: {
-      'font-family-root-must-include'?: string;
+      "font-family-root-must-include"?: string;
     };
   };
 }
 
 function readContract(): RawContract {
-  return YAML.parse(fs.readFileSync(CONTRACT_PATH, 'utf8')) as RawContract;
+  return YAML.parse(fs.readFileSync(CONTRACT_PATH, "utf8")) as RawContract;
 }
 
 /**
@@ -48,7 +48,7 @@ function readDocs(): { sections: string[]; classes: Set<string> } {
   const classes = new Set<string>();
 
   for (const p of DOC_PATHS) {
-    const md = fs.readFileSync(p, 'utf8');
+    const md = fs.readFileSync(p, "utf8");
 
     const sectionRegex = /^## (.+)$/gm;
     let m: RegExpExecArray | null;
@@ -74,7 +74,7 @@ function readDocs(): { sections: string[]; classes: Set<string> } {
 
 /** Normalize "Chart Card" or "chart-card" → "chartcard" for fuzzy matching. */
 function norm(s: string): string {
-  return s.toLowerCase().replace(/[-_\s]+/g, '');
+  return s.toLowerCase().replace(/[-_\s]+/g, "");
 }
 
 function check(): string[] {
@@ -91,7 +91,7 @@ function check(): string[] {
       ...(comp.sizes ?? []),
       ...(comp.states ?? []),
       ...(comp.children ?? []),
-      ...((comp.bindings ?? []).map((b) => b['require-class'])),
+      ...(comp.bindings ?? []).map((b) => b["require-class"]),
     ];
 
     // 1) Every declared class must appear somewhere in the docs' CSS blocks.
@@ -142,22 +142,22 @@ export function bundleDeliversRootFontFamily(
   } catch {
     return false;
   }
-  if (ast.type !== 'StyleSheet') return false;
+  if (ast.type !== "StyleSheet") return false;
 
   let found = false;
   csstree.walk(ast, {
-    visit: 'Rule',
+    visit: "Rule",
     enter(node) {
       if (found) return;
-      if (node.type !== 'Rule') return;
+      if (node.type !== "Rule") return;
       const sel = csstree.generate(node.prelude).trim();
       if (!ROOT_SELECTOR_RE.test(sel)) return;
       csstree.walk(node.block, {
-        visit: 'Declaration',
+        visit: "Declaration",
         enter(d) {
           if (found) return;
-          if (d.type !== 'Declaration') return;
-          if (d.property !== 'font-family') return;
+          if (d.type !== "Declaration") return;
+          if (d.property !== "font-family") return;
           const val = csstree.generate(d.value).toLowerCase();
           if (val.includes(required.toLowerCase())) found = true;
         },
@@ -170,19 +170,20 @@ export function bundleDeliversRootFontFamily(
 function checkBundlePromises(): string[] {
   const errors: string[] = [];
   const contract = readContract();
-  const required = contract.global?.typography?.['font-family-root-must-include'];
+  const required =
+    contract.global?.typography?.["font-family-root-must-include"];
   if (!required) return errors;
 
-  const bundlePath = path.join(REFERENCES, 'css/design-system.css');
+  const bundlePath = path.join(REFERENCES, "css/design-system.css");
   if (!fs.existsSync(bundlePath)) return errors; // freshness check handles missing bundle
-  const bundle = fs.readFileSync(bundlePath, 'utf8');
+  const bundle = fs.readFileSync(bundlePath, "utf8");
   if (!bundleDeliversRootFontFamily(bundle, required)) {
     errors.push(
       `bundle promise broken: contract requires '${required}' as root font-family ` +
-      `(font-family-root-must-include), but design-system.css has no body/html/:root rule ` +
-      `that includes it. The linter auto-passes the font-family-root rule when a playbook ` +
-      `<link>s the canonical bundle URL — that auto-pass is a lie until the bundle carries ` +
-      `the rule. Add a 'body { font-family: "${required}", ... }' block to design.md.`
+        `(font-family-root-must-include), but design-system.css has no body/html/:root rule ` +
+        `that includes it. The linter auto-passes the font-family-root rule when a playbook ` +
+        `<link>s the canonical bundle URL — that auto-pass is a lie until the bundle carries ` +
+        `the rule. Add a 'body { font-family: "${required}", ... }' block to design.md.`,
     );
   }
   return errors;
@@ -193,23 +194,25 @@ function main(): void {
   errors.push(...checkBundlePromises());
 
   // CSS freshness check — re-run the design-system.css build and compare
-  const cssCheck = spawnSync('tsx', ['build-design-system-css.ts', '--check'], {
+  const cssCheck = spawnSync("tsx", ["build-design-system-css.ts", "--check"], {
     cwd: __dirname,
-    stdio: 'pipe',
-    encoding: 'utf8',
+    stdio: "pipe",
+    encoding: "utf8",
   });
   if (cssCheck.status !== 0) {
     errors.push(
-      `design-system.css drift: ${(cssCheck.stderr || '').trim() || 'build --check failed'}`
+      `design-system.css drift: ${(cssCheck.stderr || "").trim() || "build --check failed"}`,
     );
   }
 
   if (errors.length === 0) {
-    console.log('design-contract.yaml ⇄ design docs: in sync\ndesign-system.css: in sync');
+    console.log(
+      "design-contract.yaml ⇄ design docs: in sync\ndesign-system.css: in sync",
+    );
     process.exit(0);
   } else {
-    console.error('design-contract.yaml ⇄ design docs DRIFT:');
-    for (const e of errors) console.error('  - ' + e);
+    console.error("design-contract.yaml ⇄ design docs DRIFT:");
+    for (const e of errors) console.error("  - " + e);
     process.exit(1);
   }
 }

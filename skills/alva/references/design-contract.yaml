@@ -1,8 +1,7 @@
 # skills/alva/references/design-contract.yaml
 # Machine-readable contract for the Alva playbook design system.
 # Source of truth for the design linter shipped in @alva-ai/toolkit.
-# Run skills/alva/scripts/design-contract-sync.ts to verify this stays
-# in sync with design-components.md.
+# Keep this in sync with the design docs and generated CSS bundle.
 
 version: 1
 description: |

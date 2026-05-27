@@ -2,9 +2,8 @@
 
 > ⚠️ **The ```css blocks in this file are the source of truth for
 > [css/design-system.css](css/design-system.css) (published to CDN).**
-> When you edit any ```css block, run `pnpm build-design-system-css`
-> from `skills/alva/scripts/` and commit the regenerated `design-system.css`
-> alongside your `.md` edit. CI doc-sync catches drift.
+> When you edit any ```css block, commit the matching regenerated
+> `design-system.css` alongside your `.md` edit. CI doc-sync catches drift.
 
 ## Widget Types
 
