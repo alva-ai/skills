@@ -7,6 +7,7 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { spawnSync } from 'node:child_process';
 import YAML from 'yaml';
+import * as csstree from 'css-tree';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REFERENCES = path.resolve(__dirname, '../references');
@@ -27,6 +28,11 @@ interface Comp {
 
 interface RawContract {
   components: Record<string, Comp>;
+  global?: {
+    typography?: {
+      'font-family-root-must-include'?: string;
+    };
+  };
 }
 
 function readContract(): RawContract {
@@ -117,25 +123,97 @@ function check(): string[] {
   return errors;
 }
 
-const errors = check();
+const ROOT_SELECTOR_RE = /^(body|html|:root|html\s*,\s*body|body\s*,\s*html)$/i;
 
-// CSS freshness check — re-run the design-system.css build and compare
-const cssCheck = spawnSync('tsx', ['build-design-system-css.ts', '--check'], {
-  cwd: __dirname,
-  stdio: 'pipe',
-  encoding: 'utf8',
-});
-if (cssCheck.status !== 0) {
-  errors.push(
-    `design-system.css drift: ${(cssCheck.stderr || '').trim() || 'build --check failed'}`
-  );
+/**
+ * Walk the bundle and look for a body/html/:root ruleset whose font-family
+ * declaration mentions the required family. The linter's `font-family-root`
+ * rule auto-passes when a playbook <link>s the canonical bundle URL on the
+ * assumption that the bundle delivers what the contract promises — this
+ * check enforces that assumption at bundle build time.
+ */
+export function bundleDeliversRootFontFamily(
+  bundle: string,
+  required: string,
+): boolean {
+  let ast: csstree.CssNode;
+  try {
+    ast = csstree.parse(bundle);
+  } catch {
+    return false;
+  }
+  if (ast.type !== 'StyleSheet') return false;
+
+  let found = false;
+  csstree.walk(ast, {
+    visit: 'Rule',
+    enter(node) {
+      if (found) return;
+      if (node.type !== 'Rule') return;
+      const sel = csstree.generate(node.prelude).trim();
+      if (!ROOT_SELECTOR_RE.test(sel)) return;
+      csstree.walk(node.block, {
+        visit: 'Declaration',
+        enter(d) {
+          if (found) return;
+          if (d.type !== 'Declaration') return;
+          if (d.property !== 'font-family') return;
+          const val = csstree.generate(d.value).toLowerCase();
+          if (val.includes(required.toLowerCase())) found = true;
+        },
+      });
+    },
+  });
+  return found;
 }
 
-if (errors.length === 0) {
-  console.log('design-contract.yaml ⇄ design docs: in sync\ndesign-system.css: in sync');
-  process.exit(0);
-} else {
-  console.error('design-contract.yaml ⇄ design docs DRIFT:');
-  for (const e of errors) console.error('  - ' + e);
-  process.exit(1);
+function checkBundlePromises(): string[] {
+  const errors: string[] = [];
+  const contract = readContract();
+  const required = contract.global?.typography?.['font-family-root-must-include'];
+  if (!required) return errors;
+
+  const bundlePath = path.join(REFERENCES, 'css/design-system.css');
+  if (!fs.existsSync(bundlePath)) return errors; // freshness check handles missing bundle
+  const bundle = fs.readFileSync(bundlePath, 'utf8');
+  if (!bundleDeliversRootFontFamily(bundle, required)) {
+    errors.push(
+      `bundle promise broken: contract requires '${required}' as root font-family ` +
+      `(font-family-root-must-include), but design-system.css has no body/html/:root rule ` +
+      `that includes it. The linter auto-passes the font-family-root rule when a playbook ` +
+      `<link>s the canonical bundle URL — that auto-pass is a lie until the bundle carries ` +
+      `the rule. Add a 'body { font-family: "${required}", ... }' block to design.md.`
+    );
+  }
+  return errors;
+}
+
+function main(): void {
+  const errors = check();
+  errors.push(...checkBundlePromises());
+
+  // CSS freshness check — re-run the design-system.css build and compare
+  const cssCheck = spawnSync('tsx', ['build-design-system-css.ts', '--check'], {
+    cwd: __dirname,
+    stdio: 'pipe',
+    encoding: 'utf8',
+  });
+  if (cssCheck.status !== 0) {
+    errors.push(
+      `design-system.css drift: ${(cssCheck.stderr || '').trim() || 'build --check failed'}`
+    );
+  }
+
+  if (errors.length === 0) {
+    console.log('design-contract.yaml ⇄ design docs: in sync\ndesign-system.css: in sync');
+    process.exit(0);
+  } else {
+    console.error('design-contract.yaml ⇄ design docs DRIFT:');
+    for (const e of errors) console.error('  - ' + e);
+    process.exit(1);
+  }
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main();
 }
