@@ -788,7 +788,8 @@ hand-write bearer headers in playbook HTML; use the browser SDK.
      `before-feed-release`.
    - The draft metadata (`display_name`, description, tags, trading symbols,
      and feed list) matches the user's approved plan.
-   - `--tags` and `--trading-symbols` satisfy the overlap rule in
+   - `--tags` includes required asset overlap plus material related people
+     (investors, company figures, officials/policymakers, Twitter / X KOLs) per
      [release.md](references/api/release.md#trading-symbols-and-tags).
    - If any Skillhub skill informed this build (`/use-skill:` directive, or
      any `alva skillhub get` / `alva skillhub file` call), `--skill-id
@@ -809,8 +810,8 @@ hand-write bearer headers in playbook HTML; use the browser SDK.
    **Trading symbols and tags**: if the playbook covers specific assets,
    pass `--trading-symbols` and overlap those same entities into `--tags`
    — see [Trading symbols and tags in release.md](references/api/release.md#trading-symbols-and-tags)
-   for the casing rule, resolution behavior, and `/explore` discovery
-   semantics.
+   for the casing rule, related-person tags, resolution behavior, and
+   `/explore` discovery semantics.
 4. **Screenshot**: Take a screenshot to verify the released playbook renders
    correctly from the deployed published URL (for example,
    `https://<username>.playbook.alva.ai/<playbook_name>/v1.0.0/index.html`).
