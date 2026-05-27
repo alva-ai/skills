@@ -39,6 +39,17 @@ global:
       - "-moz-osx-font-smoothing: grayscale"
       - "text-rendering: optimizeLegibility"
 
+  # Cross-cutting script rules (not scoped to any component). Same matcher
+  # shape as a component's required-scripts.
+  required-scripts:
+    # Any page using ECharts must defer init/resize so a 0-width or
+    # display:none container at first render doesn't compress the canvas.
+    # The tab-resize requirement under components.tab covers tab-switch
+    # specifically; this covers the no-tab case.
+    - when-script-contains: ["echarts.init"]
+      must-contain: ["requestAnimationFrame"]
+      message: "Pages using ECharts must defer init/resize via requestAnimationFrame — otherwise a 0-width or display:none container at first render compresses the canvas."
+
 components:
   dropdown:
     root: "dropdown"
