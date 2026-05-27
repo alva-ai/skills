@@ -1,14 +1,15 @@
 // Build the v1 design-system.css bundle from .md sources + design-tokens.css.
-// Run: pnpm build-design-system-css         (writes the file)
+// Run from tools/alva-design-system/:
+//      pnpm build-design-system-css         (writes the file)
 //      pnpm build-design-system-css --check (CI mode: diff against committed)
-import * as fs from 'fs';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
-import * as csstree from 'css-tree';
+import * as fs from "fs";
+import * as path from "path";
+import { fileURLToPath } from "url";
+import * as csstree from "css-tree";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REFERENCES = path.resolve(__dirname, '../references');
-const OUT_PATH = path.join(REFERENCES, 'css/design-system.css');
+const REFERENCES = path.resolve(__dirname, "../../skills/alva/references");
+const OUT_PATH = path.join(REFERENCES, "css/design-system.css");
 
 export function extractCssBlocks(md: string): string[] {
   const out: string[] = [];
@@ -30,7 +31,7 @@ export function extractCssBlocks(md: string): string[] {
  * (browsers silently drop top-level declarations).
  */
 export function findOrphanDeclarations(
-  css: string
+  css: string,
 ): { line: number; property: string }[] {
   const orphans: { line: number; property: string }[] = [];
   let ast: csstree.CssNode;
@@ -39,7 +40,7 @@ export function findOrphanDeclarations(
   } catch {
     return orphans; // parse error — let downstream handle
   }
-  if (ast.type !== 'StyleSheet') return orphans;
+  if (ast.type !== "StyleSheet") return orphans;
 
   // css-tree is "be liberal in what you accept": it never produces a
   // top-level Declaration node. Bare declarations end up as:
@@ -55,7 +56,7 @@ export function findOrphanDeclarations(
     let m: RegExpExecArray | null;
     while ((m = DECL_RE.exec(rawText))) {
       const before = rawText.slice(0, m.index);
-      const lineOffset = before.split('\n').length - 1;
+      const lineOffset = before.split("\n").length - 1;
       orphans.push({ property: m[1]!, line: baseLine + lineOffset });
     }
     DECL_RE.lastIndex = 0;
@@ -63,9 +64,9 @@ export function findOrphanDeclarations(
 
   ast.children.forEach((node) => {
     const startLine = node.loc?.start.line ?? 0;
-    if (node.type === 'Raw') {
+    if (node.type === "Raw") {
       probeRaw(node.value, startLine);
-    } else if (node.type === 'Rule' && node.prelude.type === 'Raw') {
+    } else if (node.type === "Rule" && node.prelude.type === "Raw") {
       probeRaw(node.prelude.value, node.prelude.loc?.start.line ?? startLine);
     }
   });
@@ -95,16 +96,16 @@ export interface CssBlockError {
 export function validateInputs(inputs: BuildInputs): CssBlockError[] {
   const errors: CssBlockError[] = [];
   const docs = [
-    { name: 'design.md', md: inputs.designMd },
-    { name: 'design-components.md', md: inputs.componentsMd },
-    { name: 'design-widgets.md', md: inputs.widgetsMd },
+    { name: "design.md", md: inputs.designMd },
+    { name: "design-components.md", md: inputs.componentsMd },
+    { name: "design-widgets.md", md: inputs.widgetsMd },
   ];
   for (const doc of docs) {
     const blocks = extractCssBlocks(doc.md);
     blocks.forEach((block, idx) => {
       for (const o of findOrphanDeclarations(block)) {
         errors.push({
-          source: doc.name + ' ```css block #' + String(idx + 1),
+          source: doc.name + " ```css block #" + String(idx + 1),
           property: o.property,
           line: o.line,
         });
@@ -117,41 +118,50 @@ export function validateInputs(inputs: BuildInputs): CssBlockError[] {
 export function buildDesignSystemCss(inputs: BuildInputs): string {
   const sections: string[] = [];
 
-  sections.push('/* ════ Tokens ════ */');
+  sections.push("/* ════ Tokens ════ */");
   sections.push(inputs.tokensCss.trim());
 
-  sections.push('');
-  sections.push('/* ════ Globals ════ */');
+  sections.push("");
+  sections.push("/* ════ Globals ════ */");
   for (const block of extractCssBlocks(inputs.designMd)) {
     sections.push(block.trim());
   }
 
-  sections.push('');
-  sections.push('/* ════ Components ════ */');
+  sections.push("");
+  sections.push("/* ════ Components ════ */");
   for (const block of extractCssBlocks(inputs.componentsMd)) {
     sections.push(block.trim());
   }
 
-  sections.push('');
-  sections.push('/* ════ Widgets ════ */');
+  sections.push("");
+  sections.push("/* ════ Widgets ════ */");
   for (const block of extractCssBlocks(inputs.widgetsMd)) {
     sections.push(block.trim());
   }
 
-  return sections.join('\n\n') + '\n';
+  return sections.join("\n\n") + "\n";
 }
 
 function readSources(): BuildInputs {
   return {
-    tokensCss: fs.readFileSync(path.join(REFERENCES, 'design-tokens.css'), 'utf8'),
-    designMd: fs.readFileSync(path.join(REFERENCES, 'design.md'), 'utf8'),
-    componentsMd: fs.readFileSync(path.join(REFERENCES, 'design-components.md'), 'utf8'),
-    widgetsMd: fs.readFileSync(path.join(REFERENCES, 'design-widgets.md'), 'utf8'),
+    tokensCss: fs.readFileSync(
+      path.join(REFERENCES, "design-tokens.css"),
+      "utf8",
+    ),
+    designMd: fs.readFileSync(path.join(REFERENCES, "design.md"), "utf8"),
+    componentsMd: fs.readFileSync(
+      path.join(REFERENCES, "design-components.md"),
+      "utf8",
+    ),
+    widgetsMd: fs.readFileSync(
+      path.join(REFERENCES, "design-widgets.md"),
+      "utf8",
+    ),
   };
 }
 
 async function main() {
-  const checkMode = process.argv.includes('--check');
+  const checkMode = process.argv.includes("--check");
   const inputs = readSources();
 
   // Validate ```css blocks before building. Catches "documentation snippet"
@@ -161,13 +171,15 @@ async function main() {
   const inputErrors = validateInputs(inputs);
   if (inputErrors.length > 0) {
     console.error(
-      `design-system.css build aborted: ${inputErrors.length} orphan declaration(s) in .md \`\`\`css blocks:`
+      `design-system.css build aborted: ${inputErrors.length} orphan declaration(s) in .md \`\`\`css blocks:`,
     );
     for (const e of inputErrors) {
-      console.error(`  ${e.source} (L${e.line}): '${e.property}' is not inside any selector`);
+      console.error(
+        `  ${e.source} (L${e.line}): '${e.property}' is not inside any selector`,
+      );
     }
     console.error(
-      `Wrap each property declaration inside a selector block (e.g. \`body { ... }\`), or remove the block.`
+      `Wrap each property declaration inside a selector block (e.g. \`body { ... }\`), or remove the block.`,
     );
     process.exit(1);
   }
@@ -179,19 +191,19 @@ async function main() {
       console.error(`design-system.css drift: ${OUT_PATH} does not exist`);
       process.exit(1);
     }
-    const existing = fs.readFileSync(OUT_PATH, 'utf8');
+    const existing = fs.readFileSync(OUT_PATH, "utf8");
     if (existing !== css) {
       console.error(
-        `design-system.css drift: file does not match build output. Run 'pnpm build-design-system-css' and commit the result.`
+        `design-system.css drift: file does not match build output. Run 'pnpm build-design-system-css' and commit the result.`,
       );
       process.exit(1);
     }
-    console.log('design-system.css: in sync');
+    console.log("design-system.css: in sync");
     return;
   }
 
   fs.mkdirSync(path.dirname(OUT_PATH), { recursive: true });
-  fs.writeFileSync(OUT_PATH, css, 'utf8');
+  fs.writeFileSync(OUT_PATH, css, "utf8");
   console.log(`design-system.css: wrote ${css.length} bytes`);
 }
 
