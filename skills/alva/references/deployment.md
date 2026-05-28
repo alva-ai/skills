@@ -49,6 +49,7 @@ alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js
 | --name          | string | yes      | Job name (1–63 lowercase alphanumeric or hyphens, no leading/trailing hyphen) |
 | --args          | JSON   | no       | JSON passed to `require("env").args` on each execution |
 | --push-notify   | flag   | no       | Let this cronjob emit feed alert events after successful feed runs |
+| --max-heap-size-mb | int | no | Per-cronjob V8 heap cap in MB (1–2046). Unset uses the server default. |
 
 When `--push-notify` is set, every successful cronjob execution checks the
 feed's push sidecars. `signal/targets` and `notify/message` both dispatch the
@@ -74,6 +75,7 @@ the cronjob.
   "status": "active",
   "args": { "symbol": "BTC" },
   "push_notify": true,
+  "max_heap_size_mb": null,
   "created_at": "2026-03-04T12:00:00Z",
   "updated_at": "2026-03-04T12:00:00Z"
 }
@@ -104,7 +106,7 @@ Partial update -- only include flags you want to change.
 alva deploy update --id 42 --cron "0 */2 * * *" --args '{"symbol":"ETH"}'
 ```
 
-Updatable fields: `--name`, `--cron`, `--args`, `--push-notify` / `--no-push-notify`.
+Updatable fields: `--name`, `--cron`, `--args`, `--push-notify` / `--no-push-notify`, `--max-heap-size-mb`.
 
 ### Delete Cronjob
 
