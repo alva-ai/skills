@@ -49,7 +49,7 @@ alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js
 | --name          | string | yes      | Job name (1–63 lowercase alphanumeric or hyphens, no leading/trailing hyphen) |
 | --args          | JSON   | no       | JSON passed to `require("env").args` on each execution |
 | --push-notify   | flag   | no       | Let this cronjob emit feed alert events after successful feed runs |
-| --max-heap-size-mb | int | no | Per-cronjob V8 heap cap in MB (1–2046). Unset uses the server default. |
+| --max-heap-size-mb | int | no | Runtime max heap size in MB (1–2046). Bump it when the script OOMs. |
 
 When `--push-notify` is set, every successful cronjob execution checks the
 feed's push sidecars. `signal/targets` and `notify/message` both dispatch the
