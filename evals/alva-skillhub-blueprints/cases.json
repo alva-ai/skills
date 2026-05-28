@@ -1,0 +1,1311 @@
+{
+  "schema_version": "2026-05-29",
+  "name": "alva-skillhub-prd-blueprint-baseline",
+  "description": "Baseline cases for every blueprint returned by the production Skillhub catalog. Each case exercises the Alva skill path from user prompt through Skillhub blueprint retrieval, data/runtime work, release verification, and evidence capture.",
+  "profile": "prd",
+  "catalog_command": "alva --profile prd skillhub list --json",
+  "catalog_captured_at": "2026-05-29",
+  "cli_version": "alva version 0.9.1",
+  "execution_notes": [
+    "Every prompt intentionally includes /use-skill:<id> so the Alva skill must run the mandatory Skillhub path before planning or build work.",
+    "Disabled catalog entries are still represented because the production list returns blueprints for them. They are explicit-directive regression cases and must not be suggested organically while disabled.",
+    "Score current numeric values for provenance and shape, not exact market values. Live financial data drifts by design."
+  ],
+  "required_chain": [
+    {
+      "id": "skill.preflight",
+      "description": "Run the Alva skill pre-flight: version check, alva --help, alva skillhub --help, auth/profile check, Arrays JWT check when data skills are needed."
+    },
+    {
+      "id": "skillhub.inspect",
+      "description": "Run alva --profile prd skillhub get <id> --json, record disabled state and file list, and select the actual blueprint file path from the listing."
+    },
+    {
+      "id": "skillhub.blueprint",
+      "description": "Run alva --profile prd skillhub file <id> <blueprint_path>, read the blueprint fresh, and treat it as authoritative for layout, field names, cadence, and guardrails."
+    },
+    {
+      "id": "planning.guided",
+      "description": "Produce one concise Guided Planning plan that names the chosen blueprint, any deliberate deviations, data sources to shape-check, build steps, and release evidence."
+    },
+    {
+      "id": "data.discovery",
+      "description": "Use alva data-skills list/summary/endpoint before coding data calls. Store endpoint docs or shape-check output as evidence."
+    },
+    {
+      "id": "runtime.build",
+      "description": "Build feeds/scripts in Alva runtime, run focused tests or shape checks, grant/release feed paths where needed, then deploy scheduled jobs."
+    },
+    {
+      "id": "playbook.release",
+      "description": "Build the playbook HTML, README, draft, screenshot/lint verify, and release or record the exact release blocker."
+    },
+    {
+      "id": "evidence.package",
+      "description": "Capture command transcripts, file paths, feed/job ids, release URL, screenshot path, README, and rubric self-assessment for later baseline comparison."
+    }
+  ],
+  "rubric": {
+    "total_points": 100,
+    "scoring": {
+      "full": "All observable checks for the criterion are satisfied with evidence.",
+      "partial": "The behavior is mostly present but has a missing artifact, weak explanation, or minor recoverable defect.",
+      "zero": "The behavior is absent, contradicted by evidence, or impossible to verify."
+    },
+    "shared_points": 70,
+    "case_specific_points": 30,
+    "shared_criteria": [
+      {
+        "id": "chain.preflight",
+        "points": 6,
+        "tags": ["chain", "preflight", "cli"],
+        "checks": [
+          "version_check.sh or equivalent update check was run for the Alva skill",
+          "alva --help and alva skillhub --help were read before first use",
+          "the selected profile and auth status are recorded"
+        ]
+      },
+      {
+        "id": "chain.skillhub-routing",
+        "points": 8,
+        "tags": ["chain", "skillhub", "routing"],
+        "checks": [
+          "the /use-skill directive is detected before any build work",
+          "the exact catalog id is used; no namespace or filename is guessed",
+          "disabled entries are not recommended organically, only honored when explicitly directed"
+        ]
+      },
+      {
+        "id": "chain.blueprint-freshness",
+        "points": 8,
+        "tags": ["chain", "skillhub", "blueprint", "freshness"],
+        "checks": [
+          "alva skillhub get output is captured",
+          "alva skillhub file output is captured from the current prd profile",
+          "the selected blueprint path matches the production file listing"
+        ]
+      },
+      {
+        "id": "chain.blueprint-authority",
+        "points": 8,
+        "tags": ["blueprint", "compliance"],
+        "checks": [
+          "layout, tab order, frozen field names, cadence, and template guardrails follow the fetched blueprint",
+          "any deviation is explicitly named in the plan and justified by the user request or live data gap",
+          "supporting files are fetched progressively only when needed"
+        ]
+      },
+      {
+        "id": "chain.data-shape",
+        "points": 10,
+        "tags": ["data", "arrays", "shape-check"],
+        "checks": [
+          "data-skills list/summary/endpoint discovery precedes data coding",
+          "at least one small alva run shape check proves endpoint params and response fields",
+          "coverage gaps from the blueprint are surfaced instead of filled with fabricated values"
+        ]
+      },
+      {
+        "id": "chain.runtime-release",
+        "points": 10,
+        "tags": ["runtime", "feed", "deploy", "release"],
+        "checks": [
+          "runtime scripts/feeds are executed on Alva Cloud, not simulated locally when the blueprint requires Alva runtime",
+          "feed outputs use the frozen partition names and record fields",
+          "jobs/releases are created or the exact platform blocker is recorded with command output"
+        ]
+      },
+      {
+        "id": "chain.playbook-verification",
+        "points": 10,
+        "tags": ["playbook", "html", "readme", "screenshot"],
+        "checks": [
+          "playbook HTML fetches live feed outputs instead of hardcoding final data",
+          "README includes overview, data freshness, blind spots, and template-specific caveats",
+          "draft/release is linted and screenshot-verified with evidence"
+        ]
+      },
+      {
+        "id": "evidence.provenance",
+        "points": 5,
+        "tags": ["evidence", "provenance", "baseline"],
+        "checks": [
+          "all material numbers in the final artifact map to fresh SDK/BYOD/search sources",
+          "command transcripts and produced artifact paths are attached to the baseline run package",
+          "release URL or blocker is captured"
+        ]
+      },
+      {
+        "id": "communication.user-facing",
+        "points": 5,
+        "tags": ["communication", "language", "ux"],
+        "checks": [
+          "user-facing updates lead with result and avoid internal paths or raw implementation detail",
+          "visible copy uses Alva product vocabulary and avoids unsupported investment advice",
+          "the final answer names the result, verification, and remaining risk without leaking scaffold tokens"
+        ]
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "baseline-alva-thesis",
+      "skill_id": "alva/thesis",
+      "catalog": {
+        "display_name": "Theme Tracker",
+        "disabled": false,
+        "updated_at": "2026-05-28T02:21:19.574077Z",
+        "blueprint_path": "skills/alva/templates/thesis/template.md",
+        "supporting_files": [
+          "skills/alva/templates/thesis/template-design-ui-view-source.html"
+        ],
+        "expected_blueprint_markers": [
+          "Thesis Tracking Template",
+          "Push Alignment Contract"
+        ],
+        "min_blueprint_bytes": 2000
+      },
+      "prompt": "/use-skill:alva/thesis Track AI power infrastructure demand across VST, CEG, ETR, PWR, and VRT. Build and release a live playbook with thesis, basket, catalysts, risks, and news/social monitoring.",
+      "execution_mode": "full_live_playbook",
+      "case_specific_rubric": [
+        {
+          "id": "thesis.template-clone",
+          "points": 5,
+          "tags": ["thesis", "template", "clone"],
+          "checks": [
+            "starts from the fetched reference layout instead of rebuilding the thesis tracker from scratch"
+          ]
+        },
+        {
+          "id": "thesis.tabs",
+          "points": 5,
+          "tags": ["thesis", "ui", "tabs"],
+          "checks": [
+            "preserves the blueprint tab set, including thesis, basket, catalyst/risk, and news/social surfaces"
+          ]
+        },
+        {
+          "id": "thesis.feed-contract",
+          "points": 5,
+          "tags": ["thesis", "feed", "schema"],
+          "checks": [
+            "uses the frozen thesis feed partitions and record shapes without renaming fields"
+          ]
+        },
+        {
+          "id": "thesis.basket-data",
+          "points": 5,
+          "tags": ["thesis", "data", "basket"],
+          "checks": [
+            "basket composition, prices, fundamentals, and alpha/relative performance come from Alva data sources"
+          ]
+        },
+        {
+          "id": "thesis.push-alignment",
+          "points": 5,
+          "tags": ["thesis", "push", "adk"],
+          "checks": [
+            "ADK narrative output mirrors push-worthy thesis deltas and passes an alignment check"
+          ]
+        },
+        {
+          "id": "thesis.methodology",
+          "points": 5,
+          "tags": ["thesis", "methodology", "readme"],
+          "checks": [
+            "methodology and blind spots explain what is measured, what is inferred, and what is not covered"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "baseline-alva-screener",
+      "skill_id": "alva/screener",
+      "catalog": {
+        "display_name": "Smart Screener",
+        "disabled": false,
+        "updated_at": "2026-05-28T02:24:10.521406Z",
+        "blueprint_path": "skills/alva/templates/screener/template.md",
+        "supporting_files": [
+          "skills/alva/templates/screener/template-design-ui-view-source.html"
+        ],
+        "expected_blueprint_markers": ["Screener Template", "Feed Contract"],
+        "min_blueprint_bytes": 2000
+      },
+      "prompt": "/use-skill:alva/screener Build a US large-cap quality-growth screener for profitable AI infrastructure stocks with positive free-cash-flow growth, expanding margins, and net cash or low leverage.",
+      "execution_mode": "full_live_playbook",
+      "case_specific_rubric": [
+        {
+          "id": "screener.universe",
+          "points": 5,
+          "tags": ["screener", "universe", "filters"],
+          "checks": [
+            "documents universe, inclusion filters, and any dropped criteria caused by data coverage gaps"
+          ]
+        },
+        {
+          "id": "screener.scoring",
+          "points": 5,
+          "tags": ["screener", "scoring", "methodology"],
+          "checks": [
+            "implements explicit factor weights or inclusion logic and renders the methodology"
+          ]
+        },
+        {
+          "id": "screener.feed-contract",
+          "points": 5,
+          "tags": ["screener", "feed", "schema"],
+          "checks": [
+            "writes rankings, summary, klines/movers, and flags using the blueprint feed contract"
+          ]
+        },
+        {
+          "id": "screener.tabs",
+          "points": 5,
+          "tags": ["screener", "ui", "tabs"],
+          "checks": [
+            "Overview, Movers & Trends, and Analysis tabs each have live, non-empty states or clear empty states"
+          ]
+        },
+        {
+          "id": "screener.flags",
+          "points": 5,
+          "tags": ["screener", "flags", "explainability"],
+          "checks": [
+            "each highlighted stock explains which factors/flags drove inclusion"
+          ]
+        },
+        {
+          "id": "screener.digest",
+          "points": 5,
+          "tags": ["screener", "push", "optional"],
+          "checks": [
+            "daily digest or push behavior is either implemented when useful or explicitly marked out of scope"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "baseline-alva-backtest",
+      "skill_id": "alva/backtest",
+      "catalog": {
+        "display_name": "Backtest",
+        "disabled": false,
+        "updated_at": "2026-05-28T02:26:55.720194Z",
+        "blueprint_path": "skills/alva/templates/backtest/template.md",
+        "supporting_files": [
+          "skills/alva/templates/backtest/template-design-ui-view-source"
+        ],
+        "expected_blueprint_markers": [
+          "Backtest Playbook Template",
+          "Alva's Altra"
+        ],
+        "min_blueprint_bytes": 2000
+      },
+      "prompt": "/use-skill:alva/backtest Backtest how SPY performed over the next 30 trading days after a 10% drawdown from a 52-week high since 2005. Build and release the visual playbook.",
+      "execution_mode": "full_live_playbook",
+      "case_specific_rubric": [
+        {
+          "id": "backtest.altra",
+          "points": 5,
+          "tags": ["backtest", "altra", "runtime"],
+          "checks": [
+            "uses Altra on Alva Cloud for backtest/event-study computation, not local loops"
+          ]
+        },
+        {
+          "id": "backtest.mode",
+          "points": 5,
+          "tags": ["backtest", "mode-selection"],
+          "checks": [
+            "selects event-study or strategy mode according to the blueprint and explains why"
+          ]
+        },
+        {
+          "id": "backtest.verdict-hero",
+          "points": 5,
+          "tags": ["backtest", "ui", "hero"],
+          "checks": [
+            "first fold starts with the required verdict hero and concise outcome metrics"
+          ]
+        },
+        {
+          "id": "backtest.no-noise-title",
+          "points": 5,
+          "tags": ["backtest", "copy", "naming"],
+          "checks": [
+            "does not repeat forbidden generic wording such as What-If in title, slug, or user-facing copy"
+          ]
+        },
+        {
+          "id": "backtest.runtime-fetch",
+          "points": 5,
+          "tags": ["backtest", "html", "data"],
+          "checks": [
+            "HTML reads computed Altra output from released feed/runtime paths instead of hardcoded data"
+          ]
+        },
+        {
+          "id": "backtest.methodology",
+          "points": 5,
+          "tags": ["backtest", "readme", "methodology"],
+          "checks": [
+            "README/methodology captures trigger definition, sample period, assumptions, and limitations"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "baseline-alva-ai-digest",
+      "skill_id": "alva/ai-digest",
+      "catalog": {
+        "display_name": "AI Digest",
+        "disabled": false,
+        "updated_at": "2026-05-28T02:27:13.063124Z",
+        "blueprint_path": "skills/alva/templates/ai-digest/template.md",
+        "supporting_files": [
+          "skills/alva/templates/ai-digest/template-design-ui-view-source"
+        ],
+        "expected_blueprint_markers": ["AI Digest Template", "Feed Contract"],
+        "min_blueprint_bytes": 2000
+      },
+      "prompt": "/use-skill:alva/ai-digest Create a weekday pre-open AI infrastructure digest tracking NVDA, AVGO, AMD, TSM, hyperscaler capex headlines, and key market moves. Include push-ready alerts.",
+      "execution_mode": "full_live_playbook",
+      "case_specific_rubric": [
+        {
+          "id": "ai-digest.cadence",
+          "points": 5,
+          "tags": ["ai-digest", "cadence"],
+          "checks": [
+            "infers or confirms a weekday pre-open cadence and records it in config, jobs, and README"
+          ]
+        },
+        {
+          "id": "ai-digest.config",
+          "points": 5,
+          "tags": ["ai-digest", "config"],
+          "checks": [
+            "CONFIG captures tracked entities, topics, materiality rules, sources, and delivery mode"
+          ]
+        },
+        {
+          "id": "ai-digest.sources",
+          "points": 5,
+          "tags": ["ai-digest", "search", "data"],
+          "checks": [
+            "uses the smallest useful mix of Alva search/feed/data inputs and records source coverage"
+          ]
+        },
+        {
+          "id": "ai-digest.feed-contract",
+          "points": 5,
+          "tags": ["ai-digest", "feed", "schema"],
+          "checks": [
+            "events, summaries, and notification sidecars follow the blueprint feed contract"
+          ]
+        },
+        {
+          "id": "ai-digest.push",
+          "points": 5,
+          "tags": ["ai-digest", "push", "delivery"],
+          "checks": [
+            "push messages are material, concise, scoped to subscribers, and not sent for routine noise"
+          ]
+        },
+        {
+          "id": "ai-digest.ui",
+          "points": 5,
+          "tags": ["ai-digest", "ui", "stream"],
+          "checks": [
+            "playbook renders a light feed-stream view with source links, timestamps, and empty states"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "baseline-alva-earnings",
+      "skill_id": "alva/earnings",
+      "catalog": {
+        "display_name": "Earnings",
+        "disabled": false,
+        "updated_at": "2026-05-28T02:30:54.13165Z",
+        "blueprint_path": "skills/alva/templates/earnings",
+        "supporting_files": [
+          "skills/alva/templates/earnings/template-design-ui-view-source.html"
+        ],
+        "expected_blueprint_markers": ["Earnings KOL Radar", "KOL sentiment"],
+        "min_blueprint_bytes": 2000
+      },
+      "prompt": "/use-skill:alva/earnings Build a post-earnings KOL radar for NVDA's latest reported quarter, including the day-of tape, since-print path, independent KOL sentiment, sell-side changes, and theme peer read-throughs.",
+      "execution_mode": "full_live_playbook",
+      "case_specific_rubric": [
+        {
+          "id": "earnings.event-scope",
+          "points": 5,
+          "tags": ["earnings", "event", "scope"],
+          "checks": [
+            "selects one ticker and one earnings event, with fiscal period and report date visible"
+          ]
+        },
+        {
+          "id": "earnings.hero",
+          "points": 5,
+          "tags": ["earnings", "ui", "hero"],
+          "checks": [
+            "hero contains regime banner, READ/NEXT block, four number tiles, and no duplicated tape metrics"
+          ]
+        },
+        {
+          "id": "earnings.tabs",
+          "points": 5,
+          "tags": ["earnings", "ui", "tabs"],
+          "checks": [
+            "Narrative is the default tab and all five blueprint tabs render live or clear empty states"
+          ]
+        },
+        {
+          "id": "earnings.kol-gate",
+          "points": 5,
+          "tags": ["earnings", "kol", "quality"],
+          "checks": [
+            "KOL cards pass opinion gate, author dedup, stance mix, angle limits, mark target, and URL injection"
+          ]
+        },
+        {
+          "id": "earnings.sellside-boundary",
+          "points": 5,
+          "tags": ["earnings", "sellside", "routing"],
+          "checks": [
+            "sell-side analyst moves are separated from independent social/KOL commentary"
+          ]
+        },
+        {
+          "id": "earnings.schema",
+          "points": 5,
+          "tags": ["earnings", "schema", "adk"],
+          "checks": [
+            "fixed enum and synthesis field names are preserved so the HTML does not silently blank"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "baseline-alva-asset-deepdive",
+      "skill_id": "alva/asset-deepdive",
+      "catalog": {
+        "display_name": "Asset Deepdive",
+        "disabled": false,
+        "updated_at": "2026-05-28T02:32:22.751876Z",
+        "blueprint_path": "skills/alva/templates/asset-deepdive",
+        "supporting_files": [
+          "skills/alva/templates/asset-deepdive/template-design-ui-view-source.html",
+          "skills/alva/templates/asset-deepdive/example/feeds/thesis-core.js",
+          "skills/alva/templates/asset-deepdive/example/feeds/voice.js",
+          "skills/alva/templates/asset-deepdive/example/README.md"
+        ],
+        "expected_blueprint_markers": ["asset-deepdive", "Company Inputs"],
+        "min_blueprint_bytes": 2000
+      },
+      "prompt": "/use-skill:alva/asset-deepdive Build a neutral long-term deep dive on Apple with segments, financials, peer comps, catalysts, risks, and news/social monitoring. Release the live playbook.",
+      "execution_mode": "full_live_playbook",
+      "case_specific_rubric": [
+        {
+          "id": "asset.no-scaffold-leak",
+          "points": 5,
+          "tags": ["asset-deepdive", "communication", "scaffold"],
+          "checks": [
+            "visible user output never mentions internal scaffold tokens, placeholder names, or template filenames"
+          ]
+        },
+        {
+          "id": "asset.inputs",
+          "points": 5,
+          "tags": ["asset-deepdive", "company-inputs"],
+          "checks": [
+            "company name, exchange, CIK, IR RSS, sector ETF, peers, and fiscal calendar are gathered and verified"
+          ]
+        },
+        {
+          "id": "asset.tabs",
+          "points": 5,
+          "tags": ["asset-deepdive", "ui", "tabs"],
+          "checks": [
+            "all seven blueprint tabs render: overview, thesis, financials, comps, catalysts, risks, news/social"
+          ]
+        },
+        {
+          "id": "asset.neutrality",
+          "points": 5,
+          "tags": ["asset-deepdive", "narrative", "neutrality"],
+          "checks": [
+            "bull and bear cases are balanced, data-grounded, and not promotional"
+          ]
+        },
+        {
+          "id": "asset.sec-audit",
+          "points": 5,
+          "tags": ["asset-deepdive", "sec", "financials"],
+          "checks": [
+            "SEC/EDGAR-backed financial and segment data is wired, with source dates and blind spots"
+          ]
+        },
+        {
+          "id": "asset.monitoring",
+          "points": 5,
+          "tags": ["asset-deepdive", "catalysts", "risks", "news"],
+          "checks": [
+            "catalyst, risk, and news/social pipelines refresh on the blueprint cadence and expose source links"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "baseline-anthropic-catalyst-weekly",
+      "skill_id": "anthropic/catalyst-weekly",
+      "catalog": {
+        "display_name": "Catalyst Calendar",
+        "disabled": false,
+        "updated_at": "2026-05-28T02:36:33.468978Z",
+        "blueprint_path": "skill.md",
+        "supporting_files": [
+          "skills/alva/templates/catalyst-weekly/template-design-ui-view-source.html"
+        ],
+        "expected_blueprint_markers": [
+          "Catalyst Weekly Preview Template",
+          "Data contract"
+        ],
+        "min_blueprint_bytes": 1500
+      },
+      "prompt": "/use-skill:anthropic/catalyst-weekly Build a two-week catalyst preview for US semis: NVDA, AMD, AVGO, MRVL, TSM, MU, plus relevant macro releases. Release the playbook.",
+      "execution_mode": "full_live_playbook",
+      "case_specific_rubric": [
+        {
+          "id": "catalyst.scope",
+          "points": 5,
+          "tags": ["catalyst", "coverage", "horizon"],
+          "checks": [
+            "coverage universe, horizon, and macro inclusion are explicit"
+          ]
+        },
+        {
+          "id": "catalyst.covered-types",
+          "points": 5,
+          "tags": ["catalyst", "data", "coverage-gaps"],
+          "checks": [
+            "only covered event types are claimed; missing investor days, FDA, conferences, and product launches are named as gaps unless BYOD is supplied"
+          ]
+        },
+        {
+          "id": "catalyst.feeds",
+          "points": 5,
+          "tags": ["catalyst", "feed", "sequence"],
+          "checks": [
+            "quant feed and narrative feed are both present, with narrative scheduled after quant"
+          ]
+        },
+        {
+          "id": "catalyst.contract",
+          "points": 5,
+          "tags": ["catalyst", "schema"],
+          "checks": [
+            "calendar/events, calendar/earnings, calendar/macro, and narrative/records match the frozen contract"
+          ]
+        },
+        {
+          "id": "catalyst.impact",
+          "points": 5,
+          "tags": ["catalyst", "adk", "impact"],
+          "checks": [
+            "impact ratings and position implications are labelled AI analysis, while dates and consensus values remain feed data"
+          ]
+        },
+        {
+          "id": "catalyst.ui",
+          "points": 5,
+          "tags": ["catalyst", "ui", "calendar"],
+          "checks": [
+            "playbook includes this-week hero, key events, calendar view, next-week preview, implications, and references"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "baseline-anthropic-competitive-analysis",
+      "skill_id": "anthropic/competitive-analysis",
+      "catalog": {
+        "display_name": "Competitive Landscape",
+        "disabled": false,
+        "updated_at": "2026-05-26T11:00:32.466643Z",
+        "blueprint_path": "skill.md",
+        "supporting_files": [
+          "skills/alva/templates/competitive-analysis/template-design-ui-view-source.html"
+        ],
+        "expected_blueprint_markers": [
+          "Competitive Analysis Template",
+          "Moat assessment"
+        ],
+        "min_blueprint_bytes": 1500
+      },
+      "prompt": "/use-skill:anthropic/competitive-analysis Map the cloud hyperscalers: AWS, Azure, Google Cloud, Oracle Cloud, and Alibaba Cloud. Compare scale, growth, margins, capex intensity, moats, and strategic positioning.",
+      "execution_mode": "full_live_playbook",
+      "case_specific_rubric": [
+        {
+          "id": "competitive.peer-set",
+          "points": 5,
+          "tags": ["competitive", "peer-set"],
+          "checks": [
+            "peer set and any target protagonist are confirmed and sector/profile checks are recorded"
+          ]
+        },
+        {
+          "id": "competitive.metrics",
+          "points": 5,
+          "tags": ["competitive", "metrics", "comparability"],
+          "checks": [
+            "3-5 industry-defining metrics are used consistently across all companies and periods"
+          ]
+        },
+        {
+          "id": "competitive.schema",
+          "points": 5,
+          "tags": ["competitive", "schema", "feed"],
+          "checks": [
+            "companies/metrics, comparison/dimensions, events/strategic, and narrative/records fields match the blueprint"
+          ]
+        },
+        {
+          "id": "competitive.adk-labeling",
+          "points": 5,
+          "tags": ["competitive", "adk", "labeling"],
+          "checks": [
+            "qualitative profiles, moats, synthesis, and bull/base/bear are labelled AI analysis"
+          ]
+        },
+        {
+          "id": "competitive.no-fabricated-tam",
+          "points": 5,
+          "tags": ["competitive", "coverage-gaps", "tam"],
+          "checks": [
+            "market-size/TAM and unavailable operating KPI gaps are not fabricated"
+          ]
+        },
+        {
+          "id": "competitive.ui",
+          "points": 5,
+          "tags": ["competitive", "ui", "moats"],
+          "checks": [
+            "playbook includes comparison table, positioning chart, competitor cards, ratings, moat assessment, strategic activity, and synthesis"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "baseline-anthropic-comps-analysis",
+      "skill_id": "anthropic/comps-analysis",
+      "catalog": {
+        "display_name": "Peer Comps",
+        "disabled": false,
+        "updated_at": "2026-05-28T02:37:56.487499Z",
+        "blueprint_path": "skill.md",
+        "supporting_files": [
+          "skills/alva/templates/comps-analysis/template-design-ui-view-source.html"
+        ],
+        "expected_blueprint_markers": [
+          "Comparable Company Analysis Template",
+          "comps/statistics"
+        ],
+        "min_blueprint_bytes": 1500
+      },
+      "prompt": "/use-skill:anthropic/comps-analysis Build a peer comp table for AI datacenter networking: ANET, AVGO, MRVL, CRDO, and CSCO. Include operating metrics, valuation multiples, quartile stats, and a valuation scatter.",
+      "execution_mode": "full_live_playbook",
+      "case_specific_rubric": [
+        {
+          "id": "comps.peer-quality",
+          "points": 5,
+          "tags": ["comps", "peer-set"],
+          "checks": [
+            "peer group is genuinely comparable; weak comps are excluded or flagged"
+          ]
+        },
+        {
+          "id": "comps.period",
+          "points": 5,
+          "tags": ["comps", "period", "comparability"],
+          "checks": [
+            "all operating and valuation metrics use a consistent LTM/current basis, with exceptions flagged"
+          ]
+        },
+        {
+          "id": "comps.schema",
+          "points": 5,
+          "tags": ["comps", "schema", "statistics"],
+          "checks": [
+            "comps/operating, comps/valuation, and comps/statistics match frozen fields"
+          ]
+        },
+        {
+          "id": "comps.statistics",
+          "points": 5,
+          "tags": ["comps", "quartiles", "math"],
+          "checks": [
+            "max, p75, median, p25, min are computed only on comparable metrics, never absolute revenue, market cap, or EV"
+          ]
+        },
+        {
+          "id": "comps.negative-ebitda",
+          "points": 5,
+          "tags": ["comps", "edge-case", "valuation"],
+          "checks": [
+            "negative-EBITDA names are handled on revenue multiples rather than invalid EV/EBITDA comparisons"
+          ]
+        },
+        {
+          "id": "comps.ui",
+          "points": 5,
+          "tags": ["comps", "ui", "scatter"],
+          "checks": [
+            "hero, metric cards, operating table, valuation table, and valuation scatter are present"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "baseline-anthropic-dcf-model",
+      "skill_id": "anthropic/dcf-model",
+      "catalog": {
+        "display_name": "DCF Valuation",
+        "disabled": false,
+        "updated_at": "2026-05-26T11:00:28.927858Z",
+        "blueprint_path": "skill.md",
+        "supporting_files": [],
+        "expected_blueprint_markers": [
+          "DCF Valuation Template",
+          "valuation/base"
+        ],
+        "min_blueprint_bytes": 1500
+      },
+      "prompt": "/use-skill:anthropic/dcf-model Build an interactive DCF what-if model for NVIDIA with bear, base, and bull cases, adjustable revenue growth, EBIT margin, WACC, terminal growth, and sensitivity tables.",
+      "execution_mode": "full_live_playbook",
+      "case_specific_rubric": [
+        {
+          "id": "dcf.fidelity-limit",
+          "points": 5,
+          "tags": ["dcf", "readme", "limitations"],
+          "checks": [
+            "README states the playbook is live/shareable but lower fidelity than a cell-auditable Excel model"
+          ]
+        },
+        {
+          "id": "dcf.data-inputs",
+          "points": 5,
+          "tags": ["dcf", "data", "inputs"],
+          "checks": [
+            "historicals, market inputs, diluted shares, net debt, beta, and risk-free rate are feed-sourced and shape-checked"
+          ]
+        },
+        {
+          "id": "dcf.schema",
+          "points": 5,
+          "tags": ["dcf", "schema", "feed"],
+          "checks": [
+            "history/drivers, inputs/market, and valuation/base match the frozen field names"
+          ]
+        },
+        {
+          "id": "dcf.client-math",
+          "points": 5,
+          "tags": ["dcf", "what-if", "client-side"],
+          "checks": [
+            "reader assumption controls recompute the DCF in-browser over feed data"
+          ]
+        },
+        {
+          "id": "dcf.base-anchor",
+          "points": 5,
+          "tags": ["dcf", "valuation", "anchor"],
+          "checks": [
+            "feed publishes the verified base case with EV, equity value, fair value per share, upside, WACC, terminal value, and TV share"
+          ]
+        },
+        {
+          "id": "dcf.ui",
+          "points": 5,
+          "tags": ["dcf", "ui", "sensitivity"],
+          "checks": [
+            "value hero, four cards, controls, FCF projection, equity bridge, and sensitivity grids are present"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "baseline-anthropic-idea-generation",
+      "skill_id": "anthropic/idea-generation",
+      "catalog": {
+        "display_name": "Idea Generation",
+        "disabled": false,
+        "updated_at": "2026-05-26T11:00:25.904019Z",
+        "blueprint_path": "skill.md",
+        "supporting_files": [],
+        "expected_blueprint_markers": [
+          "Idea Generation Template",
+          "screen/results"
+        ],
+        "min_blueprint_bytes": 1500
+      },
+      "prompt": "/use-skill:anthropic/idea-generation Find 12 undervalued chip names with AI memory or networking exposure, positive estimate revisions, improving margins, and manageable leverage. Build the ranked shortlist playbook.",
+      "execution_mode": "full_live_playbook",
+      "case_specific_rubric": [
+        {
+          "id": "idea.config",
+          "points": 5,
+          "tags": ["idea-generation", "screen", "config"],
+          "checks": [
+            "direction, style, universe, market cap, geography, and theme are captured as one screen configuration"
+          ]
+        },
+        {
+          "id": "idea.filters",
+          "points": 5,
+          "tags": ["idea-generation", "filters", "data"],
+          "checks": [
+            "plain-language criteria are translated into concrete screener metric filters with unavailable criteria noted"
+          ]
+        },
+        {
+          "id": "idea.schema",
+          "points": 5,
+          "tags": ["idea-generation", "schema"],
+          "checks": [
+            "screen/results, screen/criteria, enrich/crowding, and narrative/records follow the frozen contract"
+          ]
+        },
+        {
+          "id": "idea.candidates-not-conclusions",
+          "points": 5,
+          "tags": ["idea-generation", "advice", "framing"],
+          "checks": [
+            "shortlist is framed as candidates for research, not buy/sell recommendations"
+          ]
+        },
+        {
+          "id": "idea.crowding",
+          "points": 5,
+          "tags": ["idea-generation", "ownership", "crowding"],
+          "checks": [
+            "institutional/insider/crowding and analyst coverage are included where data is available"
+          ]
+        },
+        {
+          "id": "idea.ui",
+          "points": 5,
+          "tags": ["idea-generation", "ui", "shortlist"],
+          "checks": [
+            "hero, ranked shortlist, idea cards, criteria, references, source links, and cadence are present"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "baseline-anthropic-morning-note",
+      "skill_id": "anthropic/morning-note",
+      "catalog": {
+        "display_name": "Morning Note",
+        "disabled": false,
+        "updated_at": "2026-05-26T09:50:21.947139Z",
+        "blueprint_path": "skill.md",
+        "supporting_files": [],
+        "expected_blueprint_markers": ["Morning Note Template", "Top Call"],
+        "min_blueprint_bytes": 1500
+      },
+      "prompt": "/use-skill:anthropic/morning-note Build a daily pre-open morning note for US semis covering NVDA, AMD, AVGO, MRVL, TSM, and MU with overnight moves, earnings, ratings, macro context, and a top call.",
+      "execution_mode": "full_live_playbook",
+      "case_specific_rubric": [
+        {
+          "id": "morning.coverage",
+          "points": 5,
+          "tags": ["morning-note", "coverage"],
+          "checks": [
+            "fixed watchlist and market context instruments are recorded"
+          ]
+        },
+        {
+          "id": "morning.cadence",
+          "points": 5,
+          "tags": ["morning-note", "cadence", "deploy"],
+          "checks": [
+            "quant feed runs pre-open and narrative feed runs after quant; actual timezone/cadence is in README"
+          ]
+        },
+        {
+          "id": "morning.schema",
+          "points": 5,
+          "tags": ["morning-note", "schema"],
+          "checks": [
+            "coverage/movers, coverage/earnings, coverage/ratings, events/today, events/ma, market/context, and narrative/records are present"
+          ]
+        },
+        {
+          "id": "morning.top-call",
+          "points": 5,
+          "tags": ["morning-note", "adk", "top-call"],
+          "checks": [
+            "Top Call leads the playbook and is labelled AI-generated analysis"
+          ]
+        },
+        {
+          "id": "morning.data-vs-opinion",
+          "points": 5,
+          "tags": ["morning-note", "provenance", "labeling"],
+          "checks": [
+            "moves, beat/miss, ratings, and macro values are feed data; takes, actions, and trade ideas are labelled ADK"
+          ]
+        },
+        {
+          "id": "morning.readability",
+          "points": 5,
+          "tags": ["morning-note", "copy", "two-minute-read"],
+          "checks": [
+            "the note is tight enough for a two-minute pre-open read and does not bury the headline"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "baseline-anthropic-model-update",
+      "skill_id": "anthropic/model-update",
+      "catalog": {
+        "display_name": "Valuation Update",
+        "disabled": false,
+        "updated_at": "2026-05-26T11:00:23.471883Z",
+        "blueprint_path": "skill.md",
+        "supporting_files": [],
+        "expected_blueprint_markers": ["Model Update Template", "consensus"],
+        "min_blueprint_bytes": 1500
+      },
+      "prompt": "/use-skill:anthropic/model-update Update NVIDIA's consensus model after its latest earnings release and hyperscaler AI capex commentary. Compare actuals versus prior expectations, revisions, and valuation impact.",
+      "execution_mode": "full_live_playbook",
+      "case_specific_rubric": [
+        {
+          "id": "model.consensus-not-private",
+          "points": 5,
+          "tags": ["model-update", "readme", "scope"],
+          "checks": [
+            "README states that the tracked model is consensus, not the user's private Excel model"
+          ]
+        },
+        {
+          "id": "model.actuals",
+          "points": 5,
+          "tags": ["model-update", "earnings", "data"],
+          "checks": [
+            "reported actuals, guidance, estimate revisions, price/valuation, and target changes are shape-checked"
+          ]
+        },
+        {
+          "id": "model.schema",
+          "points": 5,
+          "tags": ["model-update", "schema"],
+          "checks": [
+            "quant and narrative output partitions use the frozen model-update contract from the blueprint"
+          ]
+        },
+        {
+          "id": "model.delta",
+          "points": 5,
+          "tags": ["model-update", "delta", "analysis"],
+          "checks": [
+            "focuses on what changed versus prior expectations rather than generic company background"
+          ]
+        },
+        {
+          "id": "model.dcf-leg",
+          "points": 5,
+          "tags": ["model-update", "dcf", "valuation"],
+          "checks": [
+            "DCF or implied valuation leg reuses the dcf-model default-assumption logic when included"
+          ]
+        },
+        {
+          "id": "model.labeling",
+          "points": 5,
+          "tags": ["model-update", "adk", "labeling"],
+          "checks": [
+            "estimate-change summary and rating/action interpretation are labelled AI analysis"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "baseline-anthropic-sector-overview",
+      "skill_id": "anthropic/sector-overview",
+      "catalog": {
+        "display_name": "Sector Overview",
+        "disabled": false,
+        "updated_at": "2026-05-26T11:03:14.007415Z",
+        "blueprint_path": "skill.md",
+        "supporting_files": [],
+        "expected_blueprint_markers": [
+          "Sector Overview Template",
+          "universe/members"
+        ],
+        "min_blueprint_bytes": 1500
+      },
+      "prompt": "/use-skill:anthropic/sector-overview Walk into US semiconductors: show the public-company universe, growth, margins, valuation, M&A, AI capex drivers, and investment implications.",
+      "execution_mode": "full_live_playbook",
+      "case_specific_rubric": [
+        {
+          "id": "sector.scope",
+          "points": 5,
+          "tags": ["sector", "scope", "universe"],
+          "checks": [
+            "sector/subsector scope and neutral versus thematic angle are explicit"
+          ]
+        },
+        {
+          "id": "sector.universe",
+          "points": 5,
+          "tags": ["sector", "screen", "company-detail"],
+          "checks": [
+            "universe is screened and each member's sector/industry is verified through company/detail"
+          ]
+        },
+        {
+          "id": "sector.schema",
+          "points": 5,
+          "tags": ["sector", "schema"],
+          "checks": [
+            "universe/members, metrics/companies, valuation/multiples, and narrative/records match the frozen contract"
+          ]
+        },
+        {
+          "id": "sector.market-share-proxy",
+          "points": 5,
+          "tags": ["sector", "market-share", "coverage-gaps"],
+          "checks": [
+            "revenue share is labelled as universe-relative proxy and never as true market share"
+          ]
+        },
+        {
+          "id": "sector.no-tam-fabrication",
+          "points": 5,
+          "tags": ["sector", "tam", "coverage-gaps"],
+          "checks": [
+            "TAM/market-size gaps are omitted or source-cited, not invented"
+          ]
+        },
+        {
+          "id": "sector.ui",
+          "points": 5,
+          "tags": ["sector", "ui", "landscape"],
+          "checks": [
+            "hero, metric cards, company comparison, valuation scatter, multiple history, M&A, and structure/trends/implications are present"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "baseline-anthropic-thesis-tracker",
+      "skill_id": "anthropic/thesis-tracker",
+      "catalog": {
+        "display_name": "Thesis Tracker",
+        "disabled": true,
+        "updated_at": "2026-05-22T09:34:02.388947Z",
+        "blueprint_path": "skill.md",
+        "supporting_files": [],
+        "expected_blueprint_markers": [
+          "Thesis Tracker Template",
+          "pillars/metrics"
+        ],
+        "min_blueprint_bytes": 1500
+      },
+      "prompt": "/use-skill:anthropic/thesis-tracker Maintain a thesis tracker for Microsoft: AI infrastructure spend should translate into Azure growth and operating leverage over the next four quarters. Bind 4 measurable pillars, risks, catalysts, and a valuation target.",
+      "execution_mode": "explicit_directive_full_chain_while_disabled",
+      "case_specific_rubric": [
+        {
+          "id": "thesis-tracker.disabled-guard",
+          "points": 5,
+          "tags": ["thesis-tracker", "disabled", "routing"],
+          "checks": [
+            "notes that the catalog entry is disabled and proceeds only because the user supplied an explicit /use-skill directive"
+          ]
+        },
+        {
+          "id": "thesis-tracker.falsifiable-pillars",
+          "points": 5,
+          "tags": ["thesis-tracker", "pillars", "metrics"],
+          "checks": [
+            "3-5 thesis pillars are measurable and bound to concrete Alva metrics before build proceeds"
+          ]
+        },
+        {
+          "id": "thesis-tracker.schema",
+          "points": 5,
+          "tags": ["thesis-tracker", "schema"],
+          "checks": [
+            "pillars/metrics, updates/log, catalysts/upcoming, valuation/snapshot, and narrative/records match the frozen contract"
+          ]
+        },
+        {
+          "id": "thesis-tracker.static-vs-feed",
+          "points": 5,
+          "tags": ["thesis-tracker", "config", "data-boundary"],
+          "checks": [
+            "thesis statement, risks, and target are static build-time config; tracked metrics come from feeds"
+          ]
+        },
+        {
+          "id": "thesis-tracker.labeling",
+          "points": 5,
+          "tags": ["thesis-tracker", "adk", "labeling"],
+          "checks": [
+            "conviction, scorecard status/trend, updates, and risk reads are labelled AI analysis"
+          ]
+        },
+        {
+          "id": "thesis-tracker.review-cadence",
+          "points": 5,
+          "tags": ["thesis-tracker", "cadence", "review"],
+          "checks": [
+            "feed cadence matches metric update frequency and README flags at least quarterly full review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "baseline-anthropic-earnings-preview",
+      "skill_id": "anthropic/earnings-preview",
+      "catalog": {
+        "display_name": "Pre-Earnings Brief",
+        "disabled": true,
+        "updated_at": "2026-05-22T09:34:25.92645Z",
+        "blueprint_path": "skill.md",
+        "supporting_files": [],
+        "expected_blueprint_markers": [
+          "Earnings Preview Template",
+          "schedule/next"
+        ],
+        "min_blueprint_bytes": 1500
+      },
+      "prompt": "/use-skill:anthropic/earnings-preview Build a pre-earnings preview for the next confirmed reporting company in this coverage list, preferring NVDA then AMD then AVGO then MU. Include consensus, revision trend, beat/miss history, guidance, and what to watch.",
+      "execution_mode": "explicit_directive_full_chain_while_disabled",
+      "case_specific_rubric": [
+        {
+          "id": "earnings-preview.disabled-guard",
+          "points": 5,
+          "tags": ["earnings-preview", "disabled", "routing"],
+          "checks": [
+            "notes disabled catalog status and proceeds only because the directive is explicit"
+          ]
+        },
+        {
+          "id": "earnings-preview.event-selection",
+          "points": 5,
+          "tags": ["earnings-preview", "calendar", "selection"],
+          "checks": [
+            "verifies an upcoming earnings date, records confirmed versus estimated status, and handles thin/no-event cases"
+          ]
+        },
+        {
+          "id": "earnings-preview.consensus",
+          "points": 5,
+          "tags": ["earnings-preview", "consensus", "methodology"],
+          "checks": [
+            "selects consensus by highest estimate_count for the upcoming fiscal period, not the newest stale row"
+          ]
+        },
+        {
+          "id": "earnings-preview.schema",
+          "points": 5,
+          "tags": ["earnings-preview", "schema"],
+          "checks": [
+            "schedule/next, consensus/upcoming, guidance/latest, history/beats, revisions/eps, target/consensus, and narrative/records match the contract"
+          ]
+        },
+        {
+          "id": "earnings-preview.beat-history",
+          "points": 5,
+          "tags": ["earnings-preview", "beat-miss", "math"],
+          "checks": [
+            "beat/miss surprise math uses pre-report consensus and last-eight-quarter context"
+          ]
+        },
+        {
+          "id": "earnings-preview.ui",
+          "points": 5,
+          "tags": ["earnings-preview", "ui", "first-fold"],
+          "checks": [
+            "first fold includes verdict hero plus four cards, followed by history, revisions, guidance, watch items, and references"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "baseline-anthropic-earnings-analysis",
+      "skill_id": "anthropic/earnings-analysis",
+      "catalog": {
+        "display_name": "Post-Earnings Review",
+        "disabled": true,
+        "updated_at": "2026-05-22T09:34:42.65811Z",
+        "blueprint_path": "skill.md",
+        "supporting_files": [],
+        "expected_blueprint_markers": [
+          "Earnings Analysis Template",
+          "results/reported"
+        ],
+        "min_blueprint_bytes": 1500
+      },
+      "prompt": "/use-skill:anthropic/earnings-analysis Debrief Apple's most recent reported quarter. Quantify beat or miss versus pre-print consensus, margin and guidance changes, estimate revisions, and thesis impact.",
+      "execution_mode": "explicit_directive_full_chain_while_disabled",
+      "case_specific_rubric": [
+        {
+          "id": "earnings-analysis.disabled-guard",
+          "points": 5,
+          "tags": ["earnings-analysis", "disabled", "routing"],
+          "checks": [
+            "notes disabled catalog status and proceeds only because the directive is explicit"
+          ]
+        },
+        {
+          "id": "earnings-analysis.latest-quarter",
+          "points": 5,
+          "tags": ["earnings-analysis", "quarter", "selection"],
+          "checks": [
+            "confirms the most recent reported quarter and does not analyze a stale or future period"
+          ]
+        },
+        {
+          "id": "earnings-analysis.preprint-consensus",
+          "points": 5,
+          "tags": ["earnings-analysis", "consensus", "methodology"],
+          "checks": [
+            "beat/miss bars use pre-print consensus, not post-print revised estimates"
+          ]
+        },
+        {
+          "id": "earnings-analysis.schema",
+          "points": 5,
+          "tags": ["earnings-analysis", "schema"],
+          "checks": [
+            "results/reported, trends/quarterly, revisions/consensus, valuation/snapshot, and narrative/records match the contract"
+          ]
+        },
+        {
+          "id": "earnings-analysis.delta-focus",
+          "points": 5,
+          "tags": ["earnings-analysis", "delta", "narrative"],
+          "checks": [
+            "analysis focuses on what changed this quarter rather than rehashing background"
+          ]
+        },
+        {
+          "id": "earnings-analysis.ui",
+          "points": 5,
+          "tags": ["earnings-analysis", "ui", "first-fold"],
+          "checks": [
+            "verdict hero, four metric cards, beat/miss bars, quarterly trend, estimate revisions, and labelled thesis impact are present"
+          ]
+        }
+      ]
+    }
+  ]
+}
