@@ -514,9 +514,10 @@ If a run is killed with an out-of-memory error, retry with a larger
 Structured data endpoints served by the Arrays backend
 (`$ARRAYS_ENDPOINT`, defaults to `https://data-tools.prd.space.id`),
 covering financial markets, on-chain analytics, macro indicators, news, and
-per-handle Twitter/X feeds (history and rolling updates). To find the right
-API for a task, use the `alva data-skills` CLI (public, no auth). Follow
-the pipeline in order; do not skip steps and do not guess inputs.
+Twitter/X feeds (per-handle history and rolling updates, post lookup by
+URL, and full-text search over the X accounts Arrays tracks). To find
+the right API for a task, use the `alva data-skills` CLI (public, no auth).
+Follow the pipeline in order; do not skip steps and do not guess inputs.
 
 1. **`alva data-skills list`** — every skill id is namespaced `arrays-data-api-*`
    and is not predictable from concept words, so always start here. Pipe
@@ -535,17 +536,29 @@ the pipeline in order; do not skip steps and do not guess inputs.
 Data skills span spot and derivatives markets across stocks, ETFs, options,
 and crypto; equity fundamentals, estimates, events, and ownership flows;
 on-chain metrics and exchange flows; macro and economic indicators; news;
-prediction markets; and per-handle Twitter/X feeds (history and rolling
-updates). Run `alva data-skills list` for the live catalog.
+prediction markets; and Twitter/X feeds (per-handle history and rolling
+updates, post lookup by URL, and full-text search over the X accounts
+Arrays tracks). Run `alva data-skills list` for the live catalog.
 
 **Source routing**
 
 | Need                                                                              | Surface                                                  |
 | --------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| Financial data (markets, fundamentals, on-chain, macro, news, prediction markets) | [`alva data-skills` CLI](#3-data-skills)                 |
-| Twitter/X by handle (history + rolling)                                           | [`alva data-skills` CLI](#3-data-skills)                 |
-| Handle subscriptions for news, YouTube, Reddit, podcasts                          | [`feed_widgets`](#runtime-libraries)                     |
-| Topic/keyword search (Twitter, news, web, etc.)                                   | [`unified_search`](#content-search)                      |
+| Structured financial data: markets, fundamentals, on-chain, macro, news, prediction markets | [`alva data-skills` CLI](#3-data-skills)       |
+| Twitter/X: per-handle history, URL lookup, full-text search over the X accounts Arrays tracks | [`alva data-skills` CLI](#3-data-skills)     |
+| Twitter/X: search across all of X (when the relevant author isn't in Arrays' index) | [`unified_search`](#content-search) (Grok)           |
+| News, YouTube, Reddit, podcasts: rolling per-publisher feeds                      | [`feed_widgets`](#runtime-libraries)                     |
+| News, web, YouTube, Reddit, podcasts: topic/keyword search                        | [`unified_search`](#content-search)                      |
+
+**Arrays' Twitter/X index**: 70k+ accounts and growing — investing-related or
+commonly followed by investing-related accounts. New accounts are also
+auto-indexed when users search for them. Each indexed account has up to ~3200
+historical posts stored, plus any posts referenced by other indexed accounts.
+New posts from indexed accounts are picked up on a rolling refresh.
+
+**Twitter/X routing**: default to `alva data-skills` for investing-relevant or
+KOL-focused queries. Reach for `unified_search` (Grok) when you need global X
+search beyond Arrays' tracked accounts.
 
 **Direct latest-price queries**: use structured intraday kline data for covered
 US equities and crypto; use `searchPerplexityFinance` first for non-US equities
@@ -579,7 +592,7 @@ available in every script execution.
 
 | Module group                              | Description                                                               |
 | ----------------------------------------- | ------------------------------------------------------------------------- |
-| `feed_widgets`                            | Per-handle/channel rolling subscriptions for news, YouTube, Reddit, and podcasts. For Twitter/X handle feeds, use [Data Skills](#3-data-skills). For topic/keyword search, use [Content Search](#content-search). |
+| `feed_widgets`                            | Per-handle/channel rolling subscriptions for news, YouTube, Reddit, and podcasts. For Twitter/X (by handle, by URL, or full-text search over the X accounts Arrays tracks), use [Data Skills](#3-data-skills). For Twitter/X search across all of X (when the author isn't in Arrays' index), or for news/web topic search, use [Content Search](#content-search). |
 | `unified_search`                          | Web, social, non-US finance search, and URL scraping tools (X/Grok, Perplexity Finance, Google, Brave, serper, decodo) |
 | `technical_indicator_calculation_helpers` | 50+ pure calculation helpers (RSI, MACD, Bollinger, etc.)                 |
 
