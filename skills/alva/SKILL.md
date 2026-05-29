@@ -201,6 +201,7 @@ that the user should verify with current sources.
 | **Backtest / Strategy** | Use Altra, run the backtest correctly, and always produce a visual playbook (equity curve, trade log, metrics) alongside the text summary. Optionally deploy as live paper trading. |
 | **Data Query** | Fetch the requested data accurately and return it directly unless the user asks for a richer artifact |
 | **Remix** | Reuse the source artifact, apply the requested changes, and return an updated result that matches the requested customization |
+| **Platform Feedback** | Help the user report Alva bugs, product gaps, or suggestions to the Alva team. Read [agent-feedback.md](references/agent-feedback.md); if no dedicated team-feedback CLI/API is available, prepare a feedback packet and say the send path is not available. |
 
 ### Choose Skill (mandatory when `/use-skill:<username>/<name>` is present)
 
@@ -220,6 +221,14 @@ The directive gives the full catalog id (`<username>/<name>`). Skills are curate
 **Push-driven requests** — if the user's primary outcome is a recurring push (digest, threshold tracker, stream watch, periodic alert), the `alva/ai-digest` skill is purpose-built for that shape and worth offering during Guided Planning. Push can also be added to any other playbook via Step 9 — the skill is one good option, not a requirement.
 
 No `/use-skill:` directive → skip this step and proceed to Guided Planning normally.
+
+### Platform Feedback
+
+When the user asks the Agent to send feedback, bugs, product gaps, or
+suggestions to the Alva team, read [agent-feedback.md](references/agent-feedback.md).
+First verify that a dedicated team-feedback CLI/API exists in `alva --help`.
+If none exists, do not use playbook comments, `notify/message`, notification
+history/preferences, or channel subscriptions as a substitute.
 
 ### Guided Planning
 
@@ -1089,6 +1098,7 @@ the full locate-and-edit procedure.
 | [search.md](references/search.md) | Content search SDKs: per-source usage, enrichment patterns, and gotchas for Twitter/X, news, Reddit, YouTube, podcasts, and web |
 | [secret-manager.md](references/secret-manager.md) | Secret upload, CRUD API, and runtime usage via `require("secret-manager")` |
 | [memory.md](references/memory.md) | Per-user memory: storage layout, `user.md` template, what to save, read/write rules |
+| [agent-feedback.md](references/agent-feedback.md) | Agent-to-Alva-team feedback: current send-surface check, safe packet shape, and fallback behavior |
 | [narrative-voice.md](references/narrative-voice.md) | Voice rules for user-facing prose: banned tokens/shapes, copy-paste ADK system-prompt block with few-shots |
 | [language.md](references/language.md) | Canonical product vocabulary: automation, playbook, alert, Agent, and when feed must stay internal |
 | [udf-runtime.md](references/api/udf-runtime.md) | User-defined functions for playbooks: strict trigger rule, creator registration, browser invocation, PBSV, allowance consent, and `UdfButton` |
