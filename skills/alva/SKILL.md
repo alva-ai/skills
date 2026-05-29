@@ -546,15 +546,19 @@ Arrays tracks). Run `alva data-skills list` for the live catalog.
 | --------------------------------------------------------------------------------- | -------------------------------------------------------- |
 | Structured financial data: markets, fundamentals, on-chain, macro, news, prediction markets | [`alva data-skills` CLI](#3-data-skills)       |
 | Twitter/X: per-handle history, URL lookup, full-text search over the X accounts Arrays tracks | [`alva data-skills` CLI](#3-data-skills)     |
-| Twitter/X: live search across all of X (when Arrays' tracked coverage isn't enough) | [`unified_search`](#content-search) (Grok)             |
+| Twitter/X: search across all of X (when the relevant author isn't in Arrays' index) | [`unified_search`](#content-search) (Grok)           |
 | News, YouTube, Reddit, podcasts: rolling per-publisher feeds                      | [`feed_widgets`](#runtime-libraries)                     |
 | News, web, YouTube, Reddit, podcasts: topic/keyword search                        | [`unified_search`](#content-search)                      |
 
-**Twitter/X queries**: default to `alva data-skills` for investing-relevant
-or KOL-focused queries — Arrays' index is curated to finance-relevant
-accounts and BM25-ranked. Reach for `unified_search` (Grok) when you need
-live X coverage beyond Arrays' tracked accounts: breaking news, viral
-threads, or posts from untracked accounts.
+**Arrays' Twitter/X index**: 70k+ accounts and growing — investing-related or
+commonly followed by investing-related accounts. New accounts are also
+auto-indexed when users search for them. Each indexed account has up to ~3200
+historical posts stored, plus any posts referenced by other indexed accounts.
+New posts from indexed accounts are picked up on a rolling refresh.
+
+**Twitter/X routing**: default to `alva data-skills` for investing-relevant or
+KOL-focused queries. Reach for `unified_search` (Grok) when you need global X
+search beyond Arrays' tracked accounts.
 
 **Direct latest-price queries**: use structured intraday kline data for covered
 US equities and crypto; use `searchPerplexityFinance` first for non-US equities
@@ -588,7 +592,7 @@ available in every script execution.
 
 | Module group                              | Description                                                               |
 | ----------------------------------------- | ------------------------------------------------------------------------- |
-| `feed_widgets`                            | Per-handle/channel rolling subscriptions for news, YouTube, Reddit, and podcasts. For Twitter/X (by handle, by URL, or full-text search over the X accounts Arrays tracks), use [Data Skills](#3-data-skills). For live Twitter/X search across all of X, or for news/web topic search, use [Content Search](#content-search). |
+| `feed_widgets`                            | Per-handle/channel rolling subscriptions for news, YouTube, Reddit, and podcasts. For Twitter/X (by handle, by URL, or full-text search over the X accounts Arrays tracks), use [Data Skills](#3-data-skills). For Twitter/X search across all of X (when the author isn't in Arrays' index), or for news/web topic search, use [Content Search](#content-search). |
 | `unified_search`                          | Web, social, non-US finance search, and URL scraping tools (X/Grok, Perplexity Finance, Google, Brave, serper, decodo) |
 | `technical_indicator_calculation_helpers` | 50+ pure calculation helpers (RSI, MACD, Bollinger, etc.)                 |
 
