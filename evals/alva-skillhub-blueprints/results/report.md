@@ -16,6 +16,10 @@ This run executed the evidence-gathering slice for every case. It did not
 deploy/release 17 playbooks, so runtime/release/UI rubric points are awarded
 only where direct evidence exists and otherwise remain unearned.
 
+See `scoring-issue-report.md` for the full interpretation: this score measures
+evidence-slice execution coverage for the Alva skill plus each blueprint, not
+standalone blueprint quality or full production playbook success.
+
 ## Scores
 
 | Case                                    | Skill                          | Disabled | Total | Shared | Case-specific |

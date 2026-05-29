@@ -19,6 +19,8 @@ runtime work, playbook release verification, and evidence packaging.
 - `results/run-summary.json` - latest committed run summary.
 - `results/scorecards.json` - latest committed per-case rubric scorecards.
 - `results/report.md` - latest committed human-readable score report.
+- `results/scoring-issue-report.md` - explanation of what the score measures,
+  where points were lost, and why it is not a blueprint-quality score.
 
 ## Verify The Baseline
 
@@ -74,6 +76,10 @@ trace contains direct evidence; otherwise those checks remain unearned. Each
 criterion in `results/scorecards.json` includes a `status` label (`full`,
 `partial`, or `zero`) plus `passed_checks`, `failed_checks`, and evidence
 snippets for later re-grading.
+
+Read `results/scoring-issue-report.md` before interpreting the number as a
+quality score. The committed score is an evidence-slice execution score for the
+Alva skill plus each blueprint, not a standalone blueprint-quality benchmark.
 
 Use the rubric tags as labels in whatever evaluation store consumes the run
 result. The intended tags are small and stable: `skillhub`, `blueprint`, `data`,
