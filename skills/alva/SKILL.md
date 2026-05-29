@@ -11,7 +11,7 @@ description: >-
   Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v1.10.0
+  version: v1.10.1
 ---
 
 # Alva
@@ -709,6 +709,7 @@ Before writing or rewriting playbook HTML, read the applicable design guidance
 for this session.
 
 Required evidence:
+
 - [design.md](references/design.md) has been read first.
 - The relevant companion reference has been read when applicable:
   [design-widgets.md](references/design-widgets.md) for widget layouts,
