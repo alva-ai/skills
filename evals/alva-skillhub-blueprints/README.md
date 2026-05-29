@@ -16,11 +16,13 @@ runtime work, playbook release verification, and evidence packaging.
 - `cases.json` - machine-readable baseline cases and rubrics.
 - `scripts/verify.mjs` - manifest/catalog verifier.
 - `scripts/run-and-score.mjs` - evidence runner and deterministic scorer.
+- `scripts/render-dashboard.mjs` - static dashboard renderer for local review.
 - `results/run-summary.json` - latest committed run summary.
 - `results/scorecards.json` - latest committed per-case rubric scorecards.
 - `results/report.md` - latest committed human-readable score report.
 - `results/scoring-issue-report.md` - explanation of what the score measures,
   where points were lost, and why it is not a blueprint-quality score.
+- `results/dashboard.html` - self-contained local scoring dashboard.
 
 ## Verify The Baseline
 
@@ -80,6 +82,8 @@ snippets for later re-grading.
 Read `results/scoring-issue-report.md` before interpreting the number as a
 quality score. The committed score is an evidence-slice execution score for the
 Alva skill plus each blueprint, not a standalone blueprint-quality benchmark.
+Open `results/dashboard.html` in a browser for a local filterable view of the
+score distribution, lost points, and per-case failed checks.
 
 Use the rubric tags as labels in whatever evaluation store consumes the run
 result. The intended tags are small and stable: `skillhub`, `blueprint`, `data`,

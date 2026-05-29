@@ -1,0 +1,3359 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Skillhub Baseline Scoring Dashboard</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f7f8f3;
+        --surface: #ffffff;
+        --surface-2: #eef4f1;
+        --ink: #1f2a2e;
+        --muted: #617079;
+        --line: #d6ddd8;
+        --teal: #13746c;
+        --blue: #2f5f9f;
+        --amber: #b7791f;
+        --red: #ba3f34;
+        --green: #2f7d51;
+        --shadow: 0 1px 2px rgb(22 34 38 / 10%);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          14px/1.45 Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+
+      a {
+        color: var(--blue);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .page {
+        width: min(1440px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 28px 0 48px;
+      }
+
+      header {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 24px;
+        align-items: end;
+        padding: 0 0 18px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 28px;
+        line-height: 1.12;
+        font-weight: 760;
+        letter-spacing: 0;
+      }
+
+      .subtitle {
+        margin: 8px 0 0;
+        max-width: 860px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+
+      .link-button,
+      button {
+        min-height: 34px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        color: var(--ink);
+        padding: 7px 11px;
+        font: inherit;
+        box-shadow: var(--shadow);
+        cursor: pointer;
+      }
+
+      .link-button {
+        display: inline-flex;
+        align-items: center;
+      }
+
+      button[aria-pressed="true"] {
+        border-color: var(--teal);
+        background: #e5f2ef;
+        color: #0d5852;
+      }
+
+      .band {
+        margin-top: 18px;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface-2);
+      }
+
+      .band strong {
+        color: #123c3a;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(150px, 1fr));
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .metric {
+        min-height: 102px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        box-shadow: var(--shadow);
+      }
+
+      .metric .label {
+        color: var(--muted);
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+
+      .metric .value {
+        margin-top: 8px;
+        font-size: 25px;
+        line-height: 1;
+        font-weight: 780;
+      }
+
+      .metric .note {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: minmax(340px, 0.95fr) minmax(520px, 1.55fr);
+        gap: 16px;
+        margin-top: 18px;
+      }
+
+      section {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        box-shadow: var(--shadow);
+      }
+
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 16px;
+        letter-spacing: 0;
+      }
+
+      .section-body {
+        padding: 16px;
+      }
+
+      .loss-row {
+        margin-bottom: 14px;
+      }
+
+      .loss-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .bar {
+        position: relative;
+        height: 10px;
+        margin-top: 6px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #e8ece7;
+      }
+
+      .bar > span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+      }
+
+      .bar .shared {
+        background: var(--amber);
+      }
+
+      .bar .specific {
+        background: var(--red);
+      }
+
+      .bar .score {
+        background: var(--teal);
+      }
+
+      .bar .full {
+        background: var(--green);
+      }
+
+      .bar .partial {
+        background: var(--amber);
+      }
+
+      .bar .zero {
+        background: var(--red);
+      }
+
+      .stack {
+        display: flex;
+      }
+
+      .stack span {
+        border-radius: 0;
+      }
+
+      .stack span:first-child {
+        border-top-left-radius: 999px;
+        border-bottom-left-radius: 999px;
+      }
+
+      .stack span:last-child {
+        border-top-right-radius: 999px;
+        border-bottom-right-radius: 999px;
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: minmax(220px, 1fr) auto;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      input[type="search"] {
+        width: 100%;
+        min-height: 36px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 8px 10px;
+        background: var(--surface);
+        color: var(--ink);
+        font: inherit;
+      }
+
+      .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 10px 8px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 650;
+        text-transform: uppercase;
+      }
+
+      td.num,
+      th.num {
+        text-align: right;
+      }
+
+      tbody tr:hover {
+        background: #f7faf8;
+      }
+
+      .skill {
+        font-weight: 700;
+      }
+
+      .case-id {
+        margin-top: 3px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 22px;
+        padding: 2px 7px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        color: var(--muted);
+        background: #fafbf8;
+        font-size: 12px;
+      }
+
+      .pill.red {
+        border-color: #e5b5b0;
+        color: #8f2e27;
+        background: #fff1ef;
+      }
+
+      .pill.amber {
+        border-color: #e9c98f;
+        color: #84530d;
+        background: #fff8e8;
+      }
+
+      details {
+        max-width: 620px;
+      }
+
+      summary {
+        cursor: pointer;
+        color: var(--blue);
+      }
+
+      .failure {
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfcf9;
+      }
+
+      .failure-title {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        font-weight: 700;
+      }
+
+      .failure ul {
+        margin: 8px 0 0 18px;
+        padding: 0;
+      }
+
+      .failure li {
+        margin: 4px 0;
+      }
+
+      .empty {
+        color: var(--muted);
+      }
+
+      @media (max-width: 1100px) {
+        .metrics {
+          grid-template-columns: repeat(3, minmax(150px, 1fr));
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .page {
+          width: min(100vw - 18px, 720px);
+          padding-top: 18px;
+        }
+
+        header,
+        .controls {
+          grid-template-columns: 1fr;
+        }
+
+        .links,
+        .filters {
+          justify-content: flex-start;
+        }
+
+        .metrics {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        table,
+        thead,
+        tbody,
+        tr,
+        th,
+        td {
+          display: block;
+        }
+
+        thead {
+          display: none;
+        }
+
+        tr {
+          padding: 12px 0;
+          border-bottom: 1px solid var(--line);
+        }
+
+        td {
+          border: 0;
+          padding: 5px 8px;
+        }
+
+        td.num {
+          text-align: left;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <div>
+          <h1>Skillhub Baseline Scoring Dashboard</h1>
+          <p class="subtitle" id="subtitle"></p>
+        </div>
+        <nav class="links" aria-label="Local artifacts">
+          <a class="link-button" href="./report.md">Run report</a>
+          <a class="link-button" href="./scoring-issue-report.md"
+            >Scoring issue report</a
+          >
+          <a class="link-button" href="./scorecards.json">Scorecards JSON</a>
+        </nav>
+      </header>
+
+      <div class="band">
+        <strong>Interpretation:</strong>
+        <span id="interpretation"></span>
+      </div>
+
+      <div class="metrics" id="metrics"></div>
+
+      <div class="grid">
+        <section>
+          <div class="section-head">
+            <h2>Where Points Were Lost</h2>
+            <span class="pill" id="loss-total"></span>
+          </div>
+          <div class="section-body" id="loss-breakdown"></div>
+        </section>
+
+        <section>
+          <div class="section-head">
+            <h2>Rubric Status Mix</h2>
+            <span class="pill" id="status-total"></span>
+          </div>
+          <div class="section-body" id="status-breakdown"></div>
+        </section>
+      </div>
+
+      <section style="margin-top: 18px">
+        <div class="section-head">
+          <h2>Case Deductions</h2>
+          <span class="pill" id="case-count"></span>
+        </div>
+        <div class="section-body">
+          <div class="controls">
+            <input
+              id="search"
+              type="search"
+              placeholder="Search skill, case, or failed check"
+            />
+            <div class="filters" id="filters">
+              <button type="button" data-filter="all" aria-pressed="true">
+                All
+              </button>
+              <button type="button" data-filter="shared">Shared loss</button>
+              <button type="button" data-filter="specific">
+                Case-specific loss
+              </button>
+              <button type="button" data-filter="lowest">Lowest scores</button>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Skill</th>
+                <th class="num">Score</th>
+                <th class="num">Shared lost</th>
+                <th class="num">Specific lost</th>
+                <th>Deductions</th>
+              </tr>
+            </thead>
+            <tbody id="case-table"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section style="margin-top: 18px">
+        <div class="section-head">
+          <h2>Top Deduction Criteria</h2>
+          <span class="pill">aggregated</span>
+        </div>
+        <div class="section-body" id="top-criteria"></div>
+      </section>
+    </div>
+
+    <script id="dashboard-data" type="application/json">
+      {
+        "summary": {
+          "run_id": "skillhub-baseline-2026-05-29",
+          "generated_at": "2026-05-29T02:00:00Z",
+          "profile": "prd",
+          "mode": "evidence-slice",
+          "caveat": "This run executed the evidence-gathering slice for every case. It did not deploy/release 17 playbooks, so runtime/release/UI rubric points are awarded only where direct evidence exists and otherwise remain unearned.",
+          "cases_total": 17,
+          "scores": { "average": 73.14, "min": 65, "max": 80 },
+          "agent_runs": { "statuses": { "0": 17 }, "timed_out": 0 },
+          "possible": { "total": 1700, "shared": 1190, "specific": 510 },
+          "awarded": { "total": 1243.32, "shared": 1168.32, "specific": 75 },
+          "lost": { "total": 456.68, "shared": 21.68, "specific": 435 },
+          "cost_usd": 6.32,
+          "duration_minutes": 25.44,
+          "command_count": 194,
+          "rubric_status_counts": {
+            "all": { "full": 158, "partial": 10, "zero": 87 },
+            "shared": { "full": 143, "partial": 10, "zero": 0 },
+            "case_specific": { "full": 15, "partial": 0, "zero": 87 }
+          }
+        },
+        "cases": [
+          {
+            "case_id": "baseline-alva-thesis",
+            "skill_id": "alva/thesis",
+            "disabled": false,
+            "execution_mode": "full_live_playbook",
+            "score": {
+              "total": 65,
+              "shared": 65,
+              "case_specific": 0,
+              "possible": 100
+            },
+            "lost": { "total": 35, "shared": 5, "specific": 30 },
+            "failed_counts": { "shared": 2, "specific": 6 },
+            "agent_run": {
+              "status": 0,
+              "timed_out": false,
+              "reused_raw": true,
+              "duration_ms": 97701,
+              "total_cost_usd": 0.35,
+              "command_count": 11
+            },
+            "shared_failed": [
+              {
+                "id": "chain.runtime-release",
+                "tags": ["runtime", "feed", "deploy", "release"],
+                "status": "partial",
+                "possible": 10,
+                "awarded": 6.67,
+                "lost": 3.33,
+                "failed_checks": [
+                  "feed outputs use the frozen partition names and record fields"
+                ],
+                "passed_checks": [
+                  "runtime scripts/feeds are executed on Alva Cloud, not simulated locally when the blueprint requires Alva runtime",
+                  "jobs/releases are created or the exact platform blocker is recorded with command output"
+                ]
+              },
+              {
+                "id": "communication.user-facing",
+                "tags": ["communication", "language", "ux"],
+                "status": "partial",
+                "possible": 5,
+                "awarded": 3.33,
+                "lost": 1.67,
+                "failed_checks": [
+                  "the final answer names the result, verification, and remaining risk without leaking scaffold tokens"
+                ],
+                "passed_checks": [
+                  "user-facing updates lead with result and avoid internal paths or raw implementation detail",
+                  "visible copy uses Alva product vocabulary and avoids unsupported investment advice"
+                ]
+              }
+            ],
+            "specific_failed": [
+              {
+                "id": "thesis.template-clone",
+                "tags": ["thesis", "template", "clone"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "starts from the fetched reference layout instead of rebuilding the thesis tracker from scratch"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "thesis.tabs",
+                "tags": ["thesis", "ui", "tabs"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "preserves the blueprint tab set, including thesis, basket, catalyst/risk, and news/social surfaces"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "thesis.feed-contract",
+                "tags": ["thesis", "feed", "schema"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "uses the frozen thesis feed partitions and record shapes without renaming fields"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "thesis.basket-data",
+                "tags": ["thesis", "data", "basket"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "basket composition, prices, fundamentals, and alpha/relative performance come from Alva data sources"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "thesis.push-alignment",
+                "tags": ["thesis", "push", "adk"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "ADK narrative output mirrors push-worthy thesis deltas and passes an alignment check"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "thesis.methodology",
+                "tags": ["thesis", "methodology", "readme"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "methodology and blind spots explain what is measured, what is inferred, and what is not covered"
+                ],
+                "passed_checks": []
+              }
+            ]
+          },
+          {
+            "case_id": "baseline-alva-screener",
+            "skill_id": "alva/screener",
+            "disabled": false,
+            "execution_mode": "full_live_playbook",
+            "score": {
+              "total": 73.33,
+              "shared": 68.33,
+              "case_specific": 5,
+              "possible": 100
+            },
+            "lost": { "total": 26.67, "shared": 1.67, "specific": 25 },
+            "failed_counts": { "shared": 1, "specific": 5 },
+            "agent_run": {
+              "status": 0,
+              "timed_out": false,
+              "reused_raw": true,
+              "duration_ms": 96553,
+              "total_cost_usd": 0.35,
+              "command_count": 11
+            },
+            "shared_failed": [
+              {
+                "id": "communication.user-facing",
+                "tags": ["communication", "language", "ux"],
+                "status": "partial",
+                "possible": 5,
+                "awarded": 3.33,
+                "lost": 1.67,
+                "failed_checks": [
+                  "the final answer names the result, verification, and remaining risk without leaking scaffold tokens"
+                ],
+                "passed_checks": [
+                  "user-facing updates lead with result and avoid internal paths or raw implementation detail",
+                  "visible copy uses Alva product vocabulary and avoids unsupported investment advice"
+                ]
+              }
+            ],
+            "specific_failed": [
+              {
+                "id": "screener.scoring",
+                "tags": ["screener", "scoring", "methodology"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "implements explicit factor weights or inclusion logic and renders the methodology"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "screener.feed-contract",
+                "tags": ["screener", "feed", "schema"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "writes rankings, summary, klines/movers, and flags using the blueprint feed contract"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "screener.tabs",
+                "tags": ["screener", "ui", "tabs"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "Overview, Movers \u0026 Trends, and Analysis tabs each have live, non-empty states or clear empty states"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "screener.flags",
+                "tags": ["screener", "flags", "explainability"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "each highlighted stock explains which factors/flags drove inclusion"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "screener.digest",
+                "tags": ["screener", "push", "optional"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "daily digest or push behavior is either implemented when useful or explicitly marked out of scope"
+                ],
+                "passed_checks": []
+              }
+            ]
+          },
+          {
+            "case_id": "baseline-alva-backtest",
+            "skill_id": "alva/backtest",
+            "disabled": false,
+            "execution_mode": "full_live_playbook",
+            "score": {
+              "total": 71.67,
+              "shared": 66.67,
+              "case_specific": 5,
+              "possible": 100
+            },
+            "lost": { "total": 28.33, "shared": 3.33, "specific": 25 },
+            "failed_counts": { "shared": 1, "specific": 5 },
+            "agent_run": {
+              "status": 0,
+              "timed_out": false,
+              "reused_raw": true,
+              "duration_ms": 93742,
+              "total_cost_usd": 0.38,
+              "command_count": 10
+            },
+            "shared_failed": [
+              {
+                "id": "chain.runtime-release",
+                "tags": ["runtime", "feed", "deploy", "release"],
+                "status": "partial",
+                "possible": 10,
+                "awarded": 6.67,
+                "lost": 3.33,
+                "failed_checks": [
+                  "feed outputs use the frozen partition names and record fields"
+                ],
+                "passed_checks": [
+                  "runtime scripts/feeds are executed on Alva Cloud, not simulated locally when the blueprint requires Alva runtime",
+                  "jobs/releases are created or the exact platform blocker is recorded with command output"
+                ]
+              }
+            ],
+            "specific_failed": [
+              {
+                "id": "backtest.altra",
+                "tags": ["backtest", "altra", "runtime"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "uses Altra on Alva Cloud for backtest/event-study computation, not local loops"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "backtest.verdict-hero",
+                "tags": ["backtest", "ui", "hero"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "first fold starts with the required verdict hero and concise outcome metrics"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "backtest.no-noise-title",
+                "tags": ["backtest", "copy", "naming"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "does not repeat forbidden generic wording such as What-If in title, slug, or user-facing copy"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "backtest.runtime-fetch",
+                "tags": ["backtest", "html", "data"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "HTML reads computed Altra output from released feed/runtime paths instead of hardcoded data"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "backtest.methodology",
+                "tags": ["backtest", "readme", "methodology"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "README/methodology captures trigger definition, sample period, assumptions, and limitations"
+                ],
+                "passed_checks": []
+              }
+            ]
+          },
+          {
+            "case_id": "baseline-alva-ai-digest",
+            "skill_id": "alva/ai-digest",
+            "disabled": false,
+            "execution_mode": "full_live_playbook",
+            "score": {
+              "total": 75,
+              "shared": 70,
+              "case_specific": 5,
+              "possible": 100
+            },
+            "lost": { "total": 25, "shared": 0, "specific": 25 },
+            "failed_counts": { "shared": 0, "specific": 5 },
+            "agent_run": {
+              "status": 0,
+              "timed_out": false,
+              "reused_raw": true,
+              "duration_ms": 102255,
+              "total_cost_usd": 0.36,
+              "command_count": 13
+            },
+            "shared_failed": [],
+            "specific_failed": [
+              {
+                "id": "ai-digest.cadence",
+                "tags": ["ai-digest", "cadence"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "infers or confirms a weekday pre-open cadence and records it in config, jobs, and README"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "ai-digest.sources",
+                "tags": ["ai-digest", "search", "data"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "uses the smallest useful mix of Alva search/feed/data inputs and records source coverage"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "ai-digest.feed-contract",
+                "tags": ["ai-digest", "feed", "schema"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "events, summaries, and notification sidecars follow the blueprint feed contract"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "ai-digest.push",
+                "tags": ["ai-digest", "push", "delivery"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "push messages are material, concise, scoped to subscribers, and not sent for routine noise"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "ai-digest.ui",
+                "tags": ["ai-digest", "ui", "stream"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "playbook renders a light feed-stream view with source links, timestamps, and empty states"
+                ],
+                "passed_checks": []
+              }
+            ]
+          },
+          {
+            "case_id": "baseline-alva-earnings",
+            "skill_id": "alva/earnings",
+            "disabled": false,
+            "execution_mode": "full_live_playbook",
+            "score": {
+              "total": 70,
+              "shared": 65,
+              "case_specific": 5,
+              "possible": 100
+            },
+            "lost": { "total": 30, "shared": 5, "specific": 25 },
+            "failed_counts": { "shared": 2, "specific": 5 },
+            "agent_run": {
+              "status": 0,
+              "timed_out": false,
+              "reused_raw": true,
+              "duration_ms": 102550,
+              "total_cost_usd": 0.34,
+              "command_count": 11
+            },
+            "shared_failed": [
+              {
+                "id": "chain.runtime-release",
+                "tags": ["runtime", "feed", "deploy", "release"],
+                "status": "partial",
+                "possible": 10,
+                "awarded": 6.67,
+                "lost": 3.33,
+                "failed_checks": [
+                  "feed outputs use the frozen partition names and record fields"
+                ],
+                "passed_checks": [
+                  "runtime scripts/feeds are executed on Alva Cloud, not simulated locally when the blueprint requires Alva runtime",
+                  "jobs/releases are created or the exact platform blocker is recorded with command output"
+                ]
+              },
+              {
+                "id": "communication.user-facing",
+                "tags": ["communication", "language", "ux"],
+                "status": "partial",
+                "possible": 5,
+                "awarded": 3.33,
+                "lost": 1.67,
+                "failed_checks": [
+                  "the final answer names the result, verification, and remaining risk without leaking scaffold tokens"
+                ],
+                "passed_checks": [
+                  "user-facing updates lead with result and avoid internal paths or raw implementation detail",
+                  "visible copy uses Alva product vocabulary and avoids unsupported investment advice"
+                ]
+              }
+            ],
+            "specific_failed": [
+              {
+                "id": "earnings.hero",
+                "tags": ["earnings", "ui", "hero"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "hero contains regime banner, READ/NEXT block, four number tiles, and no duplicated tape metrics"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "earnings.tabs",
+                "tags": ["earnings", "ui", "tabs"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "Narrative is the default tab and all five blueprint tabs render live or clear empty states"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "earnings.kol-gate",
+                "tags": ["earnings", "kol", "quality"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "KOL cards pass opinion gate, author dedup, stance mix, angle limits, mark target, and URL injection"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "earnings.sellside-boundary",
+                "tags": ["earnings", "sellside", "routing"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "sell-side analyst moves are separated from independent social/KOL commentary"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "earnings.schema",
+                "tags": ["earnings", "schema", "adk"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "fixed enum and synthesis field names are preserved so the HTML does not silently blank"
+                ],
+                "passed_checks": []
+              }
+            ]
+          },
+          {
+            "case_id": "baseline-alva-asset-deepdive",
+            "skill_id": "alva/asset-deepdive",
+            "disabled": false,
+            "execution_mode": "full_live_playbook",
+            "score": {
+              "total": 73.33,
+              "shared": 68.33,
+              "case_specific": 5,
+              "possible": 100
+            },
+            "lost": { "total": 26.67, "shared": 1.67, "specific": 25 },
+            "failed_counts": { "shared": 1, "specific": 5 },
+            "agent_run": {
+              "status": 0,
+              "timed_out": false,
+              "reused_raw": true,
+              "duration_ms": 101555,
+              "total_cost_usd": 0.49,
+              "command_count": 10
+            },
+            "shared_failed": [
+              {
+                "id": "communication.user-facing",
+                "tags": ["communication", "language", "ux"],
+                "status": "partial",
+                "possible": 5,
+                "awarded": 3.33,
+                "lost": 1.67,
+                "failed_checks": [
+                  "the final answer names the result, verification, and remaining risk without leaking scaffold tokens"
+                ],
+                "passed_checks": [
+                  "user-facing updates lead with result and avoid internal paths or raw implementation detail",
+                  "visible copy uses Alva product vocabulary and avoids unsupported investment advice"
+                ]
+              }
+            ],
+            "specific_failed": [
+              {
+                "id": "asset.no-scaffold-leak",
+                "tags": ["asset-deepdive", "communication", "scaffold"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "visible user output never mentions internal scaffold tokens, placeholder names, or template filenames"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "asset.tabs",
+                "tags": ["asset-deepdive", "ui", "tabs"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "all seven blueprint tabs render: overview, thesis, financials, comps, catalysts, risks, news/social"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "asset.neutrality",
+                "tags": ["asset-deepdive", "narrative", "neutrality"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "bull and bear cases are balanced, data-grounded, and not promotional"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "asset.sec-audit",
+                "tags": ["asset-deepdive", "sec", "financials"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "SEC/EDGAR-backed financial and segment data is wired, with source dates and blind spots"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "asset.monitoring",
+                "tags": ["asset-deepdive", "catalysts", "risks", "news"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "catalyst, risk, and news/social pipelines refresh on the blueprint cadence and expose source links"
+                ],
+                "passed_checks": []
+              }
+            ]
+          },
+          {
+            "case_id": "baseline-anthropic-catalyst-weekly",
+            "skill_id": "anthropic/catalyst-weekly",
+            "disabled": false,
+            "execution_mode": "full_live_playbook",
+            "score": {
+              "total": 73.33,
+              "shared": 68.33,
+              "case_specific": 5,
+              "possible": 100
+            },
+            "lost": { "total": 26.67, "shared": 1.67, "specific": 25 },
+            "failed_counts": { "shared": 1, "specific": 5 },
+            "agent_run": {
+              "status": 0,
+              "timed_out": false,
+              "reused_raw": true,
+              "duration_ms": 80282,
+              "total_cost_usd": 0.36,
+              "command_count": 11
+            },
+            "shared_failed": [
+              {
+                "id": "communication.user-facing",
+                "tags": ["communication", "language", "ux"],
+                "status": "partial",
+                "possible": 5,
+                "awarded": 3.33,
+                "lost": 1.67,
+                "failed_checks": [
+                  "the final answer names the result, verification, and remaining risk without leaking scaffold tokens"
+                ],
+                "passed_checks": [
+                  "user-facing updates lead with result and avoid internal paths or raw implementation detail",
+                  "visible copy uses Alva product vocabulary and avoids unsupported investment advice"
+                ]
+              }
+            ],
+            "specific_failed": [
+              {
+                "id": "catalyst.covered-types",
+                "tags": ["catalyst", "data", "coverage-gaps"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "only covered event types are claimed; missing investor days, FDA, conferences, and product launches are named as gaps unless BYOD is supplied"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "catalyst.feeds",
+                "tags": ["catalyst", "feed", "sequence"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "quant feed and narrative feed are both present, with narrative scheduled after quant"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "catalyst.contract",
+                "tags": ["catalyst", "schema"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "calendar/events, calendar/earnings, calendar/macro, and narrative/records match the frozen contract"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "catalyst.impact",
+                "tags": ["catalyst", "adk", "impact"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "impact ratings and position implications are labelled AI analysis, while dates and consensus values remain feed data"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "catalyst.ui",
+                "tags": ["catalyst", "ui", "calendar"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "playbook includes this-week hero, key events, calendar view, next-week preview, implications, and references"
+                ],
+                "passed_checks": []
+              }
+            ]
+          },
+          {
+            "case_id": "baseline-anthropic-competitive-analysis",
+            "skill_id": "anthropic/competitive-analysis",
+            "disabled": false,
+            "execution_mode": "full_live_playbook",
+            "score": {
+              "total": 75,
+              "shared": 70,
+              "case_specific": 5,
+              "possible": 100
+            },
+            "lost": { "total": 25, "shared": 0, "specific": 25 },
+            "failed_counts": { "shared": 0, "specific": 5 },
+            "agent_run": {
+              "status": 0,
+              "timed_out": false,
+              "reused_raw": true,
+              "duration_ms": 65587,
+              "total_cost_usd": 0.37,
+              "command_count": 11
+            },
+            "shared_failed": [],
+            "specific_failed": [
+              {
+                "id": "competitive.metrics",
+                "tags": ["competitive", "metrics", "comparability"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "3-5 industry-defining metrics are used consistently across all companies and periods"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "competitive.schema",
+                "tags": ["competitive", "schema", "feed"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "companies/metrics, comparison/dimensions, events/strategic, and narrative/records fields match the blueprint"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "competitive.adk-labeling",
+                "tags": ["competitive", "adk", "labeling"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "qualitative profiles, moats, synthesis, and bull/base/bear are labelled AI analysis"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "competitive.no-fabricated-tam",
+                "tags": ["competitive", "coverage-gaps", "tam"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "market-size/TAM and unavailable operating KPI gaps are not fabricated"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "competitive.ui",
+                "tags": ["competitive", "ui", "moats"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "playbook includes comparison table, positioning chart, competitor cards, ratings, moat assessment, strategic activity, and synthesis"
+                ],
+                "passed_checks": []
+              }
+            ]
+          },
+          {
+            "case_id": "baseline-anthropic-comps-analysis",
+            "skill_id": "anthropic/comps-analysis",
+            "disabled": false,
+            "execution_mode": "full_live_playbook",
+            "score": {
+              "total": 68.33,
+              "shared": 68.33,
+              "case_specific": 0,
+              "possible": 100
+            },
+            "lost": { "total": 31.67, "shared": 1.67, "specific": 30 },
+            "failed_counts": { "shared": 1, "specific": 6 },
+            "agent_run": {
+              "status": 0,
+              "timed_out": false,
+              "reused_raw": true,
+              "duration_ms": 98140,
+              "total_cost_usd": 0.4,
+              "command_count": 12
+            },
+            "shared_failed": [
+              {
+                "id": "communication.user-facing",
+                "tags": ["communication", "language", "ux"],
+                "status": "partial",
+                "possible": 5,
+                "awarded": 3.33,
+                "lost": 1.67,
+                "failed_checks": [
+                  "the final answer names the result, verification, and remaining risk without leaking scaffold tokens"
+                ],
+                "passed_checks": [
+                  "user-facing updates lead with result and avoid internal paths or raw implementation detail",
+                  "visible copy uses Alva product vocabulary and avoids unsupported investment advice"
+                ]
+              }
+            ],
+            "specific_failed": [
+              {
+                "id": "comps.peer-quality",
+                "tags": ["comps", "peer-set"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "peer group is genuinely comparable; weak comps are excluded or flagged"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "comps.period",
+                "tags": ["comps", "period", "comparability"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "all operating and valuation metrics use a consistent LTM/current basis, with exceptions flagged"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "comps.schema",
+                "tags": ["comps", "schema", "statistics"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "comps/operating, comps/valuation, and comps/statistics match frozen fields"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "comps.statistics",
+                "tags": ["comps", "quartiles", "math"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "max, p75, median, p25, min are computed only on comparable metrics, never absolute revenue, market cap, or EV"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "comps.negative-ebitda",
+                "tags": ["comps", "edge-case", "valuation"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "negative-EBITDA names are handled on revenue multiples rather than invalid EV/EBITDA comparisons"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "comps.ui",
+                "tags": ["comps", "ui", "scatter"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "hero, metric cards, operating table, valuation table, and valuation scatter are present"
+                ],
+                "passed_checks": []
+              }
+            ]
+          },
+          {
+            "case_id": "baseline-anthropic-dcf-model",
+            "skill_id": "anthropic/dcf-model",
+            "disabled": false,
+            "execution_mode": "full_live_playbook",
+            "score": {
+              "total": 68.33,
+              "shared": 68.33,
+              "case_specific": 0,
+              "possible": 100
+            },
+            "lost": { "total": 31.67, "shared": 1.67, "specific": 30 },
+            "failed_counts": { "shared": 1, "specific": 6 },
+            "agent_run": {
+              "status": 0,
+              "timed_out": false,
+              "reused_raw": true,
+              "duration_ms": 67603,
+              "total_cost_usd": 0.29,
+              "command_count": 10
+            },
+            "shared_failed": [
+              {
+                "id": "communication.user-facing",
+                "tags": ["communication", "language", "ux"],
+                "status": "partial",
+                "possible": 5,
+                "awarded": 3.33,
+                "lost": 1.67,
+                "failed_checks": [
+                  "visible copy uses Alva product vocabulary and avoids unsupported investment advice"
+                ],
+                "passed_checks": [
+                  "user-facing updates lead with result and avoid internal paths or raw implementation detail",
+                  "the final answer names the result, verification, and remaining risk without leaking scaffold tokens"
+                ]
+              }
+            ],
+            "specific_failed": [
+              {
+                "id": "dcf.fidelity-limit",
+                "tags": ["dcf", "readme", "limitations"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "README states the playbook is live/shareable but lower fidelity than a cell-auditable Excel model"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "dcf.data-inputs",
+                "tags": ["dcf", "data", "inputs"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "historicals, market inputs, diluted shares, net debt, beta, and risk-free rate are feed-sourced and shape-checked"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "dcf.schema",
+                "tags": ["dcf", "schema", "feed"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "history/drivers, inputs/market, and valuation/base match the frozen field names"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "dcf.client-math",
+                "tags": ["dcf", "what-if", "client-side"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "reader assumption controls recompute the DCF in-browser over feed data"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "dcf.base-anchor",
+                "tags": ["dcf", "valuation", "anchor"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "feed publishes the verified base case with EV, equity value, fair value per share, upside, WACC, terminal value, and TV share"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "dcf.ui",
+                "tags": ["dcf", "ui", "sensitivity"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "value hero, four cards, controls, FCF projection, equity bridge, and sensitivity grids are present"
+                ],
+                "passed_checks": []
+              }
+            ]
+          },
+          {
+            "case_id": "baseline-anthropic-idea-generation",
+            "skill_id": "anthropic/idea-generation",
+            "disabled": false,
+            "execution_mode": "full_live_playbook",
+            "score": {
+              "total": 75,
+              "shared": 70,
+              "case_specific": 5,
+              "possible": 100
+            },
+            "lost": { "total": 25, "shared": 0, "specific": 25 },
+            "failed_counts": { "shared": 0, "specific": 5 },
+            "agent_run": {
+              "status": 0,
+              "timed_out": false,
+              "reused_raw": true,
+              "duration_ms": 84541,
+              "total_cost_usd": 0.36,
+              "command_count": 12
+            },
+            "shared_failed": [],
+            "specific_failed": [
+              {
+                "id": "idea.filters",
+                "tags": ["idea-generation", "filters", "data"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "plain-language criteria are translated into concrete screener metric filters with unavailable criteria noted"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "idea.schema",
+                "tags": ["idea-generation", "schema"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "screen/results, screen/criteria, enrich/crowding, and narrative/records follow the frozen contract"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "idea.candidates-not-conclusions",
+                "tags": ["idea-generation", "advice", "framing"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "shortlist is framed as candidates for research, not buy/sell recommendations"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "idea.crowding",
+                "tags": ["idea-generation", "ownership", "crowding"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "institutional/insider/crowding and analyst coverage are included where data is available"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "idea.ui",
+                "tags": ["idea-generation", "ui", "shortlist"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "hero, ranked shortlist, idea cards, criteria, references, source links, and cadence are present"
+                ],
+                "passed_checks": []
+              }
+            ]
+          },
+          {
+            "case_id": "baseline-anthropic-morning-note",
+            "skill_id": "anthropic/morning-note",
+            "disabled": false,
+            "execution_mode": "full_live_playbook",
+            "score": {
+              "total": 75,
+              "shared": 70,
+              "case_specific": 5,
+              "possible": 100
+            },
+            "lost": { "total": 25, "shared": 0, "specific": 25 },
+            "failed_counts": { "shared": 0, "specific": 5 },
+            "agent_run": {
+              "status": 0,
+              "timed_out": false,
+              "reused_raw": true,
+              "duration_ms": 83566,
+              "total_cost_usd": 0.38,
+              "command_count": 13
+            },
+            "shared_failed": [],
+            "specific_failed": [
+              {
+                "id": "morning.cadence",
+                "tags": ["morning-note", "cadence", "deploy"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "quant feed runs pre-open and narrative feed runs after quant; actual timezone/cadence is in README"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "morning.schema",
+                "tags": ["morning-note", "schema"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "coverage/movers, coverage/earnings, coverage/ratings, events/today, events/ma, market/context, and narrative/records are present"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "morning.top-call",
+                "tags": ["morning-note", "adk", "top-call"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "Top Call leads the playbook and is labelled AI-generated analysis"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "morning.data-vs-opinion",
+                "tags": ["morning-note", "provenance", "labeling"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "moves, beat/miss, ratings, and macro values are feed data; takes, actions, and trade ideas are labelled ADK"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "morning.readability",
+                "tags": ["morning-note", "copy", "two-minute-read"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "the note is tight enough for a two-minute pre-open read and does not bury the headline"
+                ],
+                "passed_checks": []
+              }
+            ]
+          },
+          {
+            "case_id": "baseline-anthropic-model-update",
+            "skill_id": "anthropic/model-update",
+            "disabled": false,
+            "execution_mode": "full_live_playbook",
+            "score": {
+              "total": 70,
+              "shared": 70,
+              "case_specific": 0,
+              "possible": 100
+            },
+            "lost": { "total": 30, "shared": 0, "specific": 30 },
+            "failed_counts": { "shared": 0, "specific": 6 },
+            "agent_run": {
+              "status": 0,
+              "timed_out": false,
+              "reused_raw": true,
+              "duration_ms": 115779,
+              "total_cost_usd": 0.34,
+              "command_count": 11
+            },
+            "shared_failed": [],
+            "specific_failed": [
+              {
+                "id": "model.consensus-not-private",
+                "tags": ["model-update", "readme", "scope"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "README states that the tracked model is consensus, not the user's private Excel model"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "model.actuals",
+                "tags": ["model-update", "earnings", "data"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "reported actuals, guidance, estimate revisions, price/valuation, and target changes are shape-checked"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "model.schema",
+                "tags": ["model-update", "schema"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "quant and narrative output partitions use the frozen model-update contract from the blueprint"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "model.delta",
+                "tags": ["model-update", "delta", "analysis"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "focuses on what changed versus prior expectations rather than generic company background"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "model.dcf-leg",
+                "tags": ["model-update", "dcf", "valuation"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "DCF or implied valuation leg reuses the dcf-model default-assumption logic when included"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "model.labeling",
+                "tags": ["model-update", "adk", "labeling"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "estimate-change summary and rating/action interpretation are labelled AI analysis"
+                ],
+                "passed_checks": []
+              }
+            ]
+          },
+          {
+            "case_id": "baseline-anthropic-sector-overview",
+            "skill_id": "anthropic/sector-overview",
+            "disabled": false,
+            "execution_mode": "full_live_playbook",
+            "score": {
+              "total": 80,
+              "shared": 70,
+              "case_specific": 10,
+              "possible": 100
+            },
+            "lost": { "total": 20, "shared": 0, "specific": 20 },
+            "failed_counts": { "shared": 0, "specific": 4 },
+            "agent_run": {
+              "status": 0,
+              "timed_out": false,
+              "reused_raw": true,
+              "duration_ms": 92503,
+              "total_cost_usd": 0.39,
+              "command_count": 14
+            },
+            "shared_failed": [],
+            "specific_failed": [
+              {
+                "id": "sector.schema",
+                "tags": ["sector", "schema"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "universe/members, metrics/companies, valuation/multiples, and narrative/records match the frozen contract"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "sector.market-share-proxy",
+                "tags": ["sector", "market-share", "coverage-gaps"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "revenue share is labelled as universe-relative proxy and never as true market share"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "sector.no-tam-fabrication",
+                "tags": ["sector", "tam", "coverage-gaps"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "TAM/market-size gaps are omitted or source-cited, not invented"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "sector.ui",
+                "tags": ["sector", "ui", "landscape"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "hero, metric cards, company comparison, valuation scatter, multiple history, M\u0026A, and structure/trends/implications are present"
+                ],
+                "passed_checks": []
+              }
+            ]
+          },
+          {
+            "case_id": "baseline-anthropic-thesis-tracker",
+            "skill_id": "anthropic/thesis-tracker",
+            "disabled": true,
+            "execution_mode": "explicit_directive_full_chain_while_disabled",
+            "score": {
+              "total": 75,
+              "shared": 70,
+              "case_specific": 5,
+              "possible": 100
+            },
+            "lost": { "total": 25, "shared": 0, "specific": 25 },
+            "failed_counts": { "shared": 0, "specific": 5 },
+            "agent_run": {
+              "status": 0,
+              "timed_out": false,
+              "reused_raw": true,
+              "duration_ms": 93218,
+              "total_cost_usd": 0.44,
+              "command_count": 13
+            },
+            "shared_failed": [],
+            "specific_failed": [
+              {
+                "id": "thesis-tracker.falsifiable-pillars",
+                "tags": ["thesis-tracker", "pillars", "metrics"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "3-5 thesis pillars are measurable and bound to concrete Alva metrics before build proceeds"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "thesis-tracker.schema",
+                "tags": ["thesis-tracker", "schema"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "pillars/metrics, updates/log, catalysts/upcoming, valuation/snapshot, and narrative/records match the frozen contract"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "thesis-tracker.static-vs-feed",
+                "tags": ["thesis-tracker", "config", "data-boundary"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "thesis statement, risks, and target are static build-time config; tracked metrics come from feeds"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "thesis-tracker.labeling",
+                "tags": ["thesis-tracker", "adk", "labeling"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "conviction, scorecard status/trend, updates, and risk reads are labelled AI analysis"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "thesis-tracker.review-cadence",
+                "tags": ["thesis-tracker", "cadence", "review"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "feed cadence matches metric update frequency and README flags at least quarterly full review"
+                ],
+                "passed_checks": []
+              }
+            ]
+          },
+          {
+            "case_id": "baseline-anthropic-earnings-preview",
+            "skill_id": "anthropic/earnings-preview",
+            "disabled": true,
+            "execution_mode": "explicit_directive_full_chain_while_disabled",
+            "score": {
+              "total": 80,
+              "shared": 70,
+              "case_specific": 10,
+              "possible": 100
+            },
+            "lost": { "total": 20, "shared": 0, "specific": 20 },
+            "failed_counts": { "shared": 0, "specific": 4 },
+            "agent_run": {
+              "status": 0,
+              "timed_out": false,
+              "reused_raw": true,
+              "duration_ms": 80772,
+              "total_cost_usd": 0.38,
+              "command_count": 11
+            },
+            "shared_failed": [],
+            "specific_failed": [
+              {
+                "id": "earnings-preview.consensus",
+                "tags": ["earnings-preview", "consensus", "methodology"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "selects consensus by highest estimate_count for the upcoming fiscal period, not the newest stale row"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "earnings-preview.schema",
+                "tags": ["earnings-preview", "schema"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "schedule/next, consensus/upcoming, guidance/latest, history/beats, revisions/eps, target/consensus, and narrative/records match the contract"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "earnings-preview.beat-history",
+                "tags": ["earnings-preview", "beat-miss", "math"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "beat/miss surprise math uses pre-report consensus and last-eight-quarter context"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "earnings-preview.ui",
+                "tags": ["earnings-preview", "ui", "first-fold"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "first fold includes verdict hero plus four cards, followed by history, revisions, guidance, watch items, and references"
+                ],
+                "passed_checks": []
+              }
+            ]
+          },
+          {
+            "case_id": "baseline-anthropic-earnings-analysis",
+            "skill_id": "anthropic/earnings-analysis",
+            "disabled": true,
+            "execution_mode": "explicit_directive_full_chain_while_disabled",
+            "score": {
+              "total": 75,
+              "shared": 70,
+              "case_specific": 5,
+              "possible": 100
+            },
+            "lost": { "total": 25, "shared": 0, "specific": 25 },
+            "failed_counts": { "shared": 0, "specific": 5 },
+            "agent_run": {
+              "status": 0,
+              "timed_out": false,
+              "reused_raw": true,
+              "duration_ms": 70201,
+              "total_cost_usd": 0.35,
+              "command_count": 10
+            },
+            "shared_failed": [],
+            "specific_failed": [
+              {
+                "id": "earnings-analysis.latest-quarter",
+                "tags": ["earnings-analysis", "quarter", "selection"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "confirms the most recent reported quarter and does not analyze a stale or future period"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "earnings-analysis.preprint-consensus",
+                "tags": ["earnings-analysis", "consensus", "methodology"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "beat/miss bars use pre-print consensus, not post-print revised estimates"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "earnings-analysis.schema",
+                "tags": ["earnings-analysis", "schema"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "results/reported, trends/quarterly, revisions/consensus, valuation/snapshot, and narrative/records match the contract"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "earnings-analysis.delta-focus",
+                "tags": ["earnings-analysis", "delta", "narrative"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "analysis focuses on what changed this quarter rather than rehashing background"
+                ],
+                "passed_checks": []
+              },
+              {
+                "id": "earnings-analysis.ui",
+                "tags": ["earnings-analysis", "ui", "first-fold"],
+                "status": "zero",
+                "possible": 5,
+                "awarded": 0,
+                "lost": 5,
+                "failed_checks": [
+                  "verdict hero, four metric cards, beat/miss bars, quarterly trend, estimate revisions, and labelled thesis impact are present"
+                ],
+                "passed_checks": []
+              }
+            ]
+          }
+        ],
+        "top_criteria": [
+          {
+            "id": "communication.user-facing",
+            "area": "shared",
+            "count": 7,
+            "lost": 11.69,
+            "cases": [
+              "alva/thesis",
+              "alva/screener",
+              "alva/earnings",
+              "alva/asset-deepdive",
+              "anthropic/catalyst-weekly",
+              "anthropic/comps-analysis",
+              "anthropic/dcf-model"
+            ],
+            "failed_checks": [
+              "the final answer names the result, verification, and remaining risk without leaking scaffold tokens"
+            ]
+          },
+          {
+            "id": "chain.runtime-release",
+            "area": "shared",
+            "count": 3,
+            "lost": 9.99,
+            "cases": ["alva/thesis", "alva/backtest", "alva/earnings"],
+            "failed_checks": [
+              "feed outputs use the frozen partition names and record fields"
+            ]
+          },
+          {
+            "id": "thesis.template-clone",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/thesis"],
+            "failed_checks": [
+              "starts from the fetched reference layout instead of rebuilding the thesis tracker from scratch"
+            ]
+          },
+          {
+            "id": "thesis.tabs",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/thesis"],
+            "failed_checks": [
+              "preserves the blueprint tab set, including thesis, basket, catalyst/risk, and news/social surfaces"
+            ]
+          },
+          {
+            "id": "thesis.feed-contract",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/thesis"],
+            "failed_checks": [
+              "uses the frozen thesis feed partitions and record shapes without renaming fields"
+            ]
+          },
+          {
+            "id": "thesis.basket-data",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/thesis"],
+            "failed_checks": [
+              "basket composition, prices, fundamentals, and alpha/relative performance come from Alva data sources"
+            ]
+          },
+          {
+            "id": "thesis.push-alignment",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/thesis"],
+            "failed_checks": [
+              "ADK narrative output mirrors push-worthy thesis deltas and passes an alignment check"
+            ]
+          },
+          {
+            "id": "thesis.methodology",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/thesis"],
+            "failed_checks": [
+              "methodology and blind spots explain what is measured, what is inferred, and what is not covered"
+            ]
+          },
+          {
+            "id": "screener.scoring",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/screener"],
+            "failed_checks": [
+              "implements explicit factor weights or inclusion logic and renders the methodology"
+            ]
+          },
+          {
+            "id": "screener.feed-contract",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/screener"],
+            "failed_checks": [
+              "writes rankings, summary, klines/movers, and flags using the blueprint feed contract"
+            ]
+          },
+          {
+            "id": "screener.tabs",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/screener"],
+            "failed_checks": [
+              "Overview, Movers \u0026 Trends, and Analysis tabs each have live, non-empty states or clear empty states"
+            ]
+          },
+          {
+            "id": "screener.flags",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/screener"],
+            "failed_checks": [
+              "each highlighted stock explains which factors/flags drove inclusion"
+            ]
+          },
+          {
+            "id": "screener.digest",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/screener"],
+            "failed_checks": [
+              "daily digest or push behavior is either implemented when useful or explicitly marked out of scope"
+            ]
+          },
+          {
+            "id": "backtest.altra",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/backtest"],
+            "failed_checks": [
+              "uses Altra on Alva Cloud for backtest/event-study computation, not local loops"
+            ]
+          },
+          {
+            "id": "backtest.verdict-hero",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/backtest"],
+            "failed_checks": [
+              "first fold starts with the required verdict hero and concise outcome metrics"
+            ]
+          },
+          {
+            "id": "backtest.no-noise-title",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/backtest"],
+            "failed_checks": [
+              "does not repeat forbidden generic wording such as What-If in title, slug, or user-facing copy"
+            ]
+          },
+          {
+            "id": "backtest.runtime-fetch",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/backtest"],
+            "failed_checks": [
+              "HTML reads computed Altra output from released feed/runtime paths instead of hardcoded data"
+            ]
+          },
+          {
+            "id": "backtest.methodology",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/backtest"],
+            "failed_checks": [
+              "README/methodology captures trigger definition, sample period, assumptions, and limitations"
+            ]
+          },
+          {
+            "id": "ai-digest.cadence",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/ai-digest"],
+            "failed_checks": [
+              "infers or confirms a weekday pre-open cadence and records it in config, jobs, and README"
+            ]
+          },
+          {
+            "id": "ai-digest.sources",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/ai-digest"],
+            "failed_checks": [
+              "uses the smallest useful mix of Alva search/feed/data inputs and records source coverage"
+            ]
+          },
+          {
+            "id": "ai-digest.feed-contract",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/ai-digest"],
+            "failed_checks": [
+              "events, summaries, and notification sidecars follow the blueprint feed contract"
+            ]
+          },
+          {
+            "id": "ai-digest.push",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/ai-digest"],
+            "failed_checks": [
+              "push messages are material, concise, scoped to subscribers, and not sent for routine noise"
+            ]
+          },
+          {
+            "id": "ai-digest.ui",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/ai-digest"],
+            "failed_checks": [
+              "playbook renders a light feed-stream view with source links, timestamps, and empty states"
+            ]
+          },
+          {
+            "id": "earnings.hero",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/earnings"],
+            "failed_checks": [
+              "hero contains regime banner, READ/NEXT block, four number tiles, and no duplicated tape metrics"
+            ]
+          },
+          {
+            "id": "earnings.tabs",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/earnings"],
+            "failed_checks": [
+              "Narrative is the default tab and all five blueprint tabs render live or clear empty states"
+            ]
+          },
+          {
+            "id": "earnings.kol-gate",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/earnings"],
+            "failed_checks": [
+              "KOL cards pass opinion gate, author dedup, stance mix, angle limits, mark target, and URL injection"
+            ]
+          },
+          {
+            "id": "earnings.sellside-boundary",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/earnings"],
+            "failed_checks": [
+              "sell-side analyst moves are separated from independent social/KOL commentary"
+            ]
+          },
+          {
+            "id": "earnings.schema",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/earnings"],
+            "failed_checks": [
+              "fixed enum and synthesis field names are preserved so the HTML does not silently blank"
+            ]
+          },
+          {
+            "id": "asset.no-scaffold-leak",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/asset-deepdive"],
+            "failed_checks": [
+              "visible user output never mentions internal scaffold tokens, placeholder names, or template filenames"
+            ]
+          },
+          {
+            "id": "asset.tabs",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/asset-deepdive"],
+            "failed_checks": [
+              "all seven blueprint tabs render: overview, thesis, financials, comps, catalysts, risks, news/social"
+            ]
+          },
+          {
+            "id": "asset.neutrality",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/asset-deepdive"],
+            "failed_checks": [
+              "bull and bear cases are balanced, data-grounded, and not promotional"
+            ]
+          },
+          {
+            "id": "asset.sec-audit",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/asset-deepdive"],
+            "failed_checks": [
+              "SEC/EDGAR-backed financial and segment data is wired, with source dates and blind spots"
+            ]
+          },
+          {
+            "id": "asset.monitoring",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["alva/asset-deepdive"],
+            "failed_checks": [
+              "catalyst, risk, and news/social pipelines refresh on the blueprint cadence and expose source links"
+            ]
+          },
+          {
+            "id": "catalyst.covered-types",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/catalyst-weekly"],
+            "failed_checks": [
+              "only covered event types are claimed; missing investor days, FDA, conferences, and product launches are named as gaps unless BYOD is supplied"
+            ]
+          },
+          {
+            "id": "catalyst.feeds",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/catalyst-weekly"],
+            "failed_checks": [
+              "quant feed and narrative feed are both present, with narrative scheduled after quant"
+            ]
+          },
+          {
+            "id": "catalyst.contract",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/catalyst-weekly"],
+            "failed_checks": [
+              "calendar/events, calendar/earnings, calendar/macro, and narrative/records match the frozen contract"
+            ]
+          },
+          {
+            "id": "catalyst.impact",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/catalyst-weekly"],
+            "failed_checks": [
+              "impact ratings and position implications are labelled AI analysis, while dates and consensus values remain feed data"
+            ]
+          },
+          {
+            "id": "catalyst.ui",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/catalyst-weekly"],
+            "failed_checks": [
+              "playbook includes this-week hero, key events, calendar view, next-week preview, implications, and references"
+            ]
+          },
+          {
+            "id": "competitive.metrics",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/competitive-analysis"],
+            "failed_checks": [
+              "3-5 industry-defining metrics are used consistently across all companies and periods"
+            ]
+          },
+          {
+            "id": "competitive.schema",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/competitive-analysis"],
+            "failed_checks": [
+              "companies/metrics, comparison/dimensions, events/strategic, and narrative/records fields match the blueprint"
+            ]
+          },
+          {
+            "id": "competitive.adk-labeling",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/competitive-analysis"],
+            "failed_checks": [
+              "qualitative profiles, moats, synthesis, and bull/base/bear are labelled AI analysis"
+            ]
+          },
+          {
+            "id": "competitive.no-fabricated-tam",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/competitive-analysis"],
+            "failed_checks": [
+              "market-size/TAM and unavailable operating KPI gaps are not fabricated"
+            ]
+          },
+          {
+            "id": "competitive.ui",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/competitive-analysis"],
+            "failed_checks": [
+              "playbook includes comparison table, positioning chart, competitor cards, ratings, moat assessment, strategic activity, and synthesis"
+            ]
+          },
+          {
+            "id": "comps.peer-quality",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/comps-analysis"],
+            "failed_checks": [
+              "peer group is genuinely comparable; weak comps are excluded or flagged"
+            ]
+          },
+          {
+            "id": "comps.period",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/comps-analysis"],
+            "failed_checks": [
+              "all operating and valuation metrics use a consistent LTM/current basis, with exceptions flagged"
+            ]
+          },
+          {
+            "id": "comps.schema",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/comps-analysis"],
+            "failed_checks": [
+              "comps/operating, comps/valuation, and comps/statistics match frozen fields"
+            ]
+          },
+          {
+            "id": "comps.statistics",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/comps-analysis"],
+            "failed_checks": [
+              "max, p75, median, p25, min are computed only on comparable metrics, never absolute revenue, market cap, or EV"
+            ]
+          },
+          {
+            "id": "comps.negative-ebitda",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/comps-analysis"],
+            "failed_checks": [
+              "negative-EBITDA names are handled on revenue multiples rather than invalid EV/EBITDA comparisons"
+            ]
+          },
+          {
+            "id": "comps.ui",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/comps-analysis"],
+            "failed_checks": [
+              "hero, metric cards, operating table, valuation table, and valuation scatter are present"
+            ]
+          },
+          {
+            "id": "dcf.fidelity-limit",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/dcf-model"],
+            "failed_checks": [
+              "README states the playbook is live/shareable but lower fidelity than a cell-auditable Excel model"
+            ]
+          },
+          {
+            "id": "dcf.data-inputs",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/dcf-model"],
+            "failed_checks": [
+              "historicals, market inputs, diluted shares, net debt, beta, and risk-free rate are feed-sourced and shape-checked"
+            ]
+          },
+          {
+            "id": "dcf.schema",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/dcf-model"],
+            "failed_checks": [
+              "history/drivers, inputs/market, and valuation/base match the frozen field names"
+            ]
+          },
+          {
+            "id": "dcf.client-math",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/dcf-model"],
+            "failed_checks": [
+              "reader assumption controls recompute the DCF in-browser over feed data"
+            ]
+          },
+          {
+            "id": "dcf.base-anchor",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/dcf-model"],
+            "failed_checks": [
+              "feed publishes the verified base case with EV, equity value, fair value per share, upside, WACC, terminal value, and TV share"
+            ]
+          },
+          {
+            "id": "dcf.ui",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/dcf-model"],
+            "failed_checks": [
+              "value hero, four cards, controls, FCF projection, equity bridge, and sensitivity grids are present"
+            ]
+          },
+          {
+            "id": "idea.filters",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/idea-generation"],
+            "failed_checks": [
+              "plain-language criteria are translated into concrete screener metric filters with unavailable criteria noted"
+            ]
+          },
+          {
+            "id": "idea.schema",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/idea-generation"],
+            "failed_checks": [
+              "screen/results, screen/criteria, enrich/crowding, and narrative/records follow the frozen contract"
+            ]
+          },
+          {
+            "id": "idea.candidates-not-conclusions",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/idea-generation"],
+            "failed_checks": [
+              "shortlist is framed as candidates for research, not buy/sell recommendations"
+            ]
+          },
+          {
+            "id": "idea.crowding",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/idea-generation"],
+            "failed_checks": [
+              "institutional/insider/crowding and analyst coverage are included where data is available"
+            ]
+          },
+          {
+            "id": "idea.ui",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/idea-generation"],
+            "failed_checks": [
+              "hero, ranked shortlist, idea cards, criteria, references, source links, and cadence are present"
+            ]
+          },
+          {
+            "id": "morning.cadence",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/morning-note"],
+            "failed_checks": [
+              "quant feed runs pre-open and narrative feed runs after quant; actual timezone/cadence is in README"
+            ]
+          },
+          {
+            "id": "morning.schema",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/morning-note"],
+            "failed_checks": [
+              "coverage/movers, coverage/earnings, coverage/ratings, events/today, events/ma, market/context, and narrative/records are present"
+            ]
+          },
+          {
+            "id": "morning.top-call",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/morning-note"],
+            "failed_checks": [
+              "Top Call leads the playbook and is labelled AI-generated analysis"
+            ]
+          },
+          {
+            "id": "morning.data-vs-opinion",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/morning-note"],
+            "failed_checks": [
+              "moves, beat/miss, ratings, and macro values are feed data; takes, actions, and trade ideas are labelled ADK"
+            ]
+          },
+          {
+            "id": "morning.readability",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/morning-note"],
+            "failed_checks": [
+              "the note is tight enough for a two-minute pre-open read and does not bury the headline"
+            ]
+          },
+          {
+            "id": "model.consensus-not-private",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/model-update"],
+            "failed_checks": [
+              "README states that the tracked model is consensus, not the user's private Excel model"
+            ]
+          },
+          {
+            "id": "model.actuals",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/model-update"],
+            "failed_checks": [
+              "reported actuals, guidance, estimate revisions, price/valuation, and target changes are shape-checked"
+            ]
+          },
+          {
+            "id": "model.schema",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/model-update"],
+            "failed_checks": [
+              "quant and narrative output partitions use the frozen model-update contract from the blueprint"
+            ]
+          },
+          {
+            "id": "model.delta",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/model-update"],
+            "failed_checks": [
+              "focuses on what changed versus prior expectations rather than generic company background"
+            ]
+          },
+          {
+            "id": "model.dcf-leg",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/model-update"],
+            "failed_checks": [
+              "DCF or implied valuation leg reuses the dcf-model default-assumption logic when included"
+            ]
+          },
+          {
+            "id": "model.labeling",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/model-update"],
+            "failed_checks": [
+              "estimate-change summary and rating/action interpretation are labelled AI analysis"
+            ]
+          },
+          {
+            "id": "sector.schema",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/sector-overview"],
+            "failed_checks": [
+              "universe/members, metrics/companies, valuation/multiples, and narrative/records match the frozen contract"
+            ]
+          },
+          {
+            "id": "sector.market-share-proxy",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/sector-overview"],
+            "failed_checks": [
+              "revenue share is labelled as universe-relative proxy and never as true market share"
+            ]
+          },
+          {
+            "id": "sector.no-tam-fabrication",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/sector-overview"],
+            "failed_checks": [
+              "TAM/market-size gaps are omitted or source-cited, not invented"
+            ]
+          },
+          {
+            "id": "sector.ui",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/sector-overview"],
+            "failed_checks": [
+              "hero, metric cards, company comparison, valuation scatter, multiple history, M\u0026A, and structure/trends/implications are present"
+            ]
+          },
+          {
+            "id": "thesis-tracker.falsifiable-pillars",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/thesis-tracker"],
+            "failed_checks": [
+              "3-5 thesis pillars are measurable and bound to concrete Alva metrics before build proceeds"
+            ]
+          },
+          {
+            "id": "thesis-tracker.schema",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/thesis-tracker"],
+            "failed_checks": [
+              "pillars/metrics, updates/log, catalysts/upcoming, valuation/snapshot, and narrative/records match the frozen contract"
+            ]
+          },
+          {
+            "id": "thesis-tracker.static-vs-feed",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/thesis-tracker"],
+            "failed_checks": [
+              "thesis statement, risks, and target are static build-time config; tracked metrics come from feeds"
+            ]
+          },
+          {
+            "id": "thesis-tracker.labeling",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/thesis-tracker"],
+            "failed_checks": [
+              "conviction, scorecard status/trend, updates, and risk reads are labelled AI analysis"
+            ]
+          },
+          {
+            "id": "thesis-tracker.review-cadence",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/thesis-tracker"],
+            "failed_checks": [
+              "feed cadence matches metric update frequency and README flags at least quarterly full review"
+            ]
+          },
+          {
+            "id": "earnings-preview.consensus",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/earnings-preview"],
+            "failed_checks": [
+              "selects consensus by highest estimate_count for the upcoming fiscal period, not the newest stale row"
+            ]
+          },
+          {
+            "id": "earnings-preview.schema",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/earnings-preview"],
+            "failed_checks": [
+              "schedule/next, consensus/upcoming, guidance/latest, history/beats, revisions/eps, target/consensus, and narrative/records match the contract"
+            ]
+          },
+          {
+            "id": "earnings-preview.beat-history",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/earnings-preview"],
+            "failed_checks": [
+              "beat/miss surprise math uses pre-report consensus and last-eight-quarter context"
+            ]
+          },
+          {
+            "id": "earnings-preview.ui",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/earnings-preview"],
+            "failed_checks": [
+              "first fold includes verdict hero plus four cards, followed by history, revisions, guidance, watch items, and references"
+            ]
+          },
+          {
+            "id": "earnings-analysis.latest-quarter",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/earnings-analysis"],
+            "failed_checks": [
+              "confirms the most recent reported quarter and does not analyze a stale or future period"
+            ]
+          },
+          {
+            "id": "earnings-analysis.preprint-consensus",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/earnings-analysis"],
+            "failed_checks": [
+              "beat/miss bars use pre-print consensus, not post-print revised estimates"
+            ]
+          },
+          {
+            "id": "earnings-analysis.schema",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/earnings-analysis"],
+            "failed_checks": [
+              "results/reported, trends/quarterly, revisions/consensus, valuation/snapshot, and narrative/records match the contract"
+            ]
+          },
+          {
+            "id": "earnings-analysis.delta-focus",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/earnings-analysis"],
+            "failed_checks": [
+              "analysis focuses on what changed this quarter rather than rehashing background"
+            ]
+          },
+          {
+            "id": "earnings-analysis.ui",
+            "area": "case-specific",
+            "count": 1,
+            "lost": 5,
+            "cases": ["anthropic/earnings-analysis"],
+            "failed_checks": [
+              "verdict hero, four metric cards, beat/miss bars, quarterly trend, estimate revisions, and labelled thesis impact are present"
+            ]
+          }
+        ]
+      }
+    </script>
+    <script>
+      const data = JSON.parse(
+        document.getElementById("dashboard-data").textContent,
+      );
+      const state = { filter: "all", query: "" };
+
+      function fmt(value) {
+        return Number(value).toLocaleString(undefined, {
+          maximumFractionDigits: 2,
+        });
+      }
+
+      function pct(value, total) {
+        if (!total) return 0;
+        return Math.max(0, Math.min(100, (value / total) * 100));
+      }
+
+      function textMatch(testCase, query) {
+        if (!query) return true;
+        const blob = [
+          testCase.case_id,
+          testCase.skill_id,
+          ...testCase.shared_failed.map((item) => item.id),
+          ...testCase.specific_failed.map((item) => item.id),
+          ...testCase.shared_failed.flatMap((item) => item.failed_checks),
+          ...testCase.specific_failed.flatMap((item) => item.failed_checks),
+        ]
+          .join(" ")
+          .toLowerCase();
+        return blob.includes(query.toLowerCase());
+      }
+
+      function filterCase(testCase) {
+        if (!textMatch(testCase, state.query)) return false;
+        if (state.filter === "shared") return testCase.lost.shared > 0;
+        if (state.filter === "specific") return testCase.lost.specific > 0;
+        if (state.filter === "lowest") return testCase.score.total <= 70;
+        return true;
+      }
+
+      function renderMetrics() {
+        const summary = data.summary;
+        const metrics = [
+          [
+            "Average score",
+            fmt(summary.scores.average) + "/100",
+            "Range " + fmt(summary.scores.min) + ".." + fmt(summary.scores.max),
+          ],
+          [
+            "Total lost",
+            fmt(summary.lost.total),
+            fmt(summary.awarded.total) +
+              " awarded of " +
+              fmt(summary.possible.total),
+          ],
+          [
+            "Shared lost",
+            fmt(summary.lost.shared),
+            fmt(summary.awarded.shared) +
+              " awarded of " +
+              fmt(summary.possible.shared),
+          ],
+          [
+            "Specific lost",
+            fmt(summary.lost.specific),
+            fmt(summary.awarded.specific) +
+              " awarded of " +
+              fmt(summary.possible.specific),
+          ],
+          [
+            "Agent runs",
+            summary.cases_total + "/17",
+            "Status 0, timeouts " + summary.agent_runs.timed_out,
+          ],
+          [
+            "Run cost",
+            "$" + fmt(summary.cost_usd),
+            fmt(summary.duration_minutes) + " agent minutes",
+          ],
+        ];
+        document.getElementById("metrics").innerHTML = metrics
+          .map(
+            ([label, value, note]) =>
+              '<div class="metric"><div class="label">' +
+              label +
+              '</div><div class="value">' +
+              value +
+              '</div><div class="note">' +
+              note +
+              "</div></div>",
+          )
+          .join("");
+      }
+
+      function renderBreakdowns() {
+        const summary = data.summary;
+        document.getElementById("loss-total").textContent =
+          fmt(summary.lost.total) + " lost";
+        const lossRows = [
+          [
+            "Shared rubric",
+            summary.lost.shared,
+            summary.possible.shared,
+            "shared",
+          ],
+          [
+            "Case-specific rubric",
+            summary.lost.specific,
+            summary.possible.specific,
+            "specific",
+          ],
+        ];
+        document.getElementById("loss-breakdown").innerHTML = lossRows
+          .map(
+            ([label, lost, possible, className]) =>
+              '<div class="loss-row"><div class="loss-top"><span>' +
+              label +
+              "</span><span>" +
+              fmt(lost) +
+              " lost of " +
+              fmt(possible) +
+              '</span></div><div class="bar"><span class="' +
+              className +
+              '" style="width:' +
+              pct(lost, possible) +
+              '%"></span></div></div>',
+          )
+          .join("");
+
+        const counts = summary.rubric_status_counts.all;
+        const total = counts.full + counts.partial + counts.zero;
+        document.getElementById("status-total").textContent =
+          total + " criteria";
+        document.getElementById("status-breakdown").innerHTML =
+          '<div class="loss-row"><div class="loss-top"><span>All criteria</span><span>full=' +
+          counts.full +
+          ", partial=" +
+          counts.partial +
+          ", zero=" +
+          counts.zero +
+          '</span></div><div class="bar stack"><span class="full" style="width:' +
+          pct(counts.full, total) +
+          '%"></span><span class="partial" style="width:' +
+          pct(counts.partial, total) +
+          '%"></span><span class="zero" style="width:' +
+          pct(counts.zero, total) +
+          '%"></span></div></div>';
+      }
+
+      function renderFailureGroup(title, items) {
+        if (!items.length)
+          return '<div class="empty">' + title + ": none</div>";
+        return (
+          '<div class="failure"><div class="failure-title"><span>' +
+          title +
+          "</span><span>" +
+          fmt(items.reduce((total, item) => total + item.lost, 0)) +
+          " lost</span></div>" +
+          items
+            .map(
+              (item) =>
+                '<div class="failure"><div class="failure-title"><span>' +
+                item.id +
+                "</span><span>" +
+                fmt(item.lost) +
+                " lost</span></div><ul>" +
+                item.failed_checks
+                  .map((check) => "<li>" + check + "</li>")
+                  .join("") +
+                "</ul></div>",
+            )
+            .join("") +
+          "</div>"
+        );
+      }
+
+      function renderCases() {
+        const rows = data.cases.filter(filterCase);
+        document.getElementById("case-count").textContent =
+          rows.length + " of " + data.cases.length + " shown";
+        document.getElementById("case-table").innerHTML = rows
+          .map((testCase) => {
+            const badge = testCase.disabled
+              ? '<span class="pill amber">disabled</span>'
+              : '<span class="pill">enabled</span>';
+            const scoreBar =
+              '<div class="bar"><span class="score" style="width:' +
+              testCase.score.total +
+              '%"></span></div>';
+            return (
+              '<tr><td><div class="skill">' +
+              testCase.skill_id +
+              " " +
+              badge +
+              '</div><div class="case-id">' +
+              testCase.case_id +
+              '</div></td><td class="num">' +
+              fmt(testCase.score.total) +
+              scoreBar +
+              '</td><td class="num">' +
+              fmt(testCase.lost.shared) +
+              '</td><td class="num">' +
+              fmt(testCase.lost.specific) +
+              "</td><td><details><summary>" +
+              (testCase.failed_counts.shared +
+                testCase.failed_counts.specific) +
+              " failed criteria</summary>" +
+              renderFailureGroup("Shared", testCase.shared_failed) +
+              renderFailureGroup("Case-specific", testCase.specific_failed) +
+              "</details></td></tr>"
+            );
+          })
+          .join("");
+      }
+
+      function renderTopCriteria() {
+        document.getElementById("top-criteria").innerHTML = data.top_criteria
+          .slice(0, 18)
+          .map(
+            (item) =>
+              '<div class="failure"><div class="failure-title"><span>' +
+              item.id +
+              ' <span class="pill">' +
+              item.area +
+              "</span></span><span>" +
+              fmt(item.lost) +
+              ' lost</span></div><div class="case-id">' +
+              item.count +
+              " case(s): " +
+              item.cases.join(", ") +
+              "</div><ul>" +
+              item.failed_checks
+                .map((check) => "<li>" + check + "</li>")
+                .join("") +
+              "</ul></div>",
+          )
+          .join("");
+      }
+
+      function bindControls() {
+        document.getElementById("search").addEventListener("input", (event) => {
+          state.query = event.target.value;
+          renderCases();
+        });
+        for (const button of document.querySelectorAll("[data-filter]")) {
+          button.addEventListener("click", () => {
+            state.filter = button.dataset.filter;
+            for (const other of document.querySelectorAll("[data-filter]")) {
+              other.setAttribute("aria-pressed", String(other === button));
+            }
+            renderCases();
+          });
+        }
+      }
+
+      document.getElementById("subtitle").textContent =
+        data.summary.run_id +
+        " | " +
+        data.summary.profile +
+        " | " +
+        data.summary.mode +
+        " | generated " +
+        data.summary.generated_at;
+      document.getElementById("interpretation").textContent =
+        "This is an evidence-slice execution score for the Alva skill plus each blueprint. It is not a standalone blueprint-quality benchmark or proof of full playbook production success.";
+      renderMetrics();
+      renderBreakdowns();
+      renderCases();
+      renderTopCriteria();
+      bindControls();
+    </script>
+  </body>
+</html>

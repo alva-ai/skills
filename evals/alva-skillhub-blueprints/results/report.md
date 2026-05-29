@@ -20,6 +20,9 @@ See `scoring-issue-report.md` for the full interpretation: this score measures
 evidence-slice execution coverage for the Alva skill plus each blueprint, not
 standalone blueprint quality or full production playbook success.
 
+Open `dashboard.html` for the local filterable dashboard of score distribution,
+lost points, and per-case failed checks.
+
 ## Scores
 
 | Case                                    | Skill                          | Disabled | Total | Shared | Case-specific |
