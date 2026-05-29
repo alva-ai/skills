@@ -1,0 +1,173 @@
+{
+  "run_id": "skillhub-baseline-2026-05-29",
+  "generated_at": "2026-05-29T02:00:00Z",
+  "profile": "prd",
+  "mode": "evidence-slice",
+  "objective": "Run and score every Alva Skillhub production blueprint baseline case.",
+  "cases_total": 17,
+  "scores": {
+    "average": 73.14,
+    "min": 65,
+    "max": 80
+  },
+  "agent_runs": {
+    "statuses": {
+      "0": 17
+    },
+    "timed_out": 0
+  },
+  "rubric_status_counts": {
+    "all": {
+      "full": 158,
+      "partial": 10,
+      "zero": 87
+    },
+    "shared": {
+      "full": 143,
+      "partial": 10
+    },
+    "case_specific": {
+      "zero": 87,
+      "full": 15
+    }
+  },
+  "caveat": "This run executed the evidence-gathering slice for every case. It did not deploy/release 17 playbooks, so runtime/release/UI rubric points are awarded only where direct evidence exists and otherwise remain unearned.",
+  "case_scores": [
+    {
+      "case_id": "baseline-alva-thesis",
+      "skill_id": "alva/thesis",
+      "disabled": false,
+      "total": 65,
+      "shared": 65,
+      "case_specific": 0
+    },
+    {
+      "case_id": "baseline-alva-screener",
+      "skill_id": "alva/screener",
+      "disabled": false,
+      "total": 73.33,
+      "shared": 68.33,
+      "case_specific": 5
+    },
+    {
+      "case_id": "baseline-alva-backtest",
+      "skill_id": "alva/backtest",
+      "disabled": false,
+      "total": 71.67,
+      "shared": 66.67,
+      "case_specific": 5
+    },
+    {
+      "case_id": "baseline-alva-ai-digest",
+      "skill_id": "alva/ai-digest",
+      "disabled": false,
+      "total": 75,
+      "shared": 70,
+      "case_specific": 5
+    },
+    {
+      "case_id": "baseline-alva-earnings",
+      "skill_id": "alva/earnings",
+      "disabled": false,
+      "total": 70,
+      "shared": 65,
+      "case_specific": 5
+    },
+    {
+      "case_id": "baseline-alva-asset-deepdive",
+      "skill_id": "alva/asset-deepdive",
+      "disabled": false,
+      "total": 73.33,
+      "shared": 68.33,
+      "case_specific": 5
+    },
+    {
+      "case_id": "baseline-anthropic-catalyst-weekly",
+      "skill_id": "anthropic/catalyst-weekly",
+      "disabled": false,
+      "total": 73.33,
+      "shared": 68.33,
+      "case_specific": 5
+    },
+    {
+      "case_id": "baseline-anthropic-competitive-analysis",
+      "skill_id": "anthropic/competitive-analysis",
+      "disabled": false,
+      "total": 75,
+      "shared": 70,
+      "case_specific": 5
+    },
+    {
+      "case_id": "baseline-anthropic-comps-analysis",
+      "skill_id": "anthropic/comps-analysis",
+      "disabled": false,
+      "total": 68.33,
+      "shared": 68.33,
+      "case_specific": 0
+    },
+    {
+      "case_id": "baseline-anthropic-dcf-model",
+      "skill_id": "anthropic/dcf-model",
+      "disabled": false,
+      "total": 68.33,
+      "shared": 68.33,
+      "case_specific": 0
+    },
+    {
+      "case_id": "baseline-anthropic-idea-generation",
+      "skill_id": "anthropic/idea-generation",
+      "disabled": false,
+      "total": 75,
+      "shared": 70,
+      "case_specific": 5
+    },
+    {
+      "case_id": "baseline-anthropic-morning-note",
+      "skill_id": "anthropic/morning-note",
+      "disabled": false,
+      "total": 75,
+      "shared": 70,
+      "case_specific": 5
+    },
+    {
+      "case_id": "baseline-anthropic-model-update",
+      "skill_id": "anthropic/model-update",
+      "disabled": false,
+      "total": 70,
+      "shared": 70,
+      "case_specific": 0
+    },
+    {
+      "case_id": "baseline-anthropic-sector-overview",
+      "skill_id": "anthropic/sector-overview",
+      "disabled": false,
+      "total": 80,
+      "shared": 70,
+      "case_specific": 10
+    },
+    {
+      "case_id": "baseline-anthropic-thesis-tracker",
+      "skill_id": "anthropic/thesis-tracker",
+      "disabled": true,
+      "total": 75,
+      "shared": 70,
+      "case_specific": 5
+    },
+    {
+      "case_id": "baseline-anthropic-earnings-preview",
+      "skill_id": "anthropic/earnings-preview",
+      "disabled": true,
+      "total": 80,
+      "shared": 70,
+      "case_specific": 10
+    },
+    {
+      "case_id": "baseline-anthropic-earnings-analysis",
+      "skill_id": "anthropic/earnings-analysis",
+      "disabled": true,
+      "total": 75,
+      "shared": 70,
+      "case_specific": 5
+    }
+  ]
+}

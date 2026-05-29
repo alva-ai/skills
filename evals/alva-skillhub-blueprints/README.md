@@ -7,14 +7,18 @@ alva --profile prd skillhub list --json
 ```
 
 Each case starts with an explicit `/use-skill:<username>/<name>` directive. That
-forces the Alva skill to exercise the full Skillhub path: pre-flight, `get`,
-fresh blueprint `file`, Guided Planning, data discovery, Alva runtime work,
-playbook release verification, and evidence packaging.
+forces the Alva skill eval to cover the full Skillhub path in its rubric:
+pre-flight, `get`, fresh blueprint `file`, Guided Planning, data discovery, Alva
+runtime work, playbook release verification, and evidence packaging.
 
 ## Files
 
 - `cases.json` - machine-readable baseline cases and rubrics.
 - `scripts/verify.mjs` - manifest/catalog verifier.
+- `scripts/run-and-score.mjs` - evidence runner and deterministic scorer.
+- `results/run-summary.json` - latest committed run summary.
+- `results/scorecards.json` - latest committed per-case rubric scorecards.
+- `results/report.md` - latest committed human-readable score report.
 
 ## Verify The Baseline
 
@@ -52,6 +56,24 @@ Each run is scored out of 100:
 
 - 70 shared points cover the end-to-end Alva skill chain.
 - 30 case-specific points cover the blueprint's unique contract.
+
+To reproduce the latest committed baseline run:
+
+```bash
+node evals/alva-skillhub-blueprints/scripts/run-and-score.mjs \
+  --profile prd \
+  --run-id skillhub-baseline-2026-05-29 \
+  --timeout-ms 240000
+```
+
+The committed run uses `mode=evidence-slice`: every catalog case is run through
+the Alva skill, production Skillhub blueprint retrieval, data-skills discovery,
+and evidence summarization, but it does not deploy or release 17 playbooks.
+Runtime, release, screenshot, and UI artifact checks are scored only when the
+trace contains direct evidence; otherwise those checks remain unearned. Each
+criterion in `results/scorecards.json` includes a `status` label (`full`,
+`partial`, or `zero`) plus `passed_checks`, `failed_checks`, and evidence
+snippets for later re-grading.
 
 Use the rubric tags as labels in whatever evaluation store consumes the run
 result. The intended tags are small and stable: `skillhub`, `blueprint`, `data`,
