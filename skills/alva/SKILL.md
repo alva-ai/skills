@@ -870,6 +870,10 @@ validation rules and the canonical content shape.
    - **Keep private** → done. Remind the user that only they can access the
      draft URL.
 
+   To change a *published* playbook's visibility later, use
+   `alva playbooks set-visibility` (run `alva playbooks --help` first;
+   private/paid require Pro).
+
 #### Free users (`subscription_tier = "free"`)
 
 1. **Publish directly**: Call `alva release playbook` — free users can create
@@ -1122,7 +1126,7 @@ a routing index — and, for the rows in bold, the linked sub-doc is a
 | `sdk` | Runtime libraries (50+ technical indicators, search, widgets). |
 | `data-skills` | Discover the 250+ Arrays financial-data endpoints. |
 | `skillhub` | Pull curated methodology blueprints (`/use-skill:` flow). |
-| `playbooks` | Discover public playbooks (`trending`) with compact agent-friendly refs for browsing examples and choosing remix sources. |
+| `playbooks` | Discover public playbooks (`trending`) with compact agent-friendly refs for browsing examples and choosing remix sources; flip an existing playbook's visibility with `set-visibility` (public / private / paid — private and paid are Pro-gated, a free account gets `PERMISSION_DENIED`). |
 | `comments` | Create / pin / unpin playbook comments — see [creators-note.md](references/creators-note.md) for the post-release creator's-note workflow. |
 | `push-subscriptions` | Personal push opt-in for playbooks and feeds. |
 | `channel` | Group push subscriptions (Telegram / Discord groups). |
