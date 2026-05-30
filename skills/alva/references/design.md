@@ -47,7 +47,7 @@ the **design linter** that runs inside `alva release playbook`:
   components (root class, variants, sizes, states, bindings).
 - [css/design-system.css](./css/design-system.css) — the canonical CSS bundle
   (tokens + globals + components + widgets) generated from this doc's
-  fenced `css` blocks plus design-components.md / design-widgets.md. Published
+  fenced CSS blocks plus design-components.md / design-widgets.md. Published
   to the CDN; new playbooks `<link>` it to get all canonical styling.
 
 The linter is shipped in the `alva` CLI and runs as a hard gate. To pre-check

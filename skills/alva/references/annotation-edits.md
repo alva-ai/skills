@@ -55,7 +55,7 @@ so the target is one of two cases:
 
 Do not copy the element's rendered DOM and paste it back as static HTML with
 the instruction applied. That hardcodes the live feed value into a literal
-(breaking the [Content Legitimacy Rules](../SKILL.md#content-legitimacy-rules)),
+(breaking the [Content Legitimacy Rules](content-legitimacy.md)),
 so the element stops reflowing on the next feed update, and it usually drops
 design-system tokens.
 
