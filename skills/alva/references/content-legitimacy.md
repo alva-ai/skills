@@ -106,25 +106,3 @@ comparisons, read [fundamentals-periods.md](fundamentals-periods.md).
 Playbook descriptions, README, methodology, and visible copy may only claim
 data sources that were successfully called. Update-frequency claims must match
 actual cronjob deployment. If deployment failed, fix it or remove the claim.
-
-## Scored Outputs And Rankings
-
-When producing a scored screener, ranked list, factor score, model score, or
-AI-assisted rating, the score is itself a financial claim. Do not stop at a
-table of ranks and numbers. Explain what the score measures, what it does not
-measure, and whether it is a raw factor-weighted score, a percentile, a band,
-a calibrated display score, or a model output.
-
-If the user questions low or high scores, analyze the score mechanics before
-changing the artifact. Name the drivers from the actual formula: factor
-weights, min-max or percentile normalization, small-universe compression,
-outliers, missing features, stale inputs, unit/currency conventions, and any
-display calibration. Separate `raw_score`, `display_score`, and rank order
-when they differ. Never make a score look better by silently rescaling it.
-
-For every scored artifact, include a path to improvement that changes the
-model rather than laundering the output: broaden the peer universe, use
-winsorized or percentile normalization, add more horizons, add fundamentals,
-earnings revisions, analyst estimate changes, news/social/options features,
-tune weights for the objective, and backtest the formula with Altra before
-claiming the new score is better.

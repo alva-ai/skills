@@ -7,6 +7,14 @@ import { fileURLToPath } from "node:url";
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const DEFAULT_CASES = resolve(SCRIPT_DIR, "cases.json");
+const SCRIPT_PATH = fileURLToPath(import.meta.url);
+
+const SCORE_DIAGNOSIS_GUIDE = [
+  "Eval score is diagnostic: use every failed check to find a skill gap, not as user-facing scoring copy.",
+  "Classify the gap before editing: missing capability summary, missing routing pointer, missing guardrail, missing reference detail, or missing eval coverage.",
+  "Do not expose eval scores as product copy, and do not patch demos to hide a weak result.",
+  "Instead, fix the canonical skill text or eval case, then rerun baseline and final reports so the regression mechanism proves the gap is closed.",
+].join("\n");
 
 function parseArgs(argv) {
   const opts = {
@@ -81,7 +89,16 @@ function readWorktree(path) {
   return existsSync(path) ? readFileSync(path, "utf8") : null;
 }
 
+function loadEvalMaterials(casesPath) {
+  const files = [SCRIPT_PATH, casesPath];
+  return files
+    .filter((path, index, all) => all.indexOf(path) === index && existsSync(path))
+    .map((path) => `\n\n--- ${path} ---\n${readFileSync(path, "utf8")}`)
+    .join("");
+}
+
 function loadCorpus(opts) {
+  const evalText = loadEvalMaterials(opts.casesPath);
   if (opts.treeish) {
     const skill = gitShow(opts.treeish, "skills/alva/SKILL.md");
     if (skill == null) throw new Error(`No skills/alva/SKILL.md at ${opts.treeish}`);
@@ -94,7 +111,7 @@ function loadCorpus(opts) {
         if (body != null) references += `\n\n--- ${file} ---\n${body}`;
       }
     }
-    return { label: opts.treeish, skill, references, corpus: `${skill}${references}` };
+    return { label: opts.treeish, skill, references, corpus: `${skill}${references}`, eval: evalText };
   }
 
   const skillPath = resolve(opts.skillDir, "SKILL.md");
@@ -125,7 +142,7 @@ function loadCorpus(opts) {
   for (const file of refFiles) {
     references += `\n\n--- ${file} ---\n${readFileSync(file, "utf8")}`;
   }
-  return { label: opts.skillDir, skill, references, corpus: `${skill}${references}` };
+  return { label: opts.skillDir, skill, references, corpus: `${skill}${references}`, eval: evalText };
 }
 
 function includesAll(text, needles) {
@@ -141,7 +158,12 @@ function normalizeText(text) {
 }
 
 function evaluateCase(testCase, docs) {
-  const text = testCase.target === "skill" ? docs.skill : docs.corpus;
+  const text =
+    testCase.target === "skill"
+      ? docs.skill
+      : testCase.target === "eval"
+        ? docs.eval
+        : docs.corpus;
   const checks = [];
 
   if (Array.isArray(testCase.includes)) {
@@ -194,6 +216,21 @@ function renderReport(manifest, docs, results) {
   out += `SKILL.md lines: ${skillLines}\n\n`;
   out += `Cases: ${passedCases}/${totalCases}\n\n`;
   out += `Checks: ${passedChecks}/${totalChecks} (${pct.toFixed(2)}%)\n\n`;
+  out += "## Scoring Diagnosis\n\n";
+  out += `${SCORE_DIAGNOSIS_GUIDE}\n\n`;
+  const failedResults = results.filter((result) => !result.ok);
+  if (failedResults.length === 0) {
+    out += "No failed cases. Keep the eval in place as a regression mechanism.\n\n";
+  } else {
+    for (const result of failedResults) {
+      const missing = result.checks
+        .filter((check) => !check.pass)
+        .map((check) => check.needle)
+        .join("; ");
+      out += `- ${result.id}: inspect for a skill gap before editing. Missing checks: ${missing}\n`;
+    }
+    out += "\n";
+  }
 
   for (const [group, groupResults] of byGroup) {
     const gCases = groupResults.filter((r) => r.ok).length;

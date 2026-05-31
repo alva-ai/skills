@@ -1,12 +1,21 @@
 # alva-skill-doc-regression
 
-Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/skill-score-interpretation/skills/alva`
+Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/skill-eval-diagnosis/skills/alva`
 
-SKILL.md lines: 684
+SKILL.md lines: 678
 
 Cases: 23/23
 
 Checks: 141/141 (100.00%)
+
+## Scoring Diagnosis
+
+Eval score is diagnostic: use every failed check to find a skill gap, not as user-facing scoring copy.
+Classify the gap before editing: missing capability summary, missing routing pointer, missing guardrail, missing reference detail, or missing eval coverage.
+Do not expose eval scores as product copy, and do not patch demos to hide a weak result.
+Instead, fix the canonical skill text or eval case, then rerun baseline and final reports so the regression mechanism proves the gap is closed.
+
+No failed cases. Keep the eval in place as a regression mechanism.
 
 ## retained
 
@@ -243,20 +252,20 @@ Snippet claims must not be merged into new agent-authored consensus, ranking, or
 
 1/1 cases, 10/10 checks
 
-### PASS feedback.score-interpretation
+### PASS feedback.eval-diagnosis
 
-Scored screeners and ranked model outputs require interpretation, low/high-score diagnosis, and model-improvement guidance.
+Eval scoring feedback is used to diagnose skill gaps, not exposed as user-facing scoring copy.
 
-- [x] scored screener
-- [x] ranked list
-- [x] raw factor-weighted score
-- [x] calibrated display score
-- [x] min-max or percentile normalization
-- [x] small-universe compression
-- [x] outliers
-- [x] Never make a score look better by silently rescaling it
-- [x] winsorized or percentile normalization
-- [x] backtest the formula with Altra
+- [x] score is diagnostic
+- [x] skill gap
+- [x] missing capability summary
+- [x] missing routing pointer
+- [x] missing guardrail
+- [x] missing reference detail
+- [x] missing eval coverage
+- [x] Do not expose eval scores as product copy
+- [x] fix the canonical skill text or eval case
+- [x] regression mechanism
 
 ## target
 
@@ -266,8 +275,8 @@ Scored screeners and ranked model outputs require interpretation, low/high-score
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 684)
-- [x] line count <= 850 (actual 684)
+- [x] line count >= 650 (actual 678)
+- [x] line count <= 850 (actual 678)
 
 ### PASS target.playbook-task-offload
 

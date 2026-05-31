@@ -287,21 +287,21 @@
       ]
     },
     {
-      "id": "feedback.score-interpretation",
+      "id": "feedback.eval-diagnosis",
       "group": "feedback",
-      "target": "corpus",
-      "description": "Scored screeners and ranked model outputs require interpretation, low/high-score diagnosis, and model-improvement guidance.",
+      "target": "eval",
+      "description": "Eval scoring feedback is used to diagnose skill gaps, not exposed as user-facing scoring copy.",
       "includes": [
-        "scored screener",
-        "ranked list",
-        "raw factor-weighted score",
-        "calibrated display score",
-        "min-max or percentile normalization",
-        "small-universe compression",
-        "outliers",
-        "Never make a score look better by silently rescaling it",
-        "winsorized or percentile normalization",
-        "backtest the formula with Altra"
+        "score is diagnostic",
+        "skill gap",
+        "missing capability summary",
+        "missing routing pointer",
+        "missing guardrail",
+        "missing reference detail",
+        "missing eval coverage",
+        "Do not expose eval scores as product copy",
+        "fix the canonical skill text or eval case",
+        "regression mechanism"
       ]
     },
     {

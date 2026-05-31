@@ -4,9 +4,23 @@ Source: `origin/main`
 
 SKILL.md lines: 1746
 
-Cases: 16/23
+Cases: 17/23
 
-Checks: 106/141 (75.18%)
+Checks: 116/141 (82.27%)
+
+## Scoring Diagnosis
+
+Eval score is diagnostic: use every failed check to find a skill gap, not as user-facing scoring copy.
+Classify the gap before editing: missing capability summary, missing routing pointer, missing guardrail, missing reference detail, or missing eval coverage.
+Do not expose eval scores as product copy, and do not patch demos to hide a weak result.
+Instead, fix the canonical skill text or eval case, then rerun baseline and final reports so the regression mechanism proves the gap is closed.
+
+- pr353.chat-as-artifact: inspect for a skill gap before editing. Missing checks: answer_only; Chat-as-Artifact; prompt-injected text; verdict words; EPS forecasts; YTD returns; current prices; forward-return projections
+- pr353.no-synth-verdicts: inspect for a skill gap before editing. Missing checks: Cautious; inline source attribution; not investment advice
+- pr353.no-task-list: inspect for a skill gap before editing. Missing checks: enumerated list; no verb; no question; no task description; scheduled research digest
+- pr353.no-consensus-synthesis: inspect for a skill gap before editing. Missing checks: Do not merge multiple snippet claims; agent-authored consensus; ranked list; source-labeled; synthetic takeaway; source identity is missing; ambiguous
+- target.top-level-size: inspect for a skill gap before editing. Missing checks: line count <= 850 (actual 1746)
+- target.playbook-task-offload: inspect for a skill gap before editing. Missing checks: playbook-creation.md
 
 ## retained
 
@@ -241,22 +255,22 @@ Snippet claims must not be merged into new agent-authored consensus, ranking, or
 
 ## feedback
 
-0/1 cases, 0/10 checks
+1/1 cases, 10/10 checks
 
-### FAIL feedback.score-interpretation
+### PASS feedback.eval-diagnosis
 
-Scored screeners and ranked model outputs require interpretation, low/high-score diagnosis, and model-improvement guidance.
+Eval scoring feedback is used to diagnose skill gaps, not exposed as user-facing scoring copy.
 
-- [ ] scored screener
-- [ ] ranked list
-- [ ] raw factor-weighted score
-- [ ] calibrated display score
-- [ ] min-max or percentile normalization
-- [ ] small-universe compression
-- [ ] outliers
-- [ ] Never make a score look better by silently rescaling it
-- [ ] winsorized or percentile normalization
-- [ ] backtest the formula with Altra
+- [x] score is diagnostic
+- [x] skill gap
+- [x] missing capability summary
+- [x] missing routing pointer
+- [x] missing guardrail
+- [x] missing reference detail
+- [x] missing eval coverage
+- [x] Do not expose eval scores as product copy
+- [x] fix the canonical skill text or eval case
+- [x] regression mechanism
 
 ## target
 

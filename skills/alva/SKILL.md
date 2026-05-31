@@ -489,10 +489,6 @@ financial values. The quick checks:
   units, seasonality, and point-in-time/restated status come from record fields.
 - Descriptions, README, methodology, and copy can only list data sources and
   cadences actually wired and deployed.
-- Scored rankings and model outputs need interpretation, not just numbers:
-  define score semantics, explain low/high drivers from factors and
-  normalization, separate display calibration from raw score, and name how to
-  improve the model. See [content-legitimacy.md](references/content-legitimacy.md).
 
 ## Common Workflows
 
@@ -513,11 +509,9 @@ feed or playbook.
 Turn the user question into a data contract before writing UI: universe,
 metrics, freshness, output groups, and visible widgets. Build feeds first,
 then HTML that reads those feeds, then README and release. Screeners need
-explicit inclusion criteria, scoring formula when scored, score bands, score
-interpretation, and blind spots. The details live in
-[playbook-creation.md](references/playbook-creation.md),
-[api/release.md](references/api/release.md), and
-[content-legitimacy.md](references/content-legitimacy.md).
+explicit inclusion criteria, scoring formula when scored, score bands, and
+blind spots. The details live in [playbook-creation.md](references/playbook-creation.md)
+and [api/release.md](references/api/release.md).
 
 ### Thesis Or Digest
 
