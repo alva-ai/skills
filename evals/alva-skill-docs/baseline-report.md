@@ -4,9 +4,9 @@ Source: `origin/main`
 
 SKILL.md lines: 1746
 
-Cases: 16/22
+Cases: 16/23
 
-Checks: 106/131 (80.92%)
+Checks: 106/141 (75.18%)
 
 ## retained
 
@@ -238,6 +238,25 @@ Snippet claims must not be merged into new agent-authored consensus, ranking, or
 - [ ] synthetic takeaway
 - [ ] source identity is missing
 - [ ] ambiguous
+
+## feedback
+
+0/1 cases, 0/10 checks
+
+### FAIL feedback.score-interpretation
+
+Scored screeners and ranked model outputs require interpretation, low/high-score diagnosis, and model-improvement guidance.
+
+- [ ] scored screener
+- [ ] ranked list
+- [ ] raw factor-weighted score
+- [ ] calibrated display score
+- [ ] min-max or percentile normalization
+- [ ] small-universe compression
+- [ ] outliers
+- [ ] Never make a score look better by silently rescaling it
+- [ ] winsorized or percentile normalization
+- [ ] backtest the formula with Altra
 
 ## target
 

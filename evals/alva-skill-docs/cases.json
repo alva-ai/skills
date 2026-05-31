@@ -287,6 +287,24 @@
       ]
     },
     {
+      "id": "feedback.score-interpretation",
+      "group": "feedback",
+      "target": "corpus",
+      "description": "Scored screeners and ranked model outputs require interpretation, low/high-score diagnosis, and model-improvement guidance.",
+      "includes": [
+        "scored screener",
+        "ranked list",
+        "raw factor-weighted score",
+        "calibrated display score",
+        "min-max or percentile normalization",
+        "small-universe compression",
+        "outliers",
+        "Never make a score look better by silently rescaling it",
+        "winsorized or percentile normalization",
+        "backtest the formula with Altra"
+      ]
+    },
+    {
       "id": "target.top-level-size",
       "group": "target",
       "target": "skill",

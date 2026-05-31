@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/skill-encyclopedia-routing/skills/alva`
+Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/skill-score-interpretation/skills/alva`
 
-SKILL.md lines: 678
+SKILL.md lines: 684
 
-Cases: 22/22
+Cases: 23/23
 
-Checks: 131/131 (100.00%)
+Checks: 141/141 (100.00%)
 
 ## retained
 
@@ -239,6 +239,25 @@ Snippet claims must not be merged into new agent-authored consensus, ranking, or
 - [x] source identity is missing
 - [x] ambiguous
 
+## feedback
+
+1/1 cases, 10/10 checks
+
+### PASS feedback.score-interpretation
+
+Scored screeners and ranked model outputs require interpretation, low/high-score diagnosis, and model-improvement guidance.
+
+- [x] scored screener
+- [x] ranked list
+- [x] raw factor-weighted score
+- [x] calibrated display score
+- [x] min-max or percentile normalization
+- [x] small-universe compression
+- [x] outliers
+- [x] Never make a score look better by silently rescaling it
+- [x] winsorized or percentile normalization
+- [x] backtest the formula with Altra
+
 ## target
 
 2/2 cases, 8/8 checks
@@ -247,8 +266,8 @@ Snippet claims must not be merged into new agent-authored consensus, ranking, or
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 678)
-- [x] line count <= 850 (actual 678)
+- [x] line count >= 650 (actual 684)
+- [x] line count <= 850 (actual 684)
 
 ### PASS target.playbook-task-offload
 
