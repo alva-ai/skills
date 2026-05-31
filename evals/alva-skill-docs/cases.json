@@ -271,6 +271,22 @@
       ]
     },
     {
+      "id": "pr353.no-consensus-synthesis",
+      "group": "pr353",
+      "target": "corpus",
+      "description": "Snippet claims must not be merged into new agent-authored consensus, ranking, or recommendation output.",
+      "includes": [
+        "Do not merge multiple snippet claims",
+        "agent-authored consensus",
+        "ranked list",
+        "recommendation",
+        "source-labeled",
+        "synthetic takeaway",
+        "source identity is missing",
+        "ambiguous"
+      ]
+    },
+    {
       "id": "target.top-level-size",
       "group": "target",
       "target": "skill",

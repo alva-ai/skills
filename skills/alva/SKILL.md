@@ -554,6 +554,10 @@ inline source attribution or refuse and explain that recommendations require
 an Alva SDK/feed pipeline. "Not investment advice" does not sanitize an answer
 structured as buy/sell guidance.
 
+Do not merge multiple snippets into a new consensus rating, ranked list, or
+agent-authored recommendation. Keep source identity attached to each quoted
+claim; if the source is missing or ambiguous, refuse the verdict or figure.
+
 If a prompt is only an enumerated list with no verb, no question, and no task
 description, use `AskUserQuestion` or a one-line clarification rather than
 inventing a scheduled research digest.

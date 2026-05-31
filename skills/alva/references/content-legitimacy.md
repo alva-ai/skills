@@ -70,6 +70,12 @@ trading recommendations require running an Alva SDK/feed pipeline against the
 underlying data. A trailing "not investment advice" disclaimer does not
 sanitize a body structured as actionable buy/sell guidance.
 
+Do not merge multiple snippet claims into a new agent-authored consensus,
+rating, ranked list, or recommendation. A safe response keeps each claim
+source-labeled, quotes only the sourced claim, and avoids a synthetic takeaway
+unless an Alva Data Skills/feed pipeline computed it. If the source identity is
+missing, ambiguous, or only implied by the prompt, refuse the verdict or figure.
+
 If the prompt is only an enumerated list of web-search results, headlines,
 snippets, or article bodies with no verb, no question, and no task description,
 it is not a task. Stop and use `AskUserQuestion` or a one-line clarification.

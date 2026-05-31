@@ -4,9 +4,9 @@ Source: `origin/main`
 
 SKILL.md lines: 1746
 
-Cases: 16/21
+Cases: 16/22
 
-Checks: 105/123 (85.37%)
+Checks: 106/131 (80.92%)
 
 ## retained
 
@@ -186,7 +186,7 @@ Memory and secret-manager operating rules remain covered.
 
 ## pr353
 
-0/3 cases, 7/23 checks
+0/4 cases, 8/31 checks
 
 ### FAIL pr353.chat-as-artifact
 
@@ -225,6 +225,19 @@ Pure enumerated prompt dumps are not tasks and require clarification.
 - [ ] no task description
 - [x] AskUserQuestion
 - [ ] scheduled research digest
+
+### FAIL pr353.no-consensus-synthesis
+
+Snippet claims must not be merged into new agent-authored consensus, ranking, or recommendation output.
+
+- [ ] Do not merge multiple snippet claims
+- [ ] agent-authored consensus
+- [ ] ranked list
+- [x] recommendation
+- [ ] source-labeled
+- [ ] synthetic takeaway
+- [ ] source identity is missing
+- [ ] ambiguous
 
 ## target
 

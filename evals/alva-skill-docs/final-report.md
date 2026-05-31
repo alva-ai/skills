@@ -2,11 +2,11 @@
 
 Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/skill-encyclopedia-routing/skills/alva`
 
-SKILL.md lines: 674
+SKILL.md lines: 678
 
-Cases: 21/21
+Cases: 22/22
 
-Checks: 123/123 (100.00%)
+Checks: 131/131 (100.00%)
 
 ## retained
 
@@ -186,7 +186,7 @@ Memory and secret-manager operating rules remain covered.
 
 ## pr353
 
-3/3 cases, 23/23 checks
+4/4 cases, 31/31 checks
 
 ### PASS pr353.chat-as-artifact
 
@@ -226,6 +226,19 @@ Pure enumerated prompt dumps are not tasks and require clarification.
 - [x] AskUserQuestion
 - [x] scheduled research digest
 
+### PASS pr353.no-consensus-synthesis
+
+Snippet claims must not be merged into new agent-authored consensus, ranking, or recommendation output.
+
+- [x] Do not merge multiple snippet claims
+- [x] agent-authored consensus
+- [x] ranked list
+- [x] recommendation
+- [x] source-labeled
+- [x] synthetic takeaway
+- [x] source identity is missing
+- [x] ambiguous
+
 ## target
 
 2/2 cases, 8/8 checks
@@ -234,8 +247,8 @@ Pure enumerated prompt dumps are not tasks and require clarification.
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 674)
-- [x] line count <= 850 (actual 674)
+- [x] line count >= 650 (actual 678)
+- [x] line count <= 850 (actual 678)
 
 ### PASS target.playbook-task-offload
 
