@@ -1169,7 +1169,7 @@ variables, or shell. Host-agent permissions still apply. See
 | Module          | require()                    | Description                                                             |
 | --------------- | ---------------------------- | ----------------------------------------------------------------------- |
 | alfs            | `require("alfs")`            | Filesystem (uses absolute paths `'/alva/home/<username>/...'`)            |
-| env             | `require("env")`             | `userId`, `username`, `args` from request                               |
+| env             | `require("env")`             | `userId`, `callerUserId`, `username`, `args` from request               |
 | secret-manager  | `require("secret-manager")`  | Read user-scoped third-party secrets stored in Alva Secret Manager      |
 | net/http        | `require("net/http")`        | `fetch(url, init)` for async HTTP requests                              |
 | @alva/algorithm | `require("@alva/algorithm")` | Statistics                                                              |
@@ -1694,6 +1694,13 @@ consistent read pattern (`@last`, `@range`, etc.).
 - **`require("alfs")` uses absolute paths.** Inside the V8 runtime,
   `alfs.readFile()` needs full paths like `'/alva/home/alice/...'`. Get your
   username from `require("env").username`.
+- **UDF caller identity is `require("env").callerUserId`.** `env.userId` is the
+  execution owner; `callerUserId` is the user ID of the person invoking the UDF
+  when a caller is present.
+- **UDF charging is opt-in at registration.** Register UDFs with
+  `allow_charges=false` unless they are explicitly allowed to charge credits. A
+  no-charge UDF that triggers metered credit usage during execution fails instead
+  of settling a debit; otherwise it runs as a no-charge invocation.
 - **No Node.js builtins.** `require("fs")`, `require("path")`, `require("http")`
   do not exist. Use `require("alfs")` for files, `require("net/http")` for HTTP.
 - **Altra `run()` is async.** `FeedAltra.run()` returns a `Promise<RunResult>`.
