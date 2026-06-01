@@ -695,8 +695,8 @@ alva release feed --name <feed> --version 1.0.0 \
   advances fanout without sending a user-visible push. Use it for quiet
   AlvaAsk, heartbeat, and monitor runs.
 - Real delivery always requires an explicit subscription:
-  `alva push-subscriptions subscribe-feed --username <owner> --name <feed>`,
-  `alva push-subscriptions subscribe-playbook --username <owner> --name <playbook>`,
+  `alva subscriptions subscribe-feed --username <owner> --name <feed>`,
+  `alva subscriptions subscribe-playbook --username <owner> --name <playbook>`,
   or a group `/alva subscribe feed <id>` / `/alva subscribe playbook <id>`.
 
 Keep schema examples in [feed-sdk.md](references/feed-sdk.md) Patterns D/E.
@@ -1060,8 +1060,8 @@ verification.
    included.
 3. **Enable the flag on the cronjob:** `alva deploy update --id <ID> --push-notify`.
 4. **Subscribe the delivery target:** for personal push use
-   `alva push-subscriptions subscribe-feed --username <owner> --name <feed>`
-   or `alva push-subscriptions subscribe-playbook --username <owner> --name <playbook>`;
+   `alva subscriptions subscribe-feed --username <owner> --name <feed>`
+   or `alva subscriptions subscribe-playbook --username <owner> --name <playbook>`;
    for group push, run `/alva subscribe feed <id>` or
    `/alva subscribe playbook <id>` in that group.
 5. **Verify the release and a real run:** confirm `alva release feed
@@ -1145,7 +1145,7 @@ a routing index — and, for the rows in bold, the linked sub-doc is a
 | `skillhub` | Pull curated methodology blueprints (`/use-skill:` flow). |
 | `playbooks` | Discover public playbooks (`trending`) with compact agent-friendly refs for browsing examples and choosing remix sources; flip an existing playbook's visibility with `set-visibility` (public / private / paid — private and paid are Pro-gated, a free account gets `PERMISSION_DENIED`). |
 | `comments` | Create / pin / unpin playbook comments — see [creators-note.md](references/creators-note.md) for the post-release creator's-note workflow. |
-| `push-subscriptions` | Personal push opt-in for playbooks and feeds. |
+| `subscriptions` | Subscribe to playbooks (follow + enable all push-enabled automations) and feeds (single automation alert). |
 | `channel` | Group push subscriptions (Telegram / Discord groups). |
 | `trading` | Accounts, portfolio, orders, signals, risk. **Must read [trading.md](references/api/trading.md)** before `execute`, building a signal JSON, or picking an exchange/symbol — real `--signal` schema is `allocate`/`predict` (not the `{symbol,side,qty}` shape the help example shows), `date` is epoch seconds. |
 | `screenshot` | PNG capture used to verify a released playbook. |
