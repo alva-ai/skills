@@ -208,7 +208,7 @@ If the user's message contains a `/use-skill:<username>/<name>` directive (e.g. 
 
 The directive gives the full catalog id (`<username>/<name>`). Skills are curated **methodologies** — opinionated blueprints that encode how to approach a recurring class of finance work (e.g. building a thesis, an AI-curated digest, a momentum tracker). They live in the Skillhub catalog on the gateway and are fetched via the `alva skillhub` CLI (use `alva skillhub --help` for the full surface). Alva ships a starter set under the `alva/` namespace, and any user can publish their own — do not assume the `alva/` namespace.
 
-1. **Inspect**: `alva skillhub get <username>/<name>` returns the file listing with sizes. A known id can be fetched with `get`/`file` even when hidden from `list` discovery. Confirm a blueprint file is present — convention is `template.md`. If absent, look for `README.md` or ask the user which file is the blueprint.
+1. **Inspect**: `alva skillhub get <username>/<name>` returns the file listing with sizes. Confirm a blueprint file is present — convention is `template.md`. If absent, look for `README.md` or ask the user which file is the blueprint.
    - **On 404 / not found** (typo, deleted, or moved): run `alva skillhub list` and look for close matches **leniently** — case-insensitive, substring on both halves of the id, ignore separator differences. If exactly one obvious candidate, proceed with it and tell the user you corrected the id (e.g. "interpreting `/use-skill:Alva/AI-Digest` as `alva/ai-digest`"). If multiple plausible candidates, show them and ask. If nothing close, show the filtered list (use `--tag` if the user hinted at a topic) and ask the user to pick.
 2. **Read the blueprint**: `alva skillhub file <username>/<name> template.md` (or the file from step 1). Do not proceed from memory of a prior session — fetch it fresh.
 3. **Pull other files on demand**: when building, fetch additional files progressively as needed (e.g. `alva skillhub file <username>/<name> src/index.js` only if you intend to mirror the strategy logic). Do not bulk-download.
@@ -1139,7 +1139,7 @@ a routing index — and, for the rows in bold, the linked sub-doc is a
 | `secrets` | CRUD on encrypted secrets read by `require("secret-manager")`. |
 | `sdk` | Runtime libraries (50+ technical indicators, search, widgets). |
 | `data-skills` | Discover the 250+ Arrays financial-data endpoints. |
-| `skillhub` | Pull curated methodology blueprints (`/use-skill:` flow; list/tags discover enabled skills). |
+| `skillhub` | Pull curated methodology blueprints (`/use-skill:` flow). |
 | `playbooks` | Discover public playbooks (`trending`) with compact agent-friendly refs for browsing examples and choosing remix sources; flip an existing playbook's visibility with `set-visibility` (public / private / paid — private and paid are Pro-gated, a free account gets `PERMISSION_DENIED`). |
 | `comments` | Create / pin / unpin playbook comments — see [creators-note.md](references/creators-note.md) for the post-release creator's-note workflow. |
 | `push-subscriptions` | Personal push opt-in for playbooks and feeds. |
