@@ -80,6 +80,14 @@ release. From `releases[0].feeds`, collect the feed refs you need to
 inspect — each entry carries both `feed_name` (for ALFS paths) and
 `feed_id` (for API calls).
 
+If the source playbook has registered UDFs, collect each function's
+`function_name`, `entry_script_path`, and `params_schema` before editing. Read
+[udf-runtime.md](api/udf-runtime.md) for the registration contract. A remix
+must preserve source UDF methods unless the user explicitly asks to remove or
+replace them: copy every source UDF entry script into the new playbook's ALFS
+tree, rewrite its path to the new playbook namespace, and later register the
+same `function_name` and `params_schema` on the remixed playbook.
+
 ---
 
 ## Step 2 — Download UI Layer (HTML Source)
@@ -112,6 +120,17 @@ alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v1/src/index.js' > ./{
 This contains the strategy logic, data fetching, and indicator
 computations. As with the HTML, **modify the downloaded file in place**
 rather than re-typing the script from your reading of it.
+
+If Step 1 found registered UDFs, download each UDF entry script from its
+`entry_script_path` into a local file as well:
+
+```bash
+alva fs read --path '{source_entry_script_path}' > ./udf-{function_name}.js
+```
+
+Treat these as inherited source code. Edit only the path-sensitive or
+topic-specific pieces required by the remix; do not recreate the methods from
+memory.
 
 Optionally, read sample feed output to understand the data schema (this
 one stays in stdout — it's reference, not a file you'll edit):
@@ -187,12 +206,21 @@ only on explicit request). Do not write fresh files from scratch.
 6. **Edit local HTML** (the `./index.html` from Step 2 — update data
    paths to point to your own feed) and upload:
    `alva fs write --path '~/playbooks/{new-name}/index.html' --file ./index.html --mkdir-parents`
-7. **Write README** (mandatory) — adapt the source playbook's README to
+7. **Copy inherited UDF entry scripts when present**: for each source UDF,
+   upload the edited local entry script to a path under the new playbook, for
+   example
+   `alva fs write --path '~/playbooks/{new-name}/udf/{function_name}.js' --file ./udf-{function_name}.js --mkdir-parents`.
+8. **Write README** (mandatory) — adapt the source playbook's README to
    your data sources and methodology, then upload:
    `alva fs write --path '~/playbooks/{new-name}/README.md' --file ./README.md --mkdir-parents`.
    See [release.md → Playbook README](api/release.md#playbook-readme).
-8. **Draft playbook**: `alva release playbook-draft --name {new-name} --display-name "..." --feeds '[{"feed_id":ID}]'`
-9. **Release playbook**: `alva release playbook --name {new-name} --version v1.0.0 --feeds '[{"feed_id":ID}]' --changelog "..." --readme-url '/alva/home/<username>/playbooks/{new-name}/README.md'` (absolute ALFS path; resolve `<username>` via `alva whoami` — the relative shorthand is no longer accepted)
+9. **Draft playbook**: `alva release playbook-draft --name {new-name} --display-name "..." --feeds '[{"feed_id":ID}]'`
+10. **Register inherited UDFs when present**: after the draft command returns
+   the remixed playbook ID, register each copied method on that playbook using
+   the same `function_name` and `params_schema`, with `entry_script_path`
+   pointing at the new ALFS path. Do not leave inherited `window.alva.udf` UI
+   controls pointing at an unregistered function.
+11. **Release playbook**: `alva release playbook --name {new-name} --version v1.0.0 --feeds '[{"feed_id":ID}]' --changelog "..." --readme-url '/alva/home/<username>/playbooks/{new-name}/README.md'` (absolute ALFS path; resolve `<username>` via `alva whoami` — the relative shorthand is no longer accepted)
 
 **Important**: The new playbook must use a unique name in your user space. The
 feed scripts must use **your own** ALFS paths (not the original owner's) for

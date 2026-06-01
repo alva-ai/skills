@@ -968,8 +968,11 @@ prompt arrives as a `<remix>` tag — e.g.
 `<remix url="/u/alice/playbooks/btc-momentum" type="playbook" ...>...</remix>`
 — from which the agent extracts the source `owner` and `name` via the
 `url` attribute. The agent then reads the source playbook's feed scripts
-(strategy logic) and HTML (dashboard UI), customizes them per the user's
-request, and deploys a new playbook under their own namespace. The tag's
+(strategy logic), HTML (dashboard UI), and any registered UDF entry scripts,
+customizes them per the user's request, and deploys a new playbook under their
+own namespace. If the source playbook has registered UDFs, copy each original
+UDF method into the new playbook's ALFS tree and register it on the remixed
+playbook before release. The tag's
 inner text is a fixed instruction, not the user's customization request —
 if the user typed nothing meaningful outside the tag, ask what to
 customize before proceeding.
