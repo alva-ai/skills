@@ -1113,6 +1113,7 @@ the full locate-and-edit procedure.
 | [narrative-voice.md](references/narrative-voice.md) | Voice rules for user-facing prose: banned tokens/shapes, copy-paste ADK system-prompt block with few-shots |
 | [language.md](references/language.md) | Canonical product vocabulary: automation, playbook, alert, Agent, and when feed must stay internal |
 | [udf-runtime.md](references/api/udf-runtime.md) | User-defined functions for playbooks: strict trigger rule, creator registration, browser invocation, PBSV, allowance consent, and `UdfButton` |
+| [feedback.md](references/api/feedback.md) | User-confirmed Alva platform feedback: trigger, confirmation prompt, evidence/privacy rules |
 
 **Runtime artifacts** (use, don't read as reference — the spec lives in the
 `.md` files above):
@@ -1145,6 +1146,7 @@ a routing index — and, for the rows in bold, the linked sub-doc is a
 | `skillhub` | Pull curated methodology blueprints (`/use-skill:` flow). |
 | `playbooks` | Discover public playbooks (`trending`) with compact agent-friendly refs for browsing examples and choosing remix sources; flip an existing playbook's visibility with `set-visibility` (public / private / paid — private and paid are Pro-gated, a free account gets `PERMISSION_DENIED`). |
 | `comments` | Create / pin / unpin playbook comments — see [creators-note.md](references/creators-note.md) for the post-release creator's-note workflow. |
+| `feedback` | Submit user-confirmed Alva platform feedback. **Must read [feedback.md](references/api/feedback.md)** before submitting — user confirmation is required and evidence must be scrubbed. |
 | `push-subscriptions` | Personal push opt-in for playbooks and feeds. |
 | `channel` | Group push subscriptions (Telegram / Discord groups). |
 | `trading` | Accounts, portfolio, orders, signals, risk. **Must read [trading.md](references/api/trading.md)** before `execute`, building a signal JSON, or picking an exchange/symbol — real `--signal` schema is `allocate`/`predict` (not the `{symbol,side,qty}` shape the help example shows), `date` is epoch seconds. |
