@@ -56,13 +56,11 @@ These transport headers are informational only. Do not implement them manually
 in playbook HTML.
 
 This is a hard request-method rule for generated playbook HTML: do not use raw
-browser `fetch()` or hand-written auth headers for PBSV-protected service
-calls. Use the toolkit request wrapper. For UDFs, prefer `window.alva.udf`,
-which is built on the runtime. For custom service calls, instantiate
-`AlvaToolkit.AlvaClient({ pbsvToken })` with the token from
-`window.alva.udf.getViewerToken()` and use SDK resource methods or
-`client._request(...)`. Keep raw `fetch()` only for public feed reads through
-the ALFS read gateway.
+browser `fetch()` or hand-written auth headers for any Alva API request. Use
+`AlvaToolkit.AlvaClient` SDK resource methods or `_request(...)`. For UDFs,
+prefer `window.alva.udf`, which is built on the runtime. For custom PBSV
+service calls, instantiate `AlvaToolkit.AlvaClient({ pbsvToken })` with the
+token from `window.alva.udf.getViewerToken()`.
 
 ## Browser API
 
