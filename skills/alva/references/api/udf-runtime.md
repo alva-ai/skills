@@ -60,7 +60,8 @@ browser `fetch()` or hand-written auth headers for any Alva API request. Use
 `AlvaToolkit.AlvaClient` SDK resource methods or `_request(...)`. For UDFs,
 prefer `window.alva.udf`, which is built on the runtime. For custom PBSV
 service calls, instantiate `AlvaToolkit.AlvaClient({ pbsvToken })` with the
-token from `window.alva.udf.getViewerToken()`.
+token from `window.alva.udf.getViewerToken()` immediately before each request,
+because the parent page can refresh PBSV after the playbook loads.
 
 ## Browser API
 
@@ -83,15 +84,19 @@ const functions = await window.alva.udf.list();
 const result = await window.alva.udf.call("analyze", { ticker: "AAPL" });
 
 // Case B: custom PBSV service calls use AlvaClient's request wrapper.
-const pbsvToken = window.alva.udf.getViewerToken();
-if (!pbsvToken) throw new Error("Sign in to run this action.");
-const client = new AlvaToolkit.AlvaClient({ pbsvToken });
-const response = await client._request("GET", "/api/v1/service/custom", {
+function createPbsvClient() {
+  const pbsvToken = window.alva.udf.getViewerToken();
+  if (!pbsvToken) throw new Error("Sign in to run this action.");
+  return new AlvaToolkit.AlvaClient({ pbsvToken });
+}
+
+const response = await createPbsvClient()._request("GET", "/api/v1/service/custom", {
   query: { playbook_id: playbookId },
 });
 ```
 
-Do not log, store, or render `pbsvToken`; pass it directly into `AlvaClient`.
+Do not log, store, render, or cache `pbsvToken`; pass the current value directly
+into `AlvaClient` when creating the client for a request.
 
 ### `window.alva.udf.list()`
 

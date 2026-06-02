@@ -810,10 +810,13 @@ HTML:
 ```html
 <script src="https://unpkg.com/@alva-ai/toolkit/dist/browser.global.js"></script>
 <script>
-const alvaClient = new AlvaToolkit.AlvaClient({});
+function createAlvaClient() {
+  const pbsvToken = window.alva?.udf?.getViewerToken?.();
+  return new AlvaToolkit.AlvaClient(pbsvToken ? { pbsvToken } : {});
+}
 
 async function readAlfsJson(path) {
-  return alvaClient.fs.read({ path });
+  return createAlvaClient().fs.read({ path });
 }
 </script>
 ```
@@ -826,7 +829,9 @@ encoding, and response parsing stay centralized.
 **Browser request rule**: all Alva API requests in generated playbook HTML must
 use `AlvaToolkit.AlvaClient` SDK resource methods or `_request(...)`. Do not
 hand-write Alva API `fetch()` calls, endpoint URLs, auth headers, or query
-serialization in playbook HTML.
+serialization in playbook HTML. Initialize the client through
+`createAlvaClient()` immediately before each request so the current PBSV token
+from `window.alva.udf.getViewerToken()` is included after parent refreshes.
 
 **Pre-check before release**: once the HTML is ready, run
 `alva lint playbook ./index.html` locally. The same linter gates
@@ -854,7 +859,8 @@ For UDFs, prefer the high-level `window.alva.udf.list()`,
 custom PBSV service endpoints are needed, get the viewer token from
 `window.alva.udf.getViewerToken()`, instantiate
 `AlvaToolkit.AlvaClient({ pbsvToken })`, and call its SDK resource methods or
-`_request(...)`; `AlvaClient` owns the PBSV transport details.
+`_request(...)` immediately before the request; `AlvaClient` owns the PBSV
+transport details.
 
 ### 7. Release
 
