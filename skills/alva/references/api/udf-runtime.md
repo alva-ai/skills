@@ -52,12 +52,17 @@ X-Pbsv: 1
 Content-Type: application/json
 ```
 
+These transport headers are informational only. Do not implement them manually
+in playbook HTML.
+
 This is a hard request-method rule for generated playbook HTML: do not use raw
-browser `fetch()` for PBSV-protected service calls. The toolkit runtime is the
-request method. It owns token extraction, URL cleanup, parent refreshes, consent
-retry, and the `Authorization`/`X-Pbsv` headers. Keep raw `fetch()` only for
-public feed reads through the ALFS read gateway; UDF metadata and invocation
-must go through `window.alva.udf`.
+browser `fetch()` or hand-written auth headers for PBSV-protected service
+calls. Use the toolkit request wrapper. For UDFs, prefer `window.alva.udf`,
+which is built on the runtime. For custom service calls, instantiate
+`AlvaToolkit.AlvaClient({ pbsvToken })` with the token from
+`window.alva.udf.getViewerToken()` and use SDK resource methods or
+`client._request(...)`. Keep raw `fetch()` only for public feed reads through
+the ALFS read gateway.
 
 ## Browser API
 
@@ -72,15 +77,20 @@ already been registered for the playbook.
 </script>
 ```
 
-Use this replacement pattern when wiring UDF UI:
+Use this replacement pattern when wiring UDF UI or custom service calls:
 
 ```javascript
-// Good: toolkit adds PBSV headers and handles consent/token refresh.
+// Good: high-level UDF API delegates PBSV transport to the toolkit runtime.
 const functions = await window.alva.udf.list();
 const result = await window.alva.udf.call("analyze", { ticker: "AAPL" });
 
-// Bad: bare fetch will miss PBSV behavior and often fail auth/consent flows.
-await fetch("/api/v1/service/invoke", { method: "POST" });
+// Good: custom service calls use the SDK request wrapper, not raw fetch.
+const pbsvToken = window.alva.udf.getViewerToken();
+if (!pbsvToken) throw new Error("Sign in to run this action.");
+const client = new AlvaToolkit.AlvaClient({ pbsvToken });
+const response = await client._request("GET", "/api/v1/service/custom", {
+  query: { playbook_id: playbookId },
+});
 ```
 
 ### `window.alva.udf.list()`
