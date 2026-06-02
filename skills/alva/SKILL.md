@@ -382,10 +382,10 @@ fetch) when the SDK can serve the original request.
    originate from Alva feeds** (SDK modules or BYOD via `require("net/http")`).
    Never hardcode data as inline JavaScript literals in playbook HTML.
 
-2. **Playbook HTML MUST fetch data at runtime** from feed output paths.
+2. **Playbook HTML MUST read data at runtime** from feed output paths.
    Published HTML runs in the viewer's browser, so do not use sandbox-only env
-   vars such as `$ALVA_ENDPOINT` and do not guess `https://api.alva.ai`. Use the
-   public anonymous ALFS read gateway — see the `readAlfsJson` helper in
+   vars such as `$ALVA_ENDPOINT` and do not guess `https://api.alva.ai`. Use
+   `AlvaToolkit.AlvaClient` — see the `readAlfsJson` helper in
    [Build the Playbook Web App](#6-build-the-playbook-web-app).
 
    Static content (labels, colors, layout config) is fine. Quantitative data is
@@ -458,9 +458,9 @@ data-driven metrics.
 `alva release playbook --feeds '[]'` is **only** valid when the released HTML
 renders zero quantitative values at runtime (landing pages, UI-only demos).
 If the HTML shows any numbers, charts, tables, or metric cards, the release
-MUST reference deployed feeds in `--feeds` and the HTML MUST `fetch()` them
-at runtime. If you used `alva run` to source data, deploy that same logic as
-a feed and reference it.
+MUST reference deployed feeds in `--feeds` and the HTML MUST read them through
+`AlvaToolkit.AlvaClient` at runtime. If you used `alva run` to source data,
+deploy that same logic as a feed and reference it.
 
 ### Thematic Ticker Curation
 
@@ -804,23 +804,49 @@ explicitly asks for a static snapshot, default to a live playbook.
 All quantitative data in charts, tables, or metric cards must come from feed
 outputs read at runtime (no inline literals for data).
 
-Use this browser-safe helper for published playbook HTML:
+Load the browser SDK and use this browser-safe helper for published playbook
+HTML:
 
-```javascript
-const PUBLIC_ALFS_READ_URL = "https://api-llm.prd.alva.ai/api/v1/fs/read?path=";
+```html
+<script src="https://unpkg.com/@alva-ai/toolkit/dist/browser.global.js"></script>
+<script>
+function createAlvaClientConfig() {
+  const params = new URLSearchParams(window.location.search);
+  const pbsvToken = window.alva?.udf?.getViewerToken?.();
+  const apiOrigin = params.get("api_origin");
+  return {
+    ...(pbsvToken ? { pbsvToken } : {}),
+    ...(apiOrigin ? { baseUrl: apiOrigin.replace(/\/$/, "") } : {}),
+  };
+}
+
+function createAlvaClient() {
+  return new AlvaToolkit.AlvaClient(createAlvaClientConfig());
+}
 
 async function readAlfsJson(path) {
-  const resp = await fetch(PUBLIC_ALFS_READ_URL + encodeURIComponent(path));
-  if (!resp.ok) {
-    throw new Error(`Failed to load ${path}: HTTP ${resp.status}`);
-  }
-  return resp.json();
+  return createAlvaClient().fs.read({ path });
 }
+</script>
 ```
 
 `$ALVA_ENDPOINT` is available to sandbox scripts and CLI verification only. Do
-not emit it into browser HTML; published HTML must call the public read gateway
-above so anonymous viewers can load feed output without authentication.
+not emit it into browser HTML. Published HTML must call Alva APIs through
+`AlvaToolkit.AlvaClient` so endpoint selection, auth transport, query
+encoding, and response parsing stay centralized.
+
+**Browser request rule**: all Alva API requests in generated playbook HTML must
+use `AlvaToolkit.AlvaClient` SDK resource methods or `_request(...)`. Do not
+hand-write Alva API `fetch()` calls, endpoint URLs, auth headers, or query
+serialization in playbook HTML. Initialize the client through
+`createAlvaClient()` immediately before each request so the current PBSV token
+from `window.alva.udf.getViewerToken()` is included after parent refreshes.
+Also read `api_origin` from the iframe URL and pass it as `baseUrl`; otherwise
+staging, beta, or custom-origin playbooks can accidentally call the SDK's
+default production API. Do not pass `parent_origin` to `AlvaClient`; it is only
+for runtime postMessage validation. Only pass `viewer_token`, `apiKey`,
+`gaClientId`, `gaSessionId`, `utmParams`, or `arraysBaseUrl` when the
+surrounding app explicitly supplies those values.
 
 **Pre-check before release**: once the HTML is ready, run
 `alva lint playbook ./index.html` locally. The same linter gates
@@ -842,6 +868,15 @@ When the trigger is met, read
 implementation. The reference covers PBSV browser authentication, service API
 registration, `window.alva.udf`, allowance consent, and release checks. Never
 hand-write bearer headers in playbook HTML; use the browser SDK.
+
+For UDFs, prefer the high-level `window.alva.udf.list()`,
+`window.alva.udf.call(...)`, or `window.alva.udf.renderButton(...)` APIs. If
+custom PBSV service endpoints are needed, get the viewer token from
+`window.alva.udf.getViewerToken()`, instantiate
+`AlvaToolkit.AlvaClient({ pbsvToken, baseUrl })` with `baseUrl` sourced from
+the iframe `api_origin` parameter, and call its SDK resource methods or
+`_request(...)` immediately before the request; `AlvaClient` owns the PBSV
+transport details.
 
 ### 7. Release
 

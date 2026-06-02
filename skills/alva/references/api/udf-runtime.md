@@ -52,6 +52,20 @@ X-Pbsv: 1
 Content-Type: application/json
 ```
 
+These transport headers are informational only. Do not implement them manually
+in playbook HTML.
+
+This is a hard request-method rule for generated playbook HTML: do not use raw
+browser `fetch()` or hand-written auth headers for any Alva API request. Use
+`AlvaToolkit.AlvaClient` SDK resource methods or `_request(...)`. For UDFs,
+prefer `window.alva.udf`, which is built on the runtime. For custom PBSV
+service calls, instantiate `AlvaToolkit.AlvaClient({ pbsvToken, baseUrl })`
+with the token from `window.alva.udf.getViewerToken()` immediately before each
+request and `baseUrl` from the iframe `api_origin` query parameter, because the
+parent page can refresh PBSV after the playbook loads and the API origin can
+vary by environment. `parent_origin` is for postMessage validation and must not
+be passed to `AlvaClient`.
+
 ## Browser API
 
 The browser API is the viewer-side use surface. It assumes the function has
@@ -65,21 +79,50 @@ already been registered for the playbook.
 </script>
 ```
 
+Use these patterns when wiring UDF UI or custom service calls:
+
+```javascript
+// Case A: registered UDFs use the high-level runtime API.
+const functions = await window.alva.udf.list();
+const result = await window.alva.udf.call("analyze", { ticker: "AAPL" });
+
+// Case B: custom PBSV service calls use AlvaClient's request wrapper.
+function createPbsvClient() {
+  const pbsvToken = window.alva.udf.getViewerToken();
+  if (!pbsvToken) throw new Error("Sign in to run this action.");
+  const params = new URLSearchParams(window.location.search);
+  const apiOrigin = params.get("api_origin");
+  return new AlvaToolkit.AlvaClient({
+    pbsvToken,
+    ...(apiOrigin ? { baseUrl: apiOrigin.replace(/\/$/, "") } : {}),
+  });
+}
+
+const response = await createPbsvClient()._request("GET", "/api/v1/service/custom", {
+  query: { playbook_id: playbookId },
+});
+```
+
+Do not log, store, render, or cache `pbsvToken`; pass the current value directly
+into `AlvaClient` when creating the client for a request.
+
 ### `window.alva.udf.list()`
 
-Fetches metadata for functions registered on the current playbook.
+Fetches metadata for functions registered on the current playbook. Use this SDK
+method directly; do not recreate it with `fetch()`.
 
-- Uses `GET /api/v1/service/functions?playbook_id=<id>`.
-- Sends PBSV headers.
+- Internally calls `GET /api/v1/service/functions?playbook_id=<id>`.
+- Sends PBSV transport through the toolkit request wrapper.
 - Under PBSV, `entry_script_path` is intentionally hidden; only function
   metadata and `params_schema` are exposed to viewers.
 
 ### `window.alva.udf.call(functionName, params)`
 
-Invokes a registered playbook function.
+Invokes a registered playbook function. Use this SDK method directly; do not
+recreate it with `fetch()`.
 
-- Uses `POST /api/v1/service/invoke`.
-- Request body:
+- Internally calls `POST /api/v1/service/invoke`.
+- Internal request body:
 
 ```json
 {

@@ -640,12 +640,28 @@ const points = JSON.parse(data);
 
 ### From a Web Page
 
-```javascript
-const resp = await fetch(
-  "$ALVA_ENDPOINT/api/v1/fs/read?path=/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/720",
-);
-const points = await resp.json();
+```html
+<script src="https://unpkg.com/@alva-ai/toolkit/dist/browser.global.js"></script>
+<script>
+function createAlvaClientConfig() {
+  const params = new URLSearchParams(window.location.search);
+  const pbsvToken = window.alva?.udf?.getViewerToken?.();
+  const apiOrigin = params.get("api_origin");
+  return {
+    ...(pbsvToken ? { pbsvToken } : {}),
+    ...(apiOrigin ? { baseUrl: apiOrigin.replace(/\/$/, "") } : {}),
+  };
+}
+
+function createAlvaClient() {
+  return new AlvaToolkit.AlvaClient(createAlvaClientConfig());
+}
+
+const points = await createAlvaClient().fs.read({
+  path: "/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/720",
+});
 // points = [{date: 1772658000000, close: 73309.72, ema10: 72447.65}, ...]
+</script>
 ```
 
 ---
