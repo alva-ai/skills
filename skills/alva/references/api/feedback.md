@@ -34,6 +34,5 @@ obvious secrets, but you must scrub before sending.
 
 When an Alva-owned issue caused the task to fail or stay blocked, do not close
 with only the feedback prompt. Also briefly tell the user they can report the
-issue in Alva's Discord or Telegram community channels. If you need a Discord
-link, use <https://discord.com/invite/d8FxDTvsf6>; do not invent a Telegram
-link.
+issue in Alva's Discord or Telegram community channels:
+<https://discord.com/invite/d8FxDTvsf6> or <https://t.me/alvans_bot>.
