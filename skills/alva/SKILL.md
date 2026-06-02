@@ -886,8 +886,10 @@ hand-write bearer headers in playbook HTML; use the browser SDK.
    `/explore` discovery semantics.
 4. **Publish publicly**: After `playbook-draft` succeeds and
    `before-playbook-release` passes, call `alva release playbook` without
-   asking whether to keep it private. The default published visibility is Public.
-   Output the canonical public URL:
+   asking whether to stop at the draft version. Draft is a separate version
+   state; visibility (`public` / `private` / `paid`) applies after a playbook is
+   published. The default published visibility is Public. Output the canonical
+   public URL:
    `https://alva.ai/u/<username>/playbooks/<playbook_name>`.
 5. **Screenshot**: Take a screenshot to verify the released playbook renders
    correctly from the deployed published URL (for example,
@@ -941,8 +943,8 @@ validation rules and the canonical content shape.
 After publishing, tell Pro users they can change the published playbook's
 visibility with `alva playbooks set-visibility` (run
 `alva playbooks --help` first; private/paid require Pro), or ask next time to
-stop after `playbook-draft` before public release. If the user states a durable
-publish preference, update memory per [memory.md](references/memory.md).
+stop after creating the draft version before publishing. If the user states a
+durable publish preference, update memory per [memory.md](references/memory.md).
 
 #### Free users (`subscription_tier = "free"`)
 

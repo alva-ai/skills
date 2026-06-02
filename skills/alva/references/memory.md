@@ -66,7 +66,7 @@ Persistent facts about the user. Update when you learn something new.
 
 - Communication style: <!-- e.g. terse / detailed / visual -->
 - Notification channel:
-- Playbook publishing: <!-- e.g. default public release / draft-first review -->
+- Playbook publishing: <!-- e.g. default public release / draft-only before publishing -->
 ```
 
 **When to update:** User shares personal info, corrects a preference, reveals
