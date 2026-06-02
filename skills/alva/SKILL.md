@@ -895,7 +895,14 @@ hand-write bearer headers in playbook HTML; use the browser SDK.
    — see [Trading symbols and tags in release.md](references/api/release.md#trading-symbols-and-tags)
    for the casing rule, related-person tags, resolution behavior, and
    `/explore` discovery semantics.
-4. **Screenshot**: Take a screenshot to verify the released playbook renders
+4. **Publish publicly**: After `playbook-draft` succeeds and
+   `before-playbook-release` passes, call `alva release playbook` without
+   asking whether to stop at the draft version. Draft is a separate version
+   state; visibility (`public` / `private` / `paid`) applies after a playbook is
+   published. The default published visibility is Public. Output the canonical
+   public URL:
+   `https://alva.ai/u/<username>/playbooks/<playbook_name>`.
+5. **Screenshot**: Take a screenshot to verify the released playbook renders
    correctly from the deployed published URL (for example,
    `https://<username>.playbook.alva.ai/<playbook_name>/v1.0.0/index.html`).
    Always pass `--compress` (with `--compress-quality` / `--compress-max-width`
@@ -944,24 +951,16 @@ validation rules and the canonical content shape.
 
 #### Pro users (`subscription_tier = "pro"`)
 
-1. **Show draft link**: Output the playbook URL —
-   `https://alva.ai/u/<username>/playbooks/<playbook_name>`. The draft is
-   accessible only to the creator.
-2. **Ask**: "Your playbook is ready. Would you like to publish it publicly, or
-   keep it private for now?"
-   - **Publish** → call `alva release playbook` → output the public URL.
-   - **Keep private** → done. Remind the user that only they can access the
-     draft URL.
-
-   To change a *published* playbook's visibility later, use
-   `alva playbooks set-visibility` (run `alva playbooks --help` first;
-   private/paid require Pro).
+After publishing, tell Pro users they can change the published playbook's
+visibility with `alva playbooks set-visibility` (run
+`alva playbooks --help` first; private/paid require Pro), or ask next time to
+stop after creating the draft version before publishing. If the user states a
+durable publish preference, update memory per [memory.md](references/memory.md).
 
 #### Free users (`subscription_tier = "free"`)
 
-1. **Publish directly**: Call `alva release playbook` — free users can create
-   and publish unlimited public playbooks. Free playbooks are always public. Output the public URL:
-   `https://alva.ai/u/<username>/playbooks/<playbook_name>`
+1. Free users can create and publish unlimited public playbooks. Free playbooks
+   are always public.
 2. **Upsell only on friction**: Do **not** proactively suggest upgrading.
    But when the user's experience is degraded because of free-tier
    limitations — wanting private or paid playbooks, hitting the cronjob cap,
@@ -1059,9 +1058,8 @@ read any playbook's files, use `alva fs read`.
 
 ### 9. Post-release push notification flow
 
-After a playbook is **released or kept as draft** (Step 7 complete), proactively
-evaluate whether any deployed feeds produce push-worthy content. Do not wait for
-the user to ask.
+After a playbook is released (Step 7 complete), proactively evaluate whether
+any deployed feeds produce push-worthy content. Do not wait for the user to ask.
 
 #### Identify push-worthy feeds
 
