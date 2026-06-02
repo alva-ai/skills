@@ -12,9 +12,10 @@ did not block the task, or bugs in local code you wrote.
 
 ## Required confirmation
 
-When you discover a likely Alva issue yourself, ask exactly:
-
-> 哇，你遇到问题了，看起来好像Alva有些不太对的地方，要不要我们直接帮你反馈给Alva？
+When you discover a likely Alva issue yourself, ask in English and in the
+Alva voice whether the user wants you to send feedback to Alva. Do not quote a
+fixed script; make the message brief, specific to the problem, and clear that
+the user controls whether anything is submitted.
 
 Submit only after the user clearly agrees. If they decline or ignore the prompt,
 continue the task without submitting.
@@ -33,8 +34,6 @@ Keep the report small and actionable:
   correlation/request id, and sanitized snippets.
 - `context`: compact JSON with CLI version, profile/environment, session or
   task id, and any non-secret repro notes.
-- `dedupe_key`: stable per-user key for repeated reports from the same failure
-  shape, such as `runtime/<command>/<error_code>`.
 
 Never include API keys, bearer tokens, cookies, private user data, raw
 portfolio holdings, or full proprietary source files. The server also redacts
@@ -49,6 +48,5 @@ alva feedback submit \
   --severity high \
   --details "While running alva run for a BTC automation, the runtime returned INTERNAL before user code started." \
   --evidence-json '{"command":"alva run --entry-path ~/tasks/btc/src/index.js","error_code":"INTERNAL"}' \
-  --context-json '{"toolkit_version":"0.9.5","profile":"default"}' \
-  --dedupe-key "runtime/run/internal-before-user-code"
+  --context-json '{"toolkit_version":"0.11.0","profile":"default"}'
 ```

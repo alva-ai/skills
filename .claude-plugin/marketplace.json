@@ -5,14 +5,14 @@
     "email": "support@alva.ai"
   },
   "metadata": {
-    "description": "Official Alva plugin for Claude Code - agentic finance applications",
+    "description": "Official Alva plugin for Claude Code - Alva Agent investing workflows",
     "version": "1.0.0"
   },
   "plugins": [
     {
       "name": "alva",
       "source": "./",
-      "description": "Build and deploy agentic finance applications on the Alva platform. Access 250+ financial data sources, run cloud-side analytics, backtest trading strategies, and publish interactive playbooks.",
+      "description": "Use Alva Agent for investing workflows: ask market questions with live financial context, set alerts, build or remix Playbooks, connect accounts, and backtest strategies on Alva Cloud.",
       "version": "1.0.0",
       "author": {
         "name": "Alva",
@@ -21,7 +21,7 @@
       "homepage": "https://alva.ai",
       "repository": "https://github.com/alva-ai/skills",
       "license": "MIT",
-      "keywords": ["finance", "crypto", "equities", "trading", "data", "analytics", "playbooks", "backtesting"],
+      "keywords": ["finance", "crypto", "equities", "trading", "alerts", "accounts", "analytics", "playbooks", "backtesting"],
       "category": "external-integrations",
       "tags": ["finance", "data-analytics", "trading", "agents", "playbooks"]
     }

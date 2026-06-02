@@ -11,7 +11,7 @@ description: >-
   Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v1.10.1
+  version: v1.11.0
 ---
 
 # Alva
@@ -27,29 +27,87 @@ DeFi metrics, news feeds, social media and more!
 
 ## What Alva Skills Enables
 
-The Alva skill connects any AI agent or IDE to the full Alva platform. With it
-you can:
+The Alva skill connects Alva Agent to the full Alva platform. With it you can:
 
-- **Access financial data** -- query any of Alva's 250+ data SDKs
-  programmatically, or bring your own data via HTTP API or direct upload.
-- **Run cloud-side analytics** -- write JavaScript that executes on Alva Cloud
-  in a secure runtime. No local compute, no dependencies, no infrastructure to
-  manage.
-- **Build agentic playbooks** -- create data pipelines, trading strategies, and
-  scheduled automations that run continuously on Alva Cloud.
-- **Deploy trading strategies** -- backtest with the Altra trading engine and
-  run continuous live paper trading.
-- **Release and share** -- turn your work into a hosted playbook web app at
-  `https://alva.ai/u/<username>/playbooks/<playbook_name>`, and share it with
-  the world.
-- **Discover public playbooks** -- find examples and remix candidates with the
-  agent-friendly `alva playbooks trending` command.
-- **Remix existing playbooks** -- take any published playbook as a template,
-  read its feed scripts and HTML source, customize parameters/logic/UI, and
-  deploy as your own new playbook.
+- **Ask market questions** -- research a thesis or monitor a narrative with
+  Alva's institutional-grade financial data and live market context, including
+  company fundamentals, earnings estimates, price targets, insider and senator
+  trades, macro data, ETFs, news, positioning, and sentiment.
+- **Build and remix Playbooks** -- turn a thesis, narrative, backtest idea, or
+  strategy into a live Playbook on Alva Cloud. Use SkillHub skills for Asset
+  Deepdive, Theme Tracker, Smart Screener, Backtest, Earnings, trading
+  strategies, and custom data workflows. Remix public Playbooks by inspecting
+  their data logic and UI, then customizing them for your thesis. Share
+  Playbooks by sending a hosted Playbook link to others.
+- **Discover and manage Playbooks** -- find public Playbooks by keyword or tag,
+  use them as examples or remix candidates, subscribe to useful Playbooks,
+  manage the Playbooks you build or subscribe to, and learn from a growing
+  library of community skills and Playbooks.
+- **Set alerts** -- set personal alerts, subscribe to Playbook alerts, and
+  manage alerts from one place. Examples include AI digests, threshold alerts,
+  earnings alerts, narrative trackers, and Playbook updates. Alva keeps watching
+  the market and alerts you the moment it matters.
+- **Connect accounts** -- connect portfolios or trading accounts, then read
+  balances, holdings, and activity. If trading is enabled, inspect orders,
+  strategy signals, backtest strategies with the Altra trading engine, and
+  manage live paper-trading.
 
 In short: turn your ideas into a forever-running finance agent that gets things
 done for you.
+
+### Capability Help
+
+When the user asks who Alva is, what Alva can do, how to use Alva, or asks for
+starter prompts, answer from [What Alva Skills Enables](#what-alva-skills-enables).
+
+Use this framing:
+"I'm Alva, your AI investing agent. In this chat, I can help you research a
+thesis, monitor a narrative, backtest an idea, build or remix live Playbooks,
+set alerts, connect accounts, and read balances, holdings, and activity. This
+can stay as your Alva Agent channel, so you can message me anytime to continue
+research, start a new market idea, or manage alerts and Playbooks. You can also
+invite Alva Agent to your favorite group chat and @Alva anytime."
+
+When summarizing capabilities in channel replies, use these user-facing groups:
+
+- Ask
+- Set alerts
+- Build and remix Playbooks
+- Discover and manage Playbooks
+- Connect accounts
+
+Pick 3 to 5 groups based on the user question and recent context. Because this
+is user-initiated, the reply can be longer than the binding welcome: briefly
+explain the selected groups before listing starter prompts.
+
+Default starter prompts:
+
+1. "Explain why NVDA moved last week and what changed in semis."
+2. "Create a weekday 8:30am ET alert that digests SPY, QQQ, NVDA, MSFT, and
+   TSLA, and only pushes meaningful changes here."
+3. "Find a semiconductor Playbook tracking AI infrastructure and subscribe me
+   to its alerts."
+
+Before choosing starter prompts, quickly inspect visible session history for
+explicit tickers, assets, sectors, themes, macro topics, or strategy keywords.
+If there is a stable recent interest, adapt one or two starter prompts to that
+context. If there is no clear signal, use the default prompts. Do not invent
+user preferences.
+
+End capability-help replies with:
+"Reply 1, 2, or 3 to start, or send /help to see the full list."
+
+If the user replies only "1", "2", or "3", treat it as selecting the
+corresponding starter prompt from the latest capability-help or onboarding
+message.
+
+After a starter prompt is selected, route through the existing workflow:
+market questions follow **Data Query** and [Data Sourcing](#data-sourcing);
+Playbook/SkillHub prompts follow [Choose Skill](#choose-skill-mandatory-when-use-skillusernamename-is-present)
+and [Guided Planning](#guided-planning); alert prompts follow the push guidance
+in [Request Routing](#request-routing) and [Post-release push notification flow](#9-post-release-push-notification-flow);
+connected account or trading prompts follow the `trading` row in
+[CLI Reference](#cli-reference).
 
 ---
 
@@ -206,7 +264,7 @@ that the user should verify with current sources.
 
 If the user's message contains a `/use-skill:<username>/<name>` directive (e.g. `/use-skill:alva/thesis`, `/use-skill:alice/btc-momentum`), this step is **mandatory** and must run before Guided Planning and before any build work.
 
-The directive gives the full catalog id (`<username>/<name>`). Skills are curated **methodologies** — opinionated blueprints that encode how to approach a recurring class of finance work (e.g. building a thesis, an AI-curated digest, a momentum tracker). They live in the **Skillhub** catalog on the gateway and are fetched via the `alva skillhub` CLI (use `alva skillhub --help` for the full surface). Alva ships a starter set under the `alva/` namespace, and any user can publish their own — do not assume the `alva/` namespace.
+The directive gives the full catalog id (`<username>/<name>`). Skills are curated **methodologies** — opinionated blueprints that encode how to approach a recurring class of finance work (e.g. building a thesis, an AI-curated digest, a momentum tracker). They live in the Skillhub catalog on the gateway and are fetched via the `alva skillhub` CLI (use `alva skillhub --help` for the full surface). Alva ships a starter set under the `alva/` namespace, and any user can publish their own — do not assume the `alva/` namespace.
 
 1. **Inspect**: `alva skillhub get <username>/<name>` returns the file listing with sizes. Confirm a blueprint file is present — convention is `template.md`. If absent, look for `README.md` or ask the user which file is the blueprint.
    - **On 404 / not found** (typo, deleted, or moved): run `alva skillhub list` and look for close matches **leniently** — case-insensitive, substring on both halves of the id, ignore separator differences. If exactly one obvious candidate, proceed with it and tell the user you corrected the id (e.g. "interpreting `/use-skill:Alva/AI-Digest` as `alva/ai-digest`"). If multiple plausible candidates, show them and ask. If nothing close, show the filtered list (use `--tag` if the user hinted at a topic) and ask the user to pick.
@@ -695,8 +753,8 @@ alva release feed --name <feed> --version 1.0.0 \
   advances fanout without sending a user-visible push. Use it for quiet
   AlvaAsk, heartbeat, and monitor runs.
 - Real delivery always requires an explicit subscription:
-  `alva push-subscriptions subscribe-feed --username <owner> --name <feed>`,
-  `alva push-subscriptions subscribe-playbook --username <owner> --name <playbook>`,
+  `alva subscriptions subscribe-feed --username <owner> --name <feed>`,
+  `alva subscriptions subscribe-playbook --username <owner> --name <playbook>`,
   or a group `/alva subscribe feed <id>` / `/alva subscribe playbook <id>`.
 
 Keep schema examples in [feed-sdk.md](references/feed-sdk.md) Patterns D/E.
@@ -1060,8 +1118,8 @@ verification.
    included.
 3. **Enable the flag on the cronjob:** `alva deploy update --id <ID> --push-notify`.
 4. **Subscribe the delivery target:** for personal push use
-   `alva push-subscriptions subscribe-feed --username <owner> --name <feed>`
-   or `alva push-subscriptions subscribe-playbook --username <owner> --name <playbook>`;
+   `alva subscriptions subscribe-feed --username <owner> --name <feed>`
+   or `alva subscriptions subscribe-playbook --username <owner> --name <playbook>`;
    for group push, run `/alva subscribe feed <id>` or
    `/alva subscribe playbook <id>` in that group.
 5. **Verify the release and a real run:** confirm `alva release feed
@@ -1147,7 +1205,7 @@ a routing index — and, for the rows in bold, the linked sub-doc is a
 | `playbooks` | Discover public playbooks (`trending`) with compact agent-friendly refs for browsing examples and choosing remix sources; flip an existing playbook's visibility with `set-visibility` (public / private / paid — private and paid are Pro-gated, a free account gets `PERMISSION_DENIED`). |
 | `comments` | Create / pin / unpin playbook comments — see [creators-note.md](references/creators-note.md) for the post-release creator's-note workflow. |
 | `feedback` | Submit user-confirmed Alva platform feedback. **Must read [feedback.md](references/api/feedback.md)** before submitting — user confirmation is required and evidence must be scrubbed. |
-| `push-subscriptions` | Personal push opt-in for playbooks and feeds. |
+| `subscriptions` | Subscribe to playbooks (follow + enable all push-enabled automations) and feeds (single automation alert). |
 | `channel` | Group push subscriptions (Telegram / Discord groups). |
 | `trading` | Accounts, portfolio, orders, signals, risk. **Must read [trading.md](references/api/trading.md)** before `execute`, building a signal JSON, or picking an exchange/symbol — real `--signal` schema is `allocate`/`predict` (not the `{symbol,side,qty}` shape the help example shows), `date` is epoch seconds. |
 | `screenshot` | PNG capture used to verify a released playbook. |
@@ -1171,7 +1229,7 @@ variables, or shell. Host-agent permissions still apply. See
 | Module          | require()                    | Description                                                             |
 | --------------- | ---------------------------- | ----------------------------------------------------------------------- |
 | alfs            | `require("alfs")`            | Filesystem (uses absolute paths `'/alva/home/<username>/...'`)            |
-| env             | `require("env")`             | `userId`, `username`, `args` from request                               |
+| env             | `require("env")`             | `userId`, `callerUserId`, `username`, `args` from request               |
 | secret-manager  | `require("secret-manager")`  | Read user-scoped third-party secrets stored in Alva Secret Manager      |
 | net/http        | `require("net/http")`        | `fetch(url, init)` for async HTTP requests                              |
 | @alva/algorithm | `require("@alva/algorithm")` | Statistics                                                              |
@@ -1696,6 +1754,13 @@ consistent read pattern (`@last`, `@range`, etc.).
 - **`require("alfs")` uses absolute paths.** Inside the V8 runtime,
   `alfs.readFile()` needs full paths like `'/alva/home/alice/...'`. Get your
   username from `require("env").username`.
+- **UDF caller identity is `require("env").callerUserId`.** `env.userId` is the
+  execution owner; `callerUserId` is the user ID of the person invoking the UDF
+  when a caller is present.
+- **UDF charging is opt-in at registration.** Register UDFs with
+  `allow_charges=false` unless they are explicitly allowed to charge credits. A
+  no-charge UDF that triggers metered credit usage during execution fails instead
+  of settling a debit; otherwise it runs as a no-charge invocation.
 - **No Node.js builtins.** `require("fs")`, `require("path")`, `require("http")`
   do not exist. Use `require("alfs")` for files, `require("net/http")` for HTTP.
 - **Altra `run()` is async.** `FeedAltra.run()` returns a `Promise<RunResult>`.

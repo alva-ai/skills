@@ -100,9 +100,15 @@ const entries = await alfs.readDir(home + "/data");
 ```javascript
 const env = require("env");
 env.userId; // "1" (string) -- your numeric user ID
+env.callerUserId; // "2" (string) -- invoking user's ID for UDF calls, when present
 env.username; // "alice" (string) -- your username, used in ALFS paths
 env.args; // parsed JSON from the request's "args" field
 ```
+
+For UDF executions, `env.userId` / `env.username` identify the execution owner
+whose ALFS context runs the script. `env.callerUserId` identifies the caller who
+invoked the UDF and may differ from the owner. It is absent when no caller ID is
+available.
 
 ### secret-manager -- Third-Party Secrets
 

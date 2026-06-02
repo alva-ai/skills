@@ -231,7 +231,7 @@ require a 500-character summary.
   publisher capable of emitting alerts. They do **not** subscribe any user or
   group.
 - Real delivery requires an explicit subscription: personal
-  `alva push-subscriptions subscribe-feed` / `subscribe-playbook`, or group
+  `alva subscriptions subscribe-feed` / `subscribe-playbook`, or group
   `/alva subscribe feed <id>` / `/alva subscribe playbook <id>`.
 - Use `meta.reason` to provide the push-notification body -- this is what
   recipients see when the signal is delivered.
@@ -325,7 +325,7 @@ alva release feed --name daily-briefing --version 1.0.0 \
 - `--push-notify` only enables publisher-side fanout. It does **not** create
   personal or group subscriptions.
 - Real delivery requires an explicit subscription: personal
-  `alva push-subscriptions subscribe-feed --username <owner> --name <feed>`
+  `alva subscriptions subscribe-feed --username <owner> --name <feed>`
   or `subscribe-playbook`, or group `/alva subscribe feed <feed_id>` /
   `/alva subscribe playbook <playbook_id>`.
 - Combine with Pattern D if you want both feed completion notifications and
