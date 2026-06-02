@@ -77,14 +77,14 @@ already been registered for the playbook.
 </script>
 ```
 
-Use this replacement pattern when wiring UDF UI or custom service calls:
+Use these patterns when wiring UDF UI or custom service calls:
 
 ```javascript
-// Good: high-level UDF API delegates PBSV transport to the toolkit runtime.
+// Case A: registered UDFs use the high-level runtime API.
 const functions = await window.alva.udf.list();
 const result = await window.alva.udf.call("analyze", { ticker: "AAPL" });
 
-// Good: custom service calls use the SDK request wrapper, not raw fetch.
+// Case B: custom PBSV service calls use AlvaClient's request wrapper.
 const pbsvToken = window.alva.udf.getViewerToken();
 if (!pbsvToken) throw new Error("Sign in to run this action.");
 const client = new AlvaToolkit.AlvaClient({ pbsvToken });
@@ -93,21 +93,25 @@ const response = await client._request("GET", "/api/v1/service/custom", {
 });
 ```
 
+Do not log, store, or render `pbsvToken`; pass it directly into `AlvaClient`.
+
 ### `window.alva.udf.list()`
 
-Fetches metadata for functions registered on the current playbook.
+Fetches metadata for functions registered on the current playbook. Use this SDK
+method directly; do not recreate it with `fetch()`.
 
-- Uses `GET /api/v1/service/functions?playbook_id=<id>`.
-- Sends PBSV headers.
+- Internally calls `GET /api/v1/service/functions?playbook_id=<id>`.
+- Sends PBSV transport through the toolkit request wrapper.
 - Under PBSV, `entry_script_path` is intentionally hidden; only function
   metadata and `params_schema` are exposed to viewers.
 
 ### `window.alva.udf.call(functionName, params)`
 
-Invokes a registered playbook function.
+Invokes a registered playbook function. Use this SDK method directly; do not
+recreate it with `fetch()`.
 
-- Uses `POST /api/v1/service/invoke`.
-- Request body:
+- Internally calls `POST /api/v1/service/invoke`.
+- Internal request body:
 
 ```json
 {
