@@ -59,9 +59,12 @@ This is a hard request-method rule for generated playbook HTML: do not use raw
 browser `fetch()` or hand-written auth headers for any Alva API request. Use
 `AlvaToolkit.AlvaClient` SDK resource methods or `_request(...)`. For UDFs,
 prefer `window.alva.udf`, which is built on the runtime. For custom PBSV
-service calls, instantiate `AlvaToolkit.AlvaClient({ pbsvToken })` with the
-token from `window.alva.udf.getViewerToken()` immediately before each request,
-because the parent page can refresh PBSV after the playbook loads.
+service calls, instantiate `AlvaToolkit.AlvaClient({ pbsvToken, baseUrl })`
+with the token from `window.alva.udf.getViewerToken()` immediately before each
+request and `baseUrl` from the iframe `api_origin` query parameter, because the
+parent page can refresh PBSV after the playbook loads and the API origin can
+vary by environment. `parent_origin` is for postMessage validation and must not
+be passed to `AlvaClient`.
 
 ## Browser API
 
@@ -87,7 +90,12 @@ const result = await window.alva.udf.call("analyze", { ticker: "AAPL" });
 function createPbsvClient() {
   const pbsvToken = window.alva.udf.getViewerToken();
   if (!pbsvToken) throw new Error("Sign in to run this action.");
-  return new AlvaToolkit.AlvaClient({ pbsvToken });
+  const params = new URLSearchParams(window.location.search);
+  const apiOrigin = params.get("api_origin");
+  return new AlvaToolkit.AlvaClient({
+    pbsvToken,
+    ...(apiOrigin ? { baseUrl: apiOrigin.replace(/\/$/, "") } : {}),
+  });
 }
 
 const response = await createPbsvClient()._request("GET", "/api/v1/service/custom", {

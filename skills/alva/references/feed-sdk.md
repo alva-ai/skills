@@ -643,9 +643,18 @@ const points = JSON.parse(data);
 ```html
 <script src="https://unpkg.com/@alva-ai/toolkit/dist/browser.global.js"></script>
 <script>
-function createAlvaClient() {
+function createAlvaClientConfig() {
+  const params = new URLSearchParams(window.location.search);
   const pbsvToken = window.alva?.udf?.getViewerToken?.();
-  return new AlvaToolkit.AlvaClient(pbsvToken ? { pbsvToken } : {});
+  const apiOrigin = params.get("api_origin");
+  return {
+    ...(pbsvToken ? { pbsvToken } : {}),
+    ...(apiOrigin ? { baseUrl: apiOrigin.replace(/\/$/, "") } : {}),
+  };
+}
+
+function createAlvaClient() {
+  return new AlvaToolkit.AlvaClient(createAlvaClientConfig());
 }
 
 const points = await createAlvaClient().fs.read({

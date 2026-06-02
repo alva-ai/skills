@@ -810,9 +810,18 @@ HTML:
 ```html
 <script src="https://unpkg.com/@alva-ai/toolkit/dist/browser.global.js"></script>
 <script>
-function createAlvaClient() {
+function createAlvaClientConfig() {
+  const params = new URLSearchParams(window.location.search);
   const pbsvToken = window.alva?.udf?.getViewerToken?.();
-  return new AlvaToolkit.AlvaClient(pbsvToken ? { pbsvToken } : {});
+  const apiOrigin = params.get("api_origin");
+  return {
+    ...(pbsvToken ? { pbsvToken } : {}),
+    ...(apiOrigin ? { baseUrl: apiOrigin.replace(/\/$/, "") } : {}),
+  };
+}
+
+function createAlvaClient() {
+  return new AlvaToolkit.AlvaClient(createAlvaClientConfig());
 }
 
 async function readAlfsJson(path) {
@@ -832,6 +841,12 @@ hand-write Alva API `fetch()` calls, endpoint URLs, auth headers, or query
 serialization in playbook HTML. Initialize the client through
 `createAlvaClient()` immediately before each request so the current PBSV token
 from `window.alva.udf.getViewerToken()` is included after parent refreshes.
+Also read `api_origin` from the iframe URL and pass it as `baseUrl`; otherwise
+staging, beta, or custom-origin playbooks can accidentally call the SDK's
+default production API. Do not pass `parent_origin` to `AlvaClient`; it is only
+for runtime postMessage validation. Only pass `viewer_token`, `apiKey`,
+`gaClientId`, `gaSessionId`, `utmParams`, or `arraysBaseUrl` when the
+surrounding app explicitly supplies those values.
 
 **Pre-check before release**: once the HTML is ready, run
 `alva lint playbook ./index.html` locally. The same linter gates
@@ -858,7 +873,8 @@ For UDFs, prefer the high-level `window.alva.udf.list()`,
 `window.alva.udf.call(...)`, or `window.alva.udf.renderButton(...)` APIs. If
 custom PBSV service endpoints are needed, get the viewer token from
 `window.alva.udf.getViewerToken()`, instantiate
-`AlvaToolkit.AlvaClient({ pbsvToken })`, and call its SDK resource methods or
+`AlvaToolkit.AlvaClient({ pbsvToken, baseUrl })` with `baseUrl` sourced from
+the iframe `api_origin` parameter, and call its SDK resource methods or
 `_request(...)` immediately before the request; `AlvaClient` owns the PBSV
 transport details.
 
