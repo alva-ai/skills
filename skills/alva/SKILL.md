@@ -168,6 +168,11 @@ Open [request-routing.md](references/request-routing.md) whenever the task is
 not a simple direct data query. It owns route selection, Skillhub, Guided
 Planning, capability verification, and completion gates.
 
+Open [operational-pitfalls.md](references/operational-pitfalls.md) step by
+step whenever the route enters runtime, feed, ALFS, playbook HTML, deploy,
+release, chart, or cron work. Read only the relevant section before each step,
+but treat that section as mandatory, not optional debugging material.
+
 | User asks for | Route | Must not miss |
 | --- | --- | --- |
 | "price of BTC", "P/E of NVDA", "show holdings", a direct dataset answer | Data Query | Fetch fresh data through Data Skills / BYOD; do not answer from memory. |
@@ -292,7 +297,8 @@ Runtime code should be boring and inspectable: small shape checks before full
 feeds, explicit precondition errors, no silent fallback records, and no local
 simulation when the blueprint requires Alva Cloud behavior. If a script throws
 `ReferenceError: <X> is not defined`, rewrite for the jagent runtime instead of
-retrying the same code.
+retrying the same code. Before each write/run/debug step, read the matching
+section in [operational-pitfalls.md](references/operational-pitfalls.md).
 
 ### Feed Lifecycle
 
@@ -307,7 +313,9 @@ public read if needed, deploy, then `alva release feed`.
 Before feed release, satisfy `before-feed-release`: fresh run, expected shape,
 needed grants, public read verification, and non-empty data for HTML
 dependencies. Feed scripts fail fast on missing data; the detailed release and
-grant contract lives in the feed references.
+grant contract lives in the feed references. Read the matching
+[operational-pitfalls.md](references/operational-pitfalls.md) section before
+each feed, ALFS, deploy, and release step.
 
 ### Playbook Creation
 

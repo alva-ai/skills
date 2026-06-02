@@ -323,6 +323,21 @@
         "Free users",
         "Pro users"
       ]
+    },
+    {
+      "id": "target.pitfalls-stepwise-required",
+      "group": "target",
+      "target": "corpus",
+      "description": "Operational pitfalls are a mandatory stepwise gate, not an optional debugging appendix.",
+      "includes": [
+        "step by step",
+        "before each step",
+        "mandatory",
+        "runtime, feed, ALFS, playbook HTML, deploy, release, chart, or cron work",
+        "Write or run jagent code",
+        "Touch ALFS paths",
+        "Build or edit playbook HTML/charts"
+      ]
     }
   ]
 }

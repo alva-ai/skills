@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/skill-review-fixes/skills/alva`
+Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/pitfalls-gate/skills/alva`
 
-SKILL.md lines: 659
+SKILL.md lines: 667
 
-Cases: 23/23
+Cases: 24/24
 
-Checks: 139/139 (100.00%)
+Checks: 146/146 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -267,14 +267,14 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-2/2 cases, 8/8 checks
+3/3 cases, 15/15 checks
 
 ### PASS target.top-level-size
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 659)
-- [x] line count <= 850 (actual 659)
+- [x] line count >= 650 (actual 667)
+- [x] line count <= 850 (actual 667)
 
 ### PASS target.playbook-task-offload
 
@@ -286,3 +286,15 @@ Playbook creation is a concrete task reference rather than the dominant top-leve
 - [x] PUBLIC_ALFS_READ_URL
 - [x] Free users
 - [x] Pro users
+
+### PASS target.pitfalls-stepwise-required
+
+Operational pitfalls are a mandatory stepwise gate, not an optional debugging appendix.
+
+- [x] step by step
+- [x] before each step
+- [x] mandatory
+- [x] runtime, feed, ALFS, playbook HTML, deploy, release, chart, or cron work
+- [x] Write or run jagent code
+- [x] Touch ALFS paths
+- [x] Build or edit playbook HTML/charts

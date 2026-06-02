@@ -1,7 +1,16 @@
 # Operational Pitfalls
 
-Use this file when debugging feeds, runtime scripts, playbook HTML, ALFS paths,
-or release failures.
+This file is mandatory and stepwise. Do not save it for debugging. Before each
+execution step, read the matching section below, then do the step.
+
+| Before you... | Read |
+| --- | --- |
+| Write or run jagent code | [Runtime](#runtime) |
+| Touch ALFS paths, grants, feed paths, or public reads | [ALFS And Feed Paths](#alfs-and-feed-paths) |
+| Wrap a new endpoint in feed logic | [Data And Runtime Debugging](#data-and-runtime-debugging) |
+| Build or edit playbook HTML/charts | [Chart And HTML](#chart-and-html) |
+| Mix sources with different cadences | [Watermarks](#watermarks) |
+| Scale runtime, payload, HTTP, or cron behavior | [Resource Limits](#resource-limits) |
 
 ## Runtime
 

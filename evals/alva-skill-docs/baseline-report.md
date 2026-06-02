@@ -2,11 +2,11 @@
 
 Source: `origin/main`
 
-SKILL.md lines: 1756
+SKILL.md lines: 1814
 
-Cases: 16/23
+Cases: 16/24
 
-Checks: 113/139 (81.29%)
+Checks: 114/146 (78.08%)
 
 ## Scoring Diagnosis
 
@@ -20,8 +20,9 @@ Instead, fix the canonical skill text or eval case, then rerun baseline and fina
 - pr353.no-synth-verdicts: inspect for a skill gap before editing. Missing checks: Cautious; inline source attribution; not investment advice
 - pr353.no-task-list: inspect for a skill gap before editing. Missing checks: enumerated list; no verb; no question; no task description; scheduled research digest
 - pr353.no-consensus-synthesis: inspect for a skill gap before editing. Missing checks: Do not merge multiple snippet claims; agent-authored consensus; ranked list; source-labeled; synthetic takeaway; source identity is missing; ambiguous
-- target.top-level-size: inspect for a skill gap before editing. Missing checks: line count <= 850 (actual 1756)
+- target.top-level-size: inspect for a skill gap before editing. Missing checks: line count <= 850 (actual 1814)
 - target.playbook-task-offload: inspect for a skill gap before editing. Missing checks: playbook-creation.md
+- target.pitfalls-stepwise-required: inspect for a skill gap before editing. Missing checks: step by step; before each step; runtime, feed, ALFS, playbook HTML, deploy, release, chart, or cron work; Write or run jagent code; Touch ALFS paths; Build or edit playbook HTML/charts
 
 ## retained
 
@@ -273,14 +274,14 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-0/2 cases, 6/8 checks
+0/3 cases, 7/15 checks
 
 ### FAIL target.top-level-size
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 1756)
-- [ ] line count <= 850 (actual 1756)
+- [x] line count >= 650 (actual 1814)
+- [ ] line count <= 850 (actual 1814)
 
 ### FAIL target.playbook-task-offload
 
@@ -292,3 +293,15 @@ Playbook creation is a concrete task reference rather than the dominant top-leve
 - [x] PUBLIC_ALFS_READ_URL
 - [x] Free users
 - [x] Pro users
+
+### FAIL target.pitfalls-stepwise-required
+
+Operational pitfalls are a mandatory stepwise gate, not an optional debugging appendix.
+
+- [ ] step by step
+- [ ] before each step
+- [x] mandatory
+- [ ] runtime, feed, ALFS, playbook HTML, deploy, release, chart, or cron work
+- [ ] Write or run jagent code
+- [ ] Touch ALFS paths
+- [ ] Build or edit playbook HTML/charts
