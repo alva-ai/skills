@@ -51,6 +51,11 @@ If a required SDK partition lacks coverage, reduce scope, use a user-provided
 BYOD source, or report the gap as a blocker. Do not fabricate point-in-time
 values or mark them `live: false`.
 
+If more than 20% of requested symbols fail SDK/Data Skills lookup, treat it as
+a data-quality blocker. Report the failing ids and reduce scope or request a
+legitimate source instead of producing a table or chart with missing names,
+fabricated values, or `live: false` placeholders.
+
 ## Chat-as-Artifact (`answer_only` / Query Mode)
 
 When the response itself is the deliverable, including `delivery_mode =
@@ -93,7 +98,7 @@ data fields in HTML tables. If the user asks for ratings, either compute them
 from SDK fundamentals with a visible formula, or place them in a clearly labeled
 AI analysis section separated from data-driven metrics.
 
-## Conventions And Provenance
+## Data Convention Alignment
 
 Financial values carry conventions: fiscal vs calendar period, price
 adjustment, currency, units, seasonal adjustment, point-in-time vs restated

@@ -287,21 +287,19 @@
       ]
     },
     {
-      "id": "feedback.eval-diagnosis",
+      "id": "feedback.recovered-capability-guardrails",
       "group": "feedback",
-      "target": "eval",
-      "description": "Eval scoring feedback is used to diagnose skill gaps, not exposed as user-facing scoring copy.",
+      "target": "corpus",
+      "description": "Review-discovered guardrails stay present in the skill corpus instead of only in eval script prose.",
       "includes": [
-        "score is diagnostic",
-        "skill gap",
-        "missing capability summary",
-        "missing routing pointer",
-        "missing guardrail",
-        "missing reference detail",
-        "missing eval coverage",
-        "Do not expose eval scores as product copy",
-        "fix the canonical skill text or eval case",
-        "regression mechanism"
+        "getStockCompanyDetail",
+        "Thematic Ticker Curation",
+        "subscription",
+        "custom data source URL",
+        "callerUserId",
+        "allow_charges=false",
+        "20%",
+        "~/library"
       ]
     },
     {

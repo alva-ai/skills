@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/skill-eval-diagnosis/skills/alva`
+Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/skill-review-fixes/skills/alva`
 
-SKILL.md lines: 678
+SKILL.md lines: 659
 
 Cases: 23/23
 
-Checks: 141/141 (100.00%)
+Checks: 139/139 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -250,22 +250,20 @@ Snippet claims must not be merged into new agent-authored consensus, ranking, or
 
 ## feedback
 
-1/1 cases, 10/10 checks
+1/1 cases, 8/8 checks
 
-### PASS feedback.eval-diagnosis
+### PASS feedback.recovered-capability-guardrails
 
-Eval scoring feedback is used to diagnose skill gaps, not exposed as user-facing scoring copy.
+Review-discovered guardrails stay present in the skill corpus instead of only in eval script prose.
 
-- [x] score is diagnostic
-- [x] skill gap
-- [x] missing capability summary
-- [x] missing routing pointer
-- [x] missing guardrail
-- [x] missing reference detail
-- [x] missing eval coverage
-- [x] Do not expose eval scores as product copy
-- [x] fix the canonical skill text or eval case
-- [x] regression mechanism
+- [x] getStockCompanyDetail
+- [x] Thematic Ticker Curation
+- [x] subscription
+- [x] custom data source URL
+- [x] callerUserId
+- [x] allow_charges=false
+- [x] 20%
+- [x] ~/library
 
 ## target
 
@@ -275,8 +273,8 @@ Eval scoring feedback is used to diagnose skill gaps, not exposed as user-facing
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 678)
-- [x] line count <= 850 (actual 678)
+- [x] line count >= 650 (actual 659)
+- [x] line count <= 850 (actual 659)
 
 ### PASS target.playbook-task-offload
 

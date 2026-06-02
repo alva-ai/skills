@@ -64,6 +64,16 @@ Direct latest-price routing:
   structured catalog. State the limitation and use `searchPerplexityFinance`
   before suggesting BYOD.
 
+## Thematic Ticker Curation
+
+When building sector or thematic dashboards with curated ticker lists, do not
+trust agent memory for ticker-to-sector mapping. After assembling the list,
+verify each ticker's sector or industry with live company-detail data such as
+`getStockCompanyDetail` when that endpoint is available.
+
+Remove or flag mismatches before scoring, ranking, or releasing the artifact. A
+single wrong ticker can distort the whole theme.
+
 ## Runtime Libraries Are Separate
 
 `alva sdk` surfaces runtime modules, not Data Skills endpoints:
@@ -88,5 +98,11 @@ When an endpoint returns 403, 404, empty, or irrelevant data:
 
 1. Re-check `summary` for a semantically equivalent endpoint in the same skill.
 2. If the skill id was guessed, rerun `list` and recover the correct id.
-3. Report BYOD only after same-domain Alva endpoints cannot answer the task.
-4. Never replace a missing data source with LLM-fabricated values.
+3. If the error is Pro-gated or subscription-gated, say which module is
+   unavailable and give exactly two paths: the user upgrades or provides
+   access, or the user provides a custom data source URL / BYOD source for the
+   agent to wire.
+4. Report BYOD only after same-domain Alva endpoints cannot answer the task.
+5. Never stop with zero useful output when a reduced-scope artifact can still
+   be built from available endpoints.
+6. Never replace a missing data source with LLM-fabricated values.

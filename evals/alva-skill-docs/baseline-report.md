@@ -2,11 +2,11 @@
 
 Source: `origin/main`
 
-SKILL.md lines: 1746
+SKILL.md lines: 1756
 
-Cases: 17/23
+Cases: 16/23
 
-Checks: 116/141 (82.27%)
+Checks: 113/139 (81.29%)
 
 ## Scoring Diagnosis
 
@@ -15,16 +15,17 @@ Classify the gap before editing: missing capability summary, missing routing poi
 Do not expose eval scores as product copy, and do not patch demos to hide a weak result.
 Instead, fix the canonical skill text or eval case, then rerun baseline and final reports so the regression mechanism proves the gap is closed.
 
+- retained.remix-annotations-push: inspect for a skill gap before editing. Missing checks: push-subscriptions
 - pr353.chat-as-artifact: inspect for a skill gap before editing. Missing checks: answer_only; Chat-as-Artifact; prompt-injected text; verdict words; EPS forecasts; YTD returns; current prices; forward-return projections
 - pr353.no-synth-verdicts: inspect for a skill gap before editing. Missing checks: Cautious; inline source attribution; not investment advice
 - pr353.no-task-list: inspect for a skill gap before editing. Missing checks: enumerated list; no verb; no question; no task description; scheduled research digest
 - pr353.no-consensus-synthesis: inspect for a skill gap before editing. Missing checks: Do not merge multiple snippet claims; agent-authored consensus; ranked list; source-labeled; synthetic takeaway; source identity is missing; ambiguous
-- target.top-level-size: inspect for a skill gap before editing. Missing checks: line count <= 850 (actual 1746)
+- target.top-level-size: inspect for a skill gap before editing. Missing checks: line count <= 850 (actual 1756)
 - target.playbook-task-offload: inspect for a skill gap before editing. Missing checks: playbook-creation.md
 
 ## retained
 
-16/16 cases, 92/92 checks
+15/16 cases, 91/92 checks
 
 ### PASS retained.platform-panorama
 
@@ -177,7 +178,7 @@ ADK remains scheduled-pipeline reasoning, not a data source or one-off research 
 - [x] Do **not** use it for one-off research
 - [x] not use it to produce numbers
 
-### PASS retained.remix-annotations-push
+### FAIL retained.remix-annotations-push
 
 Remix, annotation edits, and push notification workflows remain covered.
 
@@ -186,7 +187,7 @@ Remix, annotation edits, and push notification workflows remain covered.
 - [x] annotation-driven edits
 - [x] feed_alert_ready
 - [x] <|SKIP_NOTIFICATION|>
-- [x] push-subscriptions
+- [ ] push-subscriptions
 
 ### PASS retained.memory-secrets
 
@@ -255,22 +256,20 @@ Snippet claims must not be merged into new agent-authored consensus, ranking, or
 
 ## feedback
 
-1/1 cases, 10/10 checks
+1/1 cases, 8/8 checks
 
-### PASS feedback.eval-diagnosis
+### PASS feedback.recovered-capability-guardrails
 
-Eval scoring feedback is used to diagnose skill gaps, not exposed as user-facing scoring copy.
+Review-discovered guardrails stay present in the skill corpus instead of only in eval script prose.
 
-- [x] score is diagnostic
-- [x] skill gap
-- [x] missing capability summary
-- [x] missing routing pointer
-- [x] missing guardrail
-- [x] missing reference detail
-- [x] missing eval coverage
-- [x] Do not expose eval scores as product copy
-- [x] fix the canonical skill text or eval case
-- [x] regression mechanism
+- [x] getStockCompanyDetail
+- [x] Thematic Ticker Curation
+- [x] subscription
+- [x] custom data source URL
+- [x] callerUserId
+- [x] allow_charges=false
+- [x] 20%
+- [x] ~/library
 
 ## target
 
@@ -280,8 +279,8 @@ Eval scoring feedback is used to diagnose skill gaps, not exposed as user-facing
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 1746)
-- [ ] line count <= 850 (actual 1746)
+- [x] line count >= 650 (actual 1756)
+- [ ] line count <= 850 (actual 1756)
 
 ### FAIL target.playbook-task-offload
 
