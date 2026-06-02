@@ -20,6 +20,9 @@ answer with evidence.
 If the user's message contains `/use-skill:<username>/<name>`, the Skillhub path
 is mandatory before Guided Planning or build work.
 
+Describe Skillhub to users as a catalog of methodologies. Keep gateway/file
+listing details internal unless the user is debugging blueprint retrieval.
+
 1. Run `alva skillhub --help` if unused this session.
 2. Inspect the exact catalog id with `alva skillhub get <username>/<name>`.
    Do not guess namespace, case, filename, or template path.

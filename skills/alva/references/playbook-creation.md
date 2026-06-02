@@ -15,7 +15,8 @@ release, version update, and playbook edit tasks.
    or [design-playbook-trading-strategy.md](design-playbook-trading-strategy.md).
 5. Build HTML that reads feed outputs at runtime.
 6. Write HTML and README to ALFS.
-7. Draft, lint, screenshot, release or keep private according to tier.
+7. Draft, lint, screenshot, and publish publicly by default unless the user
+   explicitly asks to stop at draft/private.
 8. Evaluate push setup with [push-notifications.md](push-notifications.md).
 
 ## HARD-GATE: before-build-html
@@ -116,6 +117,12 @@ ALFS path:
 
 Resolve `<username>` once via `alva whoami`.
 
+After `playbook-draft` succeeds and `before-playbook-release` passes, call
+`alva release playbook` without asking whether to stop at the draft version,
+unless the user explicitly requested draft-only/private. Draft is a separate
+version state; visibility (`public` / `private` / `paid`) applies after
+publication. The default published visibility is public.
+
 ```bash
 alva release playbook ... \
   --readme-url '/alva/home/<username>/playbooks/{name}/README.md'
@@ -164,10 +171,11 @@ retry once without compression.
 
 Pro users:
 
-- Show the draft URL: `https://alva.ai/u/<username>/playbooks/<playbook_name>`.
-- Ask whether to publish publicly or keep private.
+- Publish publicly by default after gates pass.
 - To change a published playbook later, use `alva playbooks set-visibility`
   after `alva playbooks --help`. Private/paid are Pro-gated.
+- If the user wants draft-only/private before publishing, stop at draft and say
+  how to publish later.
 
 Free users:
 

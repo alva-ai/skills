@@ -11,7 +11,7 @@ description: >-
   Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v1.10.1
+  version: v1.11.1
 ---
 
 # Alva
@@ -95,6 +95,20 @@ The same user sentence can imply different artifacts depending on verbs. "Tell
 me" usually means Answer. "Track", "monitor", "notify", "dashboard", "publish",
 "share", "backtest", "screen", "remix", and `/use-skill:` usually mean a
 larger artifact route.
+
+## Capability Help
+
+When the user asks who Alva is, what Alva can do, how to use Alva, or asks for
+starter prompts, answer from the capability map rather than implementation
+internals. Use user-facing groups such as Ask market questions, Set alerts,
+Build/remix Playbooks, Discover/manage Playbooks, and Connect accounts.
+
+Offer 3 concrete starter prompts when helpful. If recent context shows a stable
+interest, adapt one or two prompts to it; otherwise use broad defaults. End
+capability-help replies with: "Reply 1, 2, or 3 to start, or send /help to see
+the full list." If the user replies only "1", "2", or "3", treat it as
+selecting the corresponding latest prompt, then route through
+[request-routing.md](references/request-routing.md).
 
 ## First Principles
 
@@ -332,10 +346,10 @@ Before release, satisfy `before-playbook-draft` and `before-playbook-release`.
 Every release needs a current README at `~/playbooks/<name>/README.md`, passed
 via absolute `--readme-url`; see [api/release.md](references/api/release.md).
 
-Free users publish public playbooks directly. Pro users may keep drafts private
-or publish later. Existing published visibility can be changed with
-`alva playbooks set-visibility` after reading `alva playbooks --help`; private
-and paid visibility are Pro-gated.
+After a successful draft and release gates, publish publicly by default unless
+the user explicitly asks to stop at draft/private. Existing published
+visibility can be changed with `alva playbooks set-visibility` after reading
+`alva playbooks --help`; private and paid visibility are Pro-gated.
 
 Playbook creation is where many Alva concepts meet: Data Skills or BYOD feed
 the runtime, Feed SDK writes outputs, design rules govern the UI, release
@@ -434,7 +448,8 @@ subscribed, and a real run writes a fresh sidecar record.
 
 A remix request usually arrives as `<remix ...>`. Extract source owner/name from
 the tag URL, read the source feed scripts, HTML, README, and playbook metadata,
-then build a new playbook under the requesting user's namespace.
+then build a new playbook under the requesting user's namespace. If the source
+has registered UDFs, preserve them unless the user explicitly asks otherwise.
 
 Open [remix-workflow.md](references/remix-workflow.md). `alva remix` records
 parent-child lineage only; use `alva fs read` to read playbook files. If the
@@ -464,6 +479,14 @@ credentials. Prefer the web upload page at <https://alva.ai/apikey>. Do not ask
 the user to paste sensitive third-party secrets into chat when web upload is
 feasible. Runtime access and CRUD details live in the reference; never log
 returned values.
+
+### Platform Feedback
+
+When an Alva-owned API/runtime/data/docs/auth/product issue blocks or materially
+degrades the task, read [api/feedback.md](references/api/feedback.md), run
+`alva feedback --help`, ask for user confirmation, and scrub secrets before
+submitting. If the task fails because Alva behaved unexpectedly, offer the
+feedback flow before closing.
 
 ## Content Legitimacy Quick Rules
 
@@ -571,12 +594,13 @@ text does not fully cover.
 | `skillhub` | Curated methodology blueprints. See [request-routing.md](references/request-routing.md#skillhub-blueprint). |
 | `playbooks` | Trending discovery and `set-visibility`. |
 | `comments` | Playbook comments and pinned creator notes. See [creators-note.md](references/creators-note.md). |
-| `push-subscriptions` | Personal feed/playbook push subscription. See [push-notifications.md](references/push-notifications.md). |
+| `subscriptions` | Personal feed/playbook push subscription. See [push-notifications.md](references/push-notifications.md). |
 | `channel` | Group push subscriptions. See [push-notifications.md](references/push-notifications.md). |
 | `trading` | Accounts, portfolio, orders, subscriptions, execution. Must read [api/trading.md](references/api/trading.md). |
 | `screenshot` | PNG capture for released playbook verification. See [playbook-creation.md](references/playbook-creation.md#screenshot). |
 | `remix` | Lineage registration only. See [remix-workflow.md](references/remix-workflow.md). |
 | `secrets` | Secret CRUD for agent-managed setup. See [secret-manager.md](references/secret-manager.md). |
+| `feedback` | Submit user-confirmed Alva platform feedback. Must read [api/feedback.md](references/api/feedback.md). |
 
 Non-CLI references:
 
@@ -622,6 +646,7 @@ Use this index to open only the file needed for the current task.
 | [api/release.md](references/api/release.md) | Release extras: README, tags, trading symbols, skill id, descriptions. |
 | [api/trading.md](references/api/trading.md) | Trading signal schema, symbol naming, dry-run rules. |
 | [api/udf-runtime.md](references/api/udf-runtime.md) | Playbook UDF registration and browser invocation. |
+| [api/feedback.md](references/api/feedback.md) | User-confirmed Alva platform feedback for Alva-owned blockers. |
 | [api/error-responses.md](references/api/error-responses.md) | HTTP status to error-code table. |
 
 Runtime artifacts:
@@ -663,5 +688,7 @@ Before finishing an Alva task, ask:
 - Did Skillhub work fetch the blueprint fresh and set `--skill-id` if used?
 - Did backtesting or signal work use Altra?
 - Did push work verify both publisher sidecar and subscriber target?
+- If Alva-owned behavior blocked the task, did I offer the confirmed feedback
+  flow after reading [api/feedback.md](references/api/feedback.md)?
 - Did the final response describe the delivered result without leaking
   unnecessary internals?

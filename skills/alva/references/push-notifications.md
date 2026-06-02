@@ -37,9 +37,9 @@ A push is set up only after all of these succeed:
 3. Enable publisher push on the cronjob:
    `alva deploy update --id <ID> --push-notify`.
 4. Subscribe the target:
-   `alva push-subscriptions subscribe-feed --username <owner> --name <feed>`
+   `alva subscriptions subscribe-feed --username <owner> --name <feed>`
    or
-   `alva push-subscriptions subscribe-playbook --username <owner> --name <playbook>`.
+   `alva subscriptions subscribe-playbook --username <owner> --name <playbook>`.
    For groups, use `/alva subscribe feed <id>` or
    `/alva subscribe playbook <id>` in the group.
 5. Trigger or wait for a real run, read `@last/1` of the sidecar, and confirm

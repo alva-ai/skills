@@ -207,7 +207,7 @@
         "annotation-driven edits",
         "feed_alert_ready",
         "<|SKIP_NOTIFICATION|>",
-        "push-subscriptions"
+        "subscriptions"
       ]
     },
     {
@@ -337,6 +337,29 @@
         "Write or run jagent code",
         "Touch ALFS paths",
         "Build or edit playbook HTML/charts"
+      ]
+    },
+    {
+      "id": "target.mainline-2026-06-02-updates",
+      "group": "target",
+      "target": "corpus",
+      "description": "Latest mainline Alva skill updates remain integrated after rebasing the refactor.",
+      "includes": [
+        "version: v1.11.1",
+        "Capability Help",
+        "Reply 1, 2, or 3 to start",
+        "feedback",
+        "api/feedback.md",
+        "alva feedback --help",
+        "subscriptions subscribe-feed",
+        "subscriptions subscribe-playbook",
+        "publish publicly by default",
+        "registered UDFs",
+        "implementation internals",
+        "Skillhub to users as a catalog of methodologies",
+        "callerUserId",
+        "allow_charges=false",
+        "no-charge"
       ]
     }
   ]

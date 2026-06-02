@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/pitfalls-gate/skills/alva`
+Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/rebase-main/skills/alva`
 
-SKILL.md lines: 667
+SKILL.md lines: 694
 
-Cases: 24/24
+Cases: 25/25
 
-Checks: 146/146 (100.00%)
+Checks: 161/161 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -181,7 +181,7 @@ Remix, annotation edits, and push notification workflows remain covered.
 - [x] annotation-driven edits
 - [x] feed_alert_ready
 - [x] <|SKIP_NOTIFICATION|>
-- [x] push-subscriptions
+- [x] subscriptions
 
 ### PASS retained.memory-secrets
 
@@ -267,14 +267,14 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-3/3 cases, 15/15 checks
+4/4 cases, 30/30 checks
 
 ### PASS target.top-level-size
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 667)
-- [x] line count <= 850 (actual 667)
+- [x] line count >= 650 (actual 694)
+- [x] line count <= 850 (actual 694)
 
 ### PASS target.playbook-task-offload
 
@@ -298,3 +298,23 @@ Operational pitfalls are a mandatory stepwise gate, not an optional debugging ap
 - [x] Write or run jagent code
 - [x] Touch ALFS paths
 - [x] Build or edit playbook HTML/charts
+
+### PASS target.mainline-2026-06-02-updates
+
+Latest mainline Alva skill updates remain integrated after rebasing the refactor.
+
+- [x] version: v1.11.1
+- [x] Capability Help
+- [x] Reply 1, 2, or 3 to start
+- [x] feedback
+- [x] api/feedback.md
+- [x] alva feedback --help
+- [x] subscriptions subscribe-feed
+- [x] subscriptions subscribe-playbook
+- [x] publish publicly by default
+- [x] registered UDFs
+- [x] implementation internals
+- [x] Skillhub to users as a catalog of methodologies
+- [x] callerUserId
+- [x] allow_charges=false
+- [x] no-charge

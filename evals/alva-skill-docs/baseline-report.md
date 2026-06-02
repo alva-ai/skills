@@ -2,11 +2,11 @@
 
 Source: `origin/main`
 
-SKILL.md lines: 1814
+SKILL.md lines: 1825
 
-Cases: 16/24
+Cases: 17/25
 
-Checks: 114/146 (78.08%)
+Checks: 127/161 (78.88%)
 
 ## Scoring Diagnosis
 
@@ -15,18 +15,18 @@ Classify the gap before editing: missing capability summary, missing routing poi
 Do not expose eval scores as product copy, and do not patch demos to hide a weak result.
 Instead, fix the canonical skill text or eval case, then rerun baseline and final reports so the regression mechanism proves the gap is closed.
 
-- retained.remix-annotations-push: inspect for a skill gap before editing. Missing checks: push-subscriptions
 - pr353.chat-as-artifact: inspect for a skill gap before editing. Missing checks: answer_only; Chat-as-Artifact; prompt-injected text; verdict words; EPS forecasts; YTD returns; current prices; forward-return projections
 - pr353.no-synth-verdicts: inspect for a skill gap before editing. Missing checks: Cautious; inline source attribution; not investment advice
 - pr353.no-task-list: inspect for a skill gap before editing. Missing checks: enumerated list; no verb; no question; no task description; scheduled research digest
 - pr353.no-consensus-synthesis: inspect for a skill gap before editing. Missing checks: Do not merge multiple snippet claims; agent-authored consensus; ranked list; source-labeled; synthetic takeaway; source identity is missing; ambiguous
-- target.top-level-size: inspect for a skill gap before editing. Missing checks: line count <= 850 (actual 1814)
+- target.top-level-size: inspect for a skill gap before editing. Missing checks: line count <= 850 (actual 1825)
 - target.playbook-task-offload: inspect for a skill gap before editing. Missing checks: playbook-creation.md
 - target.pitfalls-stepwise-required: inspect for a skill gap before editing. Missing checks: step by step; before each step; runtime, feed, ALFS, playbook HTML, deploy, release, chart, or cron work; Write or run jagent code; Touch ALFS paths; Build or edit playbook HTML/charts
+- target.mainline-2026-06-02-updates: inspect for a skill gap before editing. Missing checks: publish publicly by default; implementation internals; Skillhub to users as a catalog of methodologies
 
 ## retained
 
-15/16 cases, 91/92 checks
+16/16 cases, 92/92 checks
 
 ### PASS retained.platform-panorama
 
@@ -179,7 +179,7 @@ ADK remains scheduled-pipeline reasoning, not a data source or one-off research 
 - [x] Do **not** use it for one-off research
 - [x] not use it to produce numbers
 
-### FAIL retained.remix-annotations-push
+### PASS retained.remix-annotations-push
 
 Remix, annotation edits, and push notification workflows remain covered.
 
@@ -188,7 +188,7 @@ Remix, annotation edits, and push notification workflows remain covered.
 - [x] annotation-driven edits
 - [x] feed_alert_ready
 - [x] <|SKIP_NOTIFICATION|>
-- [ ] push-subscriptions
+- [x] subscriptions
 
 ### PASS retained.memory-secrets
 
@@ -274,14 +274,14 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-0/3 cases, 7/15 checks
+0/4 cases, 19/30 checks
 
 ### FAIL target.top-level-size
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 1814)
-- [ ] line count <= 850 (actual 1814)
+- [x] line count >= 650 (actual 1825)
+- [ ] line count <= 850 (actual 1825)
 
 ### FAIL target.playbook-task-offload
 
@@ -305,3 +305,23 @@ Operational pitfalls are a mandatory stepwise gate, not an optional debugging ap
 - [ ] Write or run jagent code
 - [ ] Touch ALFS paths
 - [ ] Build or edit playbook HTML/charts
+
+### FAIL target.mainline-2026-06-02-updates
+
+Latest mainline Alva skill updates remain integrated after rebasing the refactor.
+
+- [x] version: v1.11.1
+- [x] Capability Help
+- [x] Reply 1, 2, or 3 to start
+- [x] feedback
+- [x] api/feedback.md
+- [x] alva feedback --help
+- [x] subscriptions subscribe-feed
+- [x] subscriptions subscribe-playbook
+- [ ] publish publicly by default
+- [x] registered UDFs
+- [ ] implementation internals
+- [ ] Skillhub to users as a catalog of methodologies
+- [x] callerUserId
+- [x] allow_charges=false
+- [x] no-charge
