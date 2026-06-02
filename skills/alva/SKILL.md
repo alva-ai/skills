@@ -843,6 +843,15 @@ implementation. The reference covers PBSV browser authentication, service API
 registration, `window.alva.udf`, allowance consent, and release checks. Never
 hand-write bearer headers in playbook HTML; use the browser SDK.
 
+**PBSV request rule**: raw browser `fetch()` is only acceptable for public feed
+reads through `readAlfsJson()`. For PBSV-protected UDF/service calls in
+playbook HTML, load `@alva-ai/toolkit` and use `window.alva.udf.list()`,
+`window.alva.udf.call(...)`, or `window.alva.udf.renderButton(...)`. Do not
+call `/api/v1/service/functions` or `/api/v1/service/invoke` with bare
+`fetch()`; the toolkit runtime is the request method that reads `_pbsv`, strips
+it from the URL, refreshes it from the parent, and sends `Authorization` plus
+`X-Pbsv: 1` on every UDF request.
+
 ### 7. Release
 
 #### Common steps (all users)

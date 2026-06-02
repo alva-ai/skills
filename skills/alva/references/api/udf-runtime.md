@@ -52,6 +52,13 @@ X-Pbsv: 1
 Content-Type: application/json
 ```
 
+This is a hard request-method rule for generated playbook HTML: do not use raw
+browser `fetch()` for PBSV-protected service calls. The toolkit runtime is the
+request method. It owns token extraction, URL cleanup, parent refreshes, consent
+retry, and the `Authorization`/`X-Pbsv` headers. Keep raw `fetch()` only for
+public feed reads through the ALFS read gateway; UDF metadata and invocation
+must go through `window.alva.udf`.
+
 ## Browser API
 
 The browser API is the viewer-side use surface. It assumes the function has
@@ -63,6 +70,17 @@ already been registered for the playbook.
   const functions = await window.alva.udf.list();
   const result = await window.alva.udf.call('analyze', { ticker: 'AAPL' });
 </script>
+```
+
+Use this replacement pattern when wiring UDF UI:
+
+```javascript
+// Good: toolkit adds PBSV headers and handles consent/token refresh.
+const functions = await window.alva.udf.list();
+const result = await window.alva.udf.call("analyze", { ticker: "AAPL" });
+
+// Bad: bare fetch will miss PBSV behavior and often fail auth/consent flows.
+await fetch("/api/v1/service/invoke", { method: "POST" });
 ```
 
 ### `window.alva.udf.list()`
