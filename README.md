@@ -2,7 +2,7 @@
 
 ![Agent Skills](https://alva-ai-static.b-cdn.net/images/alva-skill-github-cover.png)
 
-> Turn your AI agent into a finance powerhouse — access 250+ financial skills, build cloud-side analytics, backtest strategies, and ship live investing playbooks.
+> Turn your AI agent into Alva Agent — research market theses with live financial context, build or remix Playbooks, set alerts, connect accounts, and backtest strategies on Alva Cloud.
 
 ## Quick Start
 
@@ -83,23 +83,24 @@ The check is silent when your skill is up to date. It runs at most once every 8 
 Start with a simple prompt:
 
 ```
-Build me an NVDA dashboard with insider trading data and financial metrics
+Explain why NVDA moved last week and what changed in semis
 ```
 
-That's it. Your agent now has full access to the Alva platform. By default, the skill builds live playbooks unless you explicitly ask for a static snapshot. When you explicitly ask for user-callable functions, interactive playbooks use the current PBSV + UDF runtime.
+That's it. Your agent can now answer market questions, build or remix live Playbooks, set alerts, and work with connected accounts on Alva. By default, the skill builds live Playbooks unless you explicitly ask for a static snapshot. When you explicitly ask for user-callable functions, interactive Playbooks use the current PBSV + UDF runtime.
 
 ---
 
 ## Example Prompts
 
-| Use Case         | Example Prompt                                                                            |
-| ---------------- | ----------------------------------------------------------------------------------------- |
-| Stock Dashboard  | *"Build a playbook tracking AAPL with price charts, analyst targets, and insider trades"* |
-| Crypto Monitor   | *"Create a BTC/ETH dashboard with funding rates, exchange flows, and on-chain metrics"*   |
-| Trading Strategy | *"Backtest an RSI mean-reversion strategy on BTC with daily rebalancing"*                 |
-| Macro Overview   | *"Build a macro dashboard with CPI, GDP, Treasury rates, and recession probability"*      |
-| Screening Tool   | *"Screen for stocks with PE < 15, ROE > 20%, and positive insider buying"*                |
-| Interactive Tool | *"Register a playbook UDF and expose it through a Run analysis button for the selected ticker"* |
+| Use Case                    | Example Prompt                                                                                         |
+| --------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Ask Market Questions        | *"Explain why NVDA moved last week and what changed in semis."*                                        |
+| Set Alerts                  | *"Create a weekday 8:30am ET alert for SPY, QQQ, NVDA, MSFT, and TSLA meaningful changes."*            |
+| Build Playbooks             | *"Build a Playbook tracking AAPL with price charts, analyst targets, and insider trades."*             |
+| Discover & Remix Playbooks  | *"Find a semiconductor Playbook tracking AI infrastructure and subscribe me to its alerts."*            |
+| Backtest Strategies         | *"Backtest an RSI mean-reversion strategy on BTC with daily rebalancing."*                             |
+| Connect Accounts & Trading  | *"Show my connected portfolio holdings and summarize recent activity."*                                |
+| Interactive Playbook Tools  | *"Register a Playbook UDF and expose it through a Run analysis button for the selected ticker."*        |
 
 ---
 
@@ -166,7 +167,7 @@ Turn your work into a hosted web app at `https://alva.ai/u/<username>/playbooks/
 
 | Skill                            | Description                                                                                                                                                                 |
 | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **[alva](skills/alva/SKILL.md)** | Full Alva platform access — data skills, cloud runtime, feeds, backtesting, and playbook deployment. See the [skill reference](skills/alva/SKILL.md) for detailed API docs. |
+| **[alva](skills/alva/SKILL.md)** | Alva Agent for investing workflows — ask market questions, set alerts, build/remix Playbooks, connect accounts, backtest strategies, and use Alva Cloud data/runtime capabilities. See the [skill reference](skills/alva/SKILL.md) for detailed instructions. |
 
 ---
 
