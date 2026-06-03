@@ -870,7 +870,7 @@ body {
   outline-offset: 2px;
 }
 
-/* Base (default size = Small) */
+/* Base (default size = 12) */
 .tag {
   display: inline-flex;
   align-items: center;
@@ -904,10 +904,20 @@ body {
   letter-spacing: 0.14px;
 }
 
+/* Size — Small */
+.tag-sm {
+  height: 20px;
+  padding: 1px 4px;
+  font-size: 11px;
+  line-height: 18px;
+  letter-spacing: 0.11px;
+  border-radius: var(--radius-ct-min);
+}
+
 /* Size — Extra Small */
 .tag-xs {
   height: 18px;
-  padding: 1px 6px;
+  padding: 1px 4px;
   font-size: 10px;
   line-height: 16px;
   letter-spacing: 0.1px;
@@ -1376,7 +1386,7 @@ body {
 }
 .tab-pill .tab-item {
   padding: 6px var(--spacing-s);
-  border-radius: 999px; /* capsule */
+  border-radius: var(--radius-ct-max); /* capsule */
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
@@ -1411,7 +1421,7 @@ body {
 .tooltip {
   background-color: var(--b0-container);
   position: absolute;
-  border-radius: var(--radius-ct-m);
+  border-radius: var(--radius-pop-tips);
   box-shadow: var(--shadow-s);
   padding: var(--spacing-m);
   width: fit-content;
@@ -1424,7 +1434,7 @@ body {
 .tooltip-border {
   position: absolute;
   border: 0.5px solid var(--line-l2);
-  border-radius: var(--radius-ct-m);
+  border-radius: var(--radius-pop-tips);
   inset: 0;
   pointer-events: none;
 }
