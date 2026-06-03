@@ -58,7 +58,7 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add skills/alva/references/css/design-system.css
-            git commit -m "build(alva): regenerate design-system.css [skip ci]"
+            git commit -m "build(alva): regenerate design-system.css"
             if ! git push; then
               echo "::warning::Push failed — likely a race with a concurrent push. Will retry on next CI run."
               exit 0
