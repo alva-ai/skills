@@ -25,7 +25,7 @@
 1. **Widget-internal layout uses `flex-wrap`** (metric rows, metric groups,
    side-by-side elements). Never `grid-cols-N` — grid is only for page-level
    `.widget-grid`. → [Details](#content-reflow)
-2. **No border/outline on widgets** — use `--grey-g01` or `--line-l05` dividers.
+2. **No border/outline on widgets** — use `--grey-g01` or `--line-l07` dividers.
    Only Tags may have borders. → [Details](#widget-background)
 3. **Dividers don't span full width** — align both ends with content padding. →
    [Details](#divider)
@@ -95,16 +95,16 @@
 
 /* ── Dividers ── */
 .divider-v {
-  width: 1px;
+  width: 0.5px;
   flex-shrink: 0;
   margin-block: var(--spacing-l);
-  background-color: var(--line-l05);
+  background-color: var(--line-l07);
 }
 
 .divider-h {
-  height: 1px;
+  height: 0.5px;
   margin-inline: var(--spacing-l);
-  background-color: var(--line-l05);
+  background-color: var(--line-l07);
 }
 
 /* ── Equal Height Fill ── */
@@ -643,7 +643,7 @@ No `shadowBlur`, no `focus: 'series'`.
   display: flex;
   width: 100%;
   gap: var(--spacing-m); /* column spacing between cells */
-  border-bottom: 1px solid var(--line-l07); /* row divider — on the row, not cells */
+  border-bottom: 0.5px solid var(--line-l12); /* row divider — on the row, not cells */
   /* min-width is set by initTableAlignment JS — do NOT use CSS min-width here */
 }
 .table-row:last-child {
@@ -696,7 +696,7 @@ No `shadowBlur`, no `focus: 'series'`.
 - Row-first flex layout. **Do NOT use column-first layout.**
 - Column spacing: `gap: var(--spacing-m)` on `.table-row`. **Do NOT use cell padding for
   inter-column spacing.**
-- Row divider: `border-bottom: 1px solid var(--line-l07)` on `.table-row` (not
+- Row divider: `border-bottom: 0.5px solid var(--line-l12)` on `.table-row` (not
   cells). Last row: no border.
 
 | Element | Font | Color       | Padding      |
@@ -878,8 +878,8 @@ for rich text rendering.
   bottom: 0;
   left: var(--spacing-m);
   right: var(--spacing-m);
-  height: 1px;
-  background: var(--line-l05);
+  height: 0.5px;
+  background: var(--line-l07);
 }
 
 .feed-item:last-child::after {
@@ -1483,7 +1483,7 @@ Not a widget-card; a page-level section separator.
   letter-spacing: 0.12px;
   color: var(--text-n5);
   padding-left: 8px;
-  border-left: 1px solid var(--line-l07);
+  border-left: 0.5px solid var(--line-l12);
 }
 ```
 

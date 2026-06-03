@@ -31,11 +31,11 @@ values. Below is a quick reference:
 | Brand        | `--main-m1` ~ `--main-m7`                      | m3=Bullish, m4=Bearish                  |
 | Chart colors | `--chart-{color}-main/1/2`                     | Grey only when ≥ 3 series               |
 | Text         | `--text-n9/n7/n5/n3/n2`                        | n9=primary, n7=secondary, n5=supporting |
-| Background   | `--b0-page`, `--grey-g01`~`g1`, `--b-r02`~`r1` | g01 for card backgrounds                |
+| Background   | `--b0-page`, `--grey-g01`~`g7`, `--b-r02`~`r1` | g01 for card backgrounds                |
 | Line         | `--line-l05/l07/l12/l2/l3`                     | l07=default                             |
 | Shadow       | `--shadow-xs/s/l`                              | Floating surfaces only (dropdown/tooltip) |
 | Spacing      | `--spacing-xxxs`(2) ~ `--spacing-xxxxxxl`(56)  | Common: xs=8, m=16, xl=24               |
-| Radius       | `--radius-ct-xs`(2) ~ `--radius-ct-l`(8)       | xs=Tag, s=Card, l=Page                  |
+| Radius       | `--radius-ct-min`(2) ~ `--radius-ct-max`(960)  | min=Tag, s=Card, l=Page                 |
 
 ## Design Contract
 

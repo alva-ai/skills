@@ -62,6 +62,7 @@
     --chart-grey-2: #b7b7b7; /* ⚠ Only When chart has ≥ 3 series */
 
     /* ── Spacing ── */
+    --spacing-min: 0px;
     --spacing-xxxs: 2px;
     --spacing-xxs: 4px;
     --spacing-xs: 8px;
@@ -76,21 +77,25 @@
     --spacing-xxxxxxl: 56px;
 
     /* ── Radius ── */
-    --radius-ct-xs: 2px;
+    --radius-ct-min: 2px;
     --radius-ct-s: 4px;
     --radius-ct-m: 6px;
     --radius-ct-l: 8px;
     --radius-ct-xl: 12px;
-    --radius-pop-dialog: 12px;
-    --radius-pop-action-sheets: 12px;
-    --radius-pop-dropdown: 8px;
-    --radius-pop-popover: 8px;
-    --radius-pop-toast: 8px;
-    --radius-pop-tips: 8px;
-    --radius-btn-xs: 4px;
-    --radius-btn-s: 6px;
-    --radius-btn-m: 8px;
-    --radius-btn-l: 12px;
+    --radius-ct-xxl: 16px;
+    --radius-ct-xxxl: 20px;
+    --radius-ct-max: 960px;
+    --radius-pop-dialog: 8px;
+    --radius-pop-action-sheets: 8px;
+    --radius-pop-dropdown: 6px;
+    --radius-pop-popover: 6px;
+    --radius-pop-toast: 4px;
+    --radius-pop-tips: 4px;
+    --radius-btn-min: 0px;
+    --radius-btn-xs: 2px;
+    --radius-btn-s: 4px;
+    --radius-btn-m: 6px;
+    --radius-btn-l: 8px;
   }
 }
 
@@ -109,12 +114,17 @@
     --b0-page: #ffffff;
     --b0-container: #ffffff;
     --b0-sidebar: #2a2a38;
-    --b0-sidebar-select: rgba(255, 255, 255, 0.03);
+    --b0-sidebar-select: rgba(255, 255, 255, 0.05);
+    --b0-special: #375454;
     --grey-g01: #fafafa; /* Dashboard Card */
     --grey-g02: #f5f5f5;
     --grey-g03: #f0f0f0;
     --grey-g05: #eaeaea;
     --grey-g1: #dedede;
+    --grey-g2: #c5c5c5;
+    --grey-g3: #acacac;
+    --grey-g5: #7b7b7b;
+    --grey-g7: #4a4a4a;
     --b-r02: rgba(0, 0, 0, 0.02); /* Content Block */
     --b-r03: rgba(0, 0, 0, 0.03); /* Darker Block */
     --b-r05: rgba(0, 0, 0, 0.05);
