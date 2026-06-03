@@ -38,7 +38,7 @@ query parameters to the iframe URL:
 
 | Parameter       | Description                                                                    |
 | --------------- | ------------------------------------------------------------------------------ |
-| `_pbsv`         | Short-lived playbook-scoped viewer JWT. Scope is fixed to read + `udf:invoke`. |
+| `_pbsv`         | Short-lived playbook-scoped viewer JWT. Scope is fixed to read + `udf:invoke`: `read` authorizes the **bound playbook's own feed data** (e.g. `GET /api/v1/fs/read` on the playbook's feed paths, gated server-side by the playbook binding), while `udf:invoke` authorizes that playbook's UDFs. It does not grant access to arbitrary file APIs or the viewer's other files. This is why `readAlfsJson` (SKILL.md §6) works for a published playbook in both public and private modes. |
 | `parent_origin` | Origin allowed to send token refresh and consent messages.                     |
 | `api_origin`    | Alva API origin for service calls.                                             |
 

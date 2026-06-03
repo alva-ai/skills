@@ -833,6 +833,10 @@ async function readAlfsJson(path) {
 </script>
 ```
 
+For feed reads, use `readAlfsJson`; it calls `AlvaClient.fs.read` and carries
+PBSV when available, so one code path works for public and private playbooks.
+See [feed-sdk.md](references/feed-sdk.md#from-a-web-page) for details.
+
 `$ALVA_ENDPOINT` is available to sandbox scripts and CLI verification only. Do
 not emit it into browser HTML. Published HTML must call Alva APIs through
 `AlvaToolkit.AlvaClient` so endpoint selection, auth transport, query
