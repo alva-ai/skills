@@ -967,6 +967,12 @@ transport details.
    head -c4 /tmp/screenshot.png | grep -q PNG || echo "SCREENSHOT_FAILED"
    ```
 
+   A PNG/page shell is not enough: pass only when the screenshot or targeted
+   capture shows real feed-backed chart marks, table rows, or KPI values; blank
+   frames, headers-only tables, loading/error fallbacks, and fetch failures are
+   data-rendering failures that must be fixed before claiming the playbook is
+   done.
+
 `alva release playbook` **requires** `--readme-url`, and it must be the
 absolute ALFS path `/alva/home/<username>/playbooks/<name>/README.md`
 (the relative `<name>/README.md` shorthand is **no longer accepted**).
