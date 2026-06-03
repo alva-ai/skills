@@ -775,7 +775,7 @@ See **Step 9** below for the post-release subscription flow.
 
 <HARD-GATE id="before-build-html">
 Before writing or rewriting playbook HTML, read the applicable design guidance
-for this session.
+and confirm the data-layer contract for this session.
 
 Required evidence:
 
@@ -788,6 +788,9 @@ Required evidence:
   for strategy/backtest playbooks.
 - If a `/use-skill:` blueprint or template is active, its layout and data
   contract have been read before HTML work starts.
+- The HTML follows the [Browser request rule](#6-build-the-playbook-web-app)
+  for Alva data requests, including when cloning a `/use-skill:` blueprint,
+  template, or existing HTML.
 
 If this evidence is missing, stop and read the required design/reference file
 before creating or editing HTML. Do not rely on memory of prior sessions.
