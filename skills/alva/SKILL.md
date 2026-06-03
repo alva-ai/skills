@@ -833,6 +833,17 @@ async function readAlfsJson(path) {
 </script>
 ```
 
+**Read feed data through this helper, not a raw `fetch` — it is
+visibility-agnostic.** `readAlfsJson` carries the viewer's PBSV token, so a
+published playbook reads its own feed data whether the playbook is currently
+**public or private**: the token authorizes the bound playbook's feeds
+server-side. An unauthenticated `fetch` to `…/api/v1/fs/read` only works while
+the playbook and its feeds are public and **silently breaks the moment the
+owner flips the playbook to private** — treat it as a public-only fallback,
+never the default read path. (For an anonymous viewer of a public playbook the
+same helper works token-lessly as a guest read, so one code path covers every
+case.)
+
 `$ALVA_ENDPOINT` is available to sandbox scripts and CLI verification only. Do
 not emit it into browser HTML. Published HTML must call Alva APIs through
 `AlvaToolkit.AlvaClient` so endpoint selection, auth transport, query
