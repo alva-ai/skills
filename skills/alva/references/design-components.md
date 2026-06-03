@@ -25,6 +25,9 @@
 ### Specification
 
 - No check icon — selection is conveyed by the rounded tinted pill alone.
+- Selected/hover background is a `--radius-ct-s` (4px) pill on `.list-item`.
+- Two sizes: **M** (default, text 14/22) and **S** (add `.size-s` to
+  `.dropdown`, text 12/20). Width follows the associated Select in both.
 
 ### CSS
 
@@ -52,16 +55,13 @@
   position: relative;
   width: 100%;
   cursor: pointer;
+  border-radius: var(--radius-ct-s);
   transition: background-color 0.12s ease;
 }
 
 .list-item:hover,
 .list-item.selected {
   background-color: rgba(73,163,166,0.08);
-}
-
-.list-item.selected {
-  border-radius: var(--radius-ct-m);
 }
 
 .list-item.selected .list-item-text {
@@ -90,6 +90,13 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Size S — width follows the Select trigger; only typography shrinks */
+.dropdown.size-s .list-item-text {
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
 }
 ```
 
@@ -317,7 +324,7 @@ tags, and scoped CSS maps them to the Alva design spec.
 .markdown-container code,
 .markdown-container pre {
   background: var(--b-r02);
-  border-radius: var(--radius-ct-xs);
+  border-radius: var(--radius-ct-min);
   font-family: "JetBrains Mono", monospace;
   color: var(--text-n7);
 }
@@ -354,8 +361,8 @@ tags, and scoped CSS maps them to the Alva design spec.
 
 /* ── Divider ── */
 .markdown-container hr {
-  height: 1px;
-  background: var(--line-l07);
+  height: 0.5px;
+  background: var(--line-l12);
   border: none;
   margin: var(--spacing-xxs) 0;
 }
@@ -383,7 +390,7 @@ tags, and scoped CSS maps them to the Alva design spec.
   min-height: 176px;
 }
 .markdown-container tr {
-  border-bottom: 1px solid var(--line-l07);
+  border-bottom: 0.5px solid var(--line-l12);
 }
 .markdown-container tr:last-child {
   border-bottom: none;
@@ -790,7 +797,7 @@ The button component system contains **2 types** x **4 sizes** x **4 states** =
 ### 1. Overview
 
 Tags are compact labels used to display status, category, or classification.
-They come in **3 sizes** and **2 style modes**. Colors are not predefined — the
+They come in **4 sizes** and **2 style modes**. Colors are not predefined — the
 agent picks the appropriate `--main-mX` color token based on semantic context
 (m1 Theme, m2 Link, m3 Bullish, m4 Bearish, m5 Alert, m6 Emphasize). Every
 `--main-mX` has a matching `--main-mX-10` (10 % opacity) variant for the tinted
@@ -799,7 +806,7 @@ style.
 ### 2. CSS
 
 ```css
-/* Base (default size = Small) */
+/* Base (default size = 12) */
 .tag {
   display: inline-flex;
   align-items: center;
@@ -833,14 +840,24 @@ style.
   letter-spacing: 0.14px;
 }
 
+/* Size — Small */
+.tag-sm {
+  height: 20px;
+  padding: 1px 4px;
+  font-size: 11px;
+  line-height: 18px;
+  letter-spacing: 0.11px;
+  border-radius: var(--radius-ct-min);
+}
+
 /* Size — Extra Small */
 .tag-xs {
   height: 18px;
-  padding: 1px 6px;
+  padding: 1px 4px;
   font-size: 10px;
   line-height: 16px;
   letter-spacing: 0.1px;
-  border-radius: var(--radius-ct-xs);
+  border-radius: var(--radius-ct-min);
 }
 
 /*
@@ -884,6 +901,11 @@ style.
   class="tag tag-md"
   style="background:var(--main-m3-10);color:var(--main-m3)"
   >BULLISH</span
+>
+<span
+  class="tag tag-sm"
+  style="background:var(--main-m5-10);color:var(--main-m5)"
+  >MODERATE</span
 >
 <span
   class="tag tag-xs"
@@ -1163,8 +1185,10 @@ Dropdown. Arrow icon always points down and does not rotate.
   transition: border-color 0.12s ease;
 }
 
-.select:hover .select-border {
+/* Activated (dropdown open) — color + 1px border. Hover does not change color. */
+.select.open .select-border {
   border-color: var(--line-l9);
+  border-width: 1px;
 }
 
 .select-text {
@@ -1180,7 +1204,7 @@ Dropdown. Arrow icon always points down and does not rotate.
   color: var(--text-n9);
 }
 
-.select:hover .select-text {
+.select.open .select-text {
   color: var(--text-n9);
 }
 
@@ -1210,8 +1234,19 @@ Dropdown. Arrow icon always points down and does not rotate.
   letter-spacing: 0.14px;
 }
 
-/* Size — Small */
+/* Size — Small (32px) */
 .select-sm {
+  height: 32px;
+  padding: 6px var(--spacing-s);
+  gap: var(--spacing-xxs);
+  border-radius: var(--radius-btn-s);
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
+}
+
+/* Size — Extra Small (28px) */
+.select-xs {
   height: 28px;
   padding: var(--spacing-xxs) var(--spacing-xs);
   gap: var(--spacing-xxs);
@@ -1220,22 +1255,25 @@ Dropdown. Arrow icon always points down and does not rotate.
   line-height: 20px;
   letter-spacing: 0.12px;
 }
-.select-sm .select-text {
-  width: 70px;
-  flex: none;
-}
 
-/* Arrow Icon */
+/* Arrow Icon — 14px for L/M, 12px for S/XS */
 .select-icon {
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 14px;
+  height: 14px;
   opacity: 0.22;
   transition: opacity 0.12s ease;
 }
 
-.select:hover .select-icon,
+.select-sm .select-icon,
+.select-xs .select-icon {
+  width: 12px;
+  height: 12px;
+}
+
 .select.open .select-icon {
   opacity: 1;
 }
@@ -1366,9 +1404,10 @@ state; typed text matches the filled state.
   transition: border-color 0.12s ease;
 }
 
-.input:hover .input-border,
+/* Activated (focused/typing) — color + 1px border. Hover does not change color. */
 .input:focus-within .input-border {
   border-color: var(--line-l9);
+  border-width: 1px;
 }
 
 .input-field {
@@ -1406,8 +1445,18 @@ state; typed text matches the filled state.
   letter-spacing: 0.14px;
 }
 
-/* Size — Small */
+/* Size — Small (32px) */
 .input-sm {
+  height: 32px;
+  padding: 6px var(--spacing-s);
+  border-radius: var(--radius-btn-s);
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.12px;
+}
+
+/* Size — Extra Small (28px) */
+.input-xs {
   height: 28px;
   padding: var(--spacing-xxs) var(--spacing-xs);
   border-radius: var(--radius-btn-s);
@@ -1445,7 +1494,7 @@ state; typed text matches the filled state.
 
 3 styles (Underline, Segmented, Pill). Underline ships 4 sizes (XL/L/M/S); Segmented and Pill ship 3 sizes (L/M/S). 10 variants total.
 
-- **Underline**: 1px container bottom divider; active item has a 2px bottom bar in `--main-m1` that overlaps the divider. Active text is Medium.
+- **Underline**: items fill the container width by default (equal-width via `flex: 1`, centered text); thin container bottom divider; active item has a 2px bottom bar in `--main-m1`. Active text is Medium.
 - **Segmented**: items share a tinted rounded container (`--b-r05`); active item is a contrasting white tile. Active text is Medium.
 - **Pill**: capsule-shaped items, each with its own subtle background (`--b-r03`); active item is a dark capsule (`rgba(0,0,0,0.7)`) with white text. **Active text stays Regular** (no weight change).
 - **Overflow**: tab item text never wraps. When items exceed container width — Underline scrolls horizontally (scrollbar hidden); Pill wraps to the next row.
@@ -1483,7 +1532,7 @@ state; typed text matches the filled state.
 /* ── Underline ── */
 .tab-underline {
   gap: var(--spacing-m);
-  border-bottom: 1px solid var(--line-l07);
+  border-bottom: 0.5px solid var(--line-l12);
   flex-wrap: nowrap;
   overflow-x: auto;
   scrollbar-width: none; /* Firefox */
@@ -1492,8 +1541,10 @@ state; typed text matches the filled state.
   display: none;
 }
 .tab-underline .tab-item {
+  flex: 1;
+  text-align: center;
   padding-bottom: var(--spacing-xxs);
-  margin-bottom: -1px;
+  margin-bottom: -0.5px;
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
@@ -1578,7 +1629,7 @@ state; typed text matches the filled state.
 }
 .tab-segmented.tab-s .tab-item {
   padding: var(--spacing-xxs) 10px;
-  border-radius: var(--radius-ct-xs); /* 2px */
+  border-radius: var(--radius-ct-min); /* 2px */
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.12px;
@@ -1591,7 +1642,7 @@ state; typed text matches the filled state.
 }
 .tab-pill .tab-item {
   padding: 6px var(--spacing-s);
-  border-radius: 999px; /* capsule */
+  border-radius: var(--radius-ct-max); /* capsule */
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
@@ -1708,7 +1759,7 @@ document.querySelectorAll(".tab").forEach(function (tab) {
 .tooltip {
   background-color: var(--b0-container);
   position: absolute;
-  border-radius: var(--radius-ct-m);
+  border-radius: var(--radius-pop-tips);
   box-shadow: var(--shadow-s);
   padding: var(--spacing-m);
   width: fit-content;
@@ -1721,7 +1772,7 @@ document.querySelectorAll(".tab").forEach(function (tab) {
 .tooltip-border {
   position: absolute;
   border: 0.5px solid var(--line-l2);
-  border-radius: var(--radius-ct-m);
+  border-radius: var(--radius-pop-tips);
   inset: 0;
   pointer-events: none;
 }

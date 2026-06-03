@@ -82,7 +82,7 @@ first child or extra `margin-bottom`/`padding-bottom` on `.tab-bar-wrapper`.
 | Items          | Overview · Analytics · Strategy · Feed                                                                                                                                                                                                                                                 |
 | Style          | [Underline M](./design-components.md#tab) — class `.tab .tab-underline`                                                                                                                                                                                                                |
 | Position       | `.tab-bar-wrapper`: `position: sticky`, `top: 0`, `z-index: 100`, `background: var(--b0-page)`, `padding-top: var(--spacing-xl)` (24px) |
-| Bottom Divider | 1px solid var(--line-l07) on `.tab-bar-wrapper`. Active indicator and container border sit on the **same line** — apply `margin-bottom: -1px` to `.tab-item` so the 2px indicator overlaps the 1px border                                                                              |
+| Bottom Divider | 0.5px solid var(--line-l12) on `.tab-bar-wrapper`. Active indicator and container border sit on the **same line** — apply `margin-bottom: -0.5px` to `.tab-item` so the 2px indicator overlaps the 0.5px border                                                                              |
 | URL Routing    | Each tab has a unique URL hash (`#overview`, `#analytics`, `#strategy`, `#feed`); on load, activate tab matching hash. Use `history.replaceState()` (not `window.location.hash`) to update the hash without triggering a scroll jump                                                   |
 
 #### Tab Item Spec (Underline M)
@@ -523,7 +523,7 @@ Displays individual trading signals from the strategy.
 | Property      | Value                     |
 | ------------- | ------------------------- |
 | padding       | 20px 0                    |
-| border-bottom | 1px solid var(--line-l07) |
+| border-bottom | 0.5px solid var(--line-l12) |
 | Last card     | No border-bottom          |
 
 #### Header
