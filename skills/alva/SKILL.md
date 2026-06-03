@@ -11,7 +11,7 @@ description: >-
   Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v1.11.1
+  version: v1.11.2
 ---
 
 # Alva
