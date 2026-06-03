@@ -941,11 +941,12 @@ transport details.
    correctly from the deployed published URL (for example,
    `https://<username>.playbook.alva.ai/<playbook_name>/v1.0.0/index.html`).
    Always pass `--compress` (with `--compress-quality` / `--compress-max-width`
-   to shrink further) — PNG output is otherwise easily large enough to exceed
-   the 5 MB session upload cap:
+   to shrink further) — uncompressed PNG output is otherwise easily large enough
+   to exceed the 5 MB session upload cap. Compressed screenshots may be returned
+   as WebP, so use a `.webp` filename for the compressed attempt:
 
    ```bash
-   alva screenshot --url <published_url> --out /tmp/screenshot.png \
+   alva screenshot --url <published_url> --out /tmp/screenshot.webp \
      --compress --compress-quality 70 --compress-max-width 1280
    ```
 
@@ -959,12 +960,14 @@ transport details.
 
    The CLI handles authentication automatically. Run `alva screenshot --help`
    for `--selector` and `--xpath`. Before reading the output, validate it is
-   actually a PNG — a failed capture may save a JSON error blob under the
-   `.png` name, and reading that into the session corrupts conversation
+   actually an image — a failed capture may save a JSON error blob under the
+   image filename, and reading that into the session corrupts conversation
    history:
 
    ```bash
-   head -c4 /tmp/screenshot.png | grep -q PNG || echo "SCREENSHOT_FAILED"
+   (head -c12 /tmp/screenshot.webp 2>/dev/null | grep -a -q WEBP) || \
+     (head -c8 /tmp/screenshot.png 2>/dev/null | grep -a -q PNG) || \
+     echo "SCREENSHOT_FAILED"
    ```
 
 `alva release playbook` **requires** `--readme-url`, and it must be the
@@ -1252,7 +1255,7 @@ a routing index — and, for the rows in bold, the linked sub-doc is a
 | `subscriptions` | Subscribe to playbooks (follow + enable all push-enabled automations) and feeds (single automation alert). |
 | `channel` | Group push subscriptions (Telegram / Discord groups). |
 | `trading` | Accounts, portfolio, orders, signals, risk. **Must read [trading.md](references/api/trading.md)** before `execute`, building a signal JSON, or picking an exchange/symbol — real `--signal` schema is `allocate`/`predict` (not the `{symbol,side,qty}` shape the help example shows), `date` is epoch seconds. |
-| `screenshot` | PNG capture used to verify a released playbook. |
+| `screenshot` | Image capture (PNG or compressed WebP) used to verify a released playbook. |
 | `remix` | Record parent-child lineage when remixing a playbook. |
 | `arrays` | Provision / refresh the Arrays JWT (`ARRAYS_JWT` runtime secret). |
 | `auth` / `configure` | Sign in, save API key + endpoint into a named profile. |
