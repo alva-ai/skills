@@ -249,7 +249,13 @@ update at each milestone so the user knows work is progressing.
 **Data provenance in direct answers.** When a direct answer cites specific
 financial figures, each number must either come from a fresh SDK/BYOD fetch
 (attributed inline to its source) or be explicitly qualified as an estimate
-that the user should verify with current sources.
+that the user should verify with current sources. This binds **comparison
+baselines** too — a historical average, peer/sector value, or macro reference a
+judgement leans on (e.g. a stock's "5-year P/E mean", a peer P/E) is itself a
+specific figure: fetch it in-session like the current value it anchors, or flag
+it as unsourced and keep the conclusion qualitative ("未实拉，仅供定性参考").
+NEVER state a baseline from training memory as fact beside fetched numbers — an
+unsourced yardstick next to sourced data reads as sourced.
 
 ### Platform Feedback Moments
 
