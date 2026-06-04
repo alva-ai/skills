@@ -249,7 +249,10 @@ update at each milestone so the user knows work is progressing.
 **Data provenance in direct answers.** When a direct answer cites specific
 financial figures, each number must either come from a fresh SDK/BYOD fetch
 (attributed inline to its source) or be explicitly qualified as an estimate
-that the user should verify with current sources.
+that the user should verify with current sources. This binds comparison
+baselines too — a historical average, peer, or macro reference a judgement
+leans on is a specific figure: fetch it or flag it as unsourced, since an
+unsourced yardstick beside sourced numbers reads as sourced.
 
 ### Platform Feedback Moments
 
