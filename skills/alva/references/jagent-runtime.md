@@ -15,6 +15,10 @@ via `alva run` (inline code or filesystem entry path) or triggered by cronjobs.
   `max_heap_size_mb` in the `/api/v1/run` body / SDK
 - **No persistent state between executions**: each `alva run` call starts
   fresh (use `alfs` for persistence)
+- **Dry-run** (`--dry-run` / `dry_run: true`): runs and returns the result but
+  commits no writes. **Always test a feed producer with `--dry-run`** —
+  running it for real appends to its published series every time, so iterating
+  without it stacks near-duplicate entries (e.g. same-day briefs).
 
 If a run exceeds its heap it is killed with an explicit out-of-memory error;
 retry with a higher `max_heap_size_mb` (up to 2048 MB).

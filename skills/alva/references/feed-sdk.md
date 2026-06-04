@@ -790,8 +790,11 @@ feed.def("metrics", {
 
 ### Step 2: Run the feed
 
+Iterate with `--dry-run` (runs but persists nothing) so repeated test runs
+don't append duplicate points to the published series; drop it once correct.
+
 ```bash
-alva run --entry-path '~/feeds/btc-ema/v1/src/index.js'
+alva run --entry-path '~/feeds/btc-ema/v1/src/index.js' --dry-run
 ```
 
 ### Step 3: Make it public
