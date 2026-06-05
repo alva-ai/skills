@@ -15,8 +15,8 @@ release, version update, and playbook edit tasks.
    or [design-playbook-trading-strategy.md](design-playbook-trading-strategy.md).
 5. Build HTML that reads feed outputs at runtime.
 6. Write HTML and README to ALFS.
-7. Draft, lint, screenshot, and publish publicly by default unless the user
-   explicitly asks to stop at draft/private.
+7. Draft, lint, publish, then screenshot the deployed `published_url` unless
+   the user explicitly asks to stop at draft/private.
 8. Evaluate push setup with [push-notifications.md](push-notifications.md).
 
 ## HARD-GATE: before-build-html

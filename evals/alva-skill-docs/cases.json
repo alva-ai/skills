@@ -325,6 +325,19 @@
       ]
     },
     {
+      "id": "target.top-level-playbook-routing",
+      "group": "target",
+      "target": "skill",
+      "description": "Top-level routing and final checklist must keep pointing playbook work into the concrete playbook-creation reference.",
+      "includes": [
+        "Dashboard / Playbook",
+        "read [playbook-creation.md](references/playbook-creation.md)",
+        "if it informs a dashboard/playbook, continue through [playbook-creation.md](references/playbook-creation.md) before draft/release",
+        "Did playbook work read [playbook-creation.md](references/playbook-creation.md)",
+        "relevant hard gates"
+      ]
+    },
+    {
       "id": "target.pitfalls-stepwise-required",
       "group": "target",
       "target": "corpus",

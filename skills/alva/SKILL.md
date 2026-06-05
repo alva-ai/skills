@@ -193,7 +193,7 @@ but treat that section as mandatory, not optional debugging material.
 | "price of BTC", "P/E of NVDA", "show holdings", a direct dataset answer | Data Query | Fetch fresh data through Data Skills / BYOD; do not answer from memory. |
 | dashboard, screener, thesis tracker, hosted app, shareable report | Dashboard / Playbook | Use live feeds for values and read [playbook-creation.md](references/playbook-creation.md). |
 | backtest, strategy, signal, rebalance, portfolio simulation | Backtest / Strategy | Use Altra and usually package the result in a visual artifact. |
-| `/use-skill:<username>/<name>` | Skillhub Blueprint | Fetch the blueprint fresh before planning; use `--skill-id` if it informed a playbook. |
+| `/use-skill:<username>/<name>` | Skillhub Blueprint | Fetch the blueprint fresh before planning; if it informs a dashboard/playbook, continue through [playbook-creation.md](references/playbook-creation.md) before draft/release and set `--skill-id`. |
 | recurring digest, threshold tracker, alert, stream watch | Push / Alert | Build a push-capable feed and verify subscription plus sidecar output. |
 | `<remix ...>` or "remix this playbook" | Remix | Read the source playbook files; `alva remix` records lineage only. |
 | `<annotation ...>` or "change this element" | Annotation Edit | Edit the generator behind the element, not rendered feed values. |
