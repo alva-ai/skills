@@ -1,6 +1,6 @@
 # Alva Skills
 
-![Agent Skills](https://alva-ai-static.b-cdn.net/images/alva-skill-github-cover.png)
+![Agent Skills](https://alva-ai-static.b-cdn.net/images/alva-skill-github-cover-new.png)
 
 > Turn your AI agent into Alva Agent — research market theses with live financial context, build or remix Playbooks, set alerts, connect accounts, and backtest strategies on Alva Cloud.
 
