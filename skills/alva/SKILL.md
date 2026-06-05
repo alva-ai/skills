@@ -945,27 +945,27 @@ transport details.
    public URL:
    `https://alva.ai/u/<username>/playbooks/<playbook_name>`.
 5. **Screenshot**: Take a screenshot to verify the released playbook renders
-   correctly from the deployed published URL (for example,
+   correctly from the `published_url` returned by `alva release playbook`
+   (for example,
    `https://<username>.playbook.alva.ai/<playbook_name>/v1.0.0/index.html`).
-   Always pass `--compress` (with `--compress-quality` / `--compress-max-width`
-   to shrink further) — PNG output is otherwise easily large enough to exceed
-   the 5 MB session upload cap:
-
-   ```bash
-   alva screenshot --url <published_url> --out /tmp/screenshot.png \
-     --compress --compress-quality 70 --compress-max-width 1280
-   ```
-
-   If this compressed screenshot returns `HTTP 500` / `HTTP 403`, prints
-   `SCREENSHOT_FAILED`, or does not create the output file, retry once without
-   compression flags instead of repeating the same compressed command:
+   Pass the URL exactly as returned by the release command. Do not append
+   query parameters such as `isScreenshot=1`; the screenshot service adds
+   `isScreenshot=1` automatically.
 
    ```bash
    alva screenshot --url <published_url> --out /tmp/screenshot.png
    ```
 
-   The CLI handles authentication automatically. Run `alva screenshot --help`
-   for `--selector` and `--xpath`. Before reading the output, validate it is
+   If the screenshot returns `HTTP 500` / `HTTP 403`, prints
+   `SCREENSHOT_FAILED`, or does not create the output file, retry once before
+   treating it as a capture failure:
+
+   ```bash
+   alva screenshot --url <published_url> --out /tmp/screenshot.png
+   ```
+
+   Run `alva screenshot --help` for `--selector` and `--xpath` when a targeted
+   capture is explicitly needed. Before reading the output, validate it is
    actually a PNG — a failed capture may save a JSON error blob under the
    `.png` name, and reading that into the session corrupts conversation
    history:
@@ -1265,7 +1265,7 @@ a routing index — and, for the rows in bold, the linked sub-doc is a
 | `subscriptions` | Subscribe to playbooks (follow + enable all push-enabled automations) and feeds (single automation alert). |
 | `channel` | Group push subscriptions (Telegram / Discord groups). |
 | `trading` | Accounts, portfolio, orders, signals, risk. **Must read [trading.md](references/api/trading.md)** before `execute`, building a signal JSON, or picking an exchange/symbol — real `--signal` schema is `allocate`/`predict` (not the `{symbol,side,qty}` shape the help example shows), `date` is epoch seconds. |
-| `screenshot` | PNG capture used to verify a released playbook. |
+| `screenshot` | PNG capture used to verify a released playbook with the release response `published_url`; do not append screenshot query params manually. |
 | `remix` | Record parent-child lineage when remixing a playbook. |
 | `arrays` | Provision / refresh the Arrays JWT (`ARRAYS_JWT` runtime secret). |
 | `auth` / `configure` | Sign in, save API key + endpoint into a named profile. |
@@ -1748,6 +1748,10 @@ alva fs write --path '~/playbooks/btc-dashboard/README.md' --file ./README.md --
 #    written above (the relative shorthand is no longer accepted).
 alva release playbook --name btc-dashboard --version v1.0.0 --feeds '[{"feed_id":100}]' --changelog "Initial release" --readme-url '/alva/home/alice/playbooks/btc-dashboard/README.md'
 # → {"playbook_id":99,"version":"v1.0.0","published_url":"https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html"}
+
+# 5. Verify rendering with the published URL. Do not append query params;
+#    the screenshot service adds isScreenshot=1 automatically.
+alva screenshot --url "https://alice.playbook.alva.ai/btc-dashboard/v1.0.0/index.html" --out /tmp/screenshot.png
 
 # After release, output the canonical share link to the user:
 # https://alva.ai/u/<username>/playbooks/<playbook_name>
