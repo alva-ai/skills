@@ -2,11 +2,11 @@
 
 Source: `origin/main`
 
-SKILL.md lines: 1825
+SKILL.md lines: 1873
 
 Cases: 17/25
 
-Checks: 127/161 (78.88%)
+Checks: 134/168 (79.76%)
 
 ## Scoring Diagnosis
 
@@ -19,10 +19,10 @@ Instead, fix the canonical skill text or eval case, then rerun baseline and fina
 - pr353.no-synth-verdicts: inspect for a skill gap before editing. Missing checks: Cautious; inline source attribution; not investment advice
 - pr353.no-task-list: inspect for a skill gap before editing. Missing checks: enumerated list; no verb; no question; no task description; scheduled research digest
 - pr353.no-consensus-synthesis: inspect for a skill gap before editing. Missing checks: Do not merge multiple snippet claims; agent-authored consensus; ranked list; source-labeled; synthetic takeaway; source identity is missing; ambiguous
-- target.top-level-size: inspect for a skill gap before editing. Missing checks: line count <= 850 (actual 1825)
+- target.top-level-size: inspect for a skill gap before editing. Missing checks: line count <= 850 (actual 1873)
 - target.playbook-task-offload: inspect for a skill gap before editing. Missing checks: playbook-creation.md
 - target.pitfalls-stepwise-required: inspect for a skill gap before editing. Missing checks: step by step; before each step; runtime, feed, ALFS, playbook HTML, deploy, release, chart, or cron work; Write or run jagent code; Touch ALFS paths; Build or edit playbook HTML/charts
-- target.mainline-2026-06-02-updates: inspect for a skill gap before editing. Missing checks: publish publicly by default; implementation internals; Skillhub to users as a catalog of methodologies
+- target.mainline-updates: inspect for a skill gap before editing. Missing checks: publish publicly by default; implementation internals; Skillhub to users as a catalog of methodologies
 
 ## retained
 
@@ -274,14 +274,14 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-0/4 cases, 19/30 checks
+0/4 cases, 26/37 checks
 
 ### FAIL target.top-level-size
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 1825)
-- [ ] line count <= 850 (actual 1825)
+- [x] line count >= 650 (actual 1873)
+- [ ] line count <= 850 (actual 1873)
 
 ### FAIL target.playbook-task-offload
 
@@ -290,7 +290,7 @@ Playbook creation is a concrete task reference rather than the dominant top-leve
 - [ ] playbook-creation.md
 - [x] Playbook Creation
 - [x] before-playbook-release
-- [x] PUBLIC_ALFS_READ_URL
+- [x] AlvaToolkit.AlvaClient
 - [x] Free users
 - [x] Pro users
 
@@ -306,11 +306,11 @@ Operational pitfalls are a mandatory stepwise gate, not an optional debugging ap
 - [ ] Touch ALFS paths
 - [ ] Build or edit playbook HTML/charts
 
-### FAIL target.mainline-2026-06-02-updates
+### FAIL target.mainline-updates
 
 Latest mainline Alva skill updates remain integrated after rebasing the refactor.
 
-- [x] version: v1.11.1
+- [x] version: v1.11.2
 - [x] Capability Help
 - [x] Reply 1, 2, or 3 to start
 - [x] feedback
@@ -325,3 +325,10 @@ Latest mainline Alva skill updates remain integrated after rebasing the refactor
 - [x] callerUserId
 - [x] allow_charges=false
 - [x] no-charge
+- [x] Browser request rule
+- [x] AlvaToolkit.AlvaClient
+- [x] api_origin
+- [x] public and private playbooks
+- [x] real feed-backed chart marks
+- [x] headers-only tables
+- [x] fetch failures

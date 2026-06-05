@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/rebase-main/skills/alva`
+Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/rebase-main-20260605/skills/alva`
 
-SKILL.md lines: 694
+SKILL.md lines: 699
 
 Cases: 25/25
 
-Checks: 161/161 (100.00%)
+Checks: 168/168 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -267,14 +267,14 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-4/4 cases, 30/30 checks
+4/4 cases, 37/37 checks
 
 ### PASS target.top-level-size
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 694)
-- [x] line count <= 850 (actual 694)
+- [x] line count >= 650 (actual 699)
+- [x] line count <= 850 (actual 699)
 
 ### PASS target.playbook-task-offload
 
@@ -283,7 +283,7 @@ Playbook creation is a concrete task reference rather than the dominant top-leve
 - [x] playbook-creation.md
 - [x] Playbook Creation
 - [x] before-playbook-release
-- [x] PUBLIC_ALFS_READ_URL
+- [x] AlvaToolkit.AlvaClient
 - [x] Free users
 - [x] Pro users
 
@@ -299,11 +299,11 @@ Operational pitfalls are a mandatory stepwise gate, not an optional debugging ap
 - [x] Touch ALFS paths
 - [x] Build or edit playbook HTML/charts
 
-### PASS target.mainline-2026-06-02-updates
+### PASS target.mainline-updates
 
 Latest mainline Alva skill updates remain integrated after rebasing the refactor.
 
-- [x] version: v1.11.1
+- [x] version: v1.11.2
 - [x] Capability Help
 - [x] Reply 1, 2, or 3 to start
 - [x] feedback
@@ -318,3 +318,10 @@ Latest mainline Alva skill updates remain integrated after rebasing the refactor
 - [x] callerUserId
 - [x] allow_charges=false
 - [x] no-charge
+- [x] Browser request rule
+- [x] AlvaToolkit.AlvaClient
+- [x] api_origin
+- [x] public and private playbooks
+- [x] real feed-backed chart marks
+- [x] headers-only tables
+- [x] fetch failures

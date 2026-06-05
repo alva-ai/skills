@@ -29,30 +29,52 @@ Before writing or rewriting playbook HTML, verify:
 - If a `/use-skill:` blueprint is active, its layout and data contract have
   been read.
 - [content-legitimacy.md](content-legitimacy.md) has been applied.
+- The HTML follows the Browser request rule below for every Alva data request,
+  including cloned blueprints, templates, and existing HTML.
 
 Do not rely on memory of prior sessions.
 </HARD-GATE>
 
 ## Browser-Safe Feed Reads
 
-Published HTML runs in the viewer's browser. It must not use `$ALVA_ENDPOINT`
-or authenticated headers for feed data. Use the public anonymous ALFS read
-gateway:
+Published HTML runs in the viewer's browser. It must not use `$ALVA_ENDPOINT`,
+hard-coded API origins, raw browser `fetch()` calls to Alva APIs, or hand-written
+auth headers for feed data. Load the browser SDK and use
+`AlvaToolkit.AlvaClient`:
 
-```javascript
-const PUBLIC_ALFS_READ_URL = "https://api-llm.prd.alva.ai/api/v1/fs/read?path=";
+```html
+<script src="https://unpkg.com/@alva-ai/toolkit/dist/browser.global.js"></script>
+<script>
+function createAlvaClientConfig() {
+  const params = new URLSearchParams(window.location.search);
+  const pbsvToken = window.alva?.udf?.getViewerToken?.();
+  const apiOrigin = params.get("api_origin");
+  return {
+    ...(pbsvToken ? { pbsvToken } : {}),
+    ...(apiOrigin ? { baseUrl: apiOrigin.replace(/\/$/, "") } : {}),
+  };
+}
+
+function createAlvaClient() {
+  return new AlvaToolkit.AlvaClient(createAlvaClientConfig());
+}
 
 async function readAlfsJson(path) {
-  const resp = await fetch(PUBLIC_ALFS_READ_URL + encodeURIComponent(path));
-  if (!resp.ok) {
-    throw new Error(`Failed to load ${path}: HTTP ${resp.status}`);
-  }
-  return resp.json();
+  return createAlvaClient().fs.read({ path });
 }
+</script>
 ```
 
 All quantitative data in charts, tables, and metric cards must be fetched from
 feed output paths at runtime, not embedded as inline literals.
+
+Browser request rule: generated playbook HTML uses `AlvaToolkit.AlvaClient`
+SDK resource methods or `_request(...)` for Alva API requests. Initialize the
+client immediately before each request so refreshed PBSV is included, pass
+`api_origin` as `baseUrl` when present, and never pass `parent_origin` to
+`AlvaClient`. This single path works for public and private playbooks; an
+anonymous `/api/v1/fs/read` fetch is public-only and breaks after private
+visibility changes.
 
 ## UDFs
 
@@ -166,6 +188,12 @@ head -c4 /tmp/screenshot.png | grep -q PNG || echo "SCREENSHOT_FAILED"
 
 If compressed capture fails with HTTP 500/403, `SCREENSHOT_FAILED`, or no file,
 retry once without compression.
+
+A PNG or page shell is not enough. Pass screenshot verification only when the
+image or targeted capture shows real feed-backed chart marks, table rows, or
+KPI values. Blank frames, headers-only tables, loading/error fallbacks, and
+fetch failures are data-rendering failures that must be fixed before claiming
+the playbook is done.
 
 ## Tier Flow
 

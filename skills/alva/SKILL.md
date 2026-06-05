@@ -11,7 +11,7 @@ description: >-
   Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v1.11.1
+  version: v1.11.2
 ---
 
 # Alva
@@ -136,8 +136,9 @@ make it this one.
    equity curve, order logic, position tracking, or rebalancing uses Altra.
    Hand-rolled loops invite bad timestamps and look-ahead bias.
 7. **Playbooks are live by default.** If a playbook displays numbers, charts,
-   tables, or metric cards, HTML reads feed outputs at runtime and release
-   declares the backing feeds. Static snapshots are only for explicit requests.
+   tables, or metric cards, HTML reads feed outputs at runtime through
+   `AlvaToolkit.AlvaClient` and release declares the backing feeds. Static
+   snapshots are only for explicit requests.
 8. **One blocking question.** For nontrivial builds, ask at most one blocking
    question or present one short plan. A concrete `/use-skill:` directive plus
    topic means plan once, then build.
@@ -339,8 +340,10 @@ interactive tools. Creation is a concrete task, so the detailed workflow lives
 in [playbook-creation.md](references/playbook-creation.md).
 
 Before HTML work, satisfy `before-build-html`: read [design.md](references/design.md)
-first, then the relevant companion reference. If a Skillhub blueprint is
-active, its layout and data contract override stale memories or companion code.
+first, then the relevant companion reference, and follow the Browser request
+rule in [playbook-creation.md](references/playbook-creation.md). If a Skillhub
+blueprint is active, its layout and data contract override stale memories or
+companion code.
 
 Before release, satisfy `before-playbook-draft` and `before-playbook-release`.
 Every release needs a current README at `~/playbooks/<name>/README.md`, passed
@@ -355,7 +358,9 @@ Playbook creation is where many Alva concepts meet: Data Skills or BYOD feed
 the runtime, Feed SDK writes outputs, design rules govern the UI, release
 metadata explains discovery, README explains trust, and screenshots prove the
 published URL renders. The top-level rule is simple: if a number is visible,
-the viewer's browser should be able to fetch where it came from.
+the viewer's browser should be able to read where it came from, and screenshot
+verification must show real feed-backed marks, rows, or KPI values rather than
+a loaded page shell.
 
 ### Altra
 

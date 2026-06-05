@@ -319,7 +319,7 @@
         "playbook-creation.md",
         "Playbook Creation",
         "before-playbook-release",
-        "PUBLIC_ALFS_READ_URL",
+        "AlvaToolkit.AlvaClient",
         "Free users",
         "Pro users"
       ]
@@ -340,12 +340,12 @@
       ]
     },
     {
-      "id": "target.mainline-2026-06-02-updates",
+      "id": "target.mainline-updates",
       "group": "target",
       "target": "corpus",
       "description": "Latest mainline Alva skill updates remain integrated after rebasing the refactor.",
       "includes": [
-        "version: v1.11.1",
+        "version: v1.11.2",
         "Capability Help",
         "Reply 1, 2, or 3 to start",
         "feedback",
@@ -359,7 +359,14 @@
         "Skillhub to users as a catalog of methodologies",
         "callerUserId",
         "allow_charges=false",
-        "no-charge"
+        "no-charge",
+        "Browser request rule",
+        "AlvaToolkit.AlvaClient",
+        "api_origin",
+        "public and private playbooks",
+        "real feed-backed chart marks",
+        "headers-only tables",
+        "fetch failures"
       ]
     }
   ]
