@@ -26,8 +26,8 @@
 
 - No check icon — selection is conveyed by the rounded tinted pill alone.
 - Selected/hover background is a `--radius-ct-s` (4px) pill on `.list-item`.
-- Two sizes: **M** (default, text 14/22) and **S** (add `.size-s` to
-  `.dropdown`, text 12/20). Width follows the associated Select in both.
+- Two sizes: **M** (default) and **S** (add `.size-s` to `.dropdown`). Width
+  follows the associated Select in both.
 
 ### CSS
 
@@ -618,10 +618,10 @@ The button component system contains **2 types** x **4 sizes** x **4 states** =
 | Base Class       | `btn`             | Required                           |
 | Primary Button   | `btn-primary`     | `btn btn-primary btn-large`        |
 | Secondary Button | `btn-secondary`   | `btn btn-secondary btn-medium`     |
-| Large Size       | `btn-large`       | 48px height                        |
-| Medium Size      | `btn-medium`      | 40px height                        |
-| Small Size       | `btn-small`       | 32px height                        |
-| Extra Small Size | `btn-extra-small` | 28px height                        |
+| Large Size       | `btn-large`       | height/type per CSS                |
+| Medium Size      | `btn-medium`      | height/type per CSS                |
+| Small Size       | `btn-small`       | height/type per CSS                |
+| Extra Small Size | `btn-extra-small` | height/type per CSS                |
 | Disabled State   | `btn-disabled`    | Must also add `disabled` attribute |
 | Loading State    | `btn-loading`     | Shows spinning animation           |
 
@@ -806,7 +806,7 @@ style.
 ### 2. CSS
 
 ```css
-/* Base (default size = 12) */
+/* Base (default size) */
 .tag {
   display: inline-flex;
   align-items: center;
@@ -1234,7 +1234,7 @@ Dropdown. Arrow icon always points down and does not rotate.
   letter-spacing: 0.14px;
 }
 
-/* Size — Small (32px) */
+/* Size — Small */
 .select-sm {
   height: 32px;
   padding: 6px var(--spacing-s);
@@ -1245,7 +1245,7 @@ Dropdown. Arrow icon always points down and does not rotate.
   letter-spacing: 0.12px;
 }
 
-/* Size — Extra Small (28px) */
+/* Size — Extra Small */
 .select-xs {
   height: 28px;
   padding: var(--spacing-xxs) var(--spacing-xs);
@@ -1445,7 +1445,7 @@ state; typed text matches the filled state.
   letter-spacing: 0.14px;
 }
 
-/* Size — Small (32px) */
+/* Size — Small */
 .input-sm {
   height: 32px;
   padding: 6px var(--spacing-s);
@@ -1455,7 +1455,7 @@ state; typed text matches the filled state.
   letter-spacing: 0.12px;
 }
 
-/* Size — Extra Small (28px) */
+/* Size — Extra Small */
 .input-xs {
   height: 28px;
   padding: var(--spacing-xxs) var(--spacing-xs);
@@ -1494,7 +1494,7 @@ state; typed text matches the filled state.
 
 3 styles (Underline, Segmented, Pill). Underline ships 4 sizes (XL/L/M/S); Segmented and Pill ship 3 sizes (L/M/S). 10 variants total.
 
-- **Underline**: items fill the container width by default (equal-width via `flex: 1`, centered text); thin container bottom divider; active item has a 2px bottom bar in `--main-m1`. Active text is Medium.
+- **Underline**: tab bar fills the container; items are content-width, packed from the left; thin bottom divider; active item has a bottom bar in `--main-m1`. Active text is Medium.
 - **Segmented**: items share a tinted rounded container (`--b-r05`); active item is a contrasting white tile. Active text is Medium.
 - **Pill**: capsule-shaped items, each with its own subtle background (`--b-r03`); active item is a dark capsule (`rgba(0,0,0,0.7)`) with white text. **Active text stays Regular** (no weight change).
 - **Overflow**: tab item text never wraps. When items exceed container width — Underline scrolls horizontally (scrollbar hidden); Pill wraps to the next row.
@@ -1529,10 +1529,13 @@ state; typed text matches the filled state.
   overflow: hidden;
 }
 
-/* ── Underline ── */
+/* ── Underline ── divider + active bar are bottom-anchored overlays (both bottom:0,
+   so bottoms align); bar covers divider via z-index. Do not refactor to a border. */
 .tab-underline {
+  position: relative;
+  width: 100%;
+  align-items: flex-end;
   gap: var(--spacing-m);
-  border-bottom: 0.5px solid var(--line-l12);
   flex-wrap: nowrap;
   overflow-x: auto;
   scrollbar-width: none; /* Firefox */
@@ -1540,21 +1543,37 @@ state; typed text matches the filled state.
 .tab-underline::-webkit-scrollbar {
   display: none;
 }
+.tab-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0.5px;
+  background: var(--line-l12);
+  z-index: 0;
+}
 .tab-underline .tab-item {
-  flex: 1;
-  text-align: center;
   padding-bottom: var(--spacing-xxs);
-  margin-bottom: -0.5px;
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
   color: var(--text-n7);
-  border-bottom: 2px solid transparent;
 }
 .tab-underline .tab-item.active {
+  position: relative;
+  z-index: 1;
   color: var(--text-n9);
   font-weight: 500;
-  border-bottom-color: var(--main-m1);
+}
+.tab-underline .tab-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--main-m1);
 }
 
 /* Underline — Size L */
@@ -1584,7 +1603,7 @@ state; typed text matches the filled state.
 }
 .tab-underline.tab-xl .tab-item {
   padding-top: var(--spacing-s);
-  padding-bottom: 10px; /* 12 − 2px border = matches inactive py-12 */
+  padding-bottom: 10px;
   font-size: 18px;
   line-height: 28px;
   letter-spacing: 0.18px;
