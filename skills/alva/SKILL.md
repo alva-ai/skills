@@ -191,7 +191,7 @@ but treat that section as mandatory, not optional debugging material.
 
 | User asks for | Route | Must not miss |
 | --- | --- | --- |
-| price, valuation, holdings, "why did it move", compare peers, explain a thesis, rank in text | Financial Analysis / Ask Question | Fetch fresh data/search evidence; comparison baselines need provenance too. |
+| price, valuation, holdings, "why did it move", compare peers, explain a thesis, rank in text | Financial Analysis / Ask Question | Fetch fresh data/search evidence; comparison baselines need provenance too. Every answer must pass the ask evidence gate below. |
 | dashboard, screener app, thesis tracker, hosted report, shareable surface | Playbook Creation | Build live feeds first, then read [playbook-creation.md](references/playbook-creation.md). |
 | `/use-skill:<username>/<name>` or template-like research method | Skillhub Blueprint | Fetch blueprint fresh; if it becomes a playbook, route through [playbook-creation.md](references/playbook-creation.md) and set `--skill-id`. |
 | backtest, strategy, signal, rebalance, portfolio simulation | Strategy / Trading Analysis | Use Altra; package as answer, feed, or playbook only as the user goal requires. |
@@ -347,6 +347,12 @@ the user asks to track, alert, share, publish, or turn the result into an app.
 Use the shared data and execution layer first. If the user asks a direct
 question, answer directly with provenance; if they ask to track, alert, share,
 or publish, route to the durable artifact / playbook tree instead.
+
+Ask evidence gate: do not answer a financial-analysis ask until you can name
+the decomposition, data/source path for each hop, fetched vs missing coverage,
+and which judgments are sourced facts, computed values, or inference. For a
+simple ask, this can be one hop. If a required KPI or baseline is missing,
+disclose the gap instead of filling it from memory or snippets.
 
 ### Durable Artifacts / Playbook Tree
 
@@ -578,10 +584,11 @@ For "what is the latest price / P/E / funding rate / holdings / CPI print",
 "why did it move", "is it cheap vs peers", or "rank these in text", start with
 financial analysis. Run preflight if needed, verify the relevant Data Skills or
 search route, use `alva run` when live computation or joins are needed, fetch
-or qualify any comparison baseline, and answer with inline provenance. If the
-data source fails, report the failure instead of substituting a web snippet or
-model memory. If the user then asks to track, alert, share, or publish, upgrade
-the route to a feed, signal, alert, or playbook.
+or qualify any comparison baseline, apply the ask evidence gate in the
+Financial Analysis tree, and answer with inline provenance. If the data source
+fails, report the failure instead of substituting a web snippet or model
+memory. If the user then asks to track, alert, share, or publish, upgrade the
+route to a feed, signal, alert, or playbook.
 
 ### Durable Artifacts / Playbook Tree
 
@@ -743,6 +750,7 @@ Before finishing an Alva task, ask:
 - Did I read [preflight.md](references/preflight.md) and current command help?
 - Did every financial value come from Data Skills, feed output, or validated
   BYOD/search source?
+- Did Financial Analysis / Ask Question pass the ask evidence gate before I answered?
 - Did I avoid WebSearch/LLM/memory/user-pasted data as factual values?
 - Did I run Data Skills `list` -> `summary` -> `endpoint` before coding calls?
 - Did feed release pass `before-feed-release`?

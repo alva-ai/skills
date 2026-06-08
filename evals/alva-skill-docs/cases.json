@@ -382,6 +382,23 @@
       ]
     },
     {
+      "id": "target.ask-evidence-gate",
+      "group": "target",
+      "target": "corpus",
+      "description": "Direct financial asks have compact evidence gates instead of a free-form memo contract.",
+      "includes": [
+        "ask evidence gate",
+        "do not answer a financial-analysis ask until you can name",
+        "decomposition",
+        "data/source path for each hop",
+        "fetched vs missing coverage",
+        "sourced facts, computed values, or inference",
+        "For a simple ask, this can be one hop",
+        "required KPI or baseline is missing",
+        "disclose the gap instead of filling it from memory or snippets"
+      ]
+    },
+    {
       "id": "target.pitfalls-stepwise-required",
       "group": "target",
       "target": "corpus",
