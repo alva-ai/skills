@@ -66,6 +66,11 @@ parent page can refresh PBSV after the playbook loads and the API origin can
 vary by environment. `parent_origin` is for postMessage validation and must not
 be passed to `AlvaClient`.
 
+Inside the entry script, `require("env").callerUserId` is the viewer/caller
+when a caller is present; `env.userId` is the execution owner. Do not use
+`env.userId` to identify the viewer, and handle a missing caller as
+null/undefined.
+
 ## Browser API
 
 The browser API is the viewer-side use surface. It assumes the function has
@@ -239,6 +244,10 @@ DELETE /api/v1/service/functions?playbook_id=<playbook-id>&function_name=<name>
 
 Function entry scripts should live in creator-controlled ALFS paths and should
 validate `parameters_json` before doing expensive work.
+
+Registration is no-charge by default: keep `allow_charges=false` unless the
+user explicitly wants viewer-credit charging and the consent flow is wired. Do
+not silently opt viewers into charges.
 
 ## Allowance Management
 

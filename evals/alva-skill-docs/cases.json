@@ -1,0 +1,417 @@
+{
+  "schema_version": "2026-05-31",
+  "name": "alva-skill-doc-regression",
+  "description": "Deterministic documentation capability checks for the Alva skill refactor. Retained cases describe behavior already present on main; pr353 cases encode the alva-ai/skills#353 chat-as-artifact standard; target cases describe this refactor's structure goals.",
+  "cases": [
+    {
+      "id": "retained.platform-panorama",
+      "group": "retained",
+      "target": "skill",
+      "description": "SKILL.md still teaches the Alva platform, not only routes to files.",
+      "includes": [
+        "250+ financial data sources",
+        "cloud-side analytics",
+        "Altra trading engine",
+        "hosted playbook",
+        "Skillhub",
+        "remix"
+      ]
+    },
+    {
+      "id": "retained.rule-zero-preflight",
+      "group": "retained",
+      "target": "corpus",
+      "description": "Agents still run help-first preflight and session setup.",
+      "includes": [
+        "alva <command> --help",
+        "scripts/version_check.sh",
+        "alva whoami",
+        "ARRAYS_JWT",
+        "alva fs read --path '~/memory/MEMORY.md'"
+      ]
+    },
+    {
+      "id": "retained.request-routing",
+      "group": "retained",
+      "target": "corpus",
+      "description": "Routing preserves the major user intents and Guided Planning discipline.",
+      "includes": [
+        "Financial Analysis / Ask Question",
+        "Playbook Creation",
+        "Strategy / Trading Analysis",
+        "Remix",
+        "/use-skill:<username>/<name>",
+        "Exactly one blocking question"
+      ]
+    },
+    {
+      "id": "retained.skillhub",
+      "group": "retained",
+      "target": "corpus",
+      "description": "Skillhub blueprint retrieval remains mandatory and fresh when directed.",
+      "includes": [
+        "alva skillhub get",
+        "alva skillhub file",
+        "fetch it fresh",
+        "Do not bulk-download",
+        "--skill-id"
+      ]
+    },
+    {
+      "id": "retained.content-legitimacy",
+      "group": "retained",
+      "target": "corpus",
+      "description": "The core data provenance and anti-fabrication rules remain intact.",
+      "includes": [
+        "build the pipeline",
+        "not to **be",
+        "WebSearch",
+        "LLM / ADK output",
+        "user-pasted snapshots",
+        "Never hardcode data as inline JavaScript literals",
+        "Feed Scope Isolation",
+        "Data Convention Alignment"
+      ]
+    },
+    {
+      "id": "retained.data-skills",
+      "group": "retained",
+      "target": "corpus",
+      "description": "Data Skills discovery, endpoint lookup, and auth details survive.",
+      "includes": [
+        "alva data-skills list",
+        "alva data-skills summary",
+        "alva data-skills endpoint",
+        "Authorization: Bearer <ARRAYS_JWT>",
+        "Do not use `X-API-Key`"
+      ]
+    },
+    {
+      "id": "retained.search-routing",
+      "group": "retained",
+      "target": "corpus",
+      "description": "Search routing keeps structured data, Twitter/X, and non-US finance guidance.",
+      "includes": [
+        "unified_search",
+        "Twitter/X routing",
+        "searchPerplexityFinance",
+        "non-US equities",
+        "structured Alva data"
+      ]
+    },
+    {
+      "id": "retained.runtime",
+      "group": "retained",
+      "target": "corpus",
+      "description": "Jagent runtime constraints and heap override remain discoverable.",
+      "includes": [
+        "sandboxed V8 isolate",
+        "no `process`",
+        "no timer globals",
+        "Top-level `await`",
+        "--max-heap-size-mb",
+        "256 MB"
+      ]
+    },
+    {
+      "id": "retained.feed-lifecycle",
+      "group": "retained",
+      "target": "corpus",
+      "description": "Feed build, grant, deploy, and release hard gate remain preserved.",
+      "includes": [
+        "Feed SDK",
+        "alva run --entry-path",
+        "special:user:*",
+        "alva deploy create",
+        "alva release feed",
+        "before-feed-release"
+      ]
+    },
+    {
+      "id": "retained.playbook-release",
+      "group": "retained",
+      "target": "corpus",
+      "description": "Playbook release, README, screenshot, lint, pro/free, and visibility rules remain intact.",
+      "includes": [
+        "before-build-html",
+        "before-playbook-draft",
+        "before-playbook-release",
+        "alva lint playbook",
+        "readme-url",
+        "related people",
+        "alva screenshot",
+        "set-visibility"
+      ]
+    },
+    {
+      "id": "retained.design-system",
+      "group": "retained",
+      "target": "corpus",
+      "description": "Design system and linter references remain reachable.",
+      "includes": [
+        "design.md",
+        "design-widgets.md",
+        "design-components.md",
+        "design-playbook-trading-strategy.md",
+        "design-contract.yaml",
+        "required-stylesheets",
+        "requestAnimationFrame"
+      ]
+    },
+    {
+      "id": "retained.udf-runtime",
+      "group": "retained",
+      "target": "corpus",
+      "description": "UDFs stay strict opt-in and routed to the PBSV/browser runtime reference.",
+      "includes": [
+        "User-Defined Functions",
+        "strictly asks",
+        "window.alva.udf",
+        "PBSV",
+        "allowance consent"
+      ]
+    },
+    {
+      "id": "retained.altra",
+      "group": "retained",
+      "target": "corpus",
+      "description": "Backtesting and signal feeds still require Altra and preserve common guardrails.",
+      "includes": [
+        "Always use Altra for backtesting",
+        "FeedAltra",
+        "look-ahead bias",
+        "Stock intraday window guardrail",
+        "signal/targets"
+      ]
+    },
+    {
+      "id": "retained.adk",
+      "group": "retained",
+      "target": "corpus",
+      "description": "ADK remains scheduled-pipeline reasoning, not a data source or one-off research wrapper.",
+      "includes": [
+        "@alva/adk",
+        "fixed LLM reasoning step",
+        "Do **not** use it for one-off research",
+        "not use it to produce numbers"
+      ]
+    },
+    {
+      "id": "retained.remix-annotations-push",
+      "group": "retained",
+      "target": "corpus",
+      "description": "Remix, annotation edits, and push notification workflows remain covered.",
+      "includes": [
+        "<remix",
+        "alva playbooks trending",
+        "annotation-driven edits",
+        "feed_alert_ready",
+        "<|SKIP_NOTIFICATION|>",
+        "subscriptions"
+      ]
+    },
+    {
+      "id": "retained.memory-secrets",
+      "group": "retained",
+      "target": "corpus",
+      "description": "Memory and secret-manager operating rules remain covered.",
+      "includes": [
+        "Memory is a *claim*, not truth",
+        "user-visible and editable",
+        "Secret Manager",
+        "Do not ask the user to paste sensitive third-party secrets",
+        "loadPlaintext"
+      ]
+    },
+    {
+      "id": "pr353.chat-as-artifact",
+      "group": "pr353",
+      "target": "corpus",
+      "description": "The answer_only/query-mode artifact rule from alva-ai/skills#353 is present.",
+      "includes": [
+        "answer_only",
+        "Chat-as-Artifact",
+        "prompt-injected text",
+        "verdict words",
+        "price targets",
+        "EPS forecasts",
+        "YTD returns",
+        "current prices",
+        "forward-return projections"
+      ]
+    },
+    {
+      "id": "pr353.no-synth-verdicts",
+      "group": "pr353",
+      "target": "corpus",
+      "description": "Verdicts and forecast figures from snippets must be attributed or refused, not laundered with a disclaimer.",
+      "includes": [
+        "Buy",
+        "Sell",
+        "Bullish",
+        "Cautious",
+        "quote",
+        "inline source attribution",
+        "refuse",
+        "not investment advice"
+      ]
+    },
+    {
+      "id": "pr353.no-task-list",
+      "group": "pr353",
+      "target": "corpus",
+      "description": "Pure enumerated prompt dumps are not tasks and require clarification.",
+      "includes": [
+        "enumerated list",
+        "no verb",
+        "no question",
+        "no task description",
+        "AskUserQuestion",
+        "scheduled research digest"
+      ]
+    },
+    {
+      "id": "pr353.no-consensus-synthesis",
+      "group": "pr353",
+      "target": "corpus",
+      "description": "Snippet claims must not be merged into new agent-authored consensus, ranking, or recommendation output.",
+      "includes": [
+        "Do not merge multiple snippet claims",
+        "agent-authored consensus",
+        "ranked list",
+        "recommendation",
+        "source-labeled",
+        "synthetic takeaway",
+        "source identity is missing",
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "feedback.recovered-capability-guardrails",
+      "group": "feedback",
+      "target": "corpus",
+      "description": "Review-discovered guardrails stay present in the skill corpus instead of only in eval script prose.",
+      "includes": [
+        "getStockCompanyDetail",
+        "Thematic Ticker Curation",
+        "subscription",
+        "custom data source URL",
+        "callerUserId",
+        "allow_charges=false",
+        "20%",
+        "~/library"
+      ]
+    },
+    {
+      "id": "target.top-level-size",
+      "group": "target",
+      "target": "skill",
+      "description": "Top-level SKILL.md is in the requested encyclopedia/guide size band.",
+      "max_lines": 850,
+      "min_lines": 650
+    },
+    {
+      "id": "target.playbook-task-offload",
+      "group": "target",
+      "target": "corpus",
+      "description": "Playbook creation is a concrete task reference rather than the dominant top-level body.",
+      "includes": [
+        "playbook-creation.md",
+        "Playbook Creation Tree",
+        "The playbook tree has subroutes",
+        "hosted or shareable playbook surface",
+        "ordinary financial-analysis questions should answer directly",
+        "before-playbook-release",
+        "AlvaToolkit.AlvaClient",
+        "Free users",
+        "Pro users"
+      ]
+    },
+    {
+      "id": "target.top-level-playbook-routing",
+      "group": "target",
+      "target": "skill",
+      "description": "Top-level routing and final checklist keep playbook work in its concrete reference without making all routing playbook-centric.",
+      "includes": [
+        "Playbook Creation Tree",
+        "Durable Artifacts / Playbook Tree",
+        "Subroutes are new build, Skillhub-guided build, remix, annotation/edit, release/version update, and push after release",
+        "do not let every financial question inherit playbook gates",
+        "route through [playbook-creation.md](references/playbook-creation.md)",
+        "Did playbook work read [playbook-creation.md](references/playbook-creation.md)",
+        "relevant hard gates"
+      ]
+    },
+    {
+      "id": "target.financial-analysis-routing",
+      "group": "target",
+      "target": "corpus",
+      "description": "Ask-question work is grouped as financial analysis instead of a low-level Data Query route.",
+      "includes": [
+        "Shared Data And Execution Layer",
+        "Do not treat data access or `alva run` as playbook-only",
+        "A direct answer may still need Alva Cloud execution",
+        "Execution: Jagent Runtime And `alva run`",
+        "Financial Analysis / Ask Question",
+        "Financial Analysis / Ask Question Tree",
+        "It is not merely \"Data Query\"",
+        "data access and execution are steps inside an analysis answer",
+        "an `alva run` computation over live data",
+        "latest fact",
+        "comparison/valuation",
+        "Data Access: Data Sources",
+        "Data Access: Content Search And BYOD",
+        "comparison baselines are financial facts",
+        "historical average",
+        "peer multiple",
+        "Do not let playbook creation become the default",
+        "Do not turn every Skillhub task into a playbook"
+      ]
+    },
+    {
+      "id": "target.pitfalls-stepwise-required",
+      "group": "target",
+      "target": "corpus",
+      "description": "Operational pitfalls are a mandatory stepwise gate, not an optional debugging appendix.",
+      "includes": [
+        "step by step",
+        "before each step",
+        "mandatory",
+        "runtime, feed, ALFS, playbook HTML, deploy, release, chart, or cron work",
+        "Write or run jagent code",
+        "Touch ALFS paths",
+        "Build or edit playbook HTML/charts"
+      ]
+    },
+    {
+      "id": "target.mainline-updates",
+      "group": "target",
+      "target": "corpus",
+      "description": "Latest mainline Alva skill updates remain integrated after rebasing the refactor.",
+      "includes": [
+        "version: v1.11.2",
+        "Capability Help",
+        "Reply 1, 2, or 3 to start",
+        "feedback",
+        "api/feedback.md",
+        "alva feedback --help",
+        "subscriptions subscribe-feed",
+        "subscriptions subscribe-playbook",
+        "publish publicly by default",
+        "registered UDFs",
+        "implementation internals",
+        "Skillhub to users as a catalog of methodologies",
+        "callerUserId",
+        "allow_charges=false",
+        "no-charge",
+        "Browser request rule",
+        "AlvaToolkit.AlvaClient",
+        "api_origin",
+        "public and private playbooks",
+        "real feed-backed chart marks",
+        "headers-only tables",
+        "fetch failures"
+      ]
+    }
+  ]
+}

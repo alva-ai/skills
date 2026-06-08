@@ -12,6 +12,17 @@ not on this list is unsupported even if older docs or `alva fs --help`
 mention it (e.g. `@now`, `@all`, `@at`, `@range/{duration}`,
 `@range/@bounds` — do **not** use those).
 
+Common ALFS layout:
+
+| Path | Purpose |
+| --- | --- |
+| `~/tasks/<name>/src/` | Task source code |
+| `~/feeds/<name>/v1/src/` | Feed script source code |
+| `~/feeds/<name>/v1/data/` | Feed synth mount created by Feed SDK |
+| `~/playbooks/<name>/` | Playbook web app assets |
+| `~/data/` | General data storage |
+| `~/library/` | Shared code modules |
+
 ### Time-series reads
 
 | Suffix                  | Description                                  | Example                                                        |

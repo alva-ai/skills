@@ -13,6 +13,8 @@ via `alva run` (inline code or filesystem entry path) or triggered by cronjobs.
 - **Heap**: 256 MB per execution by default, overridable per run via
   `max_heap_size_mb` (1–2048 MB) — `--max-heap-size-mb <mb>` on `alva run`,
   `max_heap_size_mb` in the `/api/v1/run` body / SDK
+- **Native API boundary**: no Node built-ins, shell, local files, global
+  `fetch`, top-level `await`, or timer globals; in short, no timer globals
 - **No persistent state between executions**: each `alva run` call starts
   fresh (use `alfs` for persistence)
 
