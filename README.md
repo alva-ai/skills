@@ -86,7 +86,7 @@ Start with a simple prompt:
 Explain why NVDA moved last week and what changed in semis
 ```
 
-That's it. Your agent can now answer market questions, build or remix live Playbooks, set alerts, and work with connected accounts on Alva. By default, the skill builds live Playbooks unless you explicitly ask for a static snapshot. When you explicitly ask for user-callable functions, interactive Playbooks use the current PBSV + UDF runtime.
+That's it. Your agent can now answer market questions, build or remix live Playbooks, set alerts, and work with connected accounts on Alva. By default, the skill builds live Playbooks unless you explicitly ask for a static snapshot. When you explicitly ask for user-callable functions, interactive Playbooks register them through the functions CLI and invoke them through the PBSV + UDF runtime.
 
 ---
 
@@ -135,7 +135,7 @@ Event-driven backtesting with historical data and live paper trading. Define str
 
 ### Deploy & Share — Playbook Web Apps
 
-Turn your work into a hosted web app at `https://alva.ai/u/<username>/playbooks/<playbook_name>`. Built with the Alva Design System — charts, KPIs, tables, and optional UDF controls for explicitly requested user-registered functions. You can also remix published playbooks and add a creator's note after release.
+Turn your work into a hosted web app at `https://alva.ai/u/<username>/playbooks/<playbook_name>`. Built with the Alva Design System — charts, KPIs, tables, and optional UDF controls for explicitly requested user-registered functions registered by the functions CLI. You can also remix published playbooks and add a creator's note after release.
 
 ---
 

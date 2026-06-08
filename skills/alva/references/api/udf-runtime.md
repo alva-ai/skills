@@ -4,8 +4,8 @@ User-defined functions (UDFs) are functions registered by a playbook creator and
 made available for viewers to invoke from the playbook UI. A UDF flow always has
 two parts:
 
-1. **Registration**: the creator registers a named function, its entry script,
-   and its parameter schema against a playbook.
+1. **Registration**: the creator writes the entry script to ALFS, then
+   registers a named function and parameter schema with `alva functions`.
 2. **Use**: the playbook HTML lists or invokes registered functions through the
    browser SDK.
 
@@ -24,11 +24,13 @@ browser UI instead.
 
 If the trigger is met, implement both sides:
 
-- register or update the creator function with the service API
+- register or update the creator function with the `alva functions` CLI
 - load the toolkit browser SDK and invoke the function with `window.alva.udf`
 
 Do not build only the browser button without registering the function, and do
 not register a function without wiring the intended viewer-facing use.
+Do not hand-roll REST, GraphQL, or curl for function registration, invocation
+smoke tests, or allowance management when the CLI is available.
 
 ## Runtime Model
 
@@ -211,78 +213,53 @@ invocation once.
 
 Do not implement a custom credit authorization modal inside the playbook iframe.
 
-## Creator Function Registration
+## Creator Function CLI
 
-Creators register or update UDF functions through the service API:
+Creator-side UDF management is a CLI flow. Before using it in a session, run
+`alva functions --help` and treat the help output as authoritative for current
+flags, response fields, and examples.
 
-```http
-POST /api/v1/service/functions
-Content-Type: application/json
-Authorization: Bearer <creator-session-token>
+The stable flow is:
+
+```bash
+alva fs write --path '/alva/home/<username>/playbooks/<name>/udf/analyze.js' --file ./analyze.js --mkdir-parents
+alva functions register --playbook-id <playbook-id> --function-name analyze --entry-script-path '/alva/home/<username>/playbooks/<name>/udf/analyze.js' --params-schema-file ./schema.json --no-allow-charges
+alva functions invoke --playbook-id <playbook-id> --function-name analyze --params '{"ticker":"AAPL"}'
 ```
 
-```json
-{
-  "playbook_id": "<playbook-id>",
-  "function_name": "analyze",
-  "entry_script_path": "~/playbooks/my-playbook/udf/analyze.js",
-  "params_schema": {
-    "type": "object",
-    "properties": {
-      "ticker": { "type": "string" }
-    },
-    "required": ["ticker"]
-  }
-}
-```
+CLI gotchas the help text may not make obvious:
 
-Delete a function with:
+- `entry_script_path` is an absolute ALFS path under the creator's home and
+  must point at a `.js` file. Do not pass a local filesystem path or `~/...`.
+- Prefer `--params-schema-file` for nontrivial schemas so shell quoting does
+  not corrupt the JSON Schema. The schema must match both UI inputs and
+  server-side validation.
+- Registration is no-charge by default; pass `--no-allow-charges` unless the
+  user explicitly wants viewer-credit charging and the consent flow is wired.
+  Do not silently opt viewers into charges.
+- `alva functions invoke` is a creator/session smoke test. Released playbook
+  HTML still invokes through `window.alva.udf`, not through the CLI.
+- Use `alva functions list` and `alva functions delete` for maintenance; do
+  not recreate those operations with raw service requests.
 
-```http
-DELETE /api/v1/service/functions?playbook_id=<playbook-id>&function_name=<name>
-```
-
-Function entry scripts should live in creator-controlled ALFS paths and should
-validate `parameters_json` before doing expensive work.
-
-Registration is no-charge by default: keep `allow_charges=false` unless the
-user explicitly wants viewer-credit charging and the consent flow is wired. Do
-not silently opt viewers into charges.
+The service REST routes for register/list/delete/invoke are toolkit and gateway
+implementation details. Do not put raw HTTP request examples into playbook
+build instructions.
 
 ## Allowance Management
 
-Consumer allowance is managed by the Alva app. For product UI or session-user
-tools, prefer GraphQL because timestamps are normalized:
+Consumer allowance is normally managed by the Alva app through the consent
+modal. For agent-side session-user tools and smoke tests, use the functions
+CLI instead of GraphQL or raw gateway requests:
 
-```graphql
-query {
-  allowance(playbookId: "...")
-  myAllowances
-}
-
-mutation {
-  createAllowance(input: { playbookId: "...", amount: 25 }) {
-    allowance {
-      id
-      playbookId
-      amount
-      used
-      remaining
-      createdAtMs
-      updatedAtMs
-    }
-  }
-}
-
-mutation {
-  revokeAllowance(playbookId: "...") {
-    ok
-  }
-}
-```
+The CLI surface is `alva functions allowance get|list|create|revoke`; for
+example, use `alva functions allowance create --playbook-id <playbook-id>
+--amount 25` to set a cap.
 
 PBSV is explicitly rejected from allowance-management APIs. Only signed-in
-session users can create, edit, or revoke allowances.
+session users can create, edit, or revoke allowances. Viewer-facing playbook
+HTML must rely on the product consent modal and `window.alva.udf` retry path,
+not custom allowance forms inside the iframe.
 
 ## Pre-Release Checklist
 

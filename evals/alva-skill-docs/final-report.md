@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/shared-data-execution-layer/skills/alva`
+Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/udf-functions-cli-skill/skills/alva`
 
-SKILL.md lines: 757
+SKILL.md lines: 758
 
-Cases: 27/27
+Cases: 28/28
 
-Checks: 196/196 (100.00%)
+Checks: 201/201 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -19,7 +19,7 @@ No failed cases. Keep the eval in place as a regression mechanism.
 
 ## retained
 
-16/16 cases, 92/92 checks
+17/17 cases, 97/97 checks
 
 ### PASS retained.platform-panorama
 
@@ -153,6 +153,16 @@ UDFs stay strict opt-in and routed to the PBSV/browser runtime reference.
 - [x] PBSV
 - [x] allowance consent
 
+### PASS retained.udf-functions-cli
+
+Creator-side UDF setup and allowance management route through the functions CLI instead of manual service requests.
+
+- [x] alva functions --help
+- [x] alva functions register
+- [x] alva functions invoke
+- [x] alva functions allowance create
+- [x] Do not hand-roll REST, GraphQL, or curl
+
 ### PASS retained.altra
 
 Backtesting and signal feeds still require Altra and preserve common guardrails.
@@ -273,8 +283,8 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 757)
-- [x] line count <= 850 (actual 757)
+- [x] line count >= 650 (actual 758)
+- [x] line count <= 850 (actual 758)
 
 ### PASS target.playbook-task-offload
 

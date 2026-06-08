@@ -172,6 +172,19 @@
       ]
     },
     {
+      "id": "retained.udf-functions-cli",
+      "group": "retained",
+      "target": "corpus",
+      "description": "Creator-side UDF setup and allowance management route through the functions CLI instead of manual service requests.",
+      "includes": [
+        "alva functions --help",
+        "alva functions register",
+        "alva functions invoke",
+        "alva functions allowance create",
+        "Do not hand-roll REST, GraphQL, or curl"
+      ]
+    },
+    {
       "id": "retained.altra",
       "group": "retained",
       "target": "corpus",
