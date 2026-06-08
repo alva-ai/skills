@@ -870,7 +870,7 @@ body {
   outline-offset: 2px;
 }
 
-/* Base (default size = 12) */
+/* Base (default size) */
 .tag {
   display: inline-flex;
   align-items: center;
@@ -1112,7 +1112,7 @@ body {
   letter-spacing: 0.14px;
 }
 
-/* Size — Small (32px) */
+/* Size — Small */
 .select-sm {
   height: 32px;
   padding: 6px var(--spacing-s);
@@ -1123,7 +1123,7 @@ body {
   letter-spacing: 0.12px;
 }
 
-/* Size — Extra Small (28px) */
+/* Size — Extra Small */
 .select-xs {
   height: 28px;
   padding: var(--spacing-xxs) var(--spacing-xs);
@@ -1226,7 +1226,7 @@ body {
   letter-spacing: 0.14px;
 }
 
-/* Size — Small (32px) */
+/* Size — Small */
 .input-sm {
   height: 32px;
   padding: 6px var(--spacing-s);
@@ -1236,7 +1236,7 @@ body {
   letter-spacing: 0.12px;
 }
 
-/* Size — Extra Small (28px) */
+/* Size — Extra Small */
 .input-xs {
   height: 28px;
   padding: var(--spacing-xxs) var(--spacing-xs);
@@ -1273,10 +1273,13 @@ body {
   overflow: hidden;
 }
 
-/* ── Underline ── */
+/* ── Underline ── divider + active bar are bottom-anchored overlays (both bottom:0,
+   so bottoms align); bar covers divider via z-index. Do not refactor to a border. */
 .tab-underline {
+  position: relative;
+  width: 100%;
+  align-items: flex-end;
   gap: var(--spacing-m);
-  border-bottom: 0.5px solid var(--line-l12);
   flex-wrap: nowrap;
   overflow-x: auto;
   scrollbar-width: none; /* Firefox */
@@ -1284,21 +1287,37 @@ body {
 .tab-underline::-webkit-scrollbar {
   display: none;
 }
+.tab-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0.5px;
+  background: var(--line-l12);
+  z-index: 0;
+}
 .tab-underline .tab-item {
-  flex: 1;
-  text-align: center;
   padding-bottom: var(--spacing-xxs);
-  margin-bottom: -0.5px;
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0.14px;
   color: var(--text-n7);
-  border-bottom: 2px solid transparent;
 }
 .tab-underline .tab-item.active {
+  position: relative;
+  z-index: 1;
   color: var(--text-n9);
   font-weight: 500;
-  border-bottom-color: var(--main-m1);
+}
+.tab-underline .tab-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--main-m1);
 }
 
 /* Underline — Size L */
@@ -1328,7 +1347,7 @@ body {
 }
 .tab-underline.tab-xl .tab-item {
   padding-top: var(--spacing-s);
-  padding-bottom: 10px; /* 12 − 2px border = matches inactive py-12 */
+  padding-bottom: 10px;
   font-size: 18px;
   line-height: 28px;
   letter-spacing: 0.18px;
