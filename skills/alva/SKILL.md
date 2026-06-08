@@ -235,38 +235,23 @@ before non-dry-run execution, and [api/trading.md](references/api/trading.md).
 
 ## Capability Map
 
-The map is organized as two decision trees plus shared layers. **Financial
-Analysis / Ask Question** answers the user in chat using sourced data, search,
-and clear provenance. **Durable Artifacts** turn work into scripts, feeds,
-automations, playbooks, signals, or published surfaces. Data source modules are
-shared: analysis consumes them directly, while durable artifacts wire them
-through runtime and feeds. Choose the smallest tree that satisfies the verb.
+The map is organized as one shared layer plus two decision trees. **Shared Data
+And Execution** is the common substrate: Data Skills, search, BYOD, `alva run`,
+jagent runtime, and provenance rules. **Financial Analysis / Ask Question**
+uses that layer for sourced chat answers. **Durable Artifacts / Playbook** uses
+that layer, then persists or publishes work through feeds, automations,
+signals, playbooks, or release flows. Choose the smallest tree that satisfies
+the verb.
 
-### Financial Analysis / Ask Question Tree
+### Shared Data And Execution Layer
 
-Financial analysis is the default for user questions about markets, assets,
-portfolios, valuation, catalysts, rankings, comparisons, and "why" narratives.
-It may be a single fresh data fetch, a sourced explanation, a peer comparison,
-a thesis check, or a concise table. It is not merely "Data Query": data fetch is
-one step inside an analysis answer.
+This layer is shared by direct answers and durable artifacts. Do not treat data
+access or `alva run` as playbook-only. A direct answer may still need Alva Cloud
+execution for live fetches, joins, transformations, shape checks, indicators, or
+peer comparisons; the difference is that the result stays in chat instead of
+becoming a feed, cronjob, signal, or playbook.
 
-Common subroutes are latest fact, contextual explanation, comparison/valuation,
-ranking or screen-in-text, and thesis check. They all end as an answer unless
-the user asks to track, alert, share, publish, or turn the result into an app.
-
-Read [content-legitimacy.md](references/content-legitimacy.md) before surfacing
-financial values. Use [data-skills.md](references/data-skills.md) for
-structured facts and [search.md](references/search.md) for sourced context,
-global X/Grok, non-US finance, or off-catalog assets. If the user asks a direct
-question, answer directly with provenance; if they ask to track, alert, share,
-or publish, route to the durable artifact tree instead.
-
-Comparison baselines are financial facts. A historical average, peer multiple,
-macro yardstick, or benchmark return that supports a judgment must be fetched
-or clearly labeled as unsourced. Do not put sourced current data next to
-memory-derived baselines.
-
-#### Source Layer: Data Sources
+#### Data Access: Data Sources
 
 Data Skills are the primary source for structured financial facts: prices,
 klines, fundamentals, estimates, insider and senator trades, ownership, macro,
@@ -290,7 +275,7 @@ Source routing:
 - Direct latest price for A-shares, HK stocks, and exchange-suffixed tickers:
   `searchPerplexityFinance` first.
 
-#### Source Layer: Content Search And BYOD
+#### Data Access: Content Search And BYOD
 
 Content search enriches a real data pipeline; it does not replace one. Use it
 for market narratives, source discovery, global X/Grok queries, news, Reddit,
@@ -309,14 +294,7 @@ needed.
 BYOD still has to behave like an Alva source: validate it, state freshness and
 blind spots, and route durable outputs through feeds.
 
-### Durable Artifacts Tree
-
-Enter this tree when the user asks Alva to keep something running, reusable,
-shareable, inspectable, or actionable. The tree is not synonymous with
-playbooks: a script, feed, alert, signal, model output, or trading analysis may
-be the right artifact without a hosted UI.
-
-#### Runtime Layer: Jagent Runtime
+#### Execution: Jagent Runtime And `alva run`
 
 Alva runtime scripts execute JavaScript in a sandboxed V8 isolate through
 `alva run` or cronjobs. They cannot access local files, shell, Node builtins,
@@ -344,6 +322,40 @@ simulation when the blueprint requires Alva Cloud behavior. If a script throws
 `ReferenceError: <X> is not defined`, rewrite for the jagent runtime instead of
 retrying the same code. Before each write/run/debug step, read the matching
 section in [operational-pitfalls.md](references/operational-pitfalls.md).
+
+#### Provenance: Financial Values
+
+Read [content-legitimacy.md](references/content-legitimacy.md) before surfacing
+financial values in either tree. Comparison baselines are financial facts. A
+historical average, peer multiple, macro yardstick, or benchmark return that
+supports a judgment must be fetched or clearly labeled as unsourced. Do not put
+sourced current data next to memory-derived baselines.
+
+### Financial Analysis / Ask Question Tree
+
+Financial analysis is the default for user questions about markets, assets,
+portfolios, valuation, catalysts, rankings, comparisons, and "why" narratives.
+It may be a single fresh data fetch, an `alva run` computation over live data,
+a sourced explanation, a peer comparison, a thesis check, or a concise table.
+It is not merely "Data Query": data access and execution are steps inside an
+analysis answer.
+
+Common subroutes are latest fact, contextual explanation, comparison/valuation,
+ranking or screen-in-text, and thesis check. They all end as an answer unless
+the user asks to track, alert, share, publish, or turn the result into an app.
+
+Use the shared data and execution layer first. If the user asks a direct
+question, answer directly with provenance; if they ask to track, alert, share,
+or publish, route to the durable artifact / playbook tree instead.
+
+### Durable Artifacts / Playbook Tree
+
+Enter this tree when the user asks Alva to keep something running, reusable,
+shareable, inspectable, or actionable. The tree is broader than playbooks: a
+script, feed, alert, signal, model output, or trading analysis may be the right
+artifact without a hosted UI. Enter the playbook branch only for hosted apps,
+share URLs, remixes, annotation edits, release/version updates, or playbook
+subscription setup.
 
 #### Data Product Layer: Feed Lifecycle And Automation
 
@@ -565,12 +577,13 @@ reference before doing the task.
 For "what is the latest price / P/E / funding rate / holdings / CPI print",
 "why did it move", "is it cheap vs peers", or "rank these in text", start with
 financial analysis. Run preflight if needed, verify the relevant Data Skills or
-search route, fetch fresh data, fetch or qualify any comparison baseline, and
-answer with inline provenance. If the data source fails, report the failure
-instead of substituting a web snippet or model memory. If the user then asks to
-track, alert, share, or publish, upgrade the route to a feed or playbook.
+search route, use `alva run` when live computation or joins are needed, fetch
+or qualify any comparison baseline, and answer with inline provenance. If the
+data source fails, report the failure instead of substituting a web snippet or
+model memory. If the user then asks to track, alert, share, or publish, upgrade
+the route to a feed, signal, alert, or playbook.
 
-### Playbook Creation Tree
+### Durable Artifacts / Playbook Tree
 
 Enter this tree when the user wants a hosted app, share URL, dashboard,
 screener app, report surface, remix, annotation edit, release/version update,

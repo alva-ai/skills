@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/skill-map-analysis-20260608/skills/alva`
+Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/shared-data-execution-layer/skills/alva`
 
-SKILL.md lines: 744
+SKILL.md lines: 757
 
 Cases: 27/27
 
-Checks: 191/191 (100.00%)
+Checks: 196/196 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -267,14 +267,14 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-6/6 cases, 60/60 checks
+6/6 cases, 65/65 checks
 
 ### PASS target.top-level-size
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 744)
-- [x] line count <= 850 (actual 744)
+- [x] line count >= 650 (actual 757)
+- [x] line count <= 850 (actual 757)
 
 ### PASS target.playbook-task-offload
 
@@ -295,7 +295,7 @@ Playbook creation is a concrete task reference rather than the dominant top-leve
 Top-level routing and final checklist keep playbook work in its concrete reference without making all routing playbook-centric.
 
 - [x] Playbook Creation Tree
-- [x] Durable Artifacts Tree
+- [x] Durable Artifacts / Playbook Tree
 - [x] Subroutes are new build, Skillhub-guided build, remix, annotation/edit, release/version update, and push after release
 - [x] do not let every financial question inherit playbook gates
 - [x] route through [playbook-creation.md](references/playbook-creation.md)
@@ -306,14 +306,19 @@ Top-level routing and final checklist keep playbook work in its concrete referen
 
 Ask-question work is grouped as financial analysis instead of a low-level Data Query route.
 
+- [x] Shared Data And Execution Layer
+- [x] Do not treat data access or `alva run` as playbook-only
+- [x] A direct answer may still need Alva Cloud execution
+- [x] Execution: Jagent Runtime And `alva run`
 - [x] Financial Analysis / Ask Question
 - [x] Financial Analysis / Ask Question Tree
 - [x] It is not merely "Data Query"
-- [x] data fetch is one step inside an analysis answer
+- [x] data access and execution are steps inside an analysis answer
+- [x] an `alva run` computation over live data
 - [x] latest fact
 - [x] comparison/valuation
-- [x] Source Layer: Data Sources
-- [x] Source Layer: Content Search And BYOD
+- [x] Data Access: Data Sources
+- [x] Data Access: Content Search And BYOD
 - [x] comparison baselines are financial facts
 - [x] historical average
 - [x] peer multiple

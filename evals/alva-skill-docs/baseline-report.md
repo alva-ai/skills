@@ -6,7 +6,7 @@ SKILL.md lines: 1876
 
 Cases: 16/27
 
-Checks: 132/191 (69.11%)
+Checks: 132/196 (67.35%)
 
 ## Scoring Diagnosis
 
@@ -22,8 +22,8 @@ Instead, fix the canonical skill text or eval case, then rerun baseline and fina
 - pr353.no-consensus-synthesis: inspect for a skill gap before editing. Missing checks: Do not merge multiple snippet claims; agent-authored consensus; ranked list; source-labeled; synthetic takeaway; source identity is missing; ambiguous
 - target.top-level-size: inspect for a skill gap before editing. Missing checks: line count <= 850 (actual 1876)
 - target.playbook-task-offload: inspect for a skill gap before editing. Missing checks: playbook-creation.md; Playbook Creation Tree; The playbook tree has subroutes; hosted or shareable playbook surface; ordinary financial-analysis questions should answer directly
-- target.top-level-playbook-routing: inspect for a skill gap before editing. Missing checks: Playbook Creation Tree; Durable Artifacts Tree; Subroutes are new build, Skillhub-guided build, remix, annotation/edit, release/version update, and push after release; do not let every financial question inherit playbook gates; route through [playbook-creation.md](references/playbook-creation.md); Did playbook work read [playbook-creation.md](references/playbook-creation.md); relevant hard gates
-- target.financial-analysis-routing: inspect for a skill gap before editing. Missing checks: Financial Analysis / Ask Question; Financial Analysis / Ask Question Tree; It is not merely "Data Query"; data fetch is one step inside an analysis answer; latest fact; comparison/valuation; Source Layer: Data Sources; Source Layer: Content Search And BYOD; comparison baselines are financial facts; peer multiple; Do not let playbook creation become the default; Do not turn every Skillhub task into a playbook
+- target.top-level-playbook-routing: inspect for a skill gap before editing. Missing checks: Playbook Creation Tree; Durable Artifacts / Playbook Tree; Subroutes are new build, Skillhub-guided build, remix, annotation/edit, release/version update, and push after release; do not let every financial question inherit playbook gates; route through [playbook-creation.md](references/playbook-creation.md); Did playbook work read [playbook-creation.md](references/playbook-creation.md); relevant hard gates
+- target.financial-analysis-routing: inspect for a skill gap before editing. Missing checks: Shared Data And Execution Layer; Do not treat data access or `alva run` as playbook-only; A direct answer may still need Alva Cloud execution; Execution: Jagent Runtime And `alva run`; Financial Analysis / Ask Question; Financial Analysis / Ask Question Tree; It is not merely "Data Query"; data access and execution are steps inside an analysis answer; an `alva run` computation over live data; latest fact; comparison/valuation; Data Access: Data Sources; Data Access: Content Search And BYOD; comparison baselines are financial facts; peer multiple; Do not let playbook creation become the default; Do not turn every Skillhub task into a playbook
 - target.pitfalls-stepwise-required: inspect for a skill gap before editing. Missing checks: step by step; before each step; runtime, feed, ALFS, playbook HTML, deploy, release, chart, or cron work; Write or run jagent code; Touch ALFS paths; Build or edit playbook HTML/charts
 - target.mainline-updates: inspect for a skill gap before editing. Missing checks: publish publicly by default; implementation internals; Skillhub to users as a catalog of methodologies
 
@@ -277,7 +277,7 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-0/6 cases, 26/60 checks
+0/6 cases, 26/65 checks
 
 ### FAIL target.top-level-size
 
@@ -305,7 +305,7 @@ Playbook creation is a concrete task reference rather than the dominant top-leve
 Top-level routing and final checklist keep playbook work in its concrete reference without making all routing playbook-centric.
 
 - [ ] Playbook Creation Tree
-- [ ] Durable Artifacts Tree
+- [ ] Durable Artifacts / Playbook Tree
 - [ ] Subroutes are new build, Skillhub-guided build, remix, annotation/edit, release/version update, and push after release
 - [ ] do not let every financial question inherit playbook gates
 - [ ] route through [playbook-creation.md](references/playbook-creation.md)
@@ -316,14 +316,19 @@ Top-level routing and final checklist keep playbook work in its concrete referen
 
 Ask-question work is grouped as financial analysis instead of a low-level Data Query route.
 
+- [ ] Shared Data And Execution Layer
+- [ ] Do not treat data access or `alva run` as playbook-only
+- [ ] A direct answer may still need Alva Cloud execution
+- [ ] Execution: Jagent Runtime And `alva run`
 - [ ] Financial Analysis / Ask Question
 - [ ] Financial Analysis / Ask Question Tree
 - [ ] It is not merely "Data Query"
-- [ ] data fetch is one step inside an analysis answer
+- [ ] data access and execution are steps inside an analysis answer
+- [ ] an `alva run` computation over live data
 - [ ] latest fact
 - [ ] comparison/valuation
-- [ ] Source Layer: Data Sources
-- [ ] Source Layer: Content Search And BYOD
+- [ ] Data Access: Data Sources
+- [ ] Data Access: Content Search And BYOD
 - [ ] comparison baselines are financial facts
 - [x] historical average
 - [ ] peer multiple

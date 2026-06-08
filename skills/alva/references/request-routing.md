@@ -8,6 +8,9 @@ playbook edit.
 
 Decision order:
 
+0. Route every financial task through shared data and execution first: Data
+   Skills, search, BYOD, `alva run` / jagent, and provenance checks are common
+   to answers and artifacts.
 1. If the user wants an explanation, comparison, valuation, rank, or current
    market fact in chat, route to Financial Analysis / Ask Question.
 2. If the user wants persistence, cadence, alerting, trading signals, or a
@@ -20,7 +23,7 @@ Decision order:
 
 | Request type | Objective |
 | --- | --- |
-| Financial Analysis / Ask Question | Answer market, asset, portfolio, valuation, comparison, and "why" questions with fresh data/search evidence. Comparison baselines are figures too: fetch or qualify them. |
+| Financial Analysis / Ask Question | Answer market, asset, portfolio, valuation, comparison, and "why" questions with fresh data/search/`alva run` evidence. Comparison baselines are figures too: fetch or qualify them. |
 | Playbook Creation | Build, remix, edit, release, or update a hosted/shareable playbook. Read [playbook-creation.md](playbook-creation.md) for the subroute tree and gates. |
 | Strategy / Trading Analysis | Use Altra for backtests, signals, portfolio simulation, rebalancing, or trading analysis; deliver an answer, feed, signal, or playbook as requested. |
 | Automation / Push | Build or modify a feed that emits actionable `signal/targets` or `notify/message`, then verify subscription and delivery path. |
@@ -59,8 +62,8 @@ for one.
 ## Guided Planning
 
 For Financial Analysis / Ask Question, usually answer directly after fetching
-evidence; use a plan only when the question needs several sources or a
-nontrivial method. For build routes, present a plan once before building.
+or computing evidence; use a plan only when the question needs several sources
+or a nontrivial method. For build routes, present a plan once before building.
 
 Exactly one blocking question per session:
 
