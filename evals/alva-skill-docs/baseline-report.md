@@ -4,9 +4,9 @@ Source: `origin/main`
 
 SKILL.md lines: 758
 
-Cases: 27/28
+Cases: 28/29
 
-Checks: 196/204 (96.08%)
+Checks: 201/209 (96.17%)
 
 ## Scoring Diagnosis
 
@@ -19,7 +19,7 @@ Instead, fix the canonical skill text or eval case, then rerun baseline and fina
 
 ## retained
 
-16/16 cases, 92/92 checks
+17/17 cases, 97/97 checks
 
 ### PASS retained.platform-panorama
 
@@ -152,6 +152,16 @@ UDFs stay strict opt-in and routed to the PBSV/browser runtime reference.
 - [x] window.alva.udf
 - [x] PBSV
 - [x] allowance consent
+
+### PASS retained.udf-functions-cli
+
+Creator-side UDF setup and allowance management route through the functions CLI instead of manual service requests.
+
+- [x] alva functions --help
+- [x] alva functions register
+- [x] alva functions invoke
+- [x] alva functions allowance create
+- [x] Do not hand-roll REST, GraphQL, or curl
 
 ### PASS retained.altra
 
