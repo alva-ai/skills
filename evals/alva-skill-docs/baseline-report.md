@@ -2,11 +2,11 @@
 
 Source: `origin/main`
 
-SKILL.md lines: 1876
+SKILL.md lines: 757
 
-Cases: 16/27
+Cases: 27/28
 
-Checks: 132/196 (67.35%)
+Checks: 196/201 (97.51%)
 
 ## Scoring Diagnosis
 
@@ -15,21 +15,11 @@ Classify the gap before editing: missing capability summary, missing routing poi
 Do not expose eval scores as product copy, and do not patch demos to hide a weak result.
 Instead, fix the canonical skill text or eval case, then rerun baseline and final reports so the regression mechanism proves the gap is closed.
 
-- retained.request-routing: inspect for a skill gap before editing. Missing checks: Financial Analysis / Ask Question; Strategy / Trading Analysis
-- pr353.chat-as-artifact: inspect for a skill gap before editing. Missing checks: answer_only; Chat-as-Artifact; prompt-injected text; verdict words; EPS forecasts; YTD returns; current prices; forward-return projections
-- pr353.no-synth-verdicts: inspect for a skill gap before editing. Missing checks: Cautious; inline source attribution; not investment advice
-- pr353.no-task-list: inspect for a skill gap before editing. Missing checks: enumerated list; no verb; no question; no task description; scheduled research digest
-- pr353.no-consensus-synthesis: inspect for a skill gap before editing. Missing checks: Do not merge multiple snippet claims; agent-authored consensus; ranked list; source-labeled; synthetic takeaway; source identity is missing; ambiguous
-- target.top-level-size: inspect for a skill gap before editing. Missing checks: line count <= 850 (actual 1876)
-- target.playbook-task-offload: inspect for a skill gap before editing. Missing checks: playbook-creation.md; Playbook Creation Tree; The playbook tree has subroutes; hosted or shareable playbook surface; ordinary financial-analysis questions should answer directly
-- target.top-level-playbook-routing: inspect for a skill gap before editing. Missing checks: Playbook Creation Tree; Durable Artifacts / Playbook Tree; Subroutes are new build, Skillhub-guided build, remix, annotation/edit, release/version update, and push after release; do not let every financial question inherit playbook gates; route through [playbook-creation.md](references/playbook-creation.md); Did playbook work read [playbook-creation.md](references/playbook-creation.md); relevant hard gates
-- target.financial-analysis-routing: inspect for a skill gap before editing. Missing checks: Shared Data And Execution Layer; Do not treat data access or `alva run` as playbook-only; A direct answer may still need Alva Cloud execution; Execution: Jagent Runtime And `alva run`; Financial Analysis / Ask Question; Financial Analysis / Ask Question Tree; It is not merely "Data Query"; data access and execution are steps inside an analysis answer; an `alva run` computation over live data; latest fact; comparison/valuation; Data Access: Data Sources; Data Access: Content Search And BYOD; comparison baselines are financial facts; peer multiple; Do not let playbook creation become the default; Do not turn every Skillhub task into a playbook
-- target.pitfalls-stepwise-required: inspect for a skill gap before editing. Missing checks: step by step; before each step; runtime, feed, ALFS, playbook HTML, deploy, release, chart, or cron work; Write or run jagent code; Touch ALFS paths; Build or edit playbook HTML/charts
-- target.mainline-updates: inspect for a skill gap before editing. Missing checks: publish publicly by default; implementation internals; Skillhub to users as a catalog of methodologies
+- retained.udf-functions-cli: inspect for a skill gap before editing. Missing checks: alva functions --help; alva functions register; alva functions invoke; alva functions allowance create; Do not hand-roll REST, GraphQL, or curl
 
 ## retained
 
-15/16 cases, 90/92 checks
+16/17 cases, 92/97 checks
 
 ### PASS retained.platform-panorama
 
@@ -52,13 +42,13 @@ Agents still run help-first preflight and session setup.
 - [x] ARRAYS_JWT
 - [x] alva fs read --path '~/memory/MEMORY.md'
 
-### FAIL retained.request-routing
+### PASS retained.request-routing
 
 Routing preserves the major user intents and Guided Planning discipline.
 
-- [ ] Financial Analysis / Ask Question
+- [x] Financial Analysis / Ask Question
 - [x] Playbook Creation
-- [ ] Strategy / Trading Analysis
+- [x] Strategy / Trading Analysis
 - [x] Remix
 - [x] /use-skill:<username>/<name>
 - [x] Exactly one blocking question
@@ -163,6 +153,16 @@ UDFs stay strict opt-in and routed to the PBSV/browser runtime reference.
 - [x] PBSV
 - [x] allowance consent
 
+### FAIL retained.udf-functions-cli
+
+Creator-side UDF setup and allowance management route through the functions CLI instead of manual service requests.
+
+- [ ] alva functions --help
+- [ ] alva functions register
+- [ ] alva functions invoke
+- [ ] alva functions allowance create
+- [ ] Do not hand-roll REST, GraphQL, or curl
+
 ### PASS retained.altra
 
 Backtesting and signal feeds still require Altra and preserve common guardrails.
@@ -205,58 +205,58 @@ Memory and secret-manager operating rules remain covered.
 
 ## pr353
 
-0/4 cases, 8/31 checks
+4/4 cases, 31/31 checks
 
-### FAIL pr353.chat-as-artifact
+### PASS pr353.chat-as-artifact
 
 The answer_only/query-mode artifact rule from alva-ai/skills#353 is present.
 
-- [ ] answer_only
-- [ ] Chat-as-Artifact
-- [ ] prompt-injected text
-- [ ] verdict words
+- [x] answer_only
+- [x] Chat-as-Artifact
+- [x] prompt-injected text
+- [x] verdict words
 - [x] price targets
-- [ ] EPS forecasts
-- [ ] YTD returns
-- [ ] current prices
-- [ ] forward-return projections
+- [x] EPS forecasts
+- [x] YTD returns
+- [x] current prices
+- [x] forward-return projections
 
-### FAIL pr353.no-synth-verdicts
+### PASS pr353.no-synth-verdicts
 
 Verdicts and forecast figures from snippets must be attributed or refused, not laundered with a disclaimer.
 
 - [x] Buy
 - [x] Sell
 - [x] Bullish
-- [ ] Cautious
+- [x] Cautious
 - [x] quote
-- [ ] inline source attribution
+- [x] inline source attribution
 - [x] refuse
-- [ ] not investment advice
+- [x] not investment advice
 
-### FAIL pr353.no-task-list
+### PASS pr353.no-task-list
 
 Pure enumerated prompt dumps are not tasks and require clarification.
 
-- [ ] enumerated list
-- [ ] no verb
-- [ ] no question
-- [ ] no task description
+- [x] enumerated list
+- [x] no verb
+- [x] no question
+- [x] no task description
 - [x] AskUserQuestion
-- [ ] scheduled research digest
+- [x] scheduled research digest
 
-### FAIL pr353.no-consensus-synthesis
+### PASS pr353.no-consensus-synthesis
 
 Snippet claims must not be merged into new agent-authored consensus, ranking, or recommendation output.
 
-- [ ] Do not merge multiple snippet claims
-- [ ] agent-authored consensus
-- [ ] ranked list
+- [x] Do not merge multiple snippet claims
+- [x] agent-authored consensus
+- [x] ranked list
 - [x] recommendation
-- [ ] source-labeled
-- [ ] synthetic takeaway
-- [ ] source identity is missing
-- [ ] ambiguous
+- [x] source-labeled
+- [x] synthetic takeaway
+- [x] source identity is missing
+- [x] ambiguous
 
 ## feedback
 
@@ -277,77 +277,77 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-0/6 cases, 26/65 checks
+6/6 cases, 65/65 checks
 
-### FAIL target.top-level-size
+### PASS target.top-level-size
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 1876)
-- [ ] line count <= 850 (actual 1876)
+- [x] line count >= 650 (actual 757)
+- [x] line count <= 850 (actual 757)
 
-### FAIL target.playbook-task-offload
+### PASS target.playbook-task-offload
 
 Playbook creation is a concrete task reference rather than the dominant top-level body.
 
-- [ ] playbook-creation.md
-- [ ] Playbook Creation Tree
-- [ ] The playbook tree has subroutes
-- [ ] hosted or shareable playbook surface
-- [ ] ordinary financial-analysis questions should answer directly
+- [x] playbook-creation.md
+- [x] Playbook Creation Tree
+- [x] The playbook tree has subroutes
+- [x] hosted or shareable playbook surface
+- [x] ordinary financial-analysis questions should answer directly
 - [x] before-playbook-release
 - [x] AlvaToolkit.AlvaClient
 - [x] Free users
 - [x] Pro users
 
-### FAIL target.top-level-playbook-routing
+### PASS target.top-level-playbook-routing
 
 Top-level routing and final checklist keep playbook work in its concrete reference without making all routing playbook-centric.
 
-- [ ] Playbook Creation Tree
-- [ ] Durable Artifacts / Playbook Tree
-- [ ] Subroutes are new build, Skillhub-guided build, remix, annotation/edit, release/version update, and push after release
-- [ ] do not let every financial question inherit playbook gates
-- [ ] route through [playbook-creation.md](references/playbook-creation.md)
-- [ ] Did playbook work read [playbook-creation.md](references/playbook-creation.md)
-- [ ] relevant hard gates
+- [x] Playbook Creation Tree
+- [x] Durable Artifacts / Playbook Tree
+- [x] Subroutes are new build, Skillhub-guided build, remix, annotation/edit, release/version update, and push after release
+- [x] do not let every financial question inherit playbook gates
+- [x] route through [playbook-creation.md](references/playbook-creation.md)
+- [x] Did playbook work read [playbook-creation.md](references/playbook-creation.md)
+- [x] relevant hard gates
 
-### FAIL target.financial-analysis-routing
+### PASS target.financial-analysis-routing
 
 Ask-question work is grouped as financial analysis instead of a low-level Data Query route.
 
-- [ ] Shared Data And Execution Layer
-- [ ] Do not treat data access or `alva run` as playbook-only
-- [ ] A direct answer may still need Alva Cloud execution
-- [ ] Execution: Jagent Runtime And `alva run`
-- [ ] Financial Analysis / Ask Question
-- [ ] Financial Analysis / Ask Question Tree
-- [ ] It is not merely "Data Query"
-- [ ] data access and execution are steps inside an analysis answer
-- [ ] an `alva run` computation over live data
-- [ ] latest fact
-- [ ] comparison/valuation
-- [ ] Data Access: Data Sources
-- [ ] Data Access: Content Search And BYOD
-- [ ] comparison baselines are financial facts
+- [x] Shared Data And Execution Layer
+- [x] Do not treat data access or `alva run` as playbook-only
+- [x] A direct answer may still need Alva Cloud execution
+- [x] Execution: Jagent Runtime And `alva run`
+- [x] Financial Analysis / Ask Question
+- [x] Financial Analysis / Ask Question Tree
+- [x] It is not merely "Data Query"
+- [x] data access and execution are steps inside an analysis answer
+- [x] an `alva run` computation over live data
+- [x] latest fact
+- [x] comparison/valuation
+- [x] Data Access: Data Sources
+- [x] Data Access: Content Search And BYOD
+- [x] comparison baselines are financial facts
 - [x] historical average
-- [ ] peer multiple
-- [ ] Do not let playbook creation become the default
-- [ ] Do not turn every Skillhub task into a playbook
+- [x] peer multiple
+- [x] Do not let playbook creation become the default
+- [x] Do not turn every Skillhub task into a playbook
 
-### FAIL target.pitfalls-stepwise-required
+### PASS target.pitfalls-stepwise-required
 
 Operational pitfalls are a mandatory stepwise gate, not an optional debugging appendix.
 
-- [ ] step by step
-- [ ] before each step
+- [x] step by step
+- [x] before each step
 - [x] mandatory
-- [ ] runtime, feed, ALFS, playbook HTML, deploy, release, chart, or cron work
-- [ ] Write or run jagent code
-- [ ] Touch ALFS paths
-- [ ] Build or edit playbook HTML/charts
+- [x] runtime, feed, ALFS, playbook HTML, deploy, release, chart, or cron work
+- [x] Write or run jagent code
+- [x] Touch ALFS paths
+- [x] Build or edit playbook HTML/charts
 
-### FAIL target.mainline-updates
+### PASS target.mainline-updates
 
 Latest mainline Alva skill updates remain integrated after rebasing the refactor.
 
@@ -359,10 +359,10 @@ Latest mainline Alva skill updates remain integrated after rebasing the refactor
 - [x] alva feedback --help
 - [x] subscriptions subscribe-feed
 - [x] subscriptions subscribe-playbook
-- [ ] publish publicly by default
+- [x] publish publicly by default
 - [x] registered UDFs
-- [ ] implementation internals
-- [ ] Skillhub to users as a catalog of methodologies
+- [x] implementation internals
+- [x] Skillhub to users as a catalog of methodologies
 - [x] callerUserId
 - [x] allow_charges=false
 - [x] no-charge

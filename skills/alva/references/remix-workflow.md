@@ -82,7 +82,7 @@ inspect — each entry carries both `feed_name` (for ALFS paths) and
 
 If the source playbook has registered UDFs, collect each function's
 `function_name`, `entry_script_path`, and `params_schema` before editing. Read
-[udf-runtime.md](api/udf-runtime.md) for the registration contract. A remix
+[udf-runtime.md](api/udf-runtime.md) for the `alva functions` registration flow. A remix
 must preserve source UDF methods unless the user explicitly asks to remove or
 replace them: copy every source UDF entry script into the new playbook's ALFS
 tree, rewrite its path to the new playbook namespace, and later register the
@@ -216,10 +216,11 @@ only on explicit request). Do not write fresh files from scratch.
    See [release.md → Playbook README](api/release.md#playbook-readme).
 9. **Draft playbook**: `alva release playbook-draft --name {new-name} --display-name "..." --feeds '[{"feed_id":ID}]'`
 10. **Register inherited UDFs when present**: after the draft command returns
-   the remixed playbook ID, register each copied method on that playbook using
-   the same `function_name` and `params_schema`, with `entry_script_path`
-   pointing at the new ALFS path. Do not leave inherited `window.alva.udf` UI
-   controls pointing at an unregistered function.
+   the remixed playbook ID, use `alva functions register` for each copied
+   method with the same `function_name` and `params_schema`, with
+   `entry_script_path` pointing at the new absolute ALFS path. Do not leave
+   inherited `window.alva.udf` UI controls pointing at an unregistered
+   function.
 11. **Release playbook**: `alva release playbook --name {new-name} --version v1.0.0 --feeds '[{"feed_id":ID}]' --changelog "..." --readme-url '/alva/home/<username>/playbooks/{new-name}/README.md'` (absolute ALFS path; resolve `<username>` via `alva whoami` — the relative shorthand is no longer accepted)
 
 **Important**: The new playbook must use a unique name in your user space. The

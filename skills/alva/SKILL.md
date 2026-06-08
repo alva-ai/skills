@@ -479,9 +479,9 @@ when the user asks for a registerable function or a button that calls their
 analysis function.
 
 Open [api/udf-runtime.md](references/api/udf-runtime.md). It owns PBSV browser
-authentication, creator registration, `window.alva.udf`, allowance consent,
-`UdfButton`, caller identity, `allow_charges=false` defaults, and release
-checks.
+authentication, `alva functions` creator registration and allowance tools,
+`window.alva.udf`, allowance consent, `UdfButton`, caller identity,
+`allow_charges=false` defaults, and release checks.
 
 #### Action Layer: Push Notifications
 
@@ -662,6 +662,7 @@ text does not fully cover.
 | `trading` | Accounts, portfolio, orders, subscriptions, execution. Must read [api/trading.md](references/api/trading.md). |
 | `screenshot` | PNG capture for released playbook verification. See [playbook-creation.md](references/playbook-creation.md#screenshot). |
 | `remix` | Lineage registration only. See [remix-workflow.md](references/remix-workflow.md). |
+| `functions` | Playbook UDF registration, invoke smoke tests, and allowance management. Must read [api/udf-runtime.md](references/api/udf-runtime.md). |
 | `secrets` | Secret CRUD for agent-managed setup. See [secret-manager.md](references/secret-manager.md). |
 | `feedback` | Submit user-confirmed Alva platform feedback. Must read [api/feedback.md](references/api/feedback.md). |
 
@@ -669,8 +670,8 @@ Non-CLI references:
 
 - [api/error-responses.md](references/api/error-responses.md) for programmatic
   HTTP error handling.
-- [api/udf-runtime.md](references/api/udf-runtime.md) for playbook UDF service
-  and browser calls.
+- [api/udf-runtime.md](references/api/udf-runtime.md) for PBSV browser runtime
+  behavior behind `window.alva.udf`.
 
 ## Reference Library
 
@@ -708,7 +709,7 @@ Use this index to open only the file needed for the current task.
 | [api/filesystem.md](references/api/filesystem.md) | ALFS synth suffixes and feed grant gotcha. |
 | [api/release.md](references/api/release.md) | Release extras: README, tags, trading symbols, skill id, descriptions. |
 | [api/trading.md](references/api/trading.md) | Trading signal schema, symbol naming, dry-run rules. |
-| [api/udf-runtime.md](references/api/udf-runtime.md) | Playbook UDF registration and browser invocation. |
+| [api/udf-runtime.md](references/api/udf-runtime.md) | Playbook UDF CLI setup, allowance management, and browser invocation. |
 | [api/feedback.md](references/api/feedback.md) | User-confirmed Alva platform feedback for Alva-owned blockers. |
 | [api/error-responses.md](references/api/error-responses.md) | HTTP status to error-code table. |
 
