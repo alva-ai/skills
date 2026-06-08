@@ -74,6 +74,18 @@ verify each ticker's sector or industry with live company-detail data such as
 Remove or flag mismatches before scoring, ranking, or releasing the artifact. A
 single wrong ticker can distort the whole theme.
 
+## Company-Specific KPI Coverage
+
+Standard fundamentals do not guarantee non-standard management KPIs. Product
+mix, segment usage, subscription attach, ad pricing, inventory, deposit beta,
+CRE exposure, drug-pipeline milestones, payer coverage, and similar metrics
+need explicit coverage verification before they support an answer or artifact.
+
+Use a structured endpoint when available. Otherwise use a filing, transcript,
+source-backed search result, or BYOD source, and label the result by source and
+as-of. If search only finds commentary about the KPI rather than the KPI itself,
+state the coverage gap instead of treating the commentary as verified data.
+
 ## Runtime Libraries Are Separate
 
 `alva sdk` surfaces runtime modules, not Data Skills endpoints:

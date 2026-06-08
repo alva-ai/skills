@@ -35,6 +35,18 @@ Verification claims must reflect real tool calls. Do not say a dashboard looks
 good unless you actually rendered or screenshotted it. Copy `published_url`,
 `feed_id`, job ids, and ALFS paths verbatim from tool responses.
 
+## Attribution Granularity
+
+Every decision-useful figure or judgment needs a nearby attribution handle:
+Data Skills endpoint, published feed, validated BYOD source, or specific search
+source, plus the relevant as-of date, fiscal period, publication date, or fetch
+time. Label agent-computed ratios, screens, rankings, and scenarios as computed
+from the cited inputs; label thesis judgments as inference when no source
+directly states them.
+
+For multi-hop direct answers, the required evidence table and source coverage
+check live in [complex-financial-ask.md](complex-financial-ask.md).
+
 ## Prohibited Sources
 
 - WebSearch / WebFetch values must not be quoted as financial answers or

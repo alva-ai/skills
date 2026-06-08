@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/shared-data-execution-layer/skills/alva`
+Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/complex-ask-contract/skills/alva`
 
-SKILL.md lines: 757
+SKILL.md lines: 768
 
-Cases: 27/27
+Cases: 28/28
 
-Checks: 196/196 (100.00%)
+Checks: 210/210 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -267,14 +267,14 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-6/6 cases, 65/65 checks
+7/7 cases, 79/79 checks
 
 ### PASS target.top-level-size
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 757)
-- [x] line count <= 850 (actual 757)
+- [x] line count >= 650 (actual 768)
+- [x] line count <= 850 (actual 768)
 
 ### PASS target.playbook-task-offload
 
@@ -324,6 +324,25 @@ Ask-question work is grouped as financial analysis instead of a low-level Data Q
 - [x] peer multiple
 - [x] Do not let playbook creation become the default
 - [x] Do not turn every Skillhub task into a playbook
+
+### PASS target.complex-financial-ask-contract
+
+Multi-hop direct financial asks have an executable answer contract rather than a free-form memo.
+
+- [x] complex-financial-ask.md
+- [x] Complex Financial Ask Contract
+- [x] Required Pre-Answer Gate
+- [x] Decomposition: the question split into data hops
+- [x] Data path: which Data Skills, feeds, BYOD sources, or search modules each hop will use
+- [x] Coverage result: fetched, unavailable, stale, gated, or unresolved
+- [x] Evidence Table
+- [x] Source Coverage Checklist
+- [x] Company-specific KPIs need special care
+- [x] Thesis / counter-thesis
+- [x] Base / bull / bear
+- [x] Confidence and caveats
+- [x] Every decision-useful figure or judgment needs a nearby attribution handle
+- [x] company-specific KPI Coverage
 
 ### PASS target.pitfalls-stepwise-required
 

@@ -369,6 +369,28 @@
       ]
     },
     {
+      "id": "target.complex-financial-ask-contract",
+      "group": "target",
+      "target": "corpus",
+      "description": "Multi-hop direct financial asks have an executable answer contract rather than a free-form memo.",
+      "includes": [
+        "complex-financial-ask.md",
+        "Complex Financial Ask Contract",
+        "Required Pre-Answer Gate",
+        "Decomposition: the question split into data hops",
+        "Data path: which Data Skills, feeds, BYOD sources, or search modules each hop will use",
+        "Coverage result: fetched, unavailable, stale, gated, or unresolved",
+        "Evidence Table",
+        "Source Coverage Checklist",
+        "Company-specific KPIs need special care",
+        "Thesis / counter-thesis",
+        "Base / bull / bear",
+        "Confidence and caveats",
+        "Every decision-useful figure or judgment needs a nearby attribution handle",
+        "company-specific KPI Coverage"
+      ]
+    },
+    {
       "id": "target.pitfalls-stepwise-required",
       "group": "target",
       "target": "corpus",
