@@ -23,7 +23,7 @@ Decision order:
 
 | Request type | Objective |
 | --- | --- |
-| Financial Analysis / Ask Question | Answer market, asset, portfolio, valuation, comparison, and "why" questions with fresh data/search/`alva run` evidence. Comparison baselines are figures too: fetch or qualify them. Multi-hop asks must pass the ask evidence gate. |
+| Financial Analysis / Ask Question | Answer market, asset, portfolio, valuation, comparison, and "why" questions with fresh data/search/`alva run` evidence. Comparison baselines are figures too: fetch or qualify them. Every answer must pass the ask evidence gate. |
 | Playbook Creation | Build, remix, edit, release, or update a hosted/shareable playbook. Read [playbook-creation.md](playbook-creation.md) for the subroute tree and gates. |
 | Strategy / Trading Analysis | Use Altra for backtests, signals, portfolio simulation, rebalancing, or trading analysis; deliver an answer, feed, signal, or playbook as requested. |
 | Automation / Push | Build or modify a feed that emits actionable `signal/targets` or `notify/message`, then verify subscription and delivery path. |
@@ -62,11 +62,10 @@ for one.
 ## Guided Planning
 
 For Financial Analysis / Ask Question, usually answer directly after fetching
-or computing evidence. When the question needs several sources, peer or
-scenario work, valuation, ranking, or company-specific KPIs, first apply the
-ask evidence gate from `SKILL.md`: decomposition, source path, coverage gaps,
-and sourced-vs-inference boundary. For build routes, present a plan once before
-building.
+or computing evidence, but first apply the ask evidence gate from `SKILL.md`:
+decomposition, source path, coverage gaps, and sourced-vs-inference boundary.
+Simple asks can satisfy the gate with one hop. For build routes, present a plan
+once before building.
 
 Exactly one blocking question per session:
 
@@ -104,8 +103,8 @@ be honored while recording the disabled state or platform blocker.
 Before finishing, verify the delivered result matches the user's actual goal.
 For Financial Analysis, this means sourced figures, sourced or qualified
 comparison baselines, clear uncertainty when data is missing, and the ask
-evidence gate for multi-hop direct answers. When a shareable playbook was part
-of the task, this normally means a released playbook and a canonical share URL:
+evidence gate for direct answers. When a shareable playbook was part of the
+task, this normally means a released playbook and a canonical share URL:
 
 `https://alva.ai/u/<username>/playbooks/<playbook_name>`
 

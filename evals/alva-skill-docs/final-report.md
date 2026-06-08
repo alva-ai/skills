@@ -6,7 +6,7 @@ SKILL.md lines: 766
 
 Cases: 29/29
 
-Checks: 209/209 (100.00%)
+Checks: 210/210 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -277,7 +277,7 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-7/7 cases, 73/73 checks
+7/7 cases, 74/74 checks
 
 ### PASS target.top-level-size
 
@@ -337,14 +337,15 @@ Ask-question work is grouped as financial analysis instead of a low-level Data Q
 
 ### PASS target.ask-evidence-gate
 
-Multi-hop direct financial asks have compact evidence gates instead of a free-form memo contract.
+Direct financial asks have compact evidence gates instead of a free-form memo contract.
 
 - [x] ask evidence gate
-- [x] multi-hop valuation, thesis, ranking, scenario, or company-specific KPI asks
+- [x] do not answer a financial-analysis ask until you can name
 - [x] decomposition
 - [x] data/source path for each hop
 - [x] fetched vs missing coverage
 - [x] sourced facts, computed values, or inference
+- [x] For a simple ask, this can be one hop
 - [x] required KPI or baseline is missing
 - [x] disclose the gap instead of filling it from memory or snippets
 

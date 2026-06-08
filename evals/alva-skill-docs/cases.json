@@ -385,14 +385,15 @@
       "id": "target.ask-evidence-gate",
       "group": "target",
       "target": "corpus",
-      "description": "Multi-hop direct financial asks have compact evidence gates instead of a free-form memo contract.",
+      "description": "Direct financial asks have compact evidence gates instead of a free-form memo contract.",
       "includes": [
         "ask evidence gate",
-        "multi-hop valuation, thesis, ranking, scenario, or company-specific KPI asks",
+        "do not answer a financial-analysis ask until you can name",
         "decomposition",
         "data/source path for each hop",
         "fetched vs missing coverage",
         "sourced facts, computed values, or inference",
+        "For a simple ask, this can be one hop",
         "required KPI or baseline is missing",
         "disclose the gap instead of filling it from memory or snippets"
       ]

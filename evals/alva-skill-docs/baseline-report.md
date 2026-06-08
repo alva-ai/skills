@@ -6,7 +6,7 @@ SKILL.md lines: 758
 
 Cases: 28/29
 
-Checks: 201/209 (96.17%)
+Checks: 201/210 (95.71%)
 
 ## Scoring Diagnosis
 
@@ -15,7 +15,7 @@ Classify the gap before editing: missing capability summary, missing routing poi
 Do not expose eval scores as product copy, and do not patch demos to hide a weak result.
 Instead, fix the canonical skill text or eval case, then rerun baseline and final reports so the regression mechanism proves the gap is closed.
 
-- target.ask-evidence-gate: inspect for a skill gap before editing. Missing checks: ask evidence gate; multi-hop valuation, thesis, ranking, scenario, or company-specific KPI asks; decomposition; data/source path for each hop; fetched vs missing coverage; sourced facts, computed values, or inference; required KPI or baseline is missing; disclose the gap instead of filling it from memory or snippets
+- target.ask-evidence-gate: inspect for a skill gap before editing. Missing checks: ask evidence gate; do not answer a financial-analysis ask until you can name; decomposition; data/source path for each hop; fetched vs missing coverage; sourced facts, computed values, or inference; For a simple ask, this can be one hop; required KPI or baseline is missing; disclose the gap instead of filling it from memory or snippets
 
 ## retained
 
@@ -277,7 +277,7 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-6/7 cases, 65/73 checks
+6/7 cases, 65/74 checks
 
 ### PASS target.top-level-size
 
@@ -337,14 +337,15 @@ Ask-question work is grouped as financial analysis instead of a low-level Data Q
 
 ### FAIL target.ask-evidence-gate
 
-Multi-hop direct financial asks have compact evidence gates instead of a free-form memo contract.
+Direct financial asks have compact evidence gates instead of a free-form memo contract.
 
 - [ ] ask evidence gate
-- [ ] multi-hop valuation, thesis, ranking, scenario, or company-specific KPI asks
+- [ ] do not answer a financial-analysis ask until you can name
 - [ ] decomposition
 - [ ] data/source path for each hop
 - [ ] fetched vs missing coverage
 - [ ] sourced facts, computed values, or inference
+- [ ] For a simple ask, this can be one hop
 - [ ] required KPI or baseline is missing
 - [ ] disclose the gap instead of filling it from memory or snippets
 
