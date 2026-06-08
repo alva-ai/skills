@@ -2,11 +2,11 @@
 
 Source: `origin/main`
 
-SKILL.md lines: 758
+SKILL.md lines: 757
 
-Cases: 28/29
+Cases: 27/28
 
-Checks: 201/210 (95.71%)
+Checks: 196/201 (97.51%)
 
 ## Scoring Diagnosis
 
@@ -15,11 +15,11 @@ Classify the gap before editing: missing capability summary, missing routing poi
 Do not expose eval scores as product copy, and do not patch demos to hide a weak result.
 Instead, fix the canonical skill text or eval case, then rerun baseline and final reports so the regression mechanism proves the gap is closed.
 
-- target.ask-evidence-gate: inspect for a skill gap before editing. Missing checks: ask evidence gate; do not answer a financial-analysis ask until you can name; decomposition; data/source path for each hop; fetched vs missing coverage; sourced facts, computed values, or inference; For a simple ask, this can be one hop; required KPI or baseline is missing; disclose the gap instead of filling it from memory or snippets
+- retained.udf-functions-cli: inspect for a skill gap before editing. Missing checks: alva functions --help; alva functions register; alva functions invoke; alva functions allowance create; Do not hand-roll REST, GraphQL, or curl
 
 ## retained
 
-17/17 cases, 97/97 checks
+16/17 cases, 92/97 checks
 
 ### PASS retained.platform-panorama
 
@@ -153,15 +153,15 @@ UDFs stay strict opt-in and routed to the PBSV/browser runtime reference.
 - [x] PBSV
 - [x] allowance consent
 
-### PASS retained.udf-functions-cli
+### FAIL retained.udf-functions-cli
 
 Creator-side UDF setup and allowance management route through the functions CLI instead of manual service requests.
 
-- [x] alva functions --help
-- [x] alva functions register
-- [x] alva functions invoke
-- [x] alva functions allowance create
-- [x] Do not hand-roll REST, GraphQL, or curl
+- [ ] alva functions --help
+- [ ] alva functions register
+- [ ] alva functions invoke
+- [ ] alva functions allowance create
+- [ ] Do not hand-roll REST, GraphQL, or curl
 
 ### PASS retained.altra
 
@@ -277,14 +277,14 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-6/7 cases, 65/74 checks
+6/6 cases, 65/65 checks
 
 ### PASS target.top-level-size
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 758)
-- [x] line count <= 850 (actual 758)
+- [x] line count >= 650 (actual 757)
+- [x] line count <= 850 (actual 757)
 
 ### PASS target.playbook-task-offload
 
@@ -334,20 +334,6 @@ Ask-question work is grouped as financial analysis instead of a low-level Data Q
 - [x] peer multiple
 - [x] Do not let playbook creation become the default
 - [x] Do not turn every Skillhub task into a playbook
-
-### FAIL target.ask-evidence-gate
-
-Direct financial asks have compact evidence gates instead of a free-form memo contract.
-
-- [ ] ask evidence gate
-- [ ] do not answer a financial-analysis ask until you can name
-- [ ] decomposition
-- [ ] data/source path for each hop
-- [ ] fetched vs missing coverage
-- [ ] sourced facts, computed values, or inference
-- [ ] For a simple ask, this can be one hop
-- [ ] required KPI or baseline is missing
-- [ ] disclose the gap instead of filling it from memory or snippets
 
 ### PASS target.pitfalls-stepwise-required
 

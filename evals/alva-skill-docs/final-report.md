@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/complex-ask-contract/skills/alva`
+Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/udf-functions-cli-skill/skills/alva`
 
-SKILL.md lines: 766
+SKILL.md lines: 758
 
-Cases: 29/29
+Cases: 28/28
 
-Checks: 210/210 (100.00%)
+Checks: 201/201 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -277,14 +277,14 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-7/7 cases, 74/74 checks
+6/6 cases, 65/65 checks
 
 ### PASS target.top-level-size
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 766)
-- [x] line count <= 850 (actual 766)
+- [x] line count >= 650 (actual 758)
+- [x] line count <= 850 (actual 758)
 
 ### PASS target.playbook-task-offload
 
@@ -334,20 +334,6 @@ Ask-question work is grouped as financial analysis instead of a low-level Data Q
 - [x] peer multiple
 - [x] Do not let playbook creation become the default
 - [x] Do not turn every Skillhub task into a playbook
-
-### PASS target.ask-evidence-gate
-
-Direct financial asks have compact evidence gates instead of a free-form memo contract.
-
-- [x] ask evidence gate
-- [x] do not answer a financial-analysis ask until you can name
-- [x] decomposition
-- [x] data/source path for each hop
-- [x] fetched vs missing coverage
-- [x] sourced facts, computed values, or inference
-- [x] For a simple ask, this can be one hop
-- [x] required KPI or baseline is missing
-- [x] disclose the gap instead of filling it from memory or snippets
 
 ### PASS target.pitfalls-stepwise-required
 
