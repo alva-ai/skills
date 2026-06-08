@@ -40,7 +40,7 @@ good unless you actually rendered or screenshotted it. Copy `published_url`,
 - WebSearch / WebFetch values must not be quoted as financial answers or
   embedded as data. Search can find docs, requirements, or BYOD endpoints, but
   discovered values must flow through a legitimate data source.
-- LLM / ADK output must not be presented as factual sourced data. ADK can
+- LLM / alpi output must not be presented as factual sourced data. alpi can
   classify, summarize, and reason over real data; if it produces quantitative
   output, label it as AI-generated analysis.
 - Agent training knowledge must not fill data gaps.

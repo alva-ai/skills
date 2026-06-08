@@ -2,11 +2,11 @@
 
 Source: `origin/main`
 
-SKILL.md lines: 757
+SKILL.md lines: 766
 
-Cases: 27/28
+Cases: 27/29
 
-Checks: 196/201 (97.51%)
+Checks: 207/211 (98.10%)
 
 ## Scoring Diagnosis
 
@@ -15,11 +15,12 @@ Classify the gap before editing: missing capability summary, missing routing poi
 Do not expose eval scores as product copy, and do not patch demos to hide a weak result.
 Instead, fix the canonical skill text or eval case, then rerun baseline and final reports so the regression mechanism proves the gap is closed.
 
-- retained.udf-functions-cli: inspect for a skill gap before editing. Missing checks: alva functions --help; alva functions register; alva functions invoke; alva functions allowance create; Do not hand-roll REST, GraphQL, or curl
+- retained.content-legitimacy: inspect for a skill gap before editing. Missing checks: LLM / alpi output
+- retained.alpi: inspect for a skill gap before editing. Missing checks: @alva/pi; fixed LLM reasoning/tool loop; Agent.ask()
 
 ## retained
 
-16/17 cases, 92/97 checks
+15/17 cases, 94/98 checks
 
 ### PASS retained.platform-panorama
 
@@ -63,14 +64,14 @@ Skillhub blueprint retrieval remains mandatory and fresh when directed.
 - [x] Do not bulk-download
 - [x] --skill-id
 
-### PASS retained.content-legitimacy
+### FAIL retained.content-legitimacy
 
 The core data provenance and anti-fabrication rules remain intact.
 
 - [x] build the pipeline
 - [x] not to **be
 - [x] WebSearch
-- [x] LLM / ADK output
+- [ ] LLM / alpi output
 - [x] user-pasted snapshots
 - [x] Never hardcode data as inline JavaScript literals
 - [x] Feed Scope Isolation
@@ -153,15 +154,15 @@ UDFs stay strict opt-in and routed to the PBSV/browser runtime reference.
 - [x] PBSV
 - [x] allowance consent
 
-### FAIL retained.udf-functions-cli
+### PASS retained.udf-functions-cli
 
 Creator-side UDF setup and allowance management route through the functions CLI instead of manual service requests.
 
-- [ ] alva functions --help
-- [ ] alva functions register
-- [ ] alva functions invoke
-- [ ] alva functions allowance create
-- [ ] Do not hand-roll REST, GraphQL, or curl
+- [x] alva functions --help
+- [x] alva functions register
+- [x] alva functions invoke
+- [x] alva functions allowance create
+- [x] Do not hand-roll REST, GraphQL, or curl
 
 ### PASS retained.altra
 
@@ -173,12 +174,13 @@ Backtesting and signal feeds still require Altra and preserve common guardrails.
 - [x] Stock intraday window guardrail
 - [x] signal/targets
 
-### PASS retained.adk
+### FAIL retained.alpi
 
-ADK remains scheduled-pipeline reasoning, not a data source or one-off research wrapper.
+alpi remains scheduled-pipeline reasoning, not a data source or one-off research wrapper.
 
-- [x] @alva/adk
-- [x] fixed LLM reasoning step
+- [ ] @alva/pi
+- [ ] fixed LLM reasoning/tool loop
+- [ ] Agent.ask()
 - [x] Do **not** use it for one-off research
 - [x] not use it to produce numbers
 
@@ -277,14 +279,14 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-6/6 cases, 65/65 checks
+7/7 cases, 74/74 checks
 
 ### PASS target.top-level-size
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 757)
-- [x] line count <= 850 (actual 757)
+- [x] line count >= 650 (actual 766)
+- [x] line count <= 850 (actual 766)
 
 ### PASS target.playbook-task-offload
 
@@ -334,6 +336,20 @@ Ask-question work is grouped as financial analysis instead of a low-level Data Q
 - [x] peer multiple
 - [x] Do not let playbook creation become the default
 - [x] Do not turn every Skillhub task into a playbook
+
+### PASS target.ask-evidence-gate
+
+Direct financial asks have compact evidence gates instead of a free-form memo contract.
+
+- [x] ask evidence gate
+- [x] do not answer a financial-analysis ask until you can name
+- [x] decomposition
+- [x] data/source path for each hop
+- [x] fetched vs missing coverage
+- [x] sourced facts, computed values, or inference
+- [x] For a simple ask, this can be one hop
+- [x] required KPI or baseline is missing
+- [x] disclose the gap instead of filling it from memory or snippets
 
 ### PASS target.pitfalls-stepwise-required
 

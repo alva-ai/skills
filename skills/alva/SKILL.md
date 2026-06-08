@@ -39,12 +39,12 @@ The main objects are:
 | Concept | Meaning | Read when |
 | --- | --- | --- |
 | Data Skills | 250+ structured Arrays endpoints for equities, crypto, macro, on-chain, news, prediction markets, and indexed Twitter/X. | You need factual financial data. |
-| Runtime script | JavaScript executed inside Alva's V8/jagent runtime through `alva run` or cronjobs. | You need computation, HTTP, ALFS, secrets, ADK, ONNX, or Feed SDK. |
+| Runtime script | JavaScript executed inside Alva's V8/jagent runtime through `alva run` or cronjobs. | You need computation, HTTP, ALFS, secrets, alpi, ONNX, or Feed SDK. |
 | Feed | A persistent data pipeline that writes time-series or grouped outputs to ALFS and can back playbooks or alerts. | Data needs freshness, history, public reads, charts, release, or push. |
 | Playbook | A hosted investing app at `https://alva.ai/u/<username>/playbooks/<name>`. | The user wants a shareable dashboard, screener, thesis, what-if, or strategy surface. |
 | Skillhub blueprint | A catalog methodology addressed by `/use-skill:<username>/<name>`. | The user explicitly asks for one or a task matches an official template family. |
 | Altra | The Feed SDK trading engine for event-driven backtesting and signal feeds. | Any strategy, simulation, signal target, portfolio, order, equity curve, or rebalancing logic. |
-| ADK | A fixed LLM reasoning step inside a deterministic scheduled pipeline. | A feed needs classification, synthesis, TLDR, or why-it-matters over real upstream data. |
+| alpi | A fixed LLM reasoning/tool loop inside a deterministic scheduled pipeline. | A feed needs classification, synthesis, TLDR, why-it-matters, or result-only tool use over real upstream data. |
 | BYOD | User-supplied or validated external data source wired into runtime code. | Alva coverage is insufficient after verification. |
 
 Alva work usually flows from user intent to data discovery, then runtime/feed
@@ -56,7 +56,7 @@ The stack is layered:
 
 1. **Discovery layer**: Data Skills, runtime SDK docs, Skillhub blueprints, and
    public playbook discovery tell the agent what exists now.
-2. **Computation layer**: jagent runtime scripts, `net/http`, secrets, ADK,
+2. **Computation layer**: jagent runtime scripts, `net/http`, secrets, alpi,
    ONNX, and Altra transform source data into repeatable outputs.
 3. **Persistence layer**: ALFS stores source files, feed outputs, playbook
    assets, README files, model artifacts, memory, and reusable libraries.
@@ -172,7 +172,7 @@ words are **automation**, **playbook**, **alert/notification**, **Agent**, and
 data, API fields, release references, or an Automation detail that exposes it.
 
 Use [narrative-voice.md](references/narrative-voice.md) before writing
-playbook copy, README prose, visible HTML text, ADK prompts, digests, or
+playbook copy, README prose, visible HTML text, alpi prompts, digests, or
 release descriptions. It bans AI-tell tokens and unsupported narrative shapes.
 
 Use [creators-note.md](references/creators-note.md) when composing a pinned
@@ -221,9 +221,10 @@ distribution surface. A beautiful playbook with stale or unreleased feeds is
 not complete. A good feed with no user-facing surface may be enough for an
 internal automation or direct data product.
 
-**ADK vs data.** ADK can turn real upstream data into narrative and categories,
-but it cannot invent financial facts. Its output belongs in clearly labeled AI
-analysis or narrative fields, not factual columns posing as sourced data.
+**alpi vs data.** alpi can turn real upstream data into narrative and
+categories, but it cannot invent financial facts. Its output belongs in clearly
+labeled AI analysis or narrative fields, not factual columns posing as sourced
+data.
 
 **UDF vs ordinary interaction.** UDFs are for user-registered functions other
 viewers can invoke. Tabs, filters, chart controls, and feed-backed refresh do
@@ -312,7 +313,7 @@ code. Common modules:
 | statistics / indicators | `@alva/algorithm` or runtime `alva sdk` modules |
 | persistent feed output | `@alva/feed`; [feed-sdk.md](references/feed-sdk.md) |
 | trading engine | `FeedAltra`; [altra-trading.md](references/altra-trading.md) |
-| scheduled LLM reasoning | `@alva/adk`; [adk.md](references/adk.md) |
+| scheduled LLM reasoning | `@alva/pi`; [alpi.md](references/alpi.md) |
 | ONNX model inference | `@alva/onnx`; [onnx.md](references/onnx.md) |
 | runtime tests | `@test/suite` |
 
@@ -435,15 +436,16 @@ Stock intraday window guardrail: do not directly request multi-year US stock
 intraday backtests as one full window. Narrow the window, use daily/weekly
 bars, or choose a provider path that explicitly chunks requests.
 
-#### Reasoning Layer: ADK
+#### Reasoning Layer: alpi
 
-ADK embeds a fixed LLM reasoning step inside a deterministic scheduled
-pipeline. Use it for classification, summarization, TLDRs, why-it-matters,
-and tool-loop reasoning over real upstream data.
+alpi embeds a fixed LLM reasoning/tool loop inside a deterministic scheduled
+pipeline. Use `@alva/pi` `Agent.ask()` for result-only classification,
+summarization, TLDRs, why-it-matters, and tool-loop reasoning over real
+upstream data.
 
 Do **not** use it for one-off research the user asks interactively, and do
 not use it to produce numbers or events that should come from real data. Read
-[adk.md](references/adk.md) for API, tool calling, memory patterns, and
+[alpi.md](references/alpi.md) for API, tool calling, memory patterns, and
 jagent-specific constraints.
 
 #### Model Layer: ONNX
@@ -562,7 +564,7 @@ financial values. The quick checks:
 - If `alva release playbook --feeds '[]'` is used, the HTML must render zero
   quantitative values.
 - WebSearch can discover docs or BYOD endpoints; it cannot become the data.
-- LLM/ADK output can synthesize real upstream data; it cannot invent facts,
+- LLM/alpi output can synthesize real upstream data; it cannot invent facts,
   figures, events, or sourced-looking reports.
 - More than 20% failed symbol lookups is a data-quality blocker, not a prompt
   to fabricate or mark rows `live: false`.
@@ -605,9 +607,9 @@ release, screenshot, and optional push. Details live in
 
 ### Thesis, Digest, And Monitoring
 
-A thesis tracker combines structured metrics, content search, and ADK narrative
+A thesis tracker combines structured metrics, content search, and alpi narrative
 over real upstream data. It may be a direct answer, a scheduled feed, an alert,
-or a playbook depending on the requested artifact. Keep the ADK prompt fixed,
+or a playbook depending on the requested artifact. Keep the alpi prompt fixed,
 keep source records separate from AI analysis, and make push lines match actual
 thesis deltas. If the user gives `/use-skill:alva/thesis` or another blueprint,
 fetch it fresh and let its method drive the build.
@@ -697,14 +699,14 @@ Use this index to open only the file needed for the current task.
 | [jagent-runtime.md](references/jagent-runtime.md) | V8 runtime, modules, async model, constraints, built-ins. |
 | [feed-sdk.md](references/feed-sdk.md) | Feed SDK API, schemas, time series, grouped records, upstreams, examples. |
 | [altra-trading.md](references/altra-trading.md) | Altra strategy engine, features, signals, tests, PIT compliance. |
-| [adk.md](references/adk.md) | Scheduled LLM pipeline API and examples. |
+| [alpi.md](references/alpi.md) | Scheduled LLM reasoning/tool-loop API and examples. |
 | [onnx.md](references/onnx.md) | ONNX artifact, inference, FeedAltra integration, release checks. |
 | [deployment.md](references/deployment.md) | Cronjob create/list/pause/resume/trigger/runs/run-logs. |
 | [search.md](references/search.md) | `unified_search`, finance search, Twitter/X, Reddit, YouTube, web gotchas. |
 | [secret-manager.md](references/secret-manager.md) | Secret upload, naming, CRUD, runtime access, guardrails. |
 | [memory.md](references/memory.md) | Memory storage layout, write policy, user profile template. |
 | [language.md](references/language.md) | Canonical product vocabulary. |
-| [narrative-voice.md](references/narrative-voice.md) | Voice rules and ADK prose prompt block. |
+| [narrative-voice.md](references/narrative-voice.md) | Voice rules and alpi prose prompt block. |
 | [design.md](references/design.md) | Design entrypoint, canonical CSS link, tokens, layout. |
 | [design-widgets.md](references/design-widgets.md) | Widget and chart layouts. |
 | [design-components.md](references/design-components.md) | Component specs. |

@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/udf-functions-cli-skill/skills/alva`
+Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/replace-adk-with-alpi/skills/alva`
 
-SKILL.md lines: 758
+SKILL.md lines: 768
 
-Cases: 28/28
+Cases: 29/29
 
-Checks: 201/201 (100.00%)
+Checks: 211/211 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -19,7 +19,7 @@ No failed cases. Keep the eval in place as a regression mechanism.
 
 ## retained
 
-17/17 cases, 97/97 checks
+17/17 cases, 98/98 checks
 
 ### PASS retained.platform-panorama
 
@@ -70,7 +70,7 @@ The core data provenance and anti-fabrication rules remain intact.
 - [x] build the pipeline
 - [x] not to **be
 - [x] WebSearch
-- [x] LLM / ADK output
+- [x] LLM / alpi output
 - [x] user-pasted snapshots
 - [x] Never hardcode data as inline JavaScript literals
 - [x] Feed Scope Isolation
@@ -173,12 +173,13 @@ Backtesting and signal feeds still require Altra and preserve common guardrails.
 - [x] Stock intraday window guardrail
 - [x] signal/targets
 
-### PASS retained.adk
+### PASS retained.alpi
 
-ADK remains scheduled-pipeline reasoning, not a data source or one-off research wrapper.
+alpi remains scheduled-pipeline reasoning, not a data source or one-off research wrapper.
 
-- [x] @alva/adk
-- [x] fixed LLM reasoning step
+- [x] @alva/pi
+- [x] fixed LLM reasoning/tool loop
+- [x] Agent.ask()
 - [x] Do **not** use it for one-off research
 - [x] not use it to produce numbers
 
@@ -277,14 +278,14 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-6/6 cases, 65/65 checks
+7/7 cases, 74/74 checks
 
 ### PASS target.top-level-size
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 758)
-- [x] line count <= 850 (actual 758)
+- [x] line count >= 650 (actual 768)
+- [x] line count <= 850 (actual 768)
 
 ### PASS target.playbook-task-offload
 
@@ -334,6 +335,20 @@ Ask-question work is grouped as financial analysis instead of a low-level Data Q
 - [x] peer multiple
 - [x] Do not let playbook creation become the default
 - [x] Do not turn every Skillhub task into a playbook
+
+### PASS target.ask-evidence-gate
+
+Direct financial asks have compact evidence gates instead of a free-form memo contract.
+
+- [x] ask evidence gate
+- [x] do not answer a financial-analysis ask until you can name
+- [x] decomposition
+- [x] data/source path for each hop
+- [x] fetched vs missing coverage
+- [x] sourced facts, computed values, or inference
+- [x] For a simple ask, this can be one hop
+- [x] required KPI or baseline is missing
+- [x] disclose the gap instead of filling it from memory or snippets
 
 ### PASS target.pitfalls-stepwise-required
 

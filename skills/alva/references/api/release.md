@@ -134,7 +134,7 @@ sections.
 
 #### Conditional — Thesis shape
 
-- **How this playbook works** — quant + ADK pipelines, post-processing
+- **How this playbook works** — quant + alpi pipelines, post-processing
   matcher, exact list of inputs fed to the narrative agent.
 - **Thesis pillars** (multi-pillar only) — for each pillar: id, name,
   one-sentence claim, the daily signal that would verify or contradict it.

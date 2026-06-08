@@ -249,9 +249,10 @@ require a 500-character summary.
 
 ### Pattern E: AlvaAsk + Feed Notification (notify/message)
 
-**Preferred pattern for scheduled tasks.** Use `@alva/alvaask` instead of
-ADK for cronjob feeds — it's simpler (no sandbox/session management) and
-the `ask()` call handles tool use, web search, and ALFS access automatically.
+**Preferred pattern for scheduled tasks.** Use `@alva/alvaask` instead of a
+custom alpi loop for cronjob feeds when you need Alva's full agent behavior —
+it's simpler (no sandbox/session management) and the `ask()` call handles tool
+use, web search, and ALFS access automatically.
 
 For feeds that use `@alva/alvaask` to call Alva's agent and publish the result
 as a feed completion notification. Common use cases: scheduled market reports,

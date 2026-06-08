@@ -66,7 +66,7 @@
         "build the pipeline",
         "not to **be",
         "WebSearch",
-        "LLM / ADK output",
+        "LLM / alpi output",
         "user-pasted snapshots",
         "Never hardcode data as inline JavaScript literals",
         "Feed Scope Isolation",
@@ -198,13 +198,14 @@
       ]
     },
     {
-      "id": "retained.adk",
+      "id": "retained.alpi",
       "group": "retained",
       "target": "corpus",
-      "description": "ADK remains scheduled-pipeline reasoning, not a data source or one-off research wrapper.",
+      "description": "alpi remains scheduled-pipeline reasoning, not a data source or one-off research wrapper.",
       "includes": [
-        "@alva/adk",
-        "fixed LLM reasoning step",
+        "@alva/pi",
+        "fixed LLM reasoning/tool loop",
+        "Agent.ask()",
         "Do **not** use it for one-off research",
         "not use it to produce numbers"
       ]
