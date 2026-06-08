@@ -1,8 +1,14 @@
 # Playbook Creation
 
 This is the concrete task guide for building, drafting, releasing, verifying,
-and updating Alva playbooks. Read it for Dashboard / Playbook, strategy UI,
-release, version update, and playbook edit tasks.
+and updating Alva playbooks. Read it for hosted app/share URL, screener app,
+report surface, strategy UI, remix, annotation edit, release, version update,
+and playbook subscription tasks.
+
+The playbook tree has subroutes: new build, Skillhub-guided build, remix,
+annotation/edit, release/version update, and push after release. Use this guide
+only after routing confirms the user wants a hosted or shareable playbook
+surface; ordinary financial-analysis questions should answer directly.
 
 ## Build Order
 

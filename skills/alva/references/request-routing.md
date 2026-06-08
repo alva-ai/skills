@@ -1,24 +1,36 @@
 # Request Routing
 
 Use this file when choosing the path for an Alva task. The goal is to select the
-smallest useful route, ask at most one blocking question, and then build or
-answer with evidence.
+smallest useful route, ask at most one blocking question, and then answer or
+build with evidence. Do not let playbook creation become the default: only enter
+that tree when the user wants a hosted/shareable surface, remix, release, or
+playbook edit.
+
+Decision order:
+
+1. If the user wants an explanation, comparison, valuation, rank, or current
+   market fact in chat, route to Financial Analysis / Ask Question.
+2. If the user wants persistence, cadence, alerting, trading signals, or a
+   reusable dataset, route to the durable artifact that fits, not automatically
+   to a playbook.
+3. If the user wants a hosted app, share URL, remix, annotation edit, release,
+   or playbook version update, enter the Playbook Creation tree.
 
 ## Routes
 
 | Request type | Objective |
 | --- | --- |
-| Dashboard / Playbook | Identify data sources, validate data flow, then produce a usable dashboard or playbook when the user wants a shareable artifact. |
-| Backtest / Strategy | Use Altra, run the backtest correctly, and package the result as a visual playbook, dashboard, or concise summary. |
-| Data Query | Fetch the requested data accurately and answer directly unless the user asks for a richer artifact. |
-| Remix | Read the source artifact, apply the requested customization, and produce a new result under the requesting user. |
-| Push / Alert | Build or modify a feed that emits actionable `signal/targets` or `notify/message`, then verify subscription and delivery path. |
+| Financial Analysis / Ask Question | Answer market, asset, portfolio, valuation, comparison, and "why" questions with fresh data/search evidence. Comparison baselines are figures too: fetch or qualify them. |
+| Playbook Creation | Build, remix, edit, release, or update a hosted/shareable playbook. Read [playbook-creation.md](playbook-creation.md) for the subroute tree and gates. |
+| Strategy / Trading Analysis | Use Altra for backtests, signals, portfolio simulation, rebalancing, or trading analysis; deliver an answer, feed, signal, or playbook as requested. |
+| Automation / Push | Build or modify a feed that emits actionable `signal/targets` or `notify/message`, then verify subscription and delivery path. |
 | Debug / Edit | Inspect existing code, logs, playbook source, feed output, or annotations, then change the generator rather than rendered values. |
+| Capability Verification | Verify Data Skills, Skillhub, runtime, trading, or search coverage before saying Alva lacks a capability. |
 
 ## Skillhub Blueprint
 
 If the user's message contains `/use-skill:<username>/<name>`, the Skillhub path
-is mandatory before Guided Planning or build work.
+is mandatory before analysis, Guided Planning, or build work.
 
 Describe Skillhub to users as a catalog of methodologies. Keep gateway/file
 listing details internal unless the user is debugging blueprint retrieval.
@@ -39,12 +51,16 @@ listing details internal unless the user is debugging blueprint retrieval.
    `--skill-id <username>/<name>` during playbook draft. See
    [api/release.md](api/release.md#skill-id).
 
-The directive plus a concrete topic is a strong build directive: present one
-short plan, then build. Do not stack extra clarification questions on top.
+The directive plus a concrete topic is a strong method directive: fetch the
+blueprint, then answer or build according to the user's requested artifact. Do
+not turn every Skillhub task into a playbook unless the blueprint or user asks
+for one.
 
 ## Guided Planning
 
-For all routes except simple Data Query, present a plan once before building.
+For Financial Analysis / Ask Question, usually answer directly after fetching
+evidence; use a plan only when the question needs several sources or a
+nontrivial method. For build routes, present a plan once before building.
 
 Exactly one blocking question per session:
 
@@ -53,7 +69,8 @@ Exactly one blocking question per session:
 2. If real strategic alternatives exist, offer 2-3 approaches and lead with
    your recommendation.
 3. If the request is clear, or a `/use-skill:` directive pins the shape, give a
-   5-8 line plan naming feeds, data sources, widgets, release path, and any
+   5-8 line plan naming the intended artifact. For analysis, name sources and
+   comparison baselines. For playbooks, name feeds, widgets, release path, and
    defaults.
 
 If the user says "just do it", skip further clarifying questions for the rest
@@ -79,7 +96,9 @@ be honored while recording the disabled state or platform blocker.
 ## Completion Gate
 
 Before finishing, verify the delivered result matches the user's actual goal.
-When a shareable playbook was part of the task, this normally means a released
+For Financial Analysis, this means sourced figures, sourced or qualified
+comparison baselines, and clear uncertainty when data is missing. When a
+shareable playbook was part of the task, this normally means a released
 playbook and a canonical share URL:
 
 `https://alva.ai/u/<username>/playbooks/<playbook_name>`

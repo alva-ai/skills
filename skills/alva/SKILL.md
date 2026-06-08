@@ -91,10 +91,11 @@ Think in artifacts:
   push notifications.
 - **Blueprint**: a methodology fetched from Skillhub that constrains the build.
 
-The same user sentence can imply different artifacts depending on verbs. "Tell
-me" usually means Answer. "Track", "monitor", "notify", "dashboard", "publish",
-"share", "backtest", "screen", "remix", and `/use-skill:` usually mean a
-larger artifact route.
+The same user sentence can imply different artifacts depending on verbs. "Ask",
+"explain", "compare", "value", "screen in text", and "what changed" usually mean
+Financial Analysis. "Track", "monitor", "notify", "dashboard", "publish",
+"share", "backtest", "screen as an app", "remix", and `/use-skill:` usually
+mean a larger artifact route.
 
 ## Capability Help
 
@@ -147,11 +148,11 @@ make it this one.
    and checklists live in the linked reference.
 
 Two consequences are worth making explicit. First, a useful Alva answer can be
-small: a direct data query should not become a playbook unless the user asks
-for a durable surface. Second, a useful Alva build can be large: once the user
-does ask for a playbook, the job is not done at "HTML exists"; it is done when
-data provenance, release metadata, README, lint, screenshot, and share URL all
-match the user's goal.
+small: a financial-analysis question should not become a playbook unless the
+user asks for a durable surface. Second, a useful Alva build can be large: once
+the user does ask for a playbook, the job is not done at "HTML exists"; it is
+done when data provenance, release metadata, README, lint, screenshot, and
+share URL all match the user's goal.
 
 ## Session Start
 
@@ -180,7 +181,7 @@ post-release author note.
 ## Request Routing
 
 Open [request-routing.md](references/request-routing.md) whenever the task is
-not a simple direct data query. It owns route selection, Skillhub, Guided
+not an obvious single-fetch answer. It owns route selection, Skillhub, Guided
 Planning, capability verification, and completion gates.
 
 Open [operational-pitfalls.md](references/operational-pitfalls.md) step by
@@ -190,13 +191,13 @@ but treat that section as mandatory, not optional debugging material.
 
 | User asks for | Route | Must not miss |
 | --- | --- | --- |
-| "price of BTC", "P/E of NVDA", "show holdings", a direct dataset answer | Data Query | Fetch fresh data through Data Skills / BYOD; do not answer from memory. |
-| dashboard, screener, thesis tracker, hosted app, shareable report | Dashboard / Playbook | Use live feeds for values and read [playbook-creation.md](references/playbook-creation.md). |
-| backtest, strategy, signal, rebalance, portfolio simulation | Backtest / Strategy | Use Altra and usually package the result in a visual artifact. |
-| `/use-skill:<username>/<name>` | Skillhub Blueprint | Fetch the blueprint fresh before planning; if it informs a dashboard/playbook, continue through [playbook-creation.md](references/playbook-creation.md) before draft/release and set `--skill-id`. |
-| recurring digest, threshold tracker, alert, stream watch | Push / Alert | Build a push-capable feed and verify subscription plus sidecar output. |
-| `<remix ...>` or "remix this playbook" | Remix | Read the source playbook files; `alva remix` records lineage only. |
-| `<annotation ...>` or "change this element" | Annotation Edit | Edit the generator behind the element, not rendered feed values. |
+| price, valuation, holdings, "why did it move", compare peers, explain a thesis, rank in text | Financial Analysis / Ask Question | Fetch fresh data/search evidence; comparison baselines need provenance too. |
+| dashboard, screener app, thesis tracker, hosted report, shareable surface | Playbook Creation | Build live feeds first, then read [playbook-creation.md](references/playbook-creation.md). |
+| `/use-skill:<username>/<name>` or template-like research method | Skillhub Blueprint | Fetch blueprint fresh; if it becomes a playbook, route through [playbook-creation.md](references/playbook-creation.md) and set `--skill-id`. |
+| backtest, strategy, signal, rebalance, portfolio simulation | Strategy / Trading Analysis | Use Altra; package as answer, feed, or playbook only as the user goal requires. |
+| recurring digest, threshold tracker, alert, stream watch | Automation / Push | Build a push-capable feed and verify subscription plus sidecar output. |
+| `<remix ...>` or "remix this playbook" | Remix | Read source files; preserve lineage and source UDFs. |
+| `<annotation ...>` or "change this element" | Edit / Debug | Edit the generator behind the element, not rendered feed values. |
 | "does Alva have X?" | Capability Verification | Run `alva data-skills list | grep -i <topic>` before saying no. |
 
 ## Capability Boundaries
@@ -234,21 +235,46 @@ before non-dry-run execution, and [api/trading.md](references/api/trading.md).
 
 ## Capability Map
 
-### Data Skills
+The map is organized as two decision trees plus shared layers. **Financial
+Analysis / Ask Question** answers the user in chat using sourced data, search,
+and clear provenance. **Durable Artifacts** turn work into scripts, feeds,
+automations, playbooks, signals, or published surfaces. Data source modules are
+shared: analysis consumes them directly, while durable artifacts wire them
+through runtime and feeds. Choose the smallest tree that satisfies the verb.
 
-Data Skills are the primary route for structured financial facts: prices,
+### Financial Analysis / Ask Question Tree
+
+Financial analysis is the default for user questions about markets, assets,
+portfolios, valuation, catalysts, rankings, comparisons, and "why" narratives.
+It may be a single fresh data fetch, a sourced explanation, a peer comparison,
+a thesis check, or a concise table. It is not merely "Data Query": data fetch is
+one step inside an analysis answer.
+
+Common subroutes are latest fact, contextual explanation, comparison/valuation,
+ranking or screen-in-text, and thesis check. They all end as an answer unless
+the user asks to track, alert, share, publish, or turn the result into an app.
+
+Read [content-legitimacy.md](references/content-legitimacy.md) before surfacing
+financial values. Use [data-skills.md](references/data-skills.md) for
+structured facts and [search.md](references/search.md) for sourced context,
+global X/Grok, non-US finance, or off-catalog assets. If the user asks a direct
+question, answer directly with provenance; if they ask to track, alert, share,
+or publish, route to the durable artifact tree instead.
+
+Comparison baselines are financial facts. A historical average, peer multiple,
+macro yardstick, or benchmark return that supports a judgment must be fetched
+or clearly labeled as unsourced. Do not put sourced current data next to
+memory-derived baselines.
+
+#### Source Layer: Data Sources
+
+Data Skills are the primary source for structured financial facts: prices,
 klines, fundamentals, estimates, insider and senator trades, ownership, macro,
 on-chain metrics, exchange flows, prediction markets, news, and indexed
-Twitter/X.
-
-Read [data-skills.md](references/data-skills.md) before coding a data call. The
-mandatory discovery path is `list` -> `summary` -> `endpoint`. Use
-`Authorization: Bearer <ARRAYS_JWT>`, not `X-API-Key`. Do not use `X-API-Key`.
-For curated thematic or sector baskets, verify ticker fit with live
-company-detail data such as `getStockCompanyDetail`; do not trust memory.
-When a Data Skills endpoint is Pro-gated or subscription-gated, use the
-two-path fallback in [data-skills.md](references/data-skills.md) instead of an
-open-ended question or zero-output stop.
+Twitter/X. The mandatory discovery path is `list` -> `summary` -> `endpoint`.
+Use `Authorization: Bearer <ARRAYS_JWT>`, not `X-API-Key`. For curated thematic
+or sector baskets, verify ticker fit with live company-detail data such as
+`getStockCompanyDetail`; do not trust memory.
 
 Source routing:
 
@@ -264,7 +290,7 @@ Source routing:
 - Direct latest price for A-shares, HK stocks, and exchange-suffixed tickers:
   `searchPerplexityFinance` first.
 
-### Content Search
+#### Source Layer: Content Search And BYOD
 
 Content search enriches a real data pipeline; it does not replace one. Use it
 for market narratives, source discovery, global X/Grok queries, news, Reddit,
@@ -274,8 +300,6 @@ Open [search.md](references/search.md) for source-specific usage and gotchas,
 and [content-legitimacy.md](references/content-legitimacy.md) before presenting
 any sourced financial value.
 
-### BYOD
-
 BYOD is appropriate when the user supplies a source or Alva coverage cannot
 answer the task after capability verification. Wire the source into runtime
 code or feed logic; do not paste discovered values into HTML or direct answers.
@@ -283,10 +307,16 @@ Use [secret-manager.md](references/secret-manager.md) if credentials are
 needed.
 
 BYOD still has to behave like an Alva source: validate it, state freshness and
-blind spots, and route durable outputs through feeds. See
-[content-legitimacy.md](references/content-legitimacy.md) for source rules.
+blind spots, and route durable outputs through feeds.
 
-### Jagent Runtime
+### Durable Artifacts Tree
+
+Enter this tree when the user asks Alva to keep something running, reusable,
+shareable, inspectable, or actionable. The tree is not synonymous with
+playbooks: a script, feed, alert, signal, model output, or trading analysis may
+be the right artifact without a hosted UI.
+
+#### Runtime Layer: Jagent Runtime
 
 Alva runtime scripts execute JavaScript in a sandboxed V8 isolate through
 `alva run` or cronjobs. They cannot access local files, shell, Node builtins,
@@ -315,10 +345,12 @@ simulation when the blueprint requires Alva Cloud behavior. If a script throws
 retrying the same code. Before each write/run/debug step, read the matching
 section in [operational-pitfalls.md](references/operational-pitfalls.md).
 
-### Feed Lifecycle
+#### Data Product Layer: Feed Lifecycle And Automation
 
 Feeds persist data under ALFS and are the normal backing store for live
-playbooks, dashboards, signals, alerts, and reusable outputs.
+analysis products, playbooks, dashboards, signals, alerts, and reusable
+outputs. A feed is not automatically a playbook; it can also back an alert,
+digest, signal, reusable dataset, or future answer.
 
 Read [feed-lifecycle.md](references/feed-lifecycle.md) and
 [feed-sdk.md](references/feed-sdk.md) when creating or changing a feed. The
@@ -332,7 +364,7 @@ grant contract lives in the feed references. Read the matching
 [operational-pitfalls.md](references/operational-pitfalls.md) section before
 each feed, ALFS, deploy, and release step.
 
-### Playbook Creation
+#### Publication Layer: Playbook Creation Tree
 
 Playbooks are hosted investing apps. They can be dashboards, screeners,
 thesis trackers, backtest surfaces, what-if studies, event studies, or custom
@@ -362,7 +394,14 @@ the viewer's browser should be able to read where it came from, and screenshot
 verification must show real feed-backed marks, rows, or KPI values rather than
 a loaded page shell.
 
-### Altra
+Subroutes are new build, Skillhub-guided build, remix, annotation/edit,
+release/version update, and push after release. Keep those steps inside
+[playbook-creation.md](references/playbook-creation.md),
+[remix-workflow.md](references/remix-workflow.md), and
+[annotation-edits.md](references/annotation-edits.md); do not let every
+financial question inherit playbook gates.
+
+#### Strategy Layer: Altra
 
 Altra is the trading and backtesting engine. Always use Altra for backtesting.
 Use it for any strategy, simulation, portfolio logic, signal feed, equity
@@ -378,7 +417,7 @@ Stock intraday window guardrail: do not directly request multi-year US stock
 intraday backtests as one full window. Narrow the window, use daily/weekly
 bars, or choose a provider path that explicitly chunks requests.
 
-### ADK
+#### Reasoning Layer: ADK
 
 ADK embeds a fixed LLM reasoning step inside a deterministic scheduled
 pipeline. Use it for classification, summarization, TLDRs, why-it-matters,
@@ -389,14 +428,14 @@ not use it to produce numbers or events that should come from real data. Read
 [adk.md](references/adk.md) for API, tool calling, memory patterns, and
 jagent-specific constraints.
 
-### ONNX
+#### Model Layer: ONNX
 
 Use ONNX when the user supplies or plans to upload an exported `.onnx` model
 artifact. Read [onnx.md](references/onnx.md). Predictions must be computed from
 real data, written through feed outputs, and rendered from released/granted
 paths. Public playbooks should expose feed outputs, not raw model artifacts.
 
-### Design System
+#### Interface Layer: Design System
 
 The design system is a release gate, not decoration. Read
 [design.md](references/design.md) first for tokens, typography, theme, layout,
@@ -420,7 +459,7 @@ Runtime artifacts:
 Pages using ECharts must satisfy the contract rule requiring
 `requestAnimationFrame` around init/resize in hidden or resizable containers.
 
-### UDF Runtime
+#### Interface Layer: UDF Runtime
 
 User-Defined Functions let a playbook owner register shareable functions that
 viewers can invoke from the playbook UI. This is strict opt-in: only use it
@@ -432,7 +471,7 @@ authentication, creator registration, `window.alva.udf`, allowance consent,
 `UdfButton`, caller identity, `allow_charges=false` defaults, and release
 checks.
 
-### Push Notifications
+#### Action Layer: Push Notifications
 
 Push is a feed/playbook subscription flow. A feed may emit `signal/targets` or
 `notify/message`; both dispatch `feed_alert_ready`. `--push-notify` only marks
@@ -449,7 +488,7 @@ setup is not complete until the feed sidecar exists, the feed is released after
 that sidecar was added, the publisher has `--push-notify`, the user or group is
 subscribed, and a real run writes a fresh sidecar record.
 
-### Remix
+#### Playbook Subroute: Remix
 
 A remix request usually arrives as `<remix ...>`. Extract source owner/name from
 the tag URL, read the source feed scripts, HTML, README, and playbook metadata,
@@ -460,7 +499,7 @@ Open [remix-workflow.md](references/remix-workflow.md). `alva remix` records
 parent-child lineage only; use `alva fs read` to read playbook files. If the
 user asks to browse examples, use `alva playbooks trending` after help.
 
-### Annotation Edits
+#### Playbook Subroute: Annotation Edits
 
 Annotation edits target rendered playbook elements through `<annotation>`
 tags. Locate the generator behind the element, usually a render function or CSS
@@ -469,14 +508,14 @@ rule, and edit that. Never freeze rendered feed values into static text.
 Open [annotation-edits.md](references/annotation-edits.md). HTML edits re-enter
 `before-build-html`.
 
-### Memory
+#### Support Layer: Memory
 
 Alva memory is file-based and user-visible under `~/memory/`. Read
 [memory.md](references/memory.md) before writing it. Store durable preferences,
 identity facts, investment style, and useful context; never store secrets,
 raw API keys, or unverified claims as truth.
 
-### Secret Manager
+#### Support Layer: Secret Manager
 
 Use [secret-manager.md](references/secret-manager.md) whenever runtime code
 needs API keys, exchange credentials, webhook secrets, or other third-party
@@ -485,7 +524,7 @@ the user to paste sensitive third-party secrets into chat when web upload is
 feasible. Runtime access and CRUD details live in the reference; never log
 returned values.
 
-### Platform Feedback
+#### Support Layer: Platform Feedback
 
 When an Alva-owned API/runtime/data/docs/auth/product issue blocks or materially
 degrades the task, read [api/feedback.md](references/api/feedback.md), run
@@ -521,39 +560,45 @@ financial values. The quick checks:
 These sketches are the encyclopedia-level shape of the work. Open the named
 reference before doing the task.
 
-### Direct Market Question
+### Ask Question / Financial Analysis
 
 For "what is the latest price / P/E / funding rate / holdings / CPI print",
-start small. Run preflight if needed, verify the relevant Data Skills or
-search route, fetch fresh data, and answer with inline provenance. If the data
-source fails, report the failure instead of substituting a web snippet or model
-memory. If the user then asks to track it over time, upgrade the route to a
-feed or playbook.
+"why did it move", "is it cheap vs peers", or "rank these in text", start with
+financial analysis. Run preflight if needed, verify the relevant Data Skills or
+search route, fetch fresh data, fetch or qualify any comparison baseline, and
+answer with inline provenance. If the data source fails, report the failure
+instead of substituting a web snippet or model memory. If the user then asks to
+track, alert, share, or publish, upgrade the route to a feed or playbook.
 
-### Dashboard Or Screener
+### Playbook Creation Tree
 
-Turn the user question into a data contract before writing UI: universe,
-metrics, freshness, output groups, and visible widgets. Build feeds first,
-then HTML that reads those feeds, then README and release. Screeners need
-explicit inclusion criteria, scoring formula when scored, score bands, and
-blind spots. The details live in [playbook-creation.md](references/playbook-creation.md)
-and [api/release.md](references/api/release.md).
+Enter this tree when the user wants a hosted app, share URL, dashboard,
+screener app, report surface, remix, annotation edit, release/version update,
+or playbook subscription setup. Turn the request into a data contract before
+UI work: universe, metrics, freshness, output groups, widgets, and release
+path. Build feeds first, then HTML that reads those feeds, then README, draft,
+release, screenshot, and optional push. Details live in
+[playbook-creation.md](references/playbook-creation.md),
+[remix-workflow.md](references/remix-workflow.md),
+[annotation-edits.md](references/annotation-edits.md), and
+[api/release.md](references/api/release.md).
 
-### Thesis Or Digest
+### Thesis, Digest, And Monitoring
 
 A thesis tracker combines structured metrics, content search, and ADK narrative
-over real upstream data. Keep the ADK prompt fixed, keep source records
-separate from AI analysis, and make push lines match actual thesis deltas.
-If the user gives `/use-skill:alva/thesis` or another blueprint, fetch it fresh
-and let its feed contract and layout drive the build.
+over real upstream data. It may be a direct answer, a scheduled feed, an alert,
+or a playbook depending on the requested artifact. Keep the ADK prompt fixed,
+keep source records separate from AI analysis, and make push lines match actual
+thesis deltas. If the user gives `/use-skill:alva/thesis` or another blueprint,
+fetch it fresh and let its method drive the build.
 
-### Backtest Or Trading Strategy
+### Strategy And Trading Analysis
 
 Use Altra from the start. Register OHLCV, raw data, and features; define event
 triggers and strategy state; run the backtest; then package results as a
-visual playbook or concise summary depending on the request. If the strategy
-emits live signals, the output belongs in a feed and push/trading routes may
-apply. Read [altra-trading.md](references/altra-trading.md) and
+concise answer, feed, signal, or visual playbook depending on the request. If
+the strategy emits live signals, the output belongs in a feed and push/trading
+routes may apply. Read [altra-trading.md](references/altra-trading.md) and
 [api/trading.md](references/api/trading.md) before execution.
 
 ### Remix Or Annotated Edit

@@ -36,9 +36,9 @@
       "target": "corpus",
       "description": "Routing preserves the major user intents and Guided Planning discipline.",
       "includes": [
-        "Dashboard / Playbook",
-        "Backtest / Strategy",
-        "Data Query",
+        "Financial Analysis / Ask Question",
+        "Playbook Creation",
+        "Strategy / Trading Analysis",
         "Remix",
         "/use-skill:<username>/<name>",
         "Exactly one blocking question"
@@ -317,7 +317,10 @@
       "description": "Playbook creation is a concrete task reference rather than the dominant top-level body.",
       "includes": [
         "playbook-creation.md",
-        "Playbook Creation",
+        "Playbook Creation Tree",
+        "The playbook tree has subroutes",
+        "hosted or shareable playbook surface",
+        "ordinary financial-analysis questions should answer directly",
         "before-playbook-release",
         "AlvaToolkit.AlvaClient",
         "Free users",
@@ -328,13 +331,36 @@
       "id": "target.top-level-playbook-routing",
       "group": "target",
       "target": "skill",
-      "description": "Top-level routing and final checklist must keep pointing playbook work into the concrete playbook-creation reference.",
+      "description": "Top-level routing and final checklist keep playbook work in its concrete reference without making all routing playbook-centric.",
       "includes": [
-        "Dashboard / Playbook",
-        "read [playbook-creation.md](references/playbook-creation.md)",
-        "if it informs a dashboard/playbook, continue through [playbook-creation.md](references/playbook-creation.md) before draft/release",
+        "Playbook Creation Tree",
+        "Durable Artifacts Tree",
+        "Subroutes are new build, Skillhub-guided build, remix, annotation/edit, release/version update, and push after release",
+        "do not let every financial question inherit playbook gates",
+        "route through [playbook-creation.md](references/playbook-creation.md)",
         "Did playbook work read [playbook-creation.md](references/playbook-creation.md)",
         "relevant hard gates"
+      ]
+    },
+    {
+      "id": "target.financial-analysis-routing",
+      "group": "target",
+      "target": "corpus",
+      "description": "Ask-question work is grouped as financial analysis instead of a low-level Data Query route.",
+      "includes": [
+        "Financial Analysis / Ask Question",
+        "Financial Analysis / Ask Question Tree",
+        "It is not merely \"Data Query\"",
+        "data fetch is one step inside an analysis answer",
+        "latest fact",
+        "comparison/valuation",
+        "Source Layer: Data Sources",
+        "Source Layer: Content Search And BYOD",
+        "comparison baselines are financial facts",
+        "historical average",
+        "peer multiple",
+        "Do not let playbook creation become the default",
+        "Do not turn every Skillhub task into a playbook"
       ]
     },
     {

@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/rebase-main-20260605/skills/alva`
+Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/skill-map-analysis-20260608/skills/alva`
 
-SKILL.md lines: 699
+SKILL.md lines: 744
 
-Cases: 25/25
+Cases: 27/27
 
-Checks: 168/168 (100.00%)
+Checks: 191/191 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -46,9 +46,9 @@ Agents still run help-first preflight and session setup.
 
 Routing preserves the major user intents and Guided Planning discipline.
 
-- [x] Dashboard / Playbook
-- [x] Backtest / Strategy
-- [x] Data Query
+- [x] Financial Analysis / Ask Question
+- [x] Playbook Creation
+- [x] Strategy / Trading Analysis
 - [x] Remix
 - [x] /use-skill:<username>/<name>
 - [x] Exactly one blocking question
@@ -267,25 +267,58 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-4/4 cases, 37/37 checks
+6/6 cases, 60/60 checks
 
 ### PASS target.top-level-size
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 699)
-- [x] line count <= 850 (actual 699)
+- [x] line count >= 650 (actual 744)
+- [x] line count <= 850 (actual 744)
 
 ### PASS target.playbook-task-offload
 
 Playbook creation is a concrete task reference rather than the dominant top-level body.
 
 - [x] playbook-creation.md
-- [x] Playbook Creation
+- [x] Playbook Creation Tree
+- [x] The playbook tree has subroutes
+- [x] hosted or shareable playbook surface
+- [x] ordinary financial-analysis questions should answer directly
 - [x] before-playbook-release
 - [x] AlvaToolkit.AlvaClient
 - [x] Free users
 - [x] Pro users
+
+### PASS target.top-level-playbook-routing
+
+Top-level routing and final checklist keep playbook work in its concrete reference without making all routing playbook-centric.
+
+- [x] Playbook Creation Tree
+- [x] Durable Artifacts Tree
+- [x] Subroutes are new build, Skillhub-guided build, remix, annotation/edit, release/version update, and push after release
+- [x] do not let every financial question inherit playbook gates
+- [x] route through [playbook-creation.md](references/playbook-creation.md)
+- [x] Did playbook work read [playbook-creation.md](references/playbook-creation.md)
+- [x] relevant hard gates
+
+### PASS target.financial-analysis-routing
+
+Ask-question work is grouped as financial analysis instead of a low-level Data Query route.
+
+- [x] Financial Analysis / Ask Question
+- [x] Financial Analysis / Ask Question Tree
+- [x] It is not merely "Data Query"
+- [x] data fetch is one step inside an analysis answer
+- [x] latest fact
+- [x] comparison/valuation
+- [x] Source Layer: Data Sources
+- [x] Source Layer: Content Search And BYOD
+- [x] comparison baselines are financial facts
+- [x] historical average
+- [x] peer multiple
+- [x] Do not let playbook creation become the default
+- [x] Do not turn every Skillhub task into a playbook
 
 ### PASS target.pitfalls-stepwise-required
 

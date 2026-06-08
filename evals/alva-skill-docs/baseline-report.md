@@ -2,11 +2,11 @@
 
 Source: `origin/main`
 
-SKILL.md lines: 1873
+SKILL.md lines: 1876
 
-Cases: 17/25
+Cases: 16/27
 
-Checks: 134/168 (79.76%)
+Checks: 132/191 (69.11%)
 
 ## Scoring Diagnosis
 
@@ -15,18 +15,21 @@ Classify the gap before editing: missing capability summary, missing routing poi
 Do not expose eval scores as product copy, and do not patch demos to hide a weak result.
 Instead, fix the canonical skill text or eval case, then rerun baseline and final reports so the regression mechanism proves the gap is closed.
 
+- retained.request-routing: inspect for a skill gap before editing. Missing checks: Financial Analysis / Ask Question; Strategy / Trading Analysis
 - pr353.chat-as-artifact: inspect for a skill gap before editing. Missing checks: answer_only; Chat-as-Artifact; prompt-injected text; verdict words; EPS forecasts; YTD returns; current prices; forward-return projections
 - pr353.no-synth-verdicts: inspect for a skill gap before editing. Missing checks: Cautious; inline source attribution; not investment advice
 - pr353.no-task-list: inspect for a skill gap before editing. Missing checks: enumerated list; no verb; no question; no task description; scheduled research digest
 - pr353.no-consensus-synthesis: inspect for a skill gap before editing. Missing checks: Do not merge multiple snippet claims; agent-authored consensus; ranked list; source-labeled; synthetic takeaway; source identity is missing; ambiguous
-- target.top-level-size: inspect for a skill gap before editing. Missing checks: line count <= 850 (actual 1873)
-- target.playbook-task-offload: inspect for a skill gap before editing. Missing checks: playbook-creation.md
+- target.top-level-size: inspect for a skill gap before editing. Missing checks: line count <= 850 (actual 1876)
+- target.playbook-task-offload: inspect for a skill gap before editing. Missing checks: playbook-creation.md; Playbook Creation Tree; The playbook tree has subroutes; hosted or shareable playbook surface; ordinary financial-analysis questions should answer directly
+- target.top-level-playbook-routing: inspect for a skill gap before editing. Missing checks: Playbook Creation Tree; Durable Artifacts Tree; Subroutes are new build, Skillhub-guided build, remix, annotation/edit, release/version update, and push after release; do not let every financial question inherit playbook gates; route through [playbook-creation.md](references/playbook-creation.md); Did playbook work read [playbook-creation.md](references/playbook-creation.md); relevant hard gates
+- target.financial-analysis-routing: inspect for a skill gap before editing. Missing checks: Financial Analysis / Ask Question; Financial Analysis / Ask Question Tree; It is not merely "Data Query"; data fetch is one step inside an analysis answer; latest fact; comparison/valuation; Source Layer: Data Sources; Source Layer: Content Search And BYOD; comparison baselines are financial facts; peer multiple; Do not let playbook creation become the default; Do not turn every Skillhub task into a playbook
 - target.pitfalls-stepwise-required: inspect for a skill gap before editing. Missing checks: step by step; before each step; runtime, feed, ALFS, playbook HTML, deploy, release, chart, or cron work; Write or run jagent code; Touch ALFS paths; Build or edit playbook HTML/charts
 - target.mainline-updates: inspect for a skill gap before editing. Missing checks: publish publicly by default; implementation internals; Skillhub to users as a catalog of methodologies
 
 ## retained
 
-16/16 cases, 92/92 checks
+15/16 cases, 90/92 checks
 
 ### PASS retained.platform-panorama
 
@@ -49,13 +52,13 @@ Agents still run help-first preflight and session setup.
 - [x] ARRAYS_JWT
 - [x] alva fs read --path '~/memory/MEMORY.md'
 
-### PASS retained.request-routing
+### FAIL retained.request-routing
 
 Routing preserves the major user intents and Guided Planning discipline.
 
-- [x] Dashboard / Playbook
-- [x] Backtest / Strategy
-- [x] Data Query
+- [ ] Financial Analysis / Ask Question
+- [x] Playbook Creation
+- [ ] Strategy / Trading Analysis
 - [x] Remix
 - [x] /use-skill:<username>/<name>
 - [x] Exactly one blocking question
@@ -274,25 +277,58 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-0/4 cases, 26/37 checks
+0/6 cases, 26/60 checks
 
 ### FAIL target.top-level-size
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 1873)
-- [ ] line count <= 850 (actual 1873)
+- [x] line count >= 650 (actual 1876)
+- [ ] line count <= 850 (actual 1876)
 
 ### FAIL target.playbook-task-offload
 
 Playbook creation is a concrete task reference rather than the dominant top-level body.
 
 - [ ] playbook-creation.md
-- [x] Playbook Creation
+- [ ] Playbook Creation Tree
+- [ ] The playbook tree has subroutes
+- [ ] hosted or shareable playbook surface
+- [ ] ordinary financial-analysis questions should answer directly
 - [x] before-playbook-release
 - [x] AlvaToolkit.AlvaClient
 - [x] Free users
 - [x] Pro users
+
+### FAIL target.top-level-playbook-routing
+
+Top-level routing and final checklist keep playbook work in its concrete reference without making all routing playbook-centric.
+
+- [ ] Playbook Creation Tree
+- [ ] Durable Artifacts Tree
+- [ ] Subroutes are new build, Skillhub-guided build, remix, annotation/edit, release/version update, and push after release
+- [ ] do not let every financial question inherit playbook gates
+- [ ] route through [playbook-creation.md](references/playbook-creation.md)
+- [ ] Did playbook work read [playbook-creation.md](references/playbook-creation.md)
+- [ ] relevant hard gates
+
+### FAIL target.financial-analysis-routing
+
+Ask-question work is grouped as financial analysis instead of a low-level Data Query route.
+
+- [ ] Financial Analysis / Ask Question
+- [ ] Financial Analysis / Ask Question Tree
+- [ ] It is not merely "Data Query"
+- [ ] data fetch is one step inside an analysis answer
+- [ ] latest fact
+- [ ] comparison/valuation
+- [ ] Source Layer: Data Sources
+- [ ] Source Layer: Content Search And BYOD
+- [ ] comparison baselines are financial facts
+- [x] historical average
+- [ ] peer multiple
+- [ ] Do not let playbook creation become the default
+- [ ] Do not turn every Skillhub task into a playbook
 
 ### FAIL target.pitfalls-stepwise-required
 

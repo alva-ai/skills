@@ -105,6 +105,13 @@ adjustment, currency, units, seasonal adjustment, point-in-time vs restated
 status. Read conventions from record fields, do not infer them. Every series in
 one comparison must share conventions, and labels must state the convention.
 
+Comparison baselines are also financial values. A historical average, peer
+multiple, benchmark return, macro yardstick, or sector reference that supports
+a valuation or recommendation must be fetched from Data Skills, feed output, or
+validated BYOD/search evidence, or explicitly labeled as an unsourced estimate.
+Do not place a memory-derived yardstick beside sourced current figures; it
+misleads the reader into treating the whole comparison as sourced.
+
 For quarterly/annual fundamentals, YoY/QoQ, or cross-company period
 comparisons, read [fundamentals-periods.md](fundamentals-periods.md).
 
