@@ -2,11 +2,11 @@
 
 Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/complex-ask-contract/skills/alva`
 
-SKILL.md lines: 768
+SKILL.md lines: 765
 
 Cases: 28/28
 
-Checks: 210/210 (100.00%)
+Checks: 204/204 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -267,14 +267,14 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-7/7 cases, 79/79 checks
+7/7 cases, 73/73 checks
 
 ### PASS target.top-level-size
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 768)
-- [x] line count <= 850 (actual 768)
+- [x] line count >= 650 (actual 765)
+- [x] line count <= 850 (actual 765)
 
 ### PASS target.playbook-task-offload
 
@@ -325,24 +325,18 @@ Ask-question work is grouped as financial analysis instead of a low-level Data Q
 - [x] Do not let playbook creation become the default
 - [x] Do not turn every Skillhub task into a playbook
 
-### PASS target.complex-financial-ask-contract
+### PASS target.ask-evidence-gate
 
-Multi-hop direct financial asks have an executable answer contract rather than a free-form memo.
+Multi-hop direct financial asks have compact evidence gates instead of a free-form memo contract.
 
-- [x] complex-financial-ask.md
-- [x] Complex Financial Ask Contract
-- [x] Required Pre-Answer Gate
-- [x] Decomposition: the question split into data hops
-- [x] Data path: which Data Skills, feeds, BYOD sources, or search modules each hop will use
-- [x] Coverage result: fetched, unavailable, stale, gated, or unresolved
-- [x] Evidence Table
-- [x] Source Coverage Checklist
-- [x] Company-specific KPIs need special care
-- [x] Thesis / counter-thesis
-- [x] Base / bull / bear
-- [x] Confidence and caveats
-- [x] Every decision-useful figure or judgment needs a nearby attribution handle
-- [x] company-specific KPI Coverage
+- [x] ask evidence gate
+- [x] multi-hop valuation, thesis, ranking, scenario, or company-specific KPI asks
+- [x] decomposition
+- [x] data/source path for each hop
+- [x] fetched vs missing coverage
+- [x] sourced facts, computed values, or inference
+- [x] required KPI or baseline is missing
+- [x] disclose the gap instead of filling it from memory or snippets
 
 ### PASS target.pitfalls-stepwise-required
 

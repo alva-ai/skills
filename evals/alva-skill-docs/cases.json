@@ -369,25 +369,19 @@
       ]
     },
     {
-      "id": "target.complex-financial-ask-contract",
+      "id": "target.ask-evidence-gate",
       "group": "target",
       "target": "corpus",
-      "description": "Multi-hop direct financial asks have an executable answer contract rather than a free-form memo.",
+      "description": "Multi-hop direct financial asks have compact evidence gates instead of a free-form memo contract.",
       "includes": [
-        "complex-financial-ask.md",
-        "Complex Financial Ask Contract",
-        "Required Pre-Answer Gate",
-        "Decomposition: the question split into data hops",
-        "Data path: which Data Skills, feeds, BYOD sources, or search modules each hop will use",
-        "Coverage result: fetched, unavailable, stale, gated, or unresolved",
-        "Evidence Table",
-        "Source Coverage Checklist",
-        "Company-specific KPIs need special care",
-        "Thesis / counter-thesis",
-        "Base / bull / bear",
-        "Confidence and caveats",
-        "Every decision-useful figure or judgment needs a nearby attribution handle",
-        "company-specific KPI Coverage"
+        "ask evidence gate",
+        "multi-hop valuation, thesis, ranking, scenario, or company-specific KPI asks",
+        "decomposition",
+        "data/source path for each hop",
+        "fetched vs missing coverage",
+        "sourced facts, computed values, or inference",
+        "required KPI or baseline is missing",
+        "disclose the gap instead of filling it from memory or snippets"
       ]
     },
     {

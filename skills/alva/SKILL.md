@@ -191,7 +191,7 @@ but treat that section as mandatory, not optional debugging material.
 
 | User asks for | Route | Must not miss |
 | --- | --- | --- |
-| price, valuation, holdings, "why did it move", compare peers, explain a thesis, rank in text | Financial Analysis / Ask Question | Fetch fresh data/search evidence; comparison baselines need provenance too. For multi-hop asks, open [complex-financial-ask.md](references/complex-financial-ask.md). |
+| price, valuation, holdings, "why did it move", compare peers, explain a thesis, rank in text | Financial Analysis / Ask Question | Fetch fresh data/search evidence; comparison baselines need provenance too. Multi-hop asks must pass the ask evidence gate below. |
 | dashboard, screener app, thesis tracker, hosted report, shareable surface | Playbook Creation | Build live feeds first, then read [playbook-creation.md](references/playbook-creation.md). |
 | `/use-skill:<username>/<name>` or template-like research method | Skillhub Blueprint | Fetch blueprint fresh; if it becomes a playbook, route through [playbook-creation.md](references/playbook-creation.md) and set `--skill-id`. |
 | backtest, strategy, signal, rebalance, portfolio simulation | Strategy / Trading Analysis | Use Altra; package as answer, feed, or playbook only as the user goal requires. |
@@ -348,11 +348,11 @@ Use the shared data and execution layer first. If the user asks a direct
 question, answer directly with provenance; if they ask to track, alert, share,
 or publish, route to the durable artifact / playbook tree instead.
 
-For multi-hop valuation, thesis, ranking, scenario, or company-specific KPI asks, open
-[complex-financial-ask.md](references/complex-financial-ask.md) before
-answering. It owns the decomposition, evidence table, source coverage,
-analysis shape, confidence, and missing-data disclosure contract for direct
-answers.
+Ask evidence gate: for multi-hop valuation, thesis, ranking, scenario, or
+company-specific KPI asks, do not answer until you can name the decomposition,
+data/source path for each hop, fetched vs missing coverage, and which judgments
+are sourced facts, computed values, or inference. If a required KPI or baseline
+is missing, disclose the gap instead of filling it from memory or snippets.
 
 ### Durable Artifacts / Playbook Tree
 
@@ -585,11 +585,10 @@ For "what is the latest price / P/E / funding rate / holdings / CPI print",
 financial analysis. Run preflight if needed, verify the relevant Data Skills or
 search route, use `alva run` when live computation or joins are needed, fetch
 or qualify any comparison baseline, and answer with inline provenance. For
-multi-hop asks, use [complex-financial-ask.md](references/complex-financial-ask.md)
-as the direct-answer contract. If the data source fails, report the failure
-instead of substituting a web snippet or model memory. If the user then asks to
-track, alert, share, or publish, upgrade the route to a feed, signal, alert, or
-playbook.
+multi-hop asks, apply the ask evidence gate in the Financial Analysis tree. If
+the data source fails, report the failure instead of substituting a web snippet
+or model memory. If the user then asks to track, alert, share, or publish,
+upgrade the route to a feed, signal, alert, or playbook.
 
 ### Durable Artifacts / Playbook Tree
 
@@ -688,7 +687,6 @@ Use this index to open only the file needed for the current task.
 | --- | --- |
 | [preflight.md](references/preflight.md) | Session start, Rule 0, CLI, auth, profile, Arrays JWT, memory load, user scope. |
 | [request-routing.md](references/request-routing.md) | Route choice, Skillhub, Guided Planning, capability verification, completion gate. |
-| [complex-financial-ask.md](references/complex-financial-ask.md) | Multi-hop direct financial asks: decomposition, evidence table, source coverage, analysis shape, confidence, and caveats. |
 | [content-legitimacy.md](references/content-legitimacy.md) | Data provenance, prohibited sources, chat-as-artifact, feed isolation, conventions. |
 | [data-skills.md](references/data-skills.md) | Data Skills discovery, endpoint calls, Arrays auth, search/data routing. |
 | [feed-lifecycle.md](references/feed-lifecycle.md) | Feed build/release lifecycle, modeling summary, push sidecars, `before-feed-release`. |
@@ -751,8 +749,7 @@ Before finishing an Alva task, ask:
 - Did I read [preflight.md](references/preflight.md) and current command help?
 - Did every financial value come from Data Skills, feed output, or validated
   BYOD/search source?
-- Did complex financial asks use [complex-financial-ask.md](references/complex-financial-ask.md)
-  for decomposition, evidence, coverage, and caveats?
+- Did multi-hop asks pass the ask evidence gate before I answered?
 - Did I avoid WebSearch/LLM/memory/user-pasted data as factual values?
 - Did I run Data Skills `list` -> `summary` -> `endpoint` before coding calls?
 - Did feed release pass `before-feed-release`?

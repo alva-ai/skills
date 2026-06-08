@@ -2,11 +2,11 @@
 
 Source: `origin/main`
 
-SKILL.md lines: 757
+SKILL.md lines: 758
 
 Cases: 27/28
 
-Checks: 196/210 (93.33%)
+Checks: 196/204 (96.08%)
 
 ## Scoring Diagnosis
 
@@ -15,7 +15,7 @@ Classify the gap before editing: missing capability summary, missing routing poi
 Do not expose eval scores as product copy, and do not patch demos to hide a weak result.
 Instead, fix the canonical skill text or eval case, then rerun baseline and final reports so the regression mechanism proves the gap is closed.
 
-- target.complex-financial-ask-contract: inspect for a skill gap before editing. Missing checks: complex-financial-ask.md; Complex Financial Ask Contract; Required Pre-Answer Gate; Decomposition: the question split into data hops; Data path: which Data Skills, feeds, BYOD sources, or search modules each hop will use; Coverage result: fetched, unavailable, stale, gated, or unresolved; Evidence Table; Source Coverage Checklist; Company-specific KPIs need special care; Thesis / counter-thesis; Base / bull / bear; Confidence and caveats; Every decision-useful figure or judgment needs a nearby attribution handle; company-specific KPI Coverage
+- target.ask-evidence-gate: inspect for a skill gap before editing. Missing checks: ask evidence gate; multi-hop valuation, thesis, ranking, scenario, or company-specific KPI asks; decomposition; data/source path for each hop; fetched vs missing coverage; sourced facts, computed values, or inference; required KPI or baseline is missing; disclose the gap instead of filling it from memory or snippets
 
 ## retained
 
@@ -267,14 +267,14 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-6/7 cases, 65/79 checks
+6/7 cases, 65/73 checks
 
 ### PASS target.top-level-size
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 757)
-- [x] line count <= 850 (actual 757)
+- [x] line count >= 650 (actual 758)
+- [x] line count <= 850 (actual 758)
 
 ### PASS target.playbook-task-offload
 
@@ -325,24 +325,18 @@ Ask-question work is grouped as financial analysis instead of a low-level Data Q
 - [x] Do not let playbook creation become the default
 - [x] Do not turn every Skillhub task into a playbook
 
-### FAIL target.complex-financial-ask-contract
+### FAIL target.ask-evidence-gate
 
-Multi-hop direct financial asks have an executable answer contract rather than a free-form memo.
+Multi-hop direct financial asks have compact evidence gates instead of a free-form memo contract.
 
-- [ ] complex-financial-ask.md
-- [ ] Complex Financial Ask Contract
-- [ ] Required Pre-Answer Gate
-- [ ] Decomposition: the question split into data hops
-- [ ] Data path: which Data Skills, feeds, BYOD sources, or search modules each hop will use
-- [ ] Coverage result: fetched, unavailable, stale, gated, or unresolved
-- [ ] Evidence Table
-- [ ] Source Coverage Checklist
-- [ ] Company-specific KPIs need special care
-- [ ] Thesis / counter-thesis
-- [ ] Base / bull / bear
-- [ ] Confidence and caveats
-- [ ] Every decision-useful figure or judgment needs a nearby attribution handle
-- [ ] company-specific KPI Coverage
+- [ ] ask evidence gate
+- [ ] multi-hop valuation, thesis, ranking, scenario, or company-specific KPI asks
+- [ ] decomposition
+- [ ] data/source path for each hop
+- [ ] fetched vs missing coverage
+- [ ] sourced facts, computed values, or inference
+- [ ] required KPI or baseline is missing
+- [ ] disclose the gap instead of filling it from memory or snippets
 
 ### PASS target.pitfalls-stepwise-required
 
