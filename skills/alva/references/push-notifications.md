@@ -18,11 +18,11 @@ on material changes and emit `<|SKIP_NOTIFICATION|>` otherwise.
 ## Delivery Channel
 
 Web notifications are always available. External DM delivery depends on
-`active_channel` plus a matching `telegram_username` or `discord_username`
-from `alva whoami`.
+`active_channel` plus a matching `telegram_username`, `discord_username`, or
+`slack_username` from `alva whoami`.
 
 If no active IM channel exists, say web notifications will work immediately and
-the user can connect Telegram or Discord at <https://alva.ai/settings>.
+the user can connect Telegram, Discord, or Slack at <https://alva.ai/settings>.
 
 ## Configure And Verify
 
