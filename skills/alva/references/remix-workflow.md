@@ -203,16 +203,11 @@ only on explicit request). Do not write fresh files from scratch.
 3. **Grant** public read: `alva fs grant --path '~/feeds/{new-name}' --subject "special:user:*" --permission read`
 4. **Publish automation**:
    ```bash
-   CRONJOB_ID=$(alva deploy create \
-     --name {new-name} \
-     --path '~/feeds/{new-name}/v1/src/index.js' \
-     --cron "..." \
-     | jq -r '.id')
-
-   alva release feed \
+   alva release automation \
      --name {new-name} \
      --version 1.0.0 \
-     --cronjob-id "$CRONJOB_ID" \
+     --path '~/feeds/{new-name}/v1/src/index.js' \
+     --cron "..." \
      --description "..."
    ```
 6. **Edit local HTML** (the `./index.html` from Step 2 — update data

@@ -173,8 +173,8 @@ Before `alva release playbook`, verify:
    cronjobs.
 8. Target user namespace is correct.
 9. README exists, is current, and is passed via absolute `--readme-url`.
-10. Push-only feeds with `push_notify: true` have a current `alva release feed`
-    after the push sidecar was added.
+10. Push-only feeds with `push_notify: true` have a current
+    `alva release automation` publish after the push sidecar was added.
 11. `alva lint playbook ./index.html` passes, or an intentional
     `--bypass-lint` is documented.
 

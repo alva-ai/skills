@@ -122,8 +122,7 @@
         "Feed SDK",
         "alva run --entry-path",
         "special:user:*",
-        "alva deploy create",
-        "alva release feed",
+        "alva release automation",
         "before-feed-release"
       ]
     },
@@ -403,13 +402,11 @@
       "id": "target.automation-publish",
       "group": "target",
       "target": "corpus",
-      "description": "Deploy cronjob and release feed are treated as one automation publish operation without erasing lifecycle boundaries.",
+      "description": "Cronjob creation and feed release are exposed as one automation publish operation without erasing lifecycle boundaries.",
       "includes": [
         "automation publish",
-        "deploy-plus-release block",
-        "CRONJOB_ID=$(alva deploy create",
-        "immediately run",
-        "alva release feed ... --cronjob-id <id>",
+        "alva release automation",
+        "creates the backing cronjob and registers the released",
         "Do not treat `alva deploy create` as a finished live feed",
         "orphan producer",
         "released feed body",

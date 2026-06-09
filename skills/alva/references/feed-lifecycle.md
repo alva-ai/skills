@@ -17,15 +17,13 @@ Every feed follows the same path:
 3. Test with `alva run --entry-path '~/feeds/<name>/v1/src/index.js'`.
 4. Grant the feed root for public reads when a playbook or public user needs it:
    `alva fs grant --path '~/feeds/<name>' --subject "special:user:*" --permission read`.
-5. Publish the automation in one CLI block: `alva deploy create`, capture the
-   returned cronjob id, then immediately run
-   `alva release feed ... --cronjob-id <id>`.
+5. Publish the automation with `alva release automation`.
 
-Treat deploy and feed release as one automation publish operation. Do not stop
-after deploy, run an extra discovery loop, or leave an unreleased producer when
-the intent is a live feed, push alert, or playbook dependency. The CLI currently
-uses two commands, but the agent workflow is one block because the released feed
-body and the scheduler must be bound for downstream reads and push fanout.
+Treat scheduler creation and feed release as one automation publish operation.
+Do not stop after deploy, run an extra discovery loop, or leave an unreleased
+producer when the intent is a live feed, push alert, or playbook dependency.
+The released feed body and scheduler must be bound for downstream reads and
+push fanout.
 
 `alva run` is a test step. It does not replace deploy or release and does not
 guarantee public `@last` data for a playbook.
@@ -66,7 +64,7 @@ If a run fails with out-of-memory, retry with a larger `--max-heap-size-mb`
 ## HARD-GATE: before-feed-release
 
 <HARD-GATE id="before-feed-release">
-Before `alva release feed`, verify:
+Before `alva release automation`, verify:
 
 1. The exact feed script ran successfully in this session after the latest
    source write.

@@ -227,9 +227,8 @@ require a 500-character summary.
 
 - The group **must** be named `signal` and the output **must** be named
   `targets` -- this is the path the notification system looks for.
-- `--push-notify` and `alva release feed --cronjob-id ...` only make the feed
-  publisher capable of emitting alerts. They do **not** subscribe any user or
-  group.
+- `--push-notify` on `alva release automation` only makes the feed publisher
+  capable of emitting alerts. It does **not** subscribe any user or group.
 - Real delivery requires an explicit subscription: personal
   `alva subscriptions subscribe-feed` / `subscribe-playbook`, or group
   `/alva subscribe feed <id>` / `/alva subscribe playbook <id>`.
@@ -292,16 +291,13 @@ If there is no material update worth notifying about, output only
 })();
 ```
 
-Publish the automation as one deploy-plus-release block:
+Publish the automation in one command:
 
 ```bash
-CRONJOB_ID=$(alva deploy create --name daily-briefing \
+alva release automation --name daily-briefing --version 1.0.0 \
+  --cronjob-name daily-briefing \
   --path '~/feeds/daily-briefing/v1/src/index.js' \
   --cron "0 8 * * *" --push-notify \
-  | jq -r '.id')
-
-alva release feed --name daily-briefing --version 1.0.0 \
-  --cronjob-id "$CRONJOB_ID" \
   --description "Generates a morning briefing each day at 08:00 summarizing overnight crypto market moves and pushes it as a notification"
 ```
 
@@ -808,16 +804,12 @@ alva fs read --path '/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last
 ### Step 5: Publish the automation (required for live playbooks)
 
 ```bash
-CRONJOB_ID=$(alva deploy create \
-  --name btc-ema-update \
-  --path '~/feeds/btc-ema/v1/src/index.js' \
-  --cron "0 */4 * * *" \
-  | jq -r '.id')
-
-alva release feed \
+alva release automation \
   --name btc-ema \
   --version 1.0.0 \
-  --cronjob-id "$CRONJOB_ID" \
+  --cronjob-name btc-ema-update \
+  --path '~/feeds/btc-ema/v1/src/index.js' \
+  --cron "0 */4 * * *" \
   --description "Refreshes BTC EMA metrics every four hours"
 ```
 
