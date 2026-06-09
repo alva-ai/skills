@@ -1,321 +1,191 @@
 # Jagent Runtime Guide
 
-The jagent runtime executes JavaScript inside a V8 isolate. Scripts are invoked
-via `alva run` (inline code or filesystem entry path) or triggered by cronjobs.
+The jagent runtime executes JavaScript inside a V8 isolate. Use this reference
+before writing code for `alva run`, filesystem entry paths, or deployed
+cronjobs.
 
----
+Boundary: this file covers runtime execution and modules only. For persistent
+feed outputs and release lifecycle, read [feed-sdk.md](feed-sdk.md) and
+[feed-lifecycle.md](feed-lifecycle.md); for browser/playbook HTML, read
+[playbook-creation.md](playbook-creation.md).
 
-## Runtime Overview
+## Runtime Contract
 
-- **Engine**: V8 with strict mode enabled
-- **Isolation**: Each execution runs in a separate subprocess with its own V8
-  isolate
-- **Heap**: 256 MB per execution by default, overridable per run via
-  `max_heap_size_mb` (1–2048 MB) — `--max-heap-size-mb <mb>` on `alva run`,
-  `max_heap_size_mb` in the `/api/v1/run` body / SDK
-- **Native API boundary**: no Node built-ins, shell, local files, global
-  `fetch`, top-level `await`, or timer globals; in short, no timer globals
-- **No persistent state between executions**: each `alva run` call starts
-  fresh (use `alfs` for persistence)
+- **Engine**: V8 with strict mode enabled.
+- **Isolation**: each execution runs in a separate subprocess with its own V8
+  isolate.
+- **State**: every `alva run` or cronjob execution starts fresh. Use `alfs` for
+  persistence.
+- **Heap**: 256 MB by default. Override with `--max-heap-size-mb <mb>` on
+  `alva run`, or `max_heap_size_mb` in the `/api/v1/run` body / SDK. Valid
+  range: 1-2048 MB. Exceeding the heap kills the run with an explicit
+  out-of-memory error.
+- **Native boundary**: no Node built-ins, shell, host-local files, `process`,
+  global `fetch`, top-level `await`, and no timer globals. Use the runtime
+  modules below instead.
 
-If a run exceeds its heap it is killed with an explicit out-of-memory error;
-retry with a higher `max_heap_size_mb` (up to 2048 MB).
+## `alva run` Entry Points
 
----
+Run `alva run --help` before use; it owns the current flag names. The gotchas:
+
+- Exactly one of `--code`, `--local-file`, or `--entry-path` is required.
+- `--local-file <path>` reads a local file client-side and sends its contents
+  as code. The runtime still cannot read host-local files.
+- `--entry-path <path>` points to an ALFS script. The CLI accepts home-relative
+  paths like `~/tasks/name/src/index.js`; runtime code should still use
+  absolute ALFS paths such as `/alva/home/${env.username}/...`.
+- `--working-dir <dir>` only controls `require()` resolution for inline code.
+- `--args <json>` becomes `require("env").args`.
+- Responses include `result` (JSON-encoded return value), `logs` (captured
+  stderr), `status`, and `error` when the run fails.
+
+Minimal async shape:
+
+```javascript
+const alfs = require("alfs");
+const env = require("env");
+const http = require("net/http");
+const home = "/alva/home/" + env.username;
+
+(async () => {
+  const resp = await http.fetch("https://api.example.com/data");
+  if (!resp.ok) throw new Error("HTTP " + resp.status);
+  await alfs.writeFile(home + "/data/output.json", await resp.text());
+})();
+```
 
 ## Module System
 
-### require() Resolution Order
+`require()` resolves in this order:
 
-1. **ALFS files** -- paths ending in `.js` that don't start with `@` (e.g.
-   `require("./helper.js")`) -- resolved from the filesystem on ALFS
-2. **Official/system modules** -- `alfs`, `env`, `secret-manager`,
-   `net/http`, `@alva/algorithm`, `@alva/feed`, `@alva/pi`, `@alva/onnx`
-3. **Runtime library modules** -- versioned modules like
-   `require("@alva/technical-indicators/rsi:v1.0.0")`
+1. ALFS `.js` files that do not start with `@`, such as
+   `require("./helper.js")`.
+2. Official/system modules: `alfs`, `env`, `secret-manager`, `net/http`,
+   `@alva/algorithm`, `@alva/feed`, `@alva/pi`, `@alva/onnx`.
+3. Runtime library modules, such as
+   `require("@alva/technical-indicators/rsi:v1.0.0")` or
+   `require("@test/suite:v1.0.0")`.
 
-### Version Handling
-
-```javascript
-require("@alva/pi:v1.0.0"); // explicit version
-require("@alva/pi"); // defaults to v1.0.0
-```
-
-The `:v1.0.0` suffix is optional. When omitted, it defaults to `v1.0.0`.
-
-### Relative Imports
-
-When using `entry_path`, relative imports resolve from the entry script's
-directory:
+Version suffixes default to `:v1.0.0` when omitted:
 
 ```javascript
-// Entry on ALFS: '~/tasks/my-task/src/index.js'
-const helper = require("./helper.js"); // resolves './helper.js' on ALFS under that directory
-const utils = require("./lib/utils.js"); // resolves './lib/utils.js' on ALFS under that directory
+require("@alva/pi:v1.0.0");
+require("@alva/pi"); // same default version
 ```
 
----
+When using `entry_path`, relative imports resolve from the entry script's ALFS
+directory. The runtime rejects circular imports, freezes module exports, and
+limits require depth to 64.
 
-## Built-in Modules
+`alva run --help` may list broad module families such as `@arrays/...` and
+legacy surfaces such as `@alva/adk`. Do not infer data routing or new LLM
+patterns from the help summary alone: use `alva sdk ...` to discover runtime
+SDK modules, [data-skills.md](data-skills.md) for structured Arrays endpoints,
+and [alpi.md](alpi.md) for new scheduled LLM reasoning work.
 
-### alfs -- Filesystem Access
+## Built-In Modules
 
-Provides filesystem operations using **absolute ALFS paths** (not home-relative
-like the REST API).
+| Module | Use | Runtime rule |
+| --- | --- | --- |
+| `alfs` | ALFS file access. | Use absolute paths like `/alva/home/${env.username}/...`, not the home-relative paths used by the REST API. Methods are async. |
+| `env` | Execution identity and args. | `env.userId`, `env.username`, and `env.args` describe the execution owner. `env.callerUserId` may be present for UDF calls and can differ from the owner. |
+| `secret-manager` | User-scoped third-party credentials. | `loadPlaintext(name)` returns a string or `null`, requires authenticated execution context, is read-only from JS, and must never be logged or written to ALFS. See [secret-manager.md](secret-manager.md). |
+| `net/http` | HTTP requests. | Use `http.fetch(url, { method, headers, body })`; response has `status`, `ok`, `text()`, `json()`, and `headers`. Max response body is 128 MB. |
+| `@alva/algorithm` | Local statistics, indicators, and backtest helpers. | Calculation module, not a data source. Import `jStat`, `indicators`, or `backtest`. |
+| `@alva/feed` | Persistent feed outputs. | Use for released feed data; see [feed-sdk.md](feed-sdk.md). |
+| `@alva/pi` | Scheduled LLM reasoning/tool loops. | Use `Agent.ask()` for result-only reasoning paths; see [alpi.md](alpi.md). |
+| `@alva/onnx` | ONNX inference. | Load models with `InferenceSession.createFromAlfs({ alfs, path })`, create tensors from the model contract, and release sessions in `finally`. See [onnx.md](onnx.md). |
+| `@test/suite` | Runtime unit tests. | Import `describe`, `it`, `expect`, and `runTests`; common assertions include `toBe`, `toEqual`, `toBeDefined`, `toBeNull`, `toBeTruthy`, `toBeFalsy`, `toBeGreaterThan`, `toBeLessThan`, `toBeCloseTo`, `toContain`, `toHaveProperty`, and `toThrow`. |
 
-```javascript
-const alfs = require("alfs");
-const env = require("env");
-const home = "/alva/home/" + env.username; // absolute ALFS prefix (e.g. '/alva/home/alice')
-```
+Runtime `alfs` methods all return Promises:
 
-| Method           | Signature                                     | Description                                             |
-| ---------------- | --------------------------------------------- | ------------------------------------------------------- |
-| readFile         | `readFile(path) → string`                     | Read file content as string                             |
-| readFileBytes    | `readFileBytes(path) → string`                | Read file bytes as base64 string                        |
-| writeFile        | `writeFile(path, content)`                    | Write string content to file (auto-creates parent dirs) |
-| stat             | `stat(path) → {exists, isDir, size}`          | Get file metadata                                       |
-| readDir          | `readDir(path) → [{name, isDir, size}, ...]`  | List directory                                          |
-| mkdir            | `mkdir(path)`                                 | Create directory (recursive)                            |
-| remove           | `remove(path)`                                | Remove file                                             |
-| removeAll        | `removeAll(path)`                             | Remove directory recursively                            |
-| rename           | `rename(oldPath, newPath)`                    | Rename/move                                             |
-| copy             | `copy(src, dst)`                              | Copy file                                               |
-| symlink          | `symlink(target, link)`                       | Create symlink                                          |
-| readlink         | `readlink(path) → string`                     | Read symlink target                                     |
-| chmod            | `chmod(path, mode)`                           | Change permissions                                      |
-| grantPermission  | `grantPermission(path, subject, permission)`  | Grant access                                            |
-| revokePermission | `revokePermission(path, subject, permission)` | Revoke access                                           |
-| setPublicRead    | `setPublicRead(path)`                         | Shorthand: grant `special:user:*` read                  |
-| mountSynth       | `mountSynth(path)`                            | Mount synth filesystem at path                          |
+| Method | Signature | Behavior |
+| --- | --- | --- |
+| `readFile` | `readFile(path) -> string` | Read text content. |
+| `readFileBytes` | `readFileBytes(path) -> string` | Read bytes as a base64 string. |
+| `writeFile` | `writeFile(path, content)` | Write string content and auto-create parent directories. |
+| `stat` | `stat(path) -> {exists, isDir, size}` | Read file metadata. |
+| `readDir` | `readDir(path) -> [{name, isDir, size}, ...]` | List directory entries. |
+| `mkdir` | `mkdir(path)` | Create a directory recursively. |
+| `remove` | `remove(path)` | Remove one file. |
+| `removeAll` | `removeAll(path)` | Remove a directory recursively. |
+| `rename` | `rename(oldPath, newPath)` | Rename or move a file or directory. |
+| `copy` | `copy(src, dst)` | Copy a file. |
+| `symlink` | `symlink(target, link)` | Create a symlink. |
+| `readlink` | `readlink(path) -> string` | Read a symlink target. |
+| `chmod` | `chmod(path, mode)` | Change permissions. |
+| `grantPermission` | `grantPermission(path, subject, permission)` | Grant access. |
+| `revokePermission` | `revokePermission(path, subject, permission)` | Revoke access. |
+| `setPublicRead` | `setPublicRead(path)` | Shorthand for granting `special:user:*` read. |
+| `mountSynth` | `mountSynth(path)` | Mount a synth filesystem at a path. |
 
-All methods return Promises (async). Construct paths with your user ID:
+## Computation Modules
 
-```javascript
-const content = await alfs.readFile(home + "/data/config.json");
-await alfs.writeFile(home + "/data/output.json", JSON.stringify(result));
-const entries = await alfs.readDir(home + "/data");
-```
-
-### env -- Environment
-
-```javascript
-const env = require("env");
-env.userId; // "1" (string) -- your numeric user ID
-env.callerUserId; // "2" (string) -- invoking user's ID for UDF calls, when present
-env.username; // "alice" (string) -- your username, used in ALFS paths
-env.args; // parsed JSON from the request's "args" field
-```
-
-For UDF executions, `env.userId` / `env.username` identify the execution owner
-whose ALFS context runs the script. `env.callerUserId` identifies the caller who
-invoked the UDF and may differ from the owner. It is absent when no caller ID is
-available.
-
-### secret-manager -- Third-Party Secrets
-
-Use this built-in module for user-scoped third-party credentials that were
-uploaded to Alva Secret Manager.
-
-```javascript
-const secret = require("secret-manager");
-const braveApiKey = secret.loadPlaintext("BRAVE_API_KEY");
-
-if (!braveApiKey) {
-  throw new Error(
-    "Missing BRAVE_API_KEY. Upload it at https://alva.ai/apikey and retry.",
-  );
-}
-```
-
-Behavior:
-
-- `loadPlaintext(name)` returns the plaintext string when the secret exists
-- `loadPlaintext(name)` returns `null` when the secret is missing
-- calling it without an authenticated execution context throws an error
-- the module is read-only from JS; writes happen through the web UI or
-  `alva secrets`
-- do not log the returned value or write it into ALFS / released assets
-
-### net/http -- HTTP Requests
-
-```javascript
-const http = require("net/http");
-
-const resp = await http.fetch("https://api.example.com/data", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ query: "BTC" }),
-});
-resp.status; // HTTP status code (number)
-resp.ok; // true if status 200-299
-resp.text(); // raw response body as string
-resp.json(); // parsed JSON
-resp.headers; // response headers
-```
-
-`fetch` returns a Promise. Request `init` fields: `method`, `headers`, `body`.
-Max response body: 128 MB.
-
-### @alva/algorithm -- Statistics and Indicators
+`@alva/algorithm` is the broad local computation bundle:
 
 ```javascript
 const { jStat, indicators, backtest } = require("@alva/algorithm");
+
+const mean = jStat.mean([1, 2, 3]);
+const ema = indicators.ema(closePrices, { period: 20 });
+const macd = indicators.macd(closePrices);
+const rsi = indicators.rsi(closePrices, { period: 14 });
 ```
 
-**jStat** -- statistics library:
+Use it for local statistics, common indicators, and backtest helpers. It is not
+a data source.
+
+Standalone technical-indicator modules are versioned runtime libraries. Discover
+them with `alva sdk partition-summary --partition technical_indicator_calculation_helpers`
+and open the exact signature with `alva sdk doc --name <module>`.
 
 ```javascript
-jStat.mean([1, 2, 3, 4, 5]); // 3
-jStat.stdev([1, 2, 3, 4, 5]); // standard deviation
-jStat.median([1, 2, 3, 4, 5]); // 3
+const { rsi } = require("@alva/technical-indicators/relative-strength-index-rsi:v1.0.0");
+const values = rsi(closePrices, { period: 9 });
 ```
 
-**indicators** -- 50+ technical indicators:
-
-```javascript
-const emaValues = indicators.ema(closePrices, 20);
-const macdResult = indicators.macd(closePrices);
-const rsiValues = indicators.rsi(closePrices, 14);
-const bbands = indicators.bb(closePrices, 20, 2);
-```
-
-Categories: trend (SMA, EMA, DEMA, TEMA, MACD, Parabolic SAR, etc.), momentum
-(RSI, Stochastic, Williams %R, etc.), volatility (ATR, Bollinger Bands, Keltner
-Channel, etc.), volume (OBV, MFI, VWAP, etc.).
-
-### @alva/onnx -- ONNX Inference
-
-```javascript
-const { InferenceSession, Tensor, TensorDataType } = require("@alva/onnx");
-```
-
-Use this module for supplied/exported `.onnx` model artifacts. Read binary model
-artifacts with `InferenceSession.createFromAlfs({ alfs, path })`, build typed
-input tensors, and await `session.run(...)`.
-
-```javascript
-const alfs = require("alfs");
-const env = require("env");
-const { InferenceSession, Tensor, TensorDataType } = require("@alva/onnx");
-
-(async () => {
-  let session;
-  try {
-    session = await InferenceSession.createFromAlfs({
-      alfs,
-      path: `/alva/home/${env.username}/models/my-model/v1/model.onnx`,
-    });
-    const outputs = await session.run({
-      input: new Tensor(TensorDataType.Float32, new Float32Array([1, 2, 3]), [
-        1,
-        3,
-      ]),
-    });
-    console.log(outputs.score.data[0]);
-  } finally {
-    if (session) await session.release();
-  }
-})();
-```
-
-See [onnx.md](onnx.md) for the model-playbook contract, FeedAltra session
-lifecycle, output convention, and release checks.
-
-### @test/suite -- Testing
-
-```javascript
-const {
-  describe,
-  it,
-  expect,
-  beforeAll,
-  beforeEach,
-  runTests,
-} = require("@test/suite:v1.0.0");
-
-describe("my tests", () => {
-  it("should add numbers", () => {
-    expect(1 + 2).toBe(3);
-  });
-
-  it("should compare objects", () => {
-    expect({ a: 1 }).toEqual({ a: 1 });
-  });
-});
-
-runTests({ verbose: true, timeout: 60000 });
-```
-
-**Assertions**: `toBe`, `toEqual`, `toBeDefined`, `toBeNull`, `toBeTruthy`,
-`toBeFalsy`, `toBeGreaterThan`, `toBeLessThan`, `toBeCloseTo`, `toContain`,
-`toHaveProperty`, `toThrow`.
-
----
+The standalone modules are pure calculations and usually synchronous. Do not
+guess export names from module names; use `alva sdk doc` because names vary.
 
 ## Async Model
 
-**No top-level `await`**. The runtime does not support top-level await. Wrap
-async code in an immediately-invoked async function:
-
-```javascript
-(async () => {
-  const resp = await http.fetch("https://api.example.com/data");
-  const data = await resp.json();
-  // ...
-})();
-```
+The runtime does not support top-level `await`. Wrap async work in an async IIFE
+or another async function invoked from the entry script.
 
 When the main script exits, the runtime drains the microtask queue and async
 scheduler until all Promises settle. Promises that never resolve or reject cause
 an error.
 
-**Concurrency limits**: max 128 concurrent async HTTP requests, max 8192 pending
-requests.
+Concurrency limits:
 
----
+- max 128 concurrent async HTTP requests
+- max 8192 pending requests
 
 ## Runtime Library Modules
 
-Built-in computation and utility modules available via `require()` in the
-V8 runtime. These are **not** data APIs — they run locally in the isolate.
+`alva sdk` surfaces runtime modules, not Data Skills endpoints:
 
-```javascript
-const { rsi } = require("@alva/technical-indicators/relative-strength-index-rsi:v1.0.0");
+```bash
+alva sdk partitions
+alva sdk partition-summary --partition <name>
+alva sdk doc --name <module>
 ```
 
-**Naming convention**: `@org/[namespace]*/module_name:v1.0.0`
+Use `alva sdk doc --name "..."` to discover exact function signatures and
+response shapes. Most runtime library functions are synchronous and loaded via
+`require("@org/[namespace]*/module_name:v1.0.0")`.
 
-- `@alva/technical-indicators/...` -- 50+ pure calculation helpers (RSI, MACD, Bollinger, etc.)
-- `@alva/...` -- Alva-maintained modules (algorithm, feed, pi)
-- `@test/...` -- Testing utilities
+Data APIs for crypto, stocks, macro, ETF, news, and similar financial data are
+served by Arrays over HTTP. Discover and call them through
+[data-skills.md](data-skills.md); do not load them with `require()`.
 
-**Common response pattern**:
+## Common Fixes
 
-```javascript
-const { getRSI } = require("@alva/technical-indicators/relative-strength-index-rsi:v1.0.0");
-const result = getRSI({ prices: closePrices, period: 14 });
-```
-
-Most runtime library functions are **synchronous**.
-
-To discover function signatures and response shapes, use the SDK doc API
-(`alva sdk doc --name "..."`).
-
-**Data APIs** (crypto, stock, macro, ETF) are now served by Arrays via HTTP
-endpoints — see the Data Skills section in SKILL.md. They are **not**
-loaded via `require()`.
-
----
-
-## Constraints and Limits
-
-| Constraint          | Details                                                 |
-| ------------------- | ------------------------------------------------------- |
-| Max require depth   | 64                                                      |
-| No Node.js builtins | `fs`, `path`, `http`, `crypto` etc. are NOT available   |
-| Strict mode         | V8 runs in strict mode (`"use strict"` implicit)        |
-| Frozen exports      | Module exports are Object.freeze'd -- cannot be mutated |
-| No circular deps    | Circular require() is detected and rejected             |
-| HTTP response body  | 128 MB max                                              |
-| No top-level await  | Wrap async code in `(async () => { ... })();`           |
+| Symptom | Fix |
+| --- | --- |
+| `ReferenceError: fetch is not defined` | Use `require("net/http").fetch(...)`. |
+| `ReferenceError: require is not defined` in browser HTML | Runtime modules are server-side only; browser code must use browser-safe APIs. |
+| Top-level `await` fails | Wrap async code in `(async () => { ... })();`. |
+| Host-local file access fails | Upload/read through ALFS and use absolute `/alva/home/<username>/...` paths. |
+| Missing secret returns `null` | Stop with the exact secret name and upload URL; do not invent a fallback credential. |
+| Run dies with out-of-memory | Retry with a larger `max_heap_size_mb`, up to 2048 MB. |
