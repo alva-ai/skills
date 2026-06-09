@@ -400,6 +400,25 @@
       ]
     },
     {
+      "id": "target.automation-publish",
+      "group": "target",
+      "target": "corpus",
+      "description": "Deploy cronjob and release feed are treated as one automation publish operation without erasing lifecycle boundaries.",
+      "includes": [
+        "automation publish",
+        "deploy-plus-release block",
+        "CRONJOB_ID=$(alva deploy create",
+        "immediately run",
+        "alva release feed ... --cronjob-id <id>",
+        "Do not treat `alva deploy create` as a finished live feed",
+        "orphan producer",
+        "released feed body",
+        "each still has its own lifecycle row",
+        "Playbook release is the separate UI publication step",
+        "Without it, the push is still dispatched but arrives with an empty body"
+      ]
+    },
+    {
       "id": "target.pitfalls-stepwise-required",
       "group": "target",
       "target": "corpus",

@@ -3,8 +3,8 @@
 Feeds are persistent data pipelines. Use them whenever data needs freshness,
 history, public reads, charts, playbook backing, push sidecars, or release.
 
-For API detail and examples, read [feed-sdk.md](feed-sdk.md). For scheduled
-jobs, read [deployment.md](deployment.md). For runtime constraints, read
+For API detail and examples, read [feed-sdk.md](feed-sdk.md). For automation
+publish, read [deployment.md](deployment.md). For runtime constraints, read
 [jagent-runtime.md](jagent-runtime.md).
 
 ## Lifecycle
@@ -17,8 +17,15 @@ Every feed follows the same path:
 3. Test with `alva run --entry-path '~/feeds/<name>/v1/src/index.js'`.
 4. Grant the feed root for public reads when a playbook or public user needs it:
    `alva fs grant --path '~/feeds/<name>' --subject "special:user:*" --permission read`.
-5. Deploy the script with `alva deploy create`.
-6. Release the feed with `alva release feed` using the cronjob id from deploy.
+5. Publish the automation in one CLI block: `alva deploy create`, capture the
+   returned cronjob id, then immediately run
+   `alva release feed ... --cronjob-id <id>`.
+
+Treat deploy and feed release as one automation publish operation. Do not stop
+after deploy, run an extra discovery loop, or leave an unreleased producer when
+the intent is a live feed, push alert, or playbook dependency. The CLI currently
+uses two commands, but the agent workflow is one block because the released feed
+body and the scheduler must be bound for downstream reads and push fanout.
 
 `alva run` is a test step. It does not replace deploy or release and does not
 guarantee public `@last` data for a playbook.

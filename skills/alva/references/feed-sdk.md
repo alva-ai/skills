@@ -292,18 +292,16 @@ If there is no material update worth notifying about, output only
 })();
 ```
 
-Deploy requires **two steps** — cronjob + feed registration:
+Publish the automation as one deploy-plus-release block:
 
 ```bash
-# 1. Create the cronjob with push notification enabled
-alva deploy create --name daily-briefing \
+CRONJOB_ID=$(alva deploy create --name daily-briefing \
   --path '~/feeds/daily-briefing/v1/src/index.js' \
-  --cron "0 8 * * *" --push-notify
+  --cron "0 8 * * *" --push-notify \
+  | jq -r '.id')
 
-# 2. Register the feed (REQUIRED for push content to work)
-# Without this, notifications arrive without title/text content.
 alva release feed --name daily-briefing --version 1.0.0 \
-  --cronjob-id <ID_FROM_STEP_1> \
+  --cronjob-id "$CRONJOB_ID" \
   --description "Generates a morning briefing each day at 08:00 summarizing overnight crypto market moves and pushes it as a notification"
 ```
 
@@ -321,8 +319,8 @@ alva release feed --name daily-briefing --version 1.0.0 \
 - If `body`/`text` contains `<|SKIP_NOTIFICATION|>`, fanout state advances but
   no user-visible notification is sent. Teach AlvaAsk to output this sentinel
   when there is no material update.
-- **`alva release feed` is required** — without it, the push is still
-  dispatched but arrives with an empty body (no `title`/`body`).
+- The release command is part of the publish block. Without it, the push is
+  still dispatched but arrives with an empty body (no `title`/`body`).
 - `--push-notify` only enables publisher-side fanout. It does **not** create
   personal or group subscriptions.
 - Real delivery requires an explicit subscription: personal
@@ -807,10 +805,20 @@ alva fs grant --path '~/feeds/btc-ema/v1' --subject "special:user:*" --permissio
 alva fs read --path '/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100'
 ```
 
-### Step 5: Deploy as a cronjob (required for live playbooks)
+### Step 5: Publish the automation (required for live playbooks)
 
 ```bash
-alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js' --cron "0 */4 * * *"
+CRONJOB_ID=$(alva deploy create \
+  --name btc-ema-update \
+  --path '~/feeds/btc-ema/v1/src/index.js' \
+  --cron "0 */4 * * *" \
+  | jq -r '.id')
+
+alva release feed \
+  --name btc-ema \
+  --version 1.0.0 \
+  --cronjob-id "$CRONJOB_ID" \
+  --description "Refreshes BTC EMA metrics every four hours"
 ```
 
 ---

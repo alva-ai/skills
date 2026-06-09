@@ -1,9 +1,9 @@
 # Deployment Guide
 
-Deploy scripts as cronjobs for scheduled, automated execution and manage the
-downstream feed / playbook resources they produce. This is essential for feeds
-that need regular updates (e.g. hourly price data), recurring tasks, and for
-cleaning up when a deployment is retired or replaced.
+Publish automations by binding the scheduled producer to the released feed in
+one build step. This is essential for feeds that need regular updates (e.g.
+hourly price data), recurring tasks, push alerts, live playbook data, and clean
+retirement when an automation is replaced.
 
 The three lifecycle CLI groups:
 
@@ -15,16 +15,41 @@ The three lifecycle CLI groups:
 
 ---
 
-## Overview
+## Automation Publish
 
-The deployment workflow:
+For any live feed, push alert, or playbook dependency, deploy the producer and
+release the feed as one automation publish block:
 
-1. **Write** a script (feed or task) and upload it to the filesystem
-2. **Test** it manually via `alva run`
-3. **Deploy** it as a cronjob via `alva deploy create`
-4. **Verify** the deployment via `alva deploy trigger` (one out-of-schedule run)
-5. **Monitor** the cronjob status via `alva deploy list` / `alva deploy get`
-6. **Debug** execution history via `alva deploy runs` / `alva deploy run-logs`
+```bash
+CRONJOB_ID=$(alva deploy create \
+  --name btc-ema-update \
+  --path '~/feeds/btc-ema/v1/src/index.js' \
+  --cron "0 */4 * * *" \
+  --push-notify \
+  | jq -r '.id')
+
+alva release feed \
+  --name btc-ema \
+  --version 1.0.0 \
+  --cronjob-id "$CRONJOB_ID" \
+  --description "Refreshes BTC EMA data every four hours from the feed script and publishes the latest values for playbooks and alerts"
+```
+
+Do not treat `alva deploy create` as a finished live feed. The cronjob row
+starts scheduled execution; `alva release feed` registers the released feed body
+and active major that readers, playbooks, and push fanout consume. Keeping them
+adjacent avoids an orphan producer, removes extra list/get discovery, and keeps
+builds faster.
+
+The full automation workflow:
+
+1. **Write** a script (feed or task) and upload it to the filesystem.
+2. **Test** it manually via `alva run`.
+3. **Grant** public read if playbooks or public readers need it.
+4. **Publish** the automation with the deploy-plus-release block above.
+5. **Verify** the deployment via `alva deploy trigger` (one out-of-schedule run).
+6. **Monitor** status via `alva deploy list` / `alva deploy get`.
+7. **Debug** execution history via `alva deploy runs` / `alva deploy run-logs`.
 
 Cronjobs execute the script through the same jagent runtime as `alva run`.
 The script receives the same environment (`require("env").args` contains the
@@ -168,7 +193,7 @@ alva deploy run-logs --id 42 --run-id 123
 
 ---
 
-## Feed / Playbook lifecycle — extras not in CLI help
+## Feed / Playbook Lifecycle
 
 Run `alva feed --help` and `alva playbook --help` for subcommands,
 flags, and response shapes. This section only covers the conceptual
@@ -186,10 +211,11 @@ on flags.
   display_name + visibility + ACL). Lives in `playbooks` and is
   surfaced at `https://alva.ai/u/<username>/playbooks/<name>`.
 
-These three move in lockstep at create time (`alva deploy create` →
-`alva release feed` → `alva release playbook`) but each has its own
-lifecycle row. Deleting one does **not** automatically delete the
-others — see the cascade notes in each `--help`.
+Deploy and feed release should move together as one automation publish block
+for build speed, but each still has its own lifecycle row. Playbook release is
+the separate UI publication step after the backing automation is published.
+Deleting one row does **not** automatically delete the others — see the cascade
+notes in each `--help`.
 
 **Don't use `alva fs remove` to delete a feed or playbook.** It clears
 the ALFS files (the rendered HTML, the data mount), but the
@@ -325,13 +351,23 @@ alva run --entry-path '~/feeds/btc-hourly/v1/src/index.js'
 alva fs grant --path '~/feeds/btc-hourly/v1' --subject "special:user:*" --permission read
 ```
 
-### 4. Deploy as a cronjob
+### 4. Publish the automation
 
 ```bash
-alva deploy create --name btc-hourly-price-feed --path '~/feeds/btc-hourly/v1/src/index.js' --cron "0 */4 * * *"
+CRONJOB_ID=$(alva deploy create \
+  --name btc-hourly-price-feed \
+  --path '~/feeds/btc-hourly/v1/src/index.js' \
+  --cron "0 */4 * * *" \
+  | jq -r '.id')
+
+alva release feed \
+  --name btc-hourly \
+  --version 1.0.0 \
+  --cronjob-id "$CRONJOB_ID" \
+  --description "Refreshes hourly BTC OHLCV data every four hours from crypto market data"
 ```
 
-### 5. Verify the cronjob
+### 5. Verify the automation
 
 ```bash
 alva deploy list
@@ -350,8 +386,8 @@ alva fs read --path '/alva/home/alice/feeds/btc-hourly/v1/data/market/ohlcv/@las
 - **Use `ctx.kv` for incremental processing**: Track the last processed
   timestamp with `ctx.kv.put()`/`ctx.kv.load()` to avoid re-fetching all
   historical data on each run.
-- **Test thoroughly before deploying**: Run the script manually via
-  `alva run` and verify the output before creating a cronjob.
+- **Test thoroughly before publishing**: Run the script manually via
+  `alva run` and verify the output before the deploy-plus-release block.
 - **Use descriptive names**: The cronjob name helps you identify jobs when
   listing them.
 - **Pause before updating**: If you need to update the script, pause the cronjob

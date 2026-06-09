@@ -374,7 +374,8 @@ digest, signal, reusable dataset, or future answer.
 Read [feed-lifecycle.md](references/feed-lifecycle.md) and
 [feed-sdk.md](references/feed-sdk.md) when creating or changing a feed. The
 short lifecycle is: write schema and logic, upload source, `alva run`, grant
-public read if needed, deploy, then `alva release feed`.
+public read if needed, then publish the automation in one block: deploy the
+producer and immediately release the feed with that cronjob id.
 
 Before feed release, satisfy `before-feed-release`: fresh run, expected shape,
 needed grants, public read verification, and non-empty data for HTML
