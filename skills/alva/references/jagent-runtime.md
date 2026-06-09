@@ -30,15 +30,15 @@ retry with a higher `max_heap_size_mb` (up to 2048 MB).
 1. **ALFS files** -- paths ending in `.js` that don't start with `@` (e.g.
    `require("./helper.js")`) -- resolved from the filesystem on ALFS
 2. **Official/system modules** -- `alfs`, `env`, `secret-manager`,
-   `net/http`, `@alva/algorithm`, `@alva/feed`, `@alva/adk`, `@alva/onnx`
+   `net/http`, `@alva/algorithm`, `@alva/feed`, `@alva/pi`, `@alva/onnx`
 3. **Runtime library modules** -- versioned modules like
    `require("@alva/technical-indicators/rsi:v1.0.0")`
 
 ### Version Handling
 
 ```javascript
-require("@alva/adk:v1.0.0"); // explicit version
-require("@alva/adk"); // defaults to v1.0.0
+require("@alva/pi:v1.0.0"); // explicit version
+require("@alva/pi"); // defaults to v1.0.0
 ```
 
 The `:v1.0.0` suffix is optional. When omitted, it defaults to `v1.0.0`.
@@ -287,7 +287,7 @@ const { rsi } = require("@alva/technical-indicators/relative-strength-index-rsi:
 **Naming convention**: `@org/[namespace]*/module_name:v1.0.0`
 
 - `@alva/technical-indicators/...` -- 50+ pure calculation helpers (RSI, MACD, Bollinger, etc.)
-- `@alva/...` -- Alva-maintained modules (algorithm, feed, adk)
+- `@alva/...` -- Alva-maintained modules (algorithm, feed, pi)
 - `@test/...` -- Testing utilities
 
 **Common response pattern**:

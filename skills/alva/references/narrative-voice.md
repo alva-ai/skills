@@ -4,7 +4,7 @@ User-facing prose in Alva playbooks must read like a sharp human analyst,
 not a research-report abstract or generic LLM prose. AI-tell tokens and
 shapes make readers disengage within two sentences and dilute the
 credibility of any data underneath. This file is the single source of
-truth for voice; it applies wherever the agent or ADK produces prose
+truth for voice; it applies wherever the agent or alpi produces prose
 for end users.
 
 ## When this applies
@@ -15,7 +15,7 @@ Any sentence that ends up in front of an end user must follow these rules:
   chart footnotes, rationale paragraphs, expandable card prose.
 - Playbook metadata: `description` and `display_name` passed to
   `alva release playbook-draft` / `alva release playbook`.
-- ADK-generated narrative: TLDRs, daily digests, why-it-matters summaries,
+- alpi-generated narrative: TLDRs, daily digests, why-it-matters summaries,
   delta bodies, catalyst/risk notes, push-line headlines.
 
 **Exempt** (no voice check needed):
@@ -25,12 +25,12 @@ Any sentence that ends up in front of an end user must follow these rules:
 - Field names, column headers, button labels, error messages, log lines.
 - Code, SQL, JSON, configuration.
 
-## The voice block — copy verbatim into ADK system prompts
+## The voice block — copy verbatim into alpi system prompts
 
-Any `adk.agent()` call whose output is consumed as user-facing prose must
-include this block in `system`, verbatim. The few-shots inside the block
-are part of the prompt, not just documentation — they teach the model
-the target voice.
+Any `Agent.ask()` call whose output is consumed as user-facing prose must
+include this block in `initialState.systemPrompt`, verbatim. The few-shots
+inside the block are part of the prompt, not just documentation — they teach
+the model the target voice.
 
 ```text
 VOICE — strict. The reader is a finance professional. Sound like a sharp
@@ -117,7 +117,7 @@ them as separate sentences that paraphrase each other. Either:
 
 Never write `**Label.** Body that says the same thing in different words.`
 
-This rule applies to whoever writes the surface — ADK, agent-authored
+This rule applies to whoever writes the surface — alpi, agent-authored
 HTML, or template specs. It is structural, not stylistic, and matters
 even when every individual word is voice-clean.
 
