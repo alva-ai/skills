@@ -167,6 +167,6 @@ sections.
 ### Voice
 
 Same rules as all other user-facing prose
-([narrative-voice.md](../narrative-voice.md)). No marketing language, no
+([user-facing-prose.md](../user-facing-prose.md)). No marketing language, no
 claims unsupported by the feeds, no future tense for behavior that is not
 already wired up.

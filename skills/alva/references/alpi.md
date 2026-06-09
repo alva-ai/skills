@@ -6,7 +6,8 @@ inside a deterministic pipeline. The runtime module is `@alva/pi`; use
 
 > **If an alpi call produces user-facing prose** (TLDR, digest,
 > why-it-matters, delta body, push line, etc.), include the voice block from
-> [narrative-voice.md](narrative-voice.md) verbatim in `systemPrompt`.
+> [user-facing-prose.md](user-facing-prose.md#voice-block) verbatim in
+> `systemPrompt`.
 
 ## Quick Start
 
