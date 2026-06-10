@@ -272,8 +272,9 @@ Source routing:
   `unified_search`.
 - Direct latest price for covered US equities and crypto: intraday klines, not
   daily close.
-- Direct latest price for A-shares, HK stocks, and exchange-suffixed tickers:
-  `searchPerplexityFinance` first.
+- Non-US equities (dotted-suffix tickers like `0700.HK`, `000660.KS`): try Data
+  Skills non-US daily kline first; fall back to `searchPerplexityFinance` for
+  uncovered tickers or intraday/live prices.
 
 #### Data Access: Content Search And BYOD
 

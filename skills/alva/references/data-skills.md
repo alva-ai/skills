@@ -58,10 +58,15 @@ Direct latest-price routing:
 
 - Covered US equities and crypto: use structured intraday kline data, not daily
   bars during market hours.
-- Non-US equities such as A-shares, HK stocks, and exchange-suffixed tickers:
-  use `searchPerplexityFinance` first. See [search.md](search.md).
-- Forex pairs and traditional index/commodity futures may be outside the
-  structured catalog. State the limitation and use `searchPerplexityFinance`
+- Non-US equities (dotted-suffix tickers like `0700.HK`, `000660.KS`): try Data
+  Skills first for daily (`1d`) kline and company detail. Coverage is a curated,
+  daily-only subset, so fall back to `searchPerplexityFinance` when the ticker
+  isn't covered or you need an intraday / live price. See [search.md](search.md).
+- Forex, major index levels, and commodity futures prices (gold, oil, etc.)
+  are covered via the macro Data Skills (historical and real-time) — route
+  there. For asset classes genuinely outside the catalog, state the limitation
+  and use
+  `searchPerplexityFinance`
   before suggesting BYOD.
 
 ## Thematic Ticker Curation
