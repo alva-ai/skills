@@ -328,7 +328,10 @@ alva release feed --name daily-briefing --version 1.0.0 \
 - Real delivery requires an explicit subscription: personal
   `alva subscriptions subscribe-feed --username <owner> --name <feed>`
   or `subscribe-playbook`, or group `/alva subscribe feed <feed_id>` /
-  `/alva subscribe playbook <playbook_id>`.
+  `/alva subscribe playbook <playbook_id>`. For inventory and
+  unsubscribe (including ghost rows of deleted targets), see
+  [push-notifications.md](push-notifications.md) § Inventory And
+  Unsubscribe.
 - Combine with Pattern D if you want both feed completion notifications and
   signal-style notifications.
 
