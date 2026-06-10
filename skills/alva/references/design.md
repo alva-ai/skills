@@ -146,6 +146,17 @@ body {
 
 ## Playbook Container
 
+### Hosted Shell Boundary
+
+Playbook HTML renders inside an iframe owned by the Alva hosted shell. The
+outer shell already provides the playbook title, description, last-updated
+metadata, automation entry points, and share/open controls. By default, do not
+repeat that chrome inside the iframe; start with the first useful in-playbook
+region such as tabs, filters, KPIs, charts, tables, status rows, or analysis
+sections. Section/widget titles and scoped freshness labels are fine. Add
+custom in-iframe chrome only when the user explicitly asks for it or a
+blueprint requires a distinct app-level header.
+
 ### Page-Level Scroll Rule
 
 Playbook HTML runs inside an iframe. The **only** element that may carry
