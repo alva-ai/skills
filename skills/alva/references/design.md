@@ -1,5 +1,10 @@
 # Alva Design System
 
+> ⚠️ **The ```css blocks in this file are the source of truth for
+> [css/design-system.css](./css/design-system.css) (published to CDN).**
+> When you edit any ```css block, commit the matching regenerated
+> `design-system.css` alongside your `.md` edit. CI doc-sync catches drift.
+
 This file is the global entry point for Alva design rules — tokens, typography,
 theme, and page-level layout. Read this first, then follow the reading path at
 the bottom for widget and component specs.
@@ -32,7 +37,7 @@ values. Below is a quick reference:
 | Chart colors | `--chart-{color}-main/1/2`                     | Grey only when ≥ 3 series               |
 | Text         | `--text-n9/n7/n5/n3/n2`                        | n9=primary, n7=secondary, n5=supporting |
 | Background   | `--b0-page`, `--grey-g01`~`g7`, `--b-r02`~`r1` | g01 for card backgrounds                |
-| Line         | `--line-l05/l07/l12/l2/l3`                     | l07=default                             |
+| Line         | `--line-l05/l07/l12/l2/l3/l9`                  | l07=default, l9=hover/active            |
 | Shadow       | `--shadow-xs/s/l`                              | Floating surfaces only (dropdown/tooltip) |
 | Spacing      | `--spacing-xxxs`(2) ~ `--spacing-xxxxxxl`(56)  | Common: xs=8, m=16, xl=24               |
 | Radius       | `--radius-ct-min`(2) ~ `--radius-ct-max`(960)  | min=Tag, s=Card, l=Page                 |
