@@ -1,0 +1,13 @@
+{
+  "name": "@alva/social-wire",
+  "version": "0.1.0-prototype",
+  "description": "Prototype package for auditable social post ingestion, deduplication, evidence packing, and structured LLM summaries in Alva feeds.",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "private": true,
+  "files": [
+    "src",
+    "examples",
+    "README.md"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "properties": {
+    "check": {
+      "type": "boolean"
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "market-wire",
+        "ai-infra",
+        "crypto",
+        "macro",
+        "semis"
+      ]
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 600
+    }
+  },
+  "additionalProperties": false
+}

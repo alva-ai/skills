@@ -1,0 +1,1379 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Algostonk KOL Chat</title>
+  <link rel="stylesheet" href="https://alva-ai-static.b-cdn.net/design-system/v1/design-system.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500&family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@alva-ai/toolkit/dist/browser.global.js"></script>
+  <style>
+    :root {
+      --app-accent: var(--main-m1);
+      --app-text: var(--text-n9);
+      --app-muted: var(--text-n5);
+      --app-line: var(--line-l07);
+      --app-soft: var(--grey-g01);
+      --app-hover: var(--b-r03);
+      --app-link: var(--main-m2);
+      --rail-width: 232px;
+      --intel-width: 296px;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    html {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+    }
+    body {
+      height: 100%;
+      margin: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      background: var(--b0-page);
+      color: var(--app-text);
+      font-family: "Delight", "Noto Sans SC", "Noto Sans KR", "Noto Sans CJK SC", "Noto Sans CJK KR", "PingFang SC", "Microsoft YaHei", "Apple SD Gothic Neo", "Malgun Gothic", -apple-system, "OPPO Sans 4.0", BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+    body.playbook-container {
+      padding: 0;
+    }
+    button,
+    textarea {
+      font: inherit;
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .app-frame {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+      width: 100%;
+      min-height: 100dvh;
+      background: var(--b0-container);
+    }
+
+    /* ----- channel rail ----- */
+    .rail {
+      display: none;
+      position: sticky;
+      top: 0;
+      align-self: start;
+      max-height: 100dvh;
+      overflow: hidden;
+      padding: 16px 12px;
+      background: var(--app-soft);
+      border-right: 1px solid var(--app-line);
+    }
+    .rail-brand {
+      display: grid;
+      grid-template-columns: 36px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+      padding: 0 6px;
+      margin-bottom: 6px;
+    }
+    .rail-logo {
+      display: inline-flex;
+      width: 36px;
+      height: 36px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: var(--main-m1);
+      color: var(--b-common-white);
+      font-size: 13px;
+      line-height: 20px;
+      font-weight: 500;
+    }
+    .rail-title {
+      min-width: 0;
+      font-size: 15px;
+      line-height: 20px;
+      font-weight: 500;
+      color: var(--app-text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .rail-sub {
+      margin: 2px 6px 10px;
+      color: var(--app-muted);
+      font-size: 12px;
+      line-height: 17px;
+    }
+    .lang-row {
+      display: inline-flex;
+      gap: 4px;
+      margin: 0 6px 14px;
+    }
+    .lang-button {
+      min-width: 36px;
+      min-height: 26px;
+      padding: 0 8px;
+      border: 1px solid var(--app-line);
+      border-radius: 6px;
+      background: var(--b0-container);
+      color: var(--app-muted);
+      font-size: 12px;
+      line-height: 18px;
+      cursor: pointer;
+    }
+    .lang-button:hover {
+      border-color: var(--main-m1);
+      color: var(--main-m1);
+    }
+    .lang-button.is-active {
+      border-color: var(--main-m1);
+      background: var(--main-m1-10);
+      color: var(--main-m1);
+      font-weight: 500;
+    }
+    .rail-label {
+      margin: 0 6px 6px;
+      color: var(--app-muted);
+      font-size: 11px;
+      line-height: 16px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .channel-list {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+    .channel-list .channel-button.channel-button {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      min-height: 32px;
+      padding: 0 10px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-n7);
+      text-align: left;
+      cursor: pointer;
+    }
+    .channel-list .channel-button.channel-button:hover {
+      background: var(--app-hover);
+      color: var(--app-text);
+    }
+    .channel-list .channel-button.channel-button.is-active {
+      background: var(--main-m1-10);
+      color: var(--main-m1);
+    }
+    .channel-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 500;
+    }
+    .channel-count {
+      color: var(--app-muted);
+      font-size: 12px;
+      line-height: 18px;
+      font-variant-numeric: tabular-nums;
+    }
+    .channel-button.is-active .channel-count {
+      color: var(--main-m1);
+    }
+    .rail-foot {
+      margin: 16px 6px 0;
+      padding-top: 12px;
+      border-top: 1px solid var(--app-line);
+      color: var(--app-muted);
+      font-size: 12px;
+      line-height: 17px;
+    }
+    .rail-foot a {
+      color: var(--app-link);
+    }
+    .rail-foot a:hover {
+      text-decoration: underline;
+    }
+
+    /* ----- mobile top header ----- */
+    .mobile-head {
+      position: sticky;
+      top: 0;
+      z-index: 6;
+      display: grid;
+      gap: 8px;
+      padding: 10px 12px 8px;
+      background: var(--b0-container);
+      border-bottom: 1px solid var(--app-line);
+    }
+    .mobile-head-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+    }
+    .mobile-title {
+      min-width: 0;
+      font-size: 16px;
+      line-height: 22px;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .mobile-channels {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .mobile-channels::-webkit-scrollbar {
+      display: none;
+    }
+    .mobile-channels .channel-button.channel-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: max-content;
+      min-height: 30px;
+      padding: 0 10px;
+      border: 1px solid var(--app-line);
+      border-radius: 999px;
+      background: var(--b0-container);
+      color: var(--text-n7);
+      font-size: 13px;
+      line-height: 18px;
+      cursor: pointer;
+    }
+    .mobile-channels .channel-button.channel-button.is-active {
+      border-color: var(--main-m1);
+      background: var(--main-m1-10);
+      color: var(--main-m1);
+      font-weight: 500;
+    }
+
+    /* ----- chat column ----- */
+    .chat {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      min-width: 0;
+      min-height: 100dvh;
+      background: var(--b0-container);
+    }
+    .chat-topbar {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-width: 0;
+      min-height: 54px;
+      padding: 8px 20px;
+      border-bottom: 1px solid var(--app-line);
+      background: var(--b0-container);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+    .channel-heading {
+      display: grid;
+      min-width: 0;
+    }
+    .channel-title {
+      margin: 0;
+      color: var(--app-text);
+      font-size: 17px;
+      line-height: 23px;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .muted,
+    .message-meta,
+    .source-note {
+      color: var(--app-muted);
+      font-size: 12px;
+      line-height: 18px;
+    }
+    .status-pill,
+    .chat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-height: 21px;
+      padding: 0 8px;
+      border: 1px solid var(--line-l07);
+      border-radius: 999px;
+      background: var(--b0-container);
+      color: var(--app-muted);
+      font-size: 12px;
+      line-height: 18px;
+      white-space: nowrap;
+    }
+    .status-pill {
+      border-color: var(--main-m1);
+      color: var(--main-m1);
+      background: var(--main-m1-10);
+      font-weight: 500;
+    }
+    a.chat-pill:hover {
+      border-color: var(--main-m1);
+      color: var(--main-m1);
+    }
+    .bot-pill {
+      border-color: var(--main-m1);
+      background: var(--main-m1-10);
+      color: var(--main-m1);
+      font-weight: 500;
+    }
+    .message-list {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      padding: 14px 0 18px;
+    }
+    .date-divider {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      gap: 12px;
+      margin: 12px 20px;
+      color: var(--app-muted);
+      font-size: 12px;
+      line-height: 18px;
+      font-weight: 500;
+    }
+    .date-divider::before,
+    .date-divider::after {
+      content: "";
+      height: 1px;
+      background: var(--app-line);
+    }
+    .message {
+      display: grid;
+      grid-template-columns: 36px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      min-width: 0;
+      padding: 7px 20px;
+    }
+    .message:hover {
+      background: var(--app-hover);
+    }
+    .avatar {
+      display: inline-flex;
+      width: 36px;
+      height: 36px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: var(--grey-g5);
+      color: var(--b-common-white);
+      font-size: 13px;
+      line-height: 20px;
+      font-weight: 500;
+    }
+    .avatar.agent {
+      background: var(--main-m1);
+      padding: 0;
+      overflow: hidden;
+    }
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+      display: block;
+    }
+    .avatar.owner {
+      background: var(--main-m3);
+    }
+    .message-main {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+    .message-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      flex-wrap: wrap;
+    }
+    .message-author {
+      color: var(--app-text);
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 500;
+      overflow-wrap: anywhere;
+    }
+    .message-title {
+      color: var(--app-text);
+      font-size: 15px;
+      line-height: 21px;
+      font-weight: 500;
+      overflow-wrap: anywhere;
+    }
+    .message-body {
+      color: var(--text-n7);
+      font-size: 14px;
+      line-height: 20px;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+    .message-cred {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+      color: var(--app-muted);
+      font-size: 12px;
+      line-height: 18px;
+      overflow-wrap: anywhere;
+    }
+    .message-cred::before {
+      content: "";
+      flex: none;
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--main-m1);
+    }
+    .message-tags {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+      margin-top: 5px;
+    }
+    .message-tags .message-meta {
+      display: inline-flex;
+      align-items: center;
+      margin-left: 2px;
+    }
+    .handle-link {
+      color: var(--app-link);
+    }
+    .handle-link:hover {
+      text-decoration: underline;
+    }
+    .chat-pill .px {
+      margin-left: 5px;
+      font-variant-numeric: tabular-nums;
+    }
+    .px-up {
+      color: var(--main-m3);
+    }
+    .px-down {
+      color: var(--main-m4);
+    }
+    .composer {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: end;
+      padding: 10px 20px max(12px, env(safe-area-inset-bottom));
+      border-top: 1px solid var(--app-line);
+      background: var(--b0-container);
+      position: sticky;
+      bottom: 0;
+      z-index: 4;
+    }
+    .composer textarea {
+      width: 100%;
+      min-height: 42px;
+      max-height: 140px;
+      resize: none;
+      border: 1px solid var(--line-l3);
+      border-radius: 8px;
+      background: var(--b0-container);
+      color: var(--app-text);
+      padding: 10px 12px;
+      outline: none;
+      font-size: 14px;
+      line-height: 20px;
+    }
+    .composer textarea:focus {
+      border-color: var(--main-m1);
+      box-shadow: 0 0 0 1px var(--main-m1);
+    }
+    .composer button {
+      min-width: 68px;
+      min-height: 42px;
+      border-radius: 8px;
+      background: var(--main-m1);
+      color: var(--b-common-white);
+      font-weight: 500;
+    }
+    .composer.is-disabled {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .composer.is-disabled button {
+      display: none;
+    }
+    .composer #postButton {
+      font-family: inherit;
+    }
+    .composer button:disabled,
+    .composer textarea:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+    .composer-note {
+      grid-column: 1 / -1;
+      color: var(--app-muted);
+      font-size: 12px;
+      line-height: 18px;
+      overflow-wrap: anywhere;
+    }
+    .composer-note.is-error {
+      color: var(--main-m4);
+    }
+
+    /* ----- intel rail ----- */
+    .intel {
+      display: none;
+      position: sticky;
+      top: 0;
+      align-self: start;
+      max-height: 100dvh;
+      overflow: hidden;
+      padding: 16px 14px;
+      border-left: 1px solid var(--app-line);
+      background: var(--app-soft);
+    }
+    .intel .rail-label {
+      margin: 0 0 8px;
+    }
+    .kol-list {
+      display: grid;
+      gap: 8px;
+    }
+    .ticker-card {
+      display: grid;
+      gap: 6px;
+      padding: 10px;
+      border: 1px solid var(--line-l07);
+      border-radius: 8px;
+      background: var(--b0-container);
+    }
+    .ticker-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+    }
+    .ticker-symbol {
+      color: var(--app-text);
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .ticker-reason {
+      color: var(--text-n7);
+      font-size: 13px;
+      line-height: 18px;
+      overflow-wrap: anywhere;
+    }
+    .intel .source-note {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--app-line);
+    }
+    .intel .source-note a {
+      color: var(--app-link);
+    }
+    .empty-state {
+      display: grid;
+      place-items: center;
+      min-height: 160px;
+      margin: 14px 20px;
+      border: 1px dashed var(--line-l12);
+      border-radius: 8px;
+      color: var(--app-muted);
+      font-size: 14px;
+      line-height: 20px;
+      text-align: center;
+      padding: 18px;
+    }
+
+    @media (min-width: 820px) {
+      .app-frame {
+        grid-template-columns: var(--rail-width) minmax(0, 1fr);
+      }
+      .rail {
+        display: block;
+      }
+      .mobile-head {
+        display: none;
+      }
+      .chat-topbar {
+        display: flex;
+      }
+    }
+    @media (min-width: 1180px) {
+      .app-frame {
+        grid-template-columns: var(--rail-width) minmax(0, 1fr) var(--intel-width);
+      }
+      .intel {
+        display: block;
+      }
+    }
+    @media (max-width: 819px) {
+      .message {
+        grid-template-columns: 32px minmax(0, 1fr);
+        gap: 9px;
+        padding: 6px 12px;
+      }
+      .avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 7px;
+        font-size: 12px;
+      }
+      .date-divider {
+        margin: 10px 12px;
+      }
+      .empty-state {
+        margin: 12px 12px;
+      }
+      .composer {
+        padding: 8px 10px max(10px, env(safe-area-inset-bottom));
+      }
+    }
+  </style>
+</head>
+<body class="playbook-container">
+  <div class="app-frame">
+    <aside class="rail">
+      <div class="rail-brand">
+        <div class="rail-logo">AK</div>
+        <div class="rail-title" id="brandTitle">Algostonk KOL Chat</div>
+      </div>
+      <div class="rail-sub" id="brandSub">Top FinTwit KOL posts, filtered by leaderboard track record.</div>
+      <div class="lang-row" id="languageSwitch" aria-label="Language">
+        <button class="btn btn-secondary btn-medium lang-button is-active" type="button" data-lang="en">EN</button>
+        <button class="btn btn-secondary btn-medium lang-button" type="button" data-lang="cn">中文</button>
+        <button class="btn btn-secondary btn-medium lang-button" type="button" data-lang="kr">한국어</button>
+      </div>
+      <p class="rail-label" id="channelsLabel">Channels</p>
+      <nav class="channel-list" id="channelList" aria-label="Channels"></nav>
+      <div class="rail-foot" id="sourceNote"></div>
+    </aside>
+
+    <main class="chat">
+      <div class="mobile-head">
+        <div class="mobile-head-row">
+          <div class="mobile-title" id="mobileTitle">Algostonk KOL Chat</div>
+          <div class="lang-row" id="languageSwitchMobile" aria-label="Language" style="margin: 0;">
+            <button class="btn btn-secondary btn-medium lang-button is-active" type="button" data-lang="en">EN</button>
+            <button class="btn btn-secondary btn-medium lang-button" type="button" data-lang="cn">中文</button>
+            <button class="btn btn-secondary btn-medium lang-button" type="button" data-lang="kr">한국어</button>
+          </div>
+        </div>
+        <nav class="mobile-channels" id="channelListMobile" aria-label="Channels"></nav>
+      </div>
+
+      <header class="chat-topbar">
+        <div class="channel-heading">
+          <h1 class="channel-title" id="activeChannelTitle">#market-wire</h1>
+          <div class="muted" id="activeChannelDescription">Cross-asset KOL market tape</div>
+        </div>
+        <div class="status-pill" id="feedStatus">Loading</div>
+      </header>
+
+      <section class="message-list" id="messageList" aria-live="polite">
+        <div class="empty-state">Loading channel history.</div>
+      </section>
+
+      <form class="composer" id="composer">
+        <textarea id="messageInput" maxlength="600" placeholder="Message this channel"></textarea>
+        <button class="btn btn-primary btn-medium" id="postButton" type="submit">Post</button>
+        <div class="composer-note" id="composerNote" hidden></div>
+      </form>
+    </main>
+
+    <aside class="intel">
+      <p class="rail-label" id="contextLabel">Recent Tickers</p>
+      <div class="kol-list" id="kolList"></div>
+      <div class="source-note" id="intelSourceNote"></div>
+    </aside>
+  </div>
+
+  <script>
+    const OWNER = "snarketh";
+    const OWNER_DISPLAY_NAME = "Algostonk";
+    const AGENT_DISPLAY_NAME = "Algostonk Bot";
+    const AGENT_AVATAR_SRC = "data:image/png;base64,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";
+    const FEED = "kol-market-chat";
+    const BASE = `/alva/home/${OWNER}/feeds/${FEED}/v1/data`;
+    const SOURCE_URL = "https://alva.ai/u/zet/playbooks/alva-kol-leaderboard";
+    const FALLBACK_CHANNELS = [
+      { channel: "market-wire", name: "market-wire", description: "Cross-asset KOL market tape" },
+      { channel: "ai-infra", name: "ai-infra", description: "AI compute, semis, memory, data centers" },
+      { channel: "crypto", name: "crypto", description: "Crypto, miners, perps, token narratives" },
+      { channel: "macro", name: "macro", description: "Rates, commodities, energy, liquidity" },
+      { channel: "semis", name: "semis", description: "Chip supply chain and hardware leaders" },
+    ];
+    const I18N = {
+      en: {
+        htmlLang: "en",
+        title: "Algostonk KOL Chat",
+        brandSub: "Top FinTwit KOL posts, filtered by leaderboard track record.",
+        channelsLabel: "Channels",
+        contextLabel: "Recent Tickers",
+        loading: "Loading",
+        liveFeed: "Live feed",
+        noMessages: "No messages",
+        loadError: "Load error",
+        loadingHistory: "Loading channel history.",
+        emptyChannel: (channel) => "No messages in #" + channel + " yet.",
+        emptyContext: "No ticker context loaded.",
+        aiBadge: "KOL wire",
+        sourceBadge: "Source",
+        trackRecord: "Track record",
+        recentPosts: "recent",
+        leaderboard: "leaderboard",
+        post: "Post",
+        sending: "Sending…",
+        postFailed: "Post failed",
+        messagePlaceholder: (channel) => "Message #" + channel,
+        signInPlaceholder: "Sign in to post",
+        sourceNotePrefix: "Algostonk Bot reads the public",
+        sourceNoteLink: "FinTwit Alpha Leaderboard",
+        sourceNoteSuffix: "plus recent indexed X posts from top handles.",
+        channels: {
+          "market-wire": "Cross-asset KOL market tape",
+          "ai-infra": "AI compute, semis, memory, data centers",
+          crypto: "Crypto, miners, perps, token narratives",
+          macro: "Rates, commodities, energy, liquidity",
+          semis: "Chip supply chain and hardware leaders",
+        },
+      },
+      cn: {
+        htmlLang: "zh-CN",
+        title: "Algostonk KOL 聊天室",
+        brandSub: "按榜单战绩筛选的 FinTwit 顶级 KOL 帖子。",
+        channelsLabel: "频道",
+        contextLabel: "最新提到的 Ticker",
+        loading: "加载中",
+        liveFeed: "实时更新",
+        noMessages: "暂无消息",
+        loadError: "加载失败",
+        loadingHistory: "正在加载频道历史。",
+        emptyChannel: (channel) => "#" + channel + " 还没有消息。",
+        emptyContext: "暂无 ticker 线索。",
+        aiBadge: "KOL 快讯",
+        sourceBadge: "来源",
+        trackRecord: "战绩",
+        recentPosts: "近期",
+        leaderboard: "榜单",
+        post: "发送",
+        sending: "发送中…",
+        postFailed: "发送失败",
+        messagePlaceholder: (channel) => "在 #" + channel + " 发消息",
+        signInPlaceholder: "登录后可发消息",
+        sourceNotePrefix: "Algostonk Bot 读取公开的",
+        sourceNoteLink: "FinTwit Alpha 榜单",
+        sourceNoteSuffix: "以及顶部 handle 的近期 X 索引内容。",
+        channels: {
+          "market-wire": "跨资产 KOL 盘面",
+          "ai-infra": "AI 算力、半导体、存储、数据中心",
+          crypto: "Crypto、矿工、合约、Token 叙事",
+          macro: "利率、大宗、能源、流动性",
+          semis: "芯片供应链与硬件龙头",
+        },
+      },
+      kr: {
+        htmlLang: "ko",
+        title: "Algostonk KOL 채팅",
+        brandSub: "리더보드 트랙 레코드로 거른 FinTwit 톱 KOL 게시물.",
+        channelsLabel: "채널",
+        contextLabel: "최근 언급 티커",
+        loading: "로딩 중",
+        liveFeed: "라이브",
+        noMessages: "메시지 없음",
+        loadError: "로드 실패",
+        loadingHistory: "채널 히스토리를 불러오는 중입니다.",
+        emptyChannel: (channel) => "#" + channel + "에는 아직 메시지가 없습니다.",
+        emptyContext: "티커 맥락이 아직 없습니다.",
+        aiBadge: "KOL 와이어",
+        sourceBadge: "소스",
+        trackRecord: "트랙 레코드",
+        recentPosts: "최근",
+        leaderboard: "리더보드",
+        post: "게시",
+        sending: "전송 중…",
+        postFailed: "전송 실패",
+        messagePlaceholder: (channel) => "#" + channel + "에 메시지",
+        signInPlaceholder: "로그인 후 게시",
+        sourceNotePrefix: "Algostonk Bot은 공개",
+        sourceNoteLink: "FinTwit Alpha 리더보드",
+        sourceNoteSuffix: "와 상위 핸들의 최근 X 인덱스 글을 읽습니다.",
+        channels: {
+          "market-wire": "크로스에셋 KOL 테이프",
+          "ai-infra": "AI 컴퓨트, 반도체, 메모리, 데이터센터",
+          crypto: "크립토, 채굴주, 퍼프, 토큰 내러티브",
+          macro: "금리, 원자재, 에너지, 유동성",
+          semis: "칩 공급망과 하드웨어 리더",
+        },
+      },
+    };
+
+    const MESSAGE_WINDOW = 80;
+    let initialAnchorPending = true;
+    setTimeout(() => { initialAnchorPending = false; }, 3500);
+    let channels = FALLBACK_CHANNELS.slice();
+    let messages = [];
+    let tickerContext = [];
+    let activeChannel = "market-wire";
+    let posting = false;
+    function initialLanguage() {
+      const requested = new URLSearchParams(window.location.search).get("lang");
+      if (requested && I18N[requested]) return requested;
+      try {
+        return localStorage.getItem("kolMarketChatLang") || "en";
+      } catch (_) {
+        return "en";
+      }
+    }
+    let lang = initialLanguage();
+    if (!I18N[lang]) lang = "en";
+
+    function createAlvaClientConfig() {
+      const params = new URLSearchParams(window.location.search);
+      const pbsvToken = window.alva && window.alva.udf && window.alva.udf.getViewerToken ? window.alva.udf.getViewerToken() : "";
+      const apiOrigin = params.get("api_origin");
+      return {
+        ...(pbsvToken ? { pbsvToken } : {}),
+        ...(apiOrigin ? { baseUrl: apiOrigin.replace(/\/$/, "") } : {}),
+      };
+    }
+    function createAlvaClient() {
+      return new AlvaToolkit.AlvaClient(createAlvaClientConfig());
+    }
+    async function readAlfsJson(path) {
+      const result = await createAlvaClient().fs.read({ path });
+      return typeof result === "string" ? JSON.parse(result) : result;
+    }
+    function asRows(value) {
+      if (Array.isArray(value)) return value;
+      if (value && Array.isArray(value.data)) return value.data;
+      if (value && Array.isArray(value.rows)) return value.rows;
+      return [];
+    }
+    function normalizeChannel(row) {
+      const channel = row && (row.channel || row.slug || row.name);
+      return channel ? {
+        channel,
+        name: row.name || channel,
+        description: row.description || "",
+      } : null;
+    }
+    function tr(key) {
+      return I18N[lang][key] || I18N.en[key] || key;
+    }
+    function channelDescription(channel) {
+      return (I18N[lang].channels && I18N[lang].channels[channel]) || channelInfo(channel).description || "";
+    }
+    function parseJsonObject(value) {
+      try {
+        const parsed = JSON.parse(value || "{}");
+        return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+      } catch (_) {
+        return {};
+      }
+    }
+    function esc(value) {
+      return String(value == null ? "" : value).replace(/[&<>"']/g, (c) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      })[c]);
+    }
+    function parseJsonList(value) {
+      try {
+        const parsed = JSON.parse(value || "[]");
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (_) {
+        return [];
+      }
+    }
+    function uiLocale() {
+      return lang === "cn" ? "zh-CN" : lang === "kr" ? "ko-KR" : "en-US";
+    }
+    function fmtTime(ms) {
+      const n = Number(ms);
+      if (!Number.isFinite(n)) return "";
+      return new Intl.DateTimeFormat(uiLocale(), {
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(new Date(n));
+    }
+    function dayKey(ms) {
+      const n = Number(ms);
+      if (!Number.isFinite(n)) return "";
+      const d = new Date(n);
+      return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    }
+    function dayLabel(ms) {
+      const n = Number(ms);
+      if (!Number.isFinite(n)) return "";
+      return new Intl.DateTimeFormat(uiLocale(), {
+        month: "short",
+        day: "numeric",
+      }).format(new Date(n));
+    }
+    function channelInfo(id) {
+      return channels.find((item) => item.channel === id) || channels[0] || FALLBACK_CHANNELS[0];
+    }
+    function canPost() {
+      return !!(window.alva && window.alva.udf && window.alva.udf.getViewerToken && window.alva.udf.getViewerToken());
+    }
+    function setStatus(text) {
+      document.getElementById("feedStatus").textContent = text;
+    }
+    function sourceNoteHtml() {
+      return esc(tr("sourceNotePrefix")) +
+        ' <a href="' + esc(SOURCE_URL) + '" target="_blank" rel="noopener noreferrer">' + esc(tr("sourceNoteLink")) + "</a> " +
+        esc(tr("sourceNoteSuffix"));
+    }
+    function renderStaticCopy() {
+      document.documentElement.lang = tr("htmlLang");
+      document.title = tr("title");
+      document.getElementById("brandTitle").textContent = tr("title");
+      document.getElementById("mobileTitle").textContent = tr("title");
+      document.getElementById("brandSub").textContent = tr("brandSub");
+      document.getElementById("channelsLabel").textContent = tr("channelsLabel");
+      document.getElementById("contextLabel").textContent = tr("contextLabel");
+      document.getElementById("postButton").textContent = tr("post");
+      document.getElementById("channelList").setAttribute("aria-label", tr("channelsLabel"));
+      document.getElementById("sourceNote").innerHTML = sourceNoteHtml();
+      document.getElementById("intelSourceNote").innerHTML = sourceNoteHtml();
+      document.querySelectorAll(".lang-button").forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.lang === lang);
+      });
+    }
+    function channelButtonHtml(item, counts) {
+      return `
+        <button class="btn btn-secondary btn-medium channel-button ${item.channel === activeChannel ? "is-active" : ""}" type="button" data-channel="${esc(item.channel)}">
+          <span class="channel-name">#${esc(item.name || item.channel)}</span>
+          <span class="channel-count">${esc(counts[item.channel] || 0)}</span>
+        </button>
+      `;
+    }
+    function renderChannels() {
+      const counts = messages.reduce((acc, msg) => {
+        if (!shouldRenderMessage(msg)) return acc;
+        acc[msg.channel] = (acc[msg.channel] || 0) + 1;
+        return acc;
+      }, {});
+      const visibleChannels = channels.length ? channels : FALLBACK_CHANNELS;
+      const html = visibleChannels.map((item) => channelButtonHtml(item, counts)).join("");
+      document.getElementById("channelList").innerHTML = html;
+      document.getElementById("channelListMobile").innerHTML = html;
+      document.querySelectorAll(".channel-button").forEach((button) => {
+        button.addEventListener("click", () => {
+          activeChannel = button.dataset.channel;
+          renderAll();
+          scrollToBottomSoon();
+        });
+      });
+    }
+    function displayAuthorName(msg) {
+      if (msg.author_type === "agent") return AGENT_DISPLAY_NAME;
+      const raw = String(msg.author_name || "viewer").replace(/^@/, "");
+      if (msg.author_type === "owner" || raw.toLowerCase() === "snarketh") return OWNER_DISPLAY_NAME;
+      return raw;
+    }
+    function avatarText(msg) {
+      if (msg.author_type === "agent") return "AB";
+      const name = displayAuthorName(msg);
+      return (name.slice(0, 2) || "?").toUpperCase();
+    }
+    function localizedAgentDigest(msg, targetLang) {
+      const headlineMap = parseJsonObject(msg.headline_i18n_json);
+      const bodyMap = parseJsonObject(msg.body_i18n_json);
+      const direct = {
+        headline: headlineMap[targetLang] || "",
+        body: bodyMap[targetLang] || "",
+      };
+      if (direct.headline || direct.body) return direct;
+
+      const meta = parseJsonObject(msg.meta_json);
+      const i18n = meta.i18n || {};
+      const selected = i18n[targetLang] || {};
+      return {
+        headline: selected.headline || "",
+        body: selected.body || "",
+      };
+    }
+    function hasStructuredAgentCopy(msg) {
+      const headlineMap = parseJsonObject(msg.headline_i18n_json);
+      const bodyMap = parseJsonObject(msg.body_i18n_json);
+      if (headlineMap.en || headlineMap.cn || headlineMap.kr || bodyMap.en || bodyMap.cn || bodyMap.kr) return true;
+      const meta = parseJsonObject(msg.meta_json);
+      return !!(meta.i18n && (meta.i18n.en || meta.i18n.cn || meta.i18n.kr));
+    }
+    function isTraceablePostUrl(url) {
+      const value = String(url || "").toLowerCase();
+      return value.includes("x.com/") || value.includes("twitter.com/");
+    }
+    function shouldRenderMessage(msg) {
+      if (msg.author_type === "agent") {
+        if (!hasStructuredAgentCopy(msg)) return false;
+        if (!isTraceablePostUrl(firstMessageSourceUrl(msg))) return false;
+      }
+      if (msg.author_type !== "agent" || lang === "en") return true;
+      const text = localizedAgentDigest(msg, lang);
+      return !!(text.headline || text.body);
+    }
+    function localizedMessageText(msg) {
+      if (msg.author_type !== "agent") {
+        return { headline: msg.headline || "", body: msg.body || "" };
+      }
+      if (lang !== "en") return localizedAgentDigest(msg, lang);
+      const selected = localizedAgentDigest(msg, "en");
+      return {
+        headline: selected.headline || msg.headline || "",
+        body: selected.body || msg.body || "",
+      };
+    }
+    function credibilityText(msg) {
+      const meta = parseJsonObject(msg.meta_json);
+      const cred = meta.credibility || {};
+      return String(cred[lang] || cred.en || "").trim();
+    }
+    function firstMessageSourceUrl(msg) {
+      const meta = parseJsonObject(msg.meta_json);
+      const urls = Array.isArray(meta.source_urls) ? meta.source_urls : [];
+      const fromMeta = urls.map((url) => String(url || "").trim()).find(Boolean);
+      return fromMeta || String(msg.source_url || "").trim();
+    }
+    function stripSourceCta(text) {
+      let value = String(text || "").replace(/\s+/g, " ").trim();
+      const patterns = [
+        /\s*(?:Read|Open|Click|See)\s+(?:his|her|their|the|this|that)?\s*(?:tracker|trackers|thread|source|context|post|link)[^.?!。]*[.?!。]?$/i,
+        /\s*(?:点开|点击|打开|查看|看)(?:他|她|它|这条|该)?(?:的)?\s*(?:tracker|追踪页|原帖|原推|来源|上下文|链接)[^。.!?]*[。.!?]?$/i,
+        /\s*(?:원문|소스|tracker|트래커|링크)[^.?!。]*(?:확인|보라|보세요)[^.?!。]*[.?!。]?$/i,
+      ];
+      let changed = true;
+      while (changed) {
+        changed = false;
+        patterns.forEach((pattern) => {
+          const next = value.replace(pattern, "").trim();
+          if (next !== value) {
+            value = next;
+            changed = true;
+          }
+        });
+      }
+      return value;
+    }
+    function sourceHost(url) {
+      try {
+        return new URL(url).hostname.replace(/^www\./, "");
+      } catch (_) {
+        return "source";
+      }
+    }
+    function linkifyHandles(text) {
+      return String(text || "").split(/(@[A-Za-z0-9_]{1,30})/g).map((part) => {
+        if (/^@[A-Za-z0-9_]{1,30}$/.test(part)) {
+          return `<a class="handle-link" href="https://x.com/${esc(part.slice(1))}" target="_blank" rel="noopener noreferrer">${esc(part)}</a>`;
+        }
+        return esc(part);
+      }).join("");
+    }
+    function fmtPx(value) {
+      const n = Number(value);
+      if (!Number.isFinite(n) || !n) return "";
+      if (n >= 1000) return String(Math.round(n));
+      if (n >= 100) return n.toFixed(1);
+      if (n >= 1) return n.toFixed(2);
+      return n.toPrecision(3);
+    }
+    function tickerPillHtml(ticker, prices) {
+      const p = prices && prices[ticker];
+      const px = p ? fmtPx(p.price) : "";
+      if (!px) return `<span class="chat-pill">${esc(ticker)}</span>`;
+      const cur = p.currency && p.currency !== "USD" ? " " + esc(p.currency) : "";
+      const chg = Number(p.chg24h_pct);
+      const hasChg = Number.isFinite(chg);
+      const cls = hasChg ? (chg >= 0 ? "px-up" : "px-down") : "";
+      const chgTxt = hasChg ? " " + (chg >= 0 ? "+" : "") + chg.toFixed(1) + "%" : "";
+      return `<span class="chat-pill">${esc(ticker)}<span class="px ${cls}">${esc(px)}${cur}${chgTxt}</span></span>`;
+    }
+    function messageHtml(msg) {
+      const isAgent = msg.author_type === "agent";
+      const tags = parseJsonList(msg.tickers_json).slice(0, 8);
+      const msgMeta = parseJsonObject(msg.meta_json);
+      const tickerPrices = msgMeta.ticker_prices || {};
+      const handles = isAgent ? [] : parseJsonList(msg.source_handles_json).slice(0, 5);
+      const text = localizedMessageText(msg);
+      const headlineText = isAgent ? stripSourceCta(text.headline) : text.headline;
+      const bodyText = isAgent ? stripSourceCta(text.body) : text.body;
+      const title = headlineText ? `<div class="message-title">${esc(headlineText)}</div>` : "";
+      const cred = isAgent ? credibilityText(msg) : "";
+      const credLine = cred ? `<div class="message-cred">${linkifyHandles(cred)}</div>` : "";
+      const sourceUrl = isAgent ? firstMessageSourceUrl(msg) : String(msg.source_url || "").trim();
+      const sourcePill = sourceUrl
+        ? `<a class="chat-pill" href="${esc(sourceUrl)}" target="_blank" rel="noopener noreferrer">${esc(tr("sourceBadge"))} · ${esc(sourceHost(sourceUrl))} ↗</a>`
+        : "";
+      const timeMeta = `<span class="message-meta">${esc(fmtTime(msg.date))}</span>`;
+      const head = isAgent ? "" : `
+            <div class="message-head">
+              <span class="message-author">${esc(displayAuthorName(msg))}</span>
+              ${timeMeta}
+            </div>`;
+      const bottomRow = `
+            <div class="message-tags">
+              ${isAgent ? '<span class="chat-pill bot-pill">' + esc(tr("aiBadge")) + "</span>" : ""}
+              ${tags.map((ticker) => tickerPillHtml(ticker, tickerPrices)).join("")}
+              ${handles.map((handle) => `<a class="chat-pill" href="https://x.com/${esc(handle)}" target="_blank" rel="noopener noreferrer">@${esc(handle)}</a>`).join("")}
+              ${sourcePill}
+              ${isAgent ? timeMeta : ""}
+            </div>`;
+      return `
+        <article class="message ${esc(msg.author_type || "viewer")}">
+          <div class="avatar ${esc(msg.author_type || "viewer")}">${
+            msg.author_type === "agent"
+              ? `<img class="avatar-img" src="${AGENT_AVATAR_SRC}" alt="${esc(AGENT_DISPLAY_NAME)}" />`
+              : esc(avatarText(msg))
+          }</div>
+          <div class="message-main">${head}
+            ${title}
+            <div class="message-body">${linkifyHandles(bodyText || "")}</div>
+            ${credLine}
+            ${bottomRow}
+          </div>
+        </article>
+      `;
+    }
+    function renderMessages() {
+      const list = messages
+        .filter((msg) => msg.channel === activeChannel)
+        .filter(shouldRenderMessage)
+        .sort((a, b) => Number(a.date || 0) - Number(b.date || 0));
+      const visible = list.slice(-MESSAGE_WINDOW);
+      const el = document.getElementById("messageList");
+      if (!visible.length) {
+        el.innerHTML = `<div class="empty-state">${esc(tr("emptyChannel")(activeChannel))}</div>`;
+        return;
+      }
+      let currentDay = "";
+      el.innerHTML = visible.map((msg) => {
+        const key = dayKey(msg.date);
+        const divider = key && key !== currentDay ? `<div class="date-divider">${esc(dayLabel(msg.date))}</div>` : "";
+        currentDay = key || currentDay;
+        return divider + messageHtml(msg);
+      }).join("");
+    }
+    function scrollerEl() {
+      const body = document.body;
+      const root = document.scrollingElement || document.documentElement;
+      return body.scrollHeight > root.scrollHeight ? body : root;
+    }
+    function nearBottom() {
+      const el = scrollerEl();
+      return el.scrollHeight - el.scrollTop - el.clientHeight < 240;
+    }
+    function scrollToBottom() {
+      const body = document.body;
+      body.scrollTop = body.scrollHeight;
+      const root = document.scrollingElement || document.documentElement;
+      root.scrollTop = root.scrollHeight;
+    }
+    function scrollToBottomSoon() {
+      requestAnimationFrame(() => {
+        scrollToBottom();
+        [80, 250, 600, 1200, 2000].forEach((delay) => setTimeout(() => {
+          if (initialAnchorPending || nearBottom()) scrollToBottom();
+        }, delay));
+      });
+    }
+    function renderKols() {
+      const newestDate = tickerContext.reduce((max, row) => Math.max(max, Number(row.date || 0)), 0);
+      const batchFloor = newestDate ? newestDate - 30000 : 0;
+      const batchRows = tickerContext.filter((row) => Number(row.date || 0) >= batchFloor);
+      const byTicker = {};
+      batchRows.forEach((row) => {
+        const ticker = row.ticker || "";
+        if (!ticker) return;
+        if (!byTicker[ticker] || Number(row.date || 0) > Number(byTicker[ticker].date || 0)) byTicker[ticker] = row;
+      });
+      const top = Object.keys(byTicker)
+        .map((key) => byTicker[key])
+        .sort((a, b) => Number(b.mention_score || 0) - Number(a.mention_score || 0))
+        .slice(0, 6);
+      const el = document.getElementById("kolList");
+      if (!top.length) {
+        el.innerHTML = `<div class="empty-state" style="min-height: 100px; margin: 0;">${esc(tr("emptyContext"))}</div>`;
+        return;
+      }
+      el.innerHTML = top.map((row) => {
+        const handles = parseJsonList(row.source_handles_json).slice(0, 3);
+        const urls = parseJsonList(row.source_urls_json).slice(0, 1);
+        const basis = row.source_basis === "recent_posts" ? tr("recentPosts") : tr("leaderboard");
+        const reason = row["reason_" + lang] || row.reason_en || "";
+        const channel = row.channel ? "#" + row.channel : "";
+        return `
+          <article class="ticker-card">
+            <div class="ticker-card-top">
+              <div class="ticker-symbol">${esc(row.ticker)}</div>
+              <span class="chat-pill">${esc(basis)}</span>
+            </div>
+            <div class="ticker-reason">${esc(reason)}</div>
+            <div class="message-tags">
+              ${channel ? `<span class="chat-pill">${esc(channel)}</span>` : ""}
+              ${handles.map((handle) => `<a class="chat-pill" href="https://x.com/${esc(handle)}" target="_blank" rel="noopener noreferrer">@${esc(handle)}</a>`).join("")}
+              ${urls.map((url) => `<a class="chat-pill" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(tr("sourceBadge"))} ↗</a>`).join("")}
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+    function renderHeader() {
+      const info = channelInfo(activeChannel);
+      document.getElementById("activeChannelTitle").textContent = "#" + (info.name || info.channel);
+      document.getElementById("activeChannelDescription").textContent = channelDescription(activeChannel);
+    }
+    function renderComposer() {
+      const form = document.getElementById("composer");
+      const textarea = document.getElementById("messageInput");
+      const button = document.getElementById("postButton");
+      const signedIn = canPost();
+      const enabled = signedIn && !posting;
+      form.classList.toggle("is-disabled", !signedIn);
+      textarea.disabled = !enabled;
+      button.disabled = !enabled;
+      textarea.placeholder = signedIn ? tr("messagePlaceholder")(activeChannel) : tr("signInPlaceholder");
+    }
+    function renderAll() {
+      renderStaticCopy();
+      renderHeader();
+      renderChannels();
+      renderMessages();
+      renderKols();
+      renderComposer();
+    }
+    async function loadAll(options) {
+      const opts = options || {};
+      const stick = opts.initial || nearBottom();
+      try {
+        const [channelRows, messageRows, kolRows] = await Promise.all([
+          readAlfsJson(`${BASE}/config/channels/@last/20`).catch(() => []),
+          readAlfsJson(`${BASE}/chat/messages/@last/220`).catch(() => []),
+          readAlfsJson(`${BASE}/agent/tickers/@last/60`).catch(() => []),
+        ]);
+        const normalizedChannels = asRows(channelRows).map(normalizeChannel).filter(Boolean);
+        if (normalizedChannels.length) {
+          const latest = {};
+          normalizedChannels.forEach((row) => { latest[row.channel] = row; });
+          channels = Object.keys(latest).map((key) => latest[key]).sort((a, b) => {
+            const order = FALLBACK_CHANNELS.map((c) => c.channel);
+            return order.indexOf(a.channel) - order.indexOf(b.channel);
+          });
+        }
+        const previousCount = messages.length;
+        messages = asRows(messageRows);
+        tickerContext = asRows(kolRows);
+        if (!channels.some((item) => item.channel === activeChannel)) activeChannel = channels[0].channel;
+        setStatus(messages.length ? tr("liveFeed") : tr("noMessages"));
+        renderAll();
+        if (stick && (opts.initial || messages.length !== previousCount)) scrollToBottomSoon();
+      } catch (err) {
+        setStatus(tr("loadError"));
+        document.getElementById("messageList").innerHTML = `<div class="empty-state">${esc(err.message || err)}</div>`;
+      }
+    }
+    function setComposerNote(text, isError) {
+      const el = document.getElementById("composerNote");
+      el.textContent = text || "";
+      el.hidden = !text;
+      el.classList.toggle("is-error", !!isError);
+    }
+    document.getElementById("composer").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!canPost() || posting) return;
+      const input = document.getElementById("messageInput");
+      const text = input.value.trim();
+      if (!text) return;
+      posting = true;
+      renderComposer();
+      setComposerNote(tr("sending"), false);
+      try {
+        let result = await window.alva.udf.call("post_message", { channel: activeChannel, text });
+        if (typeof result === "string") {
+          try { result = JSON.parse(result); } catch (_) {}
+        }
+        input.value = "";
+        setComposerNote("", false);
+        if (result && result.posted) {
+          messages.push(result.posted);
+          renderAll();
+          scrollToBottomSoon();
+        }
+        await loadAll({ initial: true });
+      } catch (err) {
+        setComposerNote(tr("postFailed") + ": " + (err && err.message ? err.message : err), true);
+      } finally {
+        posting = false;
+        renderComposer();
+      }
+    });
+    document.getElementById("messageInput").addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" || event.shiftKey || event.isComposing) return;
+      event.preventDefault();
+      if (typeof event.target.form.requestSubmit === "function") {
+        event.target.form.requestSubmit();
+      } else {
+        event.target.form.dispatchEvent(new Event("submit", { cancelable: true }));
+      }
+    });
+    document.querySelectorAll(".lang-button").forEach((button) => {
+      button.addEventListener("click", () => {
+        lang = button.dataset.lang;
+        try {
+          localStorage.setItem("kolMarketChatLang", lang);
+        } catch (_) {}
+        renderAll();
+      });
+    });
+    window.addEventListener("message", () => renderComposer());
+    window.addEventListener("resize", () => renderAll());
+    window.addEventListener("load", () => {
+      if (initialAnchorPending) scrollToBottom();
+    });
+    if (document.fonts && document.fonts.ready && document.fonts.ready.then) {
+      document.fonts.ready.then(() => {
+        if (initialAnchorPending) scrollToBottom();
+      });
+    }
+    renderStaticCopy();
+    document.getElementById("feedStatus").textContent = tr("loading");
+    document.getElementById("messageList").innerHTML = `<div class="empty-state">${esc(tr("loadingHistory"))}</div>`;
+    loadAll({ initial: true });
+    setInterval(loadAll, 20000);
+  </script>
+</body>
+</html>

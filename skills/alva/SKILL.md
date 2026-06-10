@@ -267,6 +267,9 @@ Source routing:
   fundamentals data: Data Skills.
 - Twitter/X handle history, URL lookup, or full-text over tracked investing
   accounts: Data Skills.
+- Recurring Twitter/X digests, KOL-wire alerts, or social-post summaries:
+  Data Skills plus [social-wire/README.md](references/social-wire/README.md)
+  for the auditable evidence pipeline pattern.
 - Global X search beyond Arrays' index, news/web search, non-US finance, or
   off-catalog asset classes: [search.md](references/search.md) /
   `unified_search`.
@@ -700,6 +703,7 @@ Use this index to open only the file needed for the current task.
 | [operational-pitfalls.md](references/operational-pitfalls.md) | Runtime, ALFS, chart, watermark, and resource pitfalls. |
 | [jagent-runtime.md](references/jagent-runtime.md) | V8 runtime, modules, async model, constraints, built-ins. |
 | [feed-sdk.md](references/feed-sdk.md) | Feed SDK API, schemas, time series, grouped records, upstreams, examples. |
+| [social-wire/README.md](references/social-wire/README.md) | Twitter/X social evidence digest pattern, original KOL chat snapshot, and prototype package. |
 | [altra-trading.md](references/altra-trading.md) | Altra strategy engine, features, signals, tests, PIT compliance. |
 | [alpi.md](references/alpi.md) | Scheduled LLM reasoning/tool-loop API and examples. |
 | [onnx.md](references/onnx.md) | ONNX artifact, inference, FeedAltra integration, release checks. |

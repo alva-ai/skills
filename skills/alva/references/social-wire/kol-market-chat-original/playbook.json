@@ -1,0 +1,473 @@
+{
+  "playbook_id": 7918,
+  "owner_uid": "1961440700109172736",
+  "type": "dashboard",
+  "name": "kol-market-chat",
+  "display_name": "Algostonk KOL Chat",
+  "description": "Slack-style market chat by Algostonk with predefined channels, viewer posting, ticker-first KOL context, and multilingual bot alerts: each KOL wire message gives the key point, a compact leaderboard track-record line, and a link to the original X post. Daily leaderboard watchlist, 10-minute post scanning, EN/CN/KR.",
+  "created_at": "2026-06-08T09:38:09Z",
+  "updated_at": "2026-06-10T07:41:08Z",
+  "draft": {
+    "playbook_version_id": 38216,
+    "updated_at": "2026-06-09T20:35:40Z",
+    "feeds": [
+      {
+        "feed_id": 13151,
+        "feed_name": "kol-market-chat",
+        "feed_major": 1
+      }
+    ]
+  },
+  "releases": [
+    {
+      "version": "v1.3.5",
+      "playbook_version_id": 38932,
+      "created_at": "2026-06-10T06:27:19Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Live prices on message tickers: at alert time the feed fetches latest intraday price (5-min klines; US stocks, Binance spot crypto, non-US daily) plus 24h change for each cited ticker. Push adds a compact price line; ticker pills show price and colored 24h change, hidden when unavailable.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.3.5/index.html"
+    },
+    {
+      "version": "v1.3.4",
+      "playbook_version_id": 38853,
+      "created_at": "2026-06-09T20:45:08Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Composer fixes: Enter sends (Shift+Enter for newline, IME-safe), visible sending/error feedback under the input, optimistic local echo of posted messages. Backfilled leaderboard credibility lines onto all 52 historical bot messages.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.3.4/index.html"
+    },
+    {
+      "version": "v1.3.3",
+      "playbook_version_id": 38852,
+      "created_at": "2026-06-09T20:35:48Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Fix open-at-latest scrolling (body, not html, is the scroll container), merge bot message header into the headline line, move KOL-wire badge and timestamp to the bottom source row, and make @handles clickable to x.com in message bodies, credibility lines, and ticker cards.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.3.3/index.html"
+    },
+    {
+      "version": "v1.3.2",
+      "playbook_version_id": 38847,
+      "created_at": "2026-06-09T20:28:05Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Replace the Algostonk Bot text avatar (AB) with the custom bot image across all agent messages.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.3.2/index.html"
+    },
+    {
+      "version": "v1.3.1",
+      "playbook_version_id": 38845,
+      "created_at": "2026-06-09T20:17:49Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Full-width layout (remove centered max-width side gutters) and Slack-like open-at-latest behavior: channel view anchors to the newest message on load and channel switch, with font/layout-shift re-anchoring that stops once the user scrolls up.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.3.1/index.html"
+    },
+    {
+      "version": "v1.3.0",
+      "playbook_version_id": 38840,
+      "created_at": "2026-06-09T19:00:10Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Redesign: light-theme layout that no longer mimics Alva's app sidebar, full scrollable channel history with bot avatars, per-alert track-record line, cleaner source links. Feed: 10-minute cadence with 24-handle batches, word-boundary push truncation, structured credibility line in alerts, deterministic fallback digest when the AI call fails.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.3.0/index.html"
+    },
+    {
+      "version": "v1.2.4",
+      "playbook_version_id": 38430,
+      "created_at": "2026-06-09T00:11:50Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Improve Alva-style dark sidebar readability by using token-based white text treatment for rail labels, subtitles, and channel counts.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.2.4/index.html"
+    },
+    {
+      "version": "v1.2.3",
+      "playbook_version_id": 38429,
+      "created_at": "2026-06-09T00:10:37Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Retheme the Slack-like channel and message UX to the Alva design system: Delight typography, Alva tokens, teal accents, neutral cards, and platform sidebar colors.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.2.3/index.html"
+    },
+    {
+      "version": "v1.2.2",
+      "playbook_version_id": 38425,
+      "created_at": "2026-06-08T22:39:47Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Clean up the signed-out Slack-style composer by hiding the disabled submit button and leaving a single disabled input field.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.2.2/index.html"
+    },
+    {
+      "version": "v1.2.1",
+      "playbook_version_id": 38424,
+      "created_at": "2026-06-08T22:38:23Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Reduce the mobile message window to two latest localized agent cards so Chinese and Korean mobile screens remain readable above the sticky composer.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.2.1/index.html"
+    },
+    {
+      "version": "v1.2.0",
+      "playbook_version_id": 38423,
+      "created_at": "2026-06-08T22:37:15Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Convert the Slack-style chat into a fixed viewport workspace: cap visible history to the latest consistent messages and trim the ticker rail so desktop and mobile render as an app, not a long page.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.2.0/index.html"
+    },
+    {
+      "version": "v1.1.9",
+      "playbook_version_id": 38422,
+      "created_at": "2026-06-08T22:33:34Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Keep mobile opening at latest messages while preventing desktop body-scroll from being driven by the taller ticker rail.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.1.9/index.html"
+    },
+    {
+      "version": "v1.1.8",
+      "playbook_version_id": 38421,
+      "created_at": "2026-06-08T22:32:36Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Fix fixed desktop channel rail column placement so chat and ticker rail remain visible while the page opens at the latest messages.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.1.8/index.html"
+    },
+    {
+      "version": "v1.1.7",
+      "playbook_version_id": 38420,
+      "created_at": "2026-06-08T22:31:02Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Make the Slack-style workspace full-bleed and keep the desktop channel rail fixed during body-level chat scrolling.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.1.7/index.html"
+    },
+    {
+      "version": "v1.1.6",
+      "playbook_version_id": 38419,
+      "created_at": "2026-06-08T22:29:08Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Fix initial bottom-scroll for Alva body-level scroll containers so chat opens on the latest messages with sticky composer visible.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.1.6/index.html"
+    },
+    {
+      "version": "v1.1.5",
+      "playbook_version_id": 38418,
+      "created_at": "2026-06-08T22:27:27Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Stabilize chat bottom-scroll after data/font layout and force composer button CJK font inheritance for localized mobile controls.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.1.5/index.html"
+    },
+    {
+      "version": "v1.1.4",
+      "playbook_version_id": 38417,
+      "created_at": "2026-06-08T22:25:59Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Tighten Slack-like app layout with sticky channel header and composer, compact mobile workspace rail, and bottom-scroll chat behavior while preserving Alva single-scroll lint compliance.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.1.4/index.html"
+    },
+    {
+      "version": "v1.1.3",
+      "playbook_version_id": 38416,
+      "created_at": "2026-06-08T22:21:40Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Fix agent message CJK rendering and localize source label in Slack-style chat UI.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.1.3/index.html"
+    },
+    {
+      "version": "v1.1.2",
+      "playbook_version_id": 38415,
+      "created_at": "2026-06-08T22:16:39Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Keep the Slack-like channel rail compatible with the Alva design-system button contract while preserving visible dark-sidebar channel states.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.1.2/index.html"
+    },
+    {
+      "version": "v1.1.1",
+      "playbook_version_id": 38414,
+      "created_at": "2026-06-08T22:13:49Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Tighten the Slack-like workspace shell: restore visible channel buttons in the dark sidebar and make the app reliably fill the viewport height.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.1.1/index.html"
+    },
+    {
+      "version": "v1.1.0",
+      "playbook_version_id": 38413,
+      "created_at": "2026-06-08T22:12:39Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Redesign the playbook into a Slack-like, mobile-first workspace UI with a dark channel rail, compact channel header, Slack-style message rows, app-message attachments, date dividers, and filtered historical agent rows that lack traceable X sources.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.1.0/index.html"
+    },
+    {
+      "version": "v1.0.10",
+      "playbook_version_id": 38412,
+      "created_at": "2026-06-08T21:59:51Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Strip source CTA boilerplate from in-page agent message text, including historical rows, while keeping only the traceable source URL at the bottom of each agent article.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.0.10/index.html"
+    },
+    {
+      "version": "v1.0.9",
+      "playbook_version_id": 38411,
+      "created_at": "2026-06-08T21:58:48Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Simplify in-page Algostonk Bot message cards: hide the top bot/time/badge row, remove ticker and handle tag footers, and show only the traceable source URL at the bottom of each agent article.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.0.9/index.html"
+    },
+    {
+      "version": "v1.0.8",
+      "playbook_version_id": 38410,
+      "created_at": "2026-06-08T21:50:29Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Simplify KOL Wire push notifications: remove tracker CTA boilerplate, make notification title empty, keep compact body text, and put only the original X post URL on the final line.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.0.8/index.html"
+    },
+    {
+      "version": "v1.0.7",
+      "playbook_version_id": 38409,
+      "created_at": "2026-06-08T21:33:57Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Upgrade Algostonk Bot into a KOL wire scanner: daily Top-50 leaderboard watchlist, batched 5-minute X post monitoring, post-id dedupe, and fully localized KOL spotlight metadata.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.0.7/index.html"
+    },
+    {
+      "version": "v1.0.6",
+      "playbook_version_id": 38399,
+      "created_at": "2026-06-08T18:11:03Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Rename KOL Wire Agent to Algostonk Bot, use Algostonk display name in UI/UDF, add push-ready notify/message sidecar, and document the strict timely KOL agent architecture.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.0.6/index.html"
+    },
+    {
+      "version": "v1.0.5",
+      "playbook_version_id": 38394,
+      "created_at": "2026-06-08T17:38:26Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Prevent CN/KR views from falling back to stale English-only KOL Wire Agent messages; localized channel counts now match visible messages.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.0.5/index.html"
+    },
+    {
+      "version": "v1.0.4",
+      "playbook_version_id": 38392,
+      "created_at": "2026-06-08T17:12:58Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Add lang query parameter support for direct EN/CN/KR rendering.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.0.4/index.html"
+    },
+    {
+      "version": "v1.0.3",
+      "playbook_version_id": 38391,
+      "created_at": "2026-06-08T17:12:01Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Fix Recent Tickers ordering so the newest ticker-context batch renders in source priority order.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.0.3/index.html"
+    },
+    {
+      "version": "v1.0.2",
+      "playbook_version_id": 38390,
+      "created_at": "2026-06-08T17:10:28Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Adds EN/CN/KR i18n, multilingual KOL Wire Agent digests, and a ticker-first Recent Tickers rail with one-sentence context from top-KOL mentions.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.0.2/index.html"
+    },
+    {
+      "version": "v1.0.1",
+      "playbook_version_id": 38228,
+      "created_at": "2026-06-08T09:45:20Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Fix channel rail fallback and feed row normalization for predefined owner channels.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.0.1/index.html"
+    },
+    {
+      "version": "v1.0.0",
+      "playbook_version_id": 38224,
+      "created_at": "2026-06-08T09:41:14Z",
+      "feeds": [
+        {
+          "feed_id": 13151,
+          "feed_name": "kol-market-chat",
+          "feed_major": 1
+        }
+      ],
+      "changelog": "Initial release: Slack-style market channels, feed-backed history, viewer posting UDF, and hourly KOL Wire Agent messages from the FinTwit Alpha Leaderboard.",
+      "layout_html": "https://snarketh.playbook.alva.ai/kol-market-chat/v1.0.0/index.html"
+    }
+  ],
+  "readme_url": "/alva/home/snarketh/playbooks/kol-market-chat/README.md",
+  "metadata": {}
+}
