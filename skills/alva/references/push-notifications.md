@@ -52,3 +52,17 @@ claim push is set up. Diagnose and fix first.
 Confirm to the user with specifics: which feed/playbook is subscribed, what the
 next push will say, and when it will fire. For monitors, say quiet runs skip
 notifications.
+
+## Inventory And Unsubscribe
+
+- `alva subscriptions list --first 200` — rows carry `kind`, playbook
+  identity, `following`, `target_status`. If `items` < `total_count`, keep
+  paginating; never report a truncated page as the full inventory.
+- `alva subscriptions follows` — the follow list.
+- Unsubscribe by name (`unsubscribe-playbook|unsubscribe-feed`) for live
+  targets; by id (`unsubscribe --playbook-ids a,b --feed-ids c`) for bulk
+  and for `TARGET_DELETED` ghosts (name-addressed 404s on deleted targets).
+- Resolve ids with `alva playbooks get --ids a,b` / `--ref owner/name`;
+  list a user's playbooks with `alva playbooks list --owner <username>`.
+- Never probe with mutating calls — the read surface answers all identity
+  questions.
