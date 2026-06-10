@@ -58,7 +58,8 @@ alva lint playbook ./index.html
 ```
 
 `alva release playbook` runs the same lint internally and refuses to release
-if any error-severity finding fires. See SKILL.md §7 Release.
+if any error-severity finding fires. See
+[playbook-creation.md - Release](./playbook-creation.md#release).
 
 ## Typography & Font
 
