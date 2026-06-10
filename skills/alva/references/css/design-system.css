@@ -33,6 +33,7 @@
     --chart-green2-main: #8fc13a;
     --chart-green2-1: #5b8513;
     --chart-green2-2: #c0d40f;
+    --chart-cyan1-main: #49a3a6; /* same as --main-m1 */
     --chart-cyan1-1: #117a7d;
     --chart-cyan1-2: #77c9c2;
     --chart-cyan2-main: #7cafad;
@@ -139,7 +140,7 @@
     --line-l12: rgba(0, 0, 0, 0.12); /* Card Border */
     --line-l2: rgba(0, 0, 0, 0.2); /* Popup/Dropdown Border */
     --line-l3: rgba(0, 0, 0, 0.3); /* Button/Input/Select Border */
-    --line-l9: rgba(0, 0, 0, 0.9); 
+    --line-l9: rgba(0, 0, 0, 0.9); /* Hover/Active Border */
 
     /* Shadow */
     --shadow-xs: 0 4px 15px 0 rgba(0, 0, 0, 0.05);

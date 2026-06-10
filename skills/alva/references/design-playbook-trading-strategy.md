@@ -3,6 +3,18 @@
 > Follow this spec strictly for all trading strategy playbooks. Do not invent
 > alternative layouts. Global tokens and rules: [design.md](./design.md).
 
+## Table of Contents
+
+- [0. Page Layout](#0-page-layout)
+- [1. Shared Structure](#1-shared-structure)
+- [2. Tab: Overview](#2-tab-overview)
+- [3. Tab: Analytics](#3-tab-analytics)
+- [4. Tab: Strategy](#4-tab-strategy)
+- [5. Tab: Feed](#5-tab-feed)
+- [6. Responsive Breakpoints](#6-responsive-breakpoints)
+- [7. Data Schema (JSON)](#7-data-schema-json)
+- [8. Generation Checklist](#8-generation-checklist)
+
 ---
 
 ## 0. Page Layout
