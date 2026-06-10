@@ -331,7 +331,7 @@ tags, and scoped CSS maps them to the Alva design spec.
 .markdown-container code {
   display: inline-block;
   vertical-align: middle;
-  box-shadow: inset 0 0 0 1px var(--line-l07);
+  box-shadow: inset 0 0 0 0.5px var(--line-l12);
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.12px;
@@ -339,7 +339,8 @@ tags, and scoped CSS maps them to the Alva design spec.
   margin: 0 var(--spacing-xxs);
 }
 .markdown-container pre {
-  border: 1px solid var(--line-l07);
+  border: 0.5px solid var(--line-l12);
+  border-radius: var(--radius-ct-s);
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.12px;
