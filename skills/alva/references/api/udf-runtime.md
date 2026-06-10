@@ -213,6 +213,48 @@ invocation once.
 
 Do not implement a custom credit authorization modal inside the playbook iframe.
 
+## Feed Subscribe Proposal
+
+A playbook can offer the viewer a one-click "subscribe to alerts" for one of
+its feeds, but it must **not** subscribe the viewer directly. A playbook iframe
+cannot be trusted to represent real user intent — author code could silently
+`fetch()` a subscribe on load and force-subscribe the viewer. So feed subscribe
+goes through a parent-confirmed **proposal**:
+
+`window.alva.subscribe.propose({ feedOwner, feedName })` posts an
+`alva:subscribe:propose` message to the parent Alva page. The parent validates
+that the feed belongs to this playbook, shows a confirm prompt, and — only on
+user confirmation — subscribes with the viewer's own session. It replies
+`alva:subscribe:result`, and the promise resolves with the outcome.
+
+```html
+<button id="sub">Subscribe to alerts</button>
+<script>
+  document.getElementById("sub").addEventListener("click", async () => {
+    const status = await window.alva.subscribe.propose({
+      feedOwner: "alice",
+      feedName: "eth-price-push",
+    });
+    // 'subscribed' | 'declined' | 'timeout' | 'error'
+    if (status === "subscribed") {
+      document.getElementById("sub").textContent = "Subscribed ✓";
+    }
+  });
+</script>
+```
+
+Hard rules:
+
+- Do **not** call any subscribe API from playbook HTML — no
+  `fetch('/api/v1/subscriptions/...')`, no `AlvaClient` subscribe call. The
+  PBSV token does not authorize writing subscriptions; `propose()` is the only
+  allowed path.
+- The proposed feed must be one of the playbook's own feeds. Proposals for
+  any other feed are rejected by the parent (resolve `'error'`) and never
+  prompt the viewer.
+- The subscription is always written to the viewer's own account; a playbook
+  can never subscribe anyone else.
+
 ## Creator Function CLI
 
 Creator-side UDF management is a CLI flow. Before using it in a session, run

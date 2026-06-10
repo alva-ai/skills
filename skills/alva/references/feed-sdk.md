@@ -231,8 +231,11 @@ require a 500-character summary.
   publisher capable of emitting alerts. They do **not** subscribe any user or
   group.
 - Real delivery requires an explicit subscription: personal
-  `alva subscriptions subscribe-feed` / `subscribe-playbook`, or group
-  `/alva subscribe feed <id>` / `/alva subscribe playbook <id>`.
+  `alva subscriptions subscribe-feed` / `subscribe-playbook`, group
+  `/alva subscribe feed <id>` / `/alva subscribe playbook <id>`, or — from
+  inside a playbook iframe — a parent-confirmed `window.alva.subscribe.propose()`
+  (see `references/api/udf-runtime.md` § Feed Subscribe Proposal). A playbook
+  must never call a subscribe API directly.
 - Use `meta.reason` to provide the push-notification body -- this is what
   recipients see when the signal is delivered.
 - `meta.reason` is **Markdown**. Write it as the push body itself, using
