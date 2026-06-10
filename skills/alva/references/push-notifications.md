@@ -53,13 +53,6 @@ Confirm to the user with specifics: which feed/playbook is subscribed, what the
 next push will say, and when it will fire. For monitors, say quiet runs skip
 notifications.
 
-## Subscribe Disambiguation
-
-"Subscribe" means three different things — confirm which one before acting:
-**follow** (social, `alva subscriptions follows`), **alerts** (push,
-`alva subscriptions list`), **purchase** (paid — not this command, confirm
-before touching anything billing-related).
-
 ## Inventory And Unsubscribe
 
 - `alva subscriptions list --first 200` — rows carry `kind`, playbook
