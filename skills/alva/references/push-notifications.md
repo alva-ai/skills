@@ -33,9 +33,9 @@ A push is set up only after all of these succeed:
    - `notify/message` for feed completion, AlvaAsk reports, heartbeat checks,
      and proactive alerts.
 2. Run the feed through [feed-lifecycle.md](feed-lifecycle.md), including
-   `before-feed-release`.
+   `before-automation-publish`.
 3. Publish or update the automation with publisher push enabled: use
-   `alva release automation --push-notify` from [deployment.md](deployment.md),
+   `alva automation publish --push-notify` from [deployment.md](deployment.md),
    or update an existing cronjob with `alva deploy update --id <ID>
    --push-notify` and republish the feed after sidecar changes.
 4. Subscribe the target:

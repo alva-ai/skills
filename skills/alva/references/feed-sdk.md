@@ -5,6 +5,10 @@ time series data on the Alva filesystem. Feed outputs are readable via standard
 filesystem paths, making them accessible to other scripts, dashboards, and
 public consumers.
 
+In normal user-facing workflows, this SDK is the data layer for an automation.
+Use `feed` for SDK code, paths, and diagnostics; publish and explain the
+finished product as an automation.
+
 ---
 
 ## Overview
@@ -227,7 +231,7 @@ require a 500-character summary.
 
 - The group **must** be named `signal` and the output **must** be named
   `targets` -- this is the path the notification system looks for.
-- `--push-notify` on `alva release automation` only makes the feed publisher
+- `--push-notify` on `alva automation publish` only makes the feed publisher
   capable of emitting alerts. It does **not** subscribe any user or group.
 - Real delivery requires an explicit subscription: personal
   `alva subscriptions subscribe-feed` / `subscribe-playbook`, or group
@@ -294,10 +298,10 @@ If there is no material update worth notifying about, output only
 Publish the automation in one command:
 
 ```bash
-alva release automation --name daily-briefing --version 1.0.0 \
-  --cronjob-name daily-briefing \
+alva automation publish --name daily-briefing --version 1.0.0 \
+  --producer-name daily-briefing \
   --path '~/feeds/daily-briefing/v1/src/index.js' \
-  --cron "0 8 * * *" --push-notify \
+  --schedule "0 8 * * *" --push-notify \
   --description "Generates a morning briefing each day at 08:00 summarizing overnight crypto market moves and pushes it as a notification"
 ```
 
@@ -804,12 +808,12 @@ alva fs read --path '/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last
 ### Step 5: Publish the automation (required for live playbooks)
 
 ```bash
-alva release automation \
+alva automation publish \
   --name btc-ema \
   --version 1.0.0 \
-  --cronjob-name btc-ema-update \
+  --producer-name btc-ema-update \
   --path '~/feeds/btc-ema/v1/src/index.js' \
-  --cron "0 */4 * * *" \
+  --schedule "0 */4 * * *" \
   --description "Refreshes BTC EMA metrics every four hours"
 ```
 

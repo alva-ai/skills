@@ -1,7 +1,9 @@
 # Feed Lifecycle
 
-Feeds are persistent data pipelines. Use them whenever data needs freshness,
-history, public reads, charts, playbook backing, push sidecars, or release.
+Feeds are the data layer for automations and playbooks. Use the Feed SDK when
+data needs freshness, history, public reads, charts, playbook backing, push
+sidecars, or release; call the user-facing product an automation unless you
+are discussing SDK code, paths, or diagnostics.
 
 For API detail and examples, read [feed-sdk.md](feed-sdk.md). For automation
 publish, read [deployment.md](deployment.md). For runtime constraints, read
@@ -9,7 +11,7 @@ publish, read [deployment.md](deployment.md). For runtime constraints, read
 
 ## Lifecycle
 
-Every feed follows the same path:
+Every automation-backed feed follows the same path:
 
 1. Write schema and incremental logic with `feed.def()` and
    `ctx.self.ts().append()`.
@@ -17,15 +19,15 @@ Every feed follows the same path:
 3. Test with `alva run --entry-path '~/feeds/<name>/v1/src/index.js'`.
 4. Grant the feed root for public reads when a playbook or public user needs it:
    `alva fs grant --path '~/feeds/<name>' --subject "special:user:*" --permission read`.
-5. Publish the automation with `alva release automation`.
+5. Publish the automation with `alva automation publish`.
 
 Treat scheduler creation and feed release as one automation publish operation.
 Do not stop after deploy, run an extra discovery loop, or leave an unreleased
 producer when the intent is a live feed, push alert, or playbook dependency.
-The released feed body and scheduler must be bound for downstream reads and
-push fanout.
+The published automation output and scheduler must be bound for downstream
+reads and push fanout.
 
-`alva run` is a test step. It does not replace deploy or release and does not
+`alva run` is a test step. It does not replace automation publish and does not
 guarantee public `@last` data for a playbook.
 
 ## Modeling
@@ -61,10 +63,10 @@ if (!equityRecords.length) {
 If a run fails with out-of-memory, retry with a larger `--max-heap-size-mb`
 (up to 2048) before editing logic.
 
-## HARD-GATE: before-feed-release
+## HARD-GATE: before-automation-publish
 
-<HARD-GATE id="before-feed-release">
-Before `alva release automation`, verify:
+<HARD-GATE id="before-automation-publish">
+Before `alva automation publish`, verify:
 
 1. The exact feed script ran successfully in this session after the latest
    source write.
@@ -92,7 +94,7 @@ Push-capable feeds write one of these streams:
 Both dispatch `feed_alert_ready`. Do not use legacy names such as
 `playbook_data_ready` or `feed_run_complete` in new docs.
 
-`--push-notify` marks the cronjob publisher as capable of emitting alerts. It
+`--push-notify` marks the automation publisher as capable of emitting alerts. It
 does not subscribe any user or group and does not bypass notification
 preferences. For `notify/message`, `<|SKIP_NOTIFICATION|>` advances fanout
 without sending a visible push.

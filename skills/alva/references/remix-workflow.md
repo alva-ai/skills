@@ -203,11 +203,11 @@ only on explicit request). Do not write fresh files from scratch.
 3. **Grant** public read: `alva fs grant --path '~/feeds/{new-name}' --subject "special:user:*" --permission read`
 4. **Publish automation**:
    ```bash
-   alva release automation \
+   alva automation publish \
      --name {new-name} \
      --version 1.0.0 \
      --path '~/feeds/{new-name}/v1/src/index.js' \
-     --cron "..." \
+     --schedule "..." \
      --description "..."
    ```
 6. **Edit local HTML** (the `./index.html` from Step 2 — update data

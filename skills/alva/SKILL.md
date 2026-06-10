@@ -374,15 +374,15 @@ digest, signal, reusable dataset, or future answer.
 Read [feed-lifecycle.md](references/feed-lifecycle.md) and
 [feed-sdk.md](references/feed-sdk.md) when creating or changing a feed. The
 short lifecycle is: write schema and logic, upload source, `alva run`, grant
-public read if needed, then publish the automation in one block: deploy the
-producer and immediately release the feed with that cronjob id.
+public read if needed, then publish the automation with
+`alva automation publish`.
 
-Before feed release, satisfy `before-feed-release`: fresh run, expected shape,
-needed grants, public read verification, and non-empty data for HTML
-dependencies. Feed scripts fail fast on missing data; the detailed release and
-grant contract lives in the feed references. Read the matching
+Before automation publish, satisfy `before-automation-publish`: fresh run,
+expected shape, needed grants, public read verification, and non-empty data for
+HTML dependencies. Feed scripts fail fast on missing data; the detailed release
+and grant contract lives in the feed references. Read the matching
 [operational-pitfalls.md](references/operational-pitfalls.md) section before
-each feed, ALFS, deploy, and release step.
+each feed, ALFS, automation publish, and release step.
 
 #### Publication Layer: Playbook Creation Tree
 
@@ -634,8 +634,8 @@ generator behind the selected element rather than the rendered DOM.
 ### Push Monitor
 
 For a recurring alert, design the feed output first: signal target or message,
-quiet-run sentinel, cadence, and subscriber. Release the feed after adding the
-sidecar, then verify a real run. A cronjob with `--push-notify` and no
+quiet-run sentinel, cadence, and subscriber. Publish the automation after
+adding the sidecar, then verify a real run. Push enablement without an explicit
 subscription is not a completed push setup.
 
 ### Chat-as-Artifact (`answer_only` / query mode)
@@ -693,7 +693,7 @@ Use this index to open only the file needed for the current task.
 | [request-routing.md](references/request-routing.md) | Route choice, Skillhub, Guided Planning, capability verification, completion gate. |
 | [content-legitimacy.md](references/content-legitimacy.md) | Data provenance, prohibited sources, chat-as-artifact, feed isolation, conventions. |
 | [data-skills.md](references/data-skills.md) | Data Skills discovery, endpoint calls, Arrays auth, search/data routing. |
-| [feed-lifecycle.md](references/feed-lifecycle.md) | Feed build/release lifecycle, modeling summary, push sidecars, `before-feed-release`. |
+| [feed-lifecycle.md](references/feed-lifecycle.md) | Feed data-layer lifecycle for automations, modeling summary, push sidecars, `before-automation-publish`. |
 | [playbook-creation.md](references/playbook-creation.md) | HTML build, browser-safe reads, README, draft, release, screenshot, tier flow. |
 | [push-notifications.md](references/push-notifications.md) | Push-worthy feeds, sidecars, subscriptions, delivery verification. |
 | [operational-pitfalls.md](references/operational-pitfalls.md) | Runtime, ALFS, chart, watermark, and resource pitfalls. |
@@ -756,7 +756,7 @@ Before finishing an Alva task, ask:
 - Did Financial Analysis / Ask Question pass the ask evidence gate before I answered?
 - Did I avoid WebSearch/LLM/memory/user-pasted data as factual values?
 - Did I run Data Skills `list` -> `summary` -> `endpoint` before coding calls?
-- Did feed release pass `before-feed-release`?
+- Did automation publish pass `before-automation-publish`?
 - Did playbook work read [playbook-creation.md](references/playbook-creation.md)
   and pass the relevant hard gates?
 - Did design work read [design.md](references/design.md) and lint where needed?

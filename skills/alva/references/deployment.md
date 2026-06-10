@@ -3,12 +3,14 @@
 Publish automations by binding the scheduled producer to the released feed in
 one build step. This is essential for feeds that need regular updates (e.g.
 hourly price data), recurring tasks, push alerts, live playbook data, and clean
-retirement when an automation is replaced.
+retirement when an automation is replaced. Use `automation` as the normal
+product term; use feed/cronjob terms only for SDK code, diagnostics, or repair.
 
-The three lifecycle CLI groups:
+The lifecycle CLI groups:
 
 | Group           | Manages                              | Common commands                  |
 | --------------- | ------------------------------------ | -------------------------------- |
+| `alva automation` | User-facing automation publish      | `publish`                       |
 | `alva deploy`   | Cronjobs (schedule + entry script)   | `create`, `list`, `update`, `delete`, `runs` |
 | `alva feed`     | Released feed records + active majors | `list`, `delete`                |
 | `alva playbook` | Published playbook records           | `list`, `delete`                 |
@@ -21,30 +23,29 @@ For any live feed, push alert, or playbook dependency, publish the producer and
 released feed in one command:
 
 ```bash
-alva release automation \
+alva automation publish \
   --name btc-ema \
   --version 1.0.0 \
-  --cronjob-name btc-ema-update \
+  --producer-name btc-ema-update \
   --path '~/feeds/btc-ema/v1/src/index.js' \
-  --cron "0 */4 * * *" \
+  --schedule "0 */4 * * *" \
   --push-notify \
   --description "Refreshes BTC EMA data every four hours from the feed script and publishes the latest values for playbooks and alerts"
 ```
 
-`alva release automation` creates the backing cronjob and registers the released
-feed/feed major in one backend flow. Do not treat `alva deploy create` as a
-finished live feed. A standalone cronjob row only starts scheduled execution;
-the released feed body and active major are what readers, playbooks, and push
-fanout consume. Prefer the one-command publish path for new builds because it
-avoids orphan producers, removes extra list/get discovery, and keeps builds
-faster.
+`alva automation publish` creates the backing scheduler and registers the
+automation output in one backend flow. Do not treat `alva deploy create` as a
+finished live automation. A standalone scheduler only starts execution; the
+published automation output is what readers, playbooks, and push fanout
+consume. Prefer the one-command publish path for new builds because it avoids
+orphan producers, removes extra list/get discovery, and keeps builds faster.
 
 The full automation workflow:
 
 1. **Write** a script (feed or task) and upload it to the filesystem.
 2. **Test** it manually via `alva run`.
 3. **Grant** public read if playbooks or public readers need it.
-4. **Publish** the automation with `alva release automation`.
+4. **Publish** the automation with `alva automation publish`.
 5. **Verify** the deployment via `alva deploy trigger` (one out-of-schedule run).
 6. **Monitor** status via `alva deploy list` / `alva deploy get`.
 7. **Debug** execution history via `alva deploy runs` / `alva deploy run-logs`.
@@ -84,7 +85,7 @@ any group. For `notify/message`, `<|SKIP_NOTIFICATION|>` in `body`/`text`
 skips the user-visible push while advancing fanout.
 
 The CLI validates that the entry path exists on the filesystem before creating
-the cronjob. For new feed-backed automations, use `alva release automation`
+the cronjob. For new feed-backed automations, use `alva automation publish`
 instead of standalone create so the feed release is bound immediately.
 
 **Response**:
@@ -204,14 +205,14 @@ on flags.
 - `alva deploy` — the **cronjob** (schedule + entry script + args). Lives
   in the `cronjobs` table.
 - `alva feed` — the **released feed record + active majors** (the row
-  written by `alva release automation` or manual `alva release feed`,
+  written by `alva automation publish` or manual `alva release feed`,
   consumed by the push-fanout path).
   Lives in `feeds` / `feed_majors`.
 - `alva playbook` — the **published playbook** (rendered HTML +
   display_name + visibility + ACL). Lives in `playbooks` and is
   surfaced at `https://alva.ai/u/<username>/playbooks/<name>`.
 
-`alva release automation` creates and binds the deploy/feed rows in one publish
+`alva automation publish` creates and binds the deploy/feed rows in one publish
 operation for build speed, but each still has its own lifecycle row. Playbook
 release is the separate UI publication step after the backing automation is
 published.
@@ -355,12 +356,12 @@ alva fs grant --path '~/feeds/btc-hourly/v1' --subject "special:user:*" --permis
 ### 4. Publish the automation
 
 ```bash
-alva release automation \
+alva automation publish \
   --name btc-hourly \
   --version 1.0.0 \
-  --cronjob-name btc-hourly-price-feed \
+  --producer-name btc-hourly-price-feed \
   --path '~/feeds/btc-hourly/v1/src/index.js' \
-  --cron "0 */4 * * *" \
+  --schedule "0 */4 * * *" \
   --description "Refreshes hourly BTC OHLCV data every four hours from crypto market data"
 ```
 
@@ -384,8 +385,8 @@ alva fs read --path '/alva/home/alice/feeds/btc-hourly/v1/data/market/ohlcv/@las
   timestamp with `ctx.kv.put()`/`ctx.kv.load()` to avoid re-fetching all
   historical data on each run.
 - **Test thoroughly before publishing**: Run the script manually via
-  `alva run` and verify the output before `alva release automation`.
-- **Use descriptive names**: The cronjob name helps you identify jobs when
+  `alva run` and verify the output before `alva automation publish`.
+- **Use descriptive names**: The producer name helps you identify jobs when
   listing them.
 - **Pause before updating**: If you need to update the script, pause the cronjob
   first, update the script file, test it, then resume.

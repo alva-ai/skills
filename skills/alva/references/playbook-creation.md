@@ -123,7 +123,7 @@ Before `alva release playbook-draft`, verify:
 - HTML exists at `~/playbooks/{name}/index.html`.
 - README exists at `~/playbooks/{name}/README.md`.
 - Target name and owner namespace match `alva whoami`.
-- Every feed in `--feeds` has passed `before-feed-release`.
+- Every feed in `--feeds` has passed `before-automation-publish`.
 - Draft metadata matches the approved plan.
 - `--tags` includes required asset overlap plus material related people:
   investors, company figures, officials/policymakers, Twitter/X KOLs.
@@ -159,7 +159,7 @@ alva release playbook ... \
 <HARD-GATE id="before-playbook-release">
 Before `alva release playbook`, verify:
 
-1. Every backing feed passed `before-feed-release`.
+1. Every backing feed passed `before-automation-publish`.
 2. Every feed the HTML reads at runtime has a successful deploy and appears in
    `--feeds`.
 3. Cronjobs for referenced feeds are active.
@@ -174,7 +174,7 @@ Before `alva release playbook`, verify:
 8. Target user namespace is correct.
 9. README exists, is current, and is passed via absolute `--readme-url`.
 10. Push-only feeds with `push_notify: true` have a current
-    `alva release automation` publish after the push sidecar was added.
+    `alva automation publish` after the push sidecar was added.
 11. `alva lint playbook ./index.html` passes, or an intentional
     `--bypass-lint` is documented.
 
