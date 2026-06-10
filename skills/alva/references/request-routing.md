@@ -49,7 +49,10 @@ listing details internal unless the user is debugging blueprint retrieval.
 5. Pull supporting files only on demand. Do not bulk-download.
 6. Treat the blueprint as authoritative for layout, fields, sections, cadence,
    and guardrails. Deviate only when the user explicitly overrides it or live
-   data coverage blocks it.
+   data coverage blocks it. Preserve the blueprint's platform boundary by
+   default: avoid replacing platform chrome such as `<playbook-header>` with a
+   hand-written page header unless the user explicitly wants custom in-iframe
+   chrome.
 7. If any Skillhub skill informed the build, pass
    `--skill-id <username>/<name>` during playbook draft. See
    [api/release.md](api/release.md#skill-id).

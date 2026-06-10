@@ -37,6 +37,11 @@ Before writing or rewriting playbook HTML, verify:
 - [content-legitimacy.md](content-legitimacy.md) has been applied.
 - The HTML follows the Browser request rule below for every Alva data request,
   including cloned blueprints, templates, and existing HTML.
+- The iframe HTML starts with useful playbook content by default, not a second
+  title/header area. The hosted shell already renders playbook-level chrome;
+  see [design.md#hosted-shell-boundary](design.md#hosted-shell-boundary).
+  Add custom in-iframe chrome only when the user explicitly asks for it or the
+  blueprint requires a distinct app-level header.
 
 Do not rely on memory of prior sessions.
 </HARD-GATE>
@@ -177,6 +182,10 @@ Before `alva release playbook`, verify:
     after the push sidecar was added.
 11. `alva lint playbook ./index.html` passes, or an intentional
     `--bypass-lint` is documented.
+12. Header duplication has been reviewed. If the iframe repeats the outer
+    playbook title, description, last-updated text, automation controls, or
+    share/open controls, confirm that the user explicitly requested custom
+    in-iframe chrome or the blueprint requires a distinct app-level header.
 
 If any item fails, do not release. Fix it, rerun draft if metadata or files
 changed, then re-enter this gate.
