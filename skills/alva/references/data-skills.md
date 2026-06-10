@@ -44,8 +44,8 @@ If a call returns 401, rerun `alva arrays token ensure`. Do not use
 
 Data Skills cover spot and derivatives markets across stocks, ETFs, options,
 and crypto; equity fundamentals, estimates, events, ownership flows; on-chain
-metrics and exchange flows; macro indicators; prediction markets; news; and
-Twitter/X feeds.
+metrics and exchange flows; macro indicators; semiconductor spot prices;
+prediction markets; news; and Twitter/X feeds.
 
 Twitter/X routing:
 

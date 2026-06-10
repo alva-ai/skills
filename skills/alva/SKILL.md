@@ -38,7 +38,7 @@ The main objects are:
 
 | Concept | Meaning | Read when |
 | --- | --- | --- |
-| Data Skills | 250+ structured Arrays endpoints for equities, crypto, macro, on-chain, news, prediction markets, and indexed Twitter/X. | You need factual financial data. |
+| Data Skills | 250+ structured Arrays endpoints for equities, crypto, macro, on-chain, semiconductor spot prices, news, prediction markets, and indexed Twitter/X. | You need factual financial data. |
 | Runtime script | JavaScript executed inside Alva's V8/jagent runtime through `alva run` or cronjobs. | You need computation, HTTP, ALFS, secrets, alpi, ONNX, or Feed SDK. |
 | Feed | A persistent data pipeline that writes time-series or grouped outputs to ALFS and can back playbooks or alerts. | Data needs freshness, history, public reads, charts, release, or push. |
 | Playbook | A hosted investing app at `https://alva.ai/u/<username>/playbooks/<name>`. | The user wants a shareable dashboard, screener, thesis, what-if, or strategy surface. |
@@ -263,8 +263,8 @@ or sector baskets, verify ticker fit with live company-detail data such as
 
 Source routing:
 
-- Structured US-equity, crypto, on-chain, macro, prediction-market, and
-  fundamentals data: Data Skills.
+- Structured US-equity, crypto, on-chain, macro, semiconductor spot price,
+  prediction-market, and fundamentals data: Data Skills.
 - Twitter/X handle history, URL lookup, or full-text over tracked investing
   accounts: Data Skills.
 - Global X search beyond Arrays' index, news/web search, non-US finance, or
