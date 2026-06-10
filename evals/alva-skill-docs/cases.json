@@ -400,6 +400,22 @@
       ]
     },
     {
+      "id": "target.financial-analysis-prose-gate",
+      "group": "target",
+      "target": "corpus",
+      "description": "Financial Analysis answers must read the merged user-facing prose reference before answering.",
+      "includes": [
+        "Financial-analysis answer gate",
+        "before answering any Financial Analysis / Ask Question",
+        "read [user-facing-prose.md](references/user-facing-prose.md)",
+        "then satisfy the ask evidence gate",
+        "Every answer must read [user-facing-prose.md](user-facing-prose.md)",
+        "user-facing prose reference read",
+        "Product vocabulary, voice rules, and alpi prose prompt block",
+        "Chat answers for Financial Analysis / Ask Question"
+      ]
+    },
+    {
       "id": "target.pitfalls-stepwise-required",
       "group": "target",
       "target": "corpus",

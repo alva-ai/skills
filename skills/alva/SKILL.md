@@ -166,14 +166,13 @@ Before doing Alva work, open [preflight.md](references/preflight.md). It owns:
 - `~/memory/MEMORY.md` loading
 - user-scope enforcement
 
-Use [language.md](references/language.md) for product vocabulary. User-facing
-words are **automation**, **playbook**, **alert/notification**, **Agent**, and
-**script**. Treat **feed** as internal unless the user is looking at logs, raw
-data, API fields, release references, or an Automation detail that exposes it.
-
-Use [narrative-voice.md](references/narrative-voice.md) before writing
-playbook copy, README prose, visible HTML text, alpi prompts, digests, or
-release descriptions. It bans AI-tell tokens and unsupported narrative shapes.
+Use [user-facing-prose.md](references/user-facing-prose.md) for product
+vocabulary and voice before writing Financial Analysis answers, playbook copy,
+README prose, visible HTML text, alpi prompts, digests, or release
+descriptions. User-facing words include **automation**, **playbook**,
+**alert/notification**, **Agent**, and **script**. Treat **feed** as internal
+unless the user is looking at logs, raw data, API fields, release references,
+or an Automation detail that exposes it.
 
 Use [creators-note.md](references/creators-note.md) when composing a pinned
 post-release author note.
@@ -349,10 +348,12 @@ Use the shared data and execution layer first. If the user asks a direct
 question, answer directly with provenance; if they ask to track, alert, share,
 or publish, route to the durable artifact / playbook tree instead.
 
-Ask evidence gate: do not answer a financial-analysis ask until you can name
-the decomposition, data/source path for each hop, fetched vs missing coverage,
-and which judgments are sourced facts, computed values, or inference. For a
-simple ask, this can be one hop. If a required KPI or baseline is missing,
+Financial-analysis answer gate: before answering any Financial Analysis / Ask
+Question, read [user-facing-prose.md](references/user-facing-prose.md), then
+satisfy the ask evidence gate. Do not answer a financial-analysis ask until you
+can name the decomposition, data/source path for each hop, fetched vs missing
+coverage, and which judgments are sourced facts, computed values, or inference.
+For a simple ask, this can be one hop. If a required KPI or baseline is missing,
 disclose the gap instead of filling it from memory or snippets.
 
 ### Durable Artifacts / Playbook Tree
@@ -586,9 +587,10 @@ For "what is the latest price / P/E / funding rate / holdings / CPI print",
 "why did it move", "is it cheap vs peers", or "rank these in text", start with
 financial analysis. Run preflight if needed, verify the relevant Data Skills or
 search route, use `alva run` when live computation or joins are needed, fetch
-or qualify any comparison baseline, apply the ask evidence gate in the
-Financial Analysis tree, and answer with inline provenance. If the data source
-fails, report the failure instead of substituting a web snippet or model
+or qualify any comparison baseline, read
+[user-facing-prose.md](references/user-facing-prose.md), apply the answer gate
+in the Financial Analysis tree, and answer with inline provenance. If the data
+source fails, report the failure instead of substituting a web snippet or model
 memory. If the user then asks to track, alert, share, or publish, upgrade the
 route to a feed, signal, alert, or playbook.
 
@@ -705,8 +707,7 @@ Use this index to open only the file needed for the current task.
 | [search.md](references/search.md) | `unified_search`, finance search, Twitter/X, Reddit, YouTube, web gotchas. |
 | [secret-manager.md](references/secret-manager.md) | Secret upload, naming, CRUD, runtime access, guardrails. |
 | [memory.md](references/memory.md) | Memory storage layout, write policy, user profile template. |
-| [language.md](references/language.md) | Canonical product vocabulary. |
-| [narrative-voice.md](references/narrative-voice.md) | Voice rules and alpi prose prompt block. |
+| [user-facing-prose.md](references/user-facing-prose.md) | Product vocabulary, voice rules, and alpi prose prompt block. |
 | [design.md](references/design.md) | Design entrypoint, canonical CSS link, tokens, layout. |
 | [design-widgets.md](references/design-widgets.md) | Widget and chart layouts. |
 | [design-components.md](references/design-components.md) | Component specs. |
@@ -752,7 +753,9 @@ Before finishing an Alva task, ask:
 - Did I read [preflight.md](references/preflight.md) and current command help?
 - Did every financial value come from Data Skills, feed output, or validated
   BYOD/search source?
-- Did Financial Analysis / Ask Question pass the ask evidence gate before I answered?
+- Did Financial Analysis / Ask Question read
+  [user-facing-prose.md](references/user-facing-prose.md), then pass the answer
+  gate before I answered?
 - Did I avoid WebSearch/LLM/memory/user-pasted data as factual values?
 - Did I run Data Skills `list` -> `summary` -> `endpoint` before coding calls?
 - Did feed release pass `before-feed-release`?
