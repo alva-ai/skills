@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/replace-adk-with-alpi/skills/alva`
+Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/financial-ask-quality-gates/skills/alva`
 
-SKILL.md lines: 768
+SKILL.md lines: 776
 
-Cases: 29/29
+Cases: 31/31
 
-Checks: 211/211 (100.00%)
+Checks: 253/253 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -278,14 +278,14 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-7/7 cases, 74/74 checks
+9/9 cases, 116/116 checks
 
 ### PASS target.top-level-size
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 768)
-- [x] line count <= 850 (actual 768)
+- [x] line count >= 650 (actual 776)
+- [x] line count <= 850 (actual 776)
 
 ### PASS target.playbook-task-offload
 
@@ -341,14 +341,66 @@ Ask-question work is grouped as financial analysis instead of a low-level Data Q
 Direct financial asks have compact evidence gates instead of a free-form memo contract.
 
 - [x] ask evidence gate
-- [x] do not answer a financial-analysis ask until you can name
+- [x] Do not answer until
 - [x] decomposition
 - [x] data/source path for each hop
 - [x] fetched vs missing coverage
 - [x] sourced facts, computed values, or inference
-- [x] For a simple ask, this can be one hop
-- [x] required KPI or baseline is missing
-- [x] disclose the gap instead of filling it from memory or snippets
+- [x] Simple latest-fact asks stop there after one sourced hop
+- [x] Simple/latest-fact asks stop there
+- [x] cap confidence when required evidence
+- [x] KPI coverage
+- [x] computation is missing
+
+### PASS target.financial-ask-quality-gates
+
+Complex financial asks classify the problem type and apply source, methodology, KPI, and confidence gates.
+
+- [x] Complex Ask Router
+- [x] Only complex judgment asks also pass the Complex Ask Router
+- [x] treat complex judgments as high-risk financial analysis
+- [x] Simple/latest-fact asks stop there
+- [x] Complex Ask Router only for complex judgment asks
+- [x] thesis/fundamental
+- [x] earnings/catalyst
+- [x] event-study/backtest
+- [x] screener/ranking
+- [x] macro/cross-asset
+- [x] news/social sentiment
+- [x] portfolio/scenario
+- [x] valuation/accounting
+- [x] event definition
+- [x] sample count
+- [x] non-overlap rule
+- [x] look-ahead control
+- [x] benchmark/sector ETF
+- [x] missing-field handling
+- [x] evidence table with source
+- [x] authority/relevance
+- [x] duplicate status
+- [x] synchronized as-of time
+- [x] implied-probability source/proxy
+- [x] weights/exposure assumption
+- [x] beta/correlation/proxy method
+- [x] drawdown table
+- [x] current multiple/FCF/EPS
+- [x] multiple/earnings sensitivity
+- [x] attempted/found/missing/impact
+- [x] required calculation not done caps at B-/C
+- [x] hard cap
+
+### PASS target.financial-analysis-prose-gate
+
+Financial Analysis answers must read the merged user-facing prose reference before answering.
+
+- [x] Financial-analysis answer gate
+- [x] before answering any Financial Analysis / Ask Question
+- [x] read [user-facing-prose.md](references/user-facing-prose.md)
+- [x] then satisfy the ask evidence gate
+- [x] Every answer must read [user-facing-prose.md](user-facing-prose.md)
+- [x] user-facing prose reference read
+- [x] Product vocabulary, voice rules, and alpi prose prompt block
+- [x] Chat answers for Financial Analysis / Ask Question
 
 ### PASS target.pitfalls-stepwise-required
 

@@ -2,11 +2,11 @@
 
 Source: `origin/main`
 
-SKILL.md lines: 766
+SKILL.md lines: 771
 
-Cases: 27/29
+Cases: 29/31
 
-Checks: 207/211 (98.10%)
+Checks: 215/253 (84.98%)
 
 ## Scoring Diagnosis
 
@@ -15,12 +15,12 @@ Classify the gap before editing: missing capability summary, missing routing poi
 Do not expose eval scores as product copy, and do not patch demos to hide a weak result.
 Instead, fix the canonical skill text or eval case, then rerun baseline and final reports so the regression mechanism proves the gap is closed.
 
-- retained.content-legitimacy: inspect for a skill gap before editing. Missing checks: LLM / alpi output
-- retained.alpi: inspect for a skill gap before editing. Missing checks: @alva/pi; fixed LLM reasoning/tool loop; Agent.ask()
+- target.ask-evidence-gate: inspect for a skill gap before editing. Missing checks: Do not answer until; Simple latest-fact asks stop there after one sourced hop; Simple/latest-fact asks stop there; cap confidence when required evidence; KPI coverage; computation is missing
+- target.financial-ask-quality-gates: inspect for a skill gap before editing. Missing checks: Complex Ask Router; Only complex judgment asks also pass the Complex Ask Router; treat complex judgments as high-risk financial analysis; Simple/latest-fact asks stop there; Complex Ask Router only for complex judgment asks; thesis/fundamental; earnings/catalyst; event-study/backtest; screener/ranking; macro/cross-asset; news/social sentiment; portfolio/scenario; valuation/accounting; event definition; sample count; non-overlap rule; look-ahead control; benchmark/sector ETF; missing-field handling; evidence table with source; authority/relevance; duplicate status; synchronized as-of time; implied-probability source/proxy; weights/exposure assumption; beta/correlation/proxy method; drawdown table; current multiple/FCF/EPS; multiple/earnings sensitivity; attempted/found/missing/impact; required calculation not done caps at B-/C; hard cap
 
 ## retained
 
-15/17 cases, 94/98 checks
+17/17 cases, 98/98 checks
 
 ### PASS retained.platform-panorama
 
@@ -64,14 +64,14 @@ Skillhub blueprint retrieval remains mandatory and fresh when directed.
 - [x] Do not bulk-download
 - [x] --skill-id
 
-### FAIL retained.content-legitimacy
+### PASS retained.content-legitimacy
 
 The core data provenance and anti-fabrication rules remain intact.
 
 - [x] build the pipeline
 - [x] not to **be
 - [x] WebSearch
-- [ ] LLM / alpi output
+- [x] LLM / alpi output
 - [x] user-pasted snapshots
 - [x] Never hardcode data as inline JavaScript literals
 - [x] Feed Scope Isolation
@@ -174,13 +174,13 @@ Backtesting and signal feeds still require Altra and preserve common guardrails.
 - [x] Stock intraday window guardrail
 - [x] signal/targets
 
-### FAIL retained.alpi
+### PASS retained.alpi
 
 alpi remains scheduled-pipeline reasoning, not a data source or one-off research wrapper.
 
-- [ ] @alva/pi
-- [ ] fixed LLM reasoning/tool loop
-- [ ] Agent.ask()
+- [x] @alva/pi
+- [x] fixed LLM reasoning/tool loop
+- [x] Agent.ask()
 - [x] Do **not** use it for one-off research
 - [x] not use it to produce numbers
 
@@ -279,14 +279,14 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 
 ## target
 
-7/7 cases, 74/74 checks
+7/9 cases, 78/116 checks
 
 ### PASS target.top-level-size
 
 Top-level SKILL.md is in the requested encyclopedia/guide size band.
 
-- [x] line count >= 650 (actual 766)
-- [x] line count <= 850 (actual 766)
+- [x] line count >= 650 (actual 771)
+- [x] line count <= 850 (actual 771)
 
 ### PASS target.playbook-task-offload
 
@@ -337,19 +337,71 @@ Ask-question work is grouped as financial analysis instead of a low-level Data Q
 - [x] Do not let playbook creation become the default
 - [x] Do not turn every Skillhub task into a playbook
 
-### PASS target.ask-evidence-gate
+### FAIL target.ask-evidence-gate
 
 Direct financial asks have compact evidence gates instead of a free-form memo contract.
 
 - [x] ask evidence gate
-- [x] do not answer a financial-analysis ask until you can name
+- [ ] Do not answer until
 - [x] decomposition
 - [x] data/source path for each hop
 - [x] fetched vs missing coverage
 - [x] sourced facts, computed values, or inference
-- [x] For a simple ask, this can be one hop
-- [x] required KPI or baseline is missing
-- [x] disclose the gap instead of filling it from memory or snippets
+- [ ] Simple latest-fact asks stop there after one sourced hop
+- [ ] Simple/latest-fact asks stop there
+- [ ] cap confidence when required evidence
+- [ ] KPI coverage
+- [ ] computation is missing
+
+### FAIL target.financial-ask-quality-gates
+
+Complex financial asks classify the problem type and apply source, methodology, KPI, and confidence gates.
+
+- [ ] Complex Ask Router
+- [ ] Only complex judgment asks also pass the Complex Ask Router
+- [ ] treat complex judgments as high-risk financial analysis
+- [ ] Simple/latest-fact asks stop there
+- [ ] Complex Ask Router only for complex judgment asks
+- [ ] thesis/fundamental
+- [ ] earnings/catalyst
+- [ ] event-study/backtest
+- [ ] screener/ranking
+- [ ] macro/cross-asset
+- [ ] news/social sentiment
+- [ ] portfolio/scenario
+- [ ] valuation/accounting
+- [ ] event definition
+- [ ] sample count
+- [ ] non-overlap rule
+- [ ] look-ahead control
+- [ ] benchmark/sector ETF
+- [ ] missing-field handling
+- [ ] evidence table with source
+- [ ] authority/relevance
+- [ ] duplicate status
+- [ ] synchronized as-of time
+- [ ] implied-probability source/proxy
+- [ ] weights/exposure assumption
+- [ ] beta/correlation/proxy method
+- [ ] drawdown table
+- [ ] current multiple/FCF/EPS
+- [ ] multiple/earnings sensitivity
+- [ ] attempted/found/missing/impact
+- [ ] required calculation not done caps at B-/C
+- [ ] hard cap
+
+### PASS target.financial-analysis-prose-gate
+
+Financial Analysis answers must read the merged user-facing prose reference before answering.
+
+- [x] Financial-analysis answer gate
+- [x] before answering any Financial Analysis / Ask Question
+- [x] read [user-facing-prose.md](references/user-facing-prose.md)
+- [x] then satisfy the ask evidence gate
+- [x] Every answer must read [user-facing-prose.md](user-facing-prose.md)
+- [x] user-facing prose reference read
+- [x] Product vocabulary, voice rules, and alpi prose prompt block
+- [x] Chat answers for Financial Analysis / Ask Question
 
 ### PASS target.pitfalls-stepwise-required
 

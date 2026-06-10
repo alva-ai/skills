@@ -350,11 +350,13 @@ or publish, route to the durable artifact / playbook tree instead.
 
 Financial-analysis answer gate: before answering any Financial Analysis / Ask
 Question, read [user-facing-prose.md](references/user-facing-prose.md), then
-satisfy the ask evidence gate. Do not answer a financial-analysis ask until you
-can name the decomposition, data/source path for each hop, fetched vs missing
-coverage, and which judgments are sourced facts, computed values, or inference.
-For a simple ask, this can be one hop. If a required KPI or baseline is missing,
-disclose the gap instead of filling it from memory or snippets.
+satisfy the ask evidence gate. Simple latest-fact asks stop there after one
+sourced hop; complex judgment asks must also use the Complex Ask Router in
+[request-routing.md](references/request-routing.md), apply every matching
+quality gate, and cap confidence when required evidence, KPI coverage, or
+computation is missing. Do not answer until you can name the decomposition,
+data/source path for each hop, fetched vs missing coverage, and which judgments
+are sourced facts, computed values, or inference.
 
 ### Durable Artifacts / Playbook Tree
 
@@ -589,10 +591,12 @@ financial analysis. Run preflight if needed, verify the relevant Data Skills or
 search route, use `alva run` when live computation or joins are needed, fetch
 or qualify any comparison baseline, read
 [user-facing-prose.md](references/user-facing-prose.md), apply the answer gate
-in the Financial Analysis tree, and answer with inline provenance. If the data
-source fails, report the failure instead of substituting a web snippet or model
-memory. If the user then asks to track, alert, share, or publish, upgrade the
-route to a feed, signal, alert, or playbook.
+in the Financial Analysis tree, classify complex asks with
+[request-routing.md](references/request-routing.md), and answer with inline
+provenance. If the data source fails, report the failure instead of
+substituting a web snippet or model memory. If the user then asks to track,
+alert, share, or publish, upgrade the route to a feed, signal, alert, or
+playbook.
 
 ### Durable Artifacts / Playbook Tree
 
@@ -755,7 +759,8 @@ Before finishing an Alva task, ask:
   BYOD/search source?
 - Did Financial Analysis / Ask Question read
   [user-facing-prose.md](references/user-facing-prose.md), then pass the answer
-  gate before I answered?
+  gate, and the Complex Ask Router only for complex judgment asks, before I
+  answered?
 - Did I avoid WebSearch/LLM/memory/user-pasted data as factual values?
 - Did I run Data Skills `list` -> `summary` -> `endpoint` before coding calls?
 - Did feed release pass `before-feed-release`?

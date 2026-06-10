@@ -69,6 +69,40 @@ or computing evidence, but first read
 [user-facing-prose.md](user-facing-prose.md), then apply the answer gate from
 `SKILL.md`: decomposition, source path, coverage gaps, and
 sourced-vs-inference boundary. Simple asks can satisfy the gate with one hop.
+Simple/latest-fact asks stop there. Only complex judgment asks also pass the
+Complex Ask Router below before the answer is written.
+
+### Complex Ask Router
+
+For asks involving thesis, valuation, ranking, backtest, portfolio, macro,
+news/social, or other complex judgment, classify the ask into one or more
+problem types and apply every matching gate. This is the quality boundary:
+treat complex judgments as high-risk financial analysis rather than ordinary
+Q&A.
+
+| Problem type | Trigger | Minimum gate |
+| --- | --- | --- |
+| Thesis/fundamental | thesis, moat, quality, fundamental | thesis driver, key KPI, metric source, peer/baseline, missing KPI impact |
+| Earnings/catalyst | earnings, guide, catalyst, revision | event date, source, expected vs actual/consensus, forward catalyst, stale-data caveat |
+| Event-study/backtest | backtest, after/before, event window, forward returns, sample, bias-controlled | event definition, data source, sample count, date range, non-overlap rule, look-ahead control, benchmark, horizons, formula, friction/assumptions; missing sample count or event definition means incomplete and no strong trading conclusion |
+| Screener/ranking | screen, rank, top names, compare list | universe, filters, metric source, ranking formula, benchmark/sector ETF, missing-field handling; state actual fields screened vs proxies |
+| Macro/cross-asset | rates, dollar, gold, yields, Fed, cross-asset | synchronized as-of time, price move vs macro driver vs policy expectation vs positioning/narrative; recent occurrences or sample insufficient; Fed implied-probability source/proxy |
+| News/social sentiment | news, KOL, X, Reddit, sentiment | evidence table with source, timestamp, authority/relevance, stance, duplicate status, fact/opinion/inference |
+| Portfolio/scenario | portfolio, stress, shock, hedge, scenario | shocks, weights/exposure assumption, beta/correlation/proxy method, drawdown table, hedge candidates, confidence; otherwise qualitative scenario only |
+| Valuation/accounting | valuation, multiple, FCF, EPS, accounting | bridge current multiple/FCF/EPS, key operating KPI, scenario assumption, multiple/earnings sensitivity |
+
+Domain KPI checklist is not a schema. For domain-specific asks, list
+attempted/found/missing/impact for candidate KPIs. Examples: bank NIM,
+deposit beta, loan growth, credit loss, CRE, capital; GLP-1 product revenue,
+supply, payer, pipeline, gross margin; semis segment AI revenue, backlog,
+order, capex read-through, gross margin; energy upstream/downstream, WTI beta,
+shareholder yield, debt.
+
+Cap / Confidence rules: required calculation not done caps at B-/C; only news
+without structured data downgrades source/data coverage; social/KOL without
+denoising downgrades source quality; missing key KPIs with strong conclusion
+requires confidence downgrade or a hard cap.
+
 For build routes, present a plan once before building.
 
 Exactly one blocking question per session:
