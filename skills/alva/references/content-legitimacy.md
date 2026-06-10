@@ -31,6 +31,12 @@ environment variables such as `$ALVA_ENDPOINT`, guess `https://api.alva.ai`, or
 hardcode data as inline JavaScript literals. Use the browser-safe public ALFS
 helper in [playbook-creation.md](playbook-creation.md#browser-safe-feed-reads).
 
+Exception: one-off Ask chart artifacts published with `PublishChartHTML` may
+inline data already fetched or computed from legitimate sources in the current
+answer flow. Label the source/as-of time, mark user-supplied values as
+user-provided, and do not claim the artifact is live, official, or automatically
+refreshed.
+
 Verification claims must reflect real tool calls. Do not say a dashboard looks
 good unless you actually rendered or screenshotted it. Copy `published_url`,
 `feed_id`, job ids, and ALFS paths verbatim from tool responses.

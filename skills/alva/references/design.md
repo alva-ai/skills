@@ -150,6 +150,17 @@ body {
 
 **Default mode** → Light Mode
 
+## One-Off Chat Chart Artifacts
+
+For Ask / answer-only chart HTML embedded in chat, keep the artifact compact.
+Use Alva tokens, Delight typography, Chart Card styling, source/as-of labeling,
+and the standard watermark, but do not build a miniature playbook.
+
+Default shape: one Chart Card, optional 1-2 KPI chips, and a short
+source/as-of note. Avoid app headers, hero sections, long descriptions,
+methodology blocks, creator notes, footers, and share/subscribe CTAs. Put the
+analysis in the chat answer; keep the HTML focused on the chart.
+
 ## Playbook Container
 
 ### Hosted Shell Boundary
