@@ -125,8 +125,9 @@ make it this one.
    `~/memory/MEMORY.md` if not already read. Memory is a *claim*, not truth.
 3. **Pipeline, not oracle.** Financial values must come from Data Skills,
    published Alva feeds, or validated BYOD sources. WebSearch, LLM output,
-   agent memory, synthetic data, and user-pasted examples are not factual data
-   sources. Read [content-legitimacy.md](references/content-legitimacy.md).
+   agent memory, synthetic data, and user-pasted examples are not standalone
+   factual data sources. Read
+   [content-legitimacy.md](references/content-legitimacy.md).
 4. **No stale surface assumptions.** Fetch Data Skills endpoint docs, Skillhub
    blueprints, CLI help, and runtime docs in the current session. Do not act
    from remembered field names.
@@ -594,10 +595,12 @@ or qualify any comparison baseline, read
 [user-facing-prose.md](references/user-facing-prose.md), apply the answer gate
 in the Financial Analysis tree, classify complex asks with
 [request-routing.md](references/request-routing.md), and answer with inline
-provenance. If the data source fails, report the failure instead of
-substituting a web snippet or model memory. If the user then asks to track,
-alert, share, or publish, upgrade the route to a feed, signal, alert, or
-playbook.
+provenance. If a structured source returns stale or missing latest data, use
+[data-skills.md](references/data-skills.md#structured-feed-lag) before refusing
+when a known official release may be ahead of the feed; otherwise report the
+failure instead of substituting a web snippet or model memory. If the user then
+asks to track, alert, share, or publish, upgrade the route to a feed, signal,
+alert, or playbook.
 
 ### Durable Artifacts / Playbook Tree
 

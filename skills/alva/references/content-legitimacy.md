@@ -44,8 +44,10 @@ good unless you actually rendered or screenshotted it. Copy `published_url`,
 ## Prohibited Sources
 
 - WebSearch / WebFetch values must not be quoted as financial answers or
-  embedded as data. Search can find docs, requirements, or BYOD endpoints, but
-  discovered values must flow through a legitimate data source.
+  embedded as data, except for the official-source stale-feed fallback in
+  [data-skills.md](data-skills.md#structured-feed-lag). Search can find docs,
+  requirements, or BYOD endpoints, but discovered values must flow through a
+  legitimate data source.
 - LLM / alpi output must not be presented as factual sourced data. alpi can
   classify, summarize, and reason over real data; if it produces quantitative
   output, label it as AI-generated analysis.
