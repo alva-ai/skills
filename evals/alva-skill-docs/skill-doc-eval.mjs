@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const DEFAULT_CASES = resolve(SCRIPT_DIR, "cases.json");
+const DEFAULT_SCENARIOS = resolve(SCRIPT_DIR, "scenarios.json");
 const SCRIPT_PATH = fileURLToPath(import.meta.url);
 
 const SCORE_DIAGNOSIS_GUIDE = [
@@ -19,6 +20,7 @@ const SCORE_DIAGNOSIS_GUIDE = [
 function parseArgs(argv) {
   const opts = {
     casesPath: DEFAULT_CASES,
+    scenariosPath: DEFAULT_SCENARIOS,
     skillDir: resolve("skills/alva"),
     treeish: null,
     out: null,
@@ -28,6 +30,8 @@ function parseArgs(argv) {
     const arg = argv[i];
     if (arg === "--cases") {
       opts.casesPath = resolve(argv[++i]);
+    } else if (arg === "--scenarios") {
+      opts.scenariosPath = resolve(argv[++i]);
     } else if (arg === "--skill-dir") {
       opts.skillDir = resolve(argv[++i]);
     } else if (arg === "--treeish") {
@@ -52,6 +56,7 @@ Options:
   --treeish <ref>      Read skills/alva from a git ref instead of the worktree.
   --skill-dir <path>   Skill directory in the worktree. Default: skills/alva.
   --cases <path>       Cases manifest. Default: evals/alva-skill-docs/cases.json.
+  --scenarios <path>   Scenario manifest. Default: evals/alva-skill-docs/scenarios.json.
   --out <path>         Write markdown report.
   -h, --help           Show this help.
 `);
@@ -59,6 +64,10 @@ Options:
 
 function readJson(path) {
   return JSON.parse(readFileSync(path, "utf8"));
+}
+
+function readOptionalJson(path, fallback) {
+  return existsSync(path) ? readJson(path) : fallback;
 }
 
 function gitShow(treeish, path) {
@@ -93,19 +102,20 @@ function normalizeFilePath(path) {
   return path.replace(/\\/g, "/").replace(/^\.\/+/, "").replace(/^skills\/alva\//, "");
 }
 
-function loadEvalMaterials(casesPath) {
-  const files = [SCRIPT_PATH, casesPath];
+function loadEvalMaterials(casesPath, scenariosPath) {
+  const files = [SCRIPT_PATH, casesPath, scenariosPath];
   return files
     .filter((path, index, all) => all.indexOf(path) === index && existsSync(path))
     .map((path) => `\n\n--- ${path} ---\n${readFileSync(path, "utf8")}`)
     .join("");
 }
 
-function loadEvalFileTexts(casesPath) {
+function loadEvalFileTexts(casesPath, scenariosPath) {
   const cwd = resolve(".");
   const files = [
     [SCRIPT_PATH, "evals/alva-skill-docs/skill-doc-eval.mjs"],
     [casesPath, normalizeFilePath(relative(cwd, casesPath))],
+    [scenariosPath, normalizeFilePath(relative(cwd, scenariosPath))],
   ];
   const fileTexts = new Map();
   for (const [path, key] of files) {
@@ -115,8 +125,8 @@ function loadEvalFileTexts(casesPath) {
 }
 
 function loadCorpus(opts) {
-  const evalText = loadEvalMaterials(opts.casesPath);
-  const evalFiles = loadEvalFileTexts(opts.casesPath);
+  const evalText = loadEvalMaterials(opts.casesPath, opts.scenariosPath);
+  const evalFiles = loadEvalFileTexts(opts.casesPath, opts.scenariosPath);
   if (opts.treeish) {
     const skill = gitShow(opts.treeish, "skills/alva/SKILL.md");
     if (skill == null) throw new Error(`No skills/alva/SKILL.md at ${opts.treeish}`);
@@ -334,11 +344,78 @@ function evaluateCase(testCase, docs) {
   const passed = checks.filter((check) => check.pass).length;
   return {
     ...testCase,
+    kind: testCase.kind ?? "case",
     passed,
     total: checks.length,
     ok: passed === checks.length,
     checks,
   };
+}
+
+function scenarioAsCase(scenario) {
+  const requirements = scenario.expect ?? {};
+  const includes = [];
+  const sectionIncludes = [];
+  const hardGateIncludes = [];
+
+  if (requirements.route) {
+    sectionIncludes.push({
+      file: "references/request-routing.md",
+      heading: "Routes",
+      label: "expected route",
+      includes: [requirements.route],
+    });
+  }
+
+  if (requirements.top_level_route) {
+    includes.push(requirements.top_level_route);
+  }
+
+  for (const ref of requirements.references ?? []) {
+    includes.push(ref);
+  }
+
+  for (const phrase of requirements.behaviors ?? []) {
+    includes.push(phrase);
+  }
+
+  for (const forbidden of requirements.forbidden_behaviors ?? []) {
+    includes.push(forbidden);
+  }
+
+  for (const gate of requirements.gates ?? []) {
+    if (gate.type === "hard_gate") {
+      hardGateIncludes.push({
+        file: gate.file,
+        id: gate.id,
+        label: gate.label ?? gate.id,
+        includes: gate.includes ?? [gate.id],
+      });
+    } else if (gate.heading) {
+      sectionIncludes.push({
+        file: gate.file,
+        heading: gate.heading,
+        label: gate.label ?? gate.heading,
+        includes: gate.includes ?? [],
+      });
+    }
+  }
+
+  return {
+    id: scenario.id,
+    kind: "scenario",
+    group: scenario.group ?? "scenarios",
+    target: "corpus",
+    prompt: scenario.prompt,
+    description: scenario.description,
+    includes,
+    section_includes: sectionIncludes,
+    hard_gate_includes: hardGateIncludes,
+  };
+}
+
+function evaluateScenario(scenario, docs) {
+  return evaluateCase(scenarioAsCase(scenario), docs);
 }
 
 function renderReport(manifest, docs, results) {
@@ -386,6 +463,9 @@ function renderReport(manifest, docs, results) {
     for (const result of groupResults) {
       out += `### ${result.ok ? "PASS" : "FAIL"} ${result.id}\n\n`;
       out += `${result.description}\n\n`;
+      if (result.kind === "scenario" && result.prompt) {
+        out += `Prompt: \`${result.prompt}\`\n\n`;
+      }
       for (const check of result.checks) {
         out += `- ${check.pass ? "[x]" : "[ ]"} ${check.needle}\n`;
       }
@@ -398,8 +478,11 @@ function renderReport(manifest, docs, results) {
 
 const opts = parseArgs(process.argv.slice(2));
 const manifest = readJson(opts.casesPath);
+const scenarioManifest = readOptionalJson(opts.scenariosPath, { scenarios: [] });
 const docs = loadCorpus(opts);
-const results = manifest.cases.map((testCase) => evaluateCase(testCase, docs));
+const caseResults = manifest.cases.map((testCase) => evaluateCase(testCase, docs));
+const scenarioResults = (scenarioManifest.scenarios ?? []).map((scenario) => evaluateScenario(scenario, docs));
+const results = [...caseResults, ...scenarioResults];
 const report = renderReport(manifest, docs, results);
 
 if (opts.out) {

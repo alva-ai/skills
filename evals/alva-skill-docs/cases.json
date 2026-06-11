@@ -333,7 +333,7 @@
       "id": "issue592.scoped-eval-checks",
       "group": "issue592",
       "target": "eval",
-      "description": "The eval runner can verify scoped behavior contracts instead of only corpus-wide string presence.",
+      "description": "The eval runner can verify scoped behavior and scenario contracts instead of only corpus-wide string presence.",
       "file_includes": [
         {
           "file": "evals/alva-skill-docs/skill-doc-eval.mjs",
@@ -342,9 +342,23 @@
             "file_includes",
             "section_includes",
             "hard_gate_includes",
+            "scenariosPath",
+            "evaluateScenario",
+            "scenarioAsCase",
+            "expected route",
             "extractMarkdownSection",
             "extractHardGate",
             "getFileText"
+          ]
+        },
+        {
+          "file": "evals/alva-skill-docs/scenarios.json",
+          "label": "scenarios",
+          "includes": [
+            "prompt",
+            "\"route\"",
+            "Capability Verification",
+            "before-playbook-release"
           ]
         }
       ]

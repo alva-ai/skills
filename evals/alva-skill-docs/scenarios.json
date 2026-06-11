@@ -1,0 +1,245 @@
+{
+  "schema_version": "2026-06-11",
+  "name": "alva-skill-scenario-routing",
+  "description": "Deterministic prompt-intent contracts for Alva skill routing. These scenarios do not call an LLM; they bind representative user prompts to the route, references, gates, and boundaries the skill docs must preserve.",
+  "scenarios": [
+    {
+      "id": "scenario.simple-latest-price",
+      "group": "scenarios.ask",
+      "prompt": "What is BTC doing right now?",
+      "description": "A simple latest-fact ask stays in Financial Analysis, uses fresh sourced evidence, and does not inherit playbook gates.",
+      "expect": {
+        "route": "Financial Analysis / Ask Question",
+        "top_level_route": "Simple latest-fact asks stop there after one sourced hop",
+        "references": [
+          "user-facing-prose.md",
+          "content-legitimacy.md"
+        ],
+        "behaviors": [
+          "Direct latest price for covered US equities and crypto: intraday klines, not daily close",
+          "Do not answer until you can name the decomposition",
+          "Do not let playbook creation become the default"
+        ],
+        "forbidden_behaviors": [
+          "not automatically to a playbook"
+        ]
+      }
+    },
+    {
+      "id": "scenario.complex-valuation-ask",
+      "group": "scenarios.ask",
+      "prompt": "Is NVDA cheap versus peers after the latest earnings revision?",
+      "description": "A complex valuation ask uses the ask evidence gate plus Complex Ask Router without becoming a playbook by default.",
+      "expect": {
+        "route": "Financial Analysis / Ask Question",
+        "references": [
+          "request-routing.md",
+          "user-facing-prose.md",
+          "fundamentals-periods.md"
+        ],
+        "behaviors": [
+          "Complex Ask Router",
+          "valuation/accounting",
+          "comparison baselines are financial facts",
+          "current multiple/FCF/EPS",
+          "multiple/earnings sensitivity",
+          "cap confidence when required evidence"
+        ],
+        "forbidden_behaviors": [
+          "not automatically to a playbook"
+        ]
+      }
+    },
+    {
+      "id": "scenario.capability-gap-before-refusal",
+      "group": "scenarios.capability",
+      "prompt": "Does Alva have darkpool L2 realtime data?",
+      "description": "A capability-gap question verifies live coverage before saying no or moving to BYOD.",
+      "expect": {
+        "route": "Capability Verification",
+        "references": [
+          "data-skills.md",
+          "search.md"
+        ],
+        "behaviors": [
+          "Before saying Alva lacks a capability",
+          "alva data-skills list | grep -i <topic>",
+          "Decompose compound asks",
+          "Never reject the whole as one unit from memory",
+          "custom data source URL / BYOD source"
+        ]
+      }
+    },
+    {
+      "id": "scenario.dashboard-playbook-build",
+      "group": "scenarios.playbook",
+      "prompt": "Build and publish a live dashboard for BTC dominance breakouts.",
+      "description": "A hosted dashboard enters the Playbook Creation route and preserves feed-first, live-read, README, lint, release, and screenshot gates.",
+      "expect": {
+        "route": "Playbook Creation",
+        "top_level_route": "Publication Layer: Playbook Creation Tree",
+        "references": [
+          "playbook-creation.md",
+          "feed-lifecycle.md",
+          "design.md",
+          "api/release.md",
+          "AlvaToolkit.AlvaClient"
+        ],
+        "behaviors": [
+          "Build live feeds first",
+          "HTML fetches quantitative data from feeds, not inline literals",
+          "Every release needs a current README",
+          "screenshot verification must show real feed-backed marks"
+        ],
+        "gates": [
+          {
+            "type": "hard_gate",
+            "file": "references/playbook-creation.md",
+            "id": "before-playbook-release",
+            "label": "playbook release",
+            "includes": [
+              "Every backing feed passed `before-feed-release`",
+              "README exists, is current, and is passed via absolute `--readme-url`",
+              "alva lint playbook ./index.html"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "scenario.alert-push-monitor",
+      "group": "scenarios.push",
+      "prompt": "Track BTC dominance and notify me when it breaks out.",
+      "description": "A monitoring request routes to Automation / Push and validates sidecar, release, subscription, and real-run delivery.",
+      "expect": {
+        "route": "Automation / Push",
+        "references": [
+          "push-notifications.md",
+          "feed-lifecycle.md"
+        ],
+        "behaviors": [
+          "Build or modify a feed that emits actionable `signal/targets` or `notify/message`",
+          "A push is set up only after all of these succeed",
+          "alva deploy update --id <ID> --push-notify",
+          "alva subscriptions subscribe-feed",
+          "read `@last/1` of the sidecar",
+          "do not claim push is set up"
+        ]
+      }
+    },
+    {
+      "id": "scenario.backtest-strategy",
+      "group": "scenarios.strategy",
+      "prompt": "Backtest a weekly NVDA momentum strategy and show drawdowns.",
+      "description": "A backtest routes through Strategy / Trading Analysis and requires Altra instead of hand-rolled loops.",
+      "expect": {
+        "route": "Strategy / Trading Analysis",
+        "references": [
+          "altra-trading.md",
+          "api/trading.md"
+        ],
+        "behaviors": [
+          "Always use Altra for backtesting",
+          "FeedAltra",
+          "look-ahead bias",
+          "drawdown",
+          "package results as a concise answer, feed, signal, or visual playbook depending on the request"
+        ]
+      }
+    },
+    {
+      "id": "scenario.skillhub-method",
+      "group": "scenarios.skillhub",
+      "prompt": "/use-skill:alva/thesis NVDA AI capex read-through",
+      "description": "A Skillhub directive fetches the blueprint fresh, avoids bulk download, and only becomes a playbook if the user or blueprint asks.",
+      "expect": {
+        "route": "Playbook Creation",
+        "references": [
+          "request-routing.md",
+          "playbook-creation.md",
+          "api/release.md"
+        ],
+        "behaviors": [
+          "If the user's message contains `/use-skill:<username>/<name>`, the Skillhub path is mandatory",
+          "alva skillhub get",
+          "alva skillhub file",
+          "Do not bulk-download",
+          "Do not turn every Skillhub task into a playbook",
+          "--skill-id <username>/<name>"
+        ]
+      }
+    },
+    {
+      "id": "scenario.remix-existing-playbook",
+      "group": "scenarios.playbook",
+      "prompt": "<remix https://alva.ai/u/alva/playbooks/screener> make my own version",
+      "description": "A remix reads source artifacts and preserves lineage instead of regenerating from memory.",
+      "expect": {
+        "route": "Debug / Edit",
+        "top_level_route": "Playbook Subroute: Remix",
+        "references": [
+          "remix-workflow.md",
+          "playbook-creation.md"
+        ],
+        "behaviors": [
+          "Extract source owner/name from the tag URL",
+          "read the source feed scripts, HTML, README, and playbook metadata",
+          "preserve them unless the user explicitly asks otherwise",
+          "Do not regenerate from memory"
+        ]
+      }
+    },
+    {
+      "id": "scenario.annotation-edit",
+      "group": "scenarios.playbook",
+      "prompt": "<annotation id=\"hero-title\">make this chart title shorter</annotation>",
+      "description": "An annotation edit changes the generator behind the element and re-enters HTML gates.",
+      "expect": {
+        "route": "Debug / Edit",
+        "top_level_route": "Playbook Subroute: Annotation Edits",
+        "references": [
+          "annotation-edits.md",
+          "playbook-creation.md"
+        ],
+        "behaviors": [
+          "change the generator behind the selected element",
+          "Never freeze rendered feed values into static text",
+          "HTML edits re-enter `before-build-html`"
+        ],
+        "gates": [
+          {
+            "type": "hard_gate",
+            "file": "references/playbook-creation.md",
+            "id": "before-build-html",
+            "label": "html gate",
+            "includes": [
+              "The HTML follows the Browser request rule",
+              "Do not rely on memory of prior sessions"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "scenario.udf-strict-opt-in",
+      "group": "scenarios.udf",
+      "prompt": "Add a button so viewers can run my custom analysis function.",
+      "description": "A UDF request is explicit opt-in and routes to the PBSV/browser runtime and functions CLI checks.",
+      "expect": {
+        "route": "Playbook Creation",
+        "references": [
+          "api/udf-runtime.md",
+          "playbook-creation.md"
+        ],
+        "behaviors": [
+          "User-Defined Functions are strict opt-in",
+          "registerable/shareable interactive function",
+          "window.alva.udf",
+          "alva functions",
+          "allowance consent",
+          "Never hand-write bearer headers"
+        ]
+      }
+    }
+  ]
+}
