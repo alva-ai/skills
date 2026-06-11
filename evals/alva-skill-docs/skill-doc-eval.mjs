@@ -2,7 +2,7 @@
 
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
@@ -89,6 +89,10 @@ function readWorktree(path) {
   return existsSync(path) ? readFileSync(path, "utf8") : null;
 }
 
+function normalizeFilePath(path) {
+  return path.replace(/\\/g, "/").replace(/^\.\/+/, "").replace(/^skills\/alva\//, "");
+}
+
 function loadEvalMaterials(casesPath) {
   const files = [SCRIPT_PATH, casesPath];
   return files
@@ -97,26 +101,45 @@ function loadEvalMaterials(casesPath) {
     .join("");
 }
 
+function loadEvalFileTexts(casesPath) {
+  const cwd = resolve(".");
+  const files = [
+    [SCRIPT_PATH, "evals/alva-skill-docs/skill-doc-eval.mjs"],
+    [casesPath, normalizeFilePath(relative(cwd, casesPath))],
+  ];
+  const fileTexts = new Map();
+  for (const [path, key] of files) {
+    if (existsSync(path)) fileTexts.set(key, readFileSync(path, "utf8"));
+  }
+  return fileTexts;
+}
+
 function loadCorpus(opts) {
   const evalText = loadEvalMaterials(opts.casesPath);
+  const evalFiles = loadEvalFileTexts(opts.casesPath);
   if (opts.treeish) {
     const skill = gitShow(opts.treeish, "skills/alva/SKILL.md");
     if (skill == null) throw new Error(`No skills/alva/SKILL.md at ${opts.treeish}`);
 
     const files = gitLsTree(opts.treeish, "skills/alva/references");
+    const fileTexts = new Map([...evalFiles, ["SKILL.md", skill]]);
     let references = "";
     for (const file of files) {
       if (/\.(md|yaml|css)$/.test(file)) {
         const body = gitShow(opts.treeish, file);
-        if (body != null) references += `\n\n--- ${file} ---\n${body}`;
+        if (body != null) {
+          references += `\n\n--- ${file} ---\n${body}`;
+          fileTexts.set(normalizeFilePath(file), body);
+        }
       }
     }
-    return { label: opts.treeish, skill, references, corpus: `${skill}${references}`, eval: evalText };
+    return { label: opts.treeish, skill, references, corpus: `${skill}${references}`, eval: evalText, files: fileTexts };
   }
 
   const skillPath = resolve(opts.skillDir, "SKILL.md");
   const skill = readWorktree(skillPath);
   if (skill == null) throw new Error(`No SKILL.md at ${skillPath}`);
+  const fileTexts = new Map([...evalFiles, ["SKILL.md", skill]]);
 
   const refFiles = execFileSync("find", [
     resolve(opts.skillDir, "references"),
@@ -140,9 +163,11 @@ function loadCorpus(opts) {
 
   let references = "";
   for (const file of refFiles) {
-    references += `\n\n--- ${file} ---\n${readFileSync(file, "utf8")}`;
+    const body = readFileSync(file, "utf8");
+    references += `\n\n--- ${file} ---\n${body}`;
+    fileTexts.set(normalizeFilePath(relative(opts.skillDir, file)), body);
   }
-  return { label: opts.skillDir, skill, references, corpus: `${skill}${references}`, eval: evalText };
+  return { label: opts.skillDir, skill, references, corpus: `${skill}${references}`, eval: evalText, files: fileTexts };
 }
 
 function includesAll(text, needles) {
@@ -157,17 +182,137 @@ function normalizeText(text) {
   return text.toLowerCase().replace(/\s+/g, " ").trim();
 }
 
+function getTargetText(testCase, docs) {
+  return testCase.target === "skill"
+    ? docs.skill
+    : testCase.target === "eval"
+      ? docs.eval
+      : docs.corpus;
+}
+
+function getFileText(docs, file) {
+  return docs.files.get(normalizeFilePath(file)) ?? null;
+}
+
+function normalizeHeading(text) {
+  return normalizeText(text.replace(/#+\s*$/, "").replace(/[`*_]/g, ""));
+}
+
+function extractMarkdownSection(text, heading) {
+  const wanted = normalizeHeading(heading);
+  const lines = text.split(/\r?\n/);
+  let start = -1;
+  let level = 0;
+
+  for (let i = 0; i < lines.length; i += 1) {
+    const match = lines[i].match(/^(#{1,6})\s+(.+?)\s*$/);
+    if (match && normalizeHeading(match[2]) === wanted) {
+      start = i;
+      level = match[1].length;
+      break;
+    }
+  }
+
+  if (start === -1) return null;
+
+  let end = lines.length;
+  for (let i = start + 1; i < lines.length; i += 1) {
+    const match = lines[i].match(/^(#{1,6})\s+/);
+    if (match && match[1].length <= level) {
+      end = i;
+      break;
+    }
+  }
+  return lines.slice(start, end).join("\n");
+}
+
+function extractHardGate(text, id) {
+  const escaped = String(id).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = new RegExp(`<HARD-GATE\\s+id=["']${escaped}["'][^>]*>[\\s\\S]*?<\\/HARD-GATE>`, "i");
+  const match = text.match(pattern);
+  return match ? match[0] : null;
+}
+
+function formatScope(spec) {
+  const label = spec.label ? `${spec.label}: ` : "";
+  if (spec.heading) return `${label}${spec.file}#${spec.heading}`;
+  if (spec.file) return `${label}${spec.file}`;
+  return label.replace(/: $/, "");
+}
+
+function evaluateFileIncludes(spec, docs) {
+  const text = getFileText(docs, spec.file);
+  const scope = formatScope(spec);
+  if (text == null) {
+    return [{ needle: `${scope} exists`, pass: false }];
+  }
+  return includesAll(text, spec.includes ?? []).map((check) => ({
+    needle: `${scope} includes ${check.needle}`,
+    pass: check.pass,
+  }));
+}
+
+function evaluateSectionIncludes(spec, docs) {
+  const fileText = getFileText(docs, spec.file);
+  const scope = formatScope(spec);
+  if (fileText == null) {
+    return [{ needle: `${scope} file exists`, pass: false }];
+  }
+
+  const sectionText = extractMarkdownSection(fileText, spec.heading);
+  if (sectionText == null) {
+    return [{ needle: `${scope} section exists`, pass: false }];
+  }
+
+  return includesAll(sectionText, spec.includes ?? []).map((check) => ({
+    needle: `${scope} includes ${check.needle}`,
+    pass: check.pass,
+  }));
+}
+
+function evaluateHardGateIncludes(spec, docs) {
+  const fileText = getFileText(docs, spec.file);
+  const label = spec.label ? `${spec.label}: ` : "";
+  const scope = `${label}${spec.file}<HARD-GATE:${spec.id}>`;
+  if (fileText == null) {
+    return [{ needle: `${scope} file exists`, pass: false }];
+  }
+
+  const gateText = extractHardGate(fileText, spec.id);
+  if (gateText == null) {
+    return [{ needle: `${scope} block exists`, pass: false }];
+  }
+
+  return includesAll(gateText, spec.includes ?? []).map((check) => ({
+    needle: `${scope} includes ${check.needle}`,
+    pass: check.pass,
+  }));
+}
+
 function evaluateCase(testCase, docs) {
-  const text =
-    testCase.target === "skill"
-      ? docs.skill
-      : testCase.target === "eval"
-        ? docs.eval
-        : docs.corpus;
+  const text = getTargetText(testCase, docs);
   const checks = [];
 
   if (Array.isArray(testCase.includes)) {
     checks.push(...includesAll(text, testCase.includes));
+  }
+
+  if (Array.isArray(testCase.file_includes)) {
+    for (const spec of testCase.file_includes) {
+      checks.push(...evaluateFileIncludes(spec, docs));
+    }
+  }
+
+  if (Array.isArray(testCase.section_includes)) {
+    for (const spec of testCase.section_includes) {
+      checks.push(...evaluateSectionIncludes(spec, docs));
+    }
+  }
+
+  if (Array.isArray(testCase.hard_gate_includes)) {
+    for (const spec of testCase.hard_gate_includes) {
+      checks.push(...evaluateHardGateIncludes(spec, docs));
+    }
   }
 
   if (typeof testCase.max_lines === "number" || typeof testCase.min_lines === "number") {
