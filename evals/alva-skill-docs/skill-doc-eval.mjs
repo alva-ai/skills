@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const DEFAULT_CASES = resolve(SCRIPT_DIR, "cases.json");
 const DEFAULT_SCENARIOS = resolve(SCRIPT_DIR, "scenarios.json");
+const MUTATION_SMOKE = resolve(SCRIPT_DIR, "mutation-smoke.mjs");
 const SCRIPT_PATH = fileURLToPath(import.meta.url);
 
 const SCORE_DIAGNOSIS_GUIDE = [
@@ -103,7 +104,7 @@ function normalizeFilePath(path) {
 }
 
 function loadEvalMaterials(casesPath, scenariosPath) {
-  const files = [SCRIPT_PATH, casesPath, scenariosPath];
+  const files = [SCRIPT_PATH, casesPath, scenariosPath, MUTATION_SMOKE];
   return files
     .filter((path, index, all) => all.indexOf(path) === index && existsSync(path))
     .map((path) => `\n\n--- ${path} ---\n${readFileSync(path, "utf8")}`)
@@ -116,6 +117,7 @@ function loadEvalFileTexts(casesPath, scenariosPath) {
     [SCRIPT_PATH, "evals/alva-skill-docs/skill-doc-eval.mjs"],
     [casesPath, normalizeFilePath(relative(cwd, casesPath))],
     [scenariosPath, normalizeFilePath(relative(cwd, scenariosPath))],
+    [MUTATION_SMOKE, "evals/alva-skill-docs/mutation-smoke.mjs"],
   ];
   const fileTexts = new Map();
   for (const [path, key] of files) {
@@ -381,6 +383,15 @@ function scenarioAsCase(scenario) {
 
   for (const forbidden of requirements.forbidden_behaviors ?? []) {
     includes.push(forbidden);
+  }
+
+  for (const section of requirements.sections ?? []) {
+    sectionIncludes.push({
+      file: section.file,
+      heading: section.heading,
+      label: section.label ?? section.heading,
+      includes: section.includes ?? [],
+    });
   }
 
   for (const gate of requirements.gates ?? []) {

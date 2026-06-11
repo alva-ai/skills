@@ -1,0 +1,153 @@
+#!/usr/bin/env node
+
+import { spawnSync } from "node:child_process";
+import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = resolve(SCRIPT_DIR, "../..");
+const EVAL_RUNNER = resolve(SCRIPT_DIR, "skill-doc-eval.mjs");
+const DEFAULT_SKILL_DIR = resolve(REPO_ROOT, "skills/alva");
+
+const MUTATIONS = [
+  {
+    id: "simple-latest-one-hop",
+    file: "SKILL.md",
+    remove: "Simple latest-fact asks stop there after one\nsourced hop; ",
+    expectFailedCases: ["issue592.financial-ask-contract", "scenario.simple-latest-price"],
+  },
+  {
+    id: "capability-before-refusal",
+    file: "references/request-routing.md",
+    remove: "Before saying Alva lacks a capability or recommending BYOD, verify the catalog:",
+    expectFailedCases: [
+      "issue592.capability-verification-before-refusal",
+      "scenario.capability-gap-before-refusal",
+    ],
+  },
+  {
+    id: "before-playbook-release-readme",
+    file: "references/playbook-creation.md",
+    remove: "9. README exists, is current, and is passed via absolute `--readme-url`.\n",
+    expectFailedCases: ["issue592.playbook-release-behavior", "scenario.dashboard-playbook-build"],
+  },
+  {
+    id: "udf-strict-opt-in",
+    file: "references/playbook-creation.md",
+    remove: "User-Defined Functions are strict opt-in. ",
+    expectFailedCases: ["scenario.udf-strict-opt-in"],
+  },
+];
+
+function parseArgs(argv) {
+  const opts = {
+    skillDir: DEFAULT_SKILL_DIR,
+    keepTemp: false,
+  };
+
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i];
+    if (arg === "--skill-dir") {
+      opts.skillDir = resolve(argv[++i]);
+    } else if (arg === "--keep-temp") {
+      opts.keepTemp = true;
+    } else if (arg === "--help" || arg === "-h") {
+      printHelp();
+      process.exit(0);
+    } else {
+      throw new Error(`Unknown argument: ${arg}`);
+    }
+  }
+
+  return opts;
+}
+
+function printHelp() {
+  console.log(`Usage: node evals/alva-skill-docs/mutation-smoke.mjs [options]
+
+Options:
+  --skill-dir <path>   Skill directory to copy and mutate. Default: skills/alva.
+  --keep-temp          Keep mutated temporary copies for debugging.
+  -h, --help           Show this help.
+`);
+}
+
+function runEval(skillDir) {
+  const result = spawnSync(process.execPath, [EVAL_RUNNER, "--skill-dir", skillDir], {
+    cwd: REPO_ROOT,
+    encoding: "utf8",
+    maxBuffer: 50 * 1024 * 1024,
+  });
+  return {
+    status: result.status,
+    stdout: result.stdout ?? "",
+    stderr: result.stderr ?? "",
+    output: `${result.stdout ?? ""}\n${result.stderr ?? ""}`,
+  };
+}
+
+function replaceOnce(filePath, needle) {
+  const original = readFileSync(filePath, "utf8");
+  if (!original.includes(needle)) {
+    throw new Error(`Mutation target not found in ${filePath}: ${JSON.stringify(needle)}`);
+  }
+  writeFileSync(filePath, original.replace(needle, ""), "utf8");
+}
+
+function copySkill(sourceSkillDir, tempRoot, mutationId) {
+  const target = join(tempRoot, mutationId, "alva");
+  cpSync(sourceSkillDir, target, { recursive: true });
+  return target;
+}
+
+function assertEvalGreen(sourceSkillDir) {
+  const result = runEval(sourceSkillDir);
+  if (result.status !== 0) {
+    process.stderr.write(result.output);
+    throw new Error("Base skill eval must pass before mutation smoke can prove failures.");
+  }
+}
+
+function assertMutationFails(sourceSkillDir, tempRoot, mutation) {
+  const mutatedSkillDir = copySkill(sourceSkillDir, tempRoot, mutation.id);
+  replaceOnce(resolve(mutatedSkillDir, mutation.file), mutation.remove);
+
+  const result = runEval(mutatedSkillDir);
+  if (result.status === 0) {
+    throw new Error(`${mutation.id}: eval unexpectedly passed after removing ${mutation.file}`);
+  }
+
+  const missingExpectedCases = mutation.expectFailedCases.filter(
+    (caseId) => !result.output.includes(`FAIL ${caseId}`),
+  );
+  if (missingExpectedCases.length > 0) {
+    process.stderr.write(result.output);
+    throw new Error(
+      `${mutation.id}: eval failed, but not through expected cases: ${missingExpectedCases.join(", ")}`,
+    );
+  }
+}
+
+function main() {
+  const opts = parseArgs(process.argv.slice(2));
+  const tempRoot = mkdtempSync(join(tmpdir(), "alva-skill-doc-mutations-"));
+
+  try {
+    assertEvalGreen(opts.skillDir);
+    for (const mutation of MUTATIONS) {
+      assertMutationFails(opts.skillDir, tempRoot, mutation);
+      console.log(`PASS ${mutation.id}`);
+    }
+    console.log(`Mutation smoke passed: ${MUTATIONS.length}/${MUTATIONS.length} mutations failed as expected.`);
+  } finally {
+    if (opts.keepTemp) {
+      console.log(`Kept temporary mutation copies at ${tempRoot}`);
+    } else {
+      rmSync(tempRoot, { recursive: true, force: true });
+    }
+  }
+}
+
+main();

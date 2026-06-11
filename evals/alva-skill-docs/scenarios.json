@@ -62,11 +62,20 @@
           "search.md"
         ],
         "behaviors": [
-          "Before saying Alva lacks a capability",
-          "alva data-skills list | grep -i <topic>",
-          "Decompose compound asks",
-          "Never reject the whole as one unit from memory",
           "custom data source URL / BYOD source"
+        ],
+        "sections": [
+          {
+            "file": "references/request-routing.md",
+            "heading": "Capability Verification",
+            "label": "before refusal",
+            "includes": [
+              "Before saying Alva lacks a capability",
+              "alva data-skills list | grep -i <topic>",
+              "Decompose compound asks",
+              "Never reject the whole as one unit from memory"
+            ]
+          }
         ]
       }
     },

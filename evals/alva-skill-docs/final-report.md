@@ -6,7 +6,7 @@ SKILL.md lines: 780
 
 Cases: 47/47
 
-Checks: 403/403 (100.00%)
+Checks: 416/416 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -292,7 +292,7 @@ When structured data lags a known official release, web is an official-source fa
 
 ## issue592
 
-5/5 cases, 52/52 checks
+5/5 cases, 65/65 checks
 
 ### PASS issue592.scoped-eval-checks
 
@@ -302,16 +302,29 @@ The eval runner can verify scoped behavior and scenario contracts instead of onl
 - [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes section_includes
 - [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes hard_gate_includes
 - [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes scenariosPath
+- [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes mutation-smoke.mjs
 - [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes evaluateScenario
 - [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes scenarioAsCase
+- [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes requirements.sections
 - [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes expected route
 - [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes extractMarkdownSection
 - [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes extractHardGate
 - [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes getFileText
 - [x] scenarios: evals/alva-skill-docs/scenarios.json includes prompt
 - [x] scenarios: evals/alva-skill-docs/scenarios.json includes "route"
+- [x] scenarios: evals/alva-skill-docs/scenarios.json includes "sections"
 - [x] scenarios: evals/alva-skill-docs/scenarios.json includes Capability Verification
 - [x] scenarios: evals/alva-skill-docs/scenarios.json includes before-playbook-release
+- [x] mutation smoke: evals/alva-skill-docs/mutation-smoke.mjs includes MUTATIONS
+- [x] mutation smoke: evals/alva-skill-docs/mutation-smoke.mjs includes simple-latest-one-hop
+- [x] mutation smoke: evals/alva-skill-docs/mutation-smoke.mjs includes scenario.simple-latest-price
+- [x] mutation smoke: evals/alva-skill-docs/mutation-smoke.mjs includes capability-before-refusal
+- [x] mutation smoke: evals/alva-skill-docs/mutation-smoke.mjs includes issue592.capability-verification-before-refusal
+- [x] mutation smoke: evals/alva-skill-docs/mutation-smoke.mjs includes playbook-release-readme
+- [x] mutation smoke: evals/alva-skill-docs/mutation-smoke.mjs includes before-playbook-release
+- [x] mutation smoke: evals/alva-skill-docs/mutation-smoke.mjs includes udf-strict-opt-in
+- [x] mutation smoke: evals/alva-skill-docs/mutation-smoke.mjs includes scenario.udf-strict-opt-in
+- [x] mutation smoke: evals/alva-skill-docs/mutation-smoke.mjs includes expectFailedCases
 
 ### PASS issue592.financial-ask-contract
 
@@ -584,12 +597,12 @@ Prompt: `Does Alva have darkpool L2 realtime data?`
 
 - [x] data-skills.md
 - [x] search.md
-- [x] Before saying Alva lacks a capability
-- [x] alva data-skills list | grep -i <topic>
-- [x] Decompose compound asks
-- [x] Never reject the whole as one unit from memory
 - [x] custom data source URL / BYOD source
 - [x] expected route: references/request-routing.md#Routes includes Capability Verification
+- [x] before refusal: references/request-routing.md#Capability Verification includes Before saying Alva lacks a capability
+- [x] before refusal: references/request-routing.md#Capability Verification includes alva data-skills list | grep -i <topic>
+- [x] before refusal: references/request-routing.md#Capability Verification includes Decompose compound asks
+- [x] before refusal: references/request-routing.md#Capability Verification includes Never reject the whole as one unit from memory
 
 ## scenarios.playbook
 

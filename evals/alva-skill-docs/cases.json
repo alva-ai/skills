@@ -343,8 +343,10 @@
             "section_includes",
             "hard_gate_includes",
             "scenariosPath",
+            "mutation-smoke.mjs",
             "evaluateScenario",
             "scenarioAsCase",
+            "requirements.sections",
             "expected route",
             "extractMarkdownSection",
             "extractHardGate",
@@ -357,8 +359,25 @@
           "includes": [
             "prompt",
             "\"route\"",
+            "\"sections\"",
             "Capability Verification",
             "before-playbook-release"
+          ]
+        },
+        {
+          "file": "evals/alva-skill-docs/mutation-smoke.mjs",
+          "label": "mutation smoke",
+          "includes": [
+            "MUTATIONS",
+            "simple-latest-one-hop",
+            "scenario.simple-latest-price",
+            "capability-before-refusal",
+            "issue592.capability-verification-before-refusal",
+            "playbook-release-readme",
+            "before-playbook-release",
+            "udf-strict-opt-in",
+            "scenario.udf-strict-opt-in",
+            "expectFailedCases"
           ]
         }
       ]
