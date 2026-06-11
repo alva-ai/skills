@@ -317,6 +317,19 @@
       ]
     },
     {
+      "id": "issue591.official-source-web-fallback",
+      "group": "issue591",
+      "target": "corpus",
+      "description": "When structured data lags a known official release, web is an official-source fallback and corroboration path rather than an automatic refusal.",
+      "includes": [
+        "Structured Feed Lag",
+        "domain-scoped search",
+        "Alva's structured feed is not yet synced",
+        "official-source stale-feed fallback",
+        "Do not claim the value came from Data Skills"
+      ]
+    },
+    {
       "id": "target.top-level-size",
       "group": "target",
       "target": "skill",
@@ -478,7 +491,7 @@
       "target": "corpus",
       "description": "Latest mainline Alva skill updates remain integrated after rebasing the refactor.",
       "includes": [
-        "version: v1.11.2",
+        "version: v1.12.1",
         "Capability Help",
         "Reply 1, 2, or 3 to start",
         "feedback",

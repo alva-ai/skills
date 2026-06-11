@@ -99,6 +99,23 @@ alva sdk doc --name <module>
 
 ## Failure And Fallback
 
+### Structured Feed Lag
+
+If an in-catalog series appears stale against its cadence, release calendar, or
+the user's claim that an official release has happened:
+
+1. Re-check Data Skills, including observation-date and release-date endpoints
+   when available.
+2. Verify the release calendar or latest release on the official primary source
+   through domain-scoped search or direct page fetch.
+3. If confirmed, answer with inline source attribution and state that Alva's
+   structured feed is not yet synced. Do not claim the value came from Data
+   Skills.
+4. If the official source does not confirm the release, say the structured feed
+   latest value and the official-release status you checked.
+5. Treat news, blogs, screenshots, memory, and LLM output only as hints to
+   verify, not as fallback value sources.
+
 When an endpoint returns 403, 404, empty, or irrelevant data:
 
 1. Re-check `summary` for a semantically equivalent endpoint in the same skill.
