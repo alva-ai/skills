@@ -81,8 +81,8 @@ Push-capable feeds write one of these streams:
 
 | Output stream | Use |
 | --- | --- |
-| `signal/targets` | Playbook signals, trading targets, actionable alerts. |
-| `notify/message` | Feed results, AlvaAsk reports, heartbeat checks, proactive alerts. |
+| `notify/message` | Feed results, AlvaAsk reports, heartbeat checks, proactive alerts, playbook-facing notifications, and plain-text playbook alerts. |
+| `signal/targets` | Altra/trading targets and other machine-readable execution signals. |
 
 Both dispatch `feed_alert_ready`. Do not use legacy names such as
 `playbook_data_ready` or `feed_run_complete` in new docs.

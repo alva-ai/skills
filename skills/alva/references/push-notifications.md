@@ -29,9 +29,11 @@ the user can connect Telegram, Discord, or Slack at <https://alva.ai/settings>.
 A push is set up only after all of these succeed:
 
 1. Add the intended push sidecar:
-   - `signal/targets` for playbook signals and trading targets.
-   - `notify/message` for feed completion, AlvaAsk reports, heartbeat checks,
-     and proactive alerts.
+   - `notify/message` for playbook-facing notifications, feed completion,
+     AlvaAsk reports, heartbeat checks, proactive alerts, and prompts like
+     "write a playbook alert feed".
+   - `signal/targets` only for Altra/trading targets or other
+     machine-readable execution signals.
 2. Run the feed through [feed-lifecycle.md](feed-lifecycle.md), including
    `before-feed-release`.
 3. Enable publisher push on the cronjob:

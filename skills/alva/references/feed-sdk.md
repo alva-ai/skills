@@ -162,12 +162,13 @@ await feed.run(async (ctx) => {
 
 Read `@last/N` (where N >= batch size) to get the most recent batch.
 
-### Pattern D: Signal / Playbook Push Notification
+### Pattern D: Structured Signal / Trading Target
 
-For feeds that produce actionable signals worth pushing to users or groups
-that explicitly subscribed to the feed, or to a playbook that references the
-feed. Write signal records to the **`signal`** group with a **`targets`**
-output -- the resulting path
+Use this when the feed produces an Altra/trading target or another
+machine-readable execution signal.
+
+Write structured signal records to the **`signal`** group with a **`targets`**
+output. The resulting path
 `~/feeds/{name}/v{major}/data/signal/targets` is one source the platform reads
 when dispatching the canonical `feed_alert_ready` notification event.
 
@@ -179,7 +180,7 @@ const { Feed, feedPath, makeDoc, str, num, obj, arr, fld } = require("@alva/feed
 const feed = new Feed({ path: feedPath("my-signal") });
 
 feed.def("signal", {
-  targets: makeDoc("Signal Targets", "Actionable signals for playbook notifications", [
+  targets: makeDoc("Signal Targets", "Machine-readable trading targets", [
     obj("instruction", [
       str("type"),       // "allocate" | "orders"
       arr("weights", [   // for type: "allocate"
@@ -247,21 +248,28 @@ require a 500-character summary.
   notification-native. Use a push-safe projection only when a channel has a
   real hard limit or cannot render the feed's richer format.
 - One record per run is typical; the platform reads `@last/1`.
-- Altra strategies write to this path automatically. Use this pattern only for
-  non-Altra feeds that want to produce push-worthy signals.
+- Altra strategies write to this path automatically. For non-Altra
+  playbook-facing notifications, prefer `notify/message` unless a downstream
+  machine must consume the structured target.
 
-### Pattern E: AlvaAsk + Feed Notification (notify/message)
+### Pattern E: Feed Notification (notify/message)
 
-**Preferred pattern for scheduled tasks.** Use `@alva/alvaask` instead of a
-custom alpi loop for cronjob feeds when you need Alva's full agent behavior —
-it's simpler (no sandbox/session management) and the `ask()` call handles tool
-use, web search, and ALFS access automatically.
+For scheduled agent-written notifications, prefer `@alva/alvaask` over a
+custom alpi loop: it is simpler (no sandbox/session management) and `ask()`
+handles tool use, web search, and ALFS access automatically.
 
-For feeds that use `@alva/alvaask` to call Alva's agent and publish the result
-as a feed completion notification. Common use cases: scheduled market reports,
-periodic research summaries, heartbeat monitoring, and proactive alerts.
+For feeds that publish the message recipients should read. Common use cases:
+scheduled market reports, periodic research summaries, heartbeat monitoring,
+proactive alerts, and playbook-facing signal notifications that do not need
+machine-readable trading targets.
 
-Write the agent's response to the **`notify`** group with a **`message`**
+Route playbook alert/feed prompts through this pattern when the output is
+notification text, including "write a playbook alert feed", "notify when a
+playbook condition fires", and "push a signal message to playbook
+subscribers". Use Pattern D only when the user also asks for a structured
+trading target, signal-card data, or execution.
+
+Write the notification content to the **`notify`** group with a **`message`**
 output. When the cronjob completes with `--push-notify`, the platform reads
 this path and dispatches `feed_alert_ready` to users or groups that explicitly
 subscribed to the feed, or to a playbook that references the feed.
@@ -324,6 +332,9 @@ alva release feed --name daily-briefing --version 1.0.0 \
 - If `body`/`text` contains `<|SKIP_NOTIFICATION|>`, fanout state advances but
   no user-visible notification is sent. Teach AlvaAsk to output this sentinel
   when there is no material update.
+- Use this as the default for playbook-facing signals that are notification
+  text. Keep `signal/targets` only when a downstream trading, signal-card, or
+  execution path needs the structured target.
 - **`alva release feed` is required** — without it, the push is still
   dispatched but arrives with an empty body (no `title`/`body`).
 - `--push-notify` only enables publisher-side fanout. It does **not** create
@@ -335,8 +346,8 @@ alva release feed --name daily-briefing --version 1.0.0 \
   unsubscribe (including ghost rows of deleted targets), see
   [push-notifications.md](push-notifications.md) § Inventory And
   Unsubscribe.
-- Combine with Pattern D if you want both feed completion notifications and
-  signal-style notifications.
+- Combine with Pattern D only when the same run must produce both a readable
+  notification and a machine-readable trading/execution target.
 
 ### Deduplication
 

@@ -225,6 +225,19 @@
       ]
     },
     {
+      "id": "target.playbook-notify-message",
+      "group": "target",
+      "target": "corpus",
+      "description": "Playbook-facing notifications default to notify/message while structured execution targets stay on signal/targets.",
+      "includes": [
+        "Prefer `notify/message` for playbook-facing notifications",
+        "Route playbook alert/feed prompts through this pattern when the output is notification text",
+        "\"write a playbook alert feed\"",
+        "Use this as the default for playbook-facing signals that are notification text",
+        "Keep `signal/targets` only when a downstream trading, signal-card, or execution path needs the structured target"
+      ]
+    },
+    {
       "id": "retained.memory-secrets",
       "group": "retained",
       "target": "corpus",

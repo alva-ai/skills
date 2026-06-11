@@ -498,10 +498,11 @@ authentication, `alva functions` creator registration and allowance tools,
 
 #### Action Layer: Push Notifications
 
-Push is a feed/playbook subscription flow. A feed may emit `signal/targets` or
-`notify/message`; both dispatch `feed_alert_ready`. `--push-notify` only marks
-the publisher capable of alerts. It does not subscribe users or bypass
-preferences.
+Push is a feed/playbook subscription flow. Prefer `notify/message` for
+playbook-facing notifications; reserve `signal/targets` for structured
+trading/execution targets. Both dispatch `feed_alert_ready`. `--push-notify`
+only marks the publisher capable of alerts. It does not subscribe users or
+bypass preferences.
 
 Open [push-notifications.md](references/push-notifications.md) for sidecar
 creation, release, subscription, and verification. Quiet runs use
@@ -642,7 +643,8 @@ generator behind the selected element rather than the rendered DOM.
 
 ### Push Monitor
 
-For a recurring alert, design the feed output first: signal target or message,
+For a recurring alert, design the feed output first: `notify/message` by
+default, `signal/targets` only for structured trading/execution targets,
 quiet-run sentinel, cadence, and subscriber. Release the feed after adding the
 sidecar, then verify a real run. A cronjob with `--push-notify` and no
 subscription is not a completed push setup.
