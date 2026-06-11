@@ -1,0 +1,36 @@
+name: Alva skill doc evals
+
+on:
+  pull_request:
+    paths:
+      - "skills/alva/**"
+      - "evals/alva-skill-docs/**"
+      - ".github/workflows/alva-skill-doc-evals.yml"
+  push:
+    branches: [main]
+    paths:
+      - "skills/alva/**"
+      - "evals/alva-skill-docs/**"
+      - ".github/workflows/alva-skill-doc-evals.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run doc regression eval
+        run: node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva
+
+      - name: Run mutation smoke
+        run: node evals/alva-skill-docs/mutation-smoke.mjs --skill-dir skills/alva
