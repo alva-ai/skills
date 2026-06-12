@@ -47,7 +47,6 @@ inside a deterministic pipeline. The runtime module is `@alva/pi`; use
 			],
 			thinkingLevel: "off",
 		},
-		getApiKey: () => "jagent-managed",
 	});
 
 	const { message } = await agent.ask(prompt);
@@ -64,9 +63,29 @@ inside a deterministic pipeline. The runtime module is `@alva/pi`; use
 
 ### `new Agent(options)`
 
-Create an agent with a fixed initial state. In Alva's online jagent runtime,
-pass `getApiKey: () => "jagent-managed"` so provider credentials stay owned by
-jagent.
+Create an agent with a fixed initial state.
+
+**API keys (important).** In Alva's online jagent runtime you normally
+**omit `getApiKey` entirely** — the Agent defaults it and jagent injects the
+platform provider credentials host-side. Do **not** hardcode a key.
+
+**Bring your own key (BYOK).** To bill an LLM call to your *own* provider
+account instead of Alva's, return your key from `getApiKey` — but **load it
+from secret-manager, never inline it in the script**:
+
+```javascript
+const agent = new Agent({
+	initialState: { /* systemPrompt, model, tools */ },
+	// BYOK: jagent passes this key straight through to the provider and does
+	// NOT charge Alva platform credits for the call. Store the key with
+	// secret-manager; never paste a raw key into the script.
+	getApiKey: () => require("secret-manager").loadPlaintext("MY_ANTHROPIC_KEY"),
+});
+```
+
+Any non-empty key you return that is not the managed placeholder is treated as
+your own and used as-is. If `getApiKey` is omitted (or returns empty), jagent
+uses the platform key and bills platform credits as usual.
 
 ### `agent.ask(prompt): Promise<AgentAnswer>`
 
@@ -82,7 +101,7 @@ events unless the script truly needs progress updates.
 | `initialState.model` | yes | `getModel(provider, modelId)` result, usually OpenAI. |
 | `initialState.tools` | yes | Tool definitions available to the agent. |
 | `initialState.thinkingLevel` | no | Use `"off"` for deterministic result-only jobs unless reasoning is needed. |
-| `getApiKey` | yes online | Return `"jagent-managed"` in Alva runtime. |
+| `getApiKey` | no | Omit to use the jagent-managed platform key (default). For BYOK, return your own key loaded via `secret-manager` — passed through to the provider, not billed to platform credits. |
 
 ### Tool
 
@@ -194,7 +213,6 @@ Schema: {"summary":"...","changes":["..."],"sentiment":"up|down|neutral"}`,
 		],
 		thinkingLevel: "off",
 	},
-	getApiKey: () => "jagent-managed",
 });
 
 const { message } = await agent.ask("Analyze AAPL quarterly performance.");
@@ -248,7 +266,6 @@ const agent = new Agent({
 		tools,
 		thinkingLevel: "off",
 	},
-	getApiKey: () => "jagent-managed",
 });
 
 await agent.ask("How is the current rate environment affecting crypto markets?");
@@ -290,7 +307,6 @@ await feed.run(async (ctx) => {
 			],
 			thinkingLevel: "off",
 		},
-		getApiKey: () => "jagent-managed",
 	});
 
 	await agent.ask("Score growth outlook 1-10: Technology, Healthcare, Energy, Financials.");
