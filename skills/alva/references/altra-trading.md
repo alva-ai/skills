@@ -761,10 +761,10 @@ All output data is also persisted under the feed's ALFS path (quote in CLI, e.g.
 ```
 
 `signal/targets` makes the feed push-capable, but delivery still requires the
-cronjob to be created or updated with `--push-notify` and the feed release to be
+automation to be published or updated with `--push-notify` and a feed release
 bound to that cronjob. Actual delivery also requires an explicit personal or
 group subscription to the feed or to a playbook that references it. See
-`references/deployment.md` for the deploy/release flow.
+`references/deployment.md` for the automation publish flow.
 
 ---
 

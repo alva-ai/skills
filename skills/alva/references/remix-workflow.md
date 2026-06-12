@@ -201,8 +201,15 @@ only on explicit request). Do not write fresh files from scratch.
    `alva fs write --path '~/feeds/{new-name}/v1/src/index.js' --file ./{feed_name}.js --mkdir-parents`
 2. **Test** via `alva run --entry-path '~/feeds/{new-name}/v1/src/index.js'`
 3. **Grant** public read: `alva fs grant --path '~/feeds/{new-name}' --subject "special:user:*" --permission read`
-4. **Deploy cronjob**: `alva deploy create --name {new-name} --path '~/feeds/{new-name}/v1/src/index.js' --cron "..."`
-5. **Release feed**: `alva release feed --name {new-name} --version 1.0.0 --cronjob-id ID --description "..."`
+4. **Publish automation**:
+   ```bash
+   alva automation publish \
+     --name {new-name} \
+     --version 1.0.0 \
+     --path '~/feeds/{new-name}/v1/src/index.js' \
+     --schedule "..." \
+     --description "..."
+   ```
 6. **Edit local HTML** (the `./index.html` from Step 2 — update data
    paths to point to your own feed) and upload:
    `alva fs write --path '~/playbooks/{new-name}/index.html' --file ./index.html --mkdir-parents`

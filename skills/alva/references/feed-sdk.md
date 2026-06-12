@@ -5,6 +5,10 @@ time series data on the Alva filesystem. Feed outputs are readable via standard
 filesystem paths, making them accessible to other scripts, dashboards, and
 public consumers.
 
+In normal user-facing workflows, this SDK is the data layer for an automation.
+Use `feed` for SDK code, paths, and diagnostics; publish and explain the
+finished product as an automation.
+
 ---
 
 ## Overview
@@ -227,9 +231,8 @@ require a 500-character summary.
 
 - The group **must** be named `signal` and the output **must** be named
   `targets` -- this is the path the notification system looks for.
-- `--push-notify` and `alva release feed --cronjob-id ...` only make the feed
-  publisher capable of emitting alerts. They do **not** subscribe any user or
-  group.
+- `--push-notify` on `alva automation publish` only makes the feed publisher
+  capable of emitting alerts. It does **not** subscribe any user or group.
 - Real delivery requires an explicit subscription: personal
   `alva subscriptions subscribe-feed` / `subscribe-playbook`, group
   `/alva subscribe feed <id>` / `/alva subscribe playbook <id>`, or — from
@@ -295,18 +298,13 @@ If there is no material update worth notifying about, output only
 })();
 ```
 
-Deploy requires **two steps** — cronjob + feed registration:
+Publish the automation in one command:
 
 ```bash
-# 1. Create the cronjob with push notification enabled
-alva deploy create --name daily-briefing \
+alva automation publish --name daily-briefing --version 1.0.0 \
+  --producer-name daily-briefing \
   --path '~/feeds/daily-briefing/v1/src/index.js' \
-  --cron "0 8 * * *" --push-notify
-
-# 2. Register the feed (REQUIRED for push content to work)
-# Without this, notifications arrive without title/text content.
-alva release feed --name daily-briefing --version 1.0.0 \
-  --cronjob-id <ID_FROM_STEP_1> \
+  --schedule "0 8 * * *" --push-notify \
   --description "Generates a morning briefing each day at 08:00 summarizing overnight crypto market moves and pushes it as a notification"
 ```
 
@@ -324,8 +322,8 @@ alva release feed --name daily-briefing --version 1.0.0 \
 - If `body`/`text` contains `<|SKIP_NOTIFICATION|>`, fanout state advances but
   no user-visible notification is sent. Teach AlvaAsk to output this sentinel
   when there is no material update.
-- **`alva release feed` is required** — without it, the push is still
-  dispatched but arrives with an empty body (no `title`/`body`).
+- The release command is part of the publish block. Without it, the push is
+  still dispatched but arrives with an empty body (no `title`/`body`).
 - `--push-notify` only enables publisher-side fanout. It does **not** create
   personal or group subscriptions.
 - Real delivery requires an explicit subscription: personal
@@ -813,10 +811,16 @@ alva fs grant --path '~/feeds/btc-ema/v1' --subject "special:user:*" --permissio
 alva fs read --path '/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100'
 ```
 
-### Step 5: Deploy as a cronjob (required for live playbooks)
+### Step 5: Publish the automation (required for live playbooks)
 
 ```bash
-alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js' --cron "0 */4 * * *"
+alva automation publish \
+  --name btc-ema \
+  --version 1.0.0 \
+  --producer-name btc-ema-update \
+  --path '~/feeds/btc-ema/v1/src/index.js' \
+  --schedule "0 */4 * * *" \
+  --description "Refreshes BTC EMA metrics every four hours"
 ```
 
 ---

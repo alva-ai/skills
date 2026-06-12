@@ -122,9 +122,8 @@
         "Feed SDK",
         "alva run --entry-path",
         "special:user:*",
-        "alva deploy create",
-        "alva release feed",
-        "before-feed-release"
+        "alva automation publish",
+        "before-automation-publish"
       ]
     },
     {
@@ -468,6 +467,23 @@
         "user-facing prose reference read",
         "Product vocabulary, voice rules, and alpi prose prompt block",
         "Chat answers for Financial Analysis / Ask Question"
+      ]
+    },
+    {
+      "id": "target.automation-publish",
+      "group": "target",
+      "target": "corpus",
+      "description": "Cronjob creation and feed release are hidden behind the automation publish operation without erasing lifecycle boundaries.",
+      "includes": [
+        "automation publish",
+        "alva automation publish",
+        "creates the backing scheduler and registers the automation output",
+        "Do not treat `alva deploy create` as a finished live automation",
+        "orphan producer",
+        "published automation output",
+        "each still has its own lifecycle row",
+        "Playbook release is the separate UI publication step",
+        "Without it, the push is still dispatched but arrives with an empty body"
       ]
     },
     {
