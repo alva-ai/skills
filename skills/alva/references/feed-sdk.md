@@ -266,6 +266,9 @@ output. When the cronjob completes with `--push-notify`, the platform reads
 this path and dispatches `feed_alert_ready` to users or groups that explicitly
 subscribed to the feed, or to a playbook that references the feed.
 
+For a minimal standalone playbook-facing alert script, see
+[`examples/playbook-alert-feed.js`](../examples/playbook-alert-feed.js).
+
 ```javascript
 const { ask } = require("@alva/alvaask");
 const { Feed, feedPath, makeDoc, str } = require("@alva/feed");
