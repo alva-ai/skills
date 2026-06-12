@@ -135,8 +135,11 @@ make it this one.
    operations target only the requesting user's namespace from `alva whoami`
    unless the user explicitly asks for cross-user work such as remix lineage.
 6. **Altra for trading.** Any backtest, portfolio simulation, target signal,
-   equity curve, order logic, position tracking, or rebalancing uses Altra.
-   Hand-rolled loops invite bad timestamps and look-ahead bias.
+   equity curve, order logic, position tracking, or rebalancing uses Altra. The
+   tell you are bypassing it: you reach for a `net/http` price-fetch loop with a
+   by-hand P&L / return / hit-rate accumulator — that loop IS the backtest
+   engine. Build it in Altra (`registerRawData` carries any bar series); read
+   [altra-trading.md](references/altra-trading.md) first.
 7. **Playbooks are live by default.** If a playbook displays numbers, charts,
    tables, or metric cards, HTML reads feed outputs at runtime through
    `AlvaToolkit.AlvaClient` and release declares the backing feeds. Static
