@@ -96,9 +96,28 @@
         ],
         "behaviors": [
           "Build live feeds first",
-          "HTML fetches quantitative data from feeds, not inline literals",
-          "Every release needs a current README",
-          "screenshot verification must show real feed-backed marks"
+          "HTML fetches quantitative data from feeds, not inline literals"
+        ],
+        "sections": [
+          {
+            "file": "references/api/release.md",
+            "heading": "Freshness and version updates",
+            "label": "readme freshness",
+            "includes": [
+              "Every `alva release playbook` call needs a freshly reviewed README",
+              "regenerate the README",
+              "upload it again to `~/playbooks/<name>/README.md` before release"
+            ]
+          },
+          {
+            "file": "references/playbook-creation.md",
+            "heading": "Screenshot",
+            "label": "visual verification",
+            "includes": [
+              "Pass screenshot verification only when",
+              "real feed-backed chart marks"
+            ]
+          }
         ],
         "gates": [
           {

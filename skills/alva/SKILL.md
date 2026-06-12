@@ -390,40 +390,28 @@ each feed, ALFS, deploy, and release step.
 
 #### Publication Layer: Playbook Creation Tree
 
-Playbooks are hosted investing apps. They can be dashboards, screeners,
-thesis trackers, backtest surfaces, what-if studies, event studies, or custom
-interactive tools. Creation is a concrete task, so the detailed workflow lives
-in [playbook-creation.md](references/playbook-creation.md).
+Playbooks are hosted investing apps: dashboards, screeners, thesis trackers,
+backtest surfaces, what-if studies, event studies, or custom interactive tools.
+Enter this branch only when the user wants a hosted/shareable surface, remix,
+annotation edit, release/version update, or playbook subscription setup.
 
-Before HTML work, satisfy `before-build-html`: read [design.md](references/design.md)
-first, then the relevant companion reference, and follow the Browser request
-rule in [playbook-creation.md](references/playbook-creation.md). If a Skillhub
-blueprint is active, its layout and data contract override stale memories or
-companion code.
+Read [playbook-creation.md](references/playbook-creation.md) before creating
+or changing the hosted surface. It owns the build order, Browser-safe feed
+reads, README, draft/release gates, screenshot verification, tier/visibility
+flow, and push-after-release handoff. Read [api/release.md](references/api/release.md)
+for README, tags, trading-symbol, and `--skill-id` details; read
+[remix-workflow.md](references/remix-workflow.md) or
+[annotation-edits.md](references/annotation-edits.md) for those subroutes.
 
-Before release, satisfy `before-playbook-draft` and `before-playbook-release`.
-Every release needs a current README at `~/playbooks/<name>/README.md`, passed
-via absolute `--readme-url`; see [api/release.md](references/api/release.md).
-
-After a successful draft and release gates, publish publicly by default unless
-the user explicitly asks to stop at draft/private. Existing published
-visibility can be changed with `alva playbooks set-visibility` after reading
-`alva playbooks --help`; private and paid visibility are Pro-gated.
-
-Playbook creation is where many Alva concepts meet: Data Skills or BYOD feed
-the runtime, Feed SDK writes outputs, design rules govern the UI, release
-metadata explains discovery, README explains trust, and screenshots prove the
-published URL renders. The top-level rule is simple: if a number is visible,
-the viewer's browser should be able to read where it came from, and screenshot
-verification must show real feed-backed marks, rows, or KPI values rather than
-a loaded page shell.
+The top-level boundary is feed-first and live-read: build feeds before HTML,
+and visible numbers must be read from feed outputs in the viewer's browser.
+Before HTML work, satisfy `before-build-html`; before draft/release satisfy
+`before-playbook-draft` and `before-playbook-release` in the reference. Keep
+procedure, release, screenshot, and tier details in the owning references.
 
 Subroutes are new build, Skillhub-guided build, remix, annotation/edit,
-release/version update, and push after release. Keep those steps inside
-[playbook-creation.md](references/playbook-creation.md),
-[remix-workflow.md](references/remix-workflow.md), and
-[annotation-edits.md](references/annotation-edits.md); do not let every
-financial question inherit playbook gates.
+release/version update, and push after release. Do not let every financial
+question inherit playbook gates.
 
 #### Strategy Layer: Altra
 
@@ -602,18 +590,18 @@ failure instead of substituting a web snippet or model memory. If the user then
 asks to track, alert, share, or publish, upgrade the route to a feed, signal,
 alert, or playbook.
 
-### Durable Artifacts / Playbook Tree
+### Hosted Playbook Workflow
 
 Enter this tree when the user wants a hosted app, share URL, dashboard,
 screener app, report surface, remix, annotation edit, release/version update,
-or playbook subscription setup. Turn the request into a data contract before
-UI work: universe, metrics, freshness, output groups, widgets, and release
-path. Build feeds first, then HTML that reads those feeds, then README, draft,
-release, screenshot, and optional push. Details live in
+or playbook subscription setup. First choose the artifact shape: direct answer,
+feed, signal, model output, or hosted playbook. For hosted/shareable surfaces,
+turn the request into a data contract before UI work: universe, metrics,
+freshness, output groups, widgets, and release path. Then open
 [playbook-creation.md](references/playbook-creation.md),
 [remix-workflow.md](references/remix-workflow.md),
 [annotation-edits.md](references/annotation-edits.md), and
-[api/release.md](references/api/release.md).
+[api/release.md](references/api/release.md); they own the procedure.
 
 ### Thesis, Digest, And Monitoring
 

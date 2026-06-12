@@ -538,15 +538,40 @@
       "id": "target.top-level-playbook-routing",
       "group": "target",
       "target": "skill",
-      "description": "Top-level routing and final checklist keep playbook work in its concrete reference without making all routing playbook-centric.",
-      "includes": [
-        "Playbook Creation Tree",
-        "Durable Artifacts / Playbook Tree",
-        "Subroutes are new build, Skillhub-guided build, remix, annotation/edit, release/version update, and push after release",
-        "do not let every financial question inherit playbook gates",
-        "route through [playbook-creation.md](references/playbook-creation.md)",
-        "Did playbook work read [playbook-creation.md](references/playbook-creation.md)",
-        "relevant hard gates"
+      "description": "Top-level routing keeps playbook work as route-plus-boundary-plus-pointer instead of duplicating the manual.",
+      "section_includes": [
+        {
+          "file": "SKILL.md",
+          "heading": "Publication Layer: Playbook Creation Tree",
+          "label": "playbook route",
+          "includes": [
+            "Enter this branch only when the user wants a hosted/shareable surface",
+            "Read [playbook-creation.md](references/playbook-creation.md)",
+            "owns the build order, Browser-safe feed reads, README, draft/release gates, screenshot verification, tier/visibility flow, and push-after-release handoff",
+            "feed-first and live-read",
+            "Keep procedure, release, screenshot, and tier details in the owning references",
+            "Do not let every financial question inherit playbook gates"
+          ]
+        },
+        {
+          "file": "SKILL.md",
+          "heading": "Hosted Playbook Workflow",
+          "label": "common workflow",
+          "includes": [
+            "First choose the artifact shape",
+            "turn the request into a data contract before UI work",
+            "they own the procedure"
+          ]
+        },
+        {
+          "file": "SKILL.md",
+          "heading": "Final Sanity Checklist",
+          "label": "final checklist",
+          "includes": [
+            "Did playbook work read [playbook-creation.md](references/playbook-creation.md)",
+            "relevant hard gates"
+          ]
+        }
       ]
     },
     {
