@@ -93,8 +93,8 @@ same `function_name` and `params_schema` on the remixed playbook.
 ## Step 2 — Read UI Layer (HTML Source)
 
 If ALFS-native read/write/edit tools are available, inspect and edit the ALFS
-source directly. Do not force a local download/upload loop in embedded jagent
-mode.
+source directly. Do not force a local download/upload loop in PI/jagent agent
+tool mode.
 
 In a shell-only CLI session, download to a local file; do not regenerate from
 memory. Redirect `alva fs read` output into a local file so you can edit it in
@@ -201,20 +201,24 @@ adjust strategy parameters, and apply the user's customization request **within
 the scope defined above** (data/topic by default; structure only on explicit
 request). Do not write fresh files from scratch.
 
-1. **Write the edited feed script** to ALFS:
+1. **Write the edited feed script** to ALFS. Use the ALFS write/edit tool in
+   agent tool mode; shell-only fallback:
    `alva fs write --path '~/feeds/{new-name}/v1/src/index.js' --file ./{feed_name}.js --mkdir-parents`
 2. **Test** via `alva run --entry-path '~/feeds/{new-name}/v1/src/index.js'`
 3. **Grant** public read: `alva fs grant --path '~/feeds/{new-name}' --subject "special:user:*" --permission read`
 4. **Deploy cronjob**: `alva deploy create --name {new-name} --path '~/feeds/{new-name}/v1/src/index.js' --cron "..."`
 5. **Release feed**: `alva release feed --name {new-name} --version 1.0.0 --cronjob-id ID --description "..."`
 6. **Write the edited HTML** to ALFS after updating data paths to point to
-   your own feed:
+   your own feed. Use the ALFS write/edit tool in agent tool mode; shell-only
+   fallback:
    `alva fs write --path '~/playbooks/{new-name}/index.html' --file ./index.html --mkdir-parents`
 7. **Copy inherited UDF entry scripts when present**: for each source UDF,
-   write the edited entry script to a path under the new playbook, for example
+   write the edited entry script to a path under the new playbook. Use the
+   ALFS write/edit tool in agent tool mode; shell-only fallback:
    `alva fs write --path '~/playbooks/{new-name}/udf/{function_name}.js' --file ./udf-{function_name}.js --mkdir-parents`.
 8. **Write README** (mandatory) — adapt the source playbook's README to
-   your data sources and methodology, then write it to ALFS:
+   your data sources and methodology, then write it to ALFS. Use the ALFS
+   write/edit tool in agent tool mode; shell-only fallback:
    `alva fs write --path '~/playbooks/{new-name}/README.md' --file ./README.md --mkdir-parents`.
    See [release.md → Playbook README](api/release.md#playbook-readme).
 9. **Draft playbook**: `alva release playbook-draft --name {new-name} --display-name "..." --feeds '[{"feed_id":ID}]'`

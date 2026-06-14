@@ -118,7 +118,7 @@ The canonical content shape lives in [api/release.md](api/release.md#playbook-re
 Before `alva release playbook-draft`, write:
 
 Use ALFS-native write/edit tools when available. The `--file` examples below
-are for shell-only CLI sessions; in embedded jagent mode, write the same
+are for shell-only CLI sessions; in PI/jagent agent tool mode, write the same
 content directly to the target ALFS paths.
 
 ```bash
