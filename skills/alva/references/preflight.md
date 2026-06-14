@@ -36,6 +36,27 @@ npm install -g @alva-ai/toolkit
 npm install -g @alva-ai/toolkit@latest
 ```
 
+## ALFS-Native Agent Mode
+
+When the agent environment exposes ALFS-native read/write/edit tools or an
+embedded `@alva-ai/toolkit/cli` dispatcher running with `mode: "jagent"`, use
+those tools for file preparation. Do not route through local-file upload flags
+such as `alva fs write --file`, `alva run --local-file`,
+`--params-schema-file`, or screenshot `--out`.
+
+In that mode, prepare or edit content directly in ALFS, then call Alva commands
+with ALFS paths or inline JSON/data:
+
+- Use `alva fs write --data ...` or the ALFS write/edit tool for source, HTML,
+  README, and schema files.
+- Use `alva run --entry-path <alfs-js-path>` or `alva run --code <inline-js>`;
+  do not use `--local-file`.
+- Use `alva functions register --params-schema '<json>'` when the schema was
+  prepared in ALFS or memory; do not use `--params-schema-file`.
+
+CLI examples that use local files are fallback instructions for shell-only
+Node.js sessions.
+
 Third-party vendor secrets belong in Alva Secret Manager
 (`require("secret-manager")`), not CLI config, source files, or chat.
 

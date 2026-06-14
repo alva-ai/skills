@@ -13,7 +13,7 @@ inside a deterministic pipeline. The runtime module is `@alva/pi`; use
 
 ```javascript
 // @ts-nocheck
-/** alva run --local-file ./run-result.js */
+/** alva run --entry-path '~/tasks/run-result.js' */
 (async () => {
 	const { Agent, Type, getModel } = require("@alva/pi");
 	const args = require("env").args || {};

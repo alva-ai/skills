@@ -19,7 +19,7 @@ The three lifecycle CLI groups:
 
 The deployment workflow:
 
-1. **Write** a script (feed or task) and upload it to the filesystem
+1. **Write** a script (feed or task) to ALFS
 2. **Test** it manually via `alva run`
 3. **Deploy** it as a cronjob via `alva deploy create`
 4. **Verify** the deployment via `alva deploy trigger` (one out-of-schedule run)
@@ -263,7 +263,8 @@ This example creates a BTC price feed that runs every 4 hours.
 alva fs mkdir --path '~/feeds/btc-hourly/v1/src'
 ```
 
-Write the script (upload from local file):
+Write the script to ALFS. Prefer ALFS-native write/edit tools when available;
+the `--file` form is for shell-only CLI sessions:
 
 ```bash
 alva fs write --path '~/feeds/btc-hourly/v1/src/index.js' --file ./index.js --mkdir-parents
