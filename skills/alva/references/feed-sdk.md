@@ -756,6 +756,7 @@ Public reads must use absolute paths:
 ### Step 1: Create the directory and write the script
 
 ```bash
+# Prefer ALFS-native write/edit tools when available; --file is shell-only fallback.
 alva fs write --path '~/feeds/btc-ema/v1/src/index.js' --file ./index.js --mkdir-parents
 ```
 

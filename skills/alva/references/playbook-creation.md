@@ -108,14 +108,18 @@ Every released playbook ships a README at:
 
 It is the single source of truth for the playbook's "How does this work?"
 surface. For every release, version bump, or rerelease, regenerate it from the
-current HTML, feeds, metadata, and blind spots, then upload it again before
-release. Do not reuse a prior-version README.
+current HTML, feeds, metadata, and blind spots, then write it to ALFS again
+before release. Do not reuse a prior-version README.
 
 The canonical content shape lives in [api/release.md](api/release.md#playbook-readme).
 
 ## Draft
 
 Before `alva release playbook-draft`, write:
+
+Use ALFS-native write/edit tools when available. The `--file` examples below
+are for shell-only CLI sessions; in PI/jagent agent tool mode, write the same
+content directly to the target ALFS paths.
 
 ```bash
 alva fs write --path '~/playbooks/{name}/index.html' --file ./index.html --mkdir-parents
