@@ -241,7 +241,6 @@ body {
   width: 100%;
   margin: 0 auto;
   padding: var(--spacing-s) var(--spacing-xxl) var(--spacing-xxxxl);
-  /* max-width: 2048px; */
 }
 
 @media (max-width: 768px) {
