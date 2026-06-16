@@ -239,6 +239,7 @@ const {
   fld,
   makeDoc,
   createArraysOhlcvProvider,
+  createOhlcvProviderFromMultipleJson,
 } = require("@alva/feed");
 const {
   FeedAltra,
@@ -262,6 +263,7 @@ const {
 | `num`, `str`, `bool`, `obj`, `arr`, `fld` | `@alva/feed` (top level)   | Field type helpers (same as Feed SDK)            |
 | `makeDoc`                                 | `@alva/feed` (top level)   | Type document helper                             |
 | `createArraysOhlcvProvider`               | `@alva/feed` (top level)    | Builds the OHLCV provider used by Altra          |
+| `createOhlcvProviderFromMultipleJson`     | `@alva/feed` (top level)    | OHLCV provider from your own bars                |
 
 ---
 
@@ -306,6 +308,30 @@ When a user asks for a multi-year intraday stock backtest, do not blindly set a
 to daily/weekly bars if that still answers the question, or use a provider path
 that explicitly chunks the request. Retrying the same full-window request across
 regions usually does not fix this class of request.
+
+### Custom OHLCV Provider
+
+Use `createOhlcvProviderFromMultipleJson` when the traded series has no built-in
+Arrays symbol, such as a rotating contract, expiring option, roll, spread, or
+basket. Fetch or compute the bars first, then let Altra own event dispatch,
+orders, portfolio, and performance.
+
+```javascript
+const { createOhlcvProviderFromMultipleJson } = require("@alva/feed");
+
+// bars: [{ date, endTime, open, high, low, close, volume }] with ms timestamps.
+const provider = createOhlcvProviderFromMultipleJson([
+  JSON.stringify({ pair, interval: simTick, bars: minuteBars }),
+  JSON.stringify({ pair, interval: "1d", bars: dayBars }),
+]);
+
+const altra = new FeedAltra(config, provider);
+altra.getDataGraph().registerOhlcv(pair, simTick);
+```
+
+Provide the strategy interval and `"1d"` for each synthetic pair; performance
+valuation reads daily bars too. Keep `pair` in valid `VENUE_CONTRACT_BASE_QUOTE`
+form with no underscores inside the base segment, or order validation fails.
 
 ---
 
