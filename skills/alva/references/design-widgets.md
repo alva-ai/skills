@@ -395,7 +395,7 @@ Legend marker class by chart type:
 5. **Hidden containers (tab panels, modals) report 0×0 size.** When a chart
    becomes visible after being hidden, call `chart.resize()`. Likewise,
    `initTableAlignment` must re-run for tables that were hidden. The
-   [Tab JS](./design-components.md#js-interaction-1) handles both automatically
+   [Tab JS](./design-components.md#js-interaction-3) handles both automatically
    for tab switches.
 6. `.chart-body` MUST carry `.chart-dotted-background`. Do NOT set a solid
    `background` on `.chart-body` via inline style or any other class — the

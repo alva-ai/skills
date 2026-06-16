@@ -1,9 +1,11 @@
 # Alva Design System
 
-> ⚠️ **The ```css blocks in this file are the source of truth for
+> ⚠️ **The ```css blocks in this file — together with design-components.md and
+> design-widgets.md — are the source of truth for
 > [css/design-system.css](./css/design-system.css) (published to CDN).**
-> When you edit any ```css block, commit the matching regenerated
-> `design-system.css` alongside your `.md` edit. CI doc-sync catches drift.
+> When you edit any ```css block in any of those three files, commit the matching
+> regenerated `design-system.css` alongside your `.md` edit. CI doc-sync catches
+> drift.
 
 This file is the global entry point for Alva design rules — tokens, typography,
 theme, and page-level layout. Read this first, then follow the reading path at
@@ -11,32 +13,29 @@ the bottom for widget and component specs.
 
 ## Design Tokens
 
-Full token definitions (colors, spacing, radius, theme) are in
-[design-tokens.css](./design-tokens.css). Always read that file for exact
-token values.
+- **Generating playbook HTML** → put this in `<head>`. It loads tokens + global
+  rules + components + widgets, so no per-playbook CSS is needed:
 
-In generated HTML, link the canonical design-system stylesheet from the CDN.
-**For new playbooks, use the v1 bundle** — one file contains tokens + global
-rules + components + widgets:
+  ```html
+  <link rel="stylesheet" href="https://alva-ai-static.b-cdn.net/design-system/v1/design-system.css" />
+  ```
 
-```html
-<link rel="stylesheet" href="https://alva-ai-static.b-cdn.net/design-system/v1/design-system.css" />
-```
+- **Need a token's exact value** (px / hex) → Read
+  [design-tokens.css](./design-tokens.css). It is an authoring-time lookup
+  reference only — never `<link>` it into the page.
+- **Always** style via `var(--token-name)` — never hardcode hex or rgba values.
 
-Existing playbooks that only link the legacy `design-tokens.css` URL continue
-to work (the linter accepts both forms). For new playbooks, prefer the v1
-bundle so component and widget CSS comes from the CDN instead of inlined per
-playbook.
+(Legacy playbooks that link only the old `design-tokens.css` URL still pass the
+linter, but new ones use the v1 bundle above.)
 
-Always reference tokens via `var(--token-name)` — never hardcode hex or rgba
-values. Below is a quick reference:
+Token quick reference:
 
 | Category     | Tokens                                         | Notes                                   |
 | ------------ | ---------------------------------------------- | --------------------------------------- |
 | Brand        | `--main-m1` ~ `--main-m7`                      | m3=Bullish, m4=Bearish                  |
 | Chart colors | `--chart-{color}-main/1/2`                     | Grey only when ≥ 3 series               |
 | Text         | `--text-n9/n7/n5/n3/n2`                        | n9=primary, n7=secondary, n5=supporting |
-| Background   | `--b0-page`, `--grey-g01`~`g7`, `--b-r02`~`r1` | g01 for card backgrounds                |
+| Background   | `--b0-page`, `--grey-g01`~`g7`                 | g01 for card backgrounds                |
 | Line         | `--line-l05/l07/l12/l2/l3/l9`                  | l07=default, l9=hover/active            |
 | Shadow       | `--shadow-xs/s/l`                              | Floating surfaces only (dropdown/tooltip) |
 | Spacing      | `--spacing-xxxs`(2) ~ `--spacing-xxxxxxl`(56)  | Common: xs=8, m=16, xl=24               |
@@ -68,26 +67,27 @@ if any error-severity finding fires. See
 
 ## Typography & Font
 
-### General Rules
+The v1 bundle already ships all font wiring — `@font-face`, the global `body`
+font-family, and anti-aliasing. **If you `<link>` the bundle, do not rewrite any
+of it.** The fenced CSS blocks in this section are the bundle's generation source
+(and a fallback reference for legacy inline playbooks), not snippets to paste
+into a new playbook.
 
-1. **The default font for Alva must be Delight**;
-2. Backup fonts: `-apple-system`, `OPPO Sans 4.0`, `BlinkMacSystemFont`, `sans-serif`;
+You only need to follow these rules:
 
-### Font Weight
-
-The font weight for Alva is limited to Regular (400) and Medium (500), and the
-use of Semibold (600) or Bold (700) is prohibited.
+1. **Font** — Delight is the default; backups `-apple-system`, `OPPO Sans 4.0`,
+   `BlinkMacSystemFont`, `sans-serif`.
+2. **Weight** — Regular (400) and Medium (500) only; Semibold (600) and Bold
+   (700) are prohibited. At **≥ 24px use Regular (400) only** (see table):
 
 | Font Size  | Font Weight                 | Font File Path                                                                                                                                                       |
 | ---------- | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | < 24px     | Regular(400) or Medium(500) | [Delight-Regular.ttf](https://alva-ai-static.b-cdn.net/fonts/Delight-Regular.ttf) or [Delight-Medium.ttf](https://alva-ai-static.b-cdn.net/fonts/Delight-Medium.ttf) |
 | **≥ 24px** | **Regular(400) only**       | [Delight-Regular.ttf](https://alva-ai-static.b-cdn.net/fonts/Delight-Regular.ttf)                                                                                    |
 
-### Font Loading
+### What the bundle ships (reference — don't hand-copy)
 
-The Delight TTFs are served from the static CDN. The bundle ships
-`@font-face` declarations so a single `<link>` to `design-system.css` is
-enough — playbooks do not need to add their own `@font-face`:
+`@font-face` for the Delight TTFs (served from the CDN):
 
 ```css
 @font-face {
@@ -106,12 +106,8 @@ enough — playbooks do not need to add their own `@font-face`:
 }
 ```
 
-### Global Font Family
-
-The bundle sets `font-family` on registered component classes (e.g.
-`.btn`, `.tab-item`, `.markdown-container`). Free-flowing HTML outside
-components — bare `<div>`, `<p>`, ad-hoc headings — needs an explicit
-`body` rule so the cascade carries Delight everywhere:
+A global `body` font-family, so bare `<div>` / `<p>` / headings outside
+components also inherit Delight:
 
 ```css
 body {
@@ -120,10 +116,7 @@ body {
 }
 ```
 
-### Anti-aliasing Standards
-
-Include these anti-aliasing declarations in generated styles (globally, or on
-any text container):
+Anti-aliasing on `body`:
 
 ```css
 body {
@@ -132,9 +125,6 @@ body {
   text-rendering: optimizeLegibility;
 }
 ```
-
-- If the project already has a global reset or typography base class, ensure the
-  above properties are included; no need to redeclare them within components.
 
 ## Links
 
@@ -148,31 +138,36 @@ body {
 
 **The page background color must use `--b0-page`**
 
-**Default mode** → Light Mode
+**Light mode only**
 
 ## One-Off Chat Chart Artifacts
 
-For Ask / answer-only chart HTML embedded in chat, keep the artifact compact.
-Use Alva tokens, Delight typography, Chart Card styling, source/as-of labeling,
-and the standard watermark, but do not build a miniature playbook.
+For Ask / answer-only chart HTML embedded in chat, keep the artifact compact —
+do not build a miniature playbook. Put the analysis in the chat answer; keep the
+HTML focused on the chart.
 
-Default shape: one Chart Card, optional 1-2 KPI chips, and a short
-source/as-of note. Avoid app headers, hero sections, long descriptions,
-methodology blocks, creator notes, footers, and share/subscribe CTAs. Put the
-analysis in the chat answer; keep the HTML focused on the chart.
+**Default shape:** one [Chart Card](./design-widgets.md#chart-card), optionally
+1-2 KPI chips, and a short source/as-of note.
+
+- **Include** — Alva tokens, Delight typography, Chart Card styling, source/as-of
+  labeling, and the required `.alva-watermark` (both per
+  [design-widgets.md](./design-widgets.md#chart-card)).
+- **Omit** — app headers, hero sections, long descriptions, methodology blocks,
+  creator notes, footers, share/subscribe CTAs.
 
 ## Playbook Container
 
 ### Hosted Shell Boundary
 
-Playbook HTML renders inside an iframe owned by the Alva hosted shell. The
-outer shell already provides the playbook title, description, last-updated
-metadata, automation entry points, and share/open controls. By default, do not
-repeat that chrome inside the iframe; start with the first useful in-playbook
-region such as tabs, filters, KPIs, charts, tables, status rows, or analysis
-sections. Section/widget titles and scoped freshness labels are fine. Add
-custom in-iframe chrome only when the user explicitly asks for it or a
-blueprint requires a distinct app-level header.
+**Do not render app-level chrome inside the iframe.** The hosted shell already
+provides the playbook title, description, last-updated metadata, automation entry
+points, and share/open controls — repeating them duplicates the shell.
+
+- **Start** with the first useful in-playbook region: tabs, filters, KPIs,
+  charts, tables, status rows, or analysis sections.
+- **Keep** section/widget titles and scoped freshness labels — those are fine.
+- **Add custom chrome only** when the user explicitly asks, or a blueprint
+  requires a distinct app-level header.
 
 ### Page-Level Scroll Rule
 
@@ -214,7 +209,6 @@ body {
   width: 100%;
   margin: 0 auto;
   padding: var(--spacing-s) var(--spacing-xxl) var(--spacing-xxxxl);
-  /* max-width: 2048px; */
 }
 
 @media (max-width: 768px) {
