@@ -1,0 +1,64 @@
+name: Alva skill LLM trace eval
+
+on:
+  schedule:
+    # Weekly Monday 10:00 Asia/Shanghai. This is periodic diagnostics, not PR CI.
+    - cron: "0 2 * * 1"
+  workflow_dispatch:
+    inputs:
+      model:
+        description: "OpenAI model override"
+        required: false
+        type: string
+      scenario:
+        description: "Optional scenario id"
+        required: false
+        type: string
+      limit:
+        description: "Optional scenario limit"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  trace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      ALVA_SKILL_LLM_EVAL_MODEL: ${{ inputs.model || vars.ALVA_SKILL_LLM_EVAL_MODEL }}
+      ALVA_SKILL_LLM_EVAL_SCENARIO: ${{ inputs.scenario || '' }}
+      ALVA_SKILL_LLM_EVAL_LIMIT: ${{ inputs.limit || '' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run periodic LLM trace eval
+        run: |
+          mkdir -p artifacts/alva-skill-llm-trace
+          args=(
+            --out artifacts/alva-skill-llm-trace/report.md
+            --json-out artifacts/alva-skill-llm-trace/traces.json
+          )
+          if [[ -n "${ALVA_SKILL_LLM_EVAL_SCENARIO}" ]]; then
+            args+=(--scenario "${ALVA_SKILL_LLM_EVAL_SCENARIO}")
+          fi
+          if [[ -n "${ALVA_SKILL_LLM_EVAL_LIMIT}" ]]; then
+            args+=(--limit "${ALVA_SKILL_LLM_EVAL_LIMIT}")
+          fi
+          node evals/alva-skill-docs/llm-scenario-trace.mjs "${args[@]}"
+
+      - name: Upload trace report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: alva-skill-llm-trace
+          path: artifacts/alva-skill-llm-trace/
+          if-no-files-found: ignore

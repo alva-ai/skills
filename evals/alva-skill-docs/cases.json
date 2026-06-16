@@ -330,12 +330,192 @@
       ]
     },
     {
+      "id": "issue592.scoped-eval-checks",
+      "group": "issue592",
+      "target": "eval",
+      "description": "The eval runner can verify scoped behavior and scenario contracts instead of only corpus-wide string presence.",
+      "file_includes": [
+        {
+          "file": "evals/alva-skill-docs/skill-doc-eval.mjs",
+          "label": "runner",
+          "includes": [
+            "file_includes",
+            "section_includes",
+            "hard_gate_includes",
+            "scenariosPath",
+            "mutation-smoke.mjs",
+            "evaluateScenario",
+            "scenarioAsCase",
+            "requirements.sections",
+            "expected route",
+            "extractMarkdownSection",
+            "extractHardGate",
+            "getFileText"
+          ]
+        },
+        {
+          "file": "evals/alva-skill-docs/scenarios.json",
+          "label": "scenarios",
+          "includes": [
+            "prompt",
+            "\"route\"",
+            "\"sections\"",
+            "Capability Verification",
+            "before-playbook-release"
+          ]
+        },
+        {
+          "file": "evals/alva-skill-docs/mutation-smoke.mjs",
+          "label": "mutation smoke",
+          "includes": [
+            "MUTATIONS",
+            "simple-latest-one-hop",
+            "scenario.simple-latest-price",
+            "capability-before-refusal",
+            "issue592.capability-verification-before-refusal",
+            "playbook-release-readme",
+            "before-playbook-release",
+            "udf-strict-opt-in",
+            "scenario.udf-strict-opt-in",
+            "expectFailedCases"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "issue592.financial-ask-contract",
+      "group": "issue592",
+      "target": "corpus",
+      "description": "Financial Analysis / Ask Question remains a small answer route with fresh evidence, prose, and confidence gates instead of inheriting playbook workflow.",
+      "section_includes": [
+        {
+          "file": "references/request-routing.md",
+          "heading": "Routes",
+          "label": "answer route",
+          "includes": [
+            "Financial Analysis / Ask Question",
+            "fresh data/search/`alva run` evidence",
+            "Every answer must read [user-facing-prose.md](user-facing-prose.md)",
+            "ask evidence gate"
+          ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "heading": "Guided Planning",
+          "label": "answer gate",
+          "includes": [
+            "decomposition",
+            "source path",
+            "coverage gaps",
+            "sourced-vs-inference boundary",
+            "Simple asks can satisfy the gate with one hop",
+            "Only complex judgment asks also pass the Complex Ask Router"
+          ]
+        },
+        {
+          "file": "SKILL.md",
+          "heading": "Financial Analysis / Ask Question Tree",
+          "label": "top-level route",
+          "includes": [
+            "It is not merely \"Data Query\"",
+            "data access and execution are steps inside an analysis answer",
+            "Simple latest-fact asks stop there after one sourced hop",
+            "Do not answer until you can name the decomposition"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "issue592.capability-verification-before-refusal",
+      "group": "issue592",
+      "target": "corpus",
+      "description": "Capability gaps are verified against live Alva surfaces and reduced-scope/BYOD fallbacks before the agent refuses.",
+      "section_includes": [
+        {
+          "file": "references/request-routing.md",
+          "heading": "Capability Verification",
+          "label": "before refusal",
+          "includes": [
+            "Before saying Alva lacks a capability",
+            "alva data-skills list | grep -i <topic>",
+            "Decompose compound asks",
+            "Never reject the whole as one unit from memory"
+          ]
+        },
+        {
+          "file": "references/data-skills.md",
+          "heading": "Failure And Fallback",
+          "label": "fallback behavior",
+          "includes": [
+            "same-domain Alva endpoints cannot answer the task",
+            "custom data source URL / BYOD source",
+            "Never stop with zero useful output",
+            "Never replace a missing data source with LLM-fabricated values"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "issue592.playbook-release-behavior",
+      "group": "issue592",
+      "target": "corpus",
+      "description": "Playbook release remains protected by behavior-level gates for feed freshness, live data reads, README, lint, and screenshot verification.",
+      "hard_gate_includes": [
+        {
+          "file": "references/playbook-creation.md",
+          "id": "before-playbook-release",
+          "label": "release gate",
+          "includes": [
+            "Every backing feed passed `before-feed-release`",
+            "HTML fetches quantitative data from feeds, not inline literals",
+            "Latest data from each referenced feed is fresh",
+            "README exists, is current, and is passed via absolute `--readme-url`",
+            "alva lint playbook ./index.html"
+          ]
+        }
+      ],
+      "section_includes": [
+        {
+          "file": "references/playbook-creation.md",
+          "heading": "Screenshot",
+          "label": "visual verification",
+          "includes": [
+            "A PNG or page shell is not enough",
+            "real feed-backed chart marks",
+            "headers-only tables",
+            "fetch failures are data-rendering failures"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "issue592.push-delivery-behavior",
+      "group": "issue592",
+      "target": "corpus",
+      "description": "Push setup is evaluated as a full delivery path instead of a single publisher flag.",
+      "section_includes": [
+        {
+          "file": "references/push-notifications.md",
+          "heading": "Configure And Verify",
+          "label": "push setup",
+          "includes": [
+            "A push is set up only after all of these succeed",
+            "before-feed-release",
+            "alva deploy update --id <ID> --push-notify",
+            "alva subscriptions subscribe-feed",
+            "alva subscriptions subscribe-playbook",
+            "read `@last/1` of the sidecar",
+            "do not claim push is set up"
+          ]
+        }
+      ]
+    },
+    {
       "id": "target.top-level-size",
       "group": "target",
       "target": "skill",
-      "description": "Top-level SKILL.md is in the requested encyclopedia/guide size band.",
-      "max_lines": 850,
-      "min_lines": 650
+      "description": "Top-level SKILL.md stays below the current guide ceiling without forcing a minimum size that would block future compression.",
+      "max_lines": 850
     },
     {
       "id": "target.playbook-task-offload",
@@ -358,15 +538,40 @@
       "id": "target.top-level-playbook-routing",
       "group": "target",
       "target": "skill",
-      "description": "Top-level routing and final checklist keep playbook work in its concrete reference without making all routing playbook-centric.",
-      "includes": [
-        "Playbook Creation Tree",
-        "Durable Artifacts / Playbook Tree",
-        "Subroutes are new build, Skillhub-guided build, remix, annotation/edit, release/version update, and push after release",
-        "do not let every financial question inherit playbook gates",
-        "route through [playbook-creation.md](references/playbook-creation.md)",
-        "Did playbook work read [playbook-creation.md](references/playbook-creation.md)",
-        "relevant hard gates"
+      "description": "Top-level routing keeps playbook work as route-plus-boundary-plus-pointer instead of duplicating the manual.",
+      "section_includes": [
+        {
+          "file": "SKILL.md",
+          "heading": "Publication Layer: Playbook Creation Tree",
+          "label": "playbook route",
+          "includes": [
+            "Enter this branch only when the user wants a hosted/shareable surface",
+            "Read [playbook-creation.md](references/playbook-creation.md)",
+            "owns the build order, Browser-safe feed reads, README, draft/release gates, screenshot verification, tier/visibility flow, and push-after-release handoff",
+            "feed-first and live-read",
+            "Keep procedure, release, screenshot, and tier details in the owning references",
+            "Do not let every financial question inherit playbook gates"
+          ]
+        },
+        {
+          "file": "SKILL.md",
+          "heading": "Hosted Playbook Workflow",
+          "label": "common workflow",
+          "includes": [
+            "First choose the artifact shape",
+            "turn the request into a data contract before UI work",
+            "they own the procedure"
+          ]
+        },
+        {
+          "file": "SKILL.md",
+          "heading": "Final Sanity Checklist",
+          "label": "final checklist",
+          "includes": [
+            "Did playbook work read [playbook-creation.md](references/playbook-creation.md)",
+            "relevant hard gates"
+          ]
+        }
       ]
     },
     {

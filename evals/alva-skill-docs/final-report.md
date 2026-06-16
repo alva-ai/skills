@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/financial-ask-quality-gates/skills/alva`
+Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/behavioral-doc-eval/skills/alva`
 
-SKILL.md lines: 776
+SKILL.md lines: 780
 
-Cases: 31/31
+Cases: 47/47
 
-Checks: 253/253 (100.00%)
+Checks: 416/416 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -276,16 +276,123 @@ Review-discovered guardrails stay present in the skill corpus instead of only in
 - [x] 20%
 - [x] ~/library
 
+## issue591
+
+1/1 cases, 5/5 checks
+
+### PASS issue591.official-source-web-fallback
+
+When structured data lags a known official release, web is an official-source fallback and corroboration path rather than an automatic refusal.
+
+- [x] Structured Feed Lag
+- [x] domain-scoped search
+- [x] Alva's structured feed is not yet synced
+- [x] official-source stale-feed fallback
+- [x] Do not claim the value came from Data Skills
+
+## issue592
+
+5/5 cases, 65/65 checks
+
+### PASS issue592.scoped-eval-checks
+
+The eval runner can verify scoped behavior and scenario contracts instead of only corpus-wide string presence.
+
+- [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes file_includes
+- [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes section_includes
+- [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes hard_gate_includes
+- [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes scenariosPath
+- [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes mutation-smoke.mjs
+- [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes evaluateScenario
+- [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes scenarioAsCase
+- [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes requirements.sections
+- [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes expected route
+- [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes extractMarkdownSection
+- [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes extractHardGate
+- [x] runner: evals/alva-skill-docs/skill-doc-eval.mjs includes getFileText
+- [x] scenarios: evals/alva-skill-docs/scenarios.json includes prompt
+- [x] scenarios: evals/alva-skill-docs/scenarios.json includes "route"
+- [x] scenarios: evals/alva-skill-docs/scenarios.json includes "sections"
+- [x] scenarios: evals/alva-skill-docs/scenarios.json includes Capability Verification
+- [x] scenarios: evals/alva-skill-docs/scenarios.json includes before-playbook-release
+- [x] mutation smoke: evals/alva-skill-docs/mutation-smoke.mjs includes MUTATIONS
+- [x] mutation smoke: evals/alva-skill-docs/mutation-smoke.mjs includes simple-latest-one-hop
+- [x] mutation smoke: evals/alva-skill-docs/mutation-smoke.mjs includes scenario.simple-latest-price
+- [x] mutation smoke: evals/alva-skill-docs/mutation-smoke.mjs includes capability-before-refusal
+- [x] mutation smoke: evals/alva-skill-docs/mutation-smoke.mjs includes issue592.capability-verification-before-refusal
+- [x] mutation smoke: evals/alva-skill-docs/mutation-smoke.mjs includes playbook-release-readme
+- [x] mutation smoke: evals/alva-skill-docs/mutation-smoke.mjs includes before-playbook-release
+- [x] mutation smoke: evals/alva-skill-docs/mutation-smoke.mjs includes udf-strict-opt-in
+- [x] mutation smoke: evals/alva-skill-docs/mutation-smoke.mjs includes scenario.udf-strict-opt-in
+- [x] mutation smoke: evals/alva-skill-docs/mutation-smoke.mjs includes expectFailedCases
+
+### PASS issue592.financial-ask-contract
+
+Financial Analysis / Ask Question remains a small answer route with fresh evidence, prose, and confidence gates instead of inheriting playbook workflow.
+
+- [x] answer route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
+- [x] answer route: references/request-routing.md#Routes includes fresh data/search/`alva run` evidence
+- [x] answer route: references/request-routing.md#Routes includes Every answer must read [user-facing-prose.md](user-facing-prose.md)
+- [x] answer route: references/request-routing.md#Routes includes ask evidence gate
+- [x] answer gate: references/request-routing.md#Guided Planning includes decomposition
+- [x] answer gate: references/request-routing.md#Guided Planning includes source path
+- [x] answer gate: references/request-routing.md#Guided Planning includes coverage gaps
+- [x] answer gate: references/request-routing.md#Guided Planning includes sourced-vs-inference boundary
+- [x] answer gate: references/request-routing.md#Guided Planning includes Simple asks can satisfy the gate with one hop
+- [x] answer gate: references/request-routing.md#Guided Planning includes Only complex judgment asks also pass the Complex Ask Router
+- [x] top-level route: SKILL.md#Financial Analysis / Ask Question Tree includes It is not merely "Data Query"
+- [x] top-level route: SKILL.md#Financial Analysis / Ask Question Tree includes data access and execution are steps inside an analysis answer
+- [x] top-level route: SKILL.md#Financial Analysis / Ask Question Tree includes Simple latest-fact asks stop there after one sourced hop
+- [x] top-level route: SKILL.md#Financial Analysis / Ask Question Tree includes Do not answer until you can name the decomposition
+
+### PASS issue592.capability-verification-before-refusal
+
+Capability gaps are verified against live Alva surfaces and reduced-scope/BYOD fallbacks before the agent refuses.
+
+- [x] before refusal: references/request-routing.md#Capability Verification includes Before saying Alva lacks a capability
+- [x] before refusal: references/request-routing.md#Capability Verification includes alva data-skills list | grep -i <topic>
+- [x] before refusal: references/request-routing.md#Capability Verification includes Decompose compound asks
+- [x] before refusal: references/request-routing.md#Capability Verification includes Never reject the whole as one unit from memory
+- [x] fallback behavior: references/data-skills.md#Failure And Fallback includes same-domain Alva endpoints cannot answer the task
+- [x] fallback behavior: references/data-skills.md#Failure And Fallback includes custom data source URL / BYOD source
+- [x] fallback behavior: references/data-skills.md#Failure And Fallback includes Never stop with zero useful output
+- [x] fallback behavior: references/data-skills.md#Failure And Fallback includes Never replace a missing data source with LLM-fabricated values
+
+### PASS issue592.playbook-release-behavior
+
+Playbook release remains protected by behavior-level gates for feed freshness, live data reads, README, lint, and screenshot verification.
+
+- [x] visual verification: references/playbook-creation.md#Screenshot includes A PNG or page shell is not enough
+- [x] visual verification: references/playbook-creation.md#Screenshot includes real feed-backed chart marks
+- [x] visual verification: references/playbook-creation.md#Screenshot includes headers-only tables
+- [x] visual verification: references/playbook-creation.md#Screenshot includes fetch failures are data-rendering failures
+- [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes Every backing feed passed `before-feed-release`
+- [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes HTML fetches quantitative data from feeds, not inline literals
+- [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes Latest data from each referenced feed is fresh
+- [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes README exists, is current, and is passed via absolute `--readme-url`
+- [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes alva lint playbook ./index.html
+
+### PASS issue592.push-delivery-behavior
+
+Push setup is evaluated as a full delivery path instead of a single publisher flag.
+
+- [x] push setup: references/push-notifications.md#Configure And Verify includes A push is set up only after all of these succeed
+- [x] push setup: references/push-notifications.md#Configure And Verify includes before-feed-release
+- [x] push setup: references/push-notifications.md#Configure And Verify includes alva deploy update --id <ID> --push-notify
+- [x] push setup: references/push-notifications.md#Configure And Verify includes alva subscriptions subscribe-feed
+- [x] push setup: references/push-notifications.md#Configure And Verify includes alva subscriptions subscribe-playbook
+- [x] push setup: references/push-notifications.md#Configure And Verify includes read `@last/1` of the sidecar
+- [x] push setup: references/push-notifications.md#Configure And Verify includes do not claim push is set up
+
 ## target
 
-9/9 cases, 116/116 checks
+9/9 cases, 115/115 checks
 
 ### PASS target.top-level-size
 
-Top-level SKILL.md is in the requested encyclopedia/guide size band.
+Top-level SKILL.md stays below the current guide ceiling without forcing a minimum size that would block future compression.
 
-- [x] line count >= 650 (actual 776)
-- [x] line count <= 850 (actual 776)
+- [x] line count <= 850 (actual 780)
 
 ### PASS target.playbook-task-offload
 
@@ -418,7 +525,7 @@ Operational pitfalls are a mandatory stepwise gate, not an optional debugging ap
 
 Latest mainline Alva skill updates remain integrated after rebasing the refactor.
 
-- [x] version: v1.11.2
+- [x] version: v1.12.1
 - [x] Capability Help
 - [x] Reply 1, 2, or 3 to start
 - [x] feedback
@@ -440,3 +547,195 @@ Latest mainline Alva skill updates remain integrated after rebasing the refactor
 - [x] real feed-backed chart marks
 - [x] headers-only tables
 - [x] fetch failures
+
+## scenarios.ask
+
+2/2 cases, 19/19 checks
+
+### PASS scenario.simple-latest-price
+
+A simple latest-fact ask stays in Financial Analysis, uses fresh sourced evidence, and does not inherit playbook gates.
+
+Prompt: `What is BTC doing right now?`
+
+- [x] Simple latest-fact asks stop there after one sourced hop
+- [x] user-facing-prose.md
+- [x] content-legitimacy.md
+- [x] Direct latest price for covered US equities and crypto: intraday klines, not daily close
+- [x] Do not answer until you can name the decomposition
+- [x] Do not let playbook creation become the default
+- [x] not automatically to a playbook
+- [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
+
+### PASS scenario.complex-valuation-ask
+
+A complex valuation ask uses the ask evidence gate plus Complex Ask Router without becoming a playbook by default.
+
+Prompt: `Is NVDA cheap versus peers after the latest earnings revision?`
+
+- [x] request-routing.md
+- [x] user-facing-prose.md
+- [x] fundamentals-periods.md
+- [x] Complex Ask Router
+- [x] valuation/accounting
+- [x] comparison baselines are financial facts
+- [x] current multiple/FCF/EPS
+- [x] multiple/earnings sensitivity
+- [x] cap confidence when required evidence
+- [x] not automatically to a playbook
+- [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
+
+## scenarios.capability
+
+1/1 cases, 8/8 checks
+
+### PASS scenario.capability-gap-before-refusal
+
+A capability-gap question verifies live coverage before saying no or moving to BYOD.
+
+Prompt: `Does Alva have darkpool L2 realtime data?`
+
+- [x] data-skills.md
+- [x] search.md
+- [x] custom data source URL / BYOD source
+- [x] expected route: references/request-routing.md#Routes includes Capability Verification
+- [x] before refusal: references/request-routing.md#Capability Verification includes Before saying Alva lacks a capability
+- [x] before refusal: references/request-routing.md#Capability Verification includes alva data-skills list | grep -i <topic>
+- [x] before refusal: references/request-routing.md#Capability Verification includes Decompose compound asks
+- [x] before refusal: references/request-routing.md#Capability Verification includes Never reject the whole as one unit from memory
+
+## scenarios.playbook
+
+3/3 cases, 31/31 checks
+
+### PASS scenario.dashboard-playbook-build
+
+A hosted dashboard enters the Playbook Creation route and preserves feed-first, live-read, README, lint, release, and screenshot gates.
+
+Prompt: `Build and publish a live dashboard for BTC dominance breakouts.`
+
+- [x] Publication Layer: Playbook Creation Tree
+- [x] playbook-creation.md
+- [x] feed-lifecycle.md
+- [x] design.md
+- [x] api/release.md
+- [x] AlvaToolkit.AlvaClient
+- [x] Build live feeds first
+- [x] HTML fetches quantitative data from feeds, not inline literals
+- [x] Every release needs a current README
+- [x] screenshot verification must show real feed-backed marks
+- [x] expected route: references/request-routing.md#Routes includes Playbook Creation
+- [x] playbook release: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes Every backing feed passed `before-feed-release`
+- [x] playbook release: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes README exists, is current, and is passed via absolute `--readme-url`
+- [x] playbook release: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes alva lint playbook ./index.html
+
+### PASS scenario.remix-existing-playbook
+
+A remix reads source artifacts and preserves lineage instead of regenerating from memory.
+
+Prompt: `<remix https://alva.ai/u/alva/playbooks/screener> make my own version`
+
+- [x] Playbook Subroute: Remix
+- [x] remix-workflow.md
+- [x] playbook-creation.md
+- [x] Extract source owner/name from the tag URL
+- [x] read the source feed scripts, HTML, README, and playbook metadata
+- [x] preserve them unless the user explicitly asks otherwise
+- [x] Do not regenerate from memory
+- [x] expected route: references/request-routing.md#Routes includes Debug / Edit
+
+### PASS scenario.annotation-edit
+
+An annotation edit changes the generator behind the element and re-enters HTML gates.
+
+Prompt: `<annotation id="hero-title">make this chart title shorter</annotation>`
+
+- [x] Playbook Subroute: Annotation Edits
+- [x] annotation-edits.md
+- [x] playbook-creation.md
+- [x] change the generator behind the selected element
+- [x] Never freeze rendered feed values into static text
+- [x] HTML edits re-enter `before-build-html`
+- [x] expected route: references/request-routing.md#Routes includes Debug / Edit
+- [x] html gate: references/playbook-creation.md<HARD-GATE:before-build-html> includes The HTML follows the Browser request rule
+- [x] html gate: references/playbook-creation.md<HARD-GATE:before-build-html> includes Do not rely on memory of prior sessions
+
+## scenarios.push
+
+1/1 cases, 9/9 checks
+
+### PASS scenario.alert-push-monitor
+
+A monitoring request routes to Automation / Push and validates sidecar, release, subscription, and real-run delivery.
+
+Prompt: `Track BTC dominance and notify me when it breaks out.`
+
+- [x] push-notifications.md
+- [x] feed-lifecycle.md
+- [x] Build or modify a feed that emits actionable `signal/targets` or `notify/message`
+- [x] A push is set up only after all of these succeed
+- [x] alva deploy update --id <ID> --push-notify
+- [x] alva subscriptions subscribe-feed
+- [x] read `@last/1` of the sidecar
+- [x] do not claim push is set up
+- [x] expected route: references/request-routing.md#Routes includes Automation / Push
+
+## scenarios.strategy
+
+1/1 cases, 8/8 checks
+
+### PASS scenario.backtest-strategy
+
+A backtest routes through Strategy / Trading Analysis and requires Altra instead of hand-rolled loops.
+
+Prompt: `Backtest a weekly NVDA momentum strategy and show drawdowns.`
+
+- [x] altra-trading.md
+- [x] api/trading.md
+- [x] Always use Altra for backtesting
+- [x] FeedAltra
+- [x] look-ahead bias
+- [x] drawdown
+- [x] package results as a concise answer, feed, signal, or visual playbook depending on the request
+- [x] expected route: references/request-routing.md#Routes includes Strategy / Trading Analysis
+
+## scenarios.skillhub
+
+1/1 cases, 10/10 checks
+
+### PASS scenario.skillhub-method
+
+A Skillhub directive fetches the blueprint fresh, avoids bulk download, and only becomes a playbook if the user or blueprint asks.
+
+Prompt: `/use-skill:alva/thesis NVDA AI capex read-through`
+
+- [x] request-routing.md
+- [x] playbook-creation.md
+- [x] api/release.md
+- [x] If the user's message contains `/use-skill:<username>/<name>`, the Skillhub path is mandatory
+- [x] alva skillhub get
+- [x] alva skillhub file
+- [x] Do not bulk-download
+- [x] Do not turn every Skillhub task into a playbook
+- [x] --skill-id <username>/<name>
+- [x] expected route: references/request-routing.md#Routes includes Playbook Creation
+
+## scenarios.udf
+
+1/1 cases, 9/9 checks
+
+### PASS scenario.udf-strict-opt-in
+
+A UDF request is explicit opt-in and routes to the PBSV/browser runtime and functions CLI checks.
+
+Prompt: `Add a button so viewers can run my custom analysis function.`
+
+- [x] api/udf-runtime.md
+- [x] playbook-creation.md
+- [x] User-Defined Functions are strict opt-in
+- [x] registerable/shareable interactive function
+- [x] window.alva.udf
+- [x] alva functions
+- [x] allowance consent
+- [x] Never hand-write bearer headers
+- [x] expected route: references/request-routing.md#Routes includes Playbook Creation
