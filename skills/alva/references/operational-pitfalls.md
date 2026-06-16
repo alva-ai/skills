@@ -3,14 +3,14 @@
 This file is mandatory and stepwise. Do not save it for debugging. Before each
 execution step, read the matching section below, then do the step.
 
-| Before you... | Read |
-| --- | --- |
-| Write or run jagent code | [Runtime](#runtime) |
-| Touch ALFS paths, grants, feed paths, or public reads | [ALFS And Feed Paths](#alfs-and-feed-paths) |
-| Wrap a new endpoint in feed logic | [Data And Runtime Debugging](#data-and-runtime-debugging) |
-| Build or edit playbook HTML/charts | [Chart And HTML](#chart-and-html) |
-| Mix sources with different cadences | [Watermarks](#watermarks) |
-| Scale runtime, payload, HTTP, or cron behavior | [Resource Limits](#resource-limits) |
+| Before you...                                         | Read                                                      |
+| ----------------------------------------------------- | --------------------------------------------------------- |
+| Write or run jagent code                              | [Runtime](#runtime)                                       |
+| Touch ALFS paths, grants, feed paths, or public reads | [ALFS And Feed Paths](#alfs-and-feed-paths)               |
+| Wrap a new endpoint in feed logic                     | [Data And Runtime Debugging](#data-and-runtime-debugging) |
+| Build or edit playbook HTML/charts                    | [Chart And HTML](#chart-and-html)                         |
+| Mix sources with different cadences                   | [Watermarks](#watermarks)                                 |
+| Scale runtime, payload, HTTP, or cron behavior        | [Resource Limits](#resource-limits)                       |
 
 ## Runtime
 
@@ -18,6 +18,10 @@ execution step, read the matching section below, then do the step.
   `await` in jagent runtime. Use [jagent-runtime.md](jagent-runtime.md).
 - Use `require("net/http")` for HTTP.
 - Use `require("alfs")` with absolute `/alva/home/<username>/...` paths.
+- `TypeError: feed.def is not a function` means the code used the `@alva/feed`
+  module object as a feed instance. Fix the API shape: destructure
+  `Feed/feedPath/makeDoc`, instantiate `new Feed({ path: feedPath(name) })`,
+  then call `feed.def(groupName, outputs)`.
 - `FeedAltra.run()` is async; always `await` it.
 - V8 heap is 256 MB by default. For memory-heavy `alva run`, use
   `--max-heap-size-mb <mb>` up to 2048.
@@ -60,20 +64,21 @@ Do not use destructive resets in production.
   `requestAnimationFrame`; the design contract checks this.
 - Graph series need validated node names, unique nodes, and edges whose
   `source`/`target` match existing node names.
-- Allocate enough chart height. Heatmaps need at least `max(300px, rows * 40px)`;
-  primary overview charts should usually be at least 400px.
+- Allocate enough chart height. Heatmaps need at least
+  `max(300px, rows * 40px)`; primary overview charts should usually be at least
+  400px.
 
 ## Watermarks
 
-Use separate `ctx.kv` watermarks for sources with different update cadences
-such as ETF OHLCV, VIX, and CPI. A shared watermark can permanently filter out
-slower sources after the first run.
+Use separate `ctx.kv` watermarks for sources with different update cadences such
+as ETF OHLCV, VIX, and CPI. A shared watermark can permanently filter out slower
+sources after the first run.
 
 ## Resource Limits
 
-| Resource | Limit |
-| --- | --- |
+| Resource              | Limit                                              |
+| --------------------- | -------------------------------------------------- |
 | V8 heap per execution | 256 MB default; `--max-heap-size-mb` up to 2048 MB |
-| Write payload | 10 MB per request |
-| HTTP response body | 128 MB |
-| Minimum cron interval | 1 minute |
+| Write payload         | 10 MB per request                                  |
+| HTTP response body    | 128 MB                                             |
+| Minimum cron interval | 1 minute                                           |

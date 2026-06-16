@@ -20,6 +20,51 @@ filesystem virtual paths (`@last`, `@range`, etc.).
 
 ---
 
+## API Shape Guardrail
+
+Start every feed source from this shape:
+
+```javascript
+const { Feed, feedPath, makeDoc, num, str } = require("@alva/feed");
+
+const feed = new Feed({ path: feedPath("btc-price-rsi") });
+
+feed.def("market", {
+  btc_price_rsi: makeDoc("BTC Price RSI", "BTC close and RSI(14)", [
+    num("close"),
+    num("rsi14"),
+    str("interpretation"),
+  ]),
+});
+
+(async () => {
+  const records = [
+    {
+      date: Date.now(),
+      close: 100000,
+      rsi14: 55,
+      interpretation: "Neutral",
+    },
+  ];
+
+  await feed.run(async (ctx) => {
+    await ctx.self.ts("market", "btc_price_rsi").append(records);
+  });
+})();
+```
+
+Common mistakes:
+
+- Do not use `const feed = require("@alva/feed")`; the module object has no
+  `.def()` method.
+- Do not call `feed.def({ ... })`; `def()` takes `(groupName, outputs)`.
+- Do not define raw `{ columns: ... }` output schemas; each output uses
+  `makeDoc(title, description, fields)`.
+- Do not write feed output with `alfs.writeFile()`; append through
+  `ctx.self.ts(groupName, outputName).append(records)`.
+
+---
+
 ## Quick Start
 
 ```javascript
@@ -164,38 +209,53 @@ Read `@last/N` (where N >= batch size) to get the most recent batch.
 
 ### Pattern D: Signal / Playbook Push Notification
 
-For feeds that produce actionable signals worth pushing to users or groups
-that explicitly subscribed to the feed, or to a playbook that references the
-feed. Write signal records to the **`signal`** group with a **`targets`**
-output -- the resulting path
-`~/feeds/{name}/v{major}/data/signal/targets` is one source the platform reads
-when dispatching the canonical `feed_alert_ready` notification event.
+For feeds that produce actionable signals worth pushing to users or groups that
+explicitly subscribed to the feed, or to a playbook that references the feed.
+Write signal records to the **`signal`** group with a **`targets`** output --
+the resulting path `~/feeds/{name}/v{major}/data/signal/targets` is one source
+the platform reads when dispatching the canonical `feed_alert_ready`
+notification event.
 
 The target format follows the same structure used by Altra trading strategies:
 
 ```javascript
-const { Feed, feedPath, makeDoc, str, num, obj, arr, fld } = require("@alva/feed");
+const {
+  Feed,
+  feedPath,
+  makeDoc,
+  str,
+  num,
+  obj,
+  arr,
+  fld,
+} = require("@alva/feed");
 
 const feed = new Feed({ path: feedPath("my-signal") });
 
 feed.def("signal", {
-  targets: makeDoc("Signal Targets", "Actionable signals for playbook notifications", [
-    obj("instruction", [
-      str("type"),       // "allocate" | "orders"
-      arr("weights", [   // for type: "allocate"
-        str("symbol"),
-        num("weight"),
+  targets: makeDoc(
+    "Signal Targets",
+    "Actionable signals for playbook notifications",
+    [
+      obj("instruction", [
+        str("type"), // "allocate" | "orders"
+        arr("weights", [
+          // for type: "allocate"
+          str("symbol"),
+          num("weight"),
+        ]),
+        arr("orders", [
+          // for type: "orders"
+          str("symbol"),
+          str("side"), // "buy" | "sell"
+          fld("amount", "object"),
+        ]),
       ]),
-      arr("orders", [    // for type: "orders"
-        str("symbol"),
-        str("side"),     // "buy" | "sell"
-        fld("amount", "object"),
+      obj("meta", [
+        str("reason"), // Markdown push-notification body
       ]),
-    ]),
-    obj("meta", [
-      str("reason"),     // Markdown push-notification body
-    ]),
-  ]),
+    ],
+  ),
 });
 
 await feed.run(async (ctx) => {
@@ -220,8 +280,8 @@ await feed.run(async (ctx) => {
 When this feed runs as a cronjob with `--push-notify`, the platform reads
 `/data/signal/targets` and dispatches the signal content as `feed_alert_ready`
 to eligible feed/playbook notification subscriptions. Telegram delivery chunks
-long messages at the platform's per-message limit; the feed SDK does not
-require a 500-character summary.
+long messages at the platform's per-message limit; the feed SDK does not require
+a 500-character summary.
 
 **Key points:**
 
@@ -233,19 +293,18 @@ require a 500-character summary.
 - Real delivery requires an explicit subscription: personal
   `alva subscriptions subscribe-feed` / `subscribe-playbook`, group
   `/alva subscribe feed <id>` / `/alva subscribe playbook <id>`, or — from
-  inside a playbook iframe — a parent-confirmed `window.alva.subscribe.propose()`
-  (see `references/api/udf-runtime.md` § Feed Subscribe Proposal). A playbook
-  must never call a subscribe API directly.
+  inside a playbook iframe — a parent-confirmed
+  `window.alva.subscribe.propose()` (see `references/api/udf-runtime.md` § Feed
+  Subscribe Proposal). A playbook must never call a subscribe API directly.
 - Use `meta.reason` to provide the push-notification body -- this is what
   recipients see when the signal is delivered.
 - `meta.reason` is **Markdown**. Write it as the push body itself, using
-  Markdown for emphasis, lists, and links; the platform renders Markdown on
-  the delivery side (Telegram, in-app surfaces). Keep it short and
-  push-friendly -- headings and heavy formatting don't translate well to a
-  notification.
+  Markdown for emphasis, lists, and links; the platform renders Markdown on the
+  delivery side (Telegram, in-app surfaces). Keep it short and push-friendly --
+  headings and heavy formatting don't translate well to a notification.
 - Keep `meta.reason` close to the user-facing feed output when the feed is
-  notification-native. Use a push-safe projection only when a channel has a
-  real hard limit or cannot render the feed's richer format.
+  notification-native. Use a push-safe projection only when a channel has a real
+  hard limit or cannot render the feed's richer format.
 - One record per run is typical; the platform reads `@last/1`.
 - Altra strategies write to this path automatically. Use this pattern only for
   non-Altra feeds that want to produce push-worthy signals.
@@ -262,8 +321,8 @@ as a feed completion notification. Common use cases: scheduled market reports,
 periodic research summaries, heartbeat monitoring, and proactive alerts.
 
 Write the agent's response to the **`notify`** group with a **`message`**
-output. When the cronjob completes with `--push-notify`, the platform reads
-this path and dispatches `feed_alert_ready` to users or groups that explicitly
+output. When the cronjob completes with `--push-notify`, the platform reads this
+path and dispatches `feed_alert_ready` to users or groups that explicitly
 subscribed to the feed, or to a playbook that references the feed.
 
 ```javascript
@@ -316,25 +375,24 @@ alva release feed --name daily-briefing --version 1.0.0 \
   `message` — this is the path the notification system looks for.
 - `title` is optional — if provided, the notification renders as
   `**title**\n\nbody`.
-- `body` is the notification body (required for content push). The
-  legacy field name `text` is still accepted for backwards compatibility,
-  but `body` is the canonical name and matches FCM / APNS / Web Push
-  / HTTP / email convention — prefer `body` in new feeds. If both
-  `body` and `text` are set on the same record, `body` wins.
+- `body` is the notification body (required for content push). The legacy field
+  name `text` is still accepted for backwards compatibility, but `body` is the
+  canonical name and matches FCM / APNS / Web Push / HTTP / email convention —
+  prefer `body` in new feeds. If both `body` and `text` are set on the same
+  record, `body` wins.
 - If `body`/`text` contains `<|SKIP_NOTIFICATION|>`, fanout state advances but
   no user-visible notification is sent. Teach AlvaAsk to output this sentinel
   when there is no material update.
-- **`alva release feed` is required** — without it, the push is still
-  dispatched but arrives with an empty body (no `title`/`body`).
+- **`alva release feed` is required** — without it, the push is still dispatched
+  but arrives with an empty body (no `title`/`body`).
 - `--push-notify` only enables publisher-side fanout. It does **not** create
   personal or group subscriptions.
 - Real delivery requires an explicit subscription: personal
-  `alva subscriptions subscribe-feed --username <owner> --name <feed>`
-  or `subscribe-playbook`, or group `/alva subscribe feed <feed_id>` /
-  `/alva subscribe playbook <playbook_id>`. For inventory and
-  unsubscribe (including ghost rows of deleted targets), see
-  [push-notifications.md](push-notifications.md) § Inventory And
-  Unsubscribe.
+  `alva subscriptions subscribe-feed --username <owner> --name <feed>` or
+  `subscribe-playbook`, or group `/alva subscribe feed <feed_id>` /
+  `/alva subscribe playbook <playbook_id>`. For inventory and unsubscribe
+  (including ghost rows of deleted targets), see
+  [push-notifications.md](push-notifications.md) § Inventory And Unsubscribe.
 - Combine with Pattern D if you want both feed completion notifications and
   signal-style notifications.
 
@@ -650,32 +708,32 @@ const points = JSON.parse(data);
 ```html
 <script src="https://unpkg.com/@alva-ai/toolkit/dist/browser.global.js"></script>
 <script>
-function createAlvaClientConfig() {
-  const params = new URLSearchParams(window.location.search);
-  const pbsvToken = window.alva?.udf?.getViewerToken?.();
-  const apiOrigin = params.get("api_origin");
-  return {
-    ...(pbsvToken ? { pbsvToken } : {}),
-    ...(apiOrigin ? { baseUrl: apiOrigin.replace(/\/$/, "") } : {}),
-  };
-}
+  function createAlvaClientConfig() {
+    const params = new URLSearchParams(window.location.search);
+    const pbsvToken = window.alva?.udf?.getViewerToken?.();
+    const apiOrigin = params.get("api_origin");
+    return {
+      ...(pbsvToken ? { pbsvToken } : {}),
+      ...(apiOrigin ? { baseUrl: apiOrigin.replace(/\/$/, "") } : {}),
+    };
+  }
 
-function createAlvaClient() {
-  return new AlvaToolkit.AlvaClient(createAlvaClientConfig());
-}
+  function createAlvaClient() {
+    return new AlvaToolkit.AlvaClient(createAlvaClientConfig());
+  }
 
-const points = await createAlvaClient().fs.read({
-  path: "/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/720",
-});
-// points = [{date: 1772658000000, close: 73309.72, ema10: 72447.65}, ...]
+  const points = await createAlvaClient().fs.read({
+    path: "/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/720",
+  });
+  // points = [{date: 1772658000000, close: 73309.72, ema10: 72447.65}, ...]
 </script>
 ```
 
 Use `createAlvaClient().fs.read(...)` (the SDK), not a raw `fetch`: it carries
 the viewer's PBSV token, so the page reads its feed data whether the playbook is
 public or private. An unauthenticated `fetch` to `/api/v1/fs/read` is a
-public-only fallback that breaks when the playbook is set private. See
-SKILL.md §6.
+public-only fallback that breaks when the playbook is set private. See SKILL.md
+§6.
 
 ---
 
@@ -773,7 +831,9 @@ const bars = getCryptoKline({
   start_time: now - 30 * 86400,
   end_time: now,
   interval: "1h",
-}).response.data.slice().reverse();
+})
+  .response.data.slice()
+  .reverse();
 
 const closes = bars.map((b) => b.close);
 const ema10 = indicators.ema(closes, { period: 10 });
@@ -838,8 +898,9 @@ alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js
 - **Re-appending overwrites**. Appending a record with an existing timestamp
   replaces the old value (`ON CONFLICT DO UPDATE`). Use this for cross-run
   accumulation: read existing + merge + re-append.
-- **`feedPath()` requires `env.username`**. It reads from `require("env").username`
-  internally, which is available in the jagent runtime.
+- **`feedPath()` requires `env.username`**. It reads from
+  `require("env").username` internally, which is available in the jagent
+  runtime.
 - **Top-level `await` is not supported**. Wrap feed logic in
   `(async () => { ... })();`.
 - **`@last` returns chronological (oldest-first) order**, consistent with
@@ -849,8 +910,8 @@ alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js
 
 ## Resetting Feed Data
 
-During development, clear stale data via the CLI. **This is for development
-only -- do not use in production.**
+During development, clear stale data via the CLI. **This is for development only
+-- do not use in production.**
 
 ```bash
 # Clear a specific time series output (e.g. market/ohlcv)

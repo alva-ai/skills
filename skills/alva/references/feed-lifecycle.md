@@ -11,8 +11,9 @@ jobs, read [deployment.md](deployment.md). For runtime constraints, read
 
 Every feed follows the same path:
 
-1. Write schema and incremental logic with `feed.def()` and
-   `ctx.self.ts().append()`.
+1. Start from the [feed-sdk.md](feed-sdk.md) skeleton, then write schema and
+   incremental logic with `new Feed(...)`, `feed.def(groupName, outputs)`, and
+   `ctx.self.ts(groupName, outputName).append(records)`.
 2. Upload source to `'~/feeds/<name>/v1/src/index.js'`.
 3. Test with `alva run --entry-path '~/feeds/<name>/v1/src/index.js'`.
 4. Grant the feed root for public reads when a playbook or public user needs it:
@@ -26,6 +27,8 @@ guarantee public `@last` data for a playbook.
 ## Modeling
 
 Use the Feed SDK for output data. Do not use `alfs.writeFile()` for feed data.
+Do not write feed schema from memory: `require("@alva/feed")` returns a module
+object, not a feed instance, and raw `{ columns: ... }` schemas are invalid.
 
 - Snapshot/latest-wins: current company detail, ratings, price target consensus.
   Stamp start-of-day and read `@last/1`.
@@ -53,8 +56,8 @@ if (!equityRecords.length) {
 }
 ```
 
-If a run fails with out-of-memory, retry with a larger `--max-heap-size-mb`
-(up to 2048) before editing logic.
+If a run fails with out-of-memory, retry with a larger `--max-heap-size-mb` (up
+to 2048) before editing logic.
 
 ## HARD-GATE: before-feed-release
 
@@ -72,16 +75,15 @@ Before `alva release feed`, verify:
    non-empty data after grant.
 
 If any evidence is missing or stale, do not release. Fix the feed, rerun, and
-re-enter the gate.
-</HARD-GATE>
+re-enter the gate. </HARD-GATE>
 
 ## Push Sidecars
 
 Push-capable feeds write one of these streams:
 
-| Output stream | Use |
-| --- | --- |
-| `signal/targets` | Playbook signals, trading targets, actionable alerts. |
+| Output stream    | Use                                                                |
+| ---------------- | ------------------------------------------------------------------ |
+| `signal/targets` | Playbook signals, trading targets, actionable alerts.              |
 | `notify/message` | Feed results, AlvaAsk reports, heartbeat checks, proactive alerts. |
 
 Both dispatch `feed_alert_ready`. Do not use legacy names such as
