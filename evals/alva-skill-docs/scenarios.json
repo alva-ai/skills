@@ -106,7 +106,8 @@
             "includes": [
               "Every `alva release playbook` call needs a freshly reviewed README",
               "regenerate the README",
-              "upload it again to `~/playbooks/<name>/README.md` before release"
+              "`~/playbooks/<name>/README.md`",
+              "before release"
             ]
           },
           {
