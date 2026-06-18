@@ -25,7 +25,7 @@
 1. **Widget-internal layout uses `flex-wrap`** (metric rows, metric groups,
    side-by-side elements). Never `grid-cols-N` — grid is only for page-level
    `.widget-grid`. → [Details](#content-reflow)
-2. **No border/outline on widgets** — use `--grey-g01` or `--line-l07` dividers.
+2. **No border/outline on widgets** — use `--grey-g01` or `--line-l12` dividers.
    Only Tags may have borders. → [Details](#widget-background)
 3. **Dividers don't span full width** — align both ends with content padding. →
    [Details](#divider)
@@ -98,13 +98,13 @@
   width: 0.5px;
   flex-shrink: 0;
   margin-block: var(--spacing-l);
-  background-color: var(--line-l07);
+  background-color: var(--line-l12);
 }
 
 .divider-h {
   height: 0.5px;
   margin-inline: var(--spacing-l);
-  background-color: var(--line-l07);
+  background-color: var(--line-l12);
 }
 
 /* ── Equal Height Fill ── */
@@ -879,7 +879,7 @@ for rich text rendering.
   left: var(--spacing-m);
   right: var(--spacing-m);
   height: 0.5px;
-  background: var(--line-l07);
+  background: var(--line-l12);
 }
 
 .feed-item:last-child::after {
@@ -1075,7 +1075,7 @@ for rich text rendering.
   width: 88px;
   height: 70px;
   border-radius: var(--radius-ct-s);
-  border: 1px solid var(--line-l07);
+  border: 0.5px solid var(--line-l12);
   flex-shrink: 0;
   overflow: hidden;
   position: relative;
@@ -1371,7 +1371,7 @@ Youtube thumbnails show a play button.
 - **Info line** (`.feed-info`): for Podcast / Youtube / News — `Source · Date · By Author`.
 - **Actions** (`.feed-actions`): for X / Reddit — icon 14×14 + count, `gap: var(--spacing-xs)`.
 - **Thumbnail** (`.feed-thumb`): 88×70, right side via flex order,
-  `border: 1px solid var(--line-l07)`. Optional for all types.
+  `border: 0.5px solid var(--line-l12)`. Optional for all types.
 - **Play button**: Podcast and Youtube thumbnails show a centered play icon
   (`.feed-thumb-play`, 28×28).
 - **Divider** (`.feed-item::after`): 1px line between items, inset by

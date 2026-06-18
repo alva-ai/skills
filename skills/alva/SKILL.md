@@ -455,10 +455,11 @@ The design system is a release gate, not decoration. Read
 [design.md](references/design.md) first for tokens, typography, theme, layout,
 and the canonical stylesheet. Then read:
 
-- [design-widgets.md](references/design-widgets.md) for charts and widget
-  layouts.
+- [design-widgets.md](references/design-widgets.md) for charts, widget
+  layouts, and tables (the authoritative Table Card spec lives here, not in
+  design-components.md).
 - [design-components.md](references/design-components.md) for buttons, tabs,
-  tags, dropdowns, tables, and component details.
+  tags, dropdowns, and component details.
 - [design-playbook-trading-strategy.md](references/design-playbook-trading-strategy.md)
   for strategy/backtest playbooks.
 

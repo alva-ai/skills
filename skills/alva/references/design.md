@@ -36,7 +36,7 @@ Token quick reference:
 | Chart colors | `--chart-{color}-main/1/2`                     | Grey only when ≥ 3 series               |
 | Text         | `--text-n9/n7/n5/n3/n2`                        | n9=primary, n7=secondary, n5=supporting |
 | Background   | `--b0-page`, `--grey-g01`~`g7`                 | g01 for card backgrounds                |
-| Line         | `--line-l05/l07/l12/l2/l3/l9`                  | l07=default, l9=hover/active            |
+| Line         | `--line-l05/l07/l12/l2/l3/l9`                  | l12=default (0.5px), l9=hover/active     |
 | Shadow       | `--shadow-xs/s/l`                              | Floating surfaces only (dropdown/tooltip) |
 | Spacing      | `--spacing-xxxs`(2) ~ `--spacing-xxxxxxl`(56)  | Common: xs=8, m=16, xl=24               |
 | Radius       | `--radius-ct-min`(2) ~ `--radius-ct-max`(960)  | min=Tag, s=Card, l=Page                 |
