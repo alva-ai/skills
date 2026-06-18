@@ -38,7 +38,7 @@ The main objects are:
 
 | Concept | Meaning | Read when |
 | --- | --- | --- |
-| Data Skills | 250+ structured Arrays endpoints for equities, crypto, macro, on-chain, semiconductor spot prices, news, prediction markets, and indexed Twitter/X. | You need factual financial data. |
+| Data Skills | 250+ structured Arrays endpoints for equities, options, crypto, macro, on-chain, semiconductor spot prices, news, prediction markets, and indexed Twitter/X. | You need factual financial data. |
 | Runtime script | JavaScript executed inside Alva's V8/jagent runtime through `alva run` or cronjobs. | You need computation, HTTP, ALFS, secrets, alpi, ONNX, or Feed SDK. |
 | Feed | A persistent data pipeline that writes time-series or grouped outputs to ALFS and can back playbooks or alerts. | Data needs freshness, history, public reads, charts, release, or push. |
 | Playbook | A hosted investing app at `https://alva.ai/u/<username>/playbooks/<name>`. | The user wants a shareable dashboard, screener, thesis, what-if, or strategy surface. |
@@ -255,17 +255,18 @@ becoming a feed, cronjob, signal, or playbook.
 #### Data Access: Data Sources
 
 Data Skills are the primary source for structured financial facts: prices,
-klines, fundamentals, estimates, insider and senator trades, ownership, macro,
-on-chain metrics, exchange flows, prediction markets, news, and indexed
-Twitter/X. The mandatory discovery path is `list` -> `summary` -> `endpoint`.
+klines, fundamentals, estimates, insider and senator trades, ownership, options
+chains and Greeks, macro, on-chain metrics, exchange flows, prediction markets,
+news, and indexed Twitter/X. The mandatory discovery path is `list` ->
+`summary` -> `endpoint`.
 Use `Authorization: Bearer <ARRAYS_JWT>`, not `X-API-Key`. For curated thematic
 or sector baskets, verify ticker fit with live company-detail data such as
 `getStockCompanyDetail`; do not trust memory.
 
 Source routing:
 
-- Structured US-equity, crypto, on-chain, macro, semiconductor spot price,
-  prediction-market, and fundamentals data: Data Skills.
+- Structured US-equity, options, crypto, on-chain, macro, semiconductor spot
+  price, prediction-market, and fundamentals data: Data Skills.
 - Twitter/X handle history, URL lookup, or full-text over tracked investing
   accounts: Data Skills.
 - Global X search beyond Arrays' index, news/web search, non-US finance, or
