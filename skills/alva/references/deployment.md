@@ -28,7 +28,8 @@ The deployment workflow:
 
 Cronjobs execute the script through the same jagent runtime as `alva run`.
 The script receives the same environment (`require("env").args` contains the
-cronjob's args).
+cronjob's args; `require("env").userPrompt` contains the cronjob user prompt
+when one is configured).
 
 ---
 
@@ -39,7 +40,7 @@ All cronjob operations use `alva deploy <subcommand>`.
 ### Create Cronjob
 
 ```bash
-alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js' --cron "0 */4 * * *" --args '{"symbol": "BTC"}' --push-notify
+alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js' --cron "0 */4 * * *" --args '{"symbol": "BTC"}' --user-prompt "Focus on risk changes since the last run." --push-notify
 ```
 
 | Flag            | Type   | Required | Description                                            |
@@ -48,6 +49,7 @@ alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js
 | --cron          | string | yes      | Standard cron expression                               |
 | --name          | string | yes      | Job name (1–63 lowercase alphanumeric or hyphens, no leading/trailing hyphen) |
 | --args          | JSON   | no       | JSON passed to `require("env").args` on each execution |
+| --user-prompt   | string | no       | Runtime prompt available as `require("env").userPrompt`; see [jagent-runtime.md](jagent-runtime.md#env----environment) and [alpi.md](alpi.md) for consumption |
 | --push-notify   | flag   | no       | Let this cronjob emit feed alert events after successful feed runs |
 
 When `--push-notify` is set, every successful cronjob execution checks the
@@ -73,6 +75,7 @@ the cronjob.
   "cron_expression": "0 */4 * * *",
   "status": "active",
   "args": { "symbol": "BTC" },
+  "user_prompt": "Focus on risk changes since the last run.",
   "push_notify": true,
   "created_at": "2026-03-04T12:00:00Z",
   "updated_at": "2026-03-04T12:00:00Z"
@@ -101,10 +104,10 @@ alva deploy get --id 42
 Partial update -- only include flags you want to change.
 
 ```bash
-alva deploy update --id 42 --cron "0 */2 * * *" --args '{"symbol":"ETH"}'
+alva deploy update --id 42 --cron "0 */2 * * *" --args '{"symbol":"ETH"}' --user-prompt "Focus on ETH-specific liquidity changes."
 ```
 
-Updatable fields: `--name`, `--cron`, `--args`, `--push-notify` / `--no-push-notify`.
+Updatable fields: `--name`, `--cron`, `--args`, `--user-prompt`, `--push-notify` / `--no-push-notify`.
 
 ### Delete Cronjob
 
@@ -230,7 +233,7 @@ rejected.
 When a cronjob triggers:
 
 1. The scheduler reads the cronjob config
-2. It executes the script with the configured `entry_path` and `args`
+2. It executes the script with the configured `entry_path`, `args`, and user prompt
 3. The script runs in the same environment as a manual `alva run` call
 
 The script has full access to:
@@ -238,6 +241,7 @@ The script has full access to:
 - All `require()` modules (alfs, env, net/http, runtime libraries, @alva/feed,
   etc.)
 - `require("env").args` contains the args from the cronjob configuration
+- `require("env").userPrompt` contains the configured user prompt
 - Filesystem read/write
 - HTTP requests
 

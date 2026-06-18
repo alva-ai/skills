@@ -9,6 +9,11 @@ inside a deterministic pipeline. The runtime module is `@alva/pi`; use
 > [user-facing-prose.md](user-facing-prose.md#voice-block) verbatim in
 > `systemPrompt`.
 
+For deployed cronjobs, prefer `alva deploy create/update --user-prompt` for
+per-deployment agent instructions. The runtime appends that prompt to Agent and
+AgentHarness system prompts before start, so do not duplicate the same prompt
+through `--args` unless the script needs to read it as ordinary data.
+
 ## Quick Start
 
 ```javascript

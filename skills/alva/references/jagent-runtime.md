@@ -105,12 +105,17 @@ env.userId; // "1" (string) -- your numeric user ID
 env.callerUserId; // "2" (string) -- invoking user's ID for UDF calls, when present
 env.username; // "alice" (string) -- your username, used in ALFS paths
 env.args; // parsed JSON from the request's "args" field
+env.userPrompt; // configured cronjob user prompt, when present
 ```
 
 For UDF executions, `env.userId` / `env.username` identify the execution owner
 whose ALFS context runs the script. `env.callerUserId` identifies the caller who
 invoked the UDF and may differ from the owner. It is absent when no caller ID is
 available.
+
+When a deployed cronjob uses `--user-prompt`, the value is available as
+`env.userPrompt`. If the script uses `@alva/pi`, see [alpi.md](alpi.md) for
+the automatic prompt-injection behavior.
 
 ### secret-manager -- Third-Party Secrets
 
