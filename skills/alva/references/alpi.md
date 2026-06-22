@@ -103,6 +103,9 @@ events unless the script truly needs progress updates.
 | `initialState.thinkingLevel` | no | Use `"off"` for deterministic result-only jobs unless reasoning is needed. |
 | `getApiKey` | no | Omit to use the jagent-managed platform key (default). For BYOK, return your own key loaded via `secret-manager` — passed through to the provider, not billed to platform credits. |
 
+For an owner-editable `systemPrompt`, load it from the feed with
+`feed.loadPrompt(fallback)` — see [feed-sdk.md](feed-sdk.md#editable-system-prompt--loadpromptfallback).
+
 ### Tool
 
 | Field | Description |

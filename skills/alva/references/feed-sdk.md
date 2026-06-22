@@ -431,6 +431,40 @@ The resolved base path (no `/data` suffix).
 feed.path; // "/alva/home/alice/feeds/btc-ema/v1"
 ```
 
+### Editable system prompt — `loadPrompt(fallback)`
+
+When a feed runs an alpi `Agent`, externalize the agent's system prompt so the
+owner can edit it without a redeploy. `feed.loadPrompt(fallback)` reads
+`${feed.path}/prompt.md` (i.e. `~/feeds/<name>/v<major>/prompt.md`) at run start
+and returns its content, else the `fallback`. The `Feed` already knows its path,
+feed name, and major — pass no path/feed/major args, only the fallback.
+
+```javascript
+const { Agent, getModel } = require("@alva/pi");
+const { Feed, feedPath } = require("@alva/feed");
+const feed = new Feed({ path: feedPath("<name>") });
+const agent = new Agent({
+  initialState: {
+    // reads ~/feeds/<name>/v<major>/prompt.md, else the fallback (which
+    // includes the user-facing-prose voice block if this agent emits prose)
+    systemPrompt: await feed.loadPrompt("You are ..."),
+    model: getModel("openai", "gpt-5.5"),
+    tools: [/* ... */],
+  },
+});
+```
+
+If this agent emits user-facing prose (TLDR, digest, why-it-matters, delta
+body, push line), put the voice block from
+[user-facing-prose.md](user-facing-prose.md#voice-block) verbatim in the
+`fallback` so the agent still has it when `prompt.md` is absent.
+
+Edits to `prompt.md` apply on the next scheduled run — no redeploy. To surface
+the prompt editor to the feed's owner in the frontend, release the feed as a
+prompt-editable agent with `alva release feed --agent-type alpi` (the prompt
+path is backend-derived; there is no `--prompt-path` flag). See
+[api/release.md](api/release.md#agent-type).
+
 ---
 
 ## feedPath(name, version?)

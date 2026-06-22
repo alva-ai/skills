@@ -191,6 +191,10 @@ These three move in lockstep at create time (`alva deploy create` →
 lifecycle row. Deleting one does **not** automatically delete the
 others — see the cascade notes in each `--help`.
 
+`alva release feed` also accepts `--agent-type alpi` to mark a feed whose
+alpi agent has an owner-editable system prompt — see
+[api/release.md](api/release.md#agent-type).
+
 **Don't use `alva fs remove` to delete a feed or playbook.** It clears
 the ALFS files (the rendered HTML, the data mount), but the
 `playbooks` / `feeds` DB row stays alive. The platform still:
