@@ -185,6 +185,24 @@
       ]
     },
     {
+      "id": "retained.credits-cli",
+      "group": "retained",
+      "target": "corpus",
+      "description": "Viewer-scoped credit balance and consumption-history lookup remains discoverable through the credits CLI.",
+      "includes": [
+        "alva credits --help",
+        "alva credits wallet",
+        "alva credits items --today",
+        "alva credits items --last 7d",
+        "alva credits items --start 2026-06-23 --end 2026-06-24",
+        "--session-id <session_id>",
+        "viewer-scoped",
+        "Do not invent or request a `--user-id` flag",
+        "Do not use raw GraphQL",
+        "items.pageInfo.hasNextPage"
+      ]
+    },
+    {
       "id": "retained.altra",
       "group": "retained",
       "target": "corpus",

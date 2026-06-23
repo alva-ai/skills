@@ -672,6 +672,7 @@ text does not fully cover.
 | `screenshot` | PNG capture for released playbook verification. See [playbook-creation.md](references/playbook-creation.md#screenshot). |
 | `remix` | Lineage registration only. See [remix-workflow.md](references/remix-workflow.md). |
 | `functions` | Playbook UDF registration, invoke smoke tests, and allowance management. Must read [api/udf-runtime.md](references/api/udf-runtime.md). |
+| `credits` | Current viewer credit wallet and self-scoped consumption rows. Must read [api/credits.md](references/api/credits.md). |
 | `secrets` | Secret CRUD for agent-managed setup. See [secret-manager.md](references/secret-manager.md). |
 | `feedback` | Submit user-confirmed Alva platform feedback. Must read [api/feedback.md](references/api/feedback.md). |
 
@@ -718,6 +719,7 @@ Use this index to open only the file needed for the current task.
 | [api/release.md](references/api/release.md) | Release extras: README, tags, trading symbols, skill id, descriptions. |
 | [api/trading.md](references/api/trading.md) | Trading signal schema, symbol naming, dry-run rules. |
 | [api/udf-runtime.md](references/api/udf-runtime.md) | Playbook UDF CLI setup, allowance management, and browser invocation. |
+| [api/credits.md](references/api/credits.md) | User-scoped credit wallet and consumption history queries. |
 | [api/feedback.md](references/api/feedback.md) | User-confirmed Alva platform feedback for Alva-owned blockers. |
 | [api/error-responses.md](references/api/error-responses.md) | HTTP status to error-code table. |
 
