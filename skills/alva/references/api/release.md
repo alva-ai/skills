@@ -55,9 +55,18 @@ the agent ran `alva skillhub get` / `alva skillhub file` during building.
 ## Agent type
 
 `alva release feed --agent-type <kind>` marks the feed as a prompt-editable
-agent. The only v1 value is `alpi`. The flag is recorded on the released feed;
-the frontend then shows a system-prompt editor to the feed's owner, who can edit
-the prompt without a redeploy (the next scheduled run picks up the change).
+agent. `<kind>` must be a value from the known catalog — the backend **rejects
+unknown values** (`InvalidArgument`):
+
+| `agent_type` | Meaning |
+|--------------|---------|
+| `alpi` | an `@alva/pi` prompt-editable agent (reads `AGENTS.md` via `feed.loadPrompt`) |
+| *(omitted / empty)* | an ordinary, non-agent feed (no prompt editor) |
+
+`alpi` is the only kind in v1; more may be added. The flag is recorded on the
+released feed; the frontend then shows a system-prompt editor to the feed's
+owner, who can edit the prompt without a redeploy (the next scheduled run picks
+up the change).
 
 The agent reads its editable prompt with `feed.loadPrompt(fallback)`, which
 reads `${feed.path}/AGENTS.md` — see
