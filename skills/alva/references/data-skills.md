@@ -56,8 +56,9 @@ Twitter/X routing:
 
 Direct latest-price routing:
 
-- Covered US equities and crypto: use structured intraday kline data, not daily
-  bars during market hours.
+- Covered US equities and crypto: latest/realtime price answers must use
+  structured intraday kline data. Do not use daily-level bars or daily closes as
+  current prices.
 - Non-US equities (dotted-suffix tickers like `0700.HK`, `000660.KS`): try Data
   Skills first for daily (`1d`) kline and company detail. Coverage is a curated,
   daily-only subset, so fall back to `searchPerplexityFinance` when the ticker

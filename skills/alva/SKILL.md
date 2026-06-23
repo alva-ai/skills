@@ -272,8 +272,8 @@ Source routing:
 - Global X search beyond Arrays' index, news/web search, non-US finance, or
   off-catalog asset classes: [search.md](references/search.md) /
   `unified_search`.
-- Direct latest price for covered US equities and crypto: intraday klines, not
-  daily close.
+- Direct latest/realtime price for covered US equities and crypto: intraday
+  klines, not daily-level bars or closes.
 - Non-US equities (dotted-suffix tickers like `0700.HK`, `000660.KS`): try Data
   Skills non-US daily kline first; fall back to `searchPerplexityFinance` for
   uncovered tickers or intraday/live prices.
