@@ -60,7 +60,7 @@ the frontend then shows a system-prompt editor to the feed's owner, who can edit
 the prompt without a redeploy (the next scheduled run picks up the change).
 
 The agent reads its editable prompt with `feed.loadPrompt(fallback)`, which
-reads `${feed.path}/prompt.md` — see
+reads `${feed.path}/AGENTS.md` — see
 [feed-sdk.md](../feed-sdk.md#editable-system-prompt--loadpromptfallback). The
 prompt path is **backend-derived** from the feed; there is no `--prompt-path`
 flag.
