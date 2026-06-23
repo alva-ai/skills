@@ -16,7 +16,7 @@
           "content-legitimacy.md"
         ],
         "behaviors": [
-          "Direct latest price for covered US equities and crypto: intraday klines, not daily close",
+          "Direct latest/realtime price for covered US equities and crypto: intraday klines, not daily-level bars or closes",
           "Do not answer until you can name the decomposition",
           "Do not let playbook creation become the default"
         ],

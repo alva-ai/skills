@@ -52,8 +52,8 @@ Do not use destructive resets in production.
 
 ## Chart And HTML
 
-- Covered US equities and crypto latest-price answers need intraday klines.
-  Daily bars return prior close during trading hours.
+- Covered US equities and crypto latest/realtime price answers need intraday
+  klines; daily-level bars and closes are not current-price sources.
 - ECharts date axes should use `type: 'time'`, not raw epoch values as category
   labels.
 - ECharts in tabs or hidden containers must initialize/resize through
