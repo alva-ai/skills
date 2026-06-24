@@ -433,28 +433,53 @@ feed.path; // "/alva/home/alice/feeds/btc-ema/v1"
 
 ### loadPrompt(fallback)
 
-Reads the feed's owner-editable prompt file `AGENTS.md` (at `feed.path/AGENTS.md`)
-and returns its trimmed contents, or `fallback` when the file is missing or
-empty. A missing file is **not** an error. This lets a feed owner tune the
-producer's prompt by editing `AGENTS.md` — it takes effect on the next run with
-no redeploy. The prompt is only surfaced as editable when the feed is released
-with an `agent_type` (e.g. `--agent-type alpi`, see below).
+Reads the feed's owner-editable file `AGENTS.md` (at `feed.path/AGENTS.md`) and
+returns its trimmed contents, or `fallback` when the file is missing or empty (a
+missing file is **not** an error). `AGENTS.md` is only editable when the feed was
+released with an `agent_type` (e.g. `--agent-type alpi`).
 
-**Use it as an additive layer, not a replacement.** Keep your real instructions
-as a `BASE_PROMPT` constant in the script and **append** the editable file on
-top — so the agent always has its base behavior and the editable file only
-customizes it:
+**`AGENTS.md` is a *supplemental* prompt — never the whole prompt.** Your script
+owns a fixed `BASE_PROMPT` (the agent's real behavior, versioned in code).
+`AGENTS.md` is an *additional-instructions* layer the owner tweaks without a
+redeploy. You **append** the supplement to the base; you never let it replace
+the base. Pass `""` as the fallback so a missing supplement contributes nothing.
+
+Canonical pattern — append the supplement as a clearly-labeled block:
 
 ```javascript
-const BASE_PROMPT = "You are a market analyst. Summarize the day's BTC move in 2 sentences.";
-// AGENTS.md content (or "" when the owner hasn't written one yet), appended on top.
-const extra = await feed.loadPrompt("");
-const systemPrompt = extra ? `${BASE_PROMPT}\n\n${extra}` : BASE_PROMPT;
+const BASE_PROMPT =
+  "You are a crypto market analyst. Summarize the day's BTC move in 2 sentences.";
+
+const supplement = await feed.loadPrompt(""); // owner's AGENTS.md, or "" if none
+const systemPrompt = supplement
+  ? `${BASE_PROMPT}\n\n## Additional instructions from the feed owner\n${supplement}`
+  : BASE_PROMPT;
 ```
 
-Pass `""` as the fallback so a missing file contributes nothing; never pass the
-base prompt as the fallback (that would make the editable file *replace* the
-base instead of extending it).
+**What the owner writes** in `AGENTS.md` is *only* the supplement — plain text,
+nothing else. For example, to sharpen the focus the owner writes:
+
+```text
+Focus only on spot-ETF flows and on-chain data; ignore funding-rate noise.
+Always end with a one-line "So what?" for a long-term holder.
+```
+
+**The effective `systemPrompt`** the agent then runs with is base + supplement:
+
+```text
+You are a crypto market analyst. Summarize the day's BTC move in 2 sentences.
+
+## Additional instructions from the feed owner
+Focus only on spot-ETF flows and on-chain data; ignore funding-rate noise.
+Always end with a one-line "So what?" for a long-term holder.
+```
+
+When `AGENTS.md` is empty or absent, the agent runs with `BASE_PROMPT` alone.
+Edits take effect on the next run — no redeploy.
+
+**Do NOT** pass the base as the fallback (`feed.loadPrompt(BASE_PROMPT)`): that
+makes the editable file *replace* your base behavior instead of supplementing
+it. The supplement is always **added on top**, never a substitute.
 
 ---
 

@@ -159,23 +159,21 @@ Guidelines:
 
 ## Patterns & Examples
 
-### User-Editable System Prompt (alpi feed)
+### Supplemental (owner-editable) system prompt — alpi feed
 
-When an alpi script *produces a feed*, expose its `systemPrompt` as an
-owner-editable layer so the user can tune the agent's behavior without you
-redeploying. Two steps:
+When an alpi script *produces a feed*, let the owner tune its behavior with a
+**supplemental prompt** they edit in the feed's `AGENTS.md` — no redeploy from
+you. Your `BASE_PROMPT` (the agent's real instructions) stays in code; the
+supplement is *appended on top*, never a replacement. See
+[feed-sdk.md](feed-sdk.md#loadpromptfallback) for the `loadPrompt` API.
 
-1. **Release the feed with `agent_type` set** so the platform treats its prompt
-   file as editable:
+1. **Release the feed with `agent_type`** so its `AGENTS.md` becomes editable:
 
    ```bash
    alva release feed --name market-pulse --version 1.0.0 --cronjob-id 44 --agent-type alpi
    ```
 
-2. **In the script, keep a `BASE_PROMPT` and append the editable layer** via
-   `feed.loadPrompt("")` (see [feed-sdk.md](feed-sdk.md#loadpromptfallback)).
-   The base prompt is your real instructions; the editable `AGENTS.md` only adds
-   to it, and a missing file changes nothing:
+2. **Append the supplement to your base prompt** and use it as `systemPrompt`:
 
    ```javascript
    const { Feed, feedPath } = require("@alva/feed");
@@ -184,18 +182,35 @@ redeploying. Two steps:
    const feed = new Feed({ path: feedPath("market-pulse") });
 
    const BASE_PROMPT =
-     "You are a market analyst. Summarize the day's BTC move in 2 sentences.";
-   const extra = await feed.loadPrompt(""); // owner's AGENTS.md, or "" if none
-   const systemPrompt = extra ? `${BASE_PROMPT}\n\n${extra}` : BASE_PROMPT;
+     "You are a crypto market analyst. Summarize the day's BTC move in 2 sentences.";
+
+   // AGENTS.md is a SUPPLEMENT appended on top — not a replacement.
+   const supplement = await feed.loadPrompt(""); // "" when the owner hasn't written one
+   const systemPrompt = supplement
+     ? `${BASE_PROMPT}\n\n## Additional instructions from the feed owner\n${supplement}`
+     : BASE_PROMPT;
 
    const agent = new Agent({
      initialState: { systemPrompt, model: getModel("openai", "gpt-5.5"), tools: [] },
    });
+   const { message } = await agent.ask("Summarize today's BTC move.");
    ```
 
-   Append, never replace: pass `""` (not `BASE_PROMPT`) as the fallback, so the
-   editable file *extends* the base behavior instead of overwriting it. Edits to
-   `AGENTS.md` take effect on the next run — no redeploy.
+3. **The owner customizes by editing `AGENTS.md`** (just the supplement, plain
+   text), e.g.:
+
+   ```text
+   Focus only on spot-ETF flows; ignore funding-rate noise.
+   End with a one-line "So what?" for a long-term holder.
+   ```
+
+   The next run's effective `systemPrompt` is base **+** that supplement,
+   appended under the labeled block — applied with no redeploy.
+
+   Pass `""` (not `BASE_PROMPT`) as the fallback: a missing supplement then adds
+   nothing and can never override the base. Never do
+   `feed.loadPrompt(BASE_PROMPT)` — that *replaces* your base instead of
+   supplementing it.
 
 ### Historical Reference (Feed as Memory)
 
