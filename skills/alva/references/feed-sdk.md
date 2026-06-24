@@ -431,6 +431,28 @@ The resolved base path (no `/data` suffix).
 feed.path; // "/alva/home/alice/feeds/btc-ema/v1"
 ```
 
+### loadPrompt(fallback)
+
+Returns the feed owner's **user instructions** from the feed's `AGENTS.md` —
+`${feed.path}/AGENTS.md`, e.g. `~/feeds/market-pulse/v1/AGENTS.md` — or
+`fallback` when the file is missing/empty (missing is not an error). It is
+editable only on feeds released with an `agent_type` (`--agent-type alpi`).
+
+**Append the user instructions to your base prompt; never let them replace it.**
+Keep your real instructions in `BASE_PROMPT` and pass `""` as the fallback so a
+missing file adds nothing:
+
+```javascript
+const userInstructions = await feed.loadPrompt("");
+const systemPrompt = userInstructions
+  ? `${BASE_PROMPT}\n\n## User instructions\n${userInstructions}`
+  : BASE_PROMPT;
+```
+
+The owner edits `AGENTS.md` (plain-text instructions); the next run picks it up,
+no redeploy. Don't pass `BASE_PROMPT` as the fallback — that lets the file
+*replace* your base instead of extending it.
+
 ---
 
 ## feedPath(name, version?)

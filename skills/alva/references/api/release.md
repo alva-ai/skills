@@ -9,6 +9,7 @@ flags, display-name conventions, and examples. This file covers only:
 3. `--trading-symbols` and `--tags` semantics, person-name discovery tags,
    and the required overlap between trading symbols and tags
 4. `--skill-id` — when it is required
+5. `--agent-type` — marking a feed as a prompt-editable agent
 
 ## Feed `--description` conventions
 
@@ -50,6 +51,21 @@ Examples:
 `--skill-id` is required whenever a Skillhub skill informed the build —
 i.e. the request carried a `/use-skill:<username>/<name>` directive, or
 the agent ran `alva skillhub get` / `alva skillhub file` during building.
+
+## Agent type
+
+`alva release feed --agent-type <kind>` marks the feed as a prompt-editable
+agent. `<kind>` must be in the catalog (the backend rejects unknown values with
+`InvalidArgument`); `alpi` is the only kind in v1:
+
+| `agent_type` | Meaning |
+|--------------|---------|
+| `alpi` | `@alva/pi` agent; its script appends the owner's `AGENTS.md` instructions via `feed.loadPrompt` |
+| *(omitted)* | ordinary feed, no editable prompt |
+
+The owner edits the feed's `AGENTS.md` (`~/feeds/<name>/v<major>/AGENTS.md`) — no
+redeploy. The path is backend-derived (no `--prompt-path` flag). See
+[feed-sdk.md](../feed-sdk.md#loadpromptfallback).
 
 ## Playbook README
 
