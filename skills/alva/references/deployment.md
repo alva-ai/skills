@@ -192,7 +192,7 @@ lifecycle row. Deleting one does **not** automatically delete the
 others — see the cascade notes in each `--help`.
 
 `alva release feed` also accepts `--agent-type alpi` to mark a feed whose
-alpi agent has an owner-editable, supplemental system prompt — see
+alpi agent appends the owner's editable `AGENTS.md` instructions — see
 [api/release.md](api/release.md#agent-type).
 
 **Don't use `alva fs remove` to delete a feed or playbook.** It clears

@@ -55,22 +55,17 @@ the agent ran `alva skillhub get` / `alva skillhub file` during building.
 ## Agent type
 
 `alva release feed --agent-type <kind>` marks the feed as a prompt-editable
-agent. `<kind>` must be a value from the known catalog — the backend **rejects
-unknown values** (`InvalidArgument`):
+agent. `<kind>` must be in the catalog (the backend rejects unknown values with
+`InvalidArgument`); `alpi` is the only kind in v1:
 
 | `agent_type` | Meaning |
 |--------------|---------|
-| `alpi` | an `@alva/pi` prompt-editable agent that reads a **supplemental** prompt from `AGENTS.md` via `feed.loadPrompt` |
-| *(omitted / empty)* | an ordinary, non-agent feed (no editable prompt) |
+| `alpi` | `@alva/pi` agent; its script appends the owner's `AGENTS.md` instructions via `feed.loadPrompt` |
+| *(omitted)* | ordinary feed, no editable prompt |
 
-`alpi` is the only kind in v1; more may be added. The flag is recorded on the
-released feed; its owner can then edit the prompt by writing the feed's
-`AGENTS.md` — no redeploy, the next scheduled run picks up the change.
-
-The script reads that editable file with `feed.loadPrompt(fallback)`
-(`${feed.path}/AGENTS.md`) and **appends** it to its base prompt — see
-[feed-sdk.md](../feed-sdk.md#loadpromptfallback). The prompt path is
-**backend-derived** from the feed; there is no `--prompt-path` flag.
+The owner edits the feed's `AGENTS.md` (`~/feeds/<name>/v<major>/AGENTS.md`) — no
+redeploy. The path is backend-derived (no `--prompt-path` flag). See
+[feed-sdk.md](../feed-sdk.md#loadpromptfallback).
 
 ## Playbook README
 
