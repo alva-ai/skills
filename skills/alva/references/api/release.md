@@ -9,6 +9,7 @@ flags, display-name conventions, and examples. This file covers only:
 3. `--trading-symbols` and `--tags` semantics, person-name discovery tags,
    and the required overlap between trading symbols and tags
 4. `--skill-id` — when it is required
+5. `--agent-type` — marking a feed as a prompt-editable agent
 
 ## Feed `--description` conventions
 
@@ -50,6 +51,26 @@ Examples:
 `--skill-id` is required whenever a Skillhub skill informed the build —
 i.e. the request carried a `/use-skill:<username>/<name>` directive, or
 the agent ran `alva skillhub get` / `alva skillhub file` during building.
+
+## Agent type
+
+`alva release feed --agent-type <kind>` marks the feed as a prompt-editable
+agent. `<kind>` must be a value from the known catalog — the backend **rejects
+unknown values** (`InvalidArgument`):
+
+| `agent_type` | Meaning |
+|--------------|---------|
+| `alpi` | an `@alva/pi` prompt-editable agent that reads a **supplemental** prompt from `AGENTS.md` via `feed.loadPrompt` |
+| *(omitted / empty)* | an ordinary, non-agent feed (no editable prompt) |
+
+`alpi` is the only kind in v1; more may be added. The flag is recorded on the
+released feed; its owner can then edit the prompt by writing the feed's
+`AGENTS.md` — no redeploy, the next scheduled run picks up the change.
+
+The script reads that editable file with `feed.loadPrompt(fallback)`
+(`${feed.path}/AGENTS.md`) and **appends** it to its base prompt — see
+[feed-sdk.md](../feed-sdk.md#loadpromptfallback). The prompt path is
+**backend-derived** from the feed; there is no `--prompt-path` flag.
 
 ## Playbook README
 
