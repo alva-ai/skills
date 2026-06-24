@@ -431,6 +431,31 @@ The resolved base path (no `/data` suffix).
 feed.path; // "/alva/home/alice/feeds/btc-ema/v1"
 ```
 
+### loadPrompt(fallback)
+
+Reads the feed's owner-editable prompt file `AGENTS.md` (at `feed.path/AGENTS.md`)
+and returns its trimmed contents, or `fallback` when the file is missing or
+empty. A missing file is **not** an error. This lets a feed owner tune the
+producer's prompt by editing `AGENTS.md` — it takes effect on the next run with
+no redeploy. The prompt is only surfaced as editable when the feed is released
+with an `agent_type` (e.g. `--agent-type alpi`, see below).
+
+**Use it as an additive layer, not a replacement.** Keep your real instructions
+as a `BASE_PROMPT` constant in the script and **append** the editable file on
+top — so the agent always has its base behavior and the editable file only
+customizes it:
+
+```javascript
+const BASE_PROMPT = "You are a market analyst. Summarize the day's BTC move in 2 sentences.";
+// AGENTS.md content (or "" when the owner hasn't written one yet), appended on top.
+const extra = await feed.loadPrompt("");
+const systemPrompt = extra ? `${BASE_PROMPT}\n\n${extra}` : BASE_PROMPT;
+```
+
+Pass `""` as the fallback so a missing file contributes nothing; never pass the
+base prompt as the fallback (that would make the editable file *replace* the
+base instead of extending it).
+
 ---
 
 ## feedPath(name, version?)

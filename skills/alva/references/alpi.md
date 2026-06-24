@@ -159,6 +159,44 @@ Guidelines:
 
 ## Patterns & Examples
 
+### User-Editable System Prompt (alpi feed)
+
+When an alpi script *produces a feed*, expose its `systemPrompt` as an
+owner-editable layer so the user can tune the agent's behavior without you
+redeploying. Two steps:
+
+1. **Release the feed with `agent_type` set** so the platform treats its prompt
+   file as editable:
+
+   ```bash
+   alva release feed --name market-pulse --version 1.0.0 --cronjob-id 44 --agent-type alpi
+   ```
+
+2. **In the script, keep a `BASE_PROMPT` and append the editable layer** via
+   `feed.loadPrompt("")` (see [feed-sdk.md](feed-sdk.md#loadpromptfallback)).
+   The base prompt is your real instructions; the editable `AGENTS.md` only adds
+   to it, and a missing file changes nothing:
+
+   ```javascript
+   const { Feed, feedPath } = require("@alva/feed");
+   const { Agent, getModel } = require("@alva/pi");
+
+   const feed = new Feed({ path: feedPath("market-pulse") });
+
+   const BASE_PROMPT =
+     "You are a market analyst. Summarize the day's BTC move in 2 sentences.";
+   const extra = await feed.loadPrompt(""); // owner's AGENTS.md, or "" if none
+   const systemPrompt = extra ? `${BASE_PROMPT}\n\n${extra}` : BASE_PROMPT;
+
+   const agent = new Agent({
+     initialState: { systemPrompt, model: getModel("openai", "gpt-5.5"), tools: [] },
+   });
+   ```
+
+   Append, never replace: pass `""` (not `BASE_PROMPT`) as the fallback, so the
+   editable file *extends* the base behavior instead of overwriting it. Edits to
+   `AGENTS.md` take effect on the next run — no redeploy.
+
 ### Historical Reference (Feed as Memory)
 
 Read the agent's previous output via feed time-series paths
