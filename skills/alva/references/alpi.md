@@ -166,14 +166,19 @@ instructions), no redeploy. Release with `--agent-type alpi`, then append those
 instructions onto your `BASE_PROMPT`:
 
 ```javascript
-const userInstructions = await feed.loadPrompt(""); // owner's AGENTS.md, "" if none
+const alfs = require("alfs");
+let userInstructions = ""; // owner's AGENTS.md, "" if none
+try {
+  const c = await alfs.readFile(`${feed.path}/AGENTS.md`);
+  if (typeof c === "string") userInstructions = c.trim();
+} catch (_) {}
 const systemPrompt = userInstructions
   ? `${BASE_PROMPT}\n\n## User instructions\n${userInstructions}`
   : BASE_PROMPT;
 ```
 
-Append, never replace (pass `""`, not `BASE_PROMPT`). File location + details:
-[feed-sdk.md](feed-sdk.md#loadpromptfallback).
+Append, never replace (a missing/empty file extends nothing). File location +
+details: [feed-sdk.md](feed-sdk.md#user-instructions-agentsmd).
 
 ### Historical Reference (Feed as Memory)
 
