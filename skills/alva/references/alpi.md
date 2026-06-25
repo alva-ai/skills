@@ -162,18 +162,10 @@ Guidelines:
 ### User-editable instructions — alpi feed
 
 Let the feed owner steer the agent by editing the feed's `AGENTS.md` (their own
-instructions), no redeploy. Release with `--agent-type alpi`, then append those
-instructions onto your `BASE_PROMPT`:
-
-```javascript
-const userInstructions = await feed.loadPrompt(""); // owner's AGENTS.md, "" if none
-const systemPrompt = userInstructions
-  ? `${BASE_PROMPT}\n\n## User instructions\n${userInstructions}`
-  : BASE_PROMPT;
-```
-
-Append, never replace (pass `""`, not `BASE_PROMPT`). File location + details:
-[feed-sdk.md](feed-sdk.md#loadpromptfallback).
+instructions), no redeploy. Release with `--agent-type alpi`, then read
+`${feed.path}/AGENTS.md` and **append** it to your `BASE_PROMPT` — append, never
+replace, so a missing/empty file extends nothing. Read snippet + rules:
+[feed-sdk.md](feed-sdk.md#user-instructions-agentsmd).
 
 ### Historical Reference (Feed as Memory)
 

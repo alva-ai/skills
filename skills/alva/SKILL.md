@@ -441,7 +441,8 @@ Do **not** use it for one-off research the user asks interactively, and do
 not use it to produce numbers or events that should come from real data. Read
 [alpi.md](references/alpi.md) for API, tool calling, memory patterns,
 user-editable agent instructions (release with `--agent-type alpi`, then append
-the owner's `AGENTS.md` via `feed.loadPrompt`), and jagent-specific constraints.
+the owner's `AGENTS.md` (read `${feed.path}/AGENTS.md` yourself)), and
+jagent-specific constraints.
 
 #### Model Layer: ONNX
 

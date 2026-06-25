@@ -431,27 +431,33 @@ The resolved base path (no `/data` suffix).
 feed.path; // "/alva/home/alice/feeds/btc-ema/v1"
 ```
 
-### loadPrompt(fallback)
+### User instructions (AGENTS.md)
 
-Returns the feed owner's **user instructions** from the feed's `AGENTS.md` —
-`${feed.path}/AGENTS.md`, e.g. `~/feeds/market-pulse/v1/AGENTS.md` — or
-`fallback` when the file is missing/empty (missing is not an error). It is
+Read the feed owner's **user instructions** from the feed's `AGENTS.md` —
+`${feed.path}/AGENTS.md`, e.g. `~/feeds/market-pulse/v1/AGENTS.md`. It is
 editable only on feeds released with an `agent_type` (`--agent-type alpi`).
+Read it yourself via `alfs`; a missing file is not an error — treat it as empty.
 
 **Append the user instructions to your base prompt; never let them replace it.**
-Keep your real instructions in `BASE_PROMPT` and pass `""` as the fallback so a
-missing file adds nothing:
+Keep your real instructions in `BASE_PROMPT`:
 
 ```javascript
-const userInstructions = await feed.loadPrompt("");
+const alfs = require("alfs");
+let userInstructions = "";
+try {
+  const c = await alfs.readFile(`${feed.path}/AGENTS.md`);
+  userInstructions = String(c ?? "").trim(); // readFile may return a non-string (e.g. Buffer)
+} catch (_) {
+  // missing/unreadable AGENTS.md → no user instructions
+}
 const systemPrompt = userInstructions
   ? `${BASE_PROMPT}\n\n## User instructions\n${userInstructions}`
   : BASE_PROMPT;
 ```
 
 The owner edits `AGENTS.md` (plain-text instructions); the next run picks it up,
-no redeploy. Don't pass `BASE_PROMPT` as the fallback — that lets the file
-*replace* your base instead of extending it.
+no redeploy. Read it yourself and append — a missing/empty file then *extends*
+nothing rather than *replacing* your base instructions.
 
 ---
 

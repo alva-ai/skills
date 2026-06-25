@@ -60,12 +60,12 @@ agent. `<kind>` must be in the catalog (the backend rejects unknown values with
 
 | `agent_type` | Meaning |
 |--------------|---------|
-| `alpi` | `@alva/pi` agent; its script appends the owner's `AGENTS.md` instructions via `feed.loadPrompt` |
+| `alpi` | `@alva/pi` agent; its script reads & appends the owner's `AGENTS.md` instructions (`${feed.path}/AGENTS.md`) |
 | *(omitted)* | ordinary feed, no editable prompt |
 
 The owner edits the feed's `AGENTS.md` (`~/feeds/<name>/v<major>/AGENTS.md`) — no
 redeploy. The path is backend-derived (no `--prompt-path` flag). See
-[feed-sdk.md](../feed-sdk.md#loadpromptfallback).
+[feed-sdk.md](../feed-sdk.md#user-instructions-agentsmd).
 
 ## Playbook README
 
