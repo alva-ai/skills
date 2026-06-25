@@ -446,7 +446,7 @@ const alfs = require("alfs");
 let userInstructions = "";
 try {
   const c = await alfs.readFile(`${feed.path}/AGENTS.md`);
-  if (typeof c === "string") userInstructions = c.trim();
+  userInstructions = String(c ?? "").trim(); // readFile may return a non-string (e.g. Buffer)
 } catch (_) {
   // missing/unreadable AGENTS.md → no user instructions
 }
