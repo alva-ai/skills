@@ -671,6 +671,7 @@ text does not fully cover.
 | `fs` | ALFS reads/writes/grants/time-series suffixes and shared modules under `~/library`. Must read [api/filesystem.md](references/api/filesystem.md) for synth suffixes and grant gotchas. |
 | `run` | Execute jagent JS. See [jagent-runtime.md](references/jagent-runtime.md). |
 | `deploy` | Cronjob lifecycle. See [deployment.md](references/deployment.md). |
+| `service-account` | Create/list/delete a restricted run-as identity and grant/revoke its ALFS paths, then set `--run-as-service-account` on a UDF/cronjob. See [service-accounts.md](references/service-accounts.md). |
 | `release` | Feed release, playbook draft/release. Must read [api/release.md](references/api/release.md). |
 | `lint playbook` | Design-system linter, same gate as release. See [design-contract.yaml](references/design-contract.yaml). |
 | `skillhub` | Curated methodology blueprints. See [request-routing.md](references/request-routing.md#skillhub-blueprint). |
@@ -712,6 +713,7 @@ Use this index to open only the file needed for the current task.
 | [alpi.md](references/alpi.md) | Scheduled LLM reasoning/tool-loop API and examples. |
 | [onnx.md](references/onnx.md) | ONNX artifact, inference, FeedAltra integration, release checks. |
 | [deployment.md](references/deployment.md) | Cronjob create/list/pause/resume/trigger/runs/run-logs. |
+| [service-accounts.md](references/service-accounts.md) | Restricted run-as identities: create/grant/run-as for UDF & cronjob, billing stays with owner, troubleshooting. |
 | [search.md](references/search.md) | `unified_search`, finance search, Twitter/X, Reddit, YouTube, web gotchas. |
 | [secret-manager.md](references/secret-manager.md) | Secret upload, naming, CRUD, runtime access, guardrails. |
 | [memory.md](references/memory.md) | Memory storage layout, write policy, user profile template. |

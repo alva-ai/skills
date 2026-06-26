@@ -49,6 +49,7 @@ alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js
 | --name          | string | yes      | Job name (1–63 lowercase alphanumeric or hyphens, no leading/trailing hyphen) |
 | --args          | JSON   | no       | JSON passed to `require("env").args` on each execution |
 | --push-notify   | flag   | no       | Let this cronjob emit feed alert events after successful feed runs |
+| --run-as-service-account | int | no | Run the job under a restricted **service account** (an id you own) instead of your full identity. The SA must already be granted the entry script + data paths. Billing/audit stay with you. See [service-accounts.md](service-accounts.md). Omit (or `0`) = run as owner (default). |
 
 When `--push-notify` is set, every successful cronjob execution checks the
 feed's push sidecars. `signal/targets` and `notify/message` both dispatch the
