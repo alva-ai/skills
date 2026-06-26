@@ -344,7 +344,7 @@ const altra = new FeedAltra(
 | `simOptions.feeRate`           | Fee per trade as fraction (e.g. 0.001 = 0.1%)                                   |
 | `simOptions.slippage`          | Slippage as fraction                                                            |
 | `perfOptions.timezone`         | `"UTC"` for crypto/mix, `"America/New_York"` for us_stock                       |
-| `perfOptions.marketType`       | `"crypto"`, `"us_stock"`, or `"mix"` (multi-asset)                              |
+| `perfOptions.marketType`       | `"crypto"`, `"us_stock"`, or `"mix"` (US stock + crypto portfolios)             |
 
 ### TIME Constants
 
@@ -360,7 +360,7 @@ TIME.WEEK; // 604,800,000 ms
 
 ### Multi-Asset Strategies
 
-When trading both crypto and stocks, use a single FeedAltra instance with
+When trading both crypto and US stocks, use a single FeedAltra instance with
 `marketType: "mix"`:
 
 ```javascript
@@ -378,6 +378,22 @@ dg.registerOhlcv("BINANCE_SPOT_BTC_USDT", "1d");
 dg.registerOhlcv("XNAS_SPOT_AAPL_USD", "1d");
 await altra.run(endDate);
 ```
+
+**Mixed-market accounting**:
+
+- `marketType: "mix"` supports portfolios that hold crypto and US stocks in a
+  single FeedAltra run. Crypto trades 24/7; US stocks use the built-in US
+  trading calendar, including weekends, full-day holidays, early-close days,
+  and daylight-saving transitions.
+- Daily mixed-asset performance records equity every day. PerfEngine marks each
+  position at the horizon for that symbol's market: crypto positions use crypto
+  bars, US stock positions use the available US stock session close, and closed
+  US stock sessions carry the latest completed US stock session for held stock
+  positions.
+- Mixed-mode portfolio snapshots are advanced only when the included fills can
+  be marked at the same row's per-symbol horizons. That keeps stock-close
+  accounting from pulling crypto fills into a row before the crypto mark can
+  price them.
 
 ---
 
@@ -893,7 +909,12 @@ const btcQty = btcPos ? btcPos.qty : 0;
 ```
 
 **Data availability**: With event-driven triggers, the strategy only runs when
-data arrives. Holidays/weekends are naturally skipped (no bar = no trigger).
+the trigger expression receives complete data. A US stock-only `e.ohlcv(...)`
+trigger will not fire on stock holidays/weekends. Mixed triggers require care:
+crypto can continue to emit bars while US stocks are closed, so strategy logic
+should handle stale or absent stock bars explicitly. `marketType: "mix"` keeps
+portfolio accounting aligned across markets; it does not create missing trigger
+data for a closed market.
 
 ---
 
