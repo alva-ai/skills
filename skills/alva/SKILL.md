@@ -192,6 +192,7 @@ but treat that section as mandatory, not optional debugging material.
 | User asks for | Route | Must not miss |
 | --- | --- | --- |
 | price, valuation, holdings, "why did it move", compare peers, explain a thesis, rank in text | Financial Analysis / Ask Question | Fetch fresh data/search evidence; comparison baselines need provenance too. Every answer must pass the ask evidence gate below. |
+| fintwit / KOL / leaderboard — top accounts or ranking, is @handle tracked, what an account thinks about a ticker or theme, track record | Fintwit Intelligence | Read [fintwit.md](references/fintwit.md); cite the snapshot date; read-only, never fabricate rankings. |
 | dashboard, screener app, thesis tracker, hosted report, shareable surface | Playbook Creation | Build live feeds first, then read [playbook-creation.md](references/playbook-creation.md). |
 | `/use-skill:<username>/<name>` or template-like research method | Skillhub Blueprint | Fetch blueprint fresh; if it becomes a playbook, route through [playbook-creation.md](references/playbook-creation.md) and set `--skill-id`. |
 | backtest, strategy, signal, rebalance, portfolio simulation | Strategy / Trading Analysis | Use Altra; package as answer, feed, or playbook only as the user goal requires. |
@@ -706,6 +707,7 @@ Use this index to open only the file needed for the current task.
 | [onnx.md](references/onnx.md) | ONNX artifact, inference, FeedAltra integration, release checks. |
 | [deployment.md](references/deployment.md) | Cronjob create/list/pause/resume/trigger/runs/run-logs. |
 | [search.md](references/search.md) | `unified_search`, finance search, Twitter/X, Reddit, YouTube, web gotchas. |
+| [fintwit.md](references/fintwit.md) | Fintwit Intelligence: curated fintwit/KOL account data — views, signals, profiles; query recipes by account, ticker, ranking. |
 | [secret-manager.md](references/secret-manager.md) | Secret upload, naming, CRUD, runtime access, guardrails. |
 | [memory.md](references/memory.md) | Memory storage layout, write policy, user profile template. |
 | [user-facing-prose.md](references/user-facing-prose.md) | Product vocabulary, voice rules, and alpi prose prompt block. |
