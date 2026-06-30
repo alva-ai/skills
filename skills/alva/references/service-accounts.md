@@ -18,16 +18,23 @@ The key split:
 
 | Dimension | Whose identity | Notes |
 | --- | --- | --- |
-| File access (ALFS), secrets, `env.userId` | **the SA** | only the paths explicitly granted |
-| Billing, credits, audit, `~` / `env.username` / home | **the owner / caller** | unchanged — the real user always pays and is attributed |
+| File access (ALFS), `env.userId` | **the SA** | only the paths explicitly granted |
+| Billing, credits, audit, secrets, `~` / `env.username` / home | **the owner / caller** | unchanged — the real user always pays and is attributed |
 
 So a UDF "run as SA" reads/writes only the SA's granted paths, but the run is
 still billed and audited to the owner. This is **opt-in**: a UDF/cronjob with no
 `run-as` set runs as the owner exactly as before.
 
+**Secrets:** an SA reads the **owner's** secrets (`require("secret-manager")`
+resolves to the owner), so scripts that need the owner's API keys / tokens keep
+working under run-as. The SA restriction is therefore **file-scoped** — it limits
+which ALFS paths the run can touch, not which secrets. (Per-secret scoping for
+SAs may come later.)
+
 Why use it: a scheduled job or shared UDF that only needs one feed's data should
-not run with the power to read every file in your account. Scoping it to an SA
-limits the blast radius if the script is buggy or the logic is reused widely.
+not run with the power to read or write every file in your account. Scoping it to
+an SA limits the file blast radius if the script is buggy or the logic is reused
+widely.
 
 ## Workflow
 
