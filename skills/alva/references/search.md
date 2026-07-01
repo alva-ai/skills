@@ -62,6 +62,14 @@ below live in the `unified_search` partition.
 - **Signals**: `views`, `likes`
 - **URL filter**: Only accept `/watch?v=`, `/shorts/`, `youtu.be/{id}`. Drop channel pages, playlists.
 - **Video ID extraction**: `url.match(/(?:v=|shorts\/)([\w-]{11})/)`
+- **Transcript / "what's this video about"**: to read a video's spoken content, use the bundled `yt-dlp` CLI from **Bash** (a local sandbox binary, not a Cloud SDK module). It fetches captions without downloading the video:
+
+  ```bash
+  yt-dlp --skip-download --write-auto-subs --write-subs \
+    --sub-langs "en.*,en" --sub-format json3 -o "/tmp/yt.%(ext)s" "<VIDEO_URL>"
+  ```
+
+  Then read `/tmp/yt.*.json3` and concatenate every `events[].segs[].utf8` into the transcript text (prefer the human `.en.json3` over the auto `.en-orig.json3` when both exist). For a long transcript, summarize first and offer to expand a section/time range. **Bot-block caveat**: if `yt-dlp` errors with `Sign in to confirm you're not a bot`, the sandbox IP is blocked by YouTube — tell the user the transcript is unavailable; do NOT fabricate one. `--write-auto-subs` only yields text when the video has captions; there is no audio-transcription fallback in the sandbox.
 
 ### Podcasts
 
