@@ -33,17 +33,22 @@ Decision order:
 ## Skillhub Blueprint
 
 If the user's message contains `/use-skill:<username>/<name>`, the Skillhub path
-is mandatory before analysis, Guided Planning, or build work.
+is mandatory before analysis, Guided Planning, or build work. The path is also
+mandatory when the user references or asks to use a skill/method that may live
+in Skillhub.
 
 Describe Skillhub to users as a catalog of methodologies. Keep gateway/file
 listing details internal unless the user is debugging blueprint retrieval.
 
 1. Run `alva skillhub --help` if unused this session.
-2. Inspect the exact catalog id with `alva skillhub get <username>/<name>`.
+2. For `/use-skill:<username>/<name>`, inspect the exact catalog id with
+   `alva skillhub get <username>/<name>`.
    Do not guess namespace, case, filename, or template path.
-3. If the id is not found, use `alva skillhub list` and look leniently for
-   case-insensitive or separator-insensitive close matches. Proceed only when
-   exactly one match is obvious; otherwise ask the user to choose.
+3. When the user references a skill without an exact id, use
+   `alva skillhub list` to search for relevant catalog matches before choosing
+   an id. Look leniently for semantic, case-insensitive, or
+   separator-insensitive matches. Proceed only when exactly one match is
+   obvious; otherwise ask the user to choose.
 4. Read the blueprint fresh with `alva skillhub file <username>/<name> <file>`.
    Use the blueprint file from the listing, conventionally `template.md`.
 5. Pull supporting files only on demand. Do not bulk-download.

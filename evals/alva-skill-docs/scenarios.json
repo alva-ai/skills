@@ -199,6 +199,30 @@
       }
     },
     {
+      "id": "scenario.skillhub-referenced-method",
+      "group": "scenarios.skillhub",
+      "prompt": "Use the thesis skill for NVDA AI capex read-through.",
+      "description": "A user skill reference searches Skillhub for relevant catalog matches, resolves one obvious id, and then fetches the blueprint fresh.",
+      "expect": {
+        "route": "Playbook Creation",
+        "references": [
+          "request-routing.md",
+          "playbook-creation.md",
+          "api/release.md"
+        ],
+        "behaviors": [
+          "references a skill without an exact id",
+          "alva skillhub list",
+          "search for relevant catalog matches",
+          "Proceed only when exactly one match is obvious",
+          "alva skillhub file",
+          "Do not bulk-download",
+          "Do not turn every Skillhub task into a playbook",
+          "--skill-id <username>/<name>"
+        ]
+      }
+    },
+    {
       "id": "scenario.remix-existing-playbook",
       "group": "scenarios.playbook",
       "prompt": "<remix https://alva.ai/u/alva/playbooks/screener> make my own version",

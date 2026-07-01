@@ -51,6 +51,7 @@
       "description": "Skillhub blueprint retrieval remains mandatory and fresh when directed.",
       "includes": [
         "alva skillhub get",
+        "alva skillhub list",
         "alva skillhub file",
         "fetch it fresh",
         "Do not bulk-download",
