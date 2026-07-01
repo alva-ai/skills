@@ -348,6 +348,36 @@
       ]
     },
     {
+      "id": "platform-data.kol-surfaces",
+      "group": "platform-data",
+      "target": "corpus",
+      "description": "KOL data and the KOL digest SDK are routed together as Alva-maintained Platform Data.",
+      "section_includes": [
+        {
+          "file": "SKILL.md",
+          "heading": "Data Access: Platform Data",
+          "label": "platform data section",
+          "includes": [
+            "Platform Data is Alva-maintained data and SDK surface",
+            "Fintwit Intelligence / KOL data",
+            "Read [fintwit.md](references/fintwit.md)",
+            "Fintwit Digest SDK",
+            "Read [fintwit-digest-sdk.md](references/fintwit-digest-sdk.md)",
+            "do not copy private runtime internals"
+          ]
+        },
+        {
+          "file": "SKILL.md",
+          "heading": "Request Routing",
+          "label": "request routing",
+          "includes": [
+            "Platform Data: Fintwit Intelligence",
+            "Platform Data: Fintwit Digest SDK"
+          ]
+        }
+      ]
+    },
+    {
       "id": "issue592.scoped-eval-checks",
       "group": "issue592",
       "target": "eval",

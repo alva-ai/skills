@@ -192,8 +192,8 @@ but treat that section as mandatory, not optional debugging material.
 | User asks for | Route | Must not miss |
 | --- | --- | --- |
 | price, valuation, holdings, "why did it move", compare peers, explain a thesis, rank in text | Financial Analysis / Ask Question | Fetch fresh data/search evidence; comparison baselines need provenance too. Every answer must pass the ask evidence gate below. |
-| fintwit / KOL / leaderboard — top accounts or ranking, is @handle tracked, what an account thinks about a ticker or theme, track record | Fintwit Intelligence | Read [fintwit.md](references/fintwit.md); cite the snapshot date; read-only, never fabricate rankings. |
-| FinTwit digest SDK, alpha radar automation, custom digest module, `@alva/fintwit-digest` | Fintwit Digest Automation | Read [fintwit-digest-sdk.md](references/fintwit-digest-sdk.md); follow the SDK API and ability contracts instead of copying runtime internals. |
+| fintwit / KOL / leaderboard — top accounts or ranking, is @handle tracked, what an account thinks about a ticker or theme, track record | Platform Data: Fintwit Intelligence | Use the Platform Data section below, then read [fintwit.md](references/fintwit.md); cite the snapshot date; read-only, never fabricate rankings. |
+| FinTwit digest SDK, alpha radar automation, custom digest module, `@alva/fintwit-digest` | Platform Data: Fintwit Digest SDK | Use the Platform Data section below, then read [fintwit-digest-sdk.md](references/fintwit-digest-sdk.md); follow the SDK API and ability contracts instead of copying runtime internals. |
 | dashboard, screener app, thesis tracker, hosted report, shareable surface | Playbook Creation | Build live feeds first, then read [playbook-creation.md](references/playbook-creation.md). |
 | `/use-skill:<username>/<name>` or template-like research method | Skillhub Blueprint | Fetch blueprint fresh; if it becomes a playbook, route through [playbook-creation.md](references/playbook-creation.md) and set `--skill-id`. |
 | backtest, strategy, signal, rebalance, portfolio simulation | Strategy / Trading Analysis | Use Altra; package as answer, feed, or playbook only as the user goal requires. |
@@ -280,6 +280,18 @@ Source routing:
   Skills non-US daily kline first; fall back to `searchPerplexityFinance` for
   uncovered tickers or intraday/live prices.
 
+#### Data Access: Platform Data
+
+Platform Data is Alva-maintained data and SDK surface that agents can consume
+without rebuilding the upstream ingestion. Treat it as a first-party data
+product: inspect the current reference and live fields, cite freshness, and do
+not copy private runtime internals into user scripts.
+
+| Surface | Use for | Must not miss |
+| --- | --- | --- |
+| Fintwit Intelligence / KOL data | Top accounts, leaderboard rankings, tracked-handle checks, account theses, ticker sentiment, and track record questions. | Read [fintwit.md](references/fintwit.md); live-read the public platform feeds, cite the snapshot timestamp, and keep the source read-only. |
+| Fintwit Digest SDK | Alpha radar automation, custom digest modules, and `@alva/fintwit-digest` scripts over platform KOL tracker feeds. | Read [fintwit-digest-sdk.md](references/fintwit-digest-sdk.md); use the public API and ability contracts instead of copying runtime internals or adding ad hoc profile config. |
+
 #### Data Access: Content Search And BYOD
 
 Content search enriches a real data pipeline; it does not replace one. Use it
@@ -316,7 +328,7 @@ code. Common modules:
 | HTTP | `require("net/http")` |
 | statistics / indicators | `@alva/algorithm` or runtime `alva sdk` modules |
 | persistent feed output | `@alva/feed`; [feed-sdk.md](references/feed-sdk.md) |
-| FinTwit digest automation module | `@alva/fintwit-digest`; [fintwit-digest-sdk.md](references/fintwit-digest-sdk.md) |
+| Platform Data digest module | `@alva/fintwit-digest`; see Platform Data above and [fintwit-digest-sdk.md](references/fintwit-digest-sdk.md) |
 | trading engine | `FeedAltra`; [altra-trading.md](references/altra-trading.md) |
 | scheduled LLM reasoning | `@alva/pi`; [alpi.md](references/alpi.md) |
 | ONNX model inference | `@alva/onnx`; [onnx.md](references/onnx.md) |
@@ -709,8 +721,8 @@ Use this index to open only the file needed for the current task.
 | [onnx.md](references/onnx.md) | ONNX artifact, inference, FeedAltra integration, release checks. |
 | [deployment.md](references/deployment.md) | Cronjob create/list/pause/resume/trigger/runs/run-logs. |
 | [search.md](references/search.md) | `unified_search`, finance search, Twitter/X, Reddit, YouTube, web gotchas. |
-| [fintwit.md](references/fintwit.md) | Fintwit Intelligence: curated fintwit/KOL account data — views, signals, profiles; query recipes by account, ticker, ranking. |
-| [fintwit-digest-sdk.md](references/fintwit-digest-sdk.md) | Fintwit digest SDK: `@alva/fintwit-digest` public API, run profiles, pipeline state, ability contracts, and override rules. |
+| [fintwit.md](references/fintwit.md) | Platform Data / Fintwit Intelligence: curated fintwit/KOL account data — views, signals, profiles; query recipes by account, ticker, ranking. |
+| [fintwit-digest-sdk.md](references/fintwit-digest-sdk.md) | Platform Data / Fintwit Digest SDK: `@alva/fintwit-digest` public API, run profiles, pipeline state, ability contracts, and override rules. |
 | [secret-manager.md](references/secret-manager.md) | Secret upload, naming, CRUD, runtime access, guardrails. |
 | [memory.md](references/memory.md) | Memory storage layout, write policy, user profile template. |
 | [user-facing-prose.md](references/user-facing-prose.md) | Product vocabulary, voice rules, and alpi prose prompt block. |
