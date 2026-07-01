@@ -42,7 +42,7 @@ The main objects are:
 | Runtime script | JavaScript executed inside Alva's V8/jagent runtime through `alva run` or cronjobs. | You need computation, HTTP, ALFS, secrets, alpi, ONNX, or Feed SDK. |
 | Feed | A persistent data pipeline that writes time-series or grouped outputs to ALFS and can back playbooks or alerts. | Data needs freshness, history, public reads, charts, release, or push. |
 | Playbook | A hosted investing app at `https://alva.ai/u/<username>/playbooks/<name>`. | The user wants a shareable dashboard, screener, thesis, what-if, or strategy surface. |
-| Skillhub blueprint | A catalog methodology addressed by `/use-skill:<username>/<name>`. | The user explicitly asks for one or a task matches an official template family. |
+| Skillhub blueprint | A catalog methodology addressed by `/use-skill:<username>/<name>` or discovered from a user skill/method reference. | The user references a skill/method, or a task matches an official template family. |
 | Altra | The Feed SDK trading engine for event-driven backtesting and signal feeds. | Any strategy, simulation, signal target, portfolio, order, equity curve, or rebalancing logic. |
 | alpi | A fixed LLM reasoning/tool loop inside a deterministic scheduled pipeline. | A feed needs classification, synthesis, TLDR, why-it-matters, or result-only tool use over real upstream data. |
 | BYOD | User-supplied or validated external data source wired into runtime code. | Alva coverage is insufficient after verification. |
@@ -142,8 +142,9 @@ make it this one.
    `AlvaToolkit.AlvaClient` and release declares the backing feeds. Static
    snapshots are only for explicit requests.
 8. **One blocking question.** For nontrivial builds, ask at most one blocking
-   question or present one short plan. A concrete `/use-skill:` directive plus
-   topic means plan once, then build.
+   question or present one short plan. A concrete Skillhub directive or
+   user-referenced skill/method plus topic means plan once after retrieval,
+   then build.
 9. **References own depth.** Top-level sections tell you what the capability is,
    what rule is easy to miss, and which file to open. Long examples, commands,
    and checklists live in the linked reference.
@@ -195,7 +196,7 @@ but treat that section as mandatory, not optional debugging material.
 | fintwit / KOL / leaderboard — top accounts or ranking, is @handle tracked, what an account thinks about a ticker or theme, track record | Platform Data: Fintwit Intelligence | Use the Platform Data section below, then read [fintwit.md](references/fintwit.md); cite the snapshot date; read-only, never fabricate rankings. |
 | FinTwit digest SDK, alpha radar automation, custom digest module, `@alva/fintwit-digest` | Platform Data: Fintwit Digest SDK | Use the Platform Data section below, then read [fintwit-digest-sdk.md](references/fintwit-digest-sdk.md); follow the SDK API and ability contracts instead of copying runtime internals. |
 | dashboard, screener app, thesis tracker, hosted report, shareable surface | Playbook Creation | Build live feeds first, then read [playbook-creation.md](references/playbook-creation.md). |
-| `/use-skill:<username>/<name>` or template-like research method | Skillhub Blueprint | Fetch blueprint fresh; if it becomes a playbook, route through [playbook-creation.md](references/playbook-creation.md) and set `--skill-id`. |
+| `/use-skill:<username>/<name>`, user-referenced skill/method, or template-like research method | Skillhub Blueprint | Fetch blueprint fresh; if it becomes a playbook, route through [playbook-creation.md](references/playbook-creation.md) and set `--skill-id`. |
 | backtest, strategy, signal, rebalance, portfolio simulation | Strategy / Trading Analysis | Use Altra; package as answer, feed, or playbook only as the user goal requires. |
 | recurring digest, threshold tracker, alert, stream watch | Automation / Push | Build a push-capable feed and verify subscription plus sidecar output. |
 | `<remix ...>` or "remix this playbook" | Remix | Read source files; preserve lineage and source UDFs. |
@@ -628,8 +629,8 @@ A thesis tracker combines structured metrics, content search, and alpi narrative
 over real upstream data. It may be a direct answer, a scheduled feed, an alert,
 or a playbook depending on the requested artifact. Keep the alpi prompt fixed,
 keep source records separate from AI analysis, and make push lines match actual
-thesis deltas. If the user gives `/use-skill:alva/thesis` or another blueprint,
-fetch it fresh and let its method drive the build.
+thesis deltas. If the user gives `/use-skill:alva/thesis` or asks to use a
+named thesis blueprint, fetch it fresh and let its method drive the build.
 
 ### Strategy And Trading Analysis
 
