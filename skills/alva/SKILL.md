@@ -378,8 +378,8 @@ Enter this tree when the user asks Alva to keep something running, reusable,
 shareable, inspectable, or actionable. The tree is broader than playbooks: a
 script, feed, alert, signal, model output, or trading analysis may be the right
 artifact without a hosted UI. Enter the playbook branch only for hosted apps,
-   share URLs, remixes, annotation edits, release/version updates, or playbook
-   alert/group-subscription setup.
+share URLs, remixes, annotation edits, release/version updates, or playbook
+alert/group-subscription setup.
 
 #### Data Product Layer: Feed Lifecycle And Automation
 
