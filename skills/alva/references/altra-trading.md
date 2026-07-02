@@ -20,8 +20,8 @@ Altra consists of four processing stages:
    features (indicators)
 2. **SignalEngine** -- Runs your strategy function on each trigger event,
    producing targets (buy/sell signals)
-3. **SimEngine** -- Simulates order execution, portfolio management, and position
-   tracking
+3. **SimEngine** -- Simulates order execution, portfolio management, and
+   position tracking
 4. **PerfEngine** -- Computes performance metrics (returns, Sharpe, drawdown,
    etc.)
 
@@ -224,9 +224,9 @@ altra.setStrategy(strategyFn, {
 
 ## Imports
 
-Altra is accessed through the `FeedAltraModule` export from `@alva/feed`.
-Field type helpers (`num`, `str`, etc.) and `createArraysOhlcvProvider` are at
-the `@alva/feed` top level:
+Altra is accessed through the `FeedAltraModule` export from `@alva/feed`. Field
+type helpers (`num`, `str`, etc.) and `createArraysOhlcvProvider` are at the
+`@alva/feed` top level:
 
 ```javascript
 const {
@@ -240,28 +240,20 @@ const {
   makeDoc,
   createArraysOhlcvProvider,
 } = require("@alva/feed");
-const {
-  FeedAltra,
-  e,
-  Amount,
-  TIME,
-  allocate,
-  order,
-  orders,
-} = FeedAltraModule;
+const { FeedAltra, e, Amount, TIME, allocate, order, orders } = FeedAltraModule;
 ```
 
-| Export                                    | Source                     | Description                                      |
-| ----------------------------------------- | -------------------------- | ------------------------------------------------ |
-| `FeedAltra`                               | `FeedAltraModule`          | Main backtesting engine class                    |
-| `e`                                       | `FeedAltraModule`          | Event trigger expression builder                 |
-| `Amount`                                  | `FeedAltraModule`          | Order amount constructors                        |
-| `TIME`                                    | `FeedAltraModule`          | Time constants (SECOND, MINUTE, HOUR, DAY, WEEK) |
-| `allocate`                                | `FeedAltraModule`          | Helper to create allocate target                 |
-| `order` / `orders`                        | `FeedAltraModule`          | Helper to create order targets                   |
-| `num`, `str`, `bool`, `obj`, `arr`, `fld` | `@alva/feed` (top level)   | Field type helpers (same as Feed SDK)            |
-| `makeDoc`                                 | `@alva/feed` (top level)   | Type document helper                             |
-| `createArraysOhlcvProvider`               | `@alva/feed` (top level)    | Builds the OHLCV provider used by Altra          |
+| Export                                    | Source                   | Description                                      |
+| ----------------------------------------- | ------------------------ | ------------------------------------------------ |
+| `FeedAltra`                               | `FeedAltraModule`        | Main backtesting engine class                    |
+| `e`                                       | `FeedAltraModule`        | Event trigger expression builder                 |
+| `Amount`                                  | `FeedAltraModule`        | Order amount constructors                        |
+| `TIME`                                    | `FeedAltraModule`        | Time constants (SECOND, MINUTE, HOUR, DAY, WEEK) |
+| `allocate`                                | `FeedAltraModule`        | Helper to create allocate target                 |
+| `order` / `orders`                        | `FeedAltraModule`        | Helper to create order targets                   |
+| `num`, `str`, `bool`, `obj`, `arr`, `fld` | `@alva/feed` (top level) | Field type helpers (same as Feed SDK)            |
+| `makeDoc`                                 | `@alva/feed` (top level) | Type document helper                             |
+| `createArraysOhlcvProvider`               | `@alva/feed` (top level) | Builds the OHLCV provider used by Altra          |
 
 ---
 
@@ -288,10 +280,9 @@ const altra = new FeedAltra(config, ohlcvProvider);
 - US stocks: `"1min"`, `"2min"`, `"3min"`, `"5min"`, `"10min"`, `"15min"`,
   `"30min"`, `"1h"`, `"2h"`, `"4h"`, `"1d"`, `"1w"`, `"1m"`.
 - Crypto spot/perp: `"1min"`, `"2min"`, `"3min"`, `"5min"`, `"10min"`,
-  `"15min"`, `"30min"`, `"45min"`, `"1h"`, `"2h"`, `"4h"`, `"1d"`,
-  `"1w"`, `"1m"`, plus locally aggregated minute/hour/day multiples that
-  divide cleanly into a supported base interval (for example `"6h"`, `"8h"`,
-  `"12h"`, `"3d"`).
+  `"15min"`, `"30min"`, `"45min"`, `"1h"`, `"2h"`, `"4h"`, `"1d"`, `"1w"`,
+  `"1m"`, plus locally aggregated minute/hour/day multiples that divide cleanly
+  into a supported base interval (for example `"6h"`, `"8h"`, `"12h"`, `"3d"`).
 - Do not use stock `"45min"`; the provider rejects it. Do not assume arbitrary
   strings between `"1min"` and `"1w"` are valid for stocks.
 
@@ -334,17 +325,17 @@ const altra = new FeedAltra(
 );
 ```
 
-| Field                          | Description                                                                     |
-| ------------------------------ | ------------------------------------------------------------------------------- |
-| `path`                         | ALFS feed path (e.g. `'~/feeds/my-strategy/v1'`). All output data stored here.   |
-| `startDate`                    | Backtest start timestamp (ms UTC). Use the exact date, never adjust for warmup, but still respect provider data-window limits. |
-| `portfolioOptions.initialCash` | Starting cash (default: 100,000)                                                |
-| `portfolioOptions.currency`    | Quote currency (default: "USD")                                                 |
+| Field                          | Description                                                                                                                              |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `path`                         | ALFS feed path (e.g. `'~/feeds/my-strategy/v1'`). All output data stored here.                                                           |
+| `startDate`                    | Backtest start timestamp (ms UTC). Use the exact date, never adjust for warmup, but still respect provider data-window limits.           |
+| `portfolioOptions.initialCash` | Starting cash (default: 100,000)                                                                                                         |
+| `portfolioOptions.currency`    | Quote currency (default: "USD")                                                                                                          |
 | `simOptions.simTick`           | Simulation resolution. Prefer valid tick strings like `"1min"`, `"15min"`, or `"1d"`; numeric ms values must map to a valid tick string. |
-| `simOptions.feeRate`           | Fee per trade as fraction (e.g. 0.001 = 0.1%)                                   |
-| `simOptions.slippage`          | Slippage as fraction                                                            |
-| `perfOptions.timezone`         | `"UTC"` for crypto/mix, `"America/New_York"` for us_stock                       |
-| `perfOptions.marketType`       | `"crypto"`, `"us_stock"`, or `"mix"` (multi-asset)                              |
+| `simOptions.feeRate`           | Fee per trade as fraction (e.g. 0.001 = 0.1%)                                                                                            |
+| `simOptions.slippage`          | Slippage as fraction                                                                                                                     |
+| `perfOptions.timezone`         | `"UTC"` for crypto/mix, `"America/New_York"` for us_stock                                                                                |
+| `perfOptions.marketType`       | `"crypto"`, `"us_stock"`, or `"mix"` (multi-asset)                                                                                       |
 
 ### TIME Constants
 
@@ -519,7 +510,7 @@ dataGraph.registerRawData({
   fn: (fromExclusive, toInclusive) => {
     const resp = http.syncFetch(
       `${ARRAYS_BASE}/api/v1/crypto/open-interest?symbol=BTCUSDT&start_time=${fromExclusive}&end_time=${toInclusive}&interval=1d`,
-      { headers: { Authorization: "Bearer " + ARRAYS_JWT } }
+      { headers: { Authorization: "Bearer " + ARRAYS_JWT } },
     );
     const result = JSON.parse(resp.text());
 
@@ -571,7 +562,10 @@ e.ohlcv("BINANCE_SPOT_BTC_USDT", "1d"); // Daily bar close
 e.raw("sentiment_score"); // Raw data update
 e.feature("rsi"); // Feature computed
 
-e.all(e.ohlcv("XNAS_SPOT_AAPL_USD", "1d"), e.ohlcv("BINANCE_SPOT_BTC_USDT", "1d")); // AND
+e.all(
+  e.ohlcv("XNAS_SPOT_AAPL_USD", "1d"),
+  e.ohlcv("BINANCE_SPOT_BTC_USDT", "1d"),
+); // AND
 e.any(e.ohlcv("BINANCE_SPOT_BTC_USDT", "1h"), e.raw("funding")); // OR
 ```
 
@@ -637,10 +631,10 @@ if (bars.length === 0) return { target: null, state }; // warmup
 
 **Feature lookback** and **strategy lookback** are set in different scopes:
 
-| Type              | Where Set                | Controls                                                    |
-| ----------------- | ------------------------ | ----------------------------------------------------------- |
+| Type              | Where Set                | Controls                                                                |
+| ----------------- | ------------------------ | ----------------------------------------------------------------------- |
 | Feature lookback  | Feature's `inputConfig`  | How many OHLCV, raw, or feature dependency records the feature receives |
-| Strategy lookback | Strategy's `inputConfig` | How many OHLCV, raw, or feature records the strategy sees              |
+| Strategy lookback | Strategy's `inputConfig` | How many OHLCV, raw, or feature records the strategy sees               |
 
 Strategy lookback can also extend upstream raw/feature computation ranges so the
 requested records are available to the strategy.
@@ -685,12 +679,12 @@ trades.
 
 **Weight values**:
 
-| Weight | Meaning                     |
-| ------ | --------------------------- |
-| `0`    | Close entire position (exit) |
-| `0.5`  | 50% of equity in this asset |
-| `1.0`  | 100% long (fully invested)  |
-| `-1.0` | 100% short                  |
+| Weight | Meaning                                    |
+| ------ | ------------------------------------------ |
+| `0`    | Close entire position (exit)               |
+| `0.5`  | 50% of equity in this asset                |
+| `1.0`  | 100% long (fully invested)                 |
+| `-1.0` | 100% short                                 |
 | `2.0`  | 200% long target, subject to margin limits |
 
 - Existing positions omitted from `weights` are also targeted to `0` and closed
@@ -726,9 +720,9 @@ Amount.ofPosition(0.5); // 50% of current position size
 Amount.ofEquity(0.05); // 5% of portfolio equity
 ```
 
-Use either an `allocate` instruction or an `orders` instruction in a target.
-Do not put `orders` inside an `allocate` instruction; current execution only
-uses the `weights` for `allocate` targets.
+Use either an `allocate` instruction or an `orders` instruction in a target. Do
+not put `orders` inside an `allocate` instruction; current execution only uses
+the `weights` for `allocate` targets.
 
 ---
 
@@ -749,7 +743,8 @@ The `RunResult` contains:
 - `orders` -- All executed orders with fill details
 - `perf` -- Performance metrics (total return, Sharpe ratio, max drawdown, etc.)
 
-All output data is also persisted under the feed's ALFS path (quote in CLI, e.g. `'~/feeds/my-strategy/v1/data/'`):
+All output data is also persisted under the feed's ALFS path (quote in CLI, e.g.
+`'~/feeds/my-strategy/v1/data/'`):
 
 ```
 ~/feeds/my-strategy/v1/data/
@@ -761,10 +756,11 @@ All output data is also persisted under the feed's ALFS path (quote in CLI, e.g.
 ```
 
 `signal/targets` makes the feed push-capable, but delivery still requires the
-cronjob to be created or updated with `--push-notify` and the feed release to be
-bound to that cronjob. Actual delivery also requires an explicit personal or
-group subscription to the feed or to a playbook that references it. See
-`references/deployment.md` for the deploy/release flow.
+cronjob to be created or updated with `--push-notify` and
+`alva automation publish` to bind the feed to that cronjob. Actual delivery also
+requires an explicit personal alert or group subscription to the automation or
+to a playbook that references it. See `references/deployment.md` for the
+deploy/publish flow.
 
 ---
 
@@ -924,7 +920,9 @@ describe("Feature: discount_30d", () => {
   it("returns empty when insufficient bars", () => {
     const mockData = {
       ohlcvs: {
-        [SYMBOL]: { [STRATEGY_INTERVAL]: createMockBars(29, 100000, 1733011200000) },
+        [SYMBOL]: {
+          [STRATEGY_INTERVAL]: createMockBars(29, 100000, 1733011200000),
+        },
       },
     };
     const result = discountFeatureFn(mockData, {
@@ -992,9 +990,7 @@ function createFundingRateRawData(options) {
   return {
     name: "funding_rate",
     fn: (fromExclusive, toInclusive) => {
-      const res = fetcher({
-        /* params */
-      });
+      const res = fetcher({/* params */});
       // ...
     },
   };

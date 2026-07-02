@@ -127,7 +127,7 @@
             "id": "before-playbook-release",
             "label": "playbook release",
             "includes": [
-              "Every backing feed passed `before-feed-release`",
+              "Every backing feed passed `before-automation-publish`",
               "README exists, is current, and is passed via absolute `--readme-url`",
               "alva lint playbook ./index.html"
             ]
@@ -150,7 +150,7 @@
           "Build or modify a feed that emits actionable `signal/targets` or `notify/message`",
           "A push is set up only after all of these succeed",
           "alva deploy update --id <ID> --push-notify",
-          "alva subscriptions subscribe-feed",
+          "alva alert enable --automation",
           "read `@last/1` of the sidecar",
           "do not claim push is set up"
         ]

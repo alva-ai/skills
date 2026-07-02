@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/behavioral-doc-eval/skills/alva`
+Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/automation-alert-surface/skills/alva`
 
-SKILL.md lines: 780
+SKILL.md lines: 791
 
-Cases: 47/47
+Cases: 50/50
 
-Checks: 416/416 (100.00%)
+Checks: 455/455 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -19,7 +19,7 @@ No failed cases. Keep the eval in place as a regression mechanism.
 
 ## retained
 
-17/17 cases, 98/98 checks
+18/18 cases, 109/109 checks
 
 ### PASS retained.platform-panorama
 
@@ -58,6 +58,7 @@ Routing preserves the major user intents and Guided Planning discipline.
 Skillhub blueprint retrieval remains mandatory and fresh when directed.
 
 - [x] alva skillhub get
+- [x] alva skillhub list
 - [x] alva skillhub file
 - [x] fetch it fresh
 - [x] Do not bulk-download
@@ -109,14 +110,14 @@ Jagent runtime constraints and heap override remain discoverable.
 
 ### PASS retained.feed-lifecycle
 
-Feed build, grant, deploy, and release hard gate remain preserved.
+Feed build, grant, deploy, and automation publish hard gate remain preserved.
 
 - [x] Feed SDK
 - [x] alva run --entry-path
 - [x] special:user:*
 - [x] alva deploy create
-- [x] alva release feed
-- [x] before-feed-release
+- [x] alva automation publish
+- [x] before-automation-publish
 
 ### PASS retained.playbook-release
 
@@ -162,6 +163,21 @@ Creator-side UDF setup and allowance management route through the functions CLI 
 - [x] alva functions invoke
 - [x] alva functions allowance create
 - [x] Do not hand-roll REST, GraphQL, or curl
+
+### PASS retained.credits-cli
+
+Viewer-scoped credit balance and consumption-history lookup remains discoverable through the credits CLI.
+
+- [x] alva credits --help
+- [x] alva credits wallet
+- [x] alva credits items --today
+- [x] alva credits items --last 7d
+- [x] alva credits items --start 2026-06-23 --end 2026-06-24
+- [x] --session-id <session_id>
+- [x] viewer-scoped
+- [x] Do not invent or request a `--user-id` flag
+- [x] Do not use raw GraphQL
+- [x] items.pageInfo.hasNextPage
 
 ### PASS retained.altra
 
@@ -290,6 +306,23 @@ When structured data lags a known official release, web is an official-source fa
 - [x] official-source stale-feed fallback
 - [x] Do not claim the value came from Data Skills
 
+## platform-data
+
+1/1 cases, 8/8 checks
+
+### PASS platform-data.kol-surfaces
+
+KOL data and the KOL digest SDK are routed together as Alva-maintained Platform Data.
+
+- [x] platform data section: SKILL.md#Data Access: Platform Data includes Platform Data is Alva-maintained data and SDK surface
+- [x] platform data section: SKILL.md#Data Access: Platform Data includes Fintwit Intelligence / KOL data
+- [x] platform data section: SKILL.md#Data Access: Platform Data includes Read [fintwit.md](references/fintwit.md)
+- [x] platform data section: SKILL.md#Data Access: Platform Data includes Fintwit Digest SDK
+- [x] platform data section: SKILL.md#Data Access: Platform Data includes Read [fintwit-digest-sdk.md](references/fintwit-digest-sdk.md)
+- [x] platform data section: SKILL.md#Data Access: Platform Data includes do not copy private runtime internals
+- [x] request routing: SKILL.md#Request Routing includes Platform Data: Fintwit Intelligence
+- [x] request routing: SKILL.md#Request Routing includes Platform Data: Fintwit Digest SDK
+
 ## issue592
 
 5/5 cases, 65/65 checks
@@ -366,7 +399,7 @@ Playbook release remains protected by behavior-level gates for feed freshness, l
 - [x] visual verification: references/playbook-creation.md#Screenshot includes real feed-backed chart marks
 - [x] visual verification: references/playbook-creation.md#Screenshot includes headers-only tables
 - [x] visual verification: references/playbook-creation.md#Screenshot includes fetch failures are data-rendering failures
-- [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes Every backing feed passed `before-feed-release`
+- [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes Every backing feed passed `before-automation-publish`
 - [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes HTML fetches quantitative data from feeds, not inline literals
 - [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes Latest data from each referenced feed is fresh
 - [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes README exists, is current, and is passed via absolute `--readme-url`
@@ -377,22 +410,22 @@ Playbook release remains protected by behavior-level gates for feed freshness, l
 Push setup is evaluated as a full delivery path instead of a single publisher flag.
 
 - [x] push setup: references/push-notifications.md#Configure And Verify includes A push is set up only after all of these succeed
-- [x] push setup: references/push-notifications.md#Configure And Verify includes before-feed-release
+- [x] push setup: references/push-notifications.md#Configure And Verify includes before-automation-publish
 - [x] push setup: references/push-notifications.md#Configure And Verify includes alva deploy update --id <ID> --push-notify
-- [x] push setup: references/push-notifications.md#Configure And Verify includes alva subscriptions subscribe-feed
-- [x] push setup: references/push-notifications.md#Configure And Verify includes alva subscriptions subscribe-playbook
+- [x] push setup: references/push-notifications.md#Configure And Verify includes alva alert enable --automation
+- [x] push setup: references/push-notifications.md#Configure And Verify includes alva alert enable --playbook
 - [x] push setup: references/push-notifications.md#Configure And Verify includes read `@last/1` of the sidecar
 - [x] push setup: references/push-notifications.md#Configure And Verify includes do not claim push is set up
 
 ## target
 
-9/9 cases, 115/115 checks
+9/9 cases, 119/119 checks
 
 ### PASS target.top-level-size
 
 Top-level SKILL.md stays below the current guide ceiling without forcing a minimum size that would block future compression.
 
-- [x] line count <= 850 (actual 780)
+- [x] line count <= 850 (actual 791)
 
 ### PASS target.playbook-task-offload
 
@@ -410,15 +443,19 @@ Playbook creation is a concrete task reference rather than the dominant top-leve
 
 ### PASS target.top-level-playbook-routing
 
-Top-level routing and final checklist keep playbook work in its concrete reference without making all routing playbook-centric.
+Top-level routing keeps playbook work as route-plus-boundary-plus-pointer instead of duplicating the manual.
 
-- [x] Playbook Creation Tree
-- [x] Durable Artifacts / Playbook Tree
-- [x] Subroutes are new build, Skillhub-guided build, remix, annotation/edit, release/version update, and push after release
-- [x] do not let every financial question inherit playbook gates
-- [x] route through [playbook-creation.md](references/playbook-creation.md)
-- [x] Did playbook work read [playbook-creation.md](references/playbook-creation.md)
-- [x] relevant hard gates
+- [x] playbook route: SKILL.md#Publication Layer: Playbook Creation Tree includes Enter this branch only when the user wants a hosted/shareable surface
+- [x] playbook route: SKILL.md#Publication Layer: Playbook Creation Tree includes Read [playbook-creation.md](references/playbook-creation.md)
+- [x] playbook route: SKILL.md#Publication Layer: Playbook Creation Tree includes owns the build order, Browser-safe feed reads, README, draft/release gates, screenshot verification, tier/visibility flow, and push-after-release handoff
+- [x] playbook route: SKILL.md#Publication Layer: Playbook Creation Tree includes feed-first and live-read
+- [x] playbook route: SKILL.md#Publication Layer: Playbook Creation Tree includes Keep procedure, release, screenshot, and tier details in the owning references
+- [x] playbook route: SKILL.md#Publication Layer: Playbook Creation Tree includes Do not let every financial question inherit playbook gates
+- [x] common workflow: SKILL.md#Hosted Playbook Workflow includes First choose the artifact shape
+- [x] common workflow: SKILL.md#Hosted Playbook Workflow includes turn the request into a data contract before UI work
+- [x] common workflow: SKILL.md#Hosted Playbook Workflow includes they own the procedure
+- [x] final checklist: SKILL.md#Final Sanity Checklist includes Did playbook work read [playbook-creation.md](references/playbook-creation.md)
+- [x] final checklist: SKILL.md#Final Sanity Checklist includes relevant hard gates
 
 ### PASS target.financial-analysis-routing
 
@@ -525,14 +562,14 @@ Operational pitfalls are a mandatory stepwise gate, not an optional debugging ap
 
 Latest mainline Alva skill updates remain integrated after rebasing the refactor.
 
-- [x] version: v1.12.1
+- [x] version: v1.15.1
 - [x] Capability Help
 - [x] Reply 1, 2, or 3 to start
 - [x] feedback
 - [x] api/feedback.md
 - [x] alva feedback --help
-- [x] subscriptions subscribe-feed
-- [x] subscriptions subscribe-playbook
+- [x] alva alert enable --automation
+- [x] alva alert enable --playbook
 - [x] publish publicly by default
 - [x] registered UDFs
 - [x] implementation internals
@@ -561,7 +598,7 @@ Prompt: `What is BTC doing right now?`
 - [x] Simple latest-fact asks stop there after one sourced hop
 - [x] user-facing-prose.md
 - [x] content-legitimacy.md
-- [x] Direct latest price for covered US equities and crypto: intraday klines, not daily close
+- [x] Direct latest/realtime price for covered US equities and crypto: intraday klines, not daily-level bars or closes
 - [x] Do not answer until you can name the decomposition
 - [x] Do not let playbook creation become the default
 - [x] not automatically to a playbook
@@ -606,7 +643,7 @@ Prompt: `Does Alva have darkpool L2 realtime data?`
 
 ## scenarios.playbook
 
-3/3 cases, 31/31 checks
+3/3 cases, 35/35 checks
 
 ### PASS scenario.dashboard-playbook-build
 
@@ -622,10 +659,14 @@ Prompt: `Build and publish a live dashboard for BTC dominance breakouts.`
 - [x] AlvaToolkit.AlvaClient
 - [x] Build live feeds first
 - [x] HTML fetches quantitative data from feeds, not inline literals
-- [x] Every release needs a current README
-- [x] screenshot verification must show real feed-backed marks
 - [x] expected route: references/request-routing.md#Routes includes Playbook Creation
-- [x] playbook release: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes Every backing feed passed `before-feed-release`
+- [x] readme freshness: references/api/release.md#Freshness and version updates includes Every `alva release playbook` call needs a freshly reviewed README
+- [x] readme freshness: references/api/release.md#Freshness and version updates includes regenerate the README
+- [x] readme freshness: references/api/release.md#Freshness and version updates includes `~/playbooks/<name>/README.md`
+- [x] readme freshness: references/api/release.md#Freshness and version updates includes before release
+- [x] visual verification: references/playbook-creation.md#Screenshot includes Pass screenshot verification only when
+- [x] visual verification: references/playbook-creation.md#Screenshot includes real feed-backed chart marks
+- [x] playbook release: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes Every backing feed passed `before-automation-publish`
 - [x] playbook release: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes README exists, is current, and is passed via absolute `--readme-url`
 - [x] playbook release: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes alva lint playbook ./index.html
 
@@ -675,7 +716,7 @@ Prompt: `Track BTC dominance and notify me when it breaks out.`
 - [x] Build or modify a feed that emits actionable `signal/targets` or `notify/message`
 - [x] A push is set up only after all of these succeed
 - [x] alva deploy update --id <ID> --push-notify
-- [x] alva subscriptions subscribe-feed
+- [x] alva alert enable --automation
 - [x] read `@last/1` of the sidecar
 - [x] do not claim push is set up
 - [x] expected route: references/request-routing.md#Routes includes Automation / Push
@@ -701,7 +742,7 @@ Prompt: `Backtest a weekly NVDA momentum strategy and show drawdowns.`
 
 ## scenarios.skillhub
 
-1/1 cases, 10/10 checks
+2/2 cases, 22/22 checks
 
 ### PASS scenario.skillhub-method
 
@@ -714,6 +755,25 @@ Prompt: `/use-skill:alva/thesis NVDA AI capex read-through`
 - [x] api/release.md
 - [x] If the user's message contains `/use-skill:<username>/<name>`, the Skillhub path is mandatory
 - [x] alva skillhub get
+- [x] alva skillhub file
+- [x] Do not bulk-download
+- [x] Do not turn every Skillhub task into a playbook
+- [x] --skill-id <username>/<name>
+- [x] expected route: references/request-routing.md#Routes includes Playbook Creation
+
+### PASS scenario.skillhub-referenced-method
+
+A user skill reference searches Skillhub for relevant catalog matches, resolves one obvious id, and then fetches the blueprint fresh.
+
+Prompt: `Use the thesis skill for NVDA AI capex read-through.`
+
+- [x] request-routing.md
+- [x] playbook-creation.md
+- [x] api/release.md
+- [x] references a skill without an exact id
+- [x] alva skillhub list
+- [x] search for relevant catalog matches
+- [x] Proceed only when exactly one match is obvious
 - [x] alva skillhub file
 - [x] Do not bulk-download
 - [x] Do not turn every Skillhub task into a playbook

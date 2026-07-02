@@ -18,7 +18,8 @@ Every feed follows the same path:
 4. Grant the feed root for public reads when a playbook or public user needs it:
    `alva fs grant --path '~/feeds/<name>' --subject "special:user:*" --permission read`.
 5. Deploy the script with `alva deploy create`.
-6. Release the feed with `alva release feed` using the cronjob id from deploy.
+6. Publish the automation with `alva automation publish` using the cronjob id
+   from deploy.
 
 `alva run` is a test step. It does not replace deploy or release and does not
 guarantee public `@last` data for a playbook.
@@ -53,13 +54,13 @@ if (!equityRecords.length) {
 }
 ```
 
-If a run fails with out-of-memory, retry with a larger `--max-heap-size-mb`
-(up to 2048) before editing logic.
+If a run fails with out-of-memory, retry with a larger `--max-heap-size-mb` (up
+to 2048) before editing logic.
 
-## HARD-GATE: before-feed-release
+## HARD-GATE: before-automation-publish
 
-<HARD-GATE id="before-feed-release">
-Before `alva release feed`, verify:
+<HARD-GATE id="before-automation-publish">
+Before `alva automation publish`, verify:
 
 1. The exact feed script ran successfully in this session after the latest
    source write.
@@ -71,7 +72,7 @@ Before `alva release feed`, verify:
 6. If the feed backs HTML, at least one public `@last` path the HTML reads has
    non-empty data after grant.
 
-If any evidence is missing or stale, do not release. Fix the feed, rerun, and
+If any evidence is missing or stale, do not publish. Fix the feed, rerun, and
 re-enter the gate.
 </HARD-GATE>
 
@@ -79,9 +80,9 @@ re-enter the gate.
 
 Push-capable feeds write one of these streams:
 
-| Output stream | Use |
-| --- | --- |
-| `signal/targets` | Playbook signals, trading targets, actionable alerts. |
+| Output stream    | Use                                                                |
+| ---------------- | ------------------------------------------------------------------ |
+| `signal/targets` | Playbook signals, trading targets, actionable alerts.              |
 | `notify/message` | Feed results, AlvaAsk reports, heartbeat checks, proactive alerts. |
 
 Both dispatch `feed_alert_ready`. Do not use legacy names such as
@@ -92,5 +93,5 @@ does not subscribe any user or group and does not bypass notification
 preferences. For `notify/message`, `<|SKIP_NOTIFICATION|>` advances fanout
 without sending a visible push.
 
-See [push-notifications.md](push-notifications.md) for the subscription and
-verification workflow.
+See [push-notifications.md](push-notifications.md) for the personal alert,
+group subscription, and verification workflow.

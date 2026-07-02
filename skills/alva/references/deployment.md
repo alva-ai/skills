@@ -5,13 +5,13 @@ downstream feed / playbook resources they produce. This is essential for feeds
 that need regular updates (e.g. hourly price data), recurring tasks, and for
 cleaning up when a deployment is retired or replaced.
 
-The three lifecycle CLI groups:
+The product-facing lifecycle CLI groups:
 
-| Group           | Manages                              | Common commands                  |
-| --------------- | ------------------------------------ | -------------------------------- |
-| `alva deploy`   | Cronjobs (schedule + entry script)   | `create`, `list`, `update`, `delete`, `runs` |
-| `alva feed`     | Released feed records + active majors | `list`, `delete`                |
-| `alva playbook` | Published playbook records           | `list`, `delete`                 |
+| Group             | Manages                                      | Common commands                              |
+| ----------------- | -------------------------------------------- | -------------------------------------------- |
+| `alva deploy`     | Cronjobs (schedule + entry script)           | `create`, `list`, `update`, `delete`, `runs` |
+| `alva automation` | Published automation records + active majors | `publish`, `list`, `delete`                  |
+| `alva playbook`   | Published playbook records                   | `list`, `delete`                             |
 
 ---
 
@@ -26,8 +26,8 @@ The deployment workflow:
 5. **Monitor** the cronjob status via `alva deploy list` / `alva deploy get`
 6. **Debug** execution history via `alva deploy runs` / `alva deploy run-logs`
 
-Cronjobs execute the script through the same jagent runtime as `alva run`.
-The script receives the same environment (`require("env").args` contains the
+Cronjobs execute the script through the same jagent runtime as `alva run`. The
+script receives the same environment (`require("env").args` contains the
 cronjob's args).
 
 ---
@@ -42,23 +42,23 @@ All cronjob operations use `alva deploy <subcommand>`.
 alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js' --cron "0 */4 * * *" --args '{"symbol": "BTC"}' --push-notify
 ```
 
-| Flag            | Type   | Required | Description                                            |
-| --------------- | ------ | -------- | ------------------------------------------------------ |
-| --path          | string | yes      | Path to entry script (home-relative or absolute)       |
-| --cron          | string | yes      | Standard cron expression                               |
-| --name          | string | yes      | Job name (1–63 lowercase alphanumeric or hyphens, no leading/trailing hyphen) |
-| --args          | JSON   | no       | JSON passed to `require("env").args` on each execution |
-| --push-notify   | flag   | no       | Let this cronjob emit feed alert events after successful feed runs |
+| Flag          | Type   | Required | Description                                                                   |
+| ------------- | ------ | -------- | ----------------------------------------------------------------------------- |
+| --path        | string | yes      | Path to entry script (home-relative or absolute)                              |
+| --cron        | string | yes      | Standard cron expression                                                      |
+| --name        | string | yes      | Job name (1–63 lowercase alphanumeric or hyphens, no leading/trailing hyphen) |
+| --args        | JSON   | no       | JSON passed to `require("env").args` on each execution                        |
+| --push-notify | flag   | no       | Let this cronjob emit feed alert events after successful feed runs            |
 
 When `--push-notify` is set, every successful cronjob execution checks the
 feed's push sidecars. `signal/targets` and `notify/message` both dispatch the
 canonical `feed_alert_ready` event with different feed-alert sources. The push
-body is read from the *released* feed: a cronjob with `--push-notify` but no
-`alva release feed` dispatches an empty body. Delivery also requires an
-explicit personal or group subscription to the feed or to a playbook that
-references the feed; `--push-notify` does not subscribe the owner, any user, or
-any group. For `notify/message`, `<|SKIP_NOTIFICATION|>` in `body`/`text`
-skips the user-visible push while advancing fanout.
+body is read from the _published_ automation: a cronjob with `--push-notify` but
+no `alva automation publish` dispatches an empty body. Delivery also requires an
+explicit personal alert or group subscription to the automation or to a playbook
+that references the feed; `--push-notify` does not subscribe the owner, any
+user, or any group. For `notify/message`, `<|SKIP_NOTIFICATION|>` in
+`body`/`text` skips the user-visible push while advancing fanout.
 
 The CLI validates that the entry path exists on the filesystem before creating
 the cronjob.
@@ -104,7 +104,8 @@ Partial update -- only include flags you want to change.
 alva deploy update --id 42 --cron "0 */2 * * *" --args '{"symbol":"ETH"}'
 ```
 
-Updatable fields: `--name`, `--cron`, `--args`, `--push-notify` / `--no-push-notify`.
+Updatable fields: `--name`, `--cron`, `--args`, `--push-notify` /
+`--no-push-notify`.
 
 ### Delete Cronjob
 
@@ -123,9 +124,9 @@ Both return the updated cronjob object.
 
 ### Trigger an Out-of-Schedule Run
 
-Fire the cronjob once, immediately. Returns the Hatchet workflow run id
-at enqueue — async; the `cronjob_runs` row appears only after the worker
-finishes the run.
+Fire the cronjob once, immediately. Returns the Hatchet workflow run id at
+enqueue — async; the `cronjob_runs` row appears only after the worker finishes
+the run.
 
 ```bash
 alva deploy trigger --id 42
@@ -143,13 +144,13 @@ done
 echo "$ROW" | jq '{id, status, error}'
 ```
 
-Use *after* deploy to confirm the full cronjob path is wired correctly.
-For iterating on script logic without Hatchet, use `alva run` instead.
+Use _after_ deploy to confirm the full cronjob path is wired correctly. For
+iterating on script logic without Hatchet, use `alva run` instead.
 
 ### Debugging Runs
 
-When a cronjob fails or produces unexpected output, use `runs` and `run-logs`
-to diagnose the problem.
+When a cronjob fails or produces unexpected output, use `runs` and `run-logs` to
+diagnose the problem.
 
 **List run history** — shows each execution's status, duration, and error
 message. The response also includes aggregate stats (total/success/fail counts).
@@ -168,45 +169,44 @@ alva deploy run-logs --id 42 --run-id 123
 
 ---
 
-## Feed / Playbook lifecycle — extras not in CLI help
+## Automation / Playbook Lifecycle — Extras Not In CLI Help
 
-Run `alva feed --help` and `alva playbook --help` for subcommands,
-flags, and response shapes. This section only covers the conceptual
-boundaries and the deletion gotcha — the help text is authoritative
-on flags.
+Run `alva automation --help` and `alva playbook --help` for subcommands, flags,
+and response shapes. This section only covers the conceptual boundaries and the
+deletion gotcha — the help text is authoritative on flags.
 
 **What each group manages.**
 
-- `alva deploy` — the **cronjob** (schedule + entry script + args). Lives
-  in the `cronjobs` table.
-- `alva feed` — the **released feed record + active majors** (the row
-  written by `alva release feed`, consumed by the push-fanout path).
+- `alva deploy` — the **cronjob** (schedule + entry script + args). Lives in the
+  `cronjobs` table.
+- `alva automation` — the **published automation record + active majors** (the
+  row written by `alva automation publish`, consumed by the push-fanout path).
   Lives in `feeds` / `feed_majors`.
-- `alva playbook` — the **published playbook** (rendered HTML +
-  display_name + visibility + ACL). Lives in `playbooks` and is
-  surfaced at `https://alva.ai/u/<username>/playbooks/<name>`.
+- `alva playbook` — the **published playbook** (rendered HTML + display_name +
+  visibility + ACL). Lives in `playbooks` and is surfaced at
+  `https://alva.ai/u/<username>/playbooks/<name>`.
 
 These three move in lockstep at create time (`alva deploy create` →
-`alva release feed` → `alva release playbook`) but each has its own
-lifecycle row. Deleting one does **not** automatically delete the
-others — see the cascade notes in each `--help`.
+`alva automation publish` → `alva release playbook`) but each has its own
+lifecycle row. Deleting one does **not** automatically delete the others — see
+the cascade notes in each `--help`.
 
-`alva release feed` also accepts `--agent-type alpi` to mark a feed whose
+`alva automation publish` also accepts `--agent-type alpi` to mark a feed whose
 alpi agent appends the owner's editable `AGENTS.md` instructions — see
 [api/release.md](api/release.md#agent-type).
 
-**Don't use `alva fs remove` to delete a feed or playbook.** It clears
-the ALFS files (the rendered HTML, the data mount), but the
-`playbooks` / `feeds` DB row stays alive. The platform still:
+**Don't use `alva fs remove` to delete a feed or playbook.** It clears the ALFS
+files (the rendered HTML, the data mount), but the `playbooks` / `feeds` DB row
+stays alive. The platform still:
 
 - counts the playbook against the free-tier 1-playbook cap
 - serves the (now empty) public URL with stale metadata
 - fires push fanout for the (now empty) feed
 
-The cap-gate symptom is "the platform still has a playbook record for
-me even after I cleaned the ALFS files". The fix is `alva playbook
-delete --name <X>` (or `alva feed delete --id <X>`), which
-soft-deletes the DB row and frees the quota / ACL immediately.
+The cap-gate symptom is "the platform still has a playbook record for me even
+after I cleaned the ALFS files". The fix is `alva playbook delete --name <X>`
+(or `alva automation delete --id <X>`), which soft-deletes the DB row and frees
+the quota / ACL immediately.
 
 ---
 
@@ -249,11 +249,11 @@ The script has full access to:
 
 ## Limits
 
-| Limit                 | Value                 |
-| --------------------- | --------------------- |
-| Min cron interval     | 1 minute              |
-| Execution timeout     | Same as `alva run`    |
-| Heap per execution    | 2 GB                  |
+| Limit              | Value              |
+| ------------------ | ------------------ |
+| Min cron interval  | 1 minute           |
+| Execution timeout  | Same as `alva run` |
+| Heap per execution | 2 GB               |
 
 ---
 
@@ -284,7 +284,11 @@ const feed = new Feed({ path: feedPath("btc-hourly") });
 
 feed.def("market", {
   ohlcv: makeDoc("BTC OHLCV", "Hourly BTC price data", [
-    num("open"), num("high"), num("low"), num("close"), num("volume"),
+    num("open"),
+    num("high"),
+    num("low"),
+    num("close"),
+    num("volume"),
   ]),
 });
 
@@ -303,12 +307,20 @@ feed.def("market", {
       interval: "1h",
     });
 
-    if (!result.success) throw new Error("Failed to fetch: " + JSON.stringify(result));
+    if (!result.success)
+      throw new Error("Failed to fetch: " + JSON.stringify(result));
 
-    const records = result.response.data.slice().reverse().map(b => ({
-      date: b.date,
-      open: b.open, high: b.high, low: b.low, close: b.close, volume: b.volume,
-    }));
+    const records = result.response.data
+      .slice()
+      .reverse()
+      .map((b) => ({
+        date: b.date,
+        open: b.open,
+        high: b.high,
+        low: b.low,
+        close: b.close,
+        volume: b.volume,
+      }));
 
     if (records.length > 0) {
       await ctx.self.ts("market", "ohlcv").append(records);
@@ -355,12 +367,12 @@ alva fs read --path '/alva/home/alice/feeds/btc-hourly/v1/data/market/ohlcv/@las
 - **Use `ctx.kv` for incremental processing**: Track the last processed
   timestamp with `ctx.kv.put()`/`ctx.kv.load()` to avoid re-fetching all
   historical data on each run.
-- **Test thoroughly before deploying**: Run the script manually via
-  `alva run` and verify the output before creating a cronjob.
+- **Test thoroughly before deploying**: Run the script manually via `alva run`
+  and verify the output before creating a cronjob.
 - **Use descriptive names**: The cronjob name helps you identify jobs when
   listing them.
 - **Pause before updating**: If you need to update the script, pause the cronjob
   first, update the script file, test it, then resume.
 - **Debug failed runs**: `alva deploy runs --id <id>` shows execution history
-  and stats; `alva deploy run-logs --id <id> --run-id <rid>` shows the full
-  log output from a specific run.
+  and stats; `alva deploy run-logs --id <id> --run-id <rid>` shows the full log
+  output from a specific run.
