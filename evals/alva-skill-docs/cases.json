@@ -118,14 +118,14 @@
       "id": "retained.feed-lifecycle",
       "group": "retained",
       "target": "corpus",
-      "description": "Feed build, grant, deploy, and release hard gate remain preserved.",
+      "description": "Feed build, grant, deploy, and automation publish hard gate remain preserved.",
       "includes": [
         "Feed SDK",
         "alva run --entry-path",
         "special:user:*",
         "alva deploy create",
-        "alva release feed",
-        "before-feed-release"
+        "alva automation publish",
+        "before-automation-publish"
       ]
     },
     {
@@ -515,7 +515,7 @@
           "id": "before-playbook-release",
           "label": "release gate",
           "includes": [
-            "Every backing feed passed `before-feed-release`",
+            "Every backing feed passed `before-automation-publish`",
             "HTML fetches quantitative data from feeds, not inline literals",
             "Latest data from each referenced feed is fresh",
             "README exists, is current, and is passed via absolute `--readme-url`",
@@ -549,10 +549,10 @@
           "label": "push setup",
           "includes": [
             "A push is set up only after all of these succeed",
-            "before-feed-release",
+            "before-automation-publish",
             "alva deploy update --id <ID> --push-notify",
-            "alva subscriptions subscribe-feed",
-            "alva subscriptions subscribe-playbook",
+            "alva alert enable --automation",
+            "alva alert enable --playbook",
             "read `@last/1` of the sidecar",
             "do not claim push is set up"
           ]
@@ -751,8 +751,8 @@
         "feedback",
         "api/feedback.md",
         "alva feedback --help",
-        "subscriptions subscribe-feed",
-        "subscriptions subscribe-playbook",
+        "alva alert enable --automation",
+        "alva alert enable --playbook",
         "publish publicly by default",
         "registered UDFs",
         "implementation internals",
