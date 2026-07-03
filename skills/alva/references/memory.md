@@ -31,6 +31,24 @@ line linking to a topic file:
 Topic files (like `user.md`) hold the actual content. They are read on demand
 when relevant to the user's request.
 
+### Channel-scoped memory
+
+`~/memory/` is your **user-global** memory — shared across every channel and
+conversation. A **channel** can also have its own memory, kept separate so
+channel-specific facts don't leak across topics.
+
+When a turn runs in a channel, the session prefill includes a
+`<session-prefill-channel-memory root="...">` block naming that channel's
+memory dir (`~/channels/<slug>/memory/`). It uses the same layout — a
+`MEMORY.md` index plus topic files.
+
+- **User-global facts** (identity, cross-channel preferences, investment
+  style) → `~/memory/`.
+- **Channel-specific facts** (this channel's topic, running thesis, decisions
+  made here) → the channel memory root from the prefill.
+- Read both at the start of a channel turn. When there is no channel-memory
+  block, there is no channel scope — use `~/memory/` only.
+
 ## user.md — Who is this user
 
 Persistent facts about the user. Update when you learn something new.
