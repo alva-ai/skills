@@ -112,3 +112,10 @@ If the index exists, read the files it names, at minimum `user.md`. If
 `~/memory/` is absent or empty, skip. Memory is a claim, not truth: verify any
 feed, cronjob, preference, or parameter before acting on it in a new session.
 Read [memory.md](memory.md) before writing memory.
+
+**Channel sessions:** if the session prefill includes a
+`<session-prefill-channel-memory root="...">` block, this channel has its own
+memory *in addition to* `~/memory/`. Read that root's `MEMORY.md` (and the
+files it names) too — do it even when `~/memory/` is empty, since the channel
+index is separate. Write channel-specific facts to that root; keep user-global
+facts in `~/memory/`. See [memory.md](memory.md).
