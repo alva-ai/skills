@@ -247,8 +247,9 @@ does not require a 500-character summary.
   or group.
 - Real delivery requires an explicit alert/subscription: personal
   `alva alert enable --automation <owner>/<feed>` /
-  `--playbook <owner>/<playbook>`, group `/alva subscribe feed <id>` /
-  `/alva subscribe playbook <id>`, or — from inside a playbook iframe — a
+  `--playbook <owner>/<playbook>`, group
+  `alva channel group-subscriptions subscribe ...`, or — from inside a playbook
+  iframe — a
   parent-confirmed `window.alva.subscribe.propose()` (see
   `references/api/udf-runtime.md` § Feed Subscribe Proposal). A playbook must
   never call a subscribe API directly.
@@ -346,7 +347,7 @@ alva automation publish --name daily-briefing --version 1.0.0 \
 - Real delivery requires an explicit alert/subscription: personal
   `alva alert enable --automation <owner>/<feed>` or
   `alva alert enable --playbook <owner>/<playbook>`, or group
-  `/alva subscribe feed <feed_id>` / `/alva subscribe playbook <playbook_id>`.
+  `alva channel group-subscriptions subscribe ...`.
   For inventory and unsubscribe (including ghost rows of deleted targets), see
   [push-notifications.md](push-notifications.md) § Inventory And Unsubscribe.
 - Combine with Pattern D if you want both feed completion notifications and

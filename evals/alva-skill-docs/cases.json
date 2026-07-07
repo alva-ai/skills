@@ -553,8 +553,22 @@
             "alva deploy update --id <ID> --push-notify",
             "alva alert enable --automation",
             "alva alert enable --playbook",
+            "alva channel group-subscriptions subscribe",
             "read `@last/1` of the sidecar",
+            "alva alert history",
             "do not claim push is set up"
+          ]
+        },
+        {
+          "file": "references/push-notifications.md",
+          "heading": "Inventory And Unsubscribe",
+          "label": "alert inventory",
+          "includes": [
+            "personal alert opt-ins",
+            "lists playbook follows, not the alert inventory",
+            "`--feed-ids` is only a legacy alias for `--automation-ids`",
+            "alva channel group-subscriptions context",
+            "alva alert preferences"
           ]
         }
       ]

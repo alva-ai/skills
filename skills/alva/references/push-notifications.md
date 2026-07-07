@@ -38,10 +38,14 @@ A push is set up only after all of these succeed:
    `alva deploy update --id <ID> --push-notify`.
 4. Enable the personal alert: `alva alert enable --automation <owner>/<feed>` or
    `alva alert enable --playbook <owner>/<playbook>`. For groups, use
-   `/alva subscribe feed <id>` or `/alva subscribe playbook <id>` in the group.
+   `alva channel group-subscriptions subscribe --session-id <id> --target-type feed --target-id <feed_id>`
+   or the same command with `--target-type playbook --target-id <playbook_id>`.
 5. Trigger or wait for a real run, read `@last/1` of the sidecar, and confirm
    the record is fresh and the message is non-empty or contains
    `<|SKIP_NOTIFICATION|>` for a quiet run.
+6. Check delivery history with `alva alert history --automation <owner>/<feed>`
+   or `alva alert history --playbook <owner>/<playbook>`; filter with
+   `--channel`, `--status`, or `--since` when diagnosing a missing push.
 
 If the automation is unpublished, the feed has no sidecar record, or the record
 has an empty body, do not claim push is set up. Diagnose and fix first.
@@ -52,15 +56,26 @@ skip notifications.
 
 ## Inventory And Unsubscribe
 
-- `alva alert list --first 200` — rows carry `kind`, playbook identity,
-  `following`, `target_status`. If `items` < `total_count`, keep paginating;
-  never report a truncated page as the full inventory.
-- `alva subscriptions follows` — the follow list.
-- Disable by name (`alva alert disable --playbook owner/name` or
-  `--automation owner/name`) for live targets; by id
-  (`alva alert disable --playbook-ids a,b --automation-ids c`) for bulk and for
-  `TARGET_DELETED` ghosts (name-addressed 404s on deleted targets).
+- `alva alert list --first 200` lists personal alert opt-ins. Rows carry
+  `kind`, `target`, `target_status`, feed or playbook identity, and pagination
+  fields. If `items` < `total_count`, keep paginating; never report a truncated
+  page as the full inventory. Use `--json` when ids or raw statuses matter.
+- `alva subscriptions follows` lists playbook follows, not the alert inventory.
+  Use it only when the user asks what they follow.
+- Disable live personal alerts by name: `alva alert disable --automation owner/name`
+  or `alva alert disable --playbook owner/name`.
+- Disable in bulk or clear `TARGET_DELETED` ghosts by target id:
+  `alva alert disable --automation-ids c --playbook-ids a,b`.
+  `--feed-ids` is only a legacy alias for `--automation-ids`; prefer
+  `--automation-ids` in new docs and examples.
 - Resolve ids with `alva playbooks get --ids a,b` / `--ref owner/name`; list a
   user's playbooks with `alva playbooks list --owner <username>`.
+- Group subscriptions are separate from personal alerts. Inspect them with
+  `alva channel group-subscriptions context --session-id <id>` and
+  `alva channel group-subscriptions list --session-id <id>`; remove one with
+  `alva channel group-subscriptions unsubscribe --session-id <id> --target-type feed --target-id <feed_id>`
+  or the playbook variant.
+- Use `alva alert preferences`, `alva alert enable-session-completed`, and
+  `alva alert disable-session-completed` only for global alert preferences.
 - Never probe with mutating calls — the read surface answers all identity
   questions.
