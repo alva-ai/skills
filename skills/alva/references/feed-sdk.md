@@ -782,10 +782,13 @@ records if some timestamps have multiple items.
 
 ## Making Feeds Public
 
-Grant public read access so anyone can read the data:
+Grant public read access so anyone can read the data. **Grant the
+non-versioned feed base** (`~/feeds/<name>`, not `~/feeds/<name>/v1`) — ALFS
+inherits parent → child, so the base grant covers every version and its
+`data/`:
 
 ```bash
-alva fs grant --path '~/feeds/btc-ema/v1' --subject "special:user:*" --permission read
+alva fs grant --path '~/feeds/btc-ema' --subject "special:user:*" --permission read
 ```
 
 Public reads must use absolute paths:
@@ -849,7 +852,8 @@ alva run --entry-path '~/feeds/btc-ema/v1/src/index.js'
 ### Step 3: Make it public
 
 ```bash
-alva fs grant --path '~/feeds/btc-ema/v1' --subject "special:user:*" --permission read
+# Grant the non-versioned base — inherited by all versions + data/.
+alva fs grant --path '~/feeds/btc-ema' --subject "special:user:*" --permission read
 ```
 
 ### Step 4: Read from any client
