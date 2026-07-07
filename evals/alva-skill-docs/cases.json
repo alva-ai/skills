@@ -556,6 +556,16 @@
             "read `@last/1` of the sidecar",
             "do not claim push is set up"
           ]
+        },
+        {
+          "file": "references/push-notifications.md",
+          "heading": "Inventory And Unsubscribe",
+          "label": "push inventory",
+          "includes": [
+            "alva alert list --first 200",
+            "alva alert follows --limit 100",
+            "has_next"
+          ]
         }
       ]
     },

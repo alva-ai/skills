@@ -682,7 +682,7 @@ text does not fully cover.
 | `playbooks`          | Trending discovery and `set-visibility`.                                                                                                                                              |
 | `comments`           | Playbook comments and pinned creator notes. See [creators-note.md](references/creators-note.md).                                                                                      |
 | `alert`              | Personal automation/playbook alert opt-ins and history. See [push-notifications.md](references/push-notifications.md).                                                                |
-| `subscriptions`      | Legacy alert/follow surface. Prefer `alert`; use only for follows. See [push-notifications.md](references/push-notifications.md).                                                     |
+| `subscriptions`      | Legacy alert/follow compatibility surface. Prefer `alert`, including for follows. See [push-notifications.md](references/push-notifications.md).                                     |
 | `channel`            | Group push subscriptions. See [push-notifications.md](references/push-notifications.md).                                                                                              |
 | `trading`            | Accounts, portfolio, orders, subscriptions, execution. Must read [api/trading.md](references/api/trading.md).                                                                         |
 | `broker`             | Agentic order execution — place/cancel/read across venues (crypto + US equities). Run `alva broker describe` for live commands/capabilities; must read [api/broker.md](references/api/broker.md).                     |
