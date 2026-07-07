@@ -6,12 +6,22 @@ per-venue capability matrix (`venues[]`). This file covers only the judgment
 quirks. `describe` is always authoritative for *what commands/venues exist*;
 this file is *how to use them safely*.
 
+## Start here: `alva broker accounts`
+
+Run `alva broker accounts` first — it lists the caller's connected accounts
+(`id`, `venue`, `paper`, `readOnly`, `name`). Every per-account command needs an
+`--account <id>` from here; this is where you discover them.
+
 ## Mental model
 
-Venue-native in, one neutral envelope out. **Reads** (`balance`, `positions`,
-`order get/list`, `quote`, `ohlcv`, `funding-rate`) return the venue's raw JSON
-unchanged. **Writes** (`order place`, `order cancel`) return a minimal spine:
-`status`, `reason`, `filled`, `price`, ids, `ts` (full venue payload in `raw`).
+Venue-native in, one neutral envelope out. Three command families:
+
+- **Account-domain reads** (trex's own data, no `--venue`): `accounts` (and,
+  as they land, portfolio / equity-history / risk-rules).
+- **Venue reads** (venue-native raw JSON, need `--venue`): `balance`,
+  `positions`, `order get/list`, `quote`, `ohlcv`, `funding-rate`, `raw`.
+- **Writes** (`order place`, `order cancel`) → a minimal neutral spine:
+  `status`, `reason`, `filled`, `price`, ids, `ts` (full venue payload in `raw`).
 
 ## The three-way result — the rule that prevents double orders
 
