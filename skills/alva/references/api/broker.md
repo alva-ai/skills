@@ -17,7 +17,10 @@ Run `alva broker accounts` first — it lists the caller's connected accounts
 Venue-native in, one neutral envelope out. Three command families:
 
 - **Account-domain reads** (trex's own data, no `--venue`): `accounts`,
-  `risk-rules` (read-only — see below). Portfolio / equity-history land later.
+  `risk-rules` (read-only — see below). There is no `portfolio` or
+  `equity-history` command: holdings are `balance` + `positions` (venue-native)
+  and order history is `order list` (venue-native) — reads are venue-native by
+  design, not trex-normalized aggregates.
 - **Venue reads** (venue-native raw JSON, need `--venue`): `balance`,
   `positions`, `order get/list`, `quote`, `ohlcv`, `funding-rate`, `raw`.
 - **Writes** (`order place`, `order cancel`) → a minimal neutral spine:
