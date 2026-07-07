@@ -390,11 +390,13 @@ reusable dataset, or future answer.
 
 Read [feed-lifecycle.md](references/feed-lifecycle.md) and
 [feed-sdk.md](references/feed-sdk.md) when creating or changing a feed. The
-short lifecycle is: write schema and logic to ALFS, `alva run`, grant public
-read if needed, deploy, then `alva automation publish`.
+short lifecycle is: write schema and logic to ALFS, `alva run`, publish for
+public reads if needed with `alva feed set-access --id <feed_id> --access public`
+(not a raw `special:user:*` grant), deploy, then `alva automation publish`.
 
 Before automation publish, satisfy `before-automation-publish`: fresh run,
-expected shape, needed grants, public read verification, and non-empty data for
+expected shape, public access set via `alva feed set-access`, public read
+verification, and non-empty data for
 HTML dependencies. Feed scripts fail fast on missing data; the detailed publish
 and grant contract lives in the feed references. Read the matching
 [operational-pitfalls.md](references/operational-pitfalls.md) section before

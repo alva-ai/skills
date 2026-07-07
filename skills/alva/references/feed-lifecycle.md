@@ -15,8 +15,11 @@ Every feed follows the same path:
    `ctx.self.ts().append()`.
 2. Upload source to `'~/feeds/<name>/v1/src/index.js'`.
 3. Test with `alva run --entry-path '~/feeds/<name>/v1/src/index.js'`.
-4. Grant the feed root for public reads when a playbook or public user needs it:
-   `alva fs grant --path '~/feeds/<name>' --subject "special:user:*" --permission read`.
+4. Make the feed public when a playbook or public user needs it:
+   `alva feed set-access --id <feed_id> --access public` (get `<feed_id>` from
+   `alva feed list`). This writes the feed's `is_public` intent and the ALFS
+   read grant together. Do **not** grant `special:user:*` on the feed directory
+   by hand — that drifts from `is_public` and can be reverted by reconciliation.
 5. Deploy the script with `alva deploy create`.
 6. Publish the automation with `alva automation publish` using the cronjob id
    from deploy.
@@ -66,8 +69,9 @@ Before `alva automation publish`, verify:
    source write.
 2. Output groups and fields match the feed contract.
 3. Evidence is fresh; if source changed after the run, rerun.
-4. `special:user:*` read permission exists on the feed root when public reads
-   are needed.
+4. The feed is public via `alva feed set-access --id <feed_id> --access public`
+   when public reads are needed (this sets `is_public` and the ALFS read grant
+   together; do not grant `special:user:*` by hand).
 5. An unauthenticated public read returns HTTP 200, not 403.
 6. If the feed backs HTML, at least one public `@last` path the HTML reads has
    non-empty data after grant.

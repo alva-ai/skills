@@ -339,8 +339,9 @@ alva run --entry-path '~/feeds/btc-hourly/v1/src/index.js'
 ### 3. Make the output public
 
 ```bash
-# Grant the non-versioned base: inherited by all versions + data/.
-alva fs grant --path '~/feeds/btc-hourly' --subject "special:user:*" --permission read
+# set-access writes is_public + the ALFS read grant together (single source of
+# truth). Get the id from `alva feed list`; do not grant special:user:* by hand.
+alva feed set-access --id <feed_id> --access public
 ```
 
 ### 4. Deploy as a cronjob

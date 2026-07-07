@@ -199,8 +199,10 @@ request). Do not write fresh files from scratch.
    agent tool mode; shell-only fallback:
    `alva fs write --path '~/feeds/{new-name}/v1/src/index.js' --file ./{feed_name}.js --mkdir-parents`
 2. **Test** via `alva run --entry-path '~/feeds/{new-name}/v1/src/index.js'`
-3. **Grant** public read:
-   `alva fs grant --path '~/feeds/{new-name}' --subject "special:user:*" --permission read`
+3. **Publish** (make public):
+   `alva feed set-access --id <feed_id> --access public` (get `<feed_id>` from
+   `alva feed list`). This sets `is_public` and the ALFS read grant together —
+   do not grant `special:user:*` on the feed directory by hand.
 4. **Deploy cronjob**:
    `alva deploy create --name {new-name} --path '~/feeds/{new-name}/v1/src/index.js' --cron "..."`
 5. **Publish automation**:

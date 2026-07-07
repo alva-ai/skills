@@ -782,14 +782,25 @@ records if some timestamps have multiple items.
 
 ## Making Feeds Public
 
-Grant public read access so anyone can read the data. **Grant the
-non-versioned feed base** (`~/feeds/<name>`, not `~/feeds/<name>/v1`) — ALFS
-inherits parent → child, so the base grant covers every version and its
-`data/`:
+Publish a feed with `alva feed set-access` — never by writing the ALFS grant
+by hand:
 
 ```bash
-alva fs grant --path '~/feeds/btc-ema' --subject "special:user:*" --permission read
+alva feed set-access --id <feed_id> --access public    # publish
+alva feed set-access --id <feed_id> --access private   # unpublish
 ```
+
+`set-access` takes the feed's **numeric id** (from `alva feed list`), not a
+path. It writes the feed's `is_public` intent (the DB source of truth) **and**
+the ALFS `special:user:*` read grant on the feed directory together, so the two
+never drift. The grant covers every version and its `data/` via ALFS parent →
+child inheritance.
+
+Do **not** grant `special:user:*` on the feed directory directly (e.g. `alva fs
+grant --path '~/feeds/<name>' --subject "special:user:*" --permission read`).
+That sets the ALFS grant without `is_public`, producing drift the reconciler
+cannot heal for standalone feeds, and a referencing playbook can silently revert
+it on its next reconcile.
 
 Public reads must use absolute paths:
 `/alva/home/<username>/feeds/btc-ema/v1/data/...`
@@ -852,8 +863,10 @@ alva run --entry-path '~/feeds/btc-ema/v1/src/index.js'
 ### Step 3: Make it public
 
 ```bash
-# Grant the non-versioned base — inherited by all versions + data/.
-alva fs grant --path '~/feeds/btc-ema' --subject "special:user:*" --permission read
+# Look up the feed's numeric id, then publish. set-access writes is_public +
+# the ALFS read grant together — do not grant special:user:* by hand.
+alva feed list
+alva feed set-access --id <feed_id> --access public
 ```
 
 ### Step 4: Read from any client
