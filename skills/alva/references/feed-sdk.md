@@ -791,10 +791,12 @@ alva feed set-access --id <feed_id> --access private   # unpublish
 ```
 
 `set-access` takes the feed's **numeric id** (from `alva feed list`), not a
-path. It writes the feed's `is_public` intent (the DB source of truth) **and**
-the ALFS `special:user:*` read grant on the feed directory together, so the two
-never drift. The grant covers every version and its `data/` via ALFS parent →
-child inheritance.
+path. The id only exists once `alva automation publish` has written the feed's
+`feeds` row, so publish the automation before calling `set-access`. It writes
+the feed's `is_public` intent (the DB source of truth) **and** the ALFS
+`special:user:*` read grant on the feed directory together, so the two never
+drift. The grant covers every version and its `data/` via ALFS parent → child
+inheritance.
 
 Do **not** grant `special:user:*` on the feed directory directly (e.g. `alva fs
 grant --path '~/feeds/<name>' --subject "special:user:*" --permission read`).
@@ -860,25 +862,32 @@ feed.def("metrics", {
 alva run --entry-path '~/feeds/btc-ema/v1/src/index.js'
 ```
 
-### Step 3: Make it public
+### Step 3: Deploy as a cronjob (required for live playbooks)
 
 ```bash
-# Look up the feed's numeric id, then publish. set-access writes is_public +
-# the ALFS read grant together — do not grant special:user:* by hand.
+alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js' --cron "0 */4 * * *"
+```
+
+### Step 4: Publish the automation
+
+```bash
+# Writes the `feeds` row — the feed only gets a numeric id after this step.
+alva automation publish --name btc-ema --version 1.0.0 --cronjob-id <id> --description "BTC close + EMA10"
+```
+
+### Step 5: Make it public
+
+```bash
+# Now the feed has an id. set-access writes is_public + the ALFS read grant
+# together — do not grant special:user:* by hand.
 alva feed list
 alva feed set-access --id <feed_id> --access public
 ```
 
-### Step 4: Read from any client
+### Step 6: Read from any client
 
 ```bash
 alva fs read --path '/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100'
-```
-
-### Step 5: Deploy as a cronjob (required for live playbooks)
-
-```bash
-alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js' --cron "0 */4 * * *"
 ```
 
 ---

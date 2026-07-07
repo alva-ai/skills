@@ -336,27 +336,35 @@ feed.def("market", {
 alva run --entry-path '~/feeds/btc-hourly/v1/src/index.js'
 ```
 
-### 3. Make the output public
-
-```bash
-# set-access writes is_public + the ALFS read grant together (single source of
-# truth). Get the id from `alva feed list`; do not grant special:user:* by hand.
-alva feed set-access --id <feed_id> --access public
-```
-
-### 4. Deploy as a cronjob
+### 3. Deploy as a cronjob
 
 ```bash
 alva deploy create --name btc-hourly-price-feed --path '~/feeds/btc-hourly/v1/src/index.js' --cron "0 */4 * * *"
 ```
 
-### 5. Verify the cronjob
+### 4. Publish the automation
+
+```bash
+# Writes the `feeds` row (feeds / feed_majors) — the feed only gets a numeric
+# id after this step.
+alva automation publish --name btc-hourly --version 1.0.0 --cronjob-id <id> --description "BTC hourly OHLCV"
+```
+
+### 5. Make the output public
+
+```bash
+# Now the feed has an id. set-access writes is_public + the ALFS read grant
+# together (single source of truth); do not grant special:user:* by hand.
+alva feed set-access --id <feed_id> --access public
+```
+
+### 6. Verify the cronjob
 
 ```bash
 alva deploy list
 ```
 
-### 6. Read the data (from anywhere)
+### 7. Read the data (from anywhere)
 
 ```bash
 alva fs read --path '/alva/home/alice/feeds/btc-hourly/v1/data/market/ohlcv/@last/24'

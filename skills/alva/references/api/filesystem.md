@@ -70,7 +70,8 @@ the ALFS grant by hand:
 
 ```bash
 # Publish: writes is_public (DB source of truth) + the ALFS read grant together.
-alva feed set-access --id <feed_id> --access public   # id from `alva feed list`
+# The id (from `alva feed list`) only exists after `alva automation publish`.
+alva feed set-access --id <feed_id> --access public
 ```
 
 Granting `special:user:*` on the feed directory directly bypasses `is_public`,

@@ -199,14 +199,15 @@ request). Do not write fresh files from scratch.
    agent tool mode; shell-only fallback:
    `alva fs write --path '~/feeds/{new-name}/v1/src/index.js' --file ./{feed_name}.js --mkdir-parents`
 2. **Test** via `alva run --entry-path '~/feeds/{new-name}/v1/src/index.js'`
-3. **Publish** (make public):
+3. **Deploy cronjob**:
+   `alva deploy create --name {new-name} --path '~/feeds/{new-name}/v1/src/index.js' --cron "..."`
+4. **Publish automation**:
+   `alva automation publish --name {new-name} --version 1.0.0 --cronjob-id ID --description "..."`
+   — this writes the `feeds` row, so the feed now has a numeric id.
+5. **Make public** (only after step 4 — the id does not exist before publish):
    `alva feed set-access --id <feed_id> --access public` (get `<feed_id>` from
    `alva feed list`). This sets `is_public` and the ALFS read grant together —
    do not grant `special:user:*` on the feed directory by hand.
-4. **Deploy cronjob**:
-   `alva deploy create --name {new-name} --path '~/feeds/{new-name}/v1/src/index.js' --cron "..."`
-5. **Publish automation**:
-   `alva automation publish --name {new-name} --version 1.0.0 --cronjob-id ID --description "..."`
 6. **Write the edited HTML** to ALFS after updating data paths to point to your
    own feed. Use the ALFS write/edit tool in agent tool mode; shell-only
    fallback:
