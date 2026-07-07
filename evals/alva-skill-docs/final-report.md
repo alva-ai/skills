@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/automation-alert-surface/skills/alva`
+Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/alert-follows-docs/skills/alva`
 
 SKILL.md lines: 791
 
 Cases: 50/50
 
-Checks: 455/455 (100.00%)
+Checks: 458/458 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -325,7 +325,7 @@ KOL data and the KOL digest SDK are routed together as Alva-maintained Platform 
 
 ## issue592
 
-5/5 cases, 65/65 checks
+5/5 cases, 68/68 checks
 
 ### PASS issue592.scoped-eval-checks
 
@@ -416,6 +416,9 @@ Push setup is evaluated as a full delivery path instead of a single publisher fl
 - [x] push setup: references/push-notifications.md#Configure And Verify includes alva alert enable --playbook
 - [x] push setup: references/push-notifications.md#Configure And Verify includes read `@last/1` of the sidecar
 - [x] push setup: references/push-notifications.md#Configure And Verify includes do not claim push is set up
+- [x] push inventory: references/push-notifications.md#Inventory And Unsubscribe includes alva alert list --first 200
+- [x] push inventory: references/push-notifications.md#Inventory And Unsubscribe includes alva alert follows --limit 100
+- [x] push inventory: references/push-notifications.md#Inventory And Unsubscribe includes has_next
 
 ## target
 

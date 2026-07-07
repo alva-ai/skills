@@ -55,7 +55,8 @@ skip notifications.
 - `alva alert list --first 200` — rows carry `kind`, playbook identity,
   `following`, `target_status`. If `items` < `total_count`, keep paginating;
   never report a truncated page as the full inventory.
-- `alva subscriptions follows` — the follow list.
+- `alva alert follows --limit 100` — the playbook follow list. Keep paginating
+  with `--cursor` when `has_next` is true.
 - Disable by name (`alva alert disable --playbook owner/name` or
   `--automation owner/name`) for live targets; by id
   (`alva alert disable --playbook-ids a,b --automation-ids c`) for bulk and for
