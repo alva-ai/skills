@@ -33,21 +33,15 @@ when relevant to the user's request.
 
 ### Channel-scoped memory
 
-`~/memory/` is your **user-global** memory — shared across every channel and
-conversation. A **channel** can also have its own memory, kept separate so
-channel-specific facts don't leak across topics.
+`~/memory/` is **user-global** (shared across all channels). A **channel** can
+also have its own memory at `~/channels/<slug>/memory/`, named in the session
+prefill as a `<session-prefill-channel-memory root="...">` block. Same layout —
+a `MEMORY.md` index plus topic files.
 
-When a turn runs in a channel, the session prefill includes a
-`<session-prefill-channel-memory root="...">` block naming that channel's
-memory dir (`~/channels/<slug>/memory/`). It uses the same layout — a
-`MEMORY.md` index plus topic files.
-
-- **User-global facts** (identity, cross-channel preferences, investment
-  style) → `~/memory/`.
-- **Channel-specific facts** (this channel's topic, running thesis, decisions
-  made here) → the channel memory root from the prefill.
-- Read both at the start of a channel turn. When there is no channel-memory
-  block, there is no channel scope — use `~/memory/` only.
+- User-global facts (identity, cross-channel preferences) → `~/memory/`.
+- Channel-specific facts (this channel's topic, decisions) → the prefill root.
+- Read both at the start of a channel turn. No prefill block → no channel
+  scope; use `~/memory/` only.
 
 ## user.md — Who is this user
 

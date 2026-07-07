@@ -113,9 +113,8 @@ If the index exists, read the files it names, at minimum `user.md`. If
 feed, cronjob, preference, or parameter before acting on it in a new session.
 Read [memory.md](memory.md) before writing memory.
 
-**Channel sessions:** if the session prefill includes a
-`<session-prefill-channel-memory root="...">` block, this channel has its own
-memory *in addition to* `~/memory/`. Read that root's `MEMORY.md` (and the
-files it names) too — do it even when `~/memory/` is empty, since the channel
-index is separate. Write channel-specific facts to that root; keep user-global
-facts in `~/memory/`. See [memory.md](memory.md).
+**Channel sessions:** if the prefill includes a
+`<session-prefill-channel-memory root="...">` block, the channel has its own
+memory alongside `~/memory/`. Read that root's `MEMORY.md` too (even when
+`~/memory/` is empty — the index is separate). Write channel-specific facts
+there; keep user-global facts in `~/memory/`. See [memory.md](memory.md).
