@@ -6,12 +6,22 @@ per-venue capability matrix (`venues[]`). This file covers only the judgment
 quirks. `describe` is always authoritative for *what commands/venues exist*;
 this file is *how to use them safely*.
 
+## Start here: `alva broker accounts`
+
+Run `alva broker accounts` first — it lists the caller's connected accounts
+(`id`, `venue`, `paper`, `readOnly`, `name`). Every per-account command needs an
+`--account <id>` from here; this is where you discover them.
+
 ## Mental model
 
-Venue-native in, one neutral envelope out. **Reads** (`balance`, `positions`,
-`order get/list`, `quote`, `ohlcv`, `funding-rate`) return the venue's raw JSON
-unchanged. **Writes** (`order place`, `order cancel`) return a minimal spine:
-`status`, `reason`, `filled`, `price`, ids, `ts` (full venue payload in `raw`).
+Venue-native in, one neutral envelope out. Three command families:
+
+- **Account-domain reads** (trex's own data, no `--venue`): `accounts`,
+  `risk-rules` (read-only — see below). Portfolio / equity-history land later.
+- **Venue reads** (venue-native raw JSON, need `--venue`): `balance`,
+  `positions`, `order get/list`, `quote`, `ohlcv`, `funding-rate`, `raw`.
+- **Writes** (`order place`, `order cancel`) → a minimal neutral spine:
+  `status`, `reason`, `filled`, `price`, ids, `ts` (full venue payload in `raw`).
 
 ## The three-way result — the rule that prevents double orders
 
@@ -41,6 +51,17 @@ an `error`.
 collar ~12%, daily budget/velocity/open-order limits) and returns
 `admitted:true` + the deterministic `clientOrderId` **without placing**.
 Confirm, then re-run without `--dry-run`.
+
+## Know your limits: `alva broker risk-rules`
+
+`alva broker risk-rules` shows the account owner's admission limits
+(`max_single_order`, `max_daily_turnover`, `max_daily_orders`; each with a value
+and `enabled`). Read them to size orders that will actually admit — a request
+over a limit is `rejected_by_policy`.
+
+**Read-only.** There is no command to raise a limit: the limit is your safety
+ceiling, and widening it is a user action in settings, never something you do to
+yourself. If a legitimate order needs a higher limit, ask the user to raise it.
 
 ## Capabilities are per-venue — read them from describe
 
