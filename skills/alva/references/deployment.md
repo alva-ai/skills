@@ -339,7 +339,8 @@ alva run --entry-path '~/feeds/btc-hourly/v1/src/index.js'
 ### 3. Make the output public
 
 ```bash
-alva fs grant --path '~/feeds/btc-hourly/v1' --subject "special:user:*" --permission read
+# Grant the non-versioned base: inherited by all versions + data/.
+alva fs grant --path '~/feeds/btc-hourly' --subject "special:user:*" --permission read
 ```
 
 ### 4. Deploy as a cronjob
