@@ -353,9 +353,9 @@ alva automation publish --name btc-hourly --version 1.0.0 --cronjob-id <id> --de
 ### 5. Make the output public
 
 ```bash
-# Now the feed has an id. set-access writes is_public + the ALFS read grant
+# Now the feed has an id. set-visibility writes is_public + the ALFS read grant
 # together (single source of truth); do not grant special:user:* by hand.
-alva feed set-access --id <feed_id> --access public
+alva feed set-visibility --id <feed_id> --visibility public
 ```
 
 ### 6. Verify the cronjob

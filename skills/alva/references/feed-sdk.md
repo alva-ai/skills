@@ -782,17 +782,17 @@ records if some timestamps have multiple items.
 
 ## Making Feeds Public
 
-Publish a feed with `alva feed set-access` — never by writing the ALFS grant
+Publish a feed with `alva feed set-visibility` — never by writing the ALFS grant
 by hand:
 
 ```bash
-alva feed set-access --id <feed_id> --access public    # publish
-alva feed set-access --id <feed_id> --access private   # unpublish
+alva feed set-visibility --id <feed_id> --visibility public    # publish
+alva feed set-visibility --id <feed_id> --visibility private   # unpublish
 ```
 
-`set-access` takes the feed's **numeric id** (from `alva feed list`), not a
+`set-visibility` takes the feed's **numeric id** (from `alva feed list`), not a
 path. The id only exists once `alva automation publish` has written the feed's
-`feeds` row, so publish the automation before calling `set-access`. It writes
+`feeds` row, so publish the automation before calling `set-visibility`. It writes
 the feed's `is_public` intent (the DB source of truth) **and** the ALFS
 `special:user:*` read grant on the feed directory together, so the two never
 drift. The grant covers every version and its `data/` via ALFS parent → child
@@ -878,10 +878,10 @@ alva automation publish --name btc-ema --version 1.0.0 --cronjob-id <id> --descr
 ### Step 5: Make it public
 
 ```bash
-# Now the feed has an id. set-access writes is_public + the ALFS read grant
+# Now the feed has an id. set-visibility writes is_public + the ALFS read grant
 # together — do not grant special:user:* by hand.
 alva feed list
-alva feed set-access --id <feed_id> --access public
+alva feed set-visibility --id <feed_id> --visibility public
 ```
 
 ### Step 6: Read from any client

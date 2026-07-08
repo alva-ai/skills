@@ -205,7 +205,7 @@ request). Do not write fresh files from scratch.
    `alva automation publish --name {new-name} --version 1.0.0 --cronjob-id ID --description "..."`
    — this writes the `feeds` row, so the feed now has a numeric id.
 5. **Make public** (only after step 4 — the id does not exist before publish):
-   `alva feed set-access --id <feed_id> --access public` (get `<feed_id>` from
+   `alva feed set-visibility --id <feed_id> --visibility public` (get `<feed_id>` from
    `alva feed list`). This sets `is_public` and the ALFS read grant together —
    do not grant `special:user:*` on the feed directory by hand.
 6. **Write the edited HTML** to ALFS after updating data paths to point to your

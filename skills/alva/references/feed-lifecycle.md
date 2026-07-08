@@ -19,7 +19,7 @@ Every feed follows the same path:
 5. Publish the automation with `alva automation publish` using the cronjob id
    from deploy. This writes the `feeds` row, so the feed now has a numeric id.
 6. Make the feed public when a playbook or public user needs it:
-   `alva feed set-access --id <feed_id> --access public` (get `<feed_id>` from
+   `alva feed set-visibility --id <feed_id> --visibility public` (get `<feed_id>` from
    `alva feed list` — it only appears after step 5). This writes the feed's
    `is_public` intent and the ALFS read grant together. Do **not** grant
    `special:user:*` on the feed directory by hand — that drifts from
@@ -77,13 +77,13 @@ re-enter the gate.
 Publishing writes the `feeds` row and gives the feed its numeric id.
 **Immediately after publish**, when public reads are needed:
 
-4. Make the feed public with `alva feed set-access --id <feed_id> --access public`
+4. Make the feed public with `alva feed set-visibility --id <feed_id> --visibility public`
    (id from `alva feed list`, which exists only after publish; this sets
    `is_public` and the ALFS read grant together — do not grant `special:user:*`
    by hand).
 5. Confirm an unauthenticated public read returns HTTP 200, not 403.
 6. If the feed backs HTML, confirm at least one public `@last` path the HTML
-   reads has non-empty data after `set-access`.
+   reads has non-empty data after `set-visibility`.
 </HARD-GATE>
 
 ## Push Sidecars

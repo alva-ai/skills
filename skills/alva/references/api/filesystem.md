@@ -65,13 +65,13 @@ under a group/output.
 
 ## Making a feed public
 
-To publish a feed for public reads, use `alva feed set-access` — do not write
+To publish a feed for public reads, use `alva feed set-visibility` — do not write
 the ALFS grant by hand:
 
 ```bash
 # Publish: writes is_public (DB source of truth) + the ALFS read grant together.
 # The id (from `alva feed list`) only exists after `alva automation publish`.
-alva feed set-access --id <feed_id> --access public
+alva feed set-visibility --id <feed_id> --visibility public
 ```
 
 Granting `special:user:*` on the feed directory directly bypasses `is_public`,
@@ -79,7 +79,7 @@ drifts from the DB intent, and can be reverted by reconciliation — do not do i
 
 Separately, you **cannot** grant permissions directly on a Feed synth `data/`
 path — it returns `PERMISSION_DENIED`. Grants belong on the feed directory (as
-`set-access` does); ALFS inherits them to every child path including the synth
+`set-visibility` does); ALFS inherits them to every child path including the synth
 data mount.
 
 ## Clearing feed data (development only)
