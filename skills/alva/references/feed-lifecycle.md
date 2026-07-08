@@ -15,11 +15,15 @@ Every feed follows the same path:
    `ctx.self.ts().append()`.
 2. Upload source to `'~/feeds/<name>/v1/src/index.js'`.
 3. Test with `alva run --entry-path '~/feeds/<name>/v1/src/index.js'`.
-4. Grant the feed root for public reads when a playbook or public user needs it:
-   `alva fs grant --path '~/feeds/<name>' --subject "special:user:*" --permission read`.
-5. Deploy the script with `alva deploy create`.
-6. Publish the automation with `alva automation publish` using the cronjob id
-   from deploy.
+4. Deploy the script with `alva deploy create`.
+5. Publish the automation with `alva automation publish` using the cronjob id
+   from deploy. This writes the `feeds` row, so the feed now has a numeric id.
+6. Make the feed public when a playbook or public user needs it:
+   `alva feed set-visibility --id <feed_id> --visibility public` (get `<feed_id>` from
+   `alva feed list` — it only appears after step 5). This writes the feed's
+   `is_public` intent and the ALFS read grant together. Do **not** grant
+   `special:user:*` on the feed directory by hand — that drifts from
+   `is_public` and can be reverted by reconciliation.
 
 `alva run` is a test step. It does not replace deploy or release and does not
 guarantee public `@last` data for a playbook.
@@ -66,14 +70,20 @@ Before `alva automation publish`, verify:
    source write.
 2. Output groups and fields match the feed contract.
 3. Evidence is fresh; if source changed after the run, rerun.
-4. `special:user:*` read permission exists on the feed root when public reads
-   are needed.
-5. An unauthenticated public read returns HTTP 200, not 403.
-6. If the feed backs HTML, at least one public `@last` path the HTML reads has
-   non-empty data after grant.
 
 If any evidence is missing or stale, do not publish. Fix the feed, rerun, and
 re-enter the gate.
+
+Publishing writes the `feeds` row and gives the feed its numeric id.
+**Immediately after publish**, when public reads are needed:
+
+4. Make the feed public with `alva feed set-visibility --id <feed_id> --visibility public`
+   (id from `alva feed list`, which exists only after publish; this sets
+   `is_public` and the ALFS read grant together — do not grant `special:user:*`
+   by hand).
+5. Confirm an unauthenticated public read returns HTTP 200, not 403.
+6. If the feed backs HTML, confirm at least one public `@last` path the HTML
+   reads has non-empty data after `set-visibility`.
 </HARD-GATE>
 
 ## Push Sidecars

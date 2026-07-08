@@ -782,14 +782,27 @@ records if some timestamps have multiple items.
 
 ## Making Feeds Public
 
-Grant public read access so anyone can read the data. **Grant the
-non-versioned feed base** (`~/feeds/<name>`, not `~/feeds/<name>/v1`) — ALFS
-inherits parent → child, so the base grant covers every version and its
-`data/`:
+Publish a feed with `alva feed set-visibility` — never by writing the ALFS grant
+by hand:
 
 ```bash
-alva fs grant --path '~/feeds/btc-ema' --subject "special:user:*" --permission read
+alva feed set-visibility --id <feed_id> --visibility public    # publish
+alva feed set-visibility --id <feed_id> --visibility private   # unpublish
 ```
+
+`set-visibility` takes the feed's **numeric id** (from `alva feed list`), not a
+path. The id only exists once `alva automation publish` has written the feed's
+`feeds` row, so publish the automation before calling `set-visibility`. It writes
+the feed's `is_public` intent (the DB source of truth) **and** the ALFS
+`special:user:*` read grant on the feed directory together, so the two never
+drift. The grant covers every version and its `data/` via ALFS parent → child
+inheritance.
+
+Do **not** grant `special:user:*` on the feed directory directly (e.g. `alva fs
+grant --path '~/feeds/<name>' --subject "special:user:*" --permission read`).
+That sets the ALFS grant without `is_public`, producing drift the reconciler
+cannot heal for standalone feeds, and a referencing playbook can silently revert
+it on its next reconcile.
 
 Public reads must use absolute paths:
 `/alva/home/<username>/feeds/btc-ema/v1/data/...`
@@ -849,23 +862,32 @@ feed.def("metrics", {
 alva run --entry-path '~/feeds/btc-ema/v1/src/index.js'
 ```
 
-### Step 3: Make it public
-
-```bash
-# Grant the non-versioned base — inherited by all versions + data/.
-alva fs grant --path '~/feeds/btc-ema' --subject "special:user:*" --permission read
-```
-
-### Step 4: Read from any client
-
-```bash
-alva fs read --path '/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100'
-```
-
-### Step 5: Deploy as a cronjob (required for live playbooks)
+### Step 3: Deploy as a cronjob (required for live playbooks)
 
 ```bash
 alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js' --cron "0 */4 * * *"
+```
+
+### Step 4: Publish the automation
+
+```bash
+# Writes the `feeds` row — the feed only gets a numeric id after this step.
+alva automation publish --name btc-ema --version 1.0.0 --cronjob-id <id> --description "BTC close + EMA10"
+```
+
+### Step 5: Make it public
+
+```bash
+# Now the feed has an id. set-visibility writes is_public + the ALFS read grant
+# together — do not grant special:user:* by hand.
+alva feed list
+alva feed set-visibility --id <feed_id> --visibility public
+```
+
+### Step 6: Read from any client
+
+```bash
+alva fs read --path '/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100'
 ```
 
 ---
