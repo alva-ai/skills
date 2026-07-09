@@ -126,7 +126,8 @@ Both return the updated cronjob object.
 
 Fire the cronjob once, immediately. Returns the Hatchet workflow run id at
 enqueue — async; the `cronjob_runs` row appears only after the worker finishes
-the run.
+the run. A missing row during the first few minutes means the run is still
+queued or executing, not that scheduling failed.
 
 ```bash
 alva deploy trigger --id 42
@@ -143,6 +144,11 @@ while ! ROW=$(alva deploy runs --id 42 --first 5 \
 done
 echo "$ROW" | jq '{id, status, error}'
 ```
+
+If the matching row has not appeared within a short poll window, say that
+completion is still pending and keep the `workflow_run_id`; do not tell the
+user delivery or scheduling failed. Use `alva deploy runs` later to confirm the
+terminal row.
 
 Use _after_ deploy to confirm the full cronjob path is wired correctly. For
 iterating on script logic without Hatchet, use `alva run` instead.
