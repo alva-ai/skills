@@ -2,6 +2,9 @@
 
 Feeds are persistent data pipelines. Use them whenever data needs freshness,
 history, public reads, charts, playbook backing, push sidecars, or release.
+The feed is the object and identity; `alva automation` is the product-facing
+lifecycle CLI for that same feed, while an `alva deploy` cronjob is its
+subordinate data producer.
 
 For API detail and examples, read [feed-sdk.md](feed-sdk.md). For scheduled
 jobs, read [deployment.md](deployment.md). For runtime constraints, read
