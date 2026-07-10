@@ -179,14 +179,15 @@ loop-runner and packs your goal/channel into the args, so you write no script.
 alva loop create \
   --channel-id 12345 \
   --name nvda-premarket-setup \
-  --goal '[Scheduled wake: this is automated, not a new human message.]
-Persistent goal: watch NVDA pre-market for a break above the pre-market high with 5-minute volume at least 2x the prior five-bar average. If confirmed, post one alert here with price, time, and evidence. If 09:30 ET passes first, post "no signal". After either outcome, stop this loop: run alva deploy list, find nvda-premarket-setup, then run alva deploy delete --id <id>. Otherwise finish this tick without an alert.' \
+  --goal 'Watch NVDA pre-market for a break above the pre-market high with 5-minute volume at least 2x the prior five-bar average. If confirmed, post one alert here with price, time, and evidence. If 09:30 ET passes first, post "no signal". After either outcome, stop this loop: run alva deploy list, find nvda-premarket-setup, then run alva deploy delete --id <id>. Otherwise finish this tick without an alert.' \
   --cron '*/15 * * * *' \
   --expires-in 1d
 ```
 
-The goal is injected as a user turn each tick. Frame it as an automated wake,
-not a fresh human message, and include both stop conditions and the stop action.
+The relay wraps the goal in an automated user-turn wake each tick, with
+platform-owned context before it and loop policy after it. Keep `--goal`
+focused on the business objective, including concrete stop conditions and the
+stop action.
 
 | Flag           | Required | Description                                                        |
 | -------------- | -------- | ------------------------------------------------------------------ |
