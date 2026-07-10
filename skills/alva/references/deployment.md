@@ -9,7 +9,7 @@ The deploy CLI manages producer cronjobs:
 
 | Group         | Manages                                                | Common commands                                             |
 | ------------- | ------------------------------------------------------ | ----------------------------------------------------------- |
-| `alva deploy` | Cronjob producers (schedule + entry script + run logs) | `create`, `list`, `update`, `delete`, `pause`, `resume`, `trigger`, `runs`, `run-logs` |
+| `alva deploy` | Cronjob producers (schedule + entry script + run logs) | `create`, `list`, `get`, `update`, `delete`, `pause`, `resume`, `trigger`, `runs`, `run-logs` |
 
 ---
 
