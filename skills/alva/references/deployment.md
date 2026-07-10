@@ -176,8 +176,17 @@ channel's main session (via `@alva/loop`), driving that channel toward a goal.
 loop-runner and packs your goal/channel into the args, so you write no script.
 
 ```bash
-alva loop create --channel-id 12345 --goal "watch NVDA pre-market, alert on setup" --cron "0 * * * *"
+alva loop create \
+  --channel-id 12345 \
+  --name nvda-premarket-setup \
+  --goal '[Scheduled wake: this is automated, not a new human message.]
+Persistent goal: watch NVDA pre-market for a break above the pre-market high with 5-minute volume at least 2x the prior five-bar average. If confirmed, post one alert here with price, time, and evidence. If 09:30 ET passes first, post "no signal". After either outcome, stop this loop: run alva deploy list, find nvda-premarket-setup, then run alva deploy delete --id <id>. Otherwise finish this tick without an alert.' \
+  --cron '*/15 * * * *' \
+  --expires-in 1d
 ```
+
+The goal is injected as a user turn each tick. Frame it as an automated wake,
+not a fresh human message, and include both stop conditions and the stop action.
 
 | Flag           | Required | Description                                                        |
 | -------------- | -------- | ------------------------------------------------------------------ |
@@ -185,15 +194,17 @@ alva loop create --channel-id 12345 --goal "watch NVDA pre-market, alert on setu
 | --cron         | yes      | Cron expression                                                    |
 | --channel-id   | no       | Target channel. Omit ⇒ your DM / Alva Agent channel               |
 | --expires-in   | no       | Lifetime `30m`/`24h`/`7d`, or `never` (discouraged). Default `7d`  |
+| --name         | no       | Stable job name; recommended when the goal stops its own loop      |
 
 **Channel id**: read `channel-id` from the
 `<session-prefill-channel-memory channel-id="…">` block in your context — that
 is the current channel's id. There is no slug→id lookup.
 
-**Stopping a loop**: there is no `alva loop stop` — a loop is a plain cronjob, so
-`alva deploy delete --id <id>` (or `pause`) stops it; find it with
-`alva deploy list` (loops use the `~/loops/_runner/…` path). Left alone, a loop
-self-terminates at its `end_at` (default 7 days).
+**Stopping a loop**: make the goal self-terminating: give explicit success and
+expiry conditions, then tell the agent to run `alva deploy list`, match the
+loop by its `--name`, and run `alva deploy delete --id <id>`. There is no
+`alva loop stop`; `pause` also stops future ticks. Left alone, a loop terminates
+at its `end_at` (default 7 days).
 
 ---
 
