@@ -10,6 +10,7 @@ The deploy CLI manages producer cronjobs:
 | Group         | Manages                                                | Common commands                                             |
 | ------------- | ------------------------------------------------------ | ----------------------------------------------------------- |
 | `alva deploy` | Cronjob producers (schedule + entry script + run logs) | `create`, `list`, `get`, `update`, `delete`, `pause`, `resume`, `trigger`, `runs`, `run-logs` |
+| `alva loop`   | Self-scheduled in-channel goal loops (sugar over `alva deploy`) | `create` |
 
 ---
 
@@ -164,6 +165,47 @@ execution, useful for tracing errors or verifying output.
 ```bash
 alva deploy run-logs --id 42 --run-id 123
 ```
+
+---
+
+## Channel Loops
+
+A **loop** is a cronjob that each tick runs one fire-and-forget agent turn on a
+channel's main session (via `@alva/loop`), driving that channel toward a goal.
+`alva loop create` is sugar over `alva deploy create`: it seeds a shared
+loop-runner and packs your goal/channel into the args, so you write no script.
+
+```bash
+alva loop create \
+  --channel-id 12345 \
+  --name nvda-premarket-setup \
+  --goal 'Watch NVDA pre-market for a break above the pre-market high with 5-minute volume at least 2x the prior five-bar average. If confirmed, post one alert here with price, time, and evidence. If 09:30 ET passes first, post "no signal". After either outcome, stop this loop: run alva deploy list, find nvda-premarket-setup, then run alva deploy delete --id <id>. Otherwise finish this tick without an alert.' \
+  --cron '*/15 * * * *' \
+  --expires-in 1d
+```
+
+The relay wraps the goal in an automated user-turn wake each tick, with
+platform-owned context before it and loop policy after it. Keep `--goal`
+focused on the business objective, including concrete stop conditions and the
+stop action.
+
+| Flag           | Required | Description                                                        |
+| -------------- | -------- | ------------------------------------------------------------------ |
+| --goal         | yes      | Instruction run each tick                                          |
+| --cron         | yes      | Cron expression                                                    |
+| --channel-id   | no       | Target channel. Omit ⇒ your DM / Alva Agent channel               |
+| --expires-in   | no       | Lifetime `30m`/`24h`/`7d`, or `never` (discouraged). Default `7d`  |
+| --name         | no       | Stable job name; recommended when the goal stops its own loop      |
+
+**Channel id**: read `channel-id` from the
+`<session-prefill-channel-memory channel-id="…">` block in your context — that
+is the current channel's id. There is no slug→id lookup.
+
+**Stopping a loop**: make the goal self-terminating: give explicit success and
+expiry conditions, then tell the agent to run `alva deploy list`, match the
+loop by its `--name`, and run `alva deploy delete --id <id>`. There is no
+`alva loop stop`; `pause` also stops future ticks. Left alone, a loop terminates
+at its `end_at` (default 7 days).
 
 ---
 
