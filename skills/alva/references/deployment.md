@@ -10,6 +10,7 @@ The deploy CLI manages producer cronjobs:
 | Group         | Manages                                                | Common commands                                             |
 | ------------- | ------------------------------------------------------ | ----------------------------------------------------------- |
 | `alva deploy` | Cronjob producers (schedule + entry script + run logs) | `create`, `list`, `get`, `update`, `delete`, `pause`, `resume`, `trigger`, `runs`, `run-logs` |
+| `alva loop`   | Self-scheduled in-channel goal loops (sugar over `alva deploy`) | `create` |
 
 ---
 
@@ -164,6 +165,35 @@ execution, useful for tracing errors or verifying output.
 ```bash
 alva deploy run-logs --id 42 --run-id 123
 ```
+
+---
+
+## Channel Loops
+
+A **loop** is a cronjob that each tick runs one fire-and-forget agent turn on a
+channel's main session (via `@alva/loop`), driving that channel toward a goal.
+`alva loop create` is sugar over `alva deploy create`: it seeds a shared
+loop-runner and packs your goal/channel into the args, so you write no script.
+
+```bash
+alva loop create --channel-id 12345 --goal "watch NVDA pre-market, alert on setup" --cron "0 * * * *"
+```
+
+| Flag           | Required | Description                                                        |
+| -------------- | -------- | ------------------------------------------------------------------ |
+| --goal         | yes      | Instruction run each tick                                          |
+| --cron         | yes      | Cron expression                                                    |
+| --channel-id   | no       | Target channel. Omit ⇒ your DM / Alva Agent channel               |
+| --expires-in   | no       | Lifetime `30m`/`24h`/`7d`, or `never` (discouraged). Default `7d`  |
+
+**Channel id**: read `channel-id` from the
+`<session-prefill-channel-memory channel-id="…">` block in your context — that
+is the current channel's id. There is no slug→id lookup.
+
+**Stopping a loop**: there is no `alva loop stop` — a loop is a plain cronjob, so
+`alva deploy delete --id <id>` (or `pause`) stops it; find it with
+`alva deploy list` (loops use the `~/loops/_runner/…` path). Left alone, a loop
+self-terminates at its `end_at` (default 7 days).
 
 ---
 
