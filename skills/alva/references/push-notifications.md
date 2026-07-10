@@ -53,8 +53,10 @@ skip notifications.
 ## Inventory And Unsubscribe
 
 - `alva alert list --first 200` — rows carry `kind`, playbook identity,
-  `following`, `target_status`. If `items` < `total_count`, keep paginating;
-  never report a truncated page as the full inventory.
+  `playbook_followed`/`following` only for PLAYBOOK rows, and
+  `target_status`. `FEED_ALERT` rows omit playbook-follow fields; an `ACTIVE`
+  FEED alert row is the alert opt-in state. If `items` < `total_count`, keep
+  paginating; never report a truncated page as the full inventory.
 - `alva alert follows --limit 100` — the playbook follow list. Keep paginating
   with `--cursor` when `has_next` is true.
 - Disable by name (`alva alert disable --playbook owner/name` or
