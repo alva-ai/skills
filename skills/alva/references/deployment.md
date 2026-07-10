@@ -7,10 +7,10 @@ managed through `alva automation`; see [feed-lifecycle.md](feed-lifecycle.md).
 
 The deploy CLI manages producer cronjobs:
 
-| Group         | Manages                                                | Common commands                                             |
-| ------------- | ------------------------------------------------------ | ----------------------------------------------------------- |
-| `alva deploy` | Cronjob producers (schedule + entry script + run logs) | `create`, `list`, `get`, `update`, `delete`, `pause`, `resume`, `trigger`, `runs`, `run-logs` |
-| `alva loop`   | Self-scheduled in-channel goal loops (sugar over `alva deploy`) | `create` |
+| Group         | Manages                                                         | Common commands                                                                                 |
+| ------------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `alva deploy` | Cronjob producers (schedule + entry script + run status/logs)   | `create`, `list`, `get`, `update`, `delete`, `pause`, `resume`, `trigger`, `run-status`, `runs`, `run-logs` |
+| `alva loop`   | Self-scheduled in-channel goal loops (sugar over `alva deploy`) | `create`                                                                                        |
 
 ---
 
@@ -124,24 +124,39 @@ Both return the updated cronjob object.
 ### Trigger an Out-of-Schedule Run
 
 Fire the cronjob once, immediately. Returns the Hatchet workflow run id at
-enqueue — async; the `cronjob_runs` row appears only after the worker finishes
-the run.
+enqueue — async; the `cronjob_runs` row may appear as `DISPATCHED` or `RUNNING`
+before the run reaches a terminal state.
 
 ```bash
 alva deploy trigger --id 42
 # { "workflow_run_id": "hatchet-wf-..." }
 ```
 
-To verify completion, poll `runs` and match by `workflow_run_id`:
+To verify completion, poll `run-status` with the returned `workflow_run_id` and
+a caller-owned timeout:
 
 ```bash
 WF=$(alva deploy trigger --id 42 | jq -r .workflow_run_id)
-while ! ROW=$(alva deploy runs --id 42 --first 5 \
-               | jq -e ".runs[] | select(.workflow_run_id==\"$WF\")"); do
+for _ in {1..60}; do
+  STATUS_JSON=$(alva deploy run-status --id 42 --workflow-run-id "$WF")
+  STATE=$(echo "$STATUS_JSON" | jq -r .state)
+  case "$STATE" in PENDING|DISPATCHED|RUNNING) ;; *) break ;; esac
   sleep 5
 done
-echo "$ROW" | jq '{id, status, error}'
+case "$STATE" in
+  PENDING|DISPATCHED|RUNNING) echo "Timed out waiting for run completion" >&2; exit 1 ;;
+esac
+echo "$STATUS_JSON" | jq '{state, run: (.run // null)}'
 ```
+
+`PENDING` means the workflow was accepted but no `cronjob_runs` row exists yet.
+It can also mean the workflow id was wrong, belongs to another cronjob, or the
+workflow failed before persistence; it is not proof that a row will eventually
+appear. `DISPATCHED` and `RUNNING` mean an in-flight row exists, but callers
+still need their own deadline in case the run never reaches a terminal state.
+Terminal states are `COMPLETED`, `FAILED`, and `SKIPPED`; when a terminal
+response includes `.run.id`, use `alva deploy run-logs --id 42 --run-id <rid>`
+for execution output.
 
 Use _after_ deploy to confirm the full cronjob path is wired correctly. For
 iterating on script logic without Hatchet, use `alva run` instead.
