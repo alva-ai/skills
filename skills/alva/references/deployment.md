@@ -1,17 +1,15 @@
 # Deployment Guide
 
-Deploy scripts as cronjobs for scheduled, automated execution and manage the
-downstream feed / playbook resources they produce. This is essential for feeds
-that need regular updates (e.g. hourly price data), recurring tasks, and for
-cleaning up when a deployment is retired or replaced.
+Deploy scripts as cronjobs for scheduled, automated execution. A deploy cronjob
+is the subordinate producer for a feed: it runs the source script, creates or
+refreshes feed data, and exposes run history/logs. The feed's lifecycle is
+managed through `alva automation`; see [feed-lifecycle.md](feed-lifecycle.md).
 
-The product-facing lifecycle CLI groups:
+The deploy CLI manages producer cronjobs:
 
-| Group             | Manages                                      | Common commands                              |
-| ----------------- | -------------------------------------------- | -------------------------------------------- |
-| `alva deploy`     | Cronjobs (schedule + entry script)           | `create`, `list`, `update`, `delete`, `runs` |
-| `alva automation` | Published automation records + active majors | `publish`, `list`, `delete`                  |
-| `alva playbook`   | Published playbook records                   | `list`, `delete`                             |
+| Group         | Manages                                                | Common commands                                             |
+| ------------- | ------------------------------------------------------ | ----------------------------------------------------------- |
+| `alva deploy` | Cronjob producers (schedule + entry script + run logs) | `create`, `list`, `get`, `update`, `delete`, `pause`, `resume`, `trigger`, `runs`, `run-logs` |
 
 ---
 
@@ -178,18 +176,19 @@ deletion gotcha — the help text is authoritative on flags.
 **What each group manages.**
 
 - `alva deploy` — the **cronjob** (schedule + entry script + args). Lives in the
-  `cronjobs` table.
-- `alva automation` — the **published automation record + active majors** (the
-  row written by `alva automation publish`, consumed by the push-fanout path).
-  Lives in `feeds` / `feed_majors`.
+  `cronjobs` table and belongs to a feed.
+- `alva automation` — the product-facing lifecycle CLI for the same underlying
+  feed object; ids are feed ids, and `stop` / `resume` delegate to the feed's
+  producer cronjob. Feed publication state lives in `feeds` / `feed_majors`.
 - `alva playbook` — the **published playbook** (rendered HTML + display_name +
   visibility + ACL). Lives in `playbooks` and is surfaced at
   `https://alva.ai/u/<username>/playbooks/<name>`.
 
-These three move in lockstep at create time (`alva deploy create` →
-`alva automation publish` → `alva release playbook`) but each has its own
-lifecycle row. Deleting one does **not** automatically delete the others — see
-the cascade notes in each `--help`.
+Creation usually moves in order (`alva deploy create` →
+`alva automation publish` → `alva release playbook`), but the producer
+cronjob, feed publication rows, and playbook row are stored separately.
+Deleting one does **not** automatically delete the others — see the cascade
+notes in each `--help`.
 
 `alva automation publish` also accepts `--agent-type alpi` to mark a feed whose
 alpi agent appends the owner's editable `AGENTS.md` instructions — see

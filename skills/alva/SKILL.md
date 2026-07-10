@@ -39,7 +39,7 @@ The main objects are:
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
 | Data Skills        | 250+ structured Arrays endpoints for equities, options, crypto, macro, on-chain, semiconductor spot prices, news, prediction markets, and indexed Twitter/X. | You need factual financial data.                                                                               |
 | Runtime script     | JavaScript executed inside Alva's V8/jagent runtime through `alva run` or cronjobs.                                                                          | You need computation, HTTP, ALFS, secrets, alpi, ONNX, or Feed SDK.                                            |
-| Feed               | A persistent data pipeline that writes time-series or grouped outputs to ALFS and can back playbooks or alerts.                                              | Data needs freshness, history, public reads, charts, release, or push.                                         |
+| Feed               | The persistent data pipeline and identity (`feed_id`) that writes outputs to ALFS. `alva automation` is its product-facing lifecycle CLI; `alva deploy` cronjobs produce its data. | Data needs freshness, history, public reads, charts, release, or push.                                         |
 | Playbook           | A hosted investing app at `https://alva.ai/u/<username>/playbooks/<name>`.                                                                                   | The user wants a shareable dashboard, screener, thesis, what-if, or strategy surface.                          |
 | Skillhub blueprint | A catalog methodology addressed by `/use-skill:<username>/<name>` or discovered from a user skill/method reference.                                          | The user references a skill/method, or a task matches an official template family.                             |
 | Altra              | The Feed SDK trading engine for event-driven backtesting and signal feeds.                                                                                   | Any strategy, simulation, signal target, portfolio, order, equity curve, or rebalancing logic.                 |
@@ -391,7 +391,8 @@ reusable dataset, or future answer.
 Read [feed-lifecycle.md](references/feed-lifecycle.md) and
 [feed-sdk.md](references/feed-sdk.md) when creating or changing a feed. The
 short lifecycle is: write schema and logic to ALFS, `alva run`, grant public
-read if needed, deploy, then `alva automation publish`.
+read if needed, create the producer cronjob with `alva deploy`, then publish
+the user-facing automation data source with `alva automation publish`.
 
 Before automation publish, satisfy `before-automation-publish`: fresh run,
 expected shape, needed grants, public read verification, and non-empty data for
@@ -674,8 +675,8 @@ text does not fully cover.
 | `sdk`                | Runtime library discovery. See [data-skills.md](references/data-skills.md#runtime-libraries-are-separate).                                                                            |
 | `fs`                 | ALFS reads/writes/grants/time-series suffixes and shared modules under `~/library`. Must read [api/filesystem.md](references/api/filesystem.md) for synth suffixes and grant gotchas. |
 | `run`                | Execute jagent JS. See [jagent-runtime.md](references/jagent-runtime.md).                                                                                                             |
-| `deploy`             | Cronjob lifecycle. See [deployment.md](references/deployment.md).                                                                                                                     |
-| `automation`         | Product-facing feed publish/lifecycle (`publish`, `list`, `stop`, `resume`, `delete`). Must read [feed-lifecycle.md](references/feed-lifecycle.md).                                   |
+| `deploy`             | Cronjob lifecycle for producer scripts: schedule, args, trigger, runs, logs. See [deployment.md](references/deployment.md).                                                           |
+| `automation`         | Product-facing lifecycle CLI for feeds (`list`, `inspect`, `publish`, `stop`, `resume`, `delete`). Must read [feed-lifecycle.md](references/feed-lifecycle.md).                         |
 | `release`            | Playbook draft/release; the release reference also covers automation publish metadata extras. Must read [api/release.md](references/api/release.md).                                   |
 | `lint playbook`      | Design-system linter, same gate as release. See [design-contract.yaml](references/design-contract.yaml).                                                                              |
 | `skillhub`           | Curated methodology blueprints. See [request-routing.md](references/request-routing.md#skillhub-blueprint).                                                                           |
