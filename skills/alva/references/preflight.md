@@ -102,19 +102,28 @@ Arrays endpoints using `Authorization: Bearer <ARRAYS_JWT>`. Do not use
 
 ## Memory
 
-If you have not read the user's Alva memory in this conversation, read it:
+If you have not read the user's Alva memory entry files in this conversation,
+read them:
 
 ```bash
 alva fs read --path '~/memory/MEMORY.md'
+alva fs read --path '~/memory/user.md'
 ```
 
-If the index exists, read the files it names, at minimum `user.md`. If
-`~/memory/` is absent or empty, skip. Memory is a claim, not truth: verify any
-feed, cronjob, preference, or parameter before acting on it in a new session.
-Read [memory.md](memory.md) before writing memory.
+If `~/memory/` is absent or empty, skip the global scope. `MEMORY.md` and
+`user.md` are default context when present; topic files and pack files are read
+on demand. Read [memory.md](memory.md) before writing memory.
 
 **Channel sessions:** if the prefill includes a
 `<session-prefill-channel-memory root="...">` block, the channel has its own
-memory alongside `~/memory/`. Read that root's `MEMORY.md` too (even when
-`~/memory/` is empty — the index is separate). Write channel-specific facts
-there; keep user-global facts in `~/memory/`. See [memory.md](memory.md).
+memory alongside `~/memory/`. Read that root's `MEMORY.md` and `user.md` when
+present too, even when `~/memory/` is empty — the index is separate. Write
+channel-specific facts there; keep user-global facts in `~/memory/`.
+Feature- or skill-specific facts belong under the current scope's
+`packs/<pack-name>/`, for example
+`<scope-root>/packs/alvest/`, with `MEMORY.md`, `state.md`, `rules.md`, and
+optional `data/` ledger storage. Pack Markdown files are read on demand, and
+append-only ledger streams are never default prompt context. Memory is a claim,
+not truth: verify any feed, cronjob, parameter, position, price, or feed state
+before acting on it in a new session; apply stable preferences unless the user
+corrects them. See [memory.md](memory.md).
