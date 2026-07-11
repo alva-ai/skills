@@ -93,6 +93,12 @@ specific files needed for the task. Append ledgers are never default prompt
 context; read a bounded projection, exact stream, or latest N records only when
 history or audit is needed.
 
+Compatibility: existing topic files directly under `~/memory/` or a channel
+memory root remain first-class memory. Do not migrate, rename, or rewrite an
+existing topic file into a pack just because packs exist. Use packs for new
+feature-, skill-, or domain-specific memory when no existing topic file already
+covers the need.
+
 ### Ledger definition contract
 
 Never create an opaque ledger stream. Before writing to an append-only stream,
@@ -158,8 +164,9 @@ changes how you should work with them.
 
 Create new files in the relevant scope root for knowledge that doesn't fit in
 `user.md` — market convictions, strategy assumptions, portfolio rules. Add a
-pointer to that scope's `MEMORY.md` for each new file. If the topic belongs to a
-feature or domain, use that scope's `packs/<pack-name>/` instead.
+pointer to that scope's `MEMORY.md` for each new file. If the topic is a new
+feature or domain area and no existing topic file covers it, use that scope's
+`packs/<pack-name>/`.
 
 ## What NOT to save
 
@@ -189,8 +196,9 @@ feature or domain, use that scope's `packs/<pack-name>/` instead.
 ## Reading rules
 
 - **Every conversation start**: Read `'~/memory/MEMORY.md'` via ALFS, then
-  `user.md` if it exists. In a channel session, also read the channel root's
-  `MEMORY.md` and `user.md` if present.
+  `user.md` and any topic files relevant to the user's request when present. In
+  a channel session, also read the channel root's `MEMORY.md`, `user.md`, and
+  relevant topic files when present.
 - **Pack relevance**: Read a pack's `MEMORY.md`, `state.md`, `rules.md`, or
   other Markdown files only when the request, current skill, or scope index
   makes that pack relevant.

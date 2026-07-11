@@ -102,17 +102,16 @@ Arrays endpoints using `Authorization: Bearer <ARRAYS_JWT>`. Do not use
 
 ## Memory
 
-If you have not read the user's Alva memory entry files in this conversation,
-read them:
+If you have not read the user's Alva memory index in this conversation, read it:
 
 ```bash
 alva fs read --path '~/memory/MEMORY.md'
-alva fs read --path '~/memory/user.md'
 ```
 
 If `~/memory/` is absent or empty, skip the global scope. `MEMORY.md` and
-`user.md` are default context when present; topic files and pack files are read
-on demand. Read [memory.md](memory.md) before writing memory.
+`user.md` are default context when present; read `user.md` and topic files only
+when they exist or are named by the index/relevant to the task. Pack files are
+read on demand. Read [memory.md](memory.md) before writing memory.
 
 **Channel sessions:** if the prefill includes a
 `<session-prefill-channel-memory root="...">` block, the channel has its own
