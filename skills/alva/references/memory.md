@@ -47,6 +47,23 @@ a `MEMORY.md` index plus topic files.
 - Read both indexes at the start of a channel turn. No prefill block → no
   channel scope; use `~/memory/` only.
 
+### Scope root resolution
+
+`<scope-root>` is not a literal path. Resolve it before reading or writing pack
+memory:
+
+1. Default to the user-global root: `~/memory/`.
+2. If the session prefill includes `<session-prefill-channel-memory root="...">`
+   and the memory is specific to this channel, use that exact `root`.
+3. If no channel-memory prefill is present, there is no channel scope. Do not
+   invent `~/channels/<slug>/memory/`.
+4. Choose the narrowest correct scope: cross-channel user preferences go to
+   `~/memory/`; this channel's topic, decisions, and context go to the channel
+   root.
+5. A pack root is always `<resolved-scope-root>/packs/<pack-name>/`. If a skill
+   helper accepts `--root` or a root environment variable, pass the pack root,
+   not the raw scope root.
+
 ### Memory packs
 
 A Memory Pack groups feature-, skill-, or domain-specific memory inside the

@@ -119,11 +119,14 @@ on demand. Read [memory.md](memory.md) before writing memory.
 memory alongside `~/memory/`. Read that root's `MEMORY.md` and `user.md` when
 present too, even when `~/memory/` is empty — the index is separate. Write
 channel-specific facts there; keep user-global facts in `~/memory/`.
-Feature- or skill-specific facts belong under the current scope's
-`packs/<pack-name>/`, for example
-`<scope-root>/packs/alvest/`, with `MEMORY.md`, `state.md`, `rules.md`, and
-optional `data/` ledger storage. Pack Markdown files are read on demand, and
-append-only ledger streams are never default prompt context. Memory is a claim,
-not truth: verify any feed, cronjob, parameter, position, price, or feed state
-before acting on it in a new session; apply stable preferences unless the user
-corrects them. See [memory.md](memory.md).
+For feature- or skill-specific facts, first resolve the scope root: use
+`~/memory/` by default; use the prefill channel root only for facts specific to
+this channel; do not invent a channel root when no prefill block is present.
+Then write the pack under `<resolved-scope-root>/packs/<pack-name>/`, for
+example `<resolved-scope-root>/packs/alvest/`, with `MEMORY.md`, `state.md`,
+`rules.md`, and optional `data/` ledger storage. If a skill helper accepts
+`--root`, pass the pack root, not the raw scope root. Pack Markdown files are
+read on demand, and append-only ledger streams are never default prompt context.
+Memory is a claim, not truth: verify any feed, cronjob, parameter, position,
+price, or feed state before acting on it in a new session; apply stable
+preferences unless the user corrects them. See [memory.md](memory.md).
