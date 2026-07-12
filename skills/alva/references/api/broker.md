@@ -50,7 +50,7 @@ markets` per venue. Do not assume; check. Notably:
 | Venue | Assets | Paper (`testnet`) | Idempotency | Notes |
 | ----- | ------ | ----------------- | ----------- | ----- |
 | `alpaca` | US equities + crypto + options | yes | coid wired | |
-| `robinhood` | US equities (long only) | **no** | **`noCoidLookup`** | a paper-provisioned account is rejected; a lost order id can't be reconciled — treat writes conservatively |
+| `robinhood` | US equities + single-leg options (long only) | **no** | **`noCoidLookup`** | a paper-provisioned account is rejected; a lost order id can't be reconciled — treat writes conservatively |
 | `binance` `okx` `bybit` `gate` `bitget` `coinbase` `hyperliquid` | crypto | per venue testnet | coid wired | ccxt-served |
 
 ## Symbols, account, paper

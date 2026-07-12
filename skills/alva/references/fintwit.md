@@ -98,7 +98,7 @@ Substitute the account's `feed_slug` into
 | --- | --- | --- |
 | `directory/summary`, `info/profile` | Identity | bio, archetype, style, focus, asset class, benchmark, "Alva's take", lifetime win rates, best calls — the one-shot account card |
 | `tweets/views` | Market views | extracted finance views/theses (categorized, stance, bilingual summary + thesis) — qualitative commentary, not only trade calls |
-| `signals/raw`, `quality/live_signals`, `quality/live_mentions` | Signals | classified calls (ticker, direction, intent, tradeability, current stance) |
+| `signals/filtered`, `signals/raw`, `quality/live_signals`, `quality/live_mentions` | Signals | classified calls (ticker, direction, intent, tradeability, current stance); `signals/filtered` is the filtered series trackers read first |
 | `portfolio/summary`, `portfolio/equity`, `portfolio/trades` | Performance | per-profile stats (win rate, ROI, Sharpe, alpha vs SPY), equity curve, trade log |
 | `tweets/raw` | Raw tweets | every ingested tweet + engagement |
 
