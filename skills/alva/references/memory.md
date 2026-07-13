@@ -4,8 +4,7 @@ A persistent, file-based memory system on ALFS. The user-global scope lives at
 `'~/memory/'`, created automatically when the user's account is provisioned. A
 channel session may also provide a channel-scoped memory root. Use memory to
 accumulate knowledge across conversations — user identity, preferences,
-investment style, channel context, and feature-specific state that will matter
-later.
+investment style, and channel context that will matter later.
 
 Memory files are **user-visible and editable**. The user can read, modify, or
 delete any memory file through the Alva dashboard or ALFS API. Write memories
@@ -20,7 +19,7 @@ as if the user will read them.
 ```
 ~/memory/
 ├── MEMORY.md     # Concise index — read at the start of every conversation
-└── user.md       # User profile, preferences, expertise, investment style
+└── user.md       # Cross-channel identity, preferences, investment style, theses
 ```
 
 `MEMORY.md` is the entrypoint. Read it at the start of every conversation to
@@ -28,24 +27,44 @@ discover what's stored. Keep it concise — under 200 lines. Each entry is one
 line linking to a topic file:
 
 ```markdown
-- [user.md](user.md) — User identity, investment style, knowledge level
-- [market-views.md](market-views.md) — Current macro thesis, conviction trades
+- [user.md](user.md) — identity, investment style, interests, theses and preferences
 ```
 
-Topic files (like `user.md`) hold the actual content. They are read on demand
-when relevant to the user's request.
+Keep the default global model in `user.md`; investment style, watched areas,
+theses, and action preferences do not get a separate `investing.md`.
 
 ### Channel-scoped memory
 
 `~/memory/` is **user-global** (shared across all channels). A **channel** can
 also have its own memory at `~/channels/<slug>/memory/`, named in the session
-prefill as a `<session-prefill-channel-memory root="...">` block. Same layout —
-a `MEMORY.md` index plus topic files.
+prefill as a `<session-prefill-channel-memory root="...">` block:
+
+```text
+~/channels/<slug>/memory/
+├── MEMORY.md
+└── journal/
+    └── YYYY-MM-DD.md
+```
 
 - User-global facts (identity, cross-channel preferences) → `~/memory/`.
 - Channel-specific facts (this channel's topic, decisions) → the prefill root.
 - Read both indexes at the start of a channel turn. No prefill block → no
   channel scope; use `~/memory/` only.
+- The default Alva channel uses the same layout at
+  `~/channels/alva/memory/`; it is not an alias for global memory.
+
+### Journal
+
+Journal files are user-visible, user-editable daily summaries maintained by an
+internal background turn. Normal conversation turns do not append Journal or
+load full daily files by default. A new/reset session may receive a small,
+quoted Carry Forward prelude; otherwise read Journal only when the user asks or
+the current task genuinely needs that history.
+
+Journal is not durable user evidence. User edits are respected, but deleting or
+rewriting an old Journal does not request replay. Never promote assistant output,
+automation output, third-party claims, or Journal prose into `user.md` as if the
+user stated it.
 
 ### Scope root resolution
 
@@ -149,11 +168,23 @@ Persistent facts about the user. Update when you learn something new.
 - Learning:
 - External tools: <!-- e.g. TradingView, Bloomberg, Dune -->
 
-## Preferences
+## Interaction Preferences
 
 - Communication style: <!-- e.g. terse / detailed / visual -->
 - Notification channel:
-- Playbook publishing: <!-- e.g. default public release / draft-only before publishing -->
+
+## Interests
+
+- Topics:
+- Companies / assets:
+
+## Investment Thesis
+
+- <!-- Only user-explicit or user-confirmed theses belong here. -->
+
+## Action Preferences
+
+- <!-- e.g. Ask before trading; prefer staged changes; notify on material changes. -->
 ```
 
 **When to update:** User shares personal info, corrects a preference, reveals
@@ -162,17 +193,18 @@ changes how you should work with them.
 
 ## Additional topic files
 
-Create new files in the relevant scope root for knowledge that doesn't fit in
-`user.md` — market convictions, strategy assumptions, portfolio rules. Add a
-pointer to that scope's `MEMORY.md` for each new file. If the topic is a new
-feature or domain area and no existing topic file covers it, use that scope's
-`packs/<pack-name>/`.
+Keep cross-channel user understanding, including market convictions and action
+rules, in `user.md` by default. Existing topic files remain valid; create a new
+file or pack only for a genuinely separate domain contract or structured
+feature memory, then link it from that scope's `MEMORY.md`.
 
 ## What NOT to save
 
 - Ephemeral conversation details (current debugging session, temp state)
 - Things derivable from code or ALFS files
 - Raw data or large outputs (store on ALFS as feed data, not in memory)
+- Automation/feed runtime state, cursors, schedules, and delivery state (their
+  own DB/feed/state files are authoritative; Journal may retain a useful outcome)
 - Anything already in the Alva skill docs
 - Market data that changes every minute (save your *interpretation*, not the
   data)
@@ -191,14 +223,19 @@ feature or domain area and no existing topic file covers it, use that scope's
 6. **Update the relevant `MEMORY.md` index** — add a one-line entry for each new
    file or pack.
 7. Keep indexes concise — one line per file or pack, under 120 characters.
-8. **Every write → confirm in chat:** 📌 Memory updated: {one-sentence summary}
+8. **Write files directly** with ordinary `alva fs` operations; do not invent a
+   proposal/validator queue or hidden review state.
+9. **Every conversational write → confirm in chat:** 📌 Memory updated:
+   {one-sentence summary}. Internal Journal/Dream maintenance completes silently.
 
 ## Reading rules
 
 - **Every conversation start**: Read `'~/memory/MEMORY.md'` via ALFS, then
   `user.md` and any topic files relevant to the user's request when present. In
-  a channel session, also read the channel root's `MEMORY.md`, `user.md`, and
-  relevant topic files when present.
+  a channel session, also read the channel root's `MEMORY.md` and relevant topic
+  files when present. Channel roots do not have their own `user.md`.
+- **Journal**: Do not load complete Journal files at every turn. Use a supplied
+  Carry Forward prelude, or read a bounded relevant daily file on explicit need.
 - **Pack relevance**: Read a pack's `MEMORY.md`, `state.md`, `rules.md`, or
   other Markdown files only when the request, current skill, or scope index
   makes that pack relevant.

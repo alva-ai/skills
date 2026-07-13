@@ -115,9 +115,11 @@ read on demand. Read [memory.md](memory.md) before writing memory.
 
 **Channel sessions:** if the prefill includes a
 `<session-prefill-channel-memory root="...">` block, the channel has its own
-memory alongside `~/memory/`. Read that root's `MEMORY.md` and `user.md` when
-present too, even when `~/memory/` is empty — the index is separate. Write
-channel-specific facts there; keep user-global facts in `~/memory/`.
+memory alongside `~/memory/`. Read that root's `MEMORY.md` when present too,
+even when `~/memory/` is empty — the index is separate. Channel roots do not
+have their own `user.md`. Write channel-specific facts there; keep user-global
+facts in `~/memory/user.md`. Do not load full `journal/` history at startup; use
+the bounded Carry Forward prelude when supplied or read a relevant day on demand.
 For feature- or skill-specific facts, first resolve the scope root: use
 `~/memory/` by default; use the prefill channel root only for facts specific to
 this channel; do not invent a channel root when no prefill block is present.

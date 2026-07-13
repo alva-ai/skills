@@ -562,10 +562,11 @@ Open [annotation-edits.md](references/annotation-edits.md). HTML edits re-enter
 
 #### Support Layer: Memory
 
-Alva memory is file-based and user-visible under `~/memory/`. Read
-[memory.md](references/memory.md) before writing it. Store durable preferences,
-identity facts, investment style, and useful context; never store secrets, raw
-API keys, or unverified claims as truth.
+Alva memory is file-based and user-visible: global user understanding lives in
+`~/memory/user.md`, while each channel has `~/channels/<slug>/memory/MEMORY.md`
+and daily Journal files. Read [memory.md](references/memory.md) before writing.
+Never store secrets, raw API keys, automation runtime state, or unverified claims
+as truth.
 
 #### Support Layer: Secret Manager
 
