@@ -13,9 +13,10 @@ Decision order:
    to answers and artifacts.
 1. If the user wants an explanation, comparison, valuation, rank, or current
    market fact in chat, route to Financial Analysis / Ask Question.
-2. If the user wants persistence, cadence, alerting, trading signals, or a
-   reusable dataset, route to the durable artifact that fits, not automatically
-   to a playbook.
+2. If the Agent itself must return to the same channel on a cadence, route to a
+   bounded Channel Loop. If the durable artifact is data, alerting, a trading
+   signal, or a reusable dataset, route to that artifact instead, not
+   automatically to a playbook.
 3. If the user wants a hosted app, share URL, remix, annotation edit, release,
    or playbook version update, enter the Playbook Creation tree.
 
@@ -27,6 +28,7 @@ Decision order:
 | Playbook Creation | Build, remix, edit, release, or update a hosted/shareable playbook. Read [playbook-creation.md](playbook-creation.md) for the subroute tree and gates. |
 | Strategy / Trading Analysis | Use Altra for backtests, signals, portfolio simulation, rebalancing, or trading analysis; deliver an answer, feed, signal, or playbook as requested. |
 | Automation / Push | Build or modify a feed that emits actionable `signal/targets` or `notify/message`, then verify subscription and delivery path. |
+| Channel Loop | Re-enter the same channel with scheduled Agent turns until a condition, exclusive cutoff, or exact run limit. Read [deployment.md](deployment.md#channel-loops), set `--start` for a future start, and provide at least one of `--until` or `--runs`. |
 | Debug / Edit | Inspect existing code, logs, playbook source, feed output, or annotations, then change the generator rather than rendered values. |
 | Capability Verification | Verify Data Skills, Skillhub, runtime, trading, or search coverage before saying Alva lacks a capability. |
 

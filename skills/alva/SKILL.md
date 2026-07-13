@@ -39,6 +39,7 @@ The main objects are:
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
 | Data Skills        | 250+ structured Arrays endpoints for equities, options, crypto, macro, on-chain, semiconductor spot prices, news, prediction markets, and indexed Twitter/X. | You need factual financial data.                                                                               |
 | Runtime script     | JavaScript executed inside Alva's V8/jagent runtime through `alva run` or cronjobs.                                                                          | You need computation, HTTP, ALFS, secrets, alpi, ONNX, or Feed SDK.                                            |
+| Channel loop       | Bounded scheduled Agent turns that continue one channel's conversation toward a goal.                                                                        | The user wants the Agent to re-check or keep working in the same channel until a condition, time, or run bound. |
 | Feed               | The persistent data pipeline and identity (`feed_id`) that writes outputs to ALFS. `alva automation` is its product-facing lifecycle CLI; `alva deploy` cronjobs produce its data. | Data needs freshness, history, public reads, charts, release, or push.                                         |
 | Playbook           | A hosted investing app at `https://alva.ai/u/<username>/playbooks/<name>`.                                                                                   | The user wants a shareable dashboard, screener, thesis, what-if, or strategy surface.                          |
 | Skillhub blueprint | A catalog methodology addressed by `/use-skill:<username>/<name>` or discovered from a user skill/method reference.                                          | The user references a skill/method, or a task matches an official template family.                             |
@@ -82,6 +83,8 @@ Think in artifacts:
 - **Answer**: a direct response grounded in fresh data. No feed or release
   required unless the user asks for persistence.
 - **Script**: an Alva Cloud computation that may be run manually or scheduled.
+- **Loop**: bounded scheduled Agent turns that re-enter one channel; no feed or
+  playbook is required unless the goal also needs durable data or a public UI.
 - **Feed**: the persistent output of a script, with schema, history, grants, and
   release metadata.
 - **Playbook**: a browser surface over feeds, README, design rules, and release
@@ -197,6 +200,7 @@ that section as mandatory, not optional debugging material.
 | `/use-skill:<username>/<name>`, user-referenced skill/method, or template-like research method                                          | Skillhub Blueprint                  | Fetch blueprint fresh; if it becomes a playbook, route through [playbook-creation.md](references/playbook-creation.md) and set `--skill-id`.                                             |
 | backtest, strategy, signal, rebalance, portfolio simulation                                                                             | Strategy / Trading Analysis         | Use Altra; package as answer, feed, or playbook only as the user goal requires.                                                                                                          |
 | recurring digest, threshold tracker, alert, stream watch                                                                                | Automation / Push                   | Build a push-capable feed and verify alert or group subscription plus sidecar output.                                                                                                    |
+| keep researching, checking, or working in this channel on a cadence until a condition, time, or run count                              | Channel Loop                        | Read [deployment.md](references/deployment.md#channel-loops); use `alva loop create`, set `--start` for a future start, and provide at least one of `--until` or `--runs`.                |
 | `<remix ...>` or "remix this playbook"                                                                                                  | Remix                               | Read source files; preserve lineage and source UDFs.                                                                                                                                     |
 | `<annotation ...>` or "change this element"                                                                                             | Edit / Debug                        | Edit the generator behind the element, not rendered feed values.                                                                                                                         |
 | "does Alva have X?"                                                                                                                     | Capability Verification             | Run `alva data-skills list` and search for `<topic>` before saying no.                                                                                                                   |
@@ -383,10 +387,21 @@ are sourced facts, computed values, or inference.
 
 Enter this tree when the user asks Alva to keep something running, reusable,
 shareable, inspectable, or actionable. The tree is broader than playbooks: a
-script, feed, alert, signal, model output, or trading analysis may be the right
-artifact without a hosted UI. Enter the playbook branch only for hosted apps,
-share URLs, remixes, annotation edits, release/version updates, or playbook
-alert/group-subscription setup.
+script, channel loop, feed, alert, signal, model output, or trading analysis
+may be the right artifact without a hosted UI. Enter the playbook branch only
+for hosted apps, share URLs, remixes, annotation edits, release/version
+updates, or playbook alert/group-subscription setup.
+
+#### Channel Goal Loops
+
+Use a channel loop when the Agent itself must return to the same conversation
+on a cadence, keep the goal and channel context, and stop on a bounded
+lifecycle. Read [deployment.md](references/deployment.md#channel-loops). Use
+the default backend-clock `now`, pass `--start now` explicitly, or set a future
+RFC3339 timestamp. Every loop requires `--until`, `--runs`, or both. Do not use
+the removed `--expires-in` flag. Use a feed and Automation / Push instead when
+the durable artifact is data or a notification pipeline rather than continued
+Agent work in the channel.
 
 #### Data Product Layer: Feed Lifecycle And Automation
 
@@ -798,6 +813,8 @@ Before finishing an Alva task, ask:
 - Did backtesting or signal work use Altra?
 - Did push work verify the publisher sidecar plus the personal alert or group
   subscription target?
+- Did a channel loop use the default or an explicit `--start`, plus a hard
+  `--until` or `--runs` bound, without the removed `--expires-in` flag?
 - If Alva-owned behavior blocked the task, did I offer the confirmed feedback
   flow after reading [api/feedback.md](references/api/feedback.md)?
 - Did the final response describe the delivered result without leaking
