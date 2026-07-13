@@ -125,13 +125,7 @@ Then write the pack under `<resolved-scope-root>/packs/<pack-name>/`, for
 example `<resolved-scope-root>/packs/alvest/`, with `MEMORY.md`, `state.md`,
 `rules.md`, and optional `data/` ledger storage. If a skill helper accepts
 `--root`, pass the pack root, not the raw scope root. Pack Markdown files are
-read on demand, and structured ledger streams are never default prompt context.
-Channel Journal files, when present, live at the exact channel root's
-`journal/YYYY-MM-DD.md`; they are Markdown source of truth, not pack `data/`
-ledgers. Ordinary `alva fs write --append` is only for manual or low-contention
-notes, not an automated concurrent Journal writer. See [memory.md](memory.md)
-for the conditional-write requirement.
-
+read on demand, and append-only ledger streams are never default prompt context.
 Memory is a claim, not truth: verify any feed, cronjob, parameter, position,
 price, or feed state before acting on it in a new session; apply stable
 preferences unless the user corrects them. See [memory.md](memory.md).

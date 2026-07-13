@@ -257,50 +257,6 @@
       ]
     },
     {
-      "id": "memory.journal-append-boundaries",
-      "group": "memory",
-      "target": "corpus",
-      "description": "Channel journals stay in date-partitioned Markdown while ordinary-file append and Synth ledger append retain their distinct concurrency semantics.",
-      "section_includes": [
-        {
-          "file": "references/memory.md",
-          "heading": "Channel journal",
-          "label": "journal source of truth",
-          "includes": [
-            "<channel-memory-root>/journal/YYYY-MM-DD.md",
-            "Markdown source of truth",
-            "not a Memory Pack `data/` ledger",
-            "read, merge the managed block, and conditional-write",
-            "must not depend on ordinary-file append"
-          ]
-        },
-        {
-          "file": "references/memory.md",
-          "heading": "Memory packs",
-          "label": "Synth ledger semantics",
-          "includes": [
-            "Synth time-series mount",
-            "`@append`",
-            "upsert",
-            "not a strictly immutable append log"
-          ]
-        },
-        {
-          "file": "references/api/filesystem.md",
-          "heading": "Ordinary ALFS file append",
-          "label": "ordinary append semantics",
-          "includes": [
-            "alva fs write",
-            "--append",
-            "does not add a newline",
-            "read-modify-write",
-            "not concurrency-safe",
-            "Synth `@append`"
-          ]
-        }
-      ]
-    },
-    {
       "id": "pr353.chat-as-artifact",
       "group": "pr353",
       "target": "corpus",
