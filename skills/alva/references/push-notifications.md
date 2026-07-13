@@ -36,9 +36,10 @@ A push is set up only after all of these succeed:
    `before-automation-publish`.
 3. Enable publisher push on the cronjob:
    `alva deploy update --id <ID> --push-notify`.
-4. Enable the personal alert: `alva alert enable --automation <owner>/<feed>` or
-   `alva alert enable --playbook <owner>/<playbook>`. For groups, use
-   `/alva subscribe feed <id>` or `/alva subscribe playbook <id>` in the group.
+4. Enable the FEED alert: for one automation use
+   `alva alert enable --automation <owner>/<feed>`; for known feed ids use
+   `alva alert enable --automation-ids <id,id>`. For groups, use
+   `/alva subscribe feed <id>` in the group.
 5. Trigger or wait for a real run, read `@last/1` of the sidecar, and confirm
    the record is fresh and the message is non-empty or contains
    `<|SKIP_NOTIFICATION|>` for a quiet run.
@@ -46,27 +47,28 @@ A push is set up only after all of these succeed:
 If the automation is unpublished, the feed has no sidecar record, or the record
 has an empty body, do not claim push is set up. Diagnose and fix first.
 
-Confirm to the user with specifics: which automation/playbook alert is enabled,
-what the next push will say, and when it will fire. For monitors, say quiet runs
-skip notifications.
+Confirm to the user with specifics: which automation alerts are enabled, what
+the next push will say, and when it will fire. For monitors, say quiet runs skip
+notifications.
+
+There is no playbook alert target. Following or unfollowing a playbook never
+changes alerts. If the user explicitly asks to enable every current automation
+behind a playbook, resolve the feed ids from that playbook's latest release and
+submit those ids with `alva alert enable --automation-ids <id,id>`. Treat this
+as a snapshot: feeds added by a later release are not subscribed automatically.
 
 ## Inventory And Unsubscribe
 
-- `alva alert list --first 200` — rows carry `kind`, `target_status`,
-  playbook/feed identity, `feed_status`, and `last_pushed_at_ms` when available.
-  If `items` < `total_count`, keep paginating; never report a truncated page as
-  the full inventory. Alert enablement is the relevant `FEED_ALERT` or
-  `PLAYBOOK_ALERTS` row with `target_status=ACTIVE`; social playbook follows are
-  separate and must not be used as delivery state. Raw JSON/SDK rows may retain
-  a legacy `following` field for compatibility; ignore it for alert
-  verification.
+- `alva alert list --first 200` — rows carry `kind`, `target_status`, feed
+  identity, `feed_status`, and `last_pushed_at_ms` when available. If `items` <
+  `total_count`, keep paginating; never report a truncated page as the full
+  inventory. Alert enablement is an active `FEED_ALERT`. Social playbook follows
+  are separate and must not be used as delivery state.
 - `alva alert follows --limit 100` — the playbook follow list. Keep paginating
   with `--cursor` when `has_next` is true.
-- Disable by name (`alva alert disable --playbook owner/name` or
-  `--automation owner/name`) for live targets; by id
-  (`alva alert disable --playbook-ids a,b --automation-ids c`) for bulk and for
-  `TARGET_DELETED` ghosts (name-addressed 404s on deleted targets).
-- Resolve ids with `alva playbooks get --ids a,b` / `--ref owner/name`; list a
-  user's playbooks with `alva playbooks list --owner <username>`.
+- Disable by name (`alva alert disable --automation owner/name`) for live
+  targets; use `alva alert disable --automation-ids a,b` for bulk and for
+  `TARGET_DELETED` feed ghosts (name-addressed calls 404 on deleted targets).
+- Use the `target.id` returned by `alva alert list` for a deleted feed row.
 - Never probe with mutating calls — the read surface answers all identity
   questions.

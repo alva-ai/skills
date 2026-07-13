@@ -3,7 +3,7 @@
 This is the concrete task guide for building, drafting, releasing, verifying,
 and updating Alva playbooks. Read it for hosted app/share URL, screener app,
 report surface, strategy UI, remix, annotation edit, release, version update,
-and playbook alert/group-subscription tasks.
+and push-after-release checks for backing feeds.
 
 The playbook tree has subroutes: new build, Skillhub-guided build, remix,
 annotation/edit, release/version update, and push after release. Use this guide

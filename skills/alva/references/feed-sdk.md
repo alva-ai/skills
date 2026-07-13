@@ -162,14 +162,13 @@ await feed.run(async (ctx) => {
 
 Read `@last/N` (where N >= batch size) to get the most recent batch.
 
-### Pattern D: Signal / Playbook Push Notification
+### Pattern D: Signal Feed Push Notification
 
 For feeds that produce actionable signals worth pushing to users with alerts or
-groups subscribed to the feed, or to a playbook that references the feed.
-Write signal records to the **`signal`** group with a **`targets`** output --
-the resulting path `~/feeds/{name}/v{major}/data/signal/targets` is one source
-the platform reads when dispatching the canonical `feed_alert_ready`
-notification event.
+groups subscribed to the feed. Write signal records to the **`signal`** group
+with a **`targets`** output -- the resulting path
+`~/feeds/{name}/v{major}/data/signal/targets` is one source the platform reads
+when dispatching the canonical `feed_alert_ready` notification event.
 
 The target format follows the same structure used by Altra trading strategies:
 
@@ -190,7 +189,7 @@ const feed = new Feed({ path: feedPath("my-signal") });
 feed.def("signal", {
   targets: makeDoc(
     "Signal Targets",
-    "Actionable signals for playbook notifications",
+    "Actionable signal alerts",
     [
       obj("instruction", [
         str("type"), // "allocate" | "orders"
@@ -234,9 +233,9 @@ await feed.run(async (ctx) => {
 
 When this feed runs as a cronjob with `--push-notify`, the platform reads
 `/data/signal/targets` and dispatches the signal content as `feed_alert_ready`
-to eligible automation/playbook alerts and group subscriptions. Telegram
-delivery chunks long messages at the platform's per-message limit; the feed SDK
-does not require a 500-character summary.
+to eligible FEED alert and group subscribers. Telegram delivery chunks long
+messages at the platform's per-message limit; the feed SDK does not require a
+500-character summary.
 
 **Key points:**
 
@@ -245,10 +244,9 @@ does not require a 500-character summary.
 - `--push-notify` and `alva automation publish --cronjob-id ...` only make the
   feed publisher capable of emitting alerts. They do **not** subscribe any user
   or group.
-- Real delivery requires an explicit alert/subscription: personal
-  `alva alert enable --automation <owner>/<feed>` /
-  `--playbook <owner>/<playbook>`, group `/alva subscribe feed <id>` /
-  `/alva subscribe playbook <id>`, or — from inside a playbook iframe — a
+- Real delivery requires an explicit FEED alert/subscription: personal
+  `alva alert enable --automation <owner>/<feed>`, group
+  `/alva subscribe feed <id>`, or — from inside a playbook iframe — a
   parent-confirmed `window.alva.subscribe.propose()` (see
   `references/api/udf-runtime.md` § Feed Subscribe Proposal). A playbook must
   never call a subscribe API directly.
@@ -278,8 +276,8 @@ periodic research summaries, heartbeat monitoring, and proactive alerts.
 
 Write the agent's response to the **`notify`** group with a **`message`**
 output. When the cronjob completes with `--push-notify`, the platform reads this
-path and dispatches `feed_alert_ready` to users with alerts or groups subscribed
-to the feed, or to a playbook that references the feed.
+path and dispatches `feed_alert_ready` to users or groups explicitly subscribed
+to the feed.
 
 ```javascript
 const { ask } = require("@alva/alvaask");
@@ -343,11 +341,10 @@ alva automation publish --name daily-briefing --version 1.0.0 \
   dispatched but arrives with an empty body (no `title`/`body`).
 - `--push-notify` only enables publisher-side fanout. It does **not** create
   personal alerts or group subscriptions.
-- Real delivery requires an explicit alert/subscription: personal
-  `alva alert enable --automation <owner>/<feed>` or
-  `alva alert enable --playbook <owner>/<playbook>`, or group
-  `/alva subscribe feed <feed_id>` / `/alva subscribe playbook <playbook_id>`.
-  For inventory and unsubscribe (including ghost rows of deleted targets), see
+- Real delivery requires an explicit FEED alert/subscription: personal
+  `alva alert enable --automation <owner>/<feed>` or group
+  `/alva subscribe feed <feed_id>`. Following a playbook does not subscribe any
+  of its feeds. For inventory and unsubscribe (including deleted feed rows), see
   [push-notifications.md](push-notifications.md) § Inventory And Unsubscribe.
 - Combine with Pattern D if you want both feed completion notifications and
   signal-style notifications.

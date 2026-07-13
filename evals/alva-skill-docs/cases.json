@@ -552,7 +552,8 @@
             "before-automation-publish",
             "alva deploy update --id <ID> --push-notify",
             "alva alert enable --automation",
-            "alva alert enable --playbook",
+            "alva alert enable --automation-ids",
+            "There is no playbook alert target",
             "read `@last/1` of the sidecar",
             "do not claim push is set up"
           ]
@@ -762,7 +763,8 @@
         "api/feedback.md",
         "alva feedback --help",
         "alva alert enable --automation",
-        "alva alert enable --playbook",
+        "alva alert enable --automation-ids",
+        "There is no playbook alert target",
         "publish publicly by default",
         "registered UDFs",
         "implementation internals",
