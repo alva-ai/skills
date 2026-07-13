@@ -70,6 +70,34 @@ Direct latest-price routing:
   `searchPerplexityFinance`
   before suggesting BYOD.
 
+## Market Identity And Listing Status
+
+Treat whether an issuer is public, private, unlisted, or delisted, plus its
+ticker, exchange, and listing date, as time-sensitive market facts. Never use
+model memory as the answer.
+
+1. Resolve the current entity and aliases. For US issuers, query company detail
+   by name when the symbol is unknown and by symbol when it is known. For
+   non-US issuers, try the exact dotted-suffix symbol against non-US company
+   detail.
+2. Read the returned identity fields, including `symbol`, `exchange`,
+   `is_listed`, and `ipo_date` when present. For non-US listings, remember that
+   company-detail coverage is only a curated subset.
+3. If the symbol is unknown, the listing may be recent, or Data Skills returns
+   no match, use `searchPerplexityFinance` with the legal/company name, aliases,
+   an explicit as-of date, and the requested identity fields. Inspect its
+   sources and prefer current exchange, regulator, or issuer/investor-relations
+   evidence.
+4. For a recent IPO, the IPO planning calendar is discovery evidence only. A
+   past `Expected` row is unknown; confirm the completed listing with positive
+   company-profile, quote/kline, exchange, regulator, or issuer evidence.
+
+An empty, 404, or unsupported lookup proves only that the queried source lacks
+coverage. It does not prove that the issuer is private, unlisted, or delisted.
+State the status as unverified unless current positive evidence supports the
+conclusion. If the user says a listing happened, treat that as a freshness
+signal and run this full fallback chain before answering.
+
 ## Thematic Ticker Curation
 
 When building sector or thematic dashboards with curated ticker lists, do not
