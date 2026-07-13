@@ -254,13 +254,20 @@ becoming a feed, cronjob, signal, or playbook.
 
 #### Data Access: Data Sources
 
-Data Skills are the primary source for structured financial facts: prices,
-klines, fundamentals, estimates, insider and senator trades, ownership, options
-chains and Greeks, macro, on-chain metrics, exchange flows, prediction markets,
-news, and indexed Twitter/X. The mandatory discovery path is `list` -> `summary`
--> `endpoint`. Use `Authorization: Bearer <ARRAYS_JWT>`, not `X-API-Key`. For
-curated thematic or sector baskets, verify ticker fit with live company-detail
-data such as `getStockCompanyDetail`; do not trust memory.
+Data Skills are the primary source for structured financial facts: market
+identity and listing status, prices, klines, fundamentals, estimates, insider
+and senator trades, ownership, options chains and Greeks, macro, on-chain
+metrics, exchange flows, prediction markets, news, and indexed Twitter/X. The
+mandatory discovery path is `list` -> `summary` -> `endpoint`. Use
+`Authorization: Bearer <ARRAYS_JWT>`, not `X-API-Key`.
+
+Whether a requested listing, ADR/ADS, ticker, exchange, or other security form
+exists is a time-sensitive fact. Never use training knowledge or model memory
+to skip current online verification, even when the remembered answer is
+"private", "unlisted", or "no ADR/ticker". A missing or single-source negative
+result is not proof of nonexistence; check another current source or report the
+status as unverified. For thematic or sector baskets, verify ticker fit with
+live company-detail data; do not trust memory.
 
 Source routing:
 
@@ -780,6 +787,8 @@ Before finishing an Alva task, ask:
   gate, and the Complex Ask Router only for complex judgment asks, before I
   answered?
 - Did I avoid WebSearch/LLM/memory/user-pasted data as factual values?
+- Did I run current online verification before using training knowledge to
+  rule out a listing, ADR/ADS, ticker, or other requested security form?
 - Did I run Data Skills `list` -> `summary` -> `endpoint` before coding calls?
 - Did automation publish pass `before-automation-publish`?
 - Did playbook work read [playbook-creation.md](references/playbook-creation.md)
