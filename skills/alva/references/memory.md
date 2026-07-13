@@ -47,6 +47,29 @@ a `MEMORY.md` index plus topic files.
 - Read both indexes at the start of a channel turn. No prefill block → no
   channel scope; use `~/memory/` only.
 
+### Channel journal
+
+When a Channel Journal is present, it lives under the exact channel memory root
+provided by session scope:
+
+```text
+<channel-memory-root>/journal/YYYY-MM-DD.md
+```
+
+For the default Alva Agent Channel, that resolves to
+`~/channels/alva/memory/journal/YYYY-MM-DD.md`. Each local date has one
+user-visible file whose Markdown headings keep the daily record readable, for
+example `# Journal — 2026-07-13` followed by bounded event sections.
+
+The Journal is the Markdown source of truth. It is not a Memory Pack `data/`
+ledger and must not be moved to Synth merely because Synth supports `@append`.
+An automated Journal writer must not depend on ordinary-file append either:
+ordinary append is a non-atomic read-modify-write and concurrent writers can
+lose updates. The managed writer must read, merge the managed block, and
+conditional-write using the file's ETag/version. Reserve `alva fs write
+--append` for explicit manual or otherwise low-contention notes, and include
+the required Markdown separator or newline in the appended content.
+
 ### Scope root resolution
 
 `<scope-root>` is not a literal path. Resolve it before reading or writing pack
@@ -74,22 +97,26 @@ current scope:
 ├── MEMORY.md
 ├── state.md
 ├── rules.md
-└── data/          # optional synth mount with append-only streams
+└── data/          # optional Synth mount with structured ledger streams
 ```
 
 - `MEMORY.md` is the pack index and short summary.
 - `state.md` is editable current state or a bounded projection.
 - `rules.md` is durable user or process rules.
-- `data/` is optional append-only ledger storage for compact events, refs,
-  hashes, and as-of timestamps.
+- `data/` is an optional Synth time-series mount for compact structured events,
+  refs, hashes, and as-of timestamps. Its `@append` operation is keyed by
+  timestamp: reusing a timestamp is an upsert, not a strictly immutable append
+  log.
 
 First-version memory semantics use editable Markdown files and optional
-append-only ledgers. Do not rely on `@kv` as product memory, user-visible truth,
-or a stable memory contract.
+structured ledgers. Do not rely on `@kv` as product memory, user-visible truth,
+or a stable memory contract. Do not put Channel Journal entries in pack
+`data/`; Journal remains date-partitioned Markdown under the Channel memory
+root.
 
 Pack docs are read on demand. Do not load every pack at conversation start; use
 the scope root index to discover relevant packs, then read the pack index and
-specific files needed for the task. Append ledgers are never default prompt
+specific files needed for the task. Structured ledgers are never default prompt
 context; read a bounded projection, exact stream, or latest N records only when
 history or audit is needed.
 
@@ -101,7 +128,7 @@ covers the need.
 
 ### Ledger definition contract
 
-Never create an opaque ledger stream. Before writing to an append-only stream,
+Never create an opaque ledger stream. Before writing to a structured stream,
 the stream's meaning must be discoverable from one of two places:
 
 1. **Skill-defined ledger** — the current skill documents the stream name, path,
@@ -202,8 +229,9 @@ feature or domain area and no existing topic file covers it, use that scope's
 - **Pack relevance**: Read a pack's `MEMORY.md`, `state.md`, `rules.md`, or
   other Markdown files only when the request, current skill, or scope index
   makes that pack relevant.
-- **Append ledgers**: Never load ledger streams by default. Read bounded latest
-  records or a projection only when the task needs history, evidence, or audit.
+- **Structured ledgers**: Never load ledger streams by default. Read bounded
+  latest records or a projection only when the task needs history, evidence, or
+  audit.
 - **User references prior work**: "that strategy from last time" / "the rules
   we discussed" → read the relevant memory file.
 - **User explicitly asks**: "do you remember" / "check my profile" → you
