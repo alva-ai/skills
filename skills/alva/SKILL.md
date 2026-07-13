@@ -390,7 +390,7 @@ shareable, inspectable, or actionable. The tree is broader than playbooks: a
 script, channel loop, feed, alert, signal, model output, or trading analysis
 may be the right artifact without a hosted UI. Enter the playbook branch only
 for hosted apps, share URLs, remixes, annotation edits, release/version
-updates, or playbook alert/group-subscription setup.
+updates, or playbook publication work.
 
 #### Channel Goal Loops
 
@@ -428,8 +428,7 @@ each feed, ALFS, deploy, and publish step.
 Playbooks are hosted investing apps: dashboards, screeners, thesis trackers,
 backtest surfaces, what-if studies, event studies, or custom interactive tools.
 Enter this branch only when the user wants a hosted/shareable surface, remix,
-annotation edit, release/version update, or playbook alert/group-subscription
-setup.
+annotation edit, release/version update, or playbook publication work.
 
 Read [playbook-creation.md](references/playbook-creation.md) before creating or
 changing the hosted surface. It owns the build order, Browser-safe feed reads,
@@ -525,8 +524,9 @@ authentication, `alva functions` creator registration and allowance tools,
 
 #### Action Layer: Alerts
 
-Alerts are personal notification opt-ins for automations or playbooks. A feed
-may emit `signal/targets` or `notify/message`; both dispatch `feed_alert_ready`.
+Alerts are personal notification opt-ins for automations (feeds). Playbook
+follows are independent and never enable or disable alerts. A feed may emit
+`signal/targets` or `notify/message`; both dispatch `feed_alert_ready`.
 `--push-notify` only marks the publisher capable of alerts. It does not
 subscribe users or bypass preferences.
 
@@ -632,8 +632,8 @@ alert, or playbook.
 ### Hosted Playbook Workflow
 
 Enter this tree when the user wants a hosted app, share URL, dashboard, screener
-app, report surface, remix, annotation edit, release/version update, or playbook
-alert/group-subscription setup. First choose the artifact shape: direct answer,
+app, report surface, remix, annotation edit, or release/version update. First
+choose the artifact shape: direct answer,
 feed, signal, model output, or hosted playbook. For hosted/shareable surfaces,
 turn the request into a data contract before UI work: universe, metrics,
 freshness, output groups, widgets, and release path. Then open
@@ -705,9 +705,9 @@ text does not fully cover.
 | `skillhub`           | Curated methodology blueprints. See [request-routing.md](references/request-routing.md#skillhub-blueprint).                                                                           |
 | `playbooks`          | Trending discovery and `set-visibility`.                                                                                                                                              |
 | `comments`           | Playbook comments and pinned creator notes. See [creators-note.md](references/creators-note.md).                                                                                      |
-| `alert`              | Personal automation/playbook alert opt-ins and history. See [push-notifications.md](references/push-notifications.md).                                                                |
-| `subscriptions`      | Legacy alert/follow compatibility surface. Prefer `alert`, including for follows. See [push-notifications.md](references/push-notifications.md).                                     |
-| `channel`            | Group push subscriptions. See [push-notifications.md](references/push-notifications.md).                                                                                              |
+| `alert`              | Personal FEED alert opt-ins and automation history. See [push-notifications.md](references/push-notifications.md).                                                                    |
+| `subscriptions`      | Playbook follow commands plus FEED alert commands. Following never changes alerts. See [push-notifications.md](references/push-notifications.md).                                    |
+| `channel`            | FEED-only group push subscriptions. See [push-notifications.md](references/push-notifications.md).                                                                                    |
 | `trading`            | Accounts, portfolio, orders, subscriptions, execution. Must read [api/trading.md](references/api/trading.md).                                                                         |
 | `broker`             | Agentic order execution — place/cancel/read across venues (crypto + US equities). Run `alva broker describe` for live commands/capabilities; must read [api/broker.md](references/api/broker.md).                     |
 | `screenshot`         | PNG capture for released playbook verification. See [playbook-creation.md](references/playbook-creation.md#screenshot).                                                               |

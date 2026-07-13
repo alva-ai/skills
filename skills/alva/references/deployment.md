@@ -54,10 +54,11 @@ feed's push sidecars. `signal/targets` and `notify/message` both dispatch the
 canonical `feed_alert_ready` event with different feed-alert sources. The push
 body is read from the _published_ automation: a cronjob with `--push-notify` but
 no `alva automation publish` dispatches an empty body. Delivery also requires an
-explicit personal alert or group subscription to the automation or to a playbook
-that references the feed; `--push-notify` does not subscribe the owner, any
-user, or any group. For `notify/message`, `<|SKIP_NOTIFICATION|>` in
-`body`/`text` skips the user-visible push while advancing fanout.
+explicit personal alert or group subscription to the automation's feed.
+Following a playbook that references the feed does not enable alerts;
+`--push-notify` does not subscribe the owner, any user, or any group. For
+`notify/message`, `<|SKIP_NOTIFICATION|>` in `body`/`text` skips the user-visible
+push while advancing fanout.
 
 The CLI validates that the entry path exists on the filesystem before creating
 the cronjob.
