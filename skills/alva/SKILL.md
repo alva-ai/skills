@@ -261,11 +261,13 @@ metrics, exchange flows, prediction markets, news, and indexed Twitter/X. The
 mandatory discovery path is `list` -> `summary` -> `endpoint`. Use
 `Authorization: Bearer <ARRAYS_JWT>`, not `X-API-Key`.
 
-Listing status, ticker, exchange, and listing date are time-sensitive facts.
-Never answer them from model memory or infer a negative status from an empty
-lookup; read [data-skills.md](references/data-skills.md#market-identity-and-listing-status)
-for the positive-evidence fallback chain. That reference also owns live ticker
-fit checks for curated thematic or sector baskets.
+Whether a requested listing, ADR/ADS, ticker, exchange, or other security form
+exists is a time-sensitive fact. Never use training knowledge or model memory
+to skip current online verification, even when the remembered answer is
+"private", "unlisted", or "no ADR/ticker"; read
+[data-skills.md](references/data-skills.md#market-identity-and-listing-status)
+for the instrument-resolution and cross-source verification chain. That
+reference also owns live ticker-fit checks for thematic or sector baskets.
 
 Source routing:
 
@@ -785,8 +787,8 @@ Before finishing an Alva task, ask:
   gate, and the Complex Ask Router only for complex judgment asks, before I
   answered?
 - Did I avoid WebSearch/LLM/memory/user-pasted data as factual values?
-- Did I verify current market identity instead of treating a missing lookup as
-  evidence that an issuer is private, unlisted, or delisted?
+- Did I run current online verification before using training knowledge to
+  rule out a listing, ADR/ADS, ticker, or other requested security form?
 - Did I run Data Skills `list` -> `summary` -> `endpoint` before coding calls?
 - Did automation publish pass `before-automation-publish`?
 - Did playbook work read [playbook-creation.md](references/playbook-creation.md)
