@@ -70,40 +70,6 @@ Direct latest-price routing:
   `searchPerplexityFinance`
   before suggesting BYOD.
 
-## Market Identity And Listing Status
-
-Treat whether an issuer or requested security form is public, private,
-unlisted, or delisted, plus its ticker, exchange, and listing date, as
-time-sensitive market facts. Training knowledge may suggest search terms, but
-it must never decide that an online query is unnecessary or ineligible.
-
-1. Run current online verification before concluding that the requested
-   instrument does or does not exist. Resolve the issuer's current legal name
-   and aliases, then preserve the security form the user asked about, such as
-   primary or secondary ordinary shares, ADR/ADS, GDR, or an OTC-traded
-   security. Evidence for one form does not establish whether another exists.
-2. Query structured company detail by name when the symbol is unknown and by
-   symbol when it is known. Read identity fields such as `symbol`, `exchange`,
-   `is_listed`, and `ipo_date` when present, but remember that both US and
-   non-US datasets can have coverage or freshness gaps.
-3. Regardless of remembered status, search the exact issuer plus the requested
-   security form. Use `searchPerplexityFinance`, then general or domain-scoped
-   online search when finance search omits the instrument or makes an
-   unsupported negative claim. Search results are discovery only: include an
-   explicit as-of date, open the cited current exchange, regulator, issuer/IR,
-   or equivalent primary source, and evaluate it before using the fact.
-4. For a recent IPO or instrument launch, a planning calendar is discovery
-   evidence only. A past `Expected` row is unknown; confirm completed trading
-   with a current primary source, company profile, or quote/kline.
-
-An empty, 404, unsupported, or single-source negative result proves only that
-the queried source did not establish the instrument. It does not prove that the
-issuer is private, unlisted, delisted, or lacks the requested instrument or
-ticker. Continue the cross-source chain or state that status is still
-unverified. Treat the user's claim that a listing exists as a freshness signal
-that requires verification, not as a reason to defend the model's remembered
-answer.
-
 ## Thematic Ticker Curation
 
 When building sector or thematic dashboards with curated ticker lists, do not

@@ -264,10 +264,10 @@ mandatory discovery path is `list` -> `summary` -> `endpoint`. Use
 Whether a requested listing, ADR/ADS, ticker, exchange, or other security form
 exists is a time-sensitive fact. Never use training knowledge or model memory
 to skip current online verification, even when the remembered answer is
-"private", "unlisted", or "no ADR/ticker"; read
-[data-skills.md](references/data-skills.md#market-identity-and-listing-status)
-for the instrument-resolution and cross-source verification chain. That
-reference also owns live ticker-fit checks for thematic or sector baskets.
+"private", "unlisted", or "no ADR/ticker". A missing or single-source negative
+result is not proof of nonexistence; check another current source or report the
+status as unverified. For thematic or sector baskets, verify ticker fit with
+live company-detail data; do not trust memory.
 
 Source routing:
 
