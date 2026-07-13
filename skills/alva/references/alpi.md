@@ -15,13 +15,9 @@ inside a deterministic pipeline. The runtime module is `@alva/pi`; use
 // @ts-nocheck
 /** alva run --entry-path '~/tasks/run-result.js' */
 (async () => {
-	const { Agent, Type, getModel } = require("@alva/pi");
+	const { Agent, Type } = require("@alva/pi");
 	const args = require("env").args || {};
 
-	const provider = String(args.provider || "").trim();
-	const modelId = String(args.model || "").trim();
-	if (!provider || !modelId) throw new Error("Pass args.provider and args.model.");
-	const model = getModel(provider, modelId);
 	const prompt =
 		args.prompt ||
 		"Use add for 100+23, then subtract 7 from that sum. Reply with only the final number.";
@@ -29,7 +25,6 @@ inside a deterministic pipeline. The runtime module is `@alva/pi`; use
 	const agent = new Agent({
 		initialState: {
 			systemPrompt: "Use add and subtract tools. Reply with only the final number.",
-			model,
 			tools: [
 				{
 					name: "add",
@@ -77,11 +72,11 @@ from secret-manager, never inline it in the script**:
 
 ```javascript
 const agent = new Agent({
-	initialState: { /* systemPrompt, model, tools */ },
+	initialState: { /* systemPrompt, tools */ },
 	// BYOK: jagent passes this key straight through to the provider and does
 	// NOT charge Alva platform credits for the call. Store the key with
 	// secret-manager; never paste a raw key into the script.
-	getApiKey: () => require("secret-manager").loadPlaintext("MY_ANTHROPIC_KEY"),
+	getApiKey: () => require("secret-manager").loadPlaintext("MY_PROVIDER_KEY"),
 });
 ```
 
@@ -100,7 +95,6 @@ events unless the script truly needs progress updates.
 | Field | Required | Description |
 | --- | --- | --- |
 | `initialState.systemPrompt` | no | Fixed instructions for the reasoning step. |
-| `initialState.model` | yes | Caller-selected `getModel(provider, modelId)` result. Pass provider/model through runtime args instead of hardcoding an ID. |
 | `initialState.tools` | no | Tool definitions available to the agent; defaults to none. |
 | `initialState.thinkingLevel` | no | Omit to use the runtime default. |
 | `getApiKey` | no | Omit to use the jagent-managed platform key (default). For BYOK, return your own key loaded via `secret-manager` — passed through to the provider, not billed to platform credits. |
@@ -161,9 +155,6 @@ Guidelines:
 
 ## Patterns & Examples
 
-The snippets below assume `model` was resolved from runtime arguments as shown
-in Quick Start. Keep provider and model selection outside the pattern itself.
-
 ### User-editable instructions — alpi feed
 
 Let the feed owner steer the agent by editing the feed's `AGENTS.md` (their own
@@ -190,7 +181,6 @@ Reply MUST begin with \`{\` and end with \`}\`. No prose, no markdown, no code f
 Output is parsed by JSON.parse with no preprocessing.
 
 Schema: {"summary":"...","changes":["..."],"sentiment":"up|down|neutral"}`,
-		model,
 		tools: [
 			{
 				name: "getIncomeStatements",
@@ -274,7 +264,6 @@ const tools = [
 const agent = new Agent({
 	initialState: {
 		systemPrompt: "Macro-financial analyst. Gather multiple sources before concluding.",
-		model,
 		tools,
 	},
 });
@@ -300,7 +289,6 @@ await feed.run(async (ctx) => {
 	const agent = new Agent({
 		initialState: {
 			systemPrompt: "Analyze each sector. After each, call saveSectorResult.",
-			model,
 			tools: [
 				{
 					name: "saveSectorResult",
