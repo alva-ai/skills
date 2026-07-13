@@ -15,10 +15,9 @@ inside a deterministic pipeline. The runtime module is `@alva/pi`; use
 // @ts-nocheck
 /** alva run --entry-path '~/tasks/run-result.js' */
 (async () => {
-	const { Agent, Type, getModel } = require("@alva/pi");
+	const { Agent, Type } = require("@alva/pi");
 	const args = require("env").args || {};
 
-	const model = getModel("openai", args.model || "gpt-5.5");
 	const prompt =
 		args.prompt ||
 		"Use add for 100+23, then subtract 7 from that sum. Reply with only the final number.";
@@ -26,7 +25,6 @@ inside a deterministic pipeline. The runtime module is `@alva/pi`; use
 	const agent = new Agent({
 		initialState: {
 			systemPrompt: "Use add and subtract tools. Reply with only the final number.",
-			model,
 			tools: [
 				{
 					name: "add",
@@ -45,7 +43,6 @@ inside a deterministic pipeline. The runtime module is `@alva/pi`; use
 					}),
 				},
 			],
-			thinkingLevel: "off",
 		},
 	});
 
@@ -75,11 +72,11 @@ from secret-manager, never inline it in the script**:
 
 ```javascript
 const agent = new Agent({
-	initialState: { /* systemPrompt, model, tools */ },
+	initialState: { /* systemPrompt, tools */ },
 	// BYOK: jagent passes this key straight through to the provider and does
 	// NOT charge Alva platform credits for the call. Store the key with
 	// secret-manager; never paste a raw key into the script.
-	getApiKey: () => require("secret-manager").loadPlaintext("MY_ANTHROPIC_KEY"),
+	getApiKey: () => require("secret-manager").loadPlaintext("MY_PROVIDER_KEY"),
 });
 ```
 
@@ -98,9 +95,8 @@ events unless the script truly needs progress updates.
 | Field | Required | Description |
 | --- | --- | --- |
 | `initialState.systemPrompt` | no | Fixed instructions for the reasoning step. |
-| `initialState.model` | yes | `getModel(provider, modelId)` result, usually OpenAI. |
-| `initialState.tools` | yes | Tool definitions available to the agent. |
-| `initialState.thinkingLevel` | no | Use `"off"` for deterministic result-only jobs unless reasoning is needed. |
+| `initialState.tools` | no | Tool definitions available to the agent; defaults to none. |
+| `initialState.thinkingLevel` | no | Omit to use the runtime default. |
 | `getApiKey` | no | Omit to use the jagent-managed platform key (default). For BYOK, return your own key loaded via `secret-manager` — passed through to the provider, not billed to platform credits. |
 
 ### Tool
@@ -173,7 +169,7 @@ Read the agent's previous output via feed time-series paths
 (`@last/N`, `@range/{start}..{end}`).
 
 ```javascript
-const { Agent, Type, getModel } = require("@alva/pi");
+const { Agent, Type } = require("@alva/pi");
 const env = require("env");
 const alfs = require("alfs");
 
@@ -185,7 +181,6 @@ Reply MUST begin with \`{\` and end with \`}\`. No prose, no markdown, no code f
 Output is parsed by JSON.parse with no preprocessing.
 
 Schema: {"summary":"...","changes":["..."],"sentiment":"up|down|neutral"}`,
-		model: getModel("openai", "gpt-5.5"),
 		tools: [
 			{
 				name: "getIncomeStatements",
@@ -219,7 +214,6 @@ Schema: {"summary":"...","changes":["..."],"sentiment":"up|down|neutral"}`,
 				},
 			},
 		],
-		thinkingLevel: "off",
 	},
 });
 
@@ -232,7 +226,7 @@ Expose multiple domain tools and let the agent decide fetch order from the
 fixed prompt.
 
 ```javascript
-const { Agent, Type, getModel } = require("@alva/pi");
+const { Agent, Type } = require("@alva/pi");
 
 const tools = [
 	{
@@ -270,9 +264,7 @@ const tools = [
 const agent = new Agent({
 	initialState: {
 		systemPrompt: "Macro-financial analyst. Gather multiple sources before concluding.",
-		model: getModel("openai", "gpt-5.5"),
 		tools,
-		thinkingLevel: "off",
 	},
 });
 
@@ -285,7 +277,7 @@ Use a tool to persist intermediate results while alpi runs. Partial results can
 survive even if a later turn fails.
 
 ```javascript
-const { Agent, Type, getModel } = require("@alva/pi");
+const { Agent, Type } = require("@alva/pi");
 const { Feed, feedPath, makeDoc, str, num } = require("@alva/feed");
 
 const feed = new Feed({ path: feedPath("sector-scan") });
@@ -297,7 +289,6 @@ await feed.run(async (ctx) => {
 	const agent = new Agent({
 		initialState: {
 			systemPrompt: "Analyze each sector. After each, call saveSectorResult.",
-			model: getModel("openai", "gpt-5.5"),
 			tools: [
 				{
 					name: "saveSectorResult",
@@ -313,7 +304,6 @@ await feed.run(async (ctx) => {
 					},
 				},
 			],
-			thinkingLevel: "off",
 		},
 	});
 
