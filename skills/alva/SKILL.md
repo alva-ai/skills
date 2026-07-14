@@ -193,7 +193,8 @@ that section as mandatory, not optional debugging material.
 
 | User asks for                                                                                                                           | Route                               | Must not miss                                                                                                                                                                            |
 | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| price, valuation, holdings, "why did it move", compare peers, explain a thesis, rank in text                                            | Financial Analysis / Ask Question   | Fetch fresh data/search evidence; comparison baselines need provenance too. Every answer must pass the ask evidence gate below.                                                          |
+| price, valuation, holdings, broad company analysis, "why did it move", compare peers, explain a thesis, rank in text                    | Financial Analysis / Ask Question   | For a named company, also apply the proactive Company Anomaly check in the Financial Analysis tree; it supplements rather than replaces ordinary analysis.                              |
+| company anomaly, scan/check whether a company is anomalous, use Platform Data to analyze a company, unusual price/volume move            | Platform Data: Company Anomaly      | Read [company-anomaly.md](references/company-anomaly.md); verify exact-ticker coverage, live-read the current state, and keep any prior attribution timestamp distinct.                 |
 | fintwit / KOL / leaderboard — top accounts or ranking, is @handle tracked, what an account thinks about a ticker or theme, track record | Platform Data: Fintwit Intelligence | Use the Platform Data section below, then read [fintwit.md](references/fintwit.md); cite the snapshot date; read-only, never fabricate rankings.                                         |
 | FinTwit digest SDK, alpha radar automation, custom digest module, `@alva/fintwit-digest`                                                | Platform Data: Fintwit Digest SDK   | Use the Platform Data section below, then read [fintwit-digest-sdk.md](references/fintwit-digest-sdk.md); follow the SDK API and ability contracts instead of copying runtime internals. |
 | dashboard, screener app, thesis tracker, hosted report, shareable surface                                                               | Playbook Creation                   | Build live feeds first, then read [playbook-creation.md](references/playbook-creation.md).                                                                                               |
@@ -297,6 +298,7 @@ not copy private runtime internals into user scripts.
 
 | Surface                         | Use for                                                                                                                  | Must not miss                                                                                                                                                                  |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Company Anomaly Intelligence    | Proactive company anomaly checks, latest attribution, sector-vs-company decomposition, and aligned supporting events.    | Read [company-anomaly.md](references/company-anomaly.md); a quiet current tick can be newer than the latest `real` attribution, so keep those states distinct.                 |
 | Fintwit Intelligence / KOL data | Top accounts, leaderboard rankings, tracked-handle checks, account theses, ticker sentiment, and track record questions. | Read [fintwit.md](references/fintwit.md); live-read the public platform feeds, cite the snapshot timestamp, and keep the source read-only.                                     |
 | Fintwit Digest SDK              | Alpha radar automation, custom digest modules, and `@alva/fintwit-digest` scripts over platform KOL tracker feeds.       | Read [fintwit-digest-sdk.md](references/fintwit-digest-sdk.md); use the public API and ability contracts instead of copying runtime internals or adding ad hoc profile config. |
 
@@ -364,6 +366,13 @@ It may be a single fresh data fetch, an `alva run` computation over live data, a
 sourced explanation, a peer comparison, a thesis check, or a concise table. It
 is not merely "Data Query": data access and execution are steps inside an
 analysis answer.
+
+For broad analysis of a named company, proactively read
+[company-anomaly.md](references/company-anomaly.md), then test its exact-ticker
+Company Anomaly coverage before answering. When covered, include the current
+anomaly state and freshness as one analysis dimension. When unavailable,
+continue the ordinary analysis; do not substitute anomaly intelligence for
+fundamentals, valuation, or company news.
 
 Common subroutes are latest fact, contextual explanation, comparison/valuation,
 ranking or screen-in-text, and thesis check. They all end as an answer unless
@@ -615,10 +624,12 @@ reference before doing the task.
 ### Ask Question / Financial Analysis
 
 For "what is the latest price / P/E / funding rate / holdings / CPI print", "why
-did it move", "is it cheap vs peers", or "rank these in text", start with
-financial analysis. Run preflight if needed, verify the relevant Data Skills or
-search route, use `alva run` when live computation or joins are needed, fetch or
-qualify any comparison baseline, read
+did it move", "analyze this company", "is it cheap vs peers", or "rank these in
+text", start with financial analysis. For broad named-company analysis, apply
+the proactive Company Anomaly check defined in the Financial Analysis tree. Run
+preflight if needed, verify the relevant Data Skills or search route, use
+`alva run` when live computation or joins are needed, fetch or qualify any
+comparison baseline, read
 [user-facing-prose.md](references/user-facing-prose.md), apply the answer gate
 in the Financial Analysis tree, classify complex asks with
 [request-routing.md](references/request-routing.md), and answer with inline
@@ -745,6 +756,7 @@ Use this index to open only the file needed for the current task.
 | [onnx.md](references/onnx.md)                                                         | ONNX artifact, inference, FeedAltra integration, release checks.                                                                              |
 | [deployment.md](references/deployment.md)                                             | Cronjob create/list/pause/resume/trigger/run-status/runs/run-logs and channel loops.                                                          |
 | [search.md](references/search.md)                                                     | `unified_search`, finance search, Twitter/X, Reddit, YouTube, web gotchas.                                                                    |
+| [company-anomaly.md](references/company-anomaly.md)                                   | Platform Data / Company Anomaly Intelligence: anomaly state, aligned attribution, evidence, interpretation, and answer workflow.              |
 | [fintwit.md](references/fintwit.md)                                                   | Platform Data / Fintwit Intelligence: curated fintwit/KOL account data — views, signals, profiles; query recipes by account, ticker, ranking. |
 | [fintwit-digest-sdk.md](references/fintwit-digest-sdk.md)                             | Platform Data / Fintwit Digest SDK: `@alva/fintwit-digest` public API, run profiles, pipeline state, ability contracts, and override rules.   |
 | [secret-manager.md](references/secret-manager.md)                                     | Secret upload, naming, CRUD, runtime access, guardrails.                                                                                      |
