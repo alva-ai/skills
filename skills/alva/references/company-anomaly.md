@@ -1,223 +1,357 @@
 # Company Anomaly Intelligence
 
-A public, read-only Platform Data surface for detecting unusual company price or
-volume behavior and explaining a likely driver from aligned market, sector,
-peer, and event evidence. Use it when a user asks whether a covered company is
-moving abnormally, why an unusual move happened, whether the move is
-sector-driven or company-specific, or what evidence supports Alva's attribution.
+A public, read-only Platform Data surface for analyzing unusual company price or
+volume behavior, the market and company context around the move, and Alva's
+evidence-backed attribution. Use it for questions such as:
 
-This is processed intelligence, not a raw quote or news feed. The anomaly
-timeline is computed from market signals; the attribution is model-generated
-analysis over supplied evidence. Keep those two layers distinct in the answer.
+- Is a covered company moving abnormally now?
+- What price or volume rule triggered?
+- Is the move market-wide, sector-driven, or company-specific?
+- What events and context support the attribution?
+- How confident is the attribution, and what evidence is missing?
 
-**Not general company research.** For valuation, fundamentals, ordinary price
-checks, or news without an anomaly question, use Financial Analysis and Data
-Skills. A quiet anomaly state does not mean the stock did not move or that no
-news exists.
+This is processed intelligence, not a raw quote or news feed. Price and volume
+signals are computed data; driver attribution is model-generated analysis over
+supplied evidence. Keep those layers distinct in the answer.
 
-## Access
+**Not general company research.** Use Financial Analysis and Data Skills for
+ordinary prices, valuation, fundamentals, or news without an anomaly question. A
+quiet anomaly state does not mean the stock did not move or that no news exists.
 
-- **Host user is `mia`.** Public feeds live under
-  `/alva/home/mia/feeds/<ticker-slug>-portfolio-watch-anomaly/v1` in production.
-- Use absolute paths, never `~/`; the data is granted `special:user:*` read.
-- Build `ticker-slug` by lowercasing the ticker and replacing each run of
-  non-alphanumeric characters with `-`, then trimming leading/trailing `-`.
-  Examples: `MU` -> `mu`, `BRK.B` -> `brk-b`.
-- Coverage is not currently exposed through a directory feed. Try the exact feed
-  path and report unavailable coverage when it returns `NOT_FOUND`; do not
-  substitute another ticker or fabricate a feed.
-- Synth-mount outputs are not discoverable with `alva fs readdir`. Use the
-  documented paths below.
-- This data is production-only. If an expected path returns `NOT_FOUND`, verify
-  the current endpoint with `alva whoami` before declaring that coverage is
-  absent.
+## Contents
 
-Feed base:
+- [Source And Access](#source-and-access)
+- [Coverage Model](#coverage-model)
+- [Anomaly Timeline](#anomaly-timeline)
+- [Detailed Anomaly Packet](#detailed-anomaly-packet)
+- [Attribution](#attribution)
+- [Company And Market Context](#company-and-market-context)
+- [Event Evidence](#event-evidence)
+- [Run And Data Quality Metadata](#run-and-data-quality-metadata)
+- [Relationships And Freshness](#relationships-and-freshness)
+- [Answer Contract](#answer-contract)
+- [Reliability Boundaries](#reliability-boundaries)
 
-```text
-/alva/home/mia/feeds/<ticker-slug>-portfolio-watch-anomaly/v1
-```
+## Source And Access
 
-## Public Read Contract
+Use the current Alva CLI filesystem commands to read this source; run
+`alva fs --help` before use. This reference owns the data contract and field
+semantics, not CLI syntax or time-series suffix behavior.
 
-| Output                   | Role                                                     | Read rule                                                           |
-| ------------------------ | -------------------------------------------------------- | ------------------------------------------------------------------- |
-| `data/anomaly/timeline`  | Every anomaly-gate evaluation and its state              | Always start here                                                   |
-| `data/analysis/decision` | Concise decision plus attribution context for heavy runs | Join by `runAtMs`                                                   |
-| `data/audit/run_log`     | Computed anomaly and final attribution payloads          | Read only the named fields below; join by `runAtMs`                 |
-| `data/event/items`       | Normalized source records used as supporting evidence    | Optional; filter by the aligned `runAtMs` and stable event identity |
+- **Host user:** `mia`.
+- **Feed base:**
+  `/alva/home/mia/feeds/<ticker-slug>-portfolio-watch-anomaly/v1`.
+- **Ticker slug:** lowercase the ticker, replace each run of non-alphanumeric
+  characters with `-`, and trim leading/trailing `-` (`MU` -> `mu`, `BRK.B` ->
+  `brk-b`).
+- **Environment:** production. Verify the current endpoint before treating
+  `NOT_FOUND` as missing company coverage.
+- **Permissions:** public read through `special:user:*`; never write to this
+  namespace.
+- **Discovery:** there is no public company directory yet, and synth outputs are
+  not discoverable through `readdir`. Test the exact feed path and report
+  unavailable coverage instead of inventing a feed.
 
-Other outputs such as `portfolio/snapshot`, `portfolio/positions`,
-`notify/message`, and persistence audit rows are producer internals, not the
-Company Anomaly Platform Data contract.
+## Coverage Model
 
-## Query Workflow
+The feed has a lightweight anomaly-gate layer and a heavier attribution layer.
+The heavy outputs exist only for runs that entered analysis; this is expected
+sparsity, not missing data.
 
-### 1. Read the current anomaly state
+### Data Domains
 
-```bash
-alva fs read --path '/alva/home/mia/feeds/<ticker-slug>-portfolio-watch-anomaly/v1/data/anomaly/timeline/@last/1'
-```
+| Domain                      | Covered data                                                                                                                                                   |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Price anomaly               | Latest price, session/reference prices, move basis, regular/pre-market/after-hours components, total move, historical return mean/stdev/sample, price z-score  |
+| Volume anomaly              | Cumulative volume at an intraday cutoff, session/interval, multi-window historical baselines, median/mean/stdev, volume multiple, volume z-score, availability |
+| Anomaly state               | Triggered rules, newly triggered rules, promotion/new-material state, current state-machine tag, attribution linkage                                           |
+| Company and peer context    | When available: company market metrics, peer roles and returns, sector tone, sector ETF direction/flow, and decomposition inputs                               |
+| Industry context            | When configured: company-relevant spot/contract prices, industry indexes, and rate/repricing or prediction-market context                                      |
+| Corporate and market events | When available: company and industry news, market news, industry social/X, analyst target changes, insider activity, and congressional activity                |
+| Attribution                 | Likely-driver headline/summary, market-sector-company driver split, evidence, confidence, status, search activity, promotion decision                          |
+| Quality and operations      | Run status/timing, source coverage, warnings, prompt coverage, gate diagnostics, notification decision                                                         |
 
-Use the row's `date` or `runAtMs` as the state timestamp. Interpret `tag` as a
-state-machine value, not as a generic sentiment label:
+### Output Mapping
 
-| `tag`           | Meaning                                                                 | Follow-up                                                                          |
-| --------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `not_triggered` | Current price/volume rules did not cross the anomaly gate               | Report the quiet state and metrics; do not claim there was no move or news         |
-| `candidate`     | A continued anomaly did not produce a new attribution                   | Report as continued/no new attribution; do not reuse an old explanation as current |
-| `no_material`   | New material was checked but did not qualify as novel enough to promote | Report the continued anomaly and failed novelty/materiality outcome                |
-| `real`          | A publishable anomaly attribution was produced                          | Follow `attributionRunAtMs` into the aligned analysis and audit rows               |
+| Data layer                       | Output                   | Coverage                                                                             |
+| -------------------------------- | ------------------------ | ------------------------------------------------------------------------------------ |
+| Anomaly state                    | `data/anomaly/timeline`  | Every gate evaluation: state, price/volume summary, triggered rules, promotion state |
+| Decision                         | `data/analysis/decision` | Run-level alert decision, concise explanation, and company attribution context       |
+| Anomaly and attribution payloads | `data/audit/run_log`     | Detailed price/volume anomaly packets, final attributions, quality and run metadata  |
+| Supporting evidence              | `data/event/items`       | Normalized company, industry, market-news, and social records used by the run        |
 
-`realReason` refines a `real` row:
+`portfolio/snapshot`, `portfolio/positions`, `notify/message`, finding rows, and
+persistence diagnostics are producer outputs, not the Company Anomaly analysis
+contract.
 
-- `first`: first qualifying anomaly in the current state sequence.
-- `new_rule`: an additional price/volume rule crossed.
-- `promoted`: new qualifying material promoted a continuing anomaly.
+## Anomaly Timeline
 
-### 2. Find the latest meaningful attribution when needed
+`anomaly/timeline` is the entry point for both current state and anomaly
+history. It answers whether the gate fired and records the minimum facts needed
+to interpret that decision.
 
-The latest timeline row is often quiet even though an earlier `real` row is
-still the most recent explanation. If the user asks for the latest attributed
-anomaly rather than only the current gate state, read a bounded timeline window
-and select the newest `tag == "real"` row:
+### Identity And Time
 
-```bash
-alva fs read --path '/alva/home/mia/feeds/<ticker-slug>-portfolio-watch-anomaly/v1/data/anomaly/timeline/@last/200'
-```
+| Field                | Meaning                                                  |
+| -------------------- | -------------------------------------------------------- |
+| `symbol`             | Covered company ticker                                   |
+| `date`               | Time-series record timestamp                             |
+| `runAtMs`            | Gate-evaluation timestamp; not the heavy-output join key |
+| `attributionRunAtMs` | Heavy attribution run to join when non-zero              |
 
-State both timestamps when they differ: the current gate timestamp and the
-selected attribution timestamp. If the initial window has no `real` row, page
-backward from its oldest `runAtMs` until a `real` row is found or history is
-exhausted:
+### State
 
-```text
-.../data/anomaly/timeline/@before/<oldest-runAtMs>/200
-```
+| Field        | Meaning                                                                      |
+| ------------ | ---------------------------------------------------------------------------- |
+| `tag`        | State-machine result: `not_triggered`, `candidate`, `no_material`, or `real` |
+| `promoted`   | String boolean indicating whether new material promoted the run              |
+| `realReason` | Why a `real` attribution was emitted: `first`, `new_rule`, or `promoted`     |
+| `headline`   | Concise attribution headline when the row has a published attribution        |
 
-Repeat with the next window's oldest timestamp. This bounded pagination is part
-of a latest-attribution lookup, not only an explicitly historical request; do
-not imply that `@last/200` is the feed's full history.
+State meanings:
 
-### 3. Join the attribution run
+| `tag`           | Interpretation                                                                                                                 |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `not_triggered` | Current price/volume signals did not cross an anomaly rule. This is a quiet gate result, not a claim that price was unchanged. |
+| `candidate`     | An anomaly continued, but the run did not produce a new attribution. Do not reuse an older explanation as current.             |
+| `no_material`   | Potential new material was checked but did not qualify as novel/material enough to promote.                                    |
+| `real`          | A publishable attribution exists for the aligned `attributionRunAtMs`.                                                         |
 
-Read bounded windows from both outputs and select rows whose `runAtMs` equals
-the timeline row's non-zero `attributionRunAtMs`:
+### Price, Volume, Rules, And Material
 
-```bash
-alva fs read --path '/alva/home/mia/feeds/<ticker-slug>-portfolio-watch-anomaly/v1/data/analysis/decision/@last/50'
-alva fs read --path '/alva/home/mia/feeds/<ticker-slug>-portfolio-watch-anomaly/v1/data/audit/run_log/@last/50'
-```
+| Field                   | Meaning                                                                                        |
+| ----------------------- | ---------------------------------------------------------------------------------------------- |
+| `priceMovePct`          | Move measured on the basis named by `priceMoveBasis`                                           |
+| `priceMoveBasis`        | Comparison basis, such as pre-market versus previous close or after-hours versus regular close |
+| `regularSessionMovePct` | Regular-session component                                                                      |
+| `afterHoursMovePct`     | After-hours component                                                                          |
+| `preMarketMovePct`      | Pre-market component                                                                           |
+| `totalMovePct`          | Combined move carried by the anomaly evaluation                                                |
+| `priceZScore`           | Standardized price anomaly signal                                                              |
+| `volumeZScore`          | Standardized volume anomaly signal                                                             |
+| `rulesTriggeredJson`    | JSON array of all currently active anomaly rules                                               |
+| `newRulesJson`          | JSON array of rules newly active in this transition                                            |
+| `newMaterialJson`       | JSON array of new event identities considered for promotion                                    |
 
-Do not blindly join `@last/1`: quiet timeline ticks can be newer than the last
-heavy attribution run. If the target `runAtMs` is outside an initial output
-window, page that output backward with `@before/<oldest-runAtMs>/<limit>` until
-the target is found or the output is exhausted. Report the attribution as
-incomplete only after confirming that an aligned row is absent; never combine
-different runs.
+The move basis matters. Do not present a pre-market move versus previous close
+as though it were a regular-session return.
 
-Parse only these consumer fields:
+## Detailed Anomaly Packet
 
-- From `analysis/decision`: `reason`, `alertDecision`, `urgency`, `skipReason`,
-  and `attributionContextJson`.
-- From `audit/run_log`: `anomaliesJson` and `anomalyAttributionsJson`.
+`audit/run_log.anomaliesJson` is a JSON-encoded array. Each anomaly object
+contains the computed facts behind the timeline summary.
 
-All `*Json` values above are JSON-encoded strings. Parse them before reading
-nested fields. Inspect live keys because context varies by company; examples
-include `sectorVsIdiosyncratic`, `peerMoves`, ETF flow, industry spot data,
-analyst target posture, and insider or congressional activity.
+### Anomaly Object
 
-### 4. Load supporting events only when useful
+| Field                  | Meaning                                                 |
+| ---------------------- | ------------------------------------------------------- |
+| `anomalyId`            | Anomaly identity inside the computed anomaly payload    |
+| `symbol`               | Company ticker                                          |
+| `abnormal`             | Whether the computed packet is abnormal                 |
+| `triggerKinds`         | Trigger families, normally price and/or volume          |
+| `summary`              | Human-readable computed signal summary                  |
+| `price`                | Detailed price signal packet                            |
+| `volume`               | Detailed volume signal packet                           |
+| `relatedEvents`        | Event records already linked to the anomaly             |
+| `attributionContext`   | Company/sector context supplied to attribution          |
+| `rateRepricingContext` | Relevant rate or prediction-market context when present |
+| `sourceNotes`          | Data provenance and quality notes                       |
 
-```bash
-alva fs read --path '/alva/home/mia/feeds/<ticker-slug>-portfolio-watch-anomaly/v1/data/event/items/@last/200'
-```
+### Price Packet
 
-Filter event rows to the aligned attribution `runAtMs`, then match existing
-supporting-event identities by `eventKey`, URL, or title. Do not add unrelated
-rows merely because they mention the ticker. Preserve source, publication time,
-and URL when present; an empty URL stays unavailable.
+| Coverage             | Fields                                                                                                                                                                     |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Current observation  | `symbol`, `latestPrice`, `latestPriceAsOfMs`, `latestPriceAsOfHkt`                                                                                                         |
+| Reference prices     | `todayOpen`, `todayOpenAsOfMs`, `previousClose`, `previousCloseAsOfMs`, `previousCloseAsOfHkt`, `priorRegularClose`, `priorRegularCloseAsOfMs`, `priorRegularCloseAsOfHkt` |
+| Move decomposition   | `todayOpenMovePct`, `priceMovePct`, `priceMoveBasis`, `regularSessionMovePct`, `afterHoursMovePct`, `preMarketMovePct`, `totalMovePct`                                     |
+| Statistical baseline | `priceZScore`, `dailyReturnMeanPct`, `dailyReturnStdevPct`, `dailyReturnSampleSize`                                                                                        |
+| Gate explanation     | `triggerKinds`, `reasons`                                                                                                                                                  |
 
-## Field Interpretation
+### Volume Packet
 
-### Timeline facts
+| Coverage              | Fields                                                                                           |
+| --------------------- | ------------------------------------------------------------------------------------------------ |
+| Current observation   | `cumulativeVolume`, `currentEtDate`, `cutoffMinuteOfDay`, `currentVolumeAvailable`               |
+| Baseline              | `historicalMedianVolume`, `historicalMedianWindow`, `historicalMedianWindows`, `baselineSamples` |
+| Comparison            | `volumeMultiple`, `volumeZScore`                                                                 |
+| Session semantics     | `volumeSession`, `volumeInterval`, `marketStatus`                                                |
+| Availability and gate | `volumeAvailable`, `triggerKinds`, `reasons`                                                     |
 
-| Field                                                            | Meaning                                              |
-| ---------------------------------------------------------------- | ---------------------------------------------------- |
-| `priceMovePct`                                                   | Move measured on the basis named by `priceMoveBasis` |
-| `regularSessionMovePct`, `afterHoursMovePct`, `preMarketMovePct` | Session-specific components when available           |
-| `totalMovePct`                                                   | Combined move carried by the anomaly check           |
-| `priceZScore`, `volumeZScore`                                    | Standardized anomaly signals used by the gate        |
-| `rulesTriggeredJson`                                             | All currently active anomaly rules                   |
-| `newRulesJson`                                                   | Rules newly active in this state transition          |
-| `newMaterialJson`                                                | New event identities considered for promotion        |
-| `headline`                                                       | Short attribution headline for a `real` row          |
+Each `historicalMedianWindows` item can include `label`, `configLabel`, `days`,
+`basis`, `baselineWindow`, `cutoffMinuteOfDay`, `sampleCount`, `medianVolume`,
+`meanVolume`, and `stdVolume`. Use the effective values in the packet rather
+than assuming one fixed baseline window.
 
-These are feed-computed facts. Describe the exact basis: a pre-market move
-versus previous close is not interchangeable with a regular-session return.
+## Attribution
 
-### Attribution analysis
+Attribution answers why the move may have happened. It is analysis, not proven
+causality.
 
-Within `anomaliesJson`, use the anomaly identity, symbol, trigger kinds, price
-and volume packets, summary, and source notes. Within `anomalyAttributionsJson`,
-use:
+### Decision Summary
 
-- `headline` and `summary` for the explanation.
-- `driverSplit` for market, sector, and company-specific decomposition.
-- `attributionStatus` and `confidence` for uncertainty.
-- `supportingEvents` and `sourceLinks` for evidence.
-- `generatedAtHkt` for attribution freshness.
+`analysis/decision` exposes the concise run result:
 
-Treat the attribution as Alva analysis, not proven causality. Evidence may show
-that a driver fits the timing and direction without proving that it caused the
-move.
+| Field                                   | Meaning                                                                     |
+| --------------------------------------- | --------------------------------------------------------------------------- |
+| `accountId`                             | Source account identifier; ticker-only feeds normally use a static identity |
+| `portfolioMode`, `positionCompleteness` | Input mode and whether position sizing was available                        |
+| `runSource`                             | Producer run mode, such as an anomaly shard                                 |
+| `alertDecision`                         | `push` or `no_push` decision                                                |
+| `urgency`                               | Notification urgency classification                                         |
+| `reason`                                | Concise driver explanation                                                  |
+| `skipReason`                            | Why no notification was selected                                            |
+| `notificationMessage`                   | Generated user-facing message when present                                  |
+| `attributionContextJson`                | JSON-encoded company, peer, sector, and market context                      |
+| `runAtMs`, `date`                       | Attribution timestamp and time-series timestamp                             |
 
-## Answer Shape
+Other decision fields (`selectedFindingIdsJson`, `unifiedEventsJson`,
+`selectedEventPacketsJson`, expansion JSON, and cooldown JSON) are producer and
+diagnostic material. They are not required to explain the company anomaly.
 
-For a company-anomaly question, always begin with:
+### Final Attribution Object
 
-1. **Current state**: ticker, latest `tag`, current-state timestamp, and whether
-   the anomaly gate is quiet or active.
-2. **What moved**: move basis, session components, z-scores, and triggered rules
-   from the current timeline row.
+`audit/run_log.anomalyAttributionsJson` is a JSON-encoded array. Pair each item
+to an anomaly by symbol within the already aligned attribution run. The current
+attribution object does not expose `anomalyId`; do not infer a cross-run
+identity from array order.
 
-For `not_triggered`, `candidate`, or `no_material`, stop there after stating the
-no-new-attribution meaning unless the user also asks for the latest prior
-attribution. Do not present an old driver as the explanation for the current
-tick.
+| Field                                  | Meaning                                                             |
+| -------------------------------------- | ------------------------------------------------------------------- |
+| `symbol`                               | Attributed company                                                  |
+| `headline`                             | Short likely-driver statement                                       |
+| `summary`                              | Full attribution narrative                                          |
+| `attributionStatus`                    | Attribution result quality/status                                   |
+| `confidence`                           | Confidence classification                                           |
+| `driverSplit`                          | Decomposition into `market`, `sector`, and `asset_specific` drivers |
+| `supportingEvents`                     | Evidence items with `title`, `why_it_fits`, and `url`               |
+| `sourceLinks`                          | Supporting source URLs                                              |
+| `generatedAtHkt`                       | Attribution generation time                                         |
+| `promote`, `promoteReason`             | Whether and why the attribution was promoted                        |
+| `searched`, `searchCalls`, `searchLog` | Search activity used during attribution                             |
+| `parseOk`, `rawPreview`                | Model-output parsing diagnostics                                    |
 
-When a `real` attribution was selected, continue with:
+## Company And Market Context
 
-3. **Attributed move, when different from the current tick**: selected `real`
-   timestamp, move basis, session components, z-scores, and rules from that
-   selected timeline row. Do not pair the older attribution with current quiet
-   metrics. Omit this separate step when the current row is the selected `real`
-   row because step 2 already describes it.
-4. **Likely driver**: attribution headline/summary and market-sector-company
-   decomposition, explicitly labeled as Alva analysis.
-5. **Evidence**: the few supporting events that actually align to the run, with
-   source and time.
-6. **Confidence and limits**: attribution status, confidence, missing URLs or
-   context, and both current-state and attribution timestamps when different.
+`attributionContextJson` supplies the comparison data used to separate broad,
+sector, and company-specific explanations. Context is company-specific; inspect
+the live keys and do not require semiconductor-only fields for other companies.
 
-Do not dump raw JSON, the full event corpus, or the producer's audit trail into
-the answer. Summarize only the fields that support the user's question.
+| Context area                       | Typical fields                                                                                        | What it explains                                                                              |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Generation and usage               | `generatedAtHkt`, `usage`                                                                             | Context timestamp and which inputs are context-only versus event candidates                   |
+| Sector vs idiosyncratic            | `sectorVsIdiosyncratic` with company move/direction, peer counts, ETF direction, sector tone, summary | Whether the move follows the peer/sector tape                                                 |
+| Peer moves                         | `peerMoves[]`: `symbol`, `role`, `direction`, `return1dPct`, `return30dPct`, `summary`                | Direct competitor, supplier/customer, storage, or benchmark comparisons                       |
+| Self market metrics                | `selfMarketMetrics.latest.<metric>` with `value`, `observedDate`                                      | Price changes, volume, dollar volume, volatility, beta, RSI, and other company market metrics |
+| Sector ETF flow                    | Company-relevant ETF object with date, direction, flow, shares, close, summary                        | Whether sector fund flows support the move                                                    |
+| Industry spot or contract data     | Industry-specific arrays with item, dates, levels, direction, change, summary                         | Whether underlying industry pricing supports the move                                         |
+| Industry index                     | Relevant industry-index value, date, multi-horizon changes, summary                                   | Broader industry-cycle direction                                                              |
+| Rate/repricing context             | Relevant market items with id, title, slug, end date, volume, and liquidity                           | Whether policy or rate-expectation repricing fits the move                                    |
+| Analyst targets                    | `analystTargetPosture.latest[]`: firm, analyst, posture, target, published, title, summary            | Fresh target changes and analyst posture                                                      |
+| Insider and congressional activity | Insider/congress summaries and latest activity lists                                                  | Recent disclosed buying or selling context                                                    |
+
+Observed self-market metric names include `PRICE_CHANGE_1d`, `PRICE_CHANGE_1w`,
+`PRICE_CHANGE_1M`, `PRICE_CHANGE_3M`, `PRICE_CHANGE_6M`, `PRICE_CHANGE_1y`,
+`SHARES_VOLUME`, `DOLLAR_VOLUME`, `AVERAGE_DAILY_DOLLAR_VOLUME`,
+`VOLATILITY_20`, `VOLATILITY_60`, `VOLATILITY_90`, `BETA`, and `RSI_14`.
+Availability can vary.
+
+## Event Evidence
+
+`event/items` contains normalized evidence records collected for an attribution
+run.
+
+| Field                           | Meaning                                                                                          |
+| ------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `eventKey`                      | Stable deduplication identity                                                                    |
+| `sourceType`                    | Event family; observed examples include `market_news`, `industry_news`, and `industry_x`         |
+| `symbol`                        | Company associated with the event                                                                |
+| `title`                         | Source-facing event title                                                                        |
+| `summary`                       | Normalized or generated event summary; treat as platform-derived                                 |
+| `url`, `source`                 | Source location and publisher/account; URL may be empty                                          |
+| `dedupeStatus`                  | Whether the event is new, duplicate, or otherwise filtered                                       |
+| `publishedAtMs`                 | Source publication time                                                                          |
+| `firstSeenAtMs`, `lastSeenAtMs` | Platform observation window                                                                      |
+| `runAtMs`, `date`               | Attribution run association and time-series timestamp                                            |
+| `metadataJson`                  | JSON-encoded provenance, filtering, materiality, ticker/topic, sentiment, or engagement metadata |
+
+Common `metadataJson` groups include:
+
+- Provenance: `sourceOrigin`, `sourceDomain`, `sourceEventTime`, `storyId`.
+- Filtering: `filterPolicy`, `retrievalTopic`, `queryGroup`, `keywordQuery`,
+  `configuredKeywords`, `sectorKeywordMatches`.
+- Classification: `tickers`, `topics`, `sentiment`, `materiality`.
+- Social engagement: `handle`, `likes`, `reposts`, `views`.
+- Search expansion: expansion identity, query, summary, top title/URL, and
+  result count.
+
+Use only events aligned to the selected attribution run and already connected by
+event identity, URL, or title. A ticker mention alone is not sufficient
+evidence.
+
+## Run And Data Quality Metadata
+
+`audit/run_log` also exposes whether the analysis completed and how trustworthy
+the inputs were.
+
+| Coverage              | Fields                                                                  |
+| --------------------- | ----------------------------------------------------------------------- |
+| Lifecycle             | `status`, `runStartedAtMs`, `runCompletedAtMs`, `durationMs`, `runAtMs` |
+| Decision              | `alertDecision`, `shouldPush`, `skipReason`, `notificationPreview`      |
+| Warnings and coverage | `warningsJson`, `dataFetchSummaryJson`, `analystPromptCoverageJson`     |
+| Analysis summary      | `llmDecisionJson`, `outputSummaryJson`, `analystDecisionJson`           |
+| Gate diagnostics      | `candidateAuditJson`, `anomalySignalsJson`, `materialityConfigJson`     |
+
+Large diagnostic fields such as `rawEventsJson`, `eventCandidatesJson`,
+`unifiedEventsJson`, `eventExpansionsJson`, and `searchExpansionTraceJson` can
+be duplicated, size-capped, or invalid JSON after truncation. They are not part
+of the public Company Anomaly consumer contract.
+
+## Relationships And Freshness
+
+- `timeline.runAtMs` identifies a gate evaluation.
+- A `real` row's non-zero `attributionRunAtMs` identifies the corresponding
+  `analysis/decision` and `audit/run_log` rows by exact `runAtMs` equality.
+- `event/items.runAtMs` associates evidence with that attribution run.
+- `anomaliesJson` contains computed anomaly facts; `anomalyAttributionsJson`
+  contains the inferred explanation.
+- The current timeline row can be quiet and newer than the latest `real`
+  attribution. Report both timestamps when discussing a prior attribution; do
+  not pair old drivers with current metrics.
+
+Use the Alva CLI's current time-series read and pagination behavior to retrieve
+the required rows. This reference intentionally does not duplicate those CLI
+instructions.
+
+## Answer Contract
+
+1. State the current anomaly state and timestamp.
+2. Report the exact move basis, session components, price/volume statistics, and
+   triggered rules from the relevant timeline/anomaly packet.
+3. When a `real` attribution exists, label the likely driver and driver split as
+   Alva analysis rather than established causality.
+4. Cite the few aligned supporting events, their source times, and URLs when
+   present.
+5. State attribution status, confidence, warnings, missing context, and any
+   difference between the current-state and attribution timestamps.
+
+For `not_triggered`, `candidate`, or `no_material`, do not attach an older
+driver to the current tick unless the user separately asks for the latest prior
+attribution.
 
 ## Reliability Boundaries
 
 1. **Live-read every answer.** Company moves, signals, events, and attribution
-   state are time-sensitive; never answer from memory or a prior transcript.
-2. **Separate fact from inference.** Timeline metrics are computed data;
-   attribution narratives and driver splits are analytical inference.
-3. **Align runs exactly.** `runAtMs == attributionRunAtMs` is the join contract.
-   Never combine a current quiet tick with an older decision without labeling
-   the older attribution timestamp.
-4. **Avoid truncated audit fields.** `rawEventsJson`, `eventExpansionsJson`, and
-   `searchExpansionTraceJson` may be size-capped and invalid JSON. They are not
-   part of the public consumer contract.
-5. **Context is company-specific.** Missing MU-style memory or semiconductor
-   fields for another company is not a schema failure. Inspect the live object
-   and use only context actually present.
+   state are time-sensitive.
+2. **Separate source facts from platform analysis.** Source title, URL,
+   publisher, and timestamps are evidence facts. Event summaries, sentiment,
+   materiality, filtering/classification metadata, attribution narrative, and
+   driver decomposition are platform-derived analysis.
+3. **Use the explicit run join.** Keep `timeline.runAtMs` as the gate-evaluation
+   timestamp. Join a `real` row only when `timeline.attributionRunAtMs` exactly
+   equals the `runAtMs` on decision, audit, and event rows.
+4. **Respect sparse heavy outputs.** A quiet gate can legitimately have no new
+   decision, attribution, or event batch.
+5. **Treat context as optional.** Missing company-irrelevant context is not a
+   schema failure; use only fields actually present.
 6. **Read-only.** This source does not authorize writes to `mia`'s namespace and
-   does not replace Feed Scope Isolation when building a new playbook or
-   automation.
+   does not replace Feed Scope Isolation for new playbooks or automations.
