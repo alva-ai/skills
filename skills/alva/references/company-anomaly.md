@@ -14,9 +14,11 @@ This is processed intelligence, not a raw quote or news feed. Price and volume
 signals are computed data; driver attribution is model-generated analysis over
 supplied evidence. Keep those layers distinct in the answer.
 
-**Not general company research.** Use Financial Analysis and Data Skills for
-ordinary prices, valuation, fundamentals, or news without an anomaly question. A
-quiet anomaly state does not mean the stock did not move or that no news exists.
+**Not a standalone general company-research source.** For broad analysis of a
+covered company, use this reference to add its current anomaly state, then use
+Financial Analysis and Data Skills for prices, valuation, fundamentals, and
+ordinary news. A quiet anomaly state does not mean the stock did not move or
+that no news exists.
 
 ## Contents
 
