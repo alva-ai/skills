@@ -135,6 +135,8 @@ Before `alva release playbook-draft`, verify:
 - README exists at `~/playbooks/{name}/README.md`.
 - Target name and owner namespace match `alva whoami`.
 - Every feed in `--feeds` has passed `before-automation-publish`.
+- Every feed the HTML reads has public visibility set through
+  `alva feed set-visibility` and a successful unauthenticated read.
 - Draft metadata matches the approved plan.
 - `--tags` includes required asset overlap plus material related people:
   investors, company figures, officials/policymakers, Twitter/X KOLs.
@@ -171,8 +173,9 @@ alva release playbook ... \
 Before `alva release playbook`, verify:
 
 1. Every backing feed passed `before-automation-publish`.
-2. Every feed the HTML reads at runtime has a successful deploy and appears in
-   `--feeds`.
+2. Every feed the HTML reads at runtime has a successful deploy, appears in
+   `--feeds`, has public visibility set through `alva feed set-visibility`, and
+   passes an unauthenticated read.
 3. Cronjobs for referenced feeds are active.
 4. HTML fetches quantitative data from feeds, not inline literals.
 5. If UDFs exist, [api/udf-runtime.md](api/udf-runtime.md) has been read, the

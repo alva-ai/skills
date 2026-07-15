@@ -118,13 +118,13 @@
       "id": "retained.feed-lifecycle",
       "group": "retained",
       "target": "corpus",
-      "description": "Feed build, grant, deploy, and automation publish hard gate remain preserved.",
+      "description": "Feed build, deploy, automation publish, and visibility hard gate remain preserved.",
       "includes": [
         "Feed SDK",
         "alva run --entry-path",
-        "special:user:*",
         "alva deploy create",
         "alva automation publish",
+        "alva feed set-visibility --id <feed_id> --visibility public",
         "before-automation-publish"
       ]
     },
