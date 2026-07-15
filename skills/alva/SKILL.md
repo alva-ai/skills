@@ -180,6 +180,14 @@ exposes it.
 Use [creators-note.md](references/creators-note.md) when composing a pinned
 post-release author note.
 
+## Alva Knowledge (Required Reading)
+
+Before designing, modifying, or evaluating any automation, read
+[alva-knowledge.md](references/alva-knowledge.md). Every automation must decide
+whether bounded history improves its output; longitudinal or decision
+automations use that history, and push-capable automations also define semantic
+notification novelty.
+
 ## Request Routing
 
 Open [request-routing.md](references/request-routing.md) whenever the task is
@@ -200,7 +208,7 @@ that section as mandatory, not optional debugging material.
 | dashboard, screener app, thesis tracker, hosted report, shareable surface                                                               | Playbook Creation                   | Build live feeds first, then read [playbook-creation.md](references/playbook-creation.md).                                                                                               |
 | `/use-skill:<username>/<name>`, user-referenced skill/method, or template-like research method                                          | Skillhub Blueprint                  | Fetch blueprint fresh; if it becomes a playbook, route through [playbook-creation.md](references/playbook-creation.md) and set `--skill-id`.                                             |
 | backtest, strategy, signal, rebalance, portfolio simulation                                                                             | Strategy / Trading Analysis         | Use Altra; package as answer, feed, or playbook only as the user goal requires.                                                                                                          |
-| recurring digest, threshold tracker, alert, stream watch                                                                                | Automation / Push                   | Build a push-capable feed and verify alert or group subscription plus sidecar output.                                                                                                    |
+| recurring digest, threshold tracker, alert, stream watch                                                                                | Automation / Push                   | Read [alva-knowledge.md](references/alva-knowledge.md), then build a push-capable feed and verify alert or group subscription plus sidecar output.                                        |
 | keep researching, checking, or working in this channel on a cadence until a condition, time, or run count                              | Channel Loop                        | Read [deployment.md](references/deployment.md#channel-loops); use `alva loop create`, set `--start` for a future start, and provide at least one of `--until` or `--runs`.                |
 | `<remix ...>` or "remix this playbook"                                                                                                  | Remix                               | Read source files; preserve lineage and source UDFs.                                                                                                                                     |
 | `<annotation ...>` or "change this element"                                                                                             | Edit / Debug                        | Edit the generator behind the element, not rendered feed values.                                                                                                                         |
@@ -419,7 +427,8 @@ products, playbooks, dashboards, signals, alerts, and reusable outputs. A feed
 is not automatically a playbook; it can also back an alert, digest, signal,
 reusable dataset, or future answer.
 
-Read [feed-lifecycle.md](references/feed-lifecycle.md) and
+Read [alva-knowledge.md](references/alva-knowledge.md) before designing an
+automation. Read [feed-lifecycle.md](references/feed-lifecycle.md) and
 [feed-sdk.md](references/feed-sdk.md) when creating or changing a feed. The
 short lifecycle is: write schema and logic to ALFS, `alva run`, grant public
 read if needed, create the producer cronjob with `alva deploy`, then publish
@@ -743,6 +752,7 @@ Use this index to open only the file needed for the current task.
 | File                                                                                  | Owns                                                                                                                                          |
 | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | [preflight.md](references/preflight.md)                                               | Session start, Rule 0, CLI, auth, profile, Arrays JWT, memory load, user scope.                                                               |
+| [alva-knowledge.md](references/alva-knowledge.md)                                     | Required automation reasoning: bounded history, cross-run comparison, semantic notification novelty, quiet runs.                            |
 | [request-routing.md](references/request-routing.md)                                   | Route choice, Skillhub, Guided Planning, capability verification, completion gate.                                                            |
 | [content-legitimacy.md](references/content-legitimacy.md)                             | Data provenance, prohibited sources, chat-as-artifact, feed isolation, conventions.                                                           |
 | [data-skills.md](references/data-skills.md)                                           | Data Skills discovery, endpoint calls, Arrays auth, search/data routing.                                                                      |
@@ -818,6 +828,9 @@ Before finishing an Alva task, ask:
 - Did I run current online verification before using training knowledge to
   rule out a listing, ADR/ADS, ticker, or other requested security form?
 - Did I run Data Skills `list` -> `summary` -> `endpoint` before coding calls?
+- Did automation work read [alva-knowledge.md](references/alva-knowledge.md),
+  apply bounded history when it improves judgment, and suppress push without a
+  material delta?
 - Did automation publish pass `before-automation-publish`?
 - Did playbook work read [playbook-creation.md](references/playbook-creation.md)
   and pass the relevant hard gates?

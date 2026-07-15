@@ -39,6 +39,40 @@ const MUTATIONS = [
     remove: "User-Defined Functions are strict opt-in. ",
     expectFailedCases: ["scenario.udf-strict-opt-in"],
   },
+  {
+    id: "automation-knowledge-route",
+    file: "references/request-routing.md",
+    remove: "Read [alva-knowledge.md](alva-knowledge.md) before design, ",
+    expectFailedCases: ["scenario.alert-push-monitor"],
+  },
+  {
+    id: "automation-knowledge-publish-gate",
+    file: "references/feed-lifecycle.md",
+    remove:
+      "1. The applicable [Alva Knowledge](alva-knowledge.md) requirements passed\n" +
+      "   consecutive-run checks: longitudinal or decision automations compare bounded\n" +
+      "   history, and push-capable automations suppress non-material repeats.\n",
+    expectFailedCases: ["scenario.alert-push-monitor"],
+  },
+  {
+    id: "automation-knowledge-required-reading",
+    file: "SKILL.md",
+    remove:
+      "## Alva Knowledge (Required Reading)\n\n" +
+      "Before designing, modifying, or evaluating any automation, read\n" +
+      "[alva-knowledge.md](references/alva-knowledge.md). Every automation must decide\n" +
+      "whether bounded history improves its output; longitudinal or decision\n" +
+      "automations use that history, and push-capable automations also define semantic\n" +
+      "notification novelty.\n\n",
+    expectFailedCases: ["scenario.alert-push-monitor"],
+  },
+  {
+    id: "automation-knowledge-reference-index",
+    file: "SKILL.md",
+    remove:
+      "| [alva-knowledge.md](references/alva-knowledge.md)                                     | Required automation reasoning: bounded history, cross-run comparison, semantic notification novelty, quiet runs.                            |\n",
+    expectFailedCases: ["scenario.alert-push-monitor"],
+  },
 ];
 
 function parseArgs(argv) {
