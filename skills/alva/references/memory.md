@@ -4,8 +4,7 @@ A persistent, file-based memory system on ALFS. The user-global scope lives at
 `'~/memory/'`, created automatically when the user's account is provisioned. A
 channel session may also provide a channel-scoped memory root. Use memory to
 accumulate knowledge across conversations — user identity, preferences,
-investment style, channel context, and feature-specific state that will matter
-later.
+investment style, and channel context that will matter later.
 
 Memory files are **user-visible and editable**. The user can read, modify, or
 delete any memory file through the Alva dashboard or ALFS API. Write memories
@@ -20,7 +19,7 @@ as if the user will read them.
 ```
 ~/memory/
 ├── MEMORY.md     # Concise index — read at the start of every conversation
-└── user.md       # User profile, preferences, expertise, investment style
+└── user.md       # Cross-channel identity, preferences, investment style, theses
 ```
 
 `MEMORY.md` is the entrypoint. Read it at the start of every conversation to
@@ -28,24 +27,45 @@ discover what's stored. Keep it concise — under 200 lines. Each entry is one
 line linking to a topic file:
 
 ```markdown
-- [user.md](user.md) — User identity, investment style, knowledge level
-- [market-views.md](market-views.md) — Current macro thesis, conviction trades
+- [user.md](user.md) — identity, investment style, interests, theses and preferences
 ```
 
-Topic files (like `user.md`) hold the actual content. They are read on demand
-when relevant to the user's request.
+Keep the default global model in `user.md`; investment style, watched areas,
+theses, and action preferences do not get a separate `investing.md`.
 
 ### Channel-scoped memory
 
 `~/memory/` is **user-global** (shared across all channels). A **channel** can
 also have its own memory at `~/channels/<slug>/memory/`, named in the session
-prefill as a `<session-prefill-channel-memory root="...">` block. Same layout —
-a `MEMORY.md` index plus topic files.
+prefill as a `<session-prefill-channel-memory root="...">` block:
+
+```text
+~/channels/<slug>/memory/
+├── MEMORY.md
+└── journal/
+    └── YYYY-MM-DD.md
+```
 
 - User-global facts (identity, cross-channel preferences) → `~/memory/`.
 - Channel-specific facts (this channel's topic, decisions) → the prefill root.
 - Read both indexes at the start of a channel turn. No prefill block → no
   channel scope; use `~/memory/` only.
+- The default Alva channel uses the same layout at
+  `~/channels/alva/memory/`; it is not an alias for global memory.
+
+### Journal
+
+Journal files are user-visible, user-editable daily summaries maintained by an
+internal background turn. Normal conversation turns do not append Journal or
+load full daily files by default. A new/reset session may receive a small,
+quoted Carry Forward prelude; otherwise read Journal only when the user asks or
+the current task genuinely needs that history.
+
+Journal prose alone is not user confirmation. User edits are respected, but
+deleting or rewriting an old Journal does not request replay. Dream may promote
+durable user memory only from traceable original user statements; never promote
+assistant output, automation output, third-party claims, or inference into
+`user.md` as if the user stated it.
 
 ### Scope root resolution
 
@@ -99,6 +119,11 @@ existing topic file into a pack just because packs exist. Use packs for new
 feature-, skill-, or domain-specific memory when no existing topic file already
 covers the need.
 
+Do not create a new `investing.md`. If one already exists, keep it readable and
+do not bulk-migrate or delete it. Put new or revised investment memory in
+`user.md`; when the user next revises an overlapping entry, consolidate that
+entry into `user.md` without leaving two active copies.
+
 ### Ledger definition contract
 
 Never create an opaque ledger stream. Before writing to an append-only stream,
@@ -140,7 +165,6 @@ Persistent facts about the user. Update when you learn something new.
 - Strategy: <!-- e.g. Momentum, Mean Reversion, Fundamental, Event-driven -->
 - Holding period: <!-- Intraday / Swing / Position / Long-term -->
 - Risk tolerance: <!-- Conservative / Moderate / Aggressive -->
-- Watching:
 
 ## Knowledge
 
@@ -149,33 +173,123 @@ Persistent facts about the user. Update when you learn something new.
 - Learning:
 - External tools: <!-- e.g. TradingView, Bloomberg, Dune -->
 
-## Preferences
+## Interaction Preferences
 
 - Communication style: <!-- e.g. terse / detailed / visual -->
 - Notification channel:
-- Playbook publishing: <!-- e.g. default public release / draft-only before publishing -->
+
+## Interests
+
+<!-- Areas the user explicitly wants Alva to keep watching or connect to future
+research. Keep a flexible flat list. An Interest is not a confirmed Thesis or
+intent to trade. -->
+
+## Investment Thesis
+
+<!-- User-explicit or user-confirmed, falsifiable investment judgments. Scope,
+Horizon, Thesis, and Last confirmed are the core fields. Optional fields belong
+only when supported and useful; never invent missing details. -->
+
+## Action Preferences
+
+<!-- User-explicit or user-confirmed investment action defaults and safety
+boundaries across investment theses. Do not store current positions, orders, or
+general communication preferences here. -->
 ```
 
-**When to update:** User shares personal info, corrects a preference, reveals
-expertise level, states investment convictions, or you learn something that
-changes how you should work with them.
+**When to update:** The user directly states stable personal information,
+corrects a preference, reveals expertise, explicitly asks you to remember
+something safe, or states, confirms, or revises investment memory. Do not infer
+durable memory from repeated behavior or repeated queries alone.
+
+### Investment memory examples
+
+These examples illustrate shape only. Never copy them into a user's memory
+without supporting original user statements.
+
+#### Interests
+
+Interests are user-stated areas Alva should keep watching or connect to future
+research, alerts, or strategy discussions. They do not imply a confirmed Thesis
+or intent to trade. Keep entries flat and include only useful fields:
+
+```markdown
+- Topic: AI infrastructure
+- Asset: NVDA · Market: NASDAQ · Why: AI compute demand · Horizon: 6-12 months · Updated: 2026-07-10
+- Person: Jensen Huang · Why: NVIDIA product and demand signals
+- Info source: @Reuters · Type: X account · URL: https://x.com/Reuters
+```
+
+Types and fields are flexible. Topics, assets, people, news sites, X accounts,
+podcasts, newsletters, and company IR pages are all valid when the user states
+the interest. A single query does not create an Interest.
+
+#### Investment Thesis
+
+An Investment Thesis is a user-stated or user-confirmed judgment that later
+evidence can support or disprove. Its title should state the conclusion.
+
+- `Scope` — the asset, theme, sector, macro regime, or cross-asset relationship.
+- `Horizon` — the expected life of this judgment, not the user's general holding
+  period.
+- `Thesis` — the concise, falsifiable judgment.
+- `Last confirmed` — the latest user-confirmed date and, when available, channel.
+
+```markdown
+### US rates · Higher for longer
+- Scope: US rates and long-duration growth equities
+- Horizon: 3-9 months
+- Thesis: Sticky services inflation can keep real yields elevated and limit valuation expansion.
+- Last confirmed: 2026-07-10 · Macro Channel
+- Key drivers: Services inflation; labor demand; term premium.
+- Invalidation: Inflation and labor data weaken enough to support sustained rate cuts.
+- Expression: Prefer quality and shorter-duration exposure; remain cautious on long duration.
+```
+
+`Scope`, `Horizon`, `Thesis`, and `Last confirmed` are the core shape, not a
+validation gate. Update `Last confirmed` whenever the user confirms or revises
+the Thesis; omit the channel when unavailable. If the user did not give a
+Horizon, do not infer one or add a placeholder. Ask only when the missing
+Horizon materially affects the current action.
+
+`Stance`, `Key drivers`, `Catalysts`, `Invalidation`, and `Expression` are
+optional; include them only when supported and useful. Dream may append
+`Needs review` when the Thesis has a freshness risk. Keep one-off event
+judgments in Channel Memory or Journal, and concrete strategy parameters in the
+relevant Playbook or Automation domain state.
+
+#### Action Preferences
+
+Action Preferences are user-stated or user-confirmed investment action defaults
+and safety boundaries that apply across investment theses. They are not current
+positions, orders, or general communication preferences:
+
+```markdown
+- Entry: High-volatility assets · Prefer staged entries; do not chase sharp intraday moves.
+- Risk: Single position · Warn before planned exposure exceeds 10% of the portfolio.
+- Live execution: All assets · Confirm before placing, changing, or cancelling an order.
+```
+
+`Expression` describes how one Thesis may be expressed. A rule that applies
+across investment theses belongs in Action Preferences.
 
 ## Additional topic files
 
-Create new files in the relevant scope root for knowledge that doesn't fit in
-`user.md` — market convictions, strategy assumptions, portfolio rules. Add a
-pointer to that scope's `MEMORY.md` for each new file. If the topic is a new
-feature or domain area and no existing topic file covers it, use that scope's
-`packs/<pack-name>/`.
+Keep cross-channel user understanding, including market convictions and action
+rules, in `user.md` by default. Existing topic files remain valid; create a new
+file or pack only for a genuinely separate domain contract or structured
+feature memory, then link it from that scope's `MEMORY.md`.
 
 ## What NOT to save
 
-- Ephemeral conversation details (current debugging session, temp state)
-- Things derivable from code or ALFS files
-- Raw data or large outputs (store on ALFS as feed data, not in memory)
-- Anything already in the Alva skill docs
-- Market data that changes every minute (save your *interpretation*, not the
-  data)
+- Full transcripts, tool logs, raw large outputs, or temporary debugging state
+- Content reliably available from code, ALFS files, Skill docs, or another
+  authoritative system
+- Secrets, credentials, tokens, private keys, or other unsafe content
+- Automation/feed runtime state, cursors, schedules, and delivery state (their
+  own DB/feed/state files are authoritative; Journal may retain a useful outcome)
+- Current market data, positions, cash, or orders (save only a user-confirmed
+  durable interpretation, never the live value)
 
 ## Writing rules
 
@@ -191,14 +305,24 @@ feature or domain area and no existing topic file covers it, use that scope's
 6. **Update the relevant `MEMORY.md` index** — add a one-line entry for each new
    file or pack.
 7. Keep indexes concise — one line per file or pack, under 120 characters.
-8. **Every write → confirm in chat:** 📌 Memory updated: {one-sentence summary}
+8. **Write files directly** with ordinary `alva fs` operations; do not invent a
+   proposal/validator queue or hidden review state.
+9. **Every conversational write → confirm in chat:** 📌 Memory updated:
+   {one-sentence summary}. Internal Journal/Dream maintenance completes silently.
+10. **Use original user evidence for durable user memory** — Journal prose,
+    assistant output, automation output, third-party claims, inference, and
+    repeated behavior are not user confirmation.
+11. **Honor corrections and forget requests** — replace or remove obsolete
+    durable entries and do not reintroduce forgotten content into later Journal.
 
 ## Reading rules
 
 - **Every conversation start**: Read `'~/memory/MEMORY.md'` via ALFS, then
   `user.md` and any topic files relevant to the user's request when present. In
-  a channel session, also read the channel root's `MEMORY.md`, `user.md`, and
-  relevant topic files when present.
+  a channel session, also read the channel root's `MEMORY.md` and relevant topic
+  files when present. Channel roots do not have their own `user.md`.
+- **Journal**: Do not load complete Journal files at every turn. Use a supplied
+  Carry Forward prelude, or read a bounded relevant daily file on explicit need.
 - **Pack relevance**: Read a pack's `MEMORY.md`, `state.md`, `rules.md`, or
   other Markdown files only when the request, current skill, or scope index
   makes that pack relevant.
