@@ -199,21 +199,23 @@ request). Do not write fresh files from scratch.
    agent tool mode; shell-only fallback:
    `alva fs write --path '~/feeds/{new-name}/v1/src/index.js' --file ./{feed_name}.js --mkdir-parents`
 2. **Test** via `alva run --entry-path '~/feeds/{new-name}/v1/src/index.js'`
-3. **Grant** public read:
-   `alva fs grant --path '~/feeds/{new-name}' --subject "special:user:*" --permission read`
-4. **Deploy cronjob**:
+3. **Deploy cronjob**:
    `alva deploy create --name {new-name} --path '~/feeds/{new-name}/v1/src/index.js' --cron "..."`
-5. **Publish automation**:
+4. **Publish automation** and record the returned `feed_id`:
    `alva automation publish --name {new-name} --version 1.0.0 --cronjob-id ID --description "..."`
-6. **Write the edited HTML** to ALFS after updating data paths to point to your
+5. **Publish feed visibility** when the remixed playbook needs public reads:
+   `alva feed set-visibility --id <feed_id> --visibility public`
+6. **Verify public data** with an unauthenticated absolute-path read before the
+   HTML depends on it.
+7. **Write the edited HTML** to ALFS after updating data paths to point to your
    own feed. Use the ALFS write/edit tool in agent tool mode; shell-only
    fallback:
    `alva fs write --path '~/playbooks/{new-name}/index.html' --file ./index.html --mkdir-parents`
-7. **Copy inherited UDF entry scripts when present**: for each source UDF, write
+8. **Copy inherited UDF entry scripts when present**: for each source UDF, write
    the edited entry script to a path under the new playbook. Use the ALFS
    write/edit tool in agent tool mode; shell-only fallback:
    `alva fs write --path '~/playbooks/{new-name}/udf/{function_name}.js' --file ./udf-{function_name}.js --mkdir-parents`.
-8. **Write README** (mandatory) — adapt the source playbook's README to your
+9. **Write README** (mandatory) — adapt the source playbook's README to your
    data sources and methodology, then write it to ALFS. Use the ALFS write/edit
    tool in agent tool mode; shell-only fallback:
    `alva fs write --path '~/playbooks/{new-name}/README.md' --file ./README.md --mkdir-parents`.

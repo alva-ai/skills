@@ -118,13 +118,13 @@
       "id": "retained.feed-lifecycle",
       "group": "retained",
       "target": "corpus",
-      "description": "Feed build, grant, deploy, and automation publish hard gate remain preserved.",
+      "description": "Feed build, deploy, automation publish, and visibility hard gate remain preserved.",
       "includes": [
         "Feed SDK",
         "alva run --entry-path",
-        "special:user:*",
         "alva deploy create",
         "alva automation publish",
+        "alva feed set-visibility --id <feed_id> --visibility public",
         "before-automation-publish"
       ]
     },
@@ -508,14 +508,29 @@
       "id": "issue592.playbook-release-behavior",
       "group": "issue592",
       "target": "corpus",
-      "description": "Playbook release remains protected by behavior-level gates for feed freshness, live data reads, README, lint, and screenshot verification.",
+      "description": "Playbook draft and release remain protected by behavior-level gates for visibility-aware reads, feed freshness, README, lint, and screenshot verification.",
       "hard_gate_includes": [
+        {
+          "file": "references/playbook-creation.md",
+          "id": "before-playbook-draft",
+          "label": "draft gate",
+          "includes": [
+            "for public playbooks",
+            "for private or paid playbooks",
+            "authenticated SDK/PBSV read instead",
+            "do not make the feed public solely to pass this gate"
+          ]
+        },
         {
           "file": "references/playbook-creation.md",
           "id": "before-playbook-release",
           "label": "release gate",
           "includes": [
             "Every backing feed passed `before-automation-publish`",
+            "for public playbooks",
+            "for private or paid playbooks",
+            "authenticated SDK/PBSV read instead",
+            "do not make the feed public solely to pass this gate",
             "HTML fetches quantitative data from feeds, not inline literals",
             "Latest data from each referenced feed is fresh",
             "README exists, is current, and is passed via absolute `--readme-url`",
@@ -756,7 +771,7 @@
       "target": "corpus",
       "description": "Latest mainline Alva skill updates remain integrated after rebasing the refactor.",
       "includes": [
-        "version: v1.15.1",
+        "version: v1.17.0",
         "Capability Help",
         "Reply 1, 2, or 3 to start",
         "feedback",

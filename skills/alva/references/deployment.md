@@ -417,18 +417,21 @@ feed.def("market", {
 alva run --entry-path '~/feeds/btc-hourly/v1/src/index.js'
 ```
 
-### 3. Make the output public
-
-```bash
-# Grant the non-versioned base: inherited by all versions + data/.
-alva fs grant --path '~/feeds/btc-hourly' --subject "special:user:*" --permission read
-```
-
-### 4. Deploy as a cronjob
+### 3. Deploy as a cronjob
 
 ```bash
 alva deploy create --name btc-hourly-price-feed --path '~/feeds/btc-hourly/v1/src/index.js' --cron "0 */4 * * *"
 ```
+
+### 4. Publish the automation and visibility
+
+```bash
+alva automation publish --name btc-hourly --version 1.0.0 --cronjob-id <cronjob_id>
+alva feed set-visibility --id <feed_id_from_publish> --visibility public
+```
+
+Do not use `alva fs grant` to publish a feed. `feed set-visibility` keeps the
+feed record and inherited ALFS public-read projection consistent.
 
 ### 5. Verify the cronjob
 

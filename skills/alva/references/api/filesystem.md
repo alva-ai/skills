@@ -63,19 +63,17 @@ consumers don't.
 `@kv` lives at the mount root (`~/feeds/<name>/v1/data/@kv/<key>`), not
 under a group/output.
 
-## Synth-mount grant gotcha
+## Feed visibility
 
-You **cannot** grant permissions directly on a Feed synth `data/` path —
-it returns `PERMISSION_DENIED`. Grant on the parent feed directory; the
-permission is inherited by every child path including the synth data mount:
+After deploying and publishing the automation, use the returned `feed_id` to
+make the feed public:
 
 ```bash
-# Wrong — errors
-alva fs grant --path '~/feeds/my-feed/v1/data' --subject "special:user:*" --permission read
-
-# Right — grant on the feed root
-alva fs grant --path '~/feeds/my-feed' --subject "special:user:*" --permission read
+alva feed set-visibility --id <feed_id> --visibility public
 ```
+
+This keeps the feed visibility record and its inherited ALFS permission
+projection consistent.
 
 ## Clearing feed data (development only)
 

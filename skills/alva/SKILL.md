@@ -430,14 +430,16 @@ reusable dataset, or future answer.
 Read [alva-knowledge.md](references/alva-knowledge.md) before designing an
 automation. Read [feed-lifecycle.md](references/feed-lifecycle.md) and
 [feed-sdk.md](references/feed-sdk.md) when creating or changing a feed. The
-short lifecycle is: write schema and logic to ALFS, `alva run`, grant public
-read if needed, create the producer cronjob with `alva deploy`, then publish
-the user-facing automation data source with `alva automation publish`.
+short lifecycle is: write schema and logic to ALFS, `alva run`, deploy, publish
+with `alva automation publish`, then use its returned `feed_id` with
+`alva feed set-visibility` when public access is required.
 
 Before automation publish, satisfy `before-automation-publish`: fresh run,
-expected shape, needed grants, public read verification, and non-empty data for
-HTML dependencies. Feed scripts fail fast on missing data; the detailed publish
-and grant contract lives in the feed references. Read the matching
+expected shape, fresh evidence, and a known producer cronjob id. After publish,
+set public visibility through the feed lifecycle command and verify public,
+non-empty data before dependent HTML work. Feed scripts fail fast on missing
+data; the detailed publish and visibility contract lives in the feed
+references. Read the matching
 [operational-pitfalls.md](references/operational-pitfalls.md) section before
 each feed, ALFS, deploy, and publish step.
 
@@ -832,6 +834,7 @@ Before finishing an Alva task, ask:
   apply bounded history when it improves judgment, and suppress push without a
   material delta?
 - Did automation publish pass `before-automation-publish`?
+- If public, did `alva feed set-visibility` and an unauthenticated read succeed?
 - Did playbook work read [playbook-creation.md](references/playbook-creation.md)
   and pass the relevant hard gates?
 - Did design work read [design.md](references/design.md) and lint where needed?

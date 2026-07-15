@@ -18,11 +18,17 @@ Every feed follows the same path:
    `ctx.self.ts().append()`.
 2. Upload source to `'~/feeds/<name>/v1/src/index.js'`.
 3. Test with `alva run --entry-path '~/feeds/<name>/v1/src/index.js'`.
-4. Grant the feed root for public reads when a playbook or public user needs it:
-   `alva fs grant --path '~/feeds/<name>' --subject "special:user:*" --permission read`.
-5. Deploy the script with `alva deploy create`.
-6. Publish the automation with `alva automation publish` using the cronjob id
-   from deploy.
+4. Deploy the script with `alva deploy create`.
+5. Publish the automation with `alva automation publish` using the cronjob id
+   from deploy, and record the returned `feed_id`.
+6. When a playbook or public user needs the feed, publish its visibility with
+   `alva feed set-visibility --id <feed_id> --visibility public`.
+7. Verify an unauthenticated read of a public feed path returns HTTP 200.
+
+Do not use `alva fs grant` or `alva fs revoke` to change a feed's public
+visibility. Feed visibility must update the feed record and its ALFS projection
+together; direct filesystem grants are rejected to prevent those states from
+drifting.
 
 `alva run` is a test step. It does not replace deploy or release and does not
 guarantee public `@last` data for a playbook.
@@ -72,15 +78,19 @@ Before `alva automation publish`, verify:
    source write.
 3. Output groups and fields match the feed contract.
 4. Evidence is fresh; if source changed after the run, rerun.
-5. `special:user:*` read permission exists on the feed root when public reads
-   are needed.
-6. An unauthenticated public read returns HTTP 200, not 403.
-7. If the feed backs HTML, at least one public `@last` path the HTML reads has
-   non-empty data after grant.
+5. The producer cronjob exists and its id is known.
 
 If any evidence is missing or stale, do not publish. Fix the feed, rerun, and
 re-enter the gate.
 </HARD-GATE>
+
+After publish, when public access is required, verify:
+
+1. `alva feed set-visibility --id <feed_id> --visibility public` succeeded for
+   the `feed_id` returned by publish.
+2. An unauthenticated public read returns HTTP 200.
+3. Before building or releasing dependent HTML, at least one public `@last`
+   path used by the HTML is non-empty.
 
 ## Push Sidecars
 
