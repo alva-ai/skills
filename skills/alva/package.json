@@ -1,0 +1,20 @@
+{
+  "name": "@alva/skill",
+  "version": "1.16.1",
+  "private": true,
+  "main": "SKILL.md",
+  "files": [
+    "SKILL.md",
+    "references",
+    "scripts"
+  ],
+  "scripts": {
+    "package:check": "node ../../tools/alva-skill-package/validate.mjs",
+    "publish:dry-run": "npm run package:check && alpkg publish --dry-run --endpoint https://api-llm.stg.alva.ai",
+    "publish:stg": "npm run package:check && alpkg publish --endpoint https://api-llm.stg.alva.ai"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}

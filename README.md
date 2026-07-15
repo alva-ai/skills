@@ -78,6 +78,38 @@ Update with one of:
 
 The check is silent when your skill is up to date. It runs at most once every 8 hours and fails gracefully offline.
 
+### Alva Package Registry
+
+Maintainers can publish the original multi-file skill tree to the Alva package
+registry as `@alva/skill`. The package allowlist includes `SKILL.md`,
+`references/`, and `scripts/`; local `.env` files and repository metadata are
+not uploaded. This initial package supports registry publish, info, and
+download workflows. Its `SKILL.md` main entry is not an executable Node or
+Jagent module.
+
+Preview the exact recursive file set without making a network request:
+
+```bash
+cd skills/alva
+npm run publish:dry-run
+```
+
+Publish the version declared in `skills/alva/package.json` to staging with an
+admin API key:
+
+```bash
+cd skills/alva
+ALVA_API_KEY=... npm run publish:stg
+```
+
+Verify the immutable release:
+
+```bash
+ALVA_ENDPOINT=https://api-llm.stg.alva.ai \
+ALVA_API_KEY=... \
+alpkg info @alva/skill:v<major>.<minor>.<patch>
+```
+
 ### 3. Try It
 
 Start with a simple prompt:
