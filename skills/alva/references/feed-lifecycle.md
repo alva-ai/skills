@@ -65,14 +65,17 @@ to 2048) before editing logic.
 <HARD-GATE id="before-automation-publish">
 Before `alva automation publish`, verify:
 
-1. The exact feed script ran successfully in this session after the latest
+1. The applicable [Alva Knowledge](alva-knowledge.md) requirements passed
+   consecutive-run checks: longitudinal or decision automations compare bounded
+   history, and push-capable automations suppress non-material repeats.
+2. The exact feed script ran successfully in this session after the latest
    source write.
-2. Output groups and fields match the feed contract.
-3. Evidence is fresh; if source changed after the run, rerun.
-4. `special:user:*` read permission exists on the feed root when public reads
+3. Output groups and fields match the feed contract.
+4. Evidence is fresh; if source changed after the run, rerun.
+5. `special:user:*` read permission exists on the feed root when public reads
    are needed.
-5. An unauthenticated public read returns HTTP 200, not 403.
-6. If the feed backs HTML, at least one public `@last` path the HTML reads has
+6. An unauthenticated public read returns HTTP 200, not 403.
+7. If the feed backs HTML, at least one public `@last` path the HTML reads has
    non-empty data after grant.
 
 If any evidence is missing or stale, do not publish. Fix the feed, rerun, and

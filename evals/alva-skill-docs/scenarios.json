@@ -139,20 +139,62 @@
       "id": "scenario.alert-push-monitor",
       "group": "scenarios.push",
       "prompt": "Track BTC dominance and notify me when it breaks out.",
-      "description": "A monitoring request routes to Automation / Push and validates sidecar, release, subscription, and real-run delivery.",
+      "description": "A monitoring request routes to Automation / Push, compares bounded history, suppresses repeated content, and validates delivery.",
       "expect": {
         "route": "Automation / Push",
         "references": [
+          "alva-knowledge.md",
           "push-notifications.md",
           "feed-lifecycle.md"
         ],
         "behaviors": [
           "Build or modify a feed that emits actionable `signal/targets` or `notify/message`",
+          "bounded history source and lookback window",
+          "Notification deduplication is semantic",
+          "If no material delta exists",
           "A push is set up only after all of these succeed",
           "alva deploy update --id <ID> --push-notify",
           "alva alert enable --automation",
           "read `@last/1` of the sidecar",
           "do not claim push is set up"
+        ],
+        "sections": [
+          {
+            "file": "SKILL.md",
+            "heading": "Alva Knowledge (Required Reading)",
+            "includes": [
+              "[alva-knowledge.md](references/alva-knowledge.md)",
+              "Every automation must decide"
+            ]
+          },
+          {
+            "file": "SKILL.md",
+            "heading": "Reference Library",
+            "includes": [
+              "[alva-knowledge.md](references/alva-knowledge.md)",
+              "Required automation reasoning"
+            ]
+          },
+          {
+            "file": "references/request-routing.md",
+            "heading": "Routes",
+            "includes": [
+              "Read [alva-knowledge.md](alva-knowledge.md) before design"
+            ]
+          }
+        ],
+        "gates": [
+          {
+            "type": "hard_gate",
+            "file": "references/feed-lifecycle.md",
+            "id": "before-automation-publish",
+            "label": "automation knowledge",
+            "includes": [
+              "[Alva Knowledge](alva-knowledge.md)",
+              "longitudinal or decision automations compare bounded history",
+              "push-capable automations suppress non-material repeats"
+            ]
+          }
         ]
       }
     },
