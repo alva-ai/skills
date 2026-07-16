@@ -39,7 +39,9 @@ alva trading execute \
 ## Operational rules
 
 - **Always dry-run first.** Show simulated orders and confirm before
-  re-running without `--dry-run`.
+  re-running without `--dry-run`. For a consented auto-trading loop tick, the
+  recorded consent per the SKILL.md trading rule stands in for this per-order
+  confirmation.
 - **One active subscription per account.** `alva trading subscribe`
   fails until you `unsubscribe` the existing one.
 - `--execute-latest` on subscribe fires the playbook's last signal
