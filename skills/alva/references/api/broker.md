@@ -40,7 +40,9 @@ an `error`.
 `order place ... --dry-run` runs the full admission gate (ownership, price
 collar ~12%, daily budget/velocity/open-order limits) and returns
 `admitted:true` + the deterministic `clientOrderId` **without placing**.
-Confirm, then re-run without `--dry-run`.
+Confirm, then re-run without `--dry-run`. (For a consented auto-trading loop
+tick, the recorded consent per the SKILL.md trading rule stands in for this
+per-order confirmation.)
 
 ## Capabilities are per-venue — read them from describe
 

@@ -4,9 +4,9 @@ Source: `origin/main`
 
 SKILL.md lines: 836
 
-Cases: 52/53
+Cases: 52/54
 
-Checks: 496/502 (98.80%)
+Checks: 496/505 (98.22%)
 
 ## Scoring Diagnosis
 
@@ -16,6 +16,7 @@ Do not expose eval scores as product copy, and do not patch demos to hide a weak
 Instead, fix the canonical skill text or eval case, then rerun baseline and final reports so the regression mechanism proves the gap is closed.
 
 - target.auto-trade-consent-exemption: inspect for a skill gap before editing. Missing checks: auto-trade-consent:; ~/memory/auto-trade-consent.md; one-read verification; place live orders without per-order user confirmation; missing or unreadable record; applies only to loop ticks
+- target.auto-trade-consent-references: inspect for a skill gap before editing. Missing checks: consented auto-trading loop tick; recorded consent; stands in for this per-order confirmation
 
 ## retained
 
@@ -437,7 +438,7 @@ Push setup is evaluated as a full delivery path instead of a single publisher fl
 
 ## target
 
-9/10 cases, 120/126 checks
+9/11 cases, 120/129 checks
 
 ### PASS target.top-level-size
 
@@ -614,6 +615,14 @@ A consent-referenced, record-verified channel-loop tick is exempt from per-order
 - [ ] place live orders without per-order user confirmation
 - [ ] missing or unreadable record
 - [ ] applies only to loop ticks
+
+### FAIL target.auto-trade-consent-references
+
+The broker and trading references reconcile their per-order confirm lines with the loop-tick consent exemption instead of demanding unqualified confirmation.
+
+- [ ] consented auto-trading loop tick
+- [ ] recorded consent
+- [ ] stands in for this per-order confirmation
 
 ## automation
 

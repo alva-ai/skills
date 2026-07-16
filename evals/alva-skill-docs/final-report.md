@@ -4,9 +4,9 @@ Source: `/home/forge/mono-meta/code/public/skills/skills/alva`
 
 SKILL.md lines: 847
 
-Cases: 53/53
+Cases: 54/54
 
-Checks: 502/502 (100.00%)
+Checks: 505/505 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -437,7 +437,7 @@ Push setup is evaluated as a full delivery path instead of a single publisher fl
 
 ## target
 
-10/10 cases, 126/126 checks
+11/11 cases, 129/129 checks
 
 ### PASS target.top-level-size
 
@@ -614,6 +614,14 @@ A consent-referenced, record-verified channel-loop tick is exempt from per-order
 - [x] place live orders without per-order user confirmation
 - [x] missing or unreadable record
 - [x] applies only to loop ticks
+
+### PASS target.auto-trade-consent-references
+
+The broker and trading references reconcile their per-order confirm lines with the loop-tick consent exemption instead of demanding unqualified confirmation.
+
+- [x] consented auto-trading loop tick
+- [x] recorded consent
+- [x] stands in for this per-order confirmation
 
 ## automation
 

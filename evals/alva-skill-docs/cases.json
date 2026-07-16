@@ -857,6 +857,17 @@
         "missing or unreadable record",
         "applies only to loop ticks"
       ]
+    },
+    {
+      "id": "target.auto-trade-consent-references",
+      "group": "target",
+      "target": "corpus",
+      "description": "The broker and trading references reconcile their per-order confirm lines with the loop-tick consent exemption instead of demanding unqualified confirmation.",
+      "includes": [
+        "consented auto-trading loop tick",
+        "recorded consent",
+        "stands in for this per-order confirmation"
+      ]
     }
   ]
 }
