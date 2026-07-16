@@ -415,9 +415,13 @@ reusable dataset, or future answer.
 Read [alva-knowledge.md](references/alva-knowledge.md) before designing an
 automation. Read [feed-lifecycle.md](references/feed-lifecycle.md) and
 [feed-sdk.md](references/feed-sdk.md) when creating or changing a feed. The
-short lifecycle is: write schema and logic to ALFS, `alva run`, deploy, publish
-with `alva automation publish`, then use its returned `feed_id` with
-`alva feed set-visibility` when public access is required.
+short creation lifecycle is: write schema and logic to ALFS, `alva run`,
+deploy, publish once with `alva automation publish`, then use its returned
+`feed_id` with `alva feed set-visibility` when public access is required.
+For an existing automation, keep that identity: ALFS source edits are already
+live, while registered version, producer, or metadata changes use
+`alva automation update --id <feed_id>`. Never delete and recreate merely to
+apply an update.
 
 Before automation publish, satisfy `before-automation-publish`: fresh run,
 expected shape, fresh evidence, and a known producer cronjob id. After publish,
@@ -706,7 +710,7 @@ text does not fully cover.
 | `fs`                 | ALFS reads/writes/grants/time-series suffixes and shared modules under `~/library`. Must read [api/filesystem.md](references/api/filesystem.md) for synth suffixes and grant gotchas. |
 | `run`                | Execute jagent JS. See [jagent-runtime.md](references/jagent-runtime.md).                                                                                                             |
 | `deploy`             | Cronjob lifecycle for producer scripts: schedule, args, trigger, run-status, runs, logs. See [deployment.md](references/deployment.md).                                               |
-| `automation`         | Product-facing lifecycle CLI for feeds (`list`, `inspect`, `publish`, `stop`, `resume`, `delete`). Must read [feed-lifecycle.md](references/feed-lifecycle.md).                         |
+| `automation`         | Product-facing lifecycle CLI for feeds (`list`, `inspect`, `publish`, `update`, `stop`, `resume`, `delete`). Must read [feed-lifecycle.md](references/feed-lifecycle.md).               |
 | `release`            | Playbook draft/release; the release reference also covers automation publish metadata extras. Must read [api/release.md](references/api/release.md).                                   |
 | `lint playbook`      | Design-system linter, same gate as release. See [design-contract.yaml](references/design-contract.yaml).                                                                              |
 | `skillhub`           | Curated methodology blueprints. See [request-routing.md](references/request-routing.md#skillhub-blueprint).                                                                           |
