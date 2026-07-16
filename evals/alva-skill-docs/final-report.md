@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/alert-follows-docs/skills/alva`
+Source: `/home/forge/mono-meta/code/public/skills/skills/alva`
 
-SKILL.md lines: 791
+SKILL.md lines: 847
 
-Cases: 50/50
+Cases: 53/53
 
-Checks: 458/458 (100.00%)
+Checks: 502/502 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -19,7 +19,7 @@ No failed cases. Keep the eval in place as a regression mechanism.
 
 ## retained
 
-18/18 cases, 109/109 checks
+19/19 cases, 110/110 checks
 
 ### PASS retained.platform-panorama
 
@@ -110,13 +110,13 @@ Jagent runtime constraints and heap override remain discoverable.
 
 ### PASS retained.feed-lifecycle
 
-Feed build, grant, deploy, and automation publish hard gate remain preserved.
+Feed build, deploy, automation publish, and visibility hard gate remain preserved.
 
 - [x] Feed SDK
 - [x] alva run --entry-path
-- [x] special:user:*
 - [x] alva deploy create
 - [x] alva automation publish
+- [x] alva feed set-visibility --id <feed_id> --visibility public
 - [x] before-automation-publish
 
 ### PASS retained.playbook-release
@@ -219,6 +219,12 @@ Memory and secret-manager operating rules remain covered.
 - [x] Secret Manager
 - [x] Do not ask the user to paste sensitive third-party secrets
 - [x] loadPlaintext
+
+### PASS retained.order-confirmation-rule
+
+Interactive orders keep the per-order confirmation rule: the exemption does not weaken it.
+
+- [x] explicit user confirmation before non-dry-run execution
 
 ## pr353
 
@@ -325,7 +331,7 @@ KOL data and the KOL digest SDK are routed together as Alva-maintained Platform 
 
 ## issue592
 
-5/5 cases, 68/68 checks
+5/5 cases, 77/77 checks
 
 ### PASS issue592.scoped-eval-checks
 
@@ -393,13 +399,21 @@ Capability gaps are verified against live Alva surfaces and reduced-scope/BYOD f
 
 ### PASS issue592.playbook-release-behavior
 
-Playbook release remains protected by behavior-level gates for feed freshness, live data reads, README, lint, and screenshot verification.
+Playbook draft and release remain protected by behavior-level gates for visibility-aware reads, feed freshness, README, lint, and screenshot verification.
 
 - [x] visual verification: references/playbook-creation.md#Screenshot includes A PNG or page shell is not enough
 - [x] visual verification: references/playbook-creation.md#Screenshot includes real feed-backed chart marks
 - [x] visual verification: references/playbook-creation.md#Screenshot includes headers-only tables
 - [x] visual verification: references/playbook-creation.md#Screenshot includes fetch failures are data-rendering failures
+- [x] draft gate: references/playbook-creation.md<HARD-GATE:before-playbook-draft> includes for public playbooks
+- [x] draft gate: references/playbook-creation.md<HARD-GATE:before-playbook-draft> includes for private or paid playbooks
+- [x] draft gate: references/playbook-creation.md<HARD-GATE:before-playbook-draft> includes authenticated SDK/PBSV read instead
+- [x] draft gate: references/playbook-creation.md<HARD-GATE:before-playbook-draft> includes do not make the feed public solely to pass this gate
 - [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes Every backing feed passed `before-automation-publish`
+- [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes for public playbooks
+- [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes for private or paid playbooks
+- [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes authenticated SDK/PBSV read instead
+- [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes do not make the feed public solely to pass this gate
 - [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes HTML fetches quantitative data from feeds, not inline literals
 - [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes Latest data from each referenced feed is fresh
 - [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes README exists, is current, and is passed via absolute `--readme-url`
@@ -413,7 +427,8 @@ Push setup is evaluated as a full delivery path instead of a single publisher fl
 - [x] push setup: references/push-notifications.md#Configure And Verify includes before-automation-publish
 - [x] push setup: references/push-notifications.md#Configure And Verify includes alva deploy update --id <ID> --push-notify
 - [x] push setup: references/push-notifications.md#Configure And Verify includes alva alert enable --automation
-- [x] push setup: references/push-notifications.md#Configure And Verify includes alva alert enable --playbook
+- [x] push setup: references/push-notifications.md#Configure And Verify includes alva alert enable --automation-ids
+- [x] push setup: references/push-notifications.md#Configure And Verify includes There is no playbook alert target
 - [x] push setup: references/push-notifications.md#Configure And Verify includes read `@last/1` of the sidecar
 - [x] push setup: references/push-notifications.md#Configure And Verify includes do not claim push is set up
 - [x] push inventory: references/push-notifications.md#Inventory And Unsubscribe includes alva alert list --first 200
@@ -422,13 +437,13 @@ Push setup is evaluated as a full delivery path instead of a single publisher fl
 
 ## target
 
-9/9 cases, 119/119 checks
+10/10 cases, 126/126 checks
 
 ### PASS target.top-level-size
 
 Top-level SKILL.md stays below the current guide ceiling without forcing a minimum size that would block future compression.
 
-- [x] line count <= 850 (actual 791)
+- [x] line count <= 850 (actual 847)
 
 ### PASS target.playbook-task-offload
 
@@ -565,14 +580,15 @@ Operational pitfalls are a mandatory stepwise gate, not an optional debugging ap
 
 Latest mainline Alva skill updates remain integrated after rebasing the refactor.
 
-- [x] version: v1.15.1
+- [x] version: v1.17.0
 - [x] Capability Help
 - [x] Reply 1, 2, or 3 to start
 - [x] feedback
 - [x] api/feedback.md
 - [x] alva feedback --help
 - [x] alva alert enable --automation
-- [x] alva alert enable --playbook
+- [x] alva alert enable --automation-ids
+- [x] There is no playbook alert target
 - [x] publish publicly by default
 - [x] registered UDFs
 - [x] implementation internals
@@ -587,6 +603,41 @@ Latest mainline Alva skill updates remain integrated after rebasing the refactor
 - [x] real feed-backed chart marks
 - [x] headers-only tables
 - [x] fetch failures
+
+### PASS target.auto-trade-consent-exemption
+
+A consent-referenced, record-verified channel-loop tick is exempt from per-order confirmation while staying dry-run/intent-id/risk bound.
+
+- [x] auto-trade-consent:
+- [x] ~/memory/auto-trade-consent.md
+- [x] one-read verification
+- [x] place live orders without per-order user confirmation
+- [x] missing or unreadable record
+- [x] applies only to loop ticks
+
+## automation
+
+1/1 cases, 15/15 checks
+
+### PASS automation.explicit-update-lifecycle
+
+Existing automations retain identity and subscriptions through the explicit ID-scoped update flow instead of publish or delete-and-recreate workarounds.
+
+- [x] automation update lifecycle: references/feed-lifecycle.md#Updating An Existing Automation includes ALFS source writes take effect without republishing
+- [x] automation update lifecycle: references/feed-lifecycle.md#Updating An Existing Automation includes alva automation update --id <feed_id>
+- [x] automation update lifecycle: references/feed-lifecycle.md#Updating An Existing Automation includes Omitted fields keep their current values
+- [x] automation update lifecycle: references/feed-lifecycle.md#Updating An Existing Automation includes explicit empty metadata string clears
+- [x] automation update lifecycle: references/feed-lifecycle.md#Updating An Existing Automation includes do not trigger a run unless `--trigger` is supplied
+- [x] automation update lifecycle: references/feed-lifecycle.md#Updating An Existing Automation includes alert subscriptions remain intact
+- [x] automation update lifecycle: references/feed-lifecycle.md#Updating An Existing Automation includes do not delete and recreate an automation to work around `ALREADY_EXISTS`
+- [x] automation update gate: references/feed-lifecycle.md<HARD-GATE:before-automation-update> includes target numeric ID belongs to the intended owned automation
+- [x] automation update gate: references/feed-lifecycle.md<HARD-GATE:before-automation-update> includes replacement cronjob exists
+- [x] automation update gate: references/feed-lifecycle.md<HARD-GATE:before-automation-update> includes Any producer change, including a producer-only update
+- [x] automation update gate: references/feed-lifecycle.md<HARD-GATE:before-automation-update> includes alva deploy trigger --id <replacement_cronjob_id>
+- [x] automation update gate: references/feed-lifecycle.md<HARD-GATE:before-automation-update> includes replacement cronjob's latest run succeeded
+- [x] automation update gate: references/feed-lifecycle.md<HARD-GATE:before-automation-update> includes current-producer script ran successfully in this session
+- [x] automation update gate: references/feed-lifecycle.md<HARD-GATE:before-automation-update> includes `--trigger` is present only when an immediate post-update run is intended
+- [x] automation update gate: references/feed-lifecycle.md<HARD-GATE:before-automation-update> includes do not fall back to delete-and-recreate
 
 ## scenarios.ask
 
@@ -706,23 +757,35 @@ Prompt: `<annotation id="hero-title">make this chart title shorter</annotation>`
 
 ## scenarios.push
 
-1/1 cases, 9/9 checks
+1/1 cases, 21/21 checks
 
 ### PASS scenario.alert-push-monitor
 
-A monitoring request routes to Automation / Push and validates sidecar, release, subscription, and real-run delivery.
+A monitoring request routes to Automation / Push, compares bounded history, suppresses repeated content, and validates delivery.
 
 Prompt: `Track BTC dominance and notify me when it breaks out.`
 
+- [x] alva-knowledge.md
 - [x] push-notifications.md
 - [x] feed-lifecycle.md
 - [x] Build or modify a feed that emits actionable `signal/targets` or `notify/message`
+- [x] bounded history source and lookback window
+- [x] Notification deduplication is semantic
+- [x] If no material delta exists
 - [x] A push is set up only after all of these succeed
 - [x] alva deploy update --id <ID> --push-notify
 - [x] alva alert enable --automation
 - [x] read `@last/1` of the sidecar
 - [x] do not claim push is set up
 - [x] expected route: references/request-routing.md#Routes includes Automation / Push
+- [x] Alva Knowledge (Required Reading): SKILL.md#Alva Knowledge (Required Reading) includes [alva-knowledge.md](references/alva-knowledge.md)
+- [x] Alva Knowledge (Required Reading): SKILL.md#Alva Knowledge (Required Reading) includes Every automation must decide
+- [x] Reference Library: SKILL.md#Reference Library includes [alva-knowledge.md](references/alva-knowledge.md)
+- [x] Reference Library: SKILL.md#Reference Library includes Required automation reasoning
+- [x] Routes: references/request-routing.md#Routes includes Read [alva-knowledge.md](alva-knowledge.md) before design
+- [x] automation knowledge: references/feed-lifecycle.md<HARD-GATE:before-automation-publish> includes [Alva Knowledge](alva-knowledge.md)
+- [x] automation knowledge: references/feed-lifecycle.md<HARD-GATE:before-automation-publish> includes longitudinal or decision automations compare bounded history
+- [x] automation knowledge: references/feed-lifecycle.md<HARD-GATE:before-automation-publish> includes push-capable automations suppress non-material repeats
 
 ## scenarios.strategy
 

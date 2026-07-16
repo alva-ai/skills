@@ -243,6 +243,17 @@ not require UDFs.
 **Trading execution vs analysis.** Backtests and signals use Altra. Actual
 orders require the trading surface, a dry run first, explicit user confirmation
 before non-dry-run execution, and [api/trading.md](references/api/trading.md).
+This per-order confirmation rule holds for any order placed in an ordinary
+conversation. *Exemption (channel-loop ticks only):* a channel-loop tick whose
+loop `--goal` carries the consent reference line `[auto-trade-consent: granted
+<ISO8601-UTC> record=~/memory/auto-trade-consent.md]` AND whose one-read
+verification (`alva fs read` of `~/memory/auto-trade-consent.md`) finds the
+consent record MAY place live orders without per-order user confirmation. It
+stays subject to dry-run validation first, a fresh idempotent intent-id, and
+trex risk rules; a missing or unreadable record means NO live orders. This
+exemption applies only to loop ticks — never to interactive conversation orders.
+The creation-side consent protocol (disclaimer, consent recording, revocation)
+lives in the channel profile's "Channel loops" section.
 
 ## Capability Map
 

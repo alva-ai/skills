@@ -834,6 +834,29 @@
         "headers-only tables",
         "fetch failures"
       ]
+    },
+    {
+      "id": "retained.order-confirmation-rule",
+      "group": "retained",
+      "target": "skill",
+      "description": "Interactive orders keep the per-order confirmation rule: the exemption does not weaken it.",
+      "includes": [
+        "explicit user confirmation before non-dry-run execution"
+      ]
+    },
+    {
+      "id": "target.auto-trade-consent-exemption",
+      "group": "target",
+      "target": "skill",
+      "description": "A consent-referenced, record-verified channel-loop tick is exempt from per-order confirmation while staying dry-run/intent-id/risk bound.",
+      "includes": [
+        "auto-trade-consent:",
+        "~/memory/auto-trade-consent.md",
+        "one-read verification",
+        "place live orders without per-order user confirmation",
+        "missing or unreadable record",
+        "applies only to loop ticks"
+      ]
     }
   ]
 }
