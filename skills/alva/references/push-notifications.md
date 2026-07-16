@@ -15,14 +15,31 @@ data.
 For heartbeat/watchlist/monitor feeds, recommend quiet behavior: notify only on
 material changes and emit `<|SKIP_NOTIFICATION|>` otherwise.
 
-## Delivery Channel
+## Choose The Delivery Destination
 
-Web notifications are always available. External DM delivery depends on
-`active_channel` plus a matching `telegram_username`, `discord_username`, or
-`slack_username` from `alva whoami`.
+A personal FEED alert has one delivery binding per viewer and feed. Enabling
+the same alert for another destination moves the personal alert; it does not
+create a second copy. Choose the destination before mutating it:
 
-If no active IM channel exists, say web notifications will work immediately and
-the user can connect Telegram, Discord, or Slack at <https://alva.ai/settings>.
+- **Default personal destination:** omit `--channel-id`. The service stores
+  `channel_id=0`; web delivery is available immediately, and external DM
+  delivery uses `active_channel` plus its matching username from `alva whoami`.
+- **Alva topic channel:** resolve the feed id and run
+  `alva alert enable --automation-ids <id,id> --channel-id <channel_id>`. This
+  binds the alert to that in-product channel. A topic channel is not an
+  external IM group, and its channel id is not a channel-session id.
+- **External IM group:** from the attached Telegram, Discord, or Slack group,
+  use `/alva subscribe feed <id>`. The CLI `alva channel
+  group-subscriptions ... --session-id <channel_session_id>` is only for that
+  external group. Never pass an Alva channel id as `--session-id`.
+
+The name-addressed `alva alert enable --automation <owner>/<feed>` command has
+no destination flag. When the user says "this channel", use the id-addressed
+form with `--channel-id`; do not silently fall back to the default destination.
+
+If no active IM channel exists for the default personal destination, say web
+notifications will work immediately and the user can connect Telegram,
+Discord, or Slack at <https://alva.ai/settings>.
 
 ## Configure And Verify
 
@@ -36,10 +53,10 @@ A push is set up only after all of these succeed:
    `before-automation-publish`.
 3. Enable publisher push on the cronjob:
    `alva deploy update --id <ID> --push-notify`.
-4. Enable the FEED alert: for one automation use
-   `alva alert enable --automation <owner>/<feed>`; for known feed ids use
-   `alva alert enable --automation-ids <id,id>`. For groups, use
-   `/alva subscribe feed <id>` in the group.
+4. Enable the FEED alert for the intended destination using
+   [Choose The Delivery Destination](#choose-the-delivery-destination). For the
+   default personal destination, use `alva alert enable --automation
+   <owner>/<feed>` or `alva alert enable --automation-ids <id,id>`.
 5. Trigger or wait for a real run, read `@last/1` of the sidecar, and confirm
    the record is fresh and the message is non-empty or contains
    `<|SKIP_NOTIFICATION|>` for a quiet run.
@@ -47,9 +64,10 @@ A push is set up only after all of these succeed:
 If the automation is unpublished, the feed has no sidecar record, or the record
 has an empty body, do not claim push is set up. Diagnose and fix first.
 
-Confirm to the user with specifics: which automation alerts are enabled, what
-the next push will say, and when it will fire. For monitors, say quiet runs skip
-notifications.
+Confirm to the user with specifics: which automation alerts are enabled, the
+intended destination, what the next push will say, and when it will fire. A
+global "subscribed" state is not sufficient evidence that an alert targets the
+requested Alva topic channel. For monitors, say quiet runs skip notifications.
 
 There is no playbook alert target. Following or unfollowing a playbook never
 changes alerts. If the user explicitly asks to enable every current automation

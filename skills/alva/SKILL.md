@@ -729,7 +729,7 @@ text does not fully cover.
 | `comments`           | Playbook comments and pinned creator notes. See [creators-note.md](references/creators-note.md).                                                                                      |
 | `alert`              | Personal FEED alert opt-ins and automation history. See [push-notifications.md](references/push-notifications.md).                                                                    |
 | `subscriptions`      | Playbook follow commands plus FEED alert commands. Following never changes alerts. See [push-notifications.md](references/push-notifications.md).                                    |
-| `channel`            | FEED-only group push subscriptions. See [push-notifications.md](references/push-notifications.md).                                                                                    |
+| `channel`            | FEED-only subscriptions for external IM groups attached to channel sessions; never use for Alva topic channels. See [push-notifications.md](references/push-notifications.md).        |
 | `trading`            | Accounts, portfolio, orders, subscriptions, execution. Must read [api/trading.md](references/api/trading.md).                                                                         |
 | `broker`             | Agentic order execution — place/cancel/read across venues (crypto + US equities). Run `alva broker describe` for live commands/capabilities; must read [api/broker.md](references/api/broker.md).                     |
 | `screenshot`         | PNG capture for released playbook verification. See [playbook-creation.md](references/playbook-creation.md#screenshot).                                                               |
