@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/home/forge/mono-meta/code/public/skills/skills/alva`
+Source: `/Users/yimingchen/alva/mono-meta/code/public/skills-topic-alert-subscription/skills/alva`
 
 SKILL.md lines: 847
 
-Cases: 54/54
+Cases: 55/55
 
-Checks: 505/505 (100.00%)
+Checks: 514/514 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -434,6 +434,24 @@ Push setup is evaluated as a full delivery path instead of a single publisher fl
 - [x] push inventory: references/push-notifications.md#Inventory And Unsubscribe includes alva alert list --first 200
 - [x] push inventory: references/push-notifications.md#Inventory And Unsubscribe includes alva alert follows --limit 100
 - [x] push inventory: references/push-notifications.md#Inventory And Unsubscribe includes has_next
+
+## subscriptions
+
+1/1 cases, 9/9 checks
+
+### PASS subscriptions.delivery-destination
+
+Agents distinguish the default personal destination, an Alva topic channel, and an external IM group before mutating an alert subscription.
+
+- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes Default personal destination
+- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes Alva topic channel
+- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes External IM group
+- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes --automation-ids <id,id> --channel-id <channel_id>
+- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes `channel_id=0`
+- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes moves the personal alert
+- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes Never pass an Alva channel id as `--session-id`
+- [x] destination verification: references/push-notifications.md#Configure And Verify includes intended destination
+- [x] destination verification: references/push-notifications.md#Configure And Verify includes global "subscribed" state is not sufficient
 
 ## target
 

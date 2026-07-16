@@ -586,6 +586,37 @@
       ]
     },
     {
+      "id": "subscriptions.delivery-destination",
+      "group": "subscriptions",
+      "target": "corpus",
+      "description": "Agents distinguish the default personal destination, an Alva topic channel, and an external IM group before mutating an alert subscription.",
+      "section_includes": [
+        {
+          "file": "references/push-notifications.md",
+          "heading": "Choose The Delivery Destination",
+          "label": "alert destination",
+          "includes": [
+            "Default personal destination",
+            "Alva topic channel",
+            "External IM group",
+            "--automation-ids <id,id> --channel-id <channel_id>",
+            "`channel_id=0`",
+            "moves the personal alert",
+            "Never pass an Alva channel id as `--session-id`"
+          ]
+        },
+        {
+          "file": "references/push-notifications.md",
+          "heading": "Configure And Verify",
+          "label": "destination verification",
+          "includes": [
+            "intended destination",
+            "global \"subscribed\" state is not sufficient"
+          ]
+        }
+      ]
+    },
+    {
       "id": "target.top-level-size",
       "group": "target",
       "target": "skill",

@@ -2,11 +2,11 @@
 
 Source: `origin/main`
 
-SKILL.md lines: 836
+SKILL.md lines: 847
 
-Cases: 52/54
+Cases: 54/55
 
-Checks: 496/505 (98.22%)
+Checks: 505/508 (99.41%)
 
 ## Scoring Diagnosis
 
@@ -15,8 +15,7 @@ Classify the gap before editing: missing capability summary, missing routing poi
 Do not expose eval scores as product copy, and do not patch demos to hide a weak result.
 Instead, fix the canonical skill text or eval case, then rerun baseline and final reports so the regression mechanism proves the gap is closed.
 
-- target.auto-trade-consent-exemption: inspect for a skill gap before editing. Missing checks: auto-trade-consent:; ~/memory/auto-trade-consent.md; one-read verification; place live orders without per-order user confirmation; missing or unreadable record; applies only to loop ticks
-- target.auto-trade-consent-references: inspect for a skill gap before editing. Missing checks: consented auto-trading loop tick; recorded consent; stands in for this per-order confirmation
+- subscriptions.delivery-destination: inspect for a skill gap before editing. Missing checks: alert destination: references/push-notifications.md#Choose The Delivery Destination section exists; destination verification: references/push-notifications.md#Configure And Verify includes intended destination; destination verification: references/push-notifications.md#Configure And Verify includes global "subscribed" state is not sufficient
 
 ## retained
 
@@ -436,15 +435,27 @@ Push setup is evaluated as a full delivery path instead of a single publisher fl
 - [x] push inventory: references/push-notifications.md#Inventory And Unsubscribe includes alva alert follows --limit 100
 - [x] push inventory: references/push-notifications.md#Inventory And Unsubscribe includes has_next
 
+## subscriptions
+
+0/1 cases, 0/3 checks
+
+### FAIL subscriptions.delivery-destination
+
+Agents distinguish the default personal destination, an Alva topic channel, and an external IM group before mutating an alert subscription.
+
+- [ ] alert destination: references/push-notifications.md#Choose The Delivery Destination section exists
+- [ ] destination verification: references/push-notifications.md#Configure And Verify includes intended destination
+- [ ] destination verification: references/push-notifications.md#Configure And Verify includes global "subscribed" state is not sufficient
+
 ## target
 
-9/11 cases, 120/129 checks
+11/11 cases, 129/129 checks
 
 ### PASS target.top-level-size
 
 Top-level SKILL.md stays below the current guide ceiling without forcing a minimum size that would block future compression.
 
-- [x] line count <= 850 (actual 836)
+- [x] line count <= 850 (actual 847)
 
 ### PASS target.playbook-task-offload
 
@@ -605,24 +616,24 @@ Latest mainline Alva skill updates remain integrated after rebasing the refactor
 - [x] headers-only tables
 - [x] fetch failures
 
-### FAIL target.auto-trade-consent-exemption
+### PASS target.auto-trade-consent-exemption
 
 A consent-referenced, record-verified channel-loop tick is exempt from per-order confirmation while staying dry-run/intent-id/risk bound.
 
-- [ ] auto-trade-consent:
-- [ ] ~/memory/auto-trade-consent.md
-- [ ] one-read verification
-- [ ] place live orders without per-order user confirmation
-- [ ] missing or unreadable record
-- [ ] applies only to loop ticks
+- [x] auto-trade-consent:
+- [x] ~/memory/auto-trade-consent.md
+- [x] one-read verification
+- [x] place live orders without per-order user confirmation
+- [x] missing or unreadable record
+- [x] applies only to loop ticks
 
-### FAIL target.auto-trade-consent-references
+### PASS target.auto-trade-consent-references
 
 The broker and trading references reconcile their per-order confirm lines with the loop-tick consent exemption instead of demanding unqualified confirmation.
 
-- [ ] consented auto-trading loop tick
-- [ ] recorded consent
-- [ ] stands in for this per-order confirmation
+- [x] consented auto-trading loop tick
+- [x] recorded consent
+- [x] stands in for this per-order confirmation
 
 ## automation
 
