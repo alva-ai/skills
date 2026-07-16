@@ -80,7 +80,8 @@ Current episode boundaries, keyed by the run's `attributionClassKey`:
 | `continued_new_attribution`    | Continue the current episode with a newly published driver                                       | `finding/attribution`  |
 | `continued_no_new_attribution` | Continue the current episode; new material was checked and the LLM ran, but it did not pass promotion | `finding/candidate`    |
 | `continued_no_info`            | Continue the current episode; no new material, or new info verified as not actually new           | —                      |
-| `not_triggered`                | No anomaly rule; close the episode (also `insufficient_history` / stale / no current data)        | —                      |
+| `not_triggered`                | No anomaly rule fires; not active, close the episode (also stale / no current data)               | —                      |
+| `insufficient_history`         | Not enough history to evaluate the signal; not active, close the episode                          | —                      |
 
 ### Attribution
 
