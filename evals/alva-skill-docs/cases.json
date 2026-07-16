@@ -794,7 +794,10 @@
           "includes": [
             "target numeric ID belongs to the intended owned automation",
             "replacement cronjob exists",
-            "exact script ran successfully in this session",
+            "Any producer change, including a producer-only update",
+            "alva deploy trigger --id <replacement_cronjob_id>",
+            "replacement cronjob's latest run succeeded",
+            "current-producer script ran successfully in this session",
             "`--trigger` is present only when an immediate post-update run is intended",
             "do not fall back to delete-and-recreate"
           ]

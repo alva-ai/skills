@@ -56,9 +56,14 @@ Before `alva automation update`, verify:
 2. The requested flags describe only the fields the user intends to change.
 3. If changing the producer, the replacement cronjob exists, belongs to the
    same user, and its id is known.
-4. If changing the version after source or producer changes, the exact script
-   ran successfully in this session and its output still matches the contract.
-5. `--trigger` is present only when an immediate post-update run is intended.
+4. Any producer change, including a producer-only update, requires
+   `alva deploy trigger --id <replacement_cronjob_id>` followed by confirmation
+   that the replacement cronjob's latest run succeeded and its output still
+   matches the feed contract.
+5. If changing source or version without changing the producer, the exact
+   current-producer script ran successfully in this session and its output
+   still matches the contract.
+6. `--trigger` is present only when an immediate post-update run is intended.
 
 If any evidence is missing, inspect or test first; do not fall back to
 delete-and-recreate.
