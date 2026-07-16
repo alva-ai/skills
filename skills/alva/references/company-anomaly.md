@@ -54,15 +54,16 @@ Typical timeline fields: `runId`, `runAtMs`, `tag`, `attributionClassKey`,
 `isActiveAnomaly`, `anomalyEpisodeId`, `episodeFirstRunId`, `priceMovePct`,
 `priceZScore`, `volumeZScore`, `newRulesJson`, `newMaterialJson`.
 
-A run's `tag` is one of:
+A run's `tag` pairs with an `attributionClassKey` that classifies the run for
+episode purposes:
 
-| `tag`                  | Meaning                                                                    |
-| ---------------------- | -------------------------------------------------------------------------- |
-| `not_triggered`        | Signals did not cross an anomaly rule. Quiet — not a claim price was flat. |
-| `insufficient_history` | Not enough history to evaluate the signal.                                 |
-| `real`                 | A confirmed, publishable attribution exists for this run.                  |
-| `candidate`            | Anomaly continued, but this run produced no new confirmed attribution.     |
-| `no_material`          | Possible new material was checked but did not qualify as novel/material.   |
+| `tag`                  | `attributionClassKey`                       | Meaning                                                                    |
+| ---------------------- | ------------------------------------------- | -------------------------------------------------------------------------- |
+| `not_triggered`        | `not_triggered`                             | Signals did not cross an anomaly rule. Quiet — not a claim price was flat. |
+| `insufficient_history` | `not_triggered`                             | Not enough history to evaluate the signal.                                 |
+| `real`                 | `new_anomaly` / `continued_new_attribution` | A confirmed, publishable attribution exists for this run.                  |
+| `candidate`            | `continued_no_new_attribution`              | Anomaly continued, but this run produced no new confirmed attribution.     |
+| `no_material`          | `continued_no_info`                         | Possible new material was checked but did not qualify as novel/material.   |
 
 ### Anomaly Episode
 
@@ -71,15 +72,15 @@ one anomaly, or different ones?"** An episode is not a separate file — it is t
 **join key between timeline and attribution**, carried on both as
 `anomalyEpisodeId` (with `episodeFirstRunId`).
 
-Current episode boundaries:
+Current episode boundaries, keyed by the run's `attributionClassKey`:
 
-| Transition                                                         | Effect                                                       |
-| ------------------------------------------------------------------ | ------------------------------------------------------------ |
-| inactive -> active                                                 | Open a new episode                                           |
-| `new_anomaly`                                                      | Open a new episode, even if the prior run was already active |
-| `candidate` / `no_material`                                        | Continue the current episode                                 |
-| `continued_new_attribution`                                        | Continue the current episode, adding a new confirmed driver  |
-| `not_triggered` / `insufficient_history` / stale / no current data | End the episode                                              |
+| `attributionClassKey`          | Episode effect                                                                                   | Attribution written to |
+| ------------------------------ | ------------------------------------------------------------------------------------------------ | ---------------------- |
+| `new_anomaly`                  | Open a new `anomalyEpisodeId` — prior run inactive→active, or a new anomaly rule fires while already active | `finding/attribution`  |
+| `continued_new_attribution`    | Continue the current episode with a newly published driver                                       | `finding/attribution`  |
+| `continued_no_new_attribution` | Continue the current episode; new material was checked and the LLM ran, but it did not pass promotion | `finding/candidate`    |
+| `continued_no_info`            | Continue the current episode; no new material, or new info verified as not actually new           | —                      |
+| `not_triggered`                | No anomaly rule; close the episode (also `insufficient_history` / stale / no current data)        | —                      |
 
 ### Attribution
 
