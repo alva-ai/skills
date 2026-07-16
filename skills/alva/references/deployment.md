@@ -7,10 +7,9 @@ managed through `alva automation`; see [feed-lifecycle.md](feed-lifecycle.md).
 
 The deploy CLI manages producer cronjobs:
 
-| Group         | Manages                                                         | Common commands                                                                                 |
-| ------------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `alva deploy` | Cronjob producers (schedule + entry script + run status/logs)   | `create`, `list`, `get`, `update`, `delete`, `pause`, `resume`, `trigger`, `run-status`, `runs`, `run-logs` |
-| `alva loop`   | Self-scheduled in-channel goal loops (sugar over `alva deploy`) | `create`                                                                                        |
+| Group         | Manages                                                       | Common commands                                                                                             |
+| ------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `alva deploy` | Cronjob producers (schedule + entry script + run status/logs) | `create`, `list`, `get`, `update`, `delete`, `pause`, `resume`, `trigger`, `run-status`, `runs`, `run-logs` |
 
 ---
 
@@ -181,71 +180,6 @@ execution, useful for tracing errors or verifying output.
 ```bash
 alva deploy run-logs --id 42 --run-id 123
 ```
-
----
-
-## Channel Loops
-
-A **loop** is a cronjob that each tick runs one fire-and-forget agent turn on a
-channel's main session (via `@alva/loop`), driving that channel toward a goal.
-`alva loop create` is sugar over `alva deploy create`: it seeds a shared
-loop-runner and packs your goal/channel into the args, so you write no script.
-
-```bash
-alva loop create \
-  --channel-id 12345 \
-  --name nvda-premarket-setup \
-  --goal 'Watch NVDA pre-market for a break above the pre-market high with 5-minute volume at least 2x the prior five-bar average. If confirmed, post one alert here with price, time, and evidence, then delete this loop by name. Otherwise finish this tick without an alert.' \
-  --cron '*/15 * * * *' \
-  --start now \
-  --until '2026-07-15T09:30:00-04:00'
-```
-
-Or start at a future time and stop after an exact number of admitted runs:
-
-```bash
-alva loop create \
-  --goal 'Check the next 12 hourly intervals and post only material changes.' \
-  --cron '0 * * * *' \
-  --start '2026-07-15T08:00:00-04:00' \
-  --runs 12
-```
-
-The relay wraps the goal in an automated user-turn wake each tick, with
-platform-owned context before it and loop policy after it. Keep `--goal`
-focused on the business objective, including concrete stop conditions and the
-stop action.
-
-| Flag         | Required    | Description                                                                 |
-| ------------ | ----------- | --------------------------------------------------------------------------- |
-| --goal       | yes         | Instruction run each tick                                                   |
-| --cron       | yes         | Cron expression                                                             |
-| --channel-id | no          | Target channel. Omit ⇒ your DM / Alva Agent channel                        |
-| --start      | no          | Inclusive start: `now` (default, resolved by backend clock) or RFC3339       |
-| --until      | conditional | Exclusive RFC3339 cutoff; required when `--runs` is absent                   |
-| --runs       | conditional | Positive maximum admitted runs after start; required when `--until` is absent |
-| --name       | no          | Stable job name; recommended when the goal may stop its own loop early      |
-
-At least one of `--until` or `--runs` is required. When both are present, the
-first exhausted bound completes the loop. RFC3339 timestamps must include a
-timezone (`Z` or `±HH:MM`). `--expires-in` is removed with no compatibility
-alias; express the real cutoff with `--until` or the exact count with `--runs`.
-
-Only admitted runs increment `run_count`: attempts before `--start`, at or
-after `--until`, or beyond `--runs` do not dispatch an Agent turn. The final
-admitted run still executes. Natural exhaustion removes the scheduler trigger
-and preserves the cronjob row with status `completed` for inspection.
-
-**Channel id**: read `channel-id` from the
-`<session-prefill-channel-memory channel-id="…">` block in your context — that
-is the current channel's id. There is no slug→id lookup.
-
-**Stopping a loop**: the platform bounds are the hard stop. For success that
-can happen earlier, make the goal self-terminating: tell the Agent to run
-`alva deploy list`, match the loop by its `--name`, and run
-`alva deploy delete --id <id>`. There is no `alva loop stop` or list command;
-use `alva deploy` for lifecycle inspection and cleanup. `pause` also stops
-future ticks without deleting the row.
 
 ---
 

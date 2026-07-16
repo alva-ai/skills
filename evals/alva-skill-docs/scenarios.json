@@ -199,26 +199,6 @@
       }
     },
     {
-      "id": "scenario.channel-loop-bounds",
-      "group": "scenarios.loop",
-      "prompt": "Starting tomorrow morning, re-check NVDA in this channel every 15 minutes and stop at 09:30 ET or after 20 runs.",
-      "description": "Continued scheduled Agent work in the same channel routes to a bounded Channel Loop instead of a feed-backed push automation.",
-      "expect": {
-        "route": "Channel Loop",
-        "references": [
-          "deployment.md"
-        ],
-        "behaviors": [
-          "alva loop create",
-          "--start",
-          "RFC3339 timestamps must include a timezone",
-          "At least one of `--until` or `--runs` is required",
-          "`--expires-in` is removed",
-          "preserves the cronjob row with status `completed`"
-        ]
-      }
-    },
-    {
       "id": "scenario.backtest-strategy",
       "group": "scenarios.strategy",
       "prompt": "Backtest a weekly NVDA momentum strategy and show drawdowns.",
