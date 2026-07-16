@@ -25,6 +25,50 @@ Every feed follows the same path:
    `alva feed set-visibility --id <feed_id> --visibility public`.
 7. Verify an unauthenticated read of a public feed path returns HTTP 200.
 
+`automation publish` is create-only. Run it once to register a new automation;
+do not treat it as create-or-update.
+
+## Updating An Existing Automation
+
+ALFS source writes take effect without republishing. Use an explicit ID-scoped
+update only when the registered semantic version, producer cronjob,
+description, changelog, or agent type must change:
+
+```bash
+alva automation inspect --id <feed_id>
+alva automation update --id <feed_id> --description "..."
+```
+
+Run `alva automation update --help` before choosing flags. Omitted fields keep
+their current values; an explicit empty metadata string clears that field.
+Updates do not trigger a run unless `--trigger` is supplied. The automation ID,
+visibility, and alert subscriptions remain intact.
+
+Do not call `automation publish` again for the same name, and do not delete and
+recreate an automation to work around `ALREADY_EXISTS`. If the ID is unknown,
+find the exact owned automation with `alva automation list`, then inspect it
+before updating.
+
+<HARD-GATE id="before-automation-update">
+Before `alva automation update`, verify:
+
+1. The target numeric ID belongs to the intended owned automation.
+2. The requested flags describe only the fields the user intends to change.
+3. If changing the producer, the replacement cronjob exists, belongs to the
+   same user, and its id is known.
+4. Any producer change, including a producer-only update, requires
+   `alva deploy trigger --id <replacement_cronjob_id>` followed by confirmation
+   that the replacement cronjob's latest run succeeded and its output still
+   matches the feed contract.
+5. If changing source or version without changing the producer, the exact
+   current-producer script ran successfully in this session and its output
+   still matches the contract.
+6. `--trigger` is present only when an immediate post-update run is intended.
+
+If any evidence is missing, inspect or test first; do not fall back to
+delete-and-recreate.
+</HARD-GATE>
+
 Do not use `alva fs grant` or `alva fs revoke` to change a feed's public
 visibility. Feed visibility must update the feed record and its ALFS projection
 together; direct filesystem grants are rejected to prevent those states from

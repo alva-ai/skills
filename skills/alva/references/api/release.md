@@ -1,7 +1,7 @@
 # Release And Automation Publish — extras not in CLI help
 
 Run `alva release --help` for playbook workflows and `alva automation --help` for
-automation publish flags before acting. CLI help is authoritative for
+automation publish/update flags before acting. CLI help is authoritative for
 subcommands, flags, display-name conventions, and examples. This file covers
 only:
 
@@ -12,6 +12,11 @@ only:
    the required overlap between trading symbols and tags
 4. `--skill-id` — when it is required
 5. `--agent-type` — marking a feed as a prompt-editable agent
+
+`alva automation publish` registers a new automation and is create-only. For an
+existing automation, use `alva automation update --id <feed_id>` for registered
+metadata, version, or producer changes; ALFS source edits themselves need no
+republish. See [feed-lifecycle.md](../feed-lifecycle.md).
 
 ## Automation Publish `--description` conventions
 
