@@ -81,8 +81,6 @@ Current episode boundaries:
 | `continued_new_attribution`                                        | Continue the current episode, adding a new confirmed driver  |
 | `not_triggered` / `insufficient_history` / stale / no current data | End the episode                                              |
 
-A rollup also computes `episodeStartedAtMs` for the episode.
-
 ### Attribution
 
 One confirmed, user-facing explanation. It answers: **"in this anomaly, is there
@@ -146,9 +144,7 @@ Logic for ticker `TICKER`:
    `<feed-base>/data/finding/attribution/@last/20`. Do **not** read
    `finding/candidate`.
 6. Select the latest attribution row where
-   `attribution.anomalyEpisodeId === timeline.anomalyEpisodeId`. Fallback for
-   transition rows: `attribution.runAtMs` between `episodeStartedAtMs` and the
-   latest timeline `runAtMs`.
+   `attribution.anomalyEpisodeId === timeline.anomalyEpisodeId`.
 7. Return that attribution (or `null` if the active episode has no confirmed
    attribution yet).
 
