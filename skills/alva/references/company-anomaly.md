@@ -60,7 +60,7 @@ episode purposes:
 | `tag`                  | `attributionClassKey`                       | Meaning                                                                    |
 | ---------------------- | ------------------------------------------- | -------------------------------------------------------------------------- |
 | `not_triggered`        | `not_triggered`                             | Signals did not cross an anomaly rule. Quiet — not a claim price was flat. |
-| `insufficient_history` | `not_triggered`                             | Not enough history to evaluate the signal.                                 |
+| `insufficient_history` | `insufficient_history`                      | Not enough history to evaluate the signal.                                 |
 | `real`                 | `new_anomaly` / `continued_new_attribution` | A confirmed, publishable attribution exists for this run.                  |
 | `candidate`            | `continued_no_new_attribution`              | Anomaly continued, but this run produced no new confirmed attribution.     |
 | `no_material`          | `continued_no_info`                         | Possible new material was checked but did not qualify as novel/material.   |
@@ -137,9 +137,9 @@ Logic for ticker `TICKER`:
 1. Read the latest timeline row: `<feed-base>/data/anomaly/timeline/@last/1`.
 2. Take `runAtMs` as the latest run time and `anomalyEpisodeId` /
    `episodeFirstRunId` as the current episode identity.
-3. **Determine active anomaly:**
-   - Preferred: `isActiveAnomaly === "true"`.
-   - Fallback: `tag` in `{ real, candidate, no_material }`.
+3. **Determine active anomaly:** `isActiveAnomaly === "true"`. The producer sets
+   this flag exactly when `tag` is `real`, `candidate`, or `no_material`, so read
+   the flag directly rather than re-deriving it from `tag`.
 4. **If not active:** return `inAnomaly: false`, `latestRealAttribution: null`.
 5. **If active:** read confirmed attributions:
    `<feed-base>/data/finding/attribution/@last/20`. Do **not** read
