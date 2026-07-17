@@ -66,13 +66,19 @@ episode purposes:
 | `no_material`          | `continued_no_info`                         | Possible new material was checked but did not qualify as novel/material.   |
 | `skipped`              | `skipped`                                   | Data-quality skip — the run could not evaluate signals. Preserves the current active/inactive state; can carry `isActiveAnomaly: "true"` mid-episode. |
 
-There is no `insufficient_history` `tag` (the tags are `not_triggered`,
-`skipped`, `no_material`, `candidate`, `real`). A low-history ticker (e.g. a
-recent IPO) is still evaluated against an absolute-move threshold: if
-`|priceMovePct|` crosses `insufficient_history_price_move`, the run triggers as
-a normal anomaly (`real` / `candidate`, active episode) like any other. Only
-when the move stays under that threshold does the run stay quiet as
-`tag: not_triggered` with `attributionClassKey: insufficient_history`.
+### What A Run Tests
+
+- **Price** — a standardized price move (z-score of the latest move against the
+  ticker's recent daily-return distribution) crossing a tier threshold.
+- **Volume** — a standardized volume move, evaluated **only during the regular
+  session**.
+- **Low history** — when there isn't enough history for a price z-score (e.g. a
+  recent IPO), the run instead tests the **absolute** price move against a
+  threshold; crossing it triggers a normal anomaly, otherwise the run stays
+  quiet with `attributionClassKey: insufficient_history`.
+- **Move basis** (`priceMoveBasis`) — pre-market and regular-session moves are
+  measured against the **previous day's close**; after-hours moves count as a
+  new day and are measured against **today's (regular-session) close**.
 
 ### Anomaly Episode
 
