@@ -27,7 +27,11 @@ create a second copy. Choose the destination before mutating it:
 - **Alva topic channel:** resolve the feed id and run
   `alva alert enable --automation-ids <id,id> --channel-id <channel_id>`. This
   binds the alert to that in-product channel. A topic channel is not an
-  external IM group, and its channel id is not a channel-session id.
+  external IM group, its channel id is not a channel-session id, and delivery
+  is web-only. In a channel turn, read the current id from
+  `<session-prefill-channel-memory channel-id="…">`; a non-`alva` slug denotes
+  a topic channel. If the user says "this channel" or "current channel" there,
+  this is the required destination.
 - **External IM group:** from the attached Telegram, Discord, or Slack group,
   use `alva alert group list`, `alva alert group enable --automation-ids <id>`,
   or the matching `disable` command. These commands infer the current group and
@@ -39,6 +43,10 @@ create a second copy. Choose the destination before mutating it:
 The name-addressed `alva alert enable --automation <owner>/<feed>` command has
 no destination flag. When the user says "this channel", use the id-addressed
 form with `--channel-id`; do not silently fall back to the default destination.
+Do not infer Telegram, Discord, Slack, or another transport from the generic
+`channel` session profile. Only name an external transport when current context
+explicitly identifies it; otherwise describe a topic destination as the
+`current Alva topic channel (channel id <id>)`.
 
 If no active IM channel exists for the default personal destination, say web
 notifications will work immediately and the user can connect Telegram,
@@ -54,16 +62,25 @@ A push is set up only after all of these succeed:
      and proactive alerts.
 2. Run the feed through [feed-lifecycle.md](feed-lifecycle.md), including
    `before-automation-publish`.
-3. Enable publisher push on the cronjob:
+3. Read `@last/1` of the sidecar written by the lifecycle test and confirm the
+   message is non-empty or contains `<|SKIP_NOTIFICATION|>` for a quiet run.
+4. Enable publisher push on the cronjob:
    `alva deploy update --id <ID> --push-notify`.
-4. Enable the FEED alert for the intended destination using
+5. Enable the FEED alert for the intended destination using
    [Choose The Delivery Destination](#choose-the-delivery-destination). For the
    default personal destination, use `alva alert enable --automation
    <owner>/<feed>` or `alva alert enable --automation-ids <id,id>`. For the
+   current Alva topic channel, use `alva alert enable --automation-ids <id,id>
+   --channel-id <current_channel_id>`; never replace this with the
+   name-addressed default-personal command. For the
    current external group, use `alva alert group enable --automation-ids <id>`.
-5. Trigger or wait for a real run, read `@last/1` of the sidecar, and confirm
-   the record is fresh and the message is non-empty or contains
-   `<|SKIP_NOTIFICATION|>` for a quiet run.
+
+Do not trigger the cronjob or wait for its next scheduled run solely to verify
+setup. A successful enable proves that alert delivery is configured for the
+selected destination; it does not prove that a message has already been
+delivered. A sidecar record alone is also not delivery proof. Claim real
+delivery only when an existing `alva alert history` row for the intended
+destination records the run as `sent`.
 
 If the automation is unpublished, the feed has no sidecar record, or the record
 has an empty body, do not claim push is set up. Diagnose and fix first.
@@ -71,7 +88,9 @@ has an empty body, do not claim push is set up. Diagnose and fix first.
 Confirm to the user with specifics: which automation alerts are enabled, the
 intended destination, what the next push will say, and when it will fire. A
 global "subscribed" state is not sufficient evidence that an alert targets the
-requested Alva topic channel. For monitors, say quiet runs skip notifications.
+requested Alva topic channel. For a topic binding, report it as an Alva web
+topic channel with its id, never as Telegram or another external DM. For
+monitors, say quiet runs skip notifications.
 
 There is no playbook alert target. Following or unfollowing a playbook never
 changes alerts. If the user explicitly asks to enable every current automation

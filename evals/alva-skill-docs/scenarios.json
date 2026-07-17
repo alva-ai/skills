@@ -199,6 +199,34 @@
       }
     },
     {
+      "id": "scenario.current-topic-channel-alert",
+      "group": "scenarios.push",
+      "prompt": "<session-prefill-channel-memory channel-id=\"44\" root=\"/alva/home/ymchcom/channels/research/memory\"> Notify this channel every minute with hello111.",
+      "description": "A request made in an Alva web topic channel binds the feed to that exact channel id and never invents Telegram delivery.",
+      "expect": {
+        "route": "Automation / Push",
+        "references": [
+          "push-notifications.md"
+        ],
+        "behaviors": [
+          "a non-`alva` slug denotes a topic channel",
+          "delivery is web-only",
+          "alva alert enable --automation-ids <id,id> --channel-id <channel_id>",
+          "do not silently fall back to the default destination",
+          "Do not infer Telegram, Discord, Slack, or another transport",
+          "current Alva topic channel (channel id <id>)",
+          "Do not trigger the cronjob or wait for its next scheduled run solely to verify setup",
+          "A successful enable proves that alert delivery is configured",
+          "it does not prove that a message has already been delivered",
+          "A sidecar record alone is also not delivery proof",
+          "report it as an Alva web topic channel with its id"
+        ],
+        "forbidden_behaviors": [
+          "never as Telegram or another external DM"
+        ]
+      }
+    },
+    {
       "id": "scenario.backtest-strategy",
       "group": "scenarios.strategy",
       "prompt": "Backtest a weekly NVDA momentum strategy and show drawdowns.",

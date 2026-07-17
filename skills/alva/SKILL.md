@@ -550,15 +550,15 @@ follows are independent and never enable or disable alerts. A feed may emit
 `--push-notify` only marks the publisher capable of alerts. It does not
 subscribe users or bypass preferences.
 
-Open [push-notifications.md](references/push-notifications.md) for sidecar
-creation, automation publish, personal and group alert setup,
-and verification. Quiet runs use `<|SKIP_NOTIFICATION|>`.
+Open [push-notifications.md](references/push-notifications.md) for sidecar creation,
+automation publish, personal/group alert setup, and verification. Quiet runs use `<|SKIP_NOTIFICATION|>`.
 
 After releasing or keeping a playbook as draft, scan whether any backing feed is
 push-worthy. Recommend specific feeds, not generic "notifications". A push setup
 is not complete until the feed sidecar exists, `alva automation publish` ran
-after that sidecar was added, the publisher has `--push-notify`, the user has an
-personal or group alert is enabled, and a real run writes a fresh sidecar record.
+after that sidecar was added, the publisher has `--push-notify`, and the
+intended personal or group alert is enabled. That proves configuration, not that a
+message has already been delivered.
 
 #### Playbook Subroute: Remix
 
@@ -694,8 +694,9 @@ generator behind the selected element rather than the rendered DOM.
 
 For a recurring alert, design the feed output first: signal target or message,
 quiet-run sentinel, cadence, and subscriber. Publish the automation after adding
-the sidecar, then verify a real run. A cronjob with `--push-notify` and no alert
-or group alert is not a completed push setup.
+the sidecar, then enable the intended alert. Do not trigger or wait for a run
+solely to verify setup. A cronjob with `--push-notify` and no personal or group
+alert is not a completed push setup.
 
 ### Chat-as-Artifact (`answer_only` / query mode)
 
@@ -841,8 +842,8 @@ Before finishing an Alva task, ask:
 - Did design work read [design.md](references/design.md) and lint where needed?
 - Did Skillhub work fetch the blueprint fresh and set `--skill-id` if used?
 - Did backtesting or signal work use Altra?
-- Did push work verify the publisher sidecar plus the personal alert or group
-  subscription target?
+- Did push work verify the publisher sidecar plus the intended personal/group
+  alert target without claiming an unobserved delivery?
 - If Alva-owned behavior blocked the task, did I offer the confirmed feedback
   flow after reading [api/feedback.md](references/api/feedback.md)?
 - Did the final response describe the delivered result without leaking
