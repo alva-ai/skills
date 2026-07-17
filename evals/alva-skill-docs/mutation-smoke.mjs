@@ -76,7 +76,7 @@ const MUTATIONS = [
   {
     id: "current-topic-channel-destination",
     file: "references/push-notifications.md",
-    remove: "  is web-only. In a channel turn, read the current id from\n",
+    remove: "  channel-session id. Topic-channel delivery is web-only. In a channel turn,\n",
     expectFailedCases: ["subscriptions.delivery-destination", "scenario.current-topic-channel-alert"],
   },
 ];

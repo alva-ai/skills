@@ -26,20 +26,12 @@ create a second copy. Choose the destination before mutating it:
   delivery uses `active_channel` plus its matching username from `alva whoami`.
 - **Alva topic channel:** resolve the feed id and run
   `alva alert enable --automation-ids <id,id> --channel-id <channel_id>`. This
-  binds the alert to that in-product channel. A topic channel is not an
-  external IM group, its channel id is not a channel-session id, and delivery
-  is web-only. In a channel turn, read the current id from
+  binds the alert to that in-product web channel. Its channel id is not a
+  channel-session id. Topic-channel delivery is web-only. In a channel turn,
+  read the current id from
   `<session-prefill-channel-memory channel-id="…">`; a non-`alva` slug denotes
   a topic channel. If the user says "this channel" or "current channel" there,
   this is the required destination.
-- **External IM group:** from the attached Telegram, Discord, or Slack group,
-  use `alva alert group list`, `alva alert group enable --automation-ids <id>`,
-  or the matching `disable` command. These commands infer the current group and
-  accept no session id. Only the group's Alva admin may mutate group alerts, and
-  the admin must own or be able to read the feed; the feed need not be public.
-  Outside that group context, do not claim group delivery is configured and do
-  not substitute a personal alert or Alva topic-channel binding.
-
 The name-addressed `alva alert enable --automation <owner>/<feed>` command has
 no destination flag. When the user says "this channel", use the id-addressed
 form with `--channel-id`; do not silently fall back to the default destination.
@@ -72,8 +64,7 @@ A push is set up only after all of these succeed:
    <owner>/<feed>` or `alva alert enable --automation-ids <id,id>`. For the
    current Alva topic channel, use `alva alert enable --automation-ids <id,id>
    --channel-id <current_channel_id>`; never replace this with the
-   name-addressed default-personal command. For the
-   current external group, use `alva alert group enable --automation-ids <id>`.
+   name-addressed default-personal command.
 
 Do not trigger the cronjob or wait for its next scheduled run solely to verify
 setup. A successful enable proves that alert delivery is configured for the
@@ -111,7 +102,5 @@ as a snapshot: feeds added by a later release are not subscribed automatically.
   targets; use `alva alert disable --automation-ids a,b` for bulk and for
   `TARGET_DELETED` feed ghosts (name-addressed calls 404 on deleted targets).
 - Use the `target.id` returned by `alva alert list` for a deleted feed row.
-- In an attached external group, use `alva alert group list` for inventory and
-  `alva alert group disable --automation-ids <id>` to remove group delivery.
 - Never probe with mutating calls — the read surface answers all identity
   questions.

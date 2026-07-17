@@ -589,7 +589,12 @@
       "id": "subscriptions.delivery-destination",
       "group": "subscriptions",
       "target": "corpus",
-      "description": "Agents distinguish the default personal destination, an Alva topic channel, and an external IM group before mutating an alert subscription.",
+      "description": "The general skill distinguishes the default personal destination from an Alva topic channel; external-group operations stay profile-owned.",
+      "excludes": [
+        "External IM group",
+        "alva alert group",
+        "group-subscriptions"
+      ],
       "section_includes": [
         {
           "file": "references/push-notifications.md",
@@ -598,17 +603,13 @@
           "includes": [
             "Default personal destination",
             "Alva topic channel",
-            "External IM group",
             "--automation-ids <id,id> --channel-id <channel_id>",
             "<session-prefill-channel-memory channel-id=\"…\">",
             "a non-`alva` slug denotes a topic channel",
             "delivery is web-only",
             "current Alva topic channel (channel id <id>)",
             "`channel_id=0`",
-            "moves the personal alert",
-            "alva alert group enable --automation-ids <id>",
-            "accept no session id",
-            "feed need not be public"
+            "moves the personal alert"
           ]
         },
         {

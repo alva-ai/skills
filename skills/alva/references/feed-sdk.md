@@ -164,8 +164,8 @@ Read `@last/N` (where N >= batch size) to get the most recent batch.
 
 ### Pattern D: Signal Feed Push Notification
 
-For feeds that produce actionable signals worth pushing to users with alerts or
-groups subscribed to the feed. Write signal records to the **`signal`** group
+For feeds that produce actionable signals worth pushing to subscribed alert
+destinations. Write signal records to the **`signal`** group
 with a **`targets`** output -- the resulting path
 `~/feeds/{name}/v{major}/data/signal/targets` is one source the platform reads
 when dispatching the canonical `feed_alert_ready` notification event.
@@ -233,7 +233,7 @@ await feed.run(async (ctx) => {
 
 When this feed runs as a cronjob with `--push-notify`, the platform reads
 `/data/signal/targets` and dispatches the signal content as `feed_alert_ready`
-to eligible FEED alert and group subscribers. Telegram delivery chunks long
+to eligible FEED alert subscribers. Telegram delivery chunks long
 messages at the platform's per-message limit; the feed SDK does not require a
 500-character summary.
 
@@ -242,12 +242,11 @@ messages at the platform's per-message limit; the feed SDK does not require a
 - The group **must** be named `signal` and the output **must** be named
   `targets` -- this is the path the notification system looks for.
 - `--push-notify` and `alva automation publish --cronjob-id ...` only make the
-  feed publisher capable of emitting alerts. They do **not** subscribe any user
-  or group.
-- Real delivery requires an explicit FEED alert: personal `alva alert enable
-  --automation <owner>/<feed>`, `alva alert group enable --automation-ids
-  <feed_id>` from the attached external group, or — from inside a playbook
-  iframe — a parent-confirmed `window.alva.subscribe.propose()` (see
+  feed publisher capable of emitting alerts. They do **not** create an alert
+  binding.
+- Real delivery requires an explicit FEED alert: `alva alert enable
+  --automation <owner>/<feed>` or — from inside a playbook iframe — a
+  parent-confirmed `window.alva.subscribe.propose()` (see
   `references/api/udf-runtime.md` § Feed Subscribe Proposal). A playbook must
   never call a subscribe API directly.
 - Use `meta.reason` to provide the push-notification body -- this is what
@@ -276,8 +275,7 @@ periodic research summaries, heartbeat monitoring, and proactive alerts.
 
 Write the agent's response to the **`notify`** group with a **`message`**
 output. When the cronjob completes with `--push-notify`, the platform reads this
-path and dispatches `feed_alert_ready` to users or groups explicitly subscribed
-to the feed.
+path and dispatches `feed_alert_ready` to eligible alert destinations.
 
 ```javascript
 const { ask } = require("@alva/alvaask");
@@ -340,13 +338,11 @@ alva automation publish --name daily-briefing --version 1.0.0 \
 - **`alva automation publish` is required** — without it, the push is still
   dispatched but arrives with an empty body (no `title`/`body`).
 - `--push-notify` only enables publisher-side fanout. It does **not** create
-  personal or group alerts.
-- Real delivery requires an explicit FEED alert: personal `alva alert enable
-  --automation <owner>/<feed>` or, from the attached external group, `alva alert
-  group enable --automation-ids <feed_id>`. Following a playbook does not
-  subscribe any of its feeds. For inventory and unsubscribe (including deleted
-  feed rows), see [push-notifications.md](push-notifications.md) § Inventory And
-  Unsubscribe.
+  alert bindings.
+- Real delivery requires an explicit FEED alert such as `alva alert enable
+  --automation <owner>/<feed>`. Following a playbook does not subscribe any of
+  its feeds. For inventory and unsubscribe (including deleted feed rows), see
+  [push-notifications.md](push-notifications.md) § Inventory And Unsubscribe.
 - Combine with Pattern D if you want both feed completion notifications and
   signal-style notifications.
 

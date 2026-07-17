@@ -758,8 +758,8 @@ All output data is also persisted under the feed's ALFS path (quote in CLI, e.g.
 `signal/targets` makes the feed push-capable, but delivery still requires the
 cronjob to be created or updated with `--push-notify` and
 `alva automation publish` to bind the feed to that cronjob. Actual delivery also
-requires an explicit personal or group alert to the automation's
-feed. A playbook follow does not enable alerts for its feeds. See
+requires an explicit alert binding to the automation's feed. A playbook follow
+does not enable alerts for its feeds. See
 `references/deployment.md` for the deploy/publish flow.
 
 ---

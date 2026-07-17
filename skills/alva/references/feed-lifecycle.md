@@ -142,9 +142,9 @@ Both dispatch `feed_alert_ready`. Do not use legacy names such as
 `playbook_data_ready` or `feed_run_complete` in new docs.
 
 `--push-notify` marks the cronjob publisher as capable of emitting alerts. It
-does not subscribe any user or group and does not bypass notification
-preferences. For `notify/message`, `<|SKIP_NOTIFICATION|>` advances fanout
+does not create an alert binding or bypass notification preferences. For
+`notify/message`, `<|SKIP_NOTIFICATION|>` advances fanout
 without sending a visible push.
 
-See [push-notifications.md](push-notifications.md) for the personal alert,
-group alert, and verification workflow.
+See [push-notifications.md](push-notifications.md) for alert destination and
+verification workflows.
