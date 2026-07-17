@@ -72,9 +72,10 @@ episode purposes:
   **90 trading days** of daily returns (`z = (move − mean) / stdev`), with tiers
   at **|z| ≥ 1 / 1.5 / 2**.
 - **Volume** — a **one-sided** z-score of today's cumulative volume *at this
-  point in the session* against the same-slot cumulative volume across the
-  baseline window of prior sessions (`z = (cumVol − mean) / stdev`), tiers at
-  **z ≥ 1 / 1.5 / 2**, evaluated **only during the regular session**.
+  point in the session* against the same-slot cumulative volume over the prior
+  **~1 month** of sessions (`volumeBaselineWindow`, `1M`; `z = (cumVol − mean) /
+  stdev`), tiers at **z ≥ 1 / 1.5 / 2**, evaluated **only during the regular
+  session**.
 - **Low history** — with too little history for a z-score (e.g. a recent IPO),
   the run instead triggers on the **absolute** move (default **≥ 5%**);
   otherwise it stays quiet with `attributionClassKey: insufficient_history`.
