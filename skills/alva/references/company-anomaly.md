@@ -64,6 +64,7 @@ episode purposes:
 | `real`                 | `new_anomaly` / `continued_new_attribution` | A confirmed, publishable attribution exists for this run.                  |
 | `candidate`            | `continued_no_new_attribution`              | Anomaly continued, but this run produced no new confirmed attribution.     |
 | `no_material`          | `continued_no_info`                         | Possible new material was checked but did not qualify as novel/material.   |
+| `skipped`              | `skipped`                                   | Data-quality skip — the run could not evaluate signals. Preserves the current active/inactive state; can carry `isActiveAnomaly: "true"` mid-episode. |
 
 ### Anomaly Episode
 
@@ -80,6 +81,7 @@ Current episode boundaries, keyed by the run's `attributionClassKey`:
 | `continued_new_attribution`    | Continue the current episode with a newly published driver                                       | `finding/attribution`  |
 | `continued_no_new_attribution` | Continue the current episode; new material was checked and the LLM ran, but it did not pass promotion | `finding/candidate`    |
 | `continued_no_info`            | Continue the current episode; no new material, or new info verified as not actually new           | —                      |
+| `skipped`                      | Data-quality skip; keeps the current episode open when `isActiveAnomaly` is `"true"`, otherwise leaves state unchanged (opens/closes nothing) | —                      |
 | `not_triggered`                | No anomaly rule fires; not active, close the episode (also stale / no current data)               | —                      |
 | `insufficient_history`         | Not enough history to evaluate the signal; not active, close the episode                          | —                      |
 
@@ -139,8 +141,9 @@ Logic for ticker `TICKER`:
 2. Take `runAtMs` as the latest run time and `anomalyEpisodeId` /
    `episodeFirstRunId` as the current episode identity.
 3. **Determine active anomaly:** `isActiveAnomaly === "true"`. The producer sets
-   this flag exactly when `tag` is `real`, `candidate`, or `no_material`, so read
-   the flag directly rather than re-deriving it from `tag`.
+   this flag when `tag` is `real`, `candidate`, or `no_material`, and also on a
+   `skipped` (data-quality) run that lands mid-episode, so read the flag directly
+   rather than re-deriving it from `tag`.
 4. **If not active:** return `inAnomaly: false`, `latestRealAttribution: null`.
 5. **If active:** read confirmed attributions:
    `<feed-base>/data/finding/attribution/@last/20`. Do **not** read
@@ -163,6 +166,7 @@ Logic for ticker `TICKER`:
     "runAtMs": 1784102823773,
     "headline": "...",
     "summary": "...",
+    "summaryWithCitationsMarkdown": "...",
     "confidence": "high",
     "attributionStatus": "confirmed",
     "driverMarket": "...",
@@ -210,6 +214,8 @@ history.
 | `attributionClassKey` | Attribution class/key for the run                                          |
 | `priceMovePct`        | Move on the basis named by `priceMoveBasis`                                |
 | `priceMoveBasis`      | Comparison basis (e.g. pre-market vs previous close, after-hours vs close) |
+| `regularSessionMovePct` / `preMarketMovePct` / `afterHoursMovePct` / `totalMovePct` | Per-session breakdown of the move; pair with `priceMoveBasis` so a pre-market/after-hours move is not read as a regular-session return |
+| `realReason`          | Why the run reached its classification (e.g. `first`, `new_rule`, `insufficient_history`) |
 | `priceZScore`         | Standardized price signal                                                  |
 | `volumeZScore`        | Standardized volume signal                                                 |
 | `newRulesJson`        | JSON array of rules newly active in this transition                        |
@@ -230,6 +236,7 @@ as though it were a regular-session return.
 | `symbol`                                | Attributed company                                |
 | `headline`                              | Short likely-driver statement                     |
 | `summary`                               | Full attribution narrative                        |
+| `summaryWithCitationsMarkdown`          | Same narrative as `summary`, with inline Markdown source links (`([source](url))`) after sourced claims, drawn only from `supportingEvents` / `sourceLinks`; falls back to `summary` when absent |
 | `drivers` / driver split                | Decomposition into market, sector, asset-specific |
 | `confidence`                            | Confidence classification                         |
 | `attributionStatus`                     | Result status; the contract uses `confirmed` rows |
@@ -239,6 +246,8 @@ as though it were a regular-session return.
 Supporting events and source links are already copied onto the attribution, so
 the consumer contract does not read the raw `event/items` stream. Label the
 driver split and narrative as Alva analysis, not established causality.
+`summaryWithCitationsMarkdown` is the same analysis with source links inline —
+the links are evidence, the narrative is still Alva analysis.
 
 ## Internal Surfaces (Not The Contract)
 
