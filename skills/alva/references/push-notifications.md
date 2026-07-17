@@ -57,8 +57,8 @@ A push is set up only after all of these succeed:
    [Choose The Delivery Destination](#choose-the-delivery-destination). For the
    default personal destination, use `alva alert enable --automation
    <owner>/<feed>` or `alva alert enable --automation-ids <id,id>`.
-5. Trigger or wait for a real run, read `@last/1` of the sidecar, and confirm
-   the record is fresh and the message is non-empty or contains
+5. Wait for a scheduled real run, read `@last/1` of the sidecar, and confirm the
+   record is fresh and the message is non-empty or contains
    `<|SKIP_NOTIFICATION|>` for a quiet run.
 
 If the automation is unpublished, the feed has no sidecar record, or the record

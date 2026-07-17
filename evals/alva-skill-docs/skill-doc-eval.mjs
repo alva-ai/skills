@@ -190,6 +190,14 @@ function includesAll(text, needles) {
   }));
 }
 
+function excludesAll(text, needles) {
+  const lower = normalizeText(text);
+  return needles.map((needle) => ({
+    needle: `excludes ${needle}`,
+    pass: !lower.includes(normalizeText(String(needle))),
+  }));
+}
+
 function normalizeText(text) {
   return text.toLowerCase().replace(/\s+/g, " ").trim();
 }
@@ -307,6 +315,10 @@ function evaluateCase(testCase, docs) {
 
   if (Array.isArray(testCase.includes)) {
     checks.push(...includesAll(text, testCase.includes));
+  }
+
+  if (Array.isArray(testCase.excludes)) {
+    checks.push(...excludesAll(text, testCase.excludes));
   }
 
   if (Array.isArray(testCase.file_includes)) {

@@ -41,8 +41,7 @@ alva automation update --id <feed_id> --description "..."
 
 Run `alva automation update --help` before choosing flags. Omitted fields keep
 their current values; an explicit empty metadata string clears that field.
-Updates do not trigger a run unless `--trigger` is supplied. The automation ID,
-visibility, and alert subscriptions remain intact.
+The automation ID, visibility, and alert subscriptions remain intact.
 
 Do not call `automation publish` again for the same name, and do not delete and
 recreate an automation to work around `ALREADY_EXISTS`. If the ID is unknown,
@@ -56,14 +55,8 @@ Before `alva automation update`, verify:
 2. The requested flags describe only the fields the user intends to change.
 3. If changing the producer, the replacement cronjob exists, belongs to the
    same user, and its id is known.
-4. Any producer change, including a producer-only update, requires
-   `alva deploy trigger --id <replacement_cronjob_id>` followed by confirmation
-   that the replacement cronjob's latest run succeeded and its output still
-   matches the feed contract.
-5. If changing source or version without changing the producer, the exact
-   current-producer script ran successfully in this session and its output
-   still matches the contract.
-6. `--trigger` is present only when an immediate post-update run is intended.
+4. The resulting producer's exact script ran successfully via `alva run` in
+   this session and its output still matches the feed contract.
 
 If any evidence is missing, inspect or test first; do not fall back to
 delete-and-recreate.
