@@ -73,6 +73,12 @@ const MUTATIONS = [
       "| [alva-knowledge.md](references/alva-knowledge.md)                                     | Required automation reasoning: bounded history, cross-run comparison, semantic notification novelty, quiet runs.                            |\n",
     expectFailedCases: ["scenario.alert-push-monitor"],
   },
+  {
+    id: "current-topic-channel-destination",
+    file: "references/push-notifications.md",
+    remove: "  channel-session id. Topic-channel delivery is web-only. In a channel turn,\n",
+    expectFailedCases: ["subscriptions.delivery-destination", "scenario.current-topic-channel-alert"],
+  },
 ];
 
 function parseArgs(argv) {

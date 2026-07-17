@@ -62,8 +62,8 @@ The stack is layered:
 4. **Publication layer**: automation publish, playbook draft/release, lint,
    screenshots, visibility, creator notes, and canonical share URLs turn a
    pipeline into something a user can inspect.
-5. **Action layer**: alerts, signal feeds, trading execution, and group
-   subscriptions connect the artifact to ongoing decisions.
+5. **Action layer**: alerts, signal feeds, trading execution, and alert bindings
+   connect the artifact to ongoing decisions.
 
 Those layers matter because most Alva bugs are layer violations: using search as
 data, using runtime code as a one-off local script, skipping automation publish
@@ -205,7 +205,7 @@ that section as mandatory, not optional debugging material.
 | dashboard, screener app, thesis tracker, hosted report, shareable surface                                                               | Playbook Creation                   | Build live feeds first, then read [playbook-creation.md](references/playbook-creation.md).                                                                                               |
 | `/use-skill:<username>/<name>`, user-referenced skill/method, or template-like research method                                          | Skillhub Blueprint                  | Fetch blueprint fresh; if it becomes a playbook, route through [playbook-creation.md](references/playbook-creation.md) and set `--skill-id`.                                             |
 | backtest, strategy, signal, rebalance, portfolio simulation                                                                             | Strategy / Trading Analysis         | Use Altra; package as answer, feed, or playbook only as the user goal requires.                                                                                                          |
-| recurring digest, threshold tracker, alert, stream watch                                                                                | Automation / Push                   | Read [alva-knowledge.md](references/alva-knowledge.md), then build a push-capable feed and verify alert or group subscription plus sidecar output.                                        |
+| recurring digest, threshold tracker, alert, stream watch                                                                                | Automation / Push                   | Read [alva-knowledge.md](references/alva-knowledge.md), then build a push-capable feed and verify the alert binding plus sidecar output.                                                  |
 | `<remix ...>` or "remix this playbook"                                                                                                  | Remix                               | Read source files; preserve lineage and source UDFs.                                                                                                                                     |
 | `<annotation ...>` or "change this element"                                                                                             | Edit / Debug                        | Edit the generator behind the element, not rendered feed values.                                                                                                                         |
 | "does Alva have X?"                                                                                                                     | Capability Verification             | Run `alva data-skills list` and search for `<topic>` before saying no.                                                                                                                   |
@@ -550,15 +550,15 @@ follows are independent and never enable or disable alerts. A feed may emit
 `--push-notify` only marks the publisher capable of alerts. It does not
 subscribe users or bypass preferences.
 
-Open [push-notifications.md](references/push-notifications.md) for sidecar
-creation, automation publish, personal alert setup, group subscription setup,
-and verification. Quiet runs use `<|SKIP_NOTIFICATION|>`.
+Open [push-notifications.md](references/push-notifications.md) for sidecar creation,
+automation publish, alert setup, and verification. Quiet runs use `<|SKIP_NOTIFICATION|>`.
 
 After releasing or keeping a playbook as draft, scan whether any backing feed is
 push-worthy. Recommend specific feeds, not generic "notifications". A push setup
 is not complete until the feed sidecar exists, `alva automation publish` ran
-after that sidecar was added, the publisher has `--push-notify`, the user has an
-alert or the group is subscribed, and a real run writes a fresh sidecar record.
+after that sidecar was added, the publisher has `--push-notify`, and the
+intended alert binding is enabled. That proves configuration, not that a
+message has already been delivered.
 
 #### Playbook Subroute: Remix
 
@@ -694,8 +694,9 @@ generator behind the selected element rather than the rendered DOM.
 
 For a recurring alert, design the feed output first: signal target or message,
 quiet-run sentinel, cadence, and subscriber. Publish the automation after adding
-the sidecar, then verify a real run. A cronjob with `--push-notify` and no alert
-or group subscription is not a completed push setup.
+the sidecar, then enable the intended alert. Do not trigger or wait for a run
+solely to verify setup. A cronjob with `--push-notify` and no alert binding is
+not a completed push setup.
 
 ### Chat-as-Artifact (`answer_only` / query mode)
 
@@ -729,7 +730,6 @@ text does not fully cover.
 | `comments`           | Playbook comments and pinned creator notes. See [creators-note.md](references/creators-note.md).                                                                                      |
 | `alert`              | Personal FEED alert opt-ins and automation history. See [push-notifications.md](references/push-notifications.md).                                                                    |
 | `subscriptions`      | Playbook follow commands plus FEED alert commands. Following never changes alerts. See [push-notifications.md](references/push-notifications.md).                                    |
-| `channel`            | FEED-only subscriptions for external IM groups attached to channel sessions; never use for Alva topic channels. See [push-notifications.md](references/push-notifications.md).        |
 | `trading`            | Accounts, portfolio, orders, subscriptions, execution. Must read [api/trading.md](references/api/trading.md).                                                                         |
 | `broker`             | Agentic order execution — place/cancel/read across venues (crypto + US equities). Run `alva broker describe` for live commands/capabilities; must read [api/broker.md](references/api/broker.md).                     |
 | `screenshot`         | PNG capture for released playbook verification. See [playbook-creation.md](references/playbook-creation.md#screenshot).                                                               |
@@ -841,8 +841,8 @@ Before finishing an Alva task, ask:
 - Did design work read [design.md](references/design.md) and lint where needed?
 - Did Skillhub work fetch the blueprint fresh and set `--skill-id` if used?
 - Did backtesting or signal work use Altra?
-- Did push work verify the publisher sidecar plus the personal alert or group
-  subscription target?
+- Did push work verify the publisher sidecar plus the intended alert target
+  without claiming an unobserved delivery?
 - If Alva-owned behavior blocked the task, did I offer the confirmed feedback
   flow after reading [api/feedback.md](references/api/feedback.md)?
 - Did the final response describe the delivered result without leaking

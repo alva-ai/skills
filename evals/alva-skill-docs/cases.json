@@ -589,7 +589,12 @@
       "id": "subscriptions.delivery-destination",
       "group": "subscriptions",
       "target": "corpus",
-      "description": "Agents distinguish the default personal destination, an Alva topic channel, and an external IM group before mutating an alert subscription.",
+      "description": "The general skill distinguishes the default personal destination from an Alva topic channel; external-group operations stay profile-owned.",
+      "excludes": [
+        "External IM group",
+        "alva alert group",
+        "group-subscriptions"
+      ],
       "section_includes": [
         {
           "file": "references/push-notifications.md",
@@ -598,11 +603,13 @@
           "includes": [
             "Default personal destination",
             "Alva topic channel",
-            "External IM group",
             "--automation-ids <id,id> --channel-id <channel_id>",
+            "<session-prefill-channel-memory channel-id=\"…\">",
+            "a non-`alva` slug denotes a topic channel",
+            "delivery is web-only",
+            "current Alva topic channel (channel id <id>)",
             "`channel_id=0`",
-            "moves the personal alert",
-            "Never pass an Alva channel id as `--session-id`"
+            "moves the personal alert"
           ]
         },
         {
@@ -611,7 +618,9 @@
           "label": "destination verification",
           "includes": [
             "intended destination",
-            "global \"subscribed\" state is not sufficient"
+            "global \"subscribed\" state is not sufficient",
+            "report it as an Alva web topic channel with its id",
+            "never as Telegram or another external DM"
           ]
         }
       ]
@@ -834,10 +843,10 @@
       "id": "deployment.manual-trigger-optional",
       "group": "deployment",
       "target": "corpus",
-      "description": "Manual deployment trigger commands remain discoverable without becoming a recommended workflow, verification step, or update gate.",
+      "description": "Manual trigger commands remain discoverable without becoming a required deployment, update, or push-verification workflow.",
       "excludes": [
         "Trigger an Out-of-Schedule Run",
-        "alva deploy trigger --id",
+        "Immediately after enabling the alert, trigger one out-of-schedule run",
         "alva deploy run-status --id",
         "Verify the deployment via `alva deploy trigger`",
         "Any producer change, including a producer-only update, requires",
