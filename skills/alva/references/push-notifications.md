@@ -28,10 +28,11 @@ create a second copy. Choose the destination before mutating it:
   `alva alert enable --automation-ids <id,id> --channel-id <channel_id>`. This
   binds the alert to that in-product channel. A topic channel is not an
   external IM group, and its channel id is not a channel-session id.
-- **External IM group:** from the attached Telegram, Discord, or Slack group,
-  use `/alva subscribe feed <id>`. The CLI `alva channel
-  group-subscriptions ... --session-id <channel_session_id>` is only for that
-  external group. Never pass an Alva channel id as `--session-id`.
+- **External IM group:** group delivery requires an explicit FEED subscription
+  configured from the attached Telegram, Discord, or Slack group by its Alva
+  admin. The channel-group session profile owns the operation and current-group
+  routing. Outside that group context, do not claim group delivery is configured
+  and do not substitute a personal alert or Alva topic-channel binding.
 
 The name-addressed `alva alert enable --automation <owner>/<feed>` command has
 no destination flag. When the user says "this channel", use the id-addressed

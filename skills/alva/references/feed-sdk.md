@@ -245,9 +245,9 @@ messages at the platform's per-message limit; the feed SDK does not require a
   feed publisher capable of emitting alerts. They do **not** subscribe any user
   or group.
 - Real delivery requires an explicit FEED alert/subscription: personal
-  `alva alert enable --automation <owner>/<feed>`, group
-  `/alva subscribe feed <id>`, or — from inside a playbook iframe — a
-  parent-confirmed `window.alva.subscribe.propose()` (see
+  `alva alert enable --automation <owner>/<feed>`, a group FEED subscription
+  configured from the attached external group, or — from inside a playbook
+  iframe — a parent-confirmed `window.alva.subscribe.propose()` (see
   `references/api/udf-runtime.md` § Feed Subscribe Proposal). A playbook must
   never call a subscribe API directly.
 - Use `meta.reason` to provide the push-notification body -- this is what
@@ -342,10 +342,11 @@ alva automation publish --name daily-briefing --version 1.0.0 \
 - `--push-notify` only enables publisher-side fanout. It does **not** create
   personal alerts or group subscriptions.
 - Real delivery requires an explicit FEED alert/subscription: personal
-  `alva alert enable --automation <owner>/<feed>` or group
-  `/alva subscribe feed <feed_id>`. Following a playbook does not subscribe any
-  of its feeds. For inventory and unsubscribe (including deleted feed rows), see
-  [push-notifications.md](push-notifications.md) § Inventory And Unsubscribe.
+  `alva alert enable --automation <owner>/<feed>` or a group FEED subscription
+  configured from the attached external group. Following a playbook does not
+  subscribe any of its feeds. For inventory and unsubscribe (including deleted
+  feed rows), see [push-notifications.md](push-notifications.md) § Inventory And
+  Unsubscribe.
 - Combine with Pattern D if you want both feed completion notifications and
   signal-style notifications.
 
