@@ -811,7 +811,6 @@
             "alva automation update --id <feed_id>",
             "Omitted fields keep their current values",
             "explicit empty metadata string clears",
-            "do not trigger a run unless `--trigger` is supplied",
             "alert subscriptions remain intact",
             "do not delete and recreate an automation to work around `ALREADY_EXISTS`"
           ]
@@ -825,12 +824,57 @@
           "includes": [
             "target numeric ID belongs to the intended owned automation",
             "replacement cronjob exists",
-            "Any producer change, including a producer-only update",
-            "alva deploy trigger --id <replacement_cronjob_id>",
-            "replacement cronjob's latest run succeeded",
-            "current-producer script ran successfully in this session",
-            "`--trigger` is present only when an immediate post-update run is intended",
+            "resulting producer's exact script ran successfully via `alva run`",
             "do not fall back to delete-and-recreate"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "deployment.manual-trigger-optional",
+      "group": "deployment",
+      "target": "corpus",
+      "description": "Manual deployment trigger commands remain discoverable without becoming a recommended workflow, verification step, or update gate.",
+      "excludes": [
+        "Trigger an Out-of-Schedule Run",
+        "alva deploy trigger --id",
+        "alva deploy run-status --id",
+        "Verify the deployment via `alva deploy trigger`",
+        "Any producer change, including a producer-only update, requires",
+        "`--trigger` is present only when an immediate post-update run is intended",
+        "Trigger or wait for a real run"
+      ],
+      "file_includes": [
+        {
+          "file": "SKILL.md",
+          "label": "deploy command index",
+          "includes": [
+            "Cronjob lifecycle for producer scripts: schedule, args, trigger, run-status, runs, logs."
+          ]
+        },
+        {
+          "file": "references/deployment.md",
+          "label": "deploy command inventory",
+          "includes": [
+            "`pause`, `resume`, `trigger`, `run-status`, `runs`, `run-logs`"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "communication.concise-completion",
+      "group": "communication",
+      "target": "corpus",
+      "description": "Post-deployment and multi-step updates report only new outcome evidence and unresolved issues instead of replaying the work.",
+      "section_includes": [
+        {
+          "file": "SKILL.md",
+          "heading": "User-Facing Communication",
+          "label": "concise completion update",
+          "includes": [
+            "After a deployment or other multi-step build",
+            "keep the final update delta-only",
+            "do not recap earlier details"
           ]
         }
       ]

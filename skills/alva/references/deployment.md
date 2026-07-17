@@ -20,9 +20,8 @@ The deployment workflow:
 1. **Write** a script (feed or task) to ALFS
 2. **Test** it manually via `alva run`
 3. **Deploy** it as a cronjob via `alva deploy create`
-4. **Verify** the deployment via `alva deploy trigger` (one out-of-schedule run)
-5. **Monitor** the cronjob status via `alva deploy list` / `alva deploy get`
-6. **Debug** execution history via `alva deploy runs` / `alva deploy run-logs`
+4. **Monitor** the cronjob status via `alva deploy list` / `alva deploy get`
+5. **Debug** execution history via `alva deploy runs` / `alva deploy run-logs`
 
 Cronjobs execute the script through the same jagent runtime as `alva run`. The
 script receives the same environment (`require("env").args` contains the
@@ -120,46 +119,6 @@ alva deploy resume --id 42
 ```
 
 Both return the updated cronjob object.
-
-### Trigger an Out-of-Schedule Run
-
-Fire the cronjob once, immediately. Returns the Hatchet workflow run id at
-enqueue — async; the `cronjob_runs` row may appear as `DISPATCHED` or `RUNNING`
-before the run reaches a terminal state.
-
-```bash
-alva deploy trigger --id 42
-# { "workflow_run_id": "hatchet-wf-..." }
-```
-
-To verify completion, poll `run-status` with the returned `workflow_run_id` and
-a caller-owned timeout:
-
-```bash
-WF=$(alva deploy trigger --id 42 | jq -r .workflow_run_id)
-for _ in {1..60}; do
-  STATUS_JSON=$(alva deploy run-status --id 42 --workflow-run-id "$WF")
-  STATE=$(echo "$STATUS_JSON" | jq -r .state)
-  case "$STATE" in PENDING|DISPATCHED|RUNNING) ;; *) break ;; esac
-  sleep 5
-done
-case "$STATE" in
-  PENDING|DISPATCHED|RUNNING) echo "Timed out waiting for run completion" >&2; exit 1 ;;
-esac
-echo "$STATUS_JSON" | jq '{state, run: (.run // null)}'
-```
-
-`PENDING` means the workflow was accepted but no `cronjob_runs` row exists yet.
-It can also mean the workflow id was wrong, belongs to another cronjob, or the
-workflow failed before persistence; it is not proof that a row will eventually
-appear. `DISPATCHED` and `RUNNING` mean an in-flight row exists, but callers
-still need their own deadline in case the run never reaches a terminal state.
-Terminal states are `COMPLETED`, `FAILED`, and `SKIPPED`; when a terminal
-response includes `.run.id`, use `alva deploy run-logs --id 42 --run-id <rid>`
-for execution output.
-
-Use _after_ deploy to confirm the full cronjob path is wired correctly. For
-iterating on script logic without Hatchet, use `alva run` instead.
 
 ### Debugging Runs
 
@@ -367,7 +326,7 @@ alva feed set-visibility --id <feed_id_from_publish> --visibility public
 Do not use `alva fs grant` to publish a feed. `feed set-visibility` keeps the
 feed record and inherited ALFS public-read projection consistent.
 
-### 5. Verify the cronjob
+### 5. Confirm cronjob registration
 
 ```bash
 alva deploy list
