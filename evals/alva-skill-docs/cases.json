@@ -862,6 +862,24 @@
       ]
     },
     {
+      "id": "communication.concise-completion",
+      "group": "communication",
+      "target": "corpus",
+      "description": "Post-deployment and multi-step updates report only new outcome evidence and unresolved issues instead of replaying the work.",
+      "section_includes": [
+        {
+          "file": "SKILL.md",
+          "heading": "User-Facing Communication",
+          "label": "concise completion update",
+          "includes": [
+            "After a deployment or other multi-step build",
+            "keep the final update delta-only",
+            "do not recap earlier details"
+          ]
+        }
+      ]
+    },
+    {
       "id": "target.mainline-updates",
       "group": "target",
       "target": "corpus",
