@@ -244,9 +244,9 @@ messages at the platform's per-message limit; the feed SDK does not require a
 - `--push-notify` and `alva automation publish --cronjob-id ...` only make the
   feed publisher capable of emitting alerts. They do **not** subscribe any user
   or group.
-- Real delivery requires an explicit FEED alert/subscription: personal
-  `alva alert enable --automation <owner>/<feed>`, a group FEED subscription
-  configured from the attached external group, or — from inside a playbook
+- Real delivery requires an explicit FEED alert: personal `alva alert enable
+  --automation <owner>/<feed>`, `alva alert group enable --automation-ids
+  <feed_id>` from the attached external group, or — from inside a playbook
   iframe — a parent-confirmed `window.alva.subscribe.propose()` (see
   `references/api/udf-runtime.md` § Feed Subscribe Proposal). A playbook must
   never call a subscribe API directly.
@@ -340,10 +340,10 @@ alva automation publish --name daily-briefing --version 1.0.0 \
 - **`alva automation publish` is required** — without it, the push is still
   dispatched but arrives with an empty body (no `title`/`body`).
 - `--push-notify` only enables publisher-side fanout. It does **not** create
-  personal alerts or group subscriptions.
-- Real delivery requires an explicit FEED alert/subscription: personal
-  `alva alert enable --automation <owner>/<feed>` or a group FEED subscription
-  configured from the attached external group. Following a playbook does not
+  personal or group alerts.
+- Real delivery requires an explicit FEED alert: personal `alva alert enable
+  --automation <owner>/<feed>` or, from the attached external group, `alva alert
+  group enable --automation-ids <feed_id>`. Following a playbook does not
   subscribe any of its feeds. For inventory and unsubscribe (including deleted
   feed rows), see [push-notifications.md](push-notifications.md) § Inventory And
   Unsubscribe.

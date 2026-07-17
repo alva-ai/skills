@@ -205,7 +205,7 @@ that section as mandatory, not optional debugging material.
 | dashboard, screener app, thesis tracker, hosted report, shareable surface                                                               | Playbook Creation                   | Build live feeds first, then read [playbook-creation.md](references/playbook-creation.md).                                                                                               |
 | `/use-skill:<username>/<name>`, user-referenced skill/method, or template-like research method                                          | Skillhub Blueprint                  | Fetch blueprint fresh; if it becomes a playbook, route through [playbook-creation.md](references/playbook-creation.md) and set `--skill-id`.                                             |
 | backtest, strategy, signal, rebalance, portfolio simulation                                                                             | Strategy / Trading Analysis         | Use Altra; package as answer, feed, or playbook only as the user goal requires.                                                                                                          |
-| recurring digest, threshold tracker, alert, stream watch                                                                                | Automation / Push                   | Read [alva-knowledge.md](references/alva-knowledge.md), then build a push-capable feed and verify alert or group subscription plus sidecar output.                                        |
+| recurring digest, threshold tracker, alert, stream watch                                                                                | Automation / Push                   | Read [alva-knowledge.md](references/alva-knowledge.md), then build a push-capable feed and verify the personal or group alert plus sidecar output.                                        |
 | `<remix ...>` or "remix this playbook"                                                                                                  | Remix                               | Read source files; preserve lineage and source UDFs.                                                                                                                                     |
 | `<annotation ...>` or "change this element"                                                                                             | Edit / Debug                        | Edit the generator behind the element, not rendered feed values.                                                                                                                         |
 | "does Alva have X?"                                                                                                                     | Capability Verification             | Run `alva data-skills list` and search for `<topic>` before saying no.                                                                                                                   |
@@ -551,14 +551,14 @@ follows are independent and never enable or disable alerts. A feed may emit
 subscribe users or bypass preferences.
 
 Open [push-notifications.md](references/push-notifications.md) for sidecar
-creation, automation publish, personal alert setup, group subscription setup,
+creation, automation publish, personal and group alert setup,
 and verification. Quiet runs use `<|SKIP_NOTIFICATION|>`.
 
 After releasing or keeping a playbook as draft, scan whether any backing feed is
 push-worthy. Recommend specific feeds, not generic "notifications". A push setup
 is not complete until the feed sidecar exists, `alva automation publish` ran
 after that sidecar was added, the publisher has `--push-notify`, the user has an
-alert or the group is subscribed, and a real run writes a fresh sidecar record.
+personal or group alert is enabled, and a real run writes a fresh sidecar record.
 
 #### Playbook Subroute: Remix
 
@@ -695,7 +695,7 @@ generator behind the selected element rather than the rendered DOM.
 For a recurring alert, design the feed output first: signal target or message,
 quiet-run sentinel, cadence, and subscriber. Publish the automation after adding
 the sidecar, then verify a real run. A cronjob with `--push-notify` and no alert
-or group subscription is not a completed push setup.
+or group alert is not a completed push setup.
 
 ### Chat-as-Artifact (`answer_only` / query mode)
 

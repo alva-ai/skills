@@ -602,7 +602,9 @@
             "--automation-ids <id,id> --channel-id <channel_id>",
             "`channel_id=0`",
             "moves the personal alert",
-            "Never pass an Alva channel id as `--session-id`"
+            "alva alert group enable --automation-ids <id>",
+            "accept no session id",
+            "feed need not be public"
           ]
         },
         {

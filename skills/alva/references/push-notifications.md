@@ -28,11 +28,13 @@ create a second copy. Choose the destination before mutating it:
   `alva alert enable --automation-ids <id,id> --channel-id <channel_id>`. This
   binds the alert to that in-product channel. A topic channel is not an
   external IM group, and its channel id is not a channel-session id.
-- **External IM group:** group delivery requires an explicit FEED subscription
-  configured from the attached Telegram, Discord, or Slack group by its Alva
-  admin. The channel-group session profile owns the operation and current-group
-  routing. Outside that group context, do not claim group delivery is configured
-  and do not substitute a personal alert or Alva topic-channel binding.
+- **External IM group:** from the attached Telegram, Discord, or Slack group,
+  use `alva alert group list`, `alva alert group enable --automation-ids <id>`,
+  or the matching `disable` command. These commands infer the current group and
+  accept no session id. Only the group's Alva admin may mutate group alerts, and
+  the admin must own or be able to read the feed; the feed need not be public.
+  Outside that group context, do not claim group delivery is configured and do
+  not substitute a personal alert or Alva topic-channel binding.
 
 The name-addressed `alva alert enable --automation <owner>/<feed>` command has
 no destination flag. When the user says "this channel", use the id-addressed
@@ -57,9 +59,10 @@ A push is set up only after all of these succeed:
 4. Enable the FEED alert for the intended destination using
    [Choose The Delivery Destination](#choose-the-delivery-destination). For the
    default personal destination, use `alva alert enable --automation
-   <owner>/<feed>` or `alva alert enable --automation-ids <id,id>`.
-5. Wait for a scheduled real run, read `@last/1` of the sidecar, and confirm the
-   record is fresh and the message is non-empty or contains
+   <owner>/<feed>` or `alva alert enable --automation-ids <id,id>`. For the
+   current external group, use `alva alert group enable --automation-ids <id>`.
+5. Trigger or wait for a real run, read `@last/1` of the sidecar, and confirm
+   the record is fresh and the message is non-empty or contains
    `<|SKIP_NOTIFICATION|>` for a quiet run.
 
 If the automation is unpublished, the feed has no sidecar record, or the record
@@ -89,5 +92,7 @@ as a snapshot: feeds added by a later release are not subscribed automatically.
   targets; use `alva alert disable --automation-ids a,b` for bulk and for
   `TARGET_DELETED` feed ghosts (name-addressed calls 404 on deleted targets).
 - Use the `target.id` returned by `alva alert list` for a deleted feed row.
+- In an attached external group, use `alva alert group list` for inventory and
+  `alva alert group disable --automation-ids <id>` to remove group delivery.
 - Never probe with mutating calls — the read surface answers all identity
   questions.

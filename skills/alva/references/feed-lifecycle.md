@@ -147,4 +147,4 @@ preferences. For `notify/message`, `<|SKIP_NOTIFICATION|>` advances fanout
 without sending a visible push.
 
 See [push-notifications.md](push-notifications.md) for the personal alert,
-group subscription, and verification workflow.
+group alert, and verification workflow.
