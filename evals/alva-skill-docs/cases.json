@@ -801,11 +801,6 @@
       "group": "automation",
       "target": "corpus",
       "description": "Existing automations retain identity and subscriptions through the explicit ID-scoped update flow instead of publish or delete-and-recreate workarounds.",
-      "excludes": [
-        "alva deploy trigger",
-        "alva deploy run-status",
-        "`--trigger`"
-      ],
       "section_includes": [
         {
           "file": "references/feed-lifecycle.md",
@@ -831,6 +826,37 @@
             "replacement cronjob exists",
             "resulting producer's exact script ran successfully via `alva run`",
             "do not fall back to delete-and-recreate"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "deployment.manual-trigger-optional",
+      "group": "deployment",
+      "target": "corpus",
+      "description": "Manual deployment trigger commands remain discoverable without becoming a recommended workflow, verification step, or update gate.",
+      "excludes": [
+        "Trigger an Out-of-Schedule Run",
+        "alva deploy trigger --id",
+        "alva deploy run-status --id",
+        "Verify the deployment via `alva deploy trigger`",
+        "Any producer change, including a producer-only update, requires",
+        "`--trigger` is present only when an immediate post-update run is intended",
+        "Trigger or wait for a real run"
+      ],
+      "file_includes": [
+        {
+          "file": "SKILL.md",
+          "label": "deploy command index",
+          "includes": [
+            "Cronjob lifecycle for producer scripts: schedule, args, trigger, run-status, runs, logs."
+          ]
+        },
+        {
+          "file": "references/deployment.md",
+          "label": "deploy command inventory",
+          "includes": [
+            "`pause`, `resume`, `trigger`, `run-status`, `runs`, `run-logs`"
           ]
         }
       ]
