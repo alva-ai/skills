@@ -60,11 +60,19 @@ episode purposes:
 | `tag`                  | `attributionClassKey`                       | Meaning                                                                    |
 | ---------------------- | ------------------------------------------- | -------------------------------------------------------------------------- |
 | `not_triggered`        | `not_triggered`                             | Signals did not cross an anomaly rule. Quiet — not a claim price was flat. |
-| `insufficient_history` | `insufficient_history`                      | Not enough history to evaluate the signal.                                 |
+| `not_triggered`        | `insufficient_history`                      | History too short for a z-score **and** the absolute move stayed under the `insufficient_history_price_move` threshold — quiet, not active. `insufficient_history` is a class derived from `realReason`, **not** a `tag`. |
 | `real`                 | `new_anomaly` / `continued_new_attribution` | A confirmed, publishable attribution exists for this run.                  |
 | `candidate`            | `continued_no_new_attribution`              | Anomaly continued, but this run produced no new confirmed attribution.     |
 | `no_material`          | `continued_no_info`                         | Possible new material was checked but did not qualify as novel/material.   |
 | `skipped`              | `skipped`                                   | Data-quality skip — the run could not evaluate signals. Preserves the current active/inactive state; can carry `isActiveAnomaly: "true"` mid-episode. |
+
+There is no `insufficient_history` `tag` (the tags are `not_triggered`,
+`skipped`, `no_material`, `candidate`, `real`). A low-history ticker (e.g. a
+recent IPO) is still evaluated against an absolute-move threshold: if
+`|priceMovePct|` crosses `insufficient_history_price_move`, the run triggers as
+a normal anomaly (`real` / `candidate`, active episode) like any other. Only
+when the move stays under that threshold does the run stay quiet as
+`tag: not_triggered` with `attributionClassKey: insufficient_history`.
 
 ### Anomaly Episode
 
@@ -83,7 +91,7 @@ Current episode boundaries, keyed by the run's `attributionClassKey`:
 | `continued_no_info`            | Continue the current episode; no new material, or new info verified as not actually new           | —                      |
 | `skipped`                      | Data-quality skip; keeps the current episode open when `isActiveAnomaly` is `"true"`, otherwise leaves state unchanged (opens/closes nothing) | —                      |
 | `not_triggered`                | No anomaly rule fires; not active, close the episode (also stale / no current data)               | —                      |
-| `insufficient_history`         | Not enough history to evaluate the signal; not active, close the episode                          | —                      |
+| `insufficient_history`         | Low-history ticker whose absolute move stayed under the trigger threshold; quiet, not active, close the episode | —                      |
 
 ### Attribution
 
