@@ -68,14 +68,14 @@ episode purposes:
 
 ### What A Run Tests
 
-- **Price** — a standardized price move (z-score of the latest move against the
-  ticker's recent daily-return distribution) crossing a tier threshold.
-- **Volume** — a standardized volume move, evaluated **only during the regular
-  session**.
-- **Low history** — when there isn't enough history for a price z-score (e.g. a
-  recent IPO), the run instead tests the **absolute** price move against a
-  threshold; crossing it triggers a normal anomaly, otherwise the run stays
-  quiet with `attributionClassKey: insufficient_history`.
+- **Price** — a **two-sided** z-score of the latest move against the trailing
+  **90 trading days** of daily returns (`z = (move − mean) / stdev`), with tiers
+  at **|z| ≥ 1 / 1.5 / 2**.
+- **Volume** — a **one-sided** volume z-score (elevated volume only), tiers at
+  **z ≥ 1 / 1.5 / 2**, evaluated **only during the regular session**.
+- **Low history** — with too little history for a z-score (e.g. a recent IPO),
+  the run instead triggers on the **absolute** move (default **≥ 5%**);
+  otherwise it stays quiet with `attributionClassKey: insufficient_history`.
 - **Move basis** (`priceMoveBasis`) — pre-market and regular-session moves are
   measured against the **previous day's close**; after-hours moves count as a
   new day and are measured against **today's (regular-session) close**.
