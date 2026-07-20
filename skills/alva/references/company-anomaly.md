@@ -274,24 +274,6 @@ the links are evidence, the narrative is still Alva analysis. `movePct` /
 signal snapshot **as of the attribution's own run** — pair them with the driver,
 not with a newer timeline tick.
 
-`decompositionJson` is the computed "how much"; the `driver*` fields are the
-LLM's "why" over the same three layers. Example (one NVDA run, trimmed):
-
-```json
-// decompositionJson — quantitative split of a -2.72% move
-{ "nameMovePct": -2.72,
-  "market":        { "movePct": -1.28 },
-  "sector":        { "beyondMarketPct": -0.13 },
-  "idiosyncratic": { "beyondSectorPct": -1.32 },
-  "dominant": "idiosyncratic" }
-```
-
-```text
-driverMarket        : broad risk-off — Iran escalation, oil/VIX up
-driverSector        : semis only slightly worse than the market
-driverAssetSpecific : NVDA underperformed peers on mega-cap rotation
-```
-
 ## Internal Surfaces (Not The Contract)
 
 These partitions are producer-internal — audit, debug, and observability. They
