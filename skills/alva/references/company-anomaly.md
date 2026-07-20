@@ -271,22 +271,12 @@ as though it were a regular-session return.
 | `previousClose`                         | Baseline close the move is measured against |
 | `latestPriceAsOfMs`                     | Timestamp of this attribution's `latestPrice` |
 
-Supporting events and source links are already copied onto the attribution, so
-the consumer contract does not read the raw `event/items` stream. Label the
-driver split and narrative as Alva analysis, not established causality.
-`summaryWithCitationsMarkdown` is the same analysis with source links inline —
-the links are evidence, the narrative is still Alva analysis. `movePct` /
-`priceMoveBasis` / `priceZScore` / `volumeZScore` / `triggeredRulesJson` are the
-signal snapshot **as of the attribution's own run** — pair them with the driver,
-not with a newer timeline tick.
-
-**Price carries its own timestamp — read it against `latestPriceAsOfMs`, not the
-row's `runAtMs`.** The latest `anomaly/timeline` row's `latestPrice` is the
-**current** price (as-of its `latestPriceAsOfMs`, ~one run ago); an attribution's
-`latestPrice` is the price **when that driver was computed** (its own, possibly
-much older, `latestPriceAsOfMs`). They routinely differ — e.g. a 1-minute-old
-timeline price next to a 30-minute-old attribution. Never render an attribution's
-stale price as the current price; show each with its own `latestPriceAsOfMs`.
+Label the driver split and narrative as Alva analysis, not established causality.
+`movePct` / `priceZScore` / `volumeZScore` / `triggeredRulesJson` / `latestPrice`
+are the attribution run's own snapshot, as-of its `latestPriceAsOfMs` — pair them
+with this driver, not a newer timeline tick. For current price/state read the
+latest `anomaly/timeline` row; an attribution's `latestPrice` is the price when
+the driver was computed, so never show it as current.
 
 ## Internal Surfaces (Not The Contract)
 
