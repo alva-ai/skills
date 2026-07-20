@@ -253,7 +253,8 @@ as though it were a regular-session return.
 | `headline`                              | Short likely-driver statement                     |
 | `summary`                               | Full attribution narrative                        |
 | `summaryWithCitationsMarkdown`          | Same narrative as `summary`, with inline Markdown source links (`([source](url))`) after sourced claims, drawn only from `supportingEvents` / `sourceLinks`; falls back to `summary` when absent |
-| `drivers` / driver split                | Decomposition into market, sector, asset-specific |
+| `driverMarket` / `driverSector` / `driverAssetSpecific` | Per-layer **narrative** ("why"), LLM-generated — the market, sector, and asset-specific drivers (no single `drivers` field) |
+| `decompositionJson`                     | Computed **quantitative** 3-way split ("how much") — `market.movePct`, `sector.beyondMarketPct`, `idiosyncratic.beyondSectorPct` (each with a `z`), plus `dominant` / `dominantOrder` |
 | `confidence`                            | Confidence classification                         |
 | `attributionStatus`                     | Result status; the contract uses `confirmed` rows |
 | `supportingEvents`                      | Evidence items (`title`, `why_it_fits`, `url`)    |
@@ -272,6 +273,24 @@ the links are evidence, the narrative is still Alva analysis. `movePct` /
 `priceMoveBasis` / `priceZScore` / `volumeZScore` / `triggeredRulesJson` are the
 signal snapshot **as of the attribution's own run** — pair them with the driver,
 not with a newer timeline tick.
+
+`decompositionJson` is the computed "how much"; the `driver*` fields are the
+LLM's "why" over the same three layers. Example (one NVDA run, trimmed):
+
+```json
+// decompositionJson — quantitative split of a -2.72% move
+{ "nameMovePct": -2.72,
+  "market":        { "movePct": -1.28 },
+  "sector":        { "beyondMarketPct": -0.13 },
+  "idiosyncratic": { "beyondSectorPct": -1.32 },
+  "dominant": "idiosyncratic" }
+```
+
+```text
+driverMarket        : broad risk-off — Iran escalation, oil/VIX up
+driverSector        : semis only slightly worse than the market
+driverAssetSpecific : NVDA underperformed peers on mega-cap rotation
+```
 
 ## Internal Surfaces (Not The Contract)
 
