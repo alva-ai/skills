@@ -258,12 +258,20 @@ as though it were a regular-session return.
 | `attributionStatus`                     | Result status; the contract uses `confirmed` rows |
 | `supportingEvents`                      | Evidence items (`title`, `why_it_fits`, `url`)    |
 | `sourceLinks`                           | Supporting source URLs                            |
+| `movePct`                               | Price move at the attribution run (signal snapshot) |
+| `priceMoveBasis`                        | Basis for that move (pre-market / after-hours / intraday) |
+| `priceZScore`                           | Price z-score at that run                         |
+| `volumeZScore`                          | Volume z-score at that run                        |
+| `triggeredRulesJson`                    | JSON array of rules that fired (e.g. `price_z2`, `volume_z1`, `insufficient_history_price_move`) |
 
 Supporting events and source links are already copied onto the attribution, so
 the consumer contract does not read the raw `event/items` stream. Label the
 driver split and narrative as Alva analysis, not established causality.
 `summaryWithCitationsMarkdown` is the same analysis with source links inline —
-the links are evidence, the narrative is still Alva analysis.
+the links are evidence, the narrative is still Alva analysis. `movePct` /
+`priceMoveBasis` / `priceZScore` / `volumeZScore` / `triggeredRulesJson` are the
+signal snapshot **as of the attribution's own run** — pair them with the driver,
+not with a newer timeline tick.
 
 ## Internal Surfaces (Not The Contract)
 
