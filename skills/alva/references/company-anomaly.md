@@ -274,9 +274,11 @@ as though it were a regular-session return.
 Label the driver split and narrative as Alva analysis, not established causality.
 `movePct` / `priceZScore` / `volumeZScore` / `triggeredRulesJson` / `latestPrice`
 are the attribution run's own snapshot, as-of its `latestPriceAsOfMs` — pair them
-with this driver, not a newer timeline tick. For current price/state read the
-latest `anomaly/timeline` row; an attribution's `latestPrice` is the price when
-the driver was computed, so never show it as current.
+with this driver, not a newer timeline tick. Both timeline and attribution
+`latestPrice` are point-in-time snapshots (each as-of its own `latestPriceAsOfMs`)
+and lag real time — even the latest timeline row. For a live price use Data
+Skills, not these rows; and never show an attribution's (often much older)
+`latestPrice` as current.
 
 ## Internal Surfaces (Not The Contract)
 
