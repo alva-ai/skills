@@ -230,6 +230,9 @@ history.
 | `attributionClassKey` | Attribution class/key for the run                                          |
 | `priceMovePct`        | Move on the basis named by `priceMoveBasis`                                |
 | `priceMoveBasis`      | Comparison basis (e.g. pre-market vs previous close, after-hours vs close) |
+| `latestPrice`         | Price at this run (last 1-min bar close) |
+| `previousClose`       | Baseline close the move is measured against |
+| `latestPriceAsOfMs`   | Timestamp of `latestPrice` — the price is as-of this, not necessarily `runAtMs` |
 | `regularSessionMovePct` / `preMarketMovePct` / `afterHoursMovePct` / `totalMovePct` | Per-session breakdown of the move; pair with `priceMoveBasis` so a pre-market/after-hours move is not read as a regular-session return |
 | `realReason`          | Why the run reached its classification (e.g. `first`, `new_rule`, `insufficient_history`) |
 | `priceZScore`         | Standardized price signal                                                  |
@@ -264,6 +267,9 @@ as though it were a regular-session return.
 | `priceZScore`                           | Price z-score at that run                         |
 | `volumeZScore`                          | Volume z-score at that run                        |
 | `triggeredRulesJson`                    | JSON array of rules that fired (e.g. `price_z2`, `volume_z1`, `insufficient_history_price_move`) |
+| `latestPrice`                           | Price at the attribution run (as-of `latestPriceAsOfMs`) |
+| `previousClose`                         | Baseline close the move is measured against |
+| `latestPriceAsOfMs`                     | Timestamp of this attribution's `latestPrice` |
 
 Supporting events and source links are already copied onto the attribution, so
 the consumer contract does not read the raw `event/items` stream. Label the
@@ -273,6 +279,14 @@ the links are evidence, the narrative is still Alva analysis. `movePct` /
 `priceMoveBasis` / `priceZScore` / `volumeZScore` / `triggeredRulesJson` are the
 signal snapshot **as of the attribution's own run** — pair them with the driver,
 not with a newer timeline tick.
+
+**Price carries its own timestamp — read it against `latestPriceAsOfMs`, not the
+row's `runAtMs`.** The latest `anomaly/timeline` row's `latestPrice` is the
+**current** price (as-of its `latestPriceAsOfMs`, ~one run ago); an attribution's
+`latestPrice` is the price **when that driver was computed** (its own, possibly
+much older, `latestPriceAsOfMs`). They routinely differ — e.g. a 1-minute-old
+timeline price next to a 30-minute-old attribution. Never render an attribution's
+stale price as the current price; show each with its own `latestPriceAsOfMs`.
 
 ## Internal Surfaces (Not The Contract)
 
