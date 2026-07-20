@@ -60,10 +60,27 @@ episode purposes:
 | `tag`                  | `attributionClassKey`                       | Meaning                                                                    |
 | ---------------------- | ------------------------------------------- | -------------------------------------------------------------------------- |
 | `not_triggered`        | `not_triggered`                             | Signals did not cross an anomaly rule. Quiet — not a claim price was flat. |
-| `insufficient_history` | `insufficient_history`                      | Not enough history to evaluate the signal.                                 |
+| `not_triggered`        | `insufficient_history`                      | History too short for a z-score **and** the absolute move stayed under the `insufficient_history_price_move` threshold — quiet, not active. `insufficient_history` is a class derived from `realReason`, **not** a `tag`. |
 | `real`                 | `new_anomaly` / `continued_new_attribution` | A confirmed, publishable attribution exists for this run.                  |
 | `candidate`            | `continued_no_new_attribution`              | Anomaly continued, but this run produced no new confirmed attribution.     |
 | `no_material`          | `continued_no_info`                         | Possible new material was checked but did not qualify as novel/material.   |
+| `skipped`              | `skipped`                                   | Data-quality skip — the run could not evaluate signals. Preserves the current active/inactive state; can carry `isActiveAnomaly: "true"` mid-episode. |
+
+### What A Run Tests
+
+- **Price** — a **two-sided** z-score of the latest move against the trailing
+  **90 trading days** of daily returns (`z = (move − mean) / stdev`), with tiers
+  at **|z| ≥ 1 / 1.5 / 2**.
+- **Volume** — a **one-sided** z-score of today's cumulative volume *at this
+  point in the session* against the same-slot cumulative volume over the prior
+  **90 trading days** (`z = (cumVol − mean) / stdev`), tiers at
+  **z ≥ 1 / 1.5 / 2**, evaluated **only during the regular session**.
+- **Low history** — with too little history for a z-score (e.g. a recent IPO),
+  the run instead triggers on the **absolute** move (default **≥ 5%**);
+  otherwise it stays quiet with `attributionClassKey: insufficient_history`.
+- **Move basis** (`priceMoveBasis`) — pre-market and regular-session moves are
+  measured against the **previous day's close**; after-hours moves count as a
+  new day and are measured against **today's (regular-session) close**.
 
 ### Anomaly Episode
 
@@ -80,8 +97,9 @@ Current episode boundaries, keyed by the run's `attributionClassKey`:
 | `continued_new_attribution`    | Continue the current episode with a newly published driver                                       | `finding/attribution`  |
 | `continued_no_new_attribution` | Continue the current episode; new material was checked and the LLM ran, but it did not pass promotion | `finding/candidate`    |
 | `continued_no_info`            | Continue the current episode; no new material, or new info verified as not actually new           | —                      |
+| `skipped`                      | Data-quality skip; keeps the current episode open when `isActiveAnomaly` is `"true"`, otherwise leaves state unchanged (opens/closes nothing) | —                      |
 | `not_triggered`                | No anomaly rule fires; not active, close the episode (also stale / no current data)               | —                      |
-| `insufficient_history`         | Not enough history to evaluate the signal; not active, close the episode                          | —                      |
+| `insufficient_history`         | Low-history ticker whose absolute move stayed under the trigger threshold; quiet, not active, close the episode | —                      |
 
 ### Attribution
 
@@ -139,8 +157,9 @@ Logic for ticker `TICKER`:
 2. Take `runAtMs` as the latest run time and `anomalyEpisodeId` /
    `episodeFirstRunId` as the current episode identity.
 3. **Determine active anomaly:** `isActiveAnomaly === "true"`. The producer sets
-   this flag exactly when `tag` is `real`, `candidate`, or `no_material`, so read
-   the flag directly rather than re-deriving it from `tag`.
+   this flag when `tag` is `real`, `candidate`, or `no_material`, and also on a
+   `skipped` (data-quality) run that lands mid-episode, so read the flag directly
+   rather than re-deriving it from `tag`.
 4. **If not active:** return `inAnomaly: false`, `latestRealAttribution: null`.
 5. **If active:** read confirmed attributions:
    `<feed-base>/data/finding/attribution/@last/20`. Do **not** read
@@ -163,6 +182,7 @@ Logic for ticker `TICKER`:
     "runAtMs": 1784102823773,
     "headline": "...",
     "summary": "...",
+    "summaryWithCitationsMarkdown": "...",
     "confidence": "high",
     "attributionStatus": "confirmed",
     "driverMarket": "...",
@@ -210,6 +230,11 @@ history.
 | `attributionClassKey` | Attribution class/key for the run                                          |
 | `priceMovePct`        | Move on the basis named by `priceMoveBasis`                                |
 | `priceMoveBasis`      | Comparison basis (e.g. pre-market vs previous close, after-hours vs close) |
+| `latestPrice`         | Price at this run (last 1-min bar close) |
+| `previousClose`       | Baseline close the move is measured against |
+| `latestPriceAsOfMs`   | Timestamp of `latestPrice` — the price is as-of this, not necessarily `runAtMs` |
+| `regularSessionMovePct` / `preMarketMovePct` / `afterHoursMovePct` / `totalMovePct` | Per-session breakdown of the move; pair with `priceMoveBasis` so a pre-market/after-hours move is not read as a regular-session return |
+| `realReason`          | Why the run reached its classification (e.g. `first`, `new_rule`, `insufficient_history`) |
 | `priceZScore`         | Standardized price signal                                                  |
 | `volumeZScore`        | Standardized volume signal                                                 |
 | `newRulesJson`        | JSON array of rules newly active in this transition                        |
@@ -230,15 +255,28 @@ as though it were a regular-session return.
 | `symbol`                                | Attributed company                                |
 | `headline`                              | Short likely-driver statement                     |
 | `summary`                               | Full attribution narrative                        |
-| `drivers` / driver split                | Decomposition into market, sector, asset-specific |
+| `summaryWithCitationsMarkdown`          | Same narrative as `summary`, with inline Markdown source links (`([source](url))`) after sourced claims, drawn only from `supportingEvents` / `sourceLinks`; falls back to `summary` when absent |
+| `driverMarket` / `driverSector` / `driverAssetSpecific` | Per-layer **narrative** ("why"), LLM-generated — the market, sector, and asset-specific drivers (no single `drivers` field) |
+| `decompositionJson`                     | Computed **quantitative** 3-way split ("how much") — `market.movePct`, `sector.beyondMarketPct`, `idiosyncratic.beyondSectorPct` (each with a `z`), plus `dominant` / `dominantOrder` |
 | `confidence`                            | Confidence classification                         |
 | `attributionStatus`                     | Result status; the contract uses `confirmed` rows |
 | `supportingEvents`                      | Evidence items (`title`, `why_it_fits`, `url`)    |
 | `sourceLinks`                           | Supporting source URLs                            |
+| `movePct`                               | Price move at the attribution run (signal snapshot) |
+| `priceMoveBasis`                        | Basis for that move (pre-market / after-hours / intraday) |
+| `priceZScore`                           | Price z-score at that run                         |
+| `volumeZScore`                          | Volume z-score at that run                        |
+| `triggeredRulesJson`                    | JSON array of rules that fired (e.g. `price_z2`, `volume_z1`, `insufficient_history_price_move`) |
+| `latestPrice`                           | Price at the attribution run (as-of `latestPriceAsOfMs`) |
+| `previousClose`                         | Baseline close the move is measured against |
+| `latestPriceAsOfMs`                     | Timestamp of this attribution's `latestPrice` |
 
-Supporting events and source links are already copied onto the attribution, so
-the consumer contract does not read the raw `event/items` stream. Label the
-driver split and narrative as Alva analysis, not established causality.
+Label the driver split and narrative as Alva analysis, not established causality.
+`movePct` / `priceZScore` / `volumeZScore` / `triggeredRulesJson` / `latestPrice`
+are the attribution run's own snapshot, as-of its `latestPriceAsOfMs` — pair them
+with this driver, not a newer timeline tick. Both timeline and attribution
+`latestPrice` are point-in-time snapshots (each as-of its own `latestPriceAsOfMs`).
+For a live price use Data Skills, not these rows.
 
 ## Internal Surfaces (Not The Contract)
 
