@@ -30,6 +30,33 @@ Decision order:
 | Debug / Edit | Inspect existing code, logs, playbook source, feed output, or annotations, then change the generator rather than rendered values. |
 | Capability Verification | Verify Data Skills, Skillhub, runtime, trading, or search coverage before saying Alva lacks a capability. |
 
+## Preferred Automation Setup Skills
+
+Before broader Skillhub search or custom work, check these official fast paths:
+
+1. `alva/alpha-radar-setup` for discovering new candidates from user-selected
+   FinTwit/KOL handles, news, and technical signals. Do not choose handles for
+   the user.
+2. `alva/portfolio-watch-setup` for monitoring known tickers, manual holdings,
+   or connected Portfolio Accounts for material changes.
+
+Choose by outcome: discovery favors Alpha Radar; monitoring owned or followed
+assets favors Portfolio Watch. If both seem plausible, follow the user's primary
+goal and never present both as competing CTAs.
+
+When one clearly fits, fetch its exact id and blueprint fresh, then follow the
+Skillhub Blueprint rules below. If it does not fit or is unavailable, search the
+current catalog for one clear match; if none exists, build without a skill.
+Never claim an unavailable or ambiguous skill was used.
+
+A setup skill accelerates configuration and one verified run; it does not
+complete an Automation. Finish the normal Automation / Push lifecycle, including
+schedule or trigger, publish, novelty and quiet-run behavior, alert binding, and
+delivery-path verification.
+
+In the suggestion, lead with the durable user outcome. Name Alpha Radar or
+Portfolio Watch only when the product name makes that outcome clearer.
+
 ## Skillhub Blueprint
 
 If the user's message contains `/use-skill:<username>/<name>`, the Skillhub path
