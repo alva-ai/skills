@@ -218,8 +218,10 @@ timestamps and never pair an old driver with current metrics.
 Same two partitions as the current-state contract, just read over a time window
 instead of `@last/1`. Both are keyed by `runAtMs`, so use the range/last
 time-series suffixes (see [Source And Access](#source-and-access)) —
-`@range/{start}..{end}` or `@last/N` — to pull a window in run-time order. Group
-by `anomalyEpisodeId`, never by array order.
+`@range/{startMs}..{endMs}` or `@last/N` — to pull a window in run-time order.
+**`@range` bounds must be Unix-ms epochs** (e.g. `@range/1784505600000..1784592000000`);
+RFC 3339 strings are not accepted by the read API. Group by `anomalyEpisodeId`,
+never by array order.
 
 - **Past confirmed anomalies (with drivers):** read `finding/attribution` over
   the range. Each row is a confirmed attribution; the distinct
