@@ -248,13 +248,14 @@ This per-order confirmation rule holds for any order placed in an ordinary
 conversation. *Exemption (channel-loop ticks only):* a channel-loop tick whose
 loop `--goal` carries the consent reference line `[auto-trade-consent: granted
 <ISO8601-UTC> record=~/memory/auto-trade-consent.md]` AND whose one-read
-verification (`alva fs read` of `~/memory/auto-trade-consent.md`) finds the
-consent record MAY place live orders without per-order user confirmation. It
-stays subject to dry-run validation first, a fresh idempotent intent-id, and
-trex risk rules; a missing or unreadable record means NO live orders. This
-exemption applies only to loop ticks — never to interactive conversation orders.
-The creation-side consent protocol (disclaimer, consent recording, revocation)
-lives in the channel profile's "Channel loops" section.
+verification (`alva fs read` of that record) finds the consent record MAY place
+live orders without per-order user confirmation, subject to dry-run validation
+first, a fresh idempotent intent-id, and trex risk rules. Verification checks
+only that the consent record exists: the reference's `granted` timestamp is
+provenance, not a match key, so a `granted_at` differing after a later re-grant
+is not a mismatch and must not refuse live orders. A missing or unreadable record
+is the only verification failure and means NO live orders; this exemption applies
+only to loop ticks, never interactive. Creation-side consent: see "Channel loops".
 
 ## Capability Map
 

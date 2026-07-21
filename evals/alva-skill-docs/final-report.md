@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/Users/yimingchen/alva/mono-meta/code/public/skills-topic-alert-subscription/skills/alva`
+Source: `/home/forge/mono-meta/code/public/skills/skills/alva`
 
-SKILL.md lines: 847
+SKILL.md lines: 850
 
-Cases: 55/55
+Cases: 58/58
 
-Checks: 514/514 (100.00%)
+Checks: 545/545 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -437,31 +437,38 @@ Push setup is evaluated as a full delivery path instead of a single publisher fl
 
 ## subscriptions
 
-1/1 cases, 9/9 checks
+1/1 cases, 16/16 checks
 
 ### PASS subscriptions.delivery-destination
 
-Agents distinguish the default personal destination, an Alva topic channel, and an external IM group before mutating an alert subscription.
+The general skill distinguishes the default personal destination from an Alva topic channel; external-group operations stay profile-owned.
 
+- [x] excludes External IM group
+- [x] excludes alva alert group
+- [x] excludes group-subscriptions
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes Default personal destination
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes Alva topic channel
-- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes External IM group
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes --automation-ids <id,id> --channel-id <channel_id>
+- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes <session-prefill-channel-memory channel-id="…">
+- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes a non-`alva` slug denotes a topic channel
+- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes delivery is web-only
+- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes current Alva topic channel (channel id <id>)
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes `channel_id=0`
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes moves the personal alert
-- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes Never pass an Alva channel id as `--session-id`
 - [x] destination verification: references/push-notifications.md#Configure And Verify includes intended destination
 - [x] destination verification: references/push-notifications.md#Configure And Verify includes global "subscribed" state is not sufficient
+- [x] destination verification: references/push-notifications.md#Configure And Verify includes report it as an Alva web topic channel with its id
+- [x] destination verification: references/push-notifications.md#Configure And Verify includes never as Telegram or another external DM
 
 ## target
 
-11/11 cases, 129/129 checks
+11/11 cases, 132/132 checks
 
 ### PASS target.top-level-size
 
 Top-level SKILL.md stays below the current guide ceiling without forcing a minimum size that would block future compression.
 
-- [x] line count <= 850 (actual 847)
+- [x] line count <= 850 (actual 850)
 
 ### PASS target.playbook-task-offload
 
@@ -598,7 +605,7 @@ Operational pitfalls are a mandatory stepwise gate, not an optional debugging ap
 
 Latest mainline Alva skill updates remain integrated after rebasing the refactor.
 
-- [x] version: v1.17.0
+- [x] version: v1.18.1
 - [x] Capability Help
 - [x] Reply 1, 2, or 3 to start
 - [x] feedback
@@ -632,6 +639,9 @@ A consent-referenced, record-verified channel-loop tick is exempt from per-order
 - [x] place live orders without per-order user confirmation
 - [x] missing or unreadable record
 - [x] applies only to loop ticks
+- [x] verification checks only that the consent record exists
+- [x] timestamp is provenance, not a match key
+- [x] is not a mismatch
 
 ### PASS target.auto-trade-consent-references
 
@@ -643,7 +653,7 @@ The broker and trading references reconcile their per-order confirm lines with t
 
 ## automation
 
-1/1 cases, 15/15 checks
+1/1 cases, 10/10 checks
 
 ### PASS automation.explicit-update-lifecycle
 
@@ -653,17 +663,42 @@ Existing automations retain identity and subscriptions through the explicit ID-s
 - [x] automation update lifecycle: references/feed-lifecycle.md#Updating An Existing Automation includes alva automation update --id <feed_id>
 - [x] automation update lifecycle: references/feed-lifecycle.md#Updating An Existing Automation includes Omitted fields keep their current values
 - [x] automation update lifecycle: references/feed-lifecycle.md#Updating An Existing Automation includes explicit empty metadata string clears
-- [x] automation update lifecycle: references/feed-lifecycle.md#Updating An Existing Automation includes do not trigger a run unless `--trigger` is supplied
 - [x] automation update lifecycle: references/feed-lifecycle.md#Updating An Existing Automation includes alert subscriptions remain intact
 - [x] automation update lifecycle: references/feed-lifecycle.md#Updating An Existing Automation includes do not delete and recreate an automation to work around `ALREADY_EXISTS`
 - [x] automation update gate: references/feed-lifecycle.md<HARD-GATE:before-automation-update> includes target numeric ID belongs to the intended owned automation
 - [x] automation update gate: references/feed-lifecycle.md<HARD-GATE:before-automation-update> includes replacement cronjob exists
-- [x] automation update gate: references/feed-lifecycle.md<HARD-GATE:before-automation-update> includes Any producer change, including a producer-only update
-- [x] automation update gate: references/feed-lifecycle.md<HARD-GATE:before-automation-update> includes alva deploy trigger --id <replacement_cronjob_id>
-- [x] automation update gate: references/feed-lifecycle.md<HARD-GATE:before-automation-update> includes replacement cronjob's latest run succeeded
-- [x] automation update gate: references/feed-lifecycle.md<HARD-GATE:before-automation-update> includes current-producer script ran successfully in this session
-- [x] automation update gate: references/feed-lifecycle.md<HARD-GATE:before-automation-update> includes `--trigger` is present only when an immediate post-update run is intended
+- [x] automation update gate: references/feed-lifecycle.md<HARD-GATE:before-automation-update> includes resulting producer's exact script ran successfully via `alva run`
 - [x] automation update gate: references/feed-lifecycle.md<HARD-GATE:before-automation-update> includes do not fall back to delete-and-recreate
+
+## deployment
+
+1/1 cases, 9/9 checks
+
+### PASS deployment.manual-trigger-optional
+
+Manual trigger commands remain discoverable without becoming a required deployment, update, or push-verification workflow.
+
+- [x] excludes Trigger an Out-of-Schedule Run
+- [x] excludes Immediately after enabling the alert, trigger one out-of-schedule run
+- [x] excludes alva deploy run-status --id
+- [x] excludes Verify the deployment via `alva deploy trigger`
+- [x] excludes Any producer change, including a producer-only update, requires
+- [x] excludes `--trigger` is present only when an immediate post-update run is intended
+- [x] excludes Trigger or wait for a real run
+- [x] deploy command index: SKILL.md includes Cronjob lifecycle for producer scripts: schedule, args, trigger, run-status, runs, logs.
+- [x] deploy command inventory: references/deployment.md includes `pause`, `resume`, `trigger`, `run-status`, `runs`, `run-logs`
+
+## communication
+
+1/1 cases, 3/3 checks
+
+### PASS communication.concise-completion
+
+Post-deployment and multi-step updates report only new outcome evidence and unresolved issues instead of replaying the work.
+
+- [x] concise completion update: SKILL.md#User-Facing Communication includes After a deployment or other multi-step build
+- [x] concise completion update: SKILL.md#User-Facing Communication includes keep the final update delta-only
+- [x] concise completion update: SKILL.md#User-Facing Communication includes do not recap earlier details
 
 ## scenarios.ask
 
@@ -783,7 +818,7 @@ Prompt: `<annotation id="hero-title">make this chart title shorter</annotation>`
 
 ## scenarios.push
 
-1/1 cases, 21/21 checks
+2/2 cases, 35/35 checks
 
 ### PASS scenario.alert-push-monitor
 
@@ -812,6 +847,27 @@ Prompt: `Track BTC dominance and notify me when it breaks out.`
 - [x] automation knowledge: references/feed-lifecycle.md<HARD-GATE:before-automation-publish> includes [Alva Knowledge](alva-knowledge.md)
 - [x] automation knowledge: references/feed-lifecycle.md<HARD-GATE:before-automation-publish> includes longitudinal or decision automations compare bounded history
 - [x] automation knowledge: references/feed-lifecycle.md<HARD-GATE:before-automation-publish> includes push-capable automations suppress non-material repeats
+
+### PASS scenario.current-topic-channel-alert
+
+A request made in an Alva web topic channel binds the feed to that exact channel id and never invents Telegram delivery.
+
+Prompt: `<session-prefill-channel-memory channel-id="44" root="/alva/home/ymchcom/channels/research/memory"> Notify this channel every minute with hello111.`
+
+- [x] push-notifications.md
+- [x] a non-`alva` slug denotes a topic channel
+- [x] delivery is web-only
+- [x] alva alert enable --automation-ids <id,id> --channel-id <channel_id>
+- [x] do not silently fall back to the default destination
+- [x] Do not infer Telegram, Discord, Slack, or another transport
+- [x] current Alva topic channel (channel id <id>)
+- [x] Do not trigger the cronjob or wait for its next scheduled run solely to verify setup
+- [x] A successful enable proves that alert delivery is configured
+- [x] it does not prove that a message has already been delivered
+- [x] A sidecar record alone is also not delivery proof
+- [x] report it as an Alva web topic channel with its id
+- [x] never as Telegram or another external DM
+- [x] expected route: references/request-routing.md#Routes includes Automation / Push
 
 ## scenarios.strategy
 
