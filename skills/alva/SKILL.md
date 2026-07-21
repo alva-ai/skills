@@ -390,8 +390,9 @@ continue the ordinary analysis; do not substitute anomaly intelligence for
 fundamentals, valuation, or company news.
 
 Common subroutes are latest fact, contextual explanation, comparison/valuation,
-ranking or screen-in-text, and thesis check. They all end as an answer unless
-the user asks to track, alert, share, publish, or turn the result into an app.
+ranking or screen-in-text, and thesis check. They produce an answer, not an
+unsolicited build; enter the durable artifact tree only when the user requests
+it or accepts an Automation suggestion.
 
 Use the shared data and execution layer first. If the user asks a direct
 question, answer directly with provenance; if they ask to track, alert, share,
@@ -406,6 +407,33 @@ quality gate, and cap confidence when required evidence, KPI coverage, or
 computation is missing. Do not answer until you can name the decomposition,
 data/source path for each hop, fetched vs missing coverage, and which judgments
 are sourced facts, computed values, or inference.
+
+#### Useful Next Step After Ask
+
+After fully answering a one-off Ask, choose one outcome:
+
+- **Automation** when changing inputs can be reevaluated by the same method and
+  cadence, a trigger, or notification creates ongoing value. Push ideas also
+  need a meaningful-change and quiet-run boundary.
+- **One-off follow-up** when one concrete question would materially deepen,
+  test, compare, apply, or naturally extend the answer. It need not lead to
+  Automation.
+- **No suggestion** when neither option is specific, relevant, and clearly
+  useful. If uncertain, choose this and end the answer without a footer.
+
+Actively look for Automation, but hold both options to the same quality bar. If
+both pass, prefer Automation when recurring value justifies the setup; choose
+one-off only when it is clearly more useful now. Never recommend Automation
+merely because work is schedulable.
+
+When suggesting, append one short, opt-in sentence in the user's language.
+Describe the outcome and value, not the implementation; avoid generic
+conversation or product CTAs. Do not invent cadence, thresholds, tickers, KOL
+handles, portfolio state, account connections, or notification policy. Wait
+for acceptance, and do not repeat a declined suggestion unless the need changes.
+If Automation clears this bar or is already requested, apply
+[Preferred Automation Setup Skills](references/request-routing.md#preferred-automation-setup-skills)
+before suggesting or building it.
 
 ### Durable Artifacts / Playbook Tree
 
@@ -754,7 +782,7 @@ Use this index to open only the file needed for the current task.
 | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | [preflight.md](references/preflight.md)                                               | Session start, Rule 0, CLI, auth, profile, Arrays JWT, memory load, user scope.                                                               |
 | [alva-knowledge.md](references/alva-knowledge.md)                                     | Required automation reasoning: bounded history, cross-run comparison, semantic notification novelty, quiet runs.                            |
-| [request-routing.md](references/request-routing.md)                                   | Route choice, Skillhub, Guided Planning, capability verification, completion gate.                                                            |
+| [request-routing.md](references/request-routing.md)                                   | Route choice, post-Ask next steps, preferred Automation setup skills, Skillhub, Guided Planning, capability verification, completion gate.    |
 | [content-legitimacy.md](references/content-legitimacy.md)                             | Data provenance, prohibited sources, chat-as-artifact, feed isolation, conventions.                                                           |
 | [data-skills.md](references/data-skills.md)                                           | Data Skills discovery, endpoint calls, Arrays auth, search/data routing.                                                                      |
 | [feed-lifecycle.md](references/feed-lifecycle.md)                                     | Feed build and automation publish lifecycle, modeling summary, push sidecars, `before-automation-publish`.                                    |
@@ -827,6 +855,9 @@ Before finishing an Alva task, ask:
   [user-facing-prose.md](references/user-facing-prose.md), then pass the answer
   gate, and the Complex Ask Router only for complex judgment asks, before I
   answered?
+- After a one-off Ask, did I omit the next step unless one clear option passed
+  the quality bar, give Automation preference only after it passed the same bar,
+  and avoid treating a setup run as a completed Automation?
 - Did I avoid WebSearch/LLM/memory/user-pasted data as factual values?
 - Did I run current online verification before using training knowledge to
   rule out a listing, ADR/ADS, ticker, or other requested security form?
