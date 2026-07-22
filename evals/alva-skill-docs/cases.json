@@ -871,6 +871,39 @@
       ]
     },
     {
+      "id": "communication.company-page-links",
+      "group": "communication",
+      "target": "skill",
+      "description": "User-facing replies link high-confidence company mentions to production Alva company pages without extra lookups or ambiguous company matches.",
+      "excludes": [
+        "https://stg.alva.ai/company/",
+        "https://stg.alva.xyz/company/"
+      ],
+      "section_includes": [
+        {
+          "file": "SKILL.md",
+          "heading": "Company Page Links",
+          "label": "company page link contract",
+          "includes": [
+            "In every user-facing Alva response",
+            "each covered stock company to its Alva company page",
+            "[visible wording](https://alva.ai/company/{CANONICAL_TICKER})",
+            "semantically clear company names",
+            "common names, or localized aliases",
+            "Apple",
+            "Use semantic context, not token shape alone",
+            "company/ticker mapping already resolved by Alva data",
+            "mapping, share class, or page coverage",
+            "do not call a tool just to add a link",
+            "Link each company at most once per reply",
+            "non-company assets",
+            "Never use a staging host or relative URL for a company page",
+            "Do not add a separate company-page footer"
+          ]
+        }
+      ]
+    },
+    {
       "id": "communication.concise-completion",
       "group": "communication",
       "target": "corpus",
