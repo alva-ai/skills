@@ -79,6 +79,26 @@ const MUTATIONS = [
     remove: "  channel-session id. Topic-channel delivery is web-only. In a channel turn,\n",
     expectFailedCases: ["subscriptions.delivery-destination", "scenario.current-topic-channel-alert"],
   },
+  {
+    id: "ticker-read-first-tier-route",
+    file: "SKILL.md",
+    remove: "read [ticker-read.md](references/ticker-read.md) before source selection",
+    expectFailedCases: [
+      "platform-data.ticker-read-sources",
+      "scenario.ticker-read-broad-analysis",
+    ],
+  },
+  {
+    id: "ticker-read-anomaly-priority",
+    file: "references/ticker-read.md",
+    remove:
+      "Use `alva/company-anomaly-read` as the first direct-read check for intraday and hourly-scale market tracking.\n",
+    expectFailedCases: [
+      "platform-data.ticker-read-sources",
+      "scenario.ticker-read-broad-analysis",
+      "scenario.ticker-read-hourly-tracking",
+    ],
+  },
 ];
 
 function parseArgs(argv) {

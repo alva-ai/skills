@@ -23,12 +23,23 @@ Decision order:
 
 | Request type | Objective |
 | --- | --- |
-| Financial Analysis / Ask Question | Answer market, asset, portfolio, valuation, comparison, and "why" questions with fresh data/search/`alva run` evidence. Comparison baselines are figures too: fetch or qualify them. Every answer must read [user-facing-prose.md](user-facing-prose.md), then pass the ask evidence gate. |
+| Financial Analysis / Ask Question | Answer market, asset, portfolio, valuation, comparison, single-ticker, and "why" questions with fresh data/search/`alva run` evidence. A named-ticker read first opens [ticker-read.md](ticker-read.md). Comparison baselines are figures too: fetch or qualify them. Every answer must read [user-facing-prose.md](user-facing-prose.md), then pass the ask evidence gate. |
 | Playbook Creation | Build, remix, edit, release, or update a hosted/shareable playbook. Read [playbook-creation.md](playbook-creation.md) for the subroute tree and gates. |
 | Strategy / Trading Analysis | Use Altra for backtests, signals, portfolio simulation, rebalancing, or trading analysis; deliver an answer, feed, signal, or playbook as requested. |
 | Automation / Push | Read [alva-knowledge.md](alva-knowledge.md) before design, build or modify a feed that emits actionable `signal/targets` or `notify/message`, then verify subscription and delivery path. |
 | Debug / Edit | Inspect existing code, logs, playbook source, feed output, or annotations, then change the generator rather than rendered values. |
 | Capability Verification | Verify Data Skills, Skillhub, runtime, trading, or search coverage before saying Alva lacks a capability. |
+
+## Official Ticker Read Sources
+
+[ticker-read.md](ticker-read.md) owns source selection, cadence, availability,
+freshness, and fallback for these official methods:
+
+- `alva/company-anomaly-read`
+- `alva/what-investors-are-looking-for`
+- `alva/query-breaking-news-feed`
+- `alva/company-data-aggregate`
+- `alva/company-move-attribution`
 
 ## Preferred Automation Setup Skills
 
@@ -114,6 +125,7 @@ Q&A.
 
 | Problem type | Trigger | Minimum gate |
 | --- | --- | --- |
+| Ticker read | analyze a ticker or named company, past hour, why did it move, investor focus, recent catalysts | read `ticker-read.md`; resolve ticker and horizon; apply its source router; state freshness, coverage/gaps, and fact/computation/model-analysis boundaries; add live Data Skills facts |
 | Thesis/fundamental | thesis, moat, quality, fundamental | thesis driver, key KPI, metric source, peer/baseline, missing KPI impact |
 | Earnings/catalyst | earnings, guide, catalyst, revision | event date, source, expected vs actual/consensus, forward catalyst, stale-data caveat |
 | Event-study/backtest | backtest, after/before, event window, forward returns, sample, bias-controlled | event definition, data source, sample count, date range, non-overlap rule, look-ahead control, benchmark, horizons, formula, friction/assumptions; missing sample count or event definition means incomplete and no strong trading conclusion |

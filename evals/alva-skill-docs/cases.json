@@ -379,6 +379,72 @@
       ]
     },
     {
+      "id": "platform-data.ticker-read-sources",
+      "group": "platform-data",
+      "target": "corpus",
+      "description": "A single-ticker read routes through the five official Skillhub sources as a first-tier Platform Data lane with explicit read, build, freshness, and fallback boundaries.",
+      "section_includes": [
+        {
+          "file": "SKILL.md",
+          "heading": "Data Access: Platform Data",
+          "label": "platform data section",
+          "includes": [
+            "Ticker Read",
+            "Read [ticker-read.md](references/ticker-read.md)",
+            "first-tier sources",
+            "select the smallest sufficient combination"
+          ]
+        },
+        {
+          "file": "SKILL.md",
+          "heading": "Request Routing",
+          "label": "ticker read route",
+          "includes": [
+            "ticker read, analyze a named ticker",
+            "read [ticker-read.md](references/ticker-read.md) before source selection"
+          ]
+        },
+        {
+          "file": "references/ticker-read.md",
+          "heading": "Source Router",
+          "label": "official source router",
+          "includes": [
+            "alva/company-anomaly-read",
+            "alva/company-move-attribution",
+            "alva/company-data-aggregate",
+            "alva/what-investors-are-looking-for",
+            "alva/query-breaking-news-feed",
+            "Direct-read lane",
+            "Build-on-demand lane",
+            "Use `alva/company-anomaly-read` as the first direct-read check for intraday and hourly-scale market tracking"
+          ]
+        },
+        {
+          "file": "references/ticker-read.md",
+          "heading": "Availability Gate",
+          "label": "profile availability",
+          "includes": [
+            "Local source files are not proof that a method is published",
+            "Continue with the remaining available Platform Data sources",
+            "Method availability is rollout state, not company coverage"
+          ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "heading": "Official Ticker Read Sources",
+          "label": "ticker read directory",
+          "includes": [
+            "[ticker-read.md](ticker-read.md) owns source selection",
+            "alva/company-anomaly-read",
+            "alva/what-investors-are-looking-for",
+            "alva/query-breaking-news-feed",
+            "alva/company-data-aggregate",
+            "alva/company-move-attribution"
+          ]
+        }
+      ]
+    },
+    {
       "id": "issue592.scoped-eval-checks",
       "group": "issue592",
       "target": "eval",
@@ -630,7 +696,7 @@
       "group": "target",
       "target": "skill",
       "description": "Top-level SKILL.md stays below the current guide ceiling without forcing a minimum size that would block future compression.",
-      "max_lines": 850
+      "max_lines": 910
     },
     {
       "id": "target.playbook-task-offload",
@@ -927,7 +993,7 @@
       "target": "corpus",
       "description": "Latest mainline Alva skill updates remain integrated after rebasing the refactor.",
       "includes": [
-        "version: v1.18.1",
+        "version: v1.19.0",
         "Capability Help",
         "Reply 1, 2, or 3 to start",
         "feedback",
