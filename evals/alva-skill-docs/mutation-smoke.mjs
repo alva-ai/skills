@@ -88,6 +88,17 @@ const MUTATIONS = [
       "scenario.ticker-read-broad-analysis",
     ],
   },
+  {
+    id: "ticker-read-anomaly-priority",
+    file: "references/ticker-read.md",
+    remove:
+      "Use `alva/company-anomaly-read` as the first direct-read check for intraday and hourly-scale market tracking.\n",
+    expectFailedCases: [
+      "platform-data.ticker-read-sources",
+      "scenario.ticker-read-broad-analysis",
+      "scenario.ticker-read-hourly-tracking",
+    ],
+  },
 ];
 
 function parseArgs(argv) {

@@ -37,17 +37,18 @@ For a named-ticker read, open
 or open-web discovery. It routes five known official methods across a
 Direct-read lane and a Build-on-demand lane:
 
-- `alva/what-investors-are-looking-for`
 - `alva/company-anomaly-read`
+- `alva/what-investors-are-looking-for`
 - `alva/query-breaking-news-feed`
 - `alva/company-data-aggregate`
 - `alva/company-move-attribution`
 
 Select by intent and coverage; do not run all five mechanically. The direct
-sources provide investor focus, current anomaly intelligence, and breaking
-macro/cross-market discovery. Aggregation plus attribution is the fallback for
-custom, off-list, non-US, or otherwise uncovered moves. Data Skills remain the
-source for live price, fundamentals, valuation, and peer facts.
+sources provide current anomaly intelligence first, then weekly investor focus
+and breaking macro/cross-market discovery as relevant. For intraday/hourly-scale
+tracking, begin with `alva/company-anomaly-read`; Data Skills remain the source
+for the live price. Aggregation plus attribution is the fallback for custom,
+off-list, non-US, or otherwise uncovered moves.
 
 The methods live in Skillhub, but using them as first-tier analysis sources does
 not turn the ask into the Skillhub Blueprint or Playbook Creation route. Fetch
@@ -138,7 +139,7 @@ Q&A.
 
 | Problem type | Trigger | Minimum gate |
 | --- | --- | --- |
-| Ticker read | analyze a ticker or named company, why did it move, investor focus, recent catalysts | read `ticker-read.md`; resolve ticker and horizon; select official direct-read/build sources; state freshness, coverage/gaps, and fact/computation/model-analysis boundaries; add live Data Skills facts |
+| Ticker read | analyze a ticker or named company, past hour, why did it move, investor focus, recent catalysts | read `ticker-read.md`; resolve ticker and horizon; use `company-anomaly-read` first for intraday/hourly-scale tracking; state freshness, coverage/gaps, and fact/computation/model-analysis boundaries; add live Data Skills facts |
 | Thesis/fundamental | thesis, moat, quality, fundamental | thesis driver, key KPI, metric source, peer/baseline, missing KPI impact |
 | Earnings/catalyst | earnings, guide, catalyst, revision | event date, source, expected vs actual/consensus, forward catalyst, stale-data caveat |
 | Event-study/backtest | backtest, after/before, event window, forward returns, sample, bias-controlled | event definition, data source, sample count, date range, non-overlap rule, look-ahead control, benchmark, horizons, formula, friction/assumptions; missing sample count or event definition means incomplete and no strong trading conclusion |

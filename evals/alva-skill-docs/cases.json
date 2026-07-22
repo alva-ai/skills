@@ -415,7 +415,8 @@
             "alva/what-investors-are-looking-for",
             "alva/query-breaking-news-feed",
             "Direct-read lane",
-            "Build-on-demand lane"
+            "Build-on-demand lane",
+            "Use `alva/company-anomaly-read` as the first direct-read check for intraday and hourly-scale market tracking"
           ]
         },
         {

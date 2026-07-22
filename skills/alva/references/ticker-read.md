@@ -17,12 +17,16 @@ The five official methods form two lanes. Fetch the selected method's current
 instructions from Skillhub before using it; the contracts and public paths can
 change.
 
+Use `alva/company-anomaly-read` as the first direct-read check for intraday and hourly-scale market tracking.
+Its feed checks roughly every 15 minutes during US market hours, so it is the
+primary ticker-state source for hour-scale tracking, not a live quote.
+
 ### Direct-read lane
 
 | Official Skillhub id | Choose it for | Coverage and boundary |
 | --- | --- | --- |
+| `alva/company-anomaly-read` | Primary intraday/hourly-scale tracking: whether a covered US ticker is anomalous now, its current signal, the latest confirmed attribution in the active episode, or anomaly history. | Public read-only coverage is a curated roughly 3,000-symbol US universe with roughly 15-minute checks during US market hours. A quiet state does not prove that price was flat or that no news exists. |
 | `alva/what-investors-are-looking-for` | Weekly investor focus, the one-line read, competitive landscape, bullish/bearish movers, four-quarter focus, recent official events, Street positioning, or what changed between weekly cards. | Per-ticker WILF cards cover roughly 2,960 symbols. During the catalog rename rollout, the active profile may still expose this method as `alva/wilf`. The feed contains generated card content, not prices, charts, fundamentals, or raw source documents. |
-| `alva/company-anomaly-read` | Whether a covered US ticker is anomalous now, its current signal, the latest confirmed attribution in the active episode, or anomaly history. | Public read-only coverage is a curated roughly 3,000-symbol US universe. A quiet state is not proof that price was flat or that no news exists. |
 | `alva/query-breaking-news-feed` | Current macro/cross-market event discovery that may explain market, sector, or highly watched-company behavior. | It is not a company-by-company news feed. Missing coverage means the feed did not surface a matching event, not that no event exists. |
 
 ### Build-on-demand lane
@@ -84,17 +88,32 @@ covered.
 
 ## Intent Routing
 
+### Intraday and hourly-scale tracking
+
+1. Use Data Skills for the live price, the move basis, and the requested
+   one-hour or intraday window.
+2. Read `alva/company-anomaly-read` first. Start with
+   `anomaly/timeline/@last/1` for current state and timestamp; use a bounded
+   range only when the user asks about the preceding hour or another window.
+3. If active, join the current `anomalyEpisodeId` to the latest confirmed
+   attribution in that episode. Do not attach an old episode's driver.
+4. Add Breaking News only when a current macro/sector event may explain the
+   move. Add WILF only when weekly investor focus helps interpret it.
+
+A quiet state does not prove that price was flat. It means no anomaly rule
+crossed in that run; report the live move from Data Skills separately.
+
 ### Broad ticker read
 
 For every broad ticker read, check the Direct-read lane before generic search:
 
 1. Resolve the canonical ticker and requested horizon.
-2. Read WILF when the question needs current investor priorities, debate,
+2. Check Company Anomaly exact-ticker coverage and current state first. When
+   covered, add the anomaly state and freshness; when uncovered, continue
+   without treating the missing feed as a company signal.
+3. Read WILF when the question needs current investor priorities, debate,
    competitive context, or recent changes. Surface `gaps` and the card's `date`
    / `as_of`.
-3. Check Company Anomaly exact-ticker coverage and current state. When covered,
-   add the anomaly state and freshness; when uncovered, continue without
-   treating the missing feed as a company signal.
 4. Query Breaking News when the user asks about recent catalysts, today's
    context, or a move that may be market- or sector-driven.
 5. Use Data Skills for live price, returns, fundamentals, valuation, estimates,

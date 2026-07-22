@@ -313,7 +313,8 @@
           "alva/query-breaking-news-feed",
           "Data Skills remain the source for live price, fundamentals, valuation",
           "Do not execute every source by default",
-          "Continue with the remaining available Platform Data sources"
+          "Continue with the remaining available Platform Data sources",
+          "Use `alva/company-anomaly-read` as the first direct-read check for intraday and hourly-scale market tracking"
         ],
         "sections": [
           {
@@ -324,6 +325,28 @@
               "read [ticker-read.md](references/ticker-read.md) before source selection"
             ]
           }
+        ]
+      }
+    },
+    {
+      "id": "scenario.ticker-read-hourly-tracking",
+      "group": "scenarios.ticker-read",
+      "prompt": "帮我看看 NVDA 过去一小时有没有异常，为什么？",
+      "description": "An hour-scale ticker check prioritizes the published anomaly timeline and current episode attribution before slower investor-focus or generic discovery sources.",
+      "expect": {
+        "route": "Financial Analysis / Ask Question",
+        "references": [
+          "ticker-read.md",
+          "company-anomaly.md",
+          "data-skills.md"
+        ],
+        "behaviors": [
+          "Use `alva/company-anomaly-read` as the first direct-read check for intraday and hourly-scale market tracking",
+          "roughly every 15 minutes during US market hours",
+          "anomaly/timeline",
+          "@last/1",
+          "A quiet state does not prove that price was flat",
+          "Data Skills for the live price"
         ]
       }
     },
