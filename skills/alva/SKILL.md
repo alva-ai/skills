@@ -389,8 +389,6 @@ For any named-ticker read, first read
 official direct-read and build-on-demand methods, then add the Data Skills and
 primary-source evidence the answer needs. Missing coverage in any one Platform
 Data source must degrade honestly without blocking ordinary analysis.
-For intraday or past-hour tracking, prioritize `alva/company-anomaly-read` before
-weekly investor-focus or generic event-discovery sources.
 
 Common subroutes are latest fact, contextual explanation, comparison/valuation,
 ranking or screen-in-text, and thesis check. They produce an answer, not an

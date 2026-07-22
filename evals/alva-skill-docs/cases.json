@@ -428,6 +428,19 @@
             "Continue with the remaining available Platform Data sources",
             "Method availability is rollout state, not company coverage"
           ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "heading": "Official Ticker Read Sources",
+          "label": "ticker read directory",
+          "includes": [
+            "[ticker-read.md](ticker-read.md) owns source selection",
+            "alva/company-anomaly-read",
+            "alva/what-investors-are-looking-for",
+            "alva/query-breaking-news-feed",
+            "alva/company-data-aggregate",
+            "alva/company-move-attribution"
+          ]
         }
       ]
     },
