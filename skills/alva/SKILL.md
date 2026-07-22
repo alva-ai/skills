@@ -199,8 +199,8 @@ that section as mandatory, not optional debugging material.
 | User asks for                                                                                                                           | Route                               | Must not miss                                                                                                                                                                            |
 | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | price, valuation, holdings, compare peers, explain a thesis, rank in text                                                                 | Financial Analysis / Ask Question   | Use fresh Data Skills/search evidence and the Financial Analysis tree; fetch or qualify every comparison baseline.                                                                    |
-| company performance, analyze a named company, "why did it move", investor focus, recent company catalysts, unusual price/volume move     | Financial Analysis + Platform Data: Company Performance | Treat the five official methods as first-tier sources; read [company-performance.md](references/company-performance.md) before source selection and use only the matching lane. |
-| company anomaly, scan/check whether a company is anomalous, use Platform Data to analyze a company                                       | Platform Data: Company Anomaly      | Route through [company-performance.md](references/company-performance.md), then read [company-anomaly.md](references/company-anomaly.md); verify exact-ticker coverage and freshness.  |
+| ticker read, analyze a named ticker or company, "why did it move", investor focus, recent catalysts, unusual price/volume move            | Financial Analysis + Platform Data: Ticker Read | Treat the five official methods as first-tier sources; read [ticker-read.md](references/ticker-read.md) before source selection and use only the matching lane.                  |
+| company anomaly, scan/check whether a company is anomalous, use Platform Data to analyze a company                                       | Platform Data: Company Anomaly      | Route through [ticker-read.md](references/ticker-read.md), then read [company-anomaly.md](references/company-anomaly.md); verify exact-ticker coverage and freshness.            |
 | fintwit / KOL / leaderboard — top accounts or ranking, is @handle tracked, what an account thinks about a ticker or theme, track record | Platform Data: Fintwit Intelligence | Use the Platform Data section below, then read [fintwit.md](references/fintwit.md); cite the snapshot date; read-only, never fabricate rankings.                                         |
 | FinTwit digest SDK, alpha radar automation, custom digest module, `@alva/fintwit-digest`                                                | Platform Data: Fintwit Digest SDK   | Use the Platform Data section below, then read [fintwit-digest-sdk.md](references/fintwit-digest-sdk.md); follow the SDK API and ability contracts instead of copying runtime internals. |
 | dashboard, screener app, thesis tracker, hosted report, shareable surface                                                               | Playbook Creation                   | Build live feeds first, then read [playbook-creation.md](references/playbook-creation.md).                                                                                               |
@@ -314,7 +314,7 @@ not copy private runtime internals into user scripts.
 
 | Surface                         | Use for                                                                                                                  | Must not miss                                                                                                                                                                  |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Company Performance Intelligence | Broad company reads, investor focus, anomaly state, move attribution, custom company records, and recent catalysts.      | Read [company-performance.md](references/company-performance.md); treat its five official Skillhub methods as first-tier sources and select the smallest sufficient combination. |
+| Ticker Read                      | Single-ticker reads, investor focus, anomaly state, move attribution, custom company records, and recent catalysts.       | Read [ticker-read.md](references/ticker-read.md); treat its five official Skillhub methods as first-tier sources and select the smallest sufficient combination.               |
 | Company Anomaly Intelligence    | Proactive company anomaly checks, latest attribution, sector-vs-company decomposition, and aligned supporting events.    | Read [company-anomaly.md](references/company-anomaly.md); a quiet current tick can be newer than the latest `real` attribution, so keep those states distinct.                 |
 | Fintwit Intelligence / KOL data | Top accounts, leaderboard rankings, tracked-handle checks, account theses, ticker sentiment, and track record questions. | Read [fintwit.md](references/fintwit.md); live-read the public platform feeds, cite the snapshot timestamp, and keep the source read-only.                                     |
 | Fintwit Digest SDK              | Alpha radar automation, custom digest modules, and `@alva/fintwit-digest` scripts over platform KOL tracker feeds.       | Read [fintwit-digest-sdk.md](references/fintwit-digest-sdk.md); use the public API and ability contracts instead of copying runtime internals or adding ad hoc profile config. |
@@ -384,8 +384,8 @@ sourced explanation, a peer comparison, a thesis check, or a concise table. It
 is not merely "Data Query": data access and execution are steps inside an
 analysis answer.
 
-For any named-company performance analysis, first read
-[company-performance.md](references/company-performance.md). Route among its
+For any named-ticker read, first read
+[ticker-read.md](references/ticker-read.md). Route among its
 official direct-read and build-on-demand methods, then add the Data Skills and
 primary-source evidence the answer needs. Missing coverage in any one Platform
 Data source must degrade honestly without blocking ordinary analysis.
@@ -666,8 +666,8 @@ reference before doing the task.
 
 For "what is the latest price / P/E / funding rate / holdings / CPI print", "why
 did it move", "analyze this company", "is it cheap vs peers", or "rank these in
-text", start with financial analysis. For named-company performance, use the
-first-tier source router in [company-performance.md](references/company-performance.md).
+text", start with financial analysis. For a named-ticker read, use the first-tier
+source router in [ticker-read.md](references/ticker-read.md).
 Run preflight if needed, verify the relevant Data Skills or search route, use
 `alva run` when live computation or joins are needed, fetch or qualify any
 comparison baseline, read
@@ -797,7 +797,7 @@ Use this index to open only the file needed for the current task.
 | [onnx.md](references/onnx.md)                                                         | ONNX artifact, inference, FeedAltra integration, release checks.                                                                              |
 | [deployment.md](references/deployment.md)                                             | Cronjob create/list/pause/resume/trigger/run-status/runs/run-logs.                                                                            |
 | [search.md](references/search.md)                                                     | `unified_search`, finance search, Twitter/X, Reddit, YouTube, web gotchas.                                                                    |
-| [company-performance.md](references/company-performance.md)                           | Platform Data / Company Performance: routing across official investor-focus, anomaly, attribution, aggregation, and breaking-news methods.    |
+| [ticker-read.md](references/ticker-read.md)                                           | Platform Data / Ticker Read: routing across official investor-focus, anomaly, attribution, aggregation, and breaking-news methods.            |
 | [company-anomaly.md](references/company-anomaly.md)                                   | Platform Data / Company Anomaly Intelligence: anomaly state, aligned attribution, evidence, interpretation, and answer workflow.              |
 | [fintwit.md](references/fintwit.md)                                                   | Platform Data / Fintwit Intelligence: curated fintwit/KOL account data — views, signals, profiles; query recipes by account, ticker, ranking. |
 | [fintwit-digest-sdk.md](references/fintwit-digest-sdk.md)                             | Platform Data / Fintwit Digest SDK: `@alva/fintwit-digest` public API, run profiles, pipeline state, ability contracts, and override rules.   |

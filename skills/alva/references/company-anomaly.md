@@ -14,7 +14,7 @@ signals are computed data; the driver explanation is model-generated analysis
 over supplied evidence. Keep those layers distinct in the answer.
 
 **Not a standalone general company-research source.** For broad analysis, start
-with [company-performance.md](company-performance.md), use this reference to add
+with [ticker-read.md](ticker-read.md), use this reference to add
 a covered company's current anomaly state, then use Financial Analysis and Data
 Skills for prices, valuation, fundamentals, and ordinary news. A quiet anomaly
 state does not mean the stock did not move or that no news exists.

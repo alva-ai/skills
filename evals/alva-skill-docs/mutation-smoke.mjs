@@ -80,12 +80,12 @@ const MUTATIONS = [
     expectFailedCases: ["subscriptions.delivery-destination", "scenario.current-topic-channel-alert"],
   },
   {
-    id: "company-performance-first-tier-route",
+    id: "ticker-read-first-tier-route",
     file: "SKILL.md",
-    remove: "read [company-performance.md](references/company-performance.md) before source selection",
+    remove: "read [ticker-read.md](references/ticker-read.md) before source selection",
     expectFailedCases: [
-      "platform-data.company-performance-sources",
-      "scenario.company-performance-broad-analysis",
+      "platform-data.ticker-read-sources",
+      "scenario.ticker-read-broad-analysis",
     ],
   },
 ];

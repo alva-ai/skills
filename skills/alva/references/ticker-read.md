@@ -1,8 +1,8 @@
-# Company Performance Intelligence
+# Ticker Read
 
-Use this reference for any named-company performance question: a broad company
-read, current investor focus, an unusual move, a catalyst check, or a comparison
-of what changed. Treat these as first-tier company-performance sources: check
+Use this reference for any single-ticker read: broad company analysis, current
+investor focus, an unusual move, a catalyst check, or a comparison of what
+changed. Treat these as first-tier ticker-read sources: check
 the matching official Platform Data method before generic search, then add Data
 Skills or primary-source verification where the method's contract requires it.
 
@@ -84,10 +84,9 @@ covered.
 
 ## Intent Routing
 
-### Broad named-company analysis
+### Broad ticker read
 
-For every broad named-company analysis, check the Direct-read lane before
-generic search:
+For every broad ticker read, check the Direct-read lane before generic search:
 
 1. Resolve the canonical ticker and requested horizon.
 2. Read WILF when the question needs current investor priorities, debate,

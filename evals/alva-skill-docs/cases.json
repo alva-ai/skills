@@ -379,18 +379,18 @@
       ]
     },
     {
-      "id": "platform-data.company-performance-sources",
+      "id": "platform-data.ticker-read-sources",
       "group": "platform-data",
       "target": "corpus",
-      "description": "Company-performance analysis routes through the five official Skillhub sources as a first-tier Platform Data lane with explicit read, build, freshness, and fallback boundaries.",
+      "description": "A single-ticker read routes through the five official Skillhub sources as a first-tier Platform Data lane with explicit read, build, freshness, and fallback boundaries.",
       "section_includes": [
         {
           "file": "SKILL.md",
           "heading": "Data Access: Platform Data",
           "label": "platform data section",
           "includes": [
-            "Company Performance Intelligence",
-            "Read [company-performance.md](references/company-performance.md)",
+            "Ticker Read",
+            "Read [ticker-read.md](references/ticker-read.md)",
             "first-tier sources",
             "select the smallest sufficient combination"
           ]
@@ -398,14 +398,14 @@
         {
           "file": "SKILL.md",
           "heading": "Request Routing",
-          "label": "company performance route",
+          "label": "ticker read route",
           "includes": [
-            "company performance, analyze a named company",
-            "read [company-performance.md](references/company-performance.md) before source selection"
+            "ticker read, analyze a named ticker",
+            "read [ticker-read.md](references/ticker-read.md) before source selection"
           ]
         },
         {
-          "file": "references/company-performance.md",
+          "file": "references/ticker-read.md",
           "heading": "Source Router",
           "label": "official source router",
           "includes": [
@@ -419,7 +419,7 @@
           ]
         },
         {
-          "file": "references/company-performance.md",
+          "file": "references/ticker-read.md",
           "heading": "Availability Gate",
           "label": "profile availability",
           "includes": [
