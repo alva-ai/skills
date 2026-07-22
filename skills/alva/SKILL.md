@@ -831,9 +831,8 @@ Runtime artifacts:
 
 ### Company Entity Links
 
-Make covered stock companies directly navigable from every Alva-hosted
-user-facing reply, including New Chat and Alva Agent Channel. When a company is
-identified with high confidence, wrap its first clear mention in
+In every user-facing Alva response, link the first high-confidence mention of
+each covered stock company to its Company Entity Page:
 `[visible wording](https://alva.ai/company/{CANONICAL_TICKER})`.
 
 - Recognize explicit tickers such as `AAPL` or `$AAPL` and semantically clear

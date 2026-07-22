@@ -885,7 +885,8 @@
           "heading": "Company Entity Links",
           "label": "company entity link contract",
           "includes": [
-            "including New Chat and Alva Agent Channel",
+            "In every user-facing Alva response",
+            "each covered stock company to its Company Entity Page",
             "[visible wording](https://alva.ai/company/{CANONICAL_TICKER})",
             "semantically clear company names",
             "common names, or localized aliases",
