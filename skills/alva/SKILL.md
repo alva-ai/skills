@@ -198,7 +198,8 @@ that section as mandatory, not optional debugging material.
 
 | User asks for                                                                                                                           | Route                               | Must not miss                                                                                                                                                                            |
 | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| price, valuation, holdings, broad company analysis, "why did it move", compare peers, explain a thesis, rank in text                    | Financial Analysis / Ask Question   | For a named company, also apply the proactive Company Anomaly check in the Financial Analysis tree; it supplements rather than replaces ordinary analysis.                              |
+| price, valuation, holdings, "why did it move", compare peers, explain a thesis, rank in text                                           | Financial Analysis / Ask Question   | Use the smallest relevant subroute and apply every matching evidence gate.                                                                                                             |
+| broad analysis of one named equity or ticker, "analyze MU", "META setup"                                                             | Financial Analysis: Ticker Analysis | Read [ticker-analysis.md](references/ticker-analysis.md); use its setup, expectations, company evidence, anomaly, catalyst, risk, and live-debate method.                                |
 | company anomaly, scan/check whether a company is anomalous, use Platform Data to analyze a company, unusual price/volume move            | Platform Data: Company Anomaly      | Read [company-anomaly.md](references/company-anomaly.md); verify exact-ticker coverage, live-read the current state, and keep any prior attribution timestamp distinct.                 |
 | fintwit / KOL / leaderboard — top accounts or ranking, is @handle tracked, what an account thinks about a ticker or theme, track record | Platform Data: Fintwit Intelligence | Use the Platform Data section below, then read [fintwit.md](references/fintwit.md); cite the snapshot date; read-only, never fabricate rankings.                                         |
 | FinTwit digest SDK, alpha radar automation, custom digest module, `@alva/fintwit-digest`                                                | Platform Data: Fintwit Digest SDK   | Use the Platform Data section below, then read [fintwit-digest-sdk.md](references/fintwit-digest-sdk.md); follow the SDK API and ability contracts instead of copying runtime internals. |
@@ -377,26 +378,20 @@ sourced current data next to memory-derived baselines.
 
 Financial analysis is the default for user questions about markets, assets,
 portfolios, valuation, catalysts, rankings, comparisons, and "why" narratives.
-It may be a single fresh data fetch, an `alva run` computation over live data, a
-sourced explanation, a peer comparison, a thesis check, or a concise table. It
-is not merely "Data Query": data access and execution are steps inside an
-analysis answer.
+It is not merely "Data Query": data access and execution are steps inside an
+analysis answer, including an `alva run` computation over live data when needed.
+Use the shared data and execution layer, then answer directly with provenance
+unless the user asks to track, alert, share, or publish.
 
-For broad analysis of a named company, proactively read
-[company-anomaly.md](references/company-anomaly.md), then test its exact-ticker
-Company Anomaly coverage before answering. When covered, include the current
-anomaly state and freshness as one analysis dimension. When unavailable,
-continue the ordinary analysis; do not substitute anomaly intelligence for
-fundamentals, valuation, or company news.
+For broad analysis of one named equity, read
+[ticker-analysis.md](references/ticker-analysis.md) and use it as the default method.
+It includes the proactive exact-ticker Company Anomaly check, WILF expectations,
+company-event sweep, setup, thesis, catalysts, risks, and live debate. Missing
+Company Anomaly coverage does not block ordinary analysis or justify replacing
+fundamentals, valuation, or news with anomaly intelligence.
 
-Common subroutes are latest fact, contextual explanation, comparison/valuation,
-ranking or screen-in-text, and thesis check. They produce an answer, not an
-unsolicited build; enter the durable artifact tree only when the user requests
-it or accepts an Automation suggestion.
-
-Use the shared data and execution layer first. If the user asks a direct
-question, answer directly with provenance; if they ask to track, alert, share,
-or publish, route to the durable artifact / playbook tree instead.
+Other common subroutes are latest fact, contextual explanation, comparison/valuation,
+ranking or screen-in-text, and thesis check. They produce an answer, not an unsolicited build.
 
 Financial-analysis answer gate: before answering any Financial Analysis / Ask
 Question, read [user-facing-prose.md](references/user-facing-prose.md), then
@@ -410,30 +405,10 @@ are sourced facts, computed values, or inference.
 
 #### Useful Next Step After Ask
 
-After fully answering a one-off Ask, choose one outcome:
-
-- **Automation** when changing inputs can be reevaluated by the same method and
-  cadence, a trigger, or notification creates ongoing value. Push ideas also
-  need a meaningful-change and quiet-run boundary.
-- **One-off follow-up** when one concrete question would materially deepen,
-  test, compare, apply, or naturally extend the answer. It need not lead to
-  Automation.
-- **No suggestion** when neither option is specific, relevant, and clearly
-  useful. If uncertain, choose this and end the answer without a footer.
-
-Actively look for Automation, but hold both options to the same quality bar. If
-both pass, prefer Automation when recurring value justifies the setup; choose
-one-off only when it is clearly more useful now. Never recommend Automation
-merely because work is schedulable.
-
-When suggesting, append one short, opt-in sentence in the user's language.
-Describe the outcome and value, not the implementation; avoid generic
-conversation or product CTAs. Do not invent cadence, thresholds, tickers, KOL
-handles, portfolio state, account connections, or notification policy. Wait
-for acceptance, and do not repeat a declined suggestion unless the need changes.
-If Automation clears this bar or is already requested, apply
-[Preferred Automation Setup Skills](references/request-routing.md#preferred-automation-setup-skills)
-before suggesting or building it.
+After fully answering a one-off Ask, follow
+[Post-Ask Next Step](references/request-routing.md#post-ask-next-step). Suggest
+at most one specific, opt-in Automation or one-off follow-up; omit the footer
+when neither clearly helps.
 
 ### Durable Artifacts / Playbook Tree
 
@@ -663,22 +638,12 @@ reference before doing the task.
 
 ### Ask Question / Financial Analysis
 
-For "what is the latest price / P/E / funding rate / holdings / CPI print", "why
-did it move", "analyze this company", "is it cheap vs peers", or "rank these in
-text", start with financial analysis. For broad named-company analysis, apply
-the proactive Company Anomaly check defined in the Financial Analysis tree. Run
-preflight if needed, verify the relevant Data Skills or search route, use
-`alva run` when live computation or joins are needed, fetch or qualify any
-comparison baseline, read
-[user-facing-prose.md](references/user-facing-prose.md), apply the answer gate
-in the Financial Analysis tree, classify complex asks with
-[request-routing.md](references/request-routing.md), and answer with inline
-provenance. If a structured source returns stale or missing latest data, use
-[data-skills.md](references/data-skills.md#structured-feed-lag) before refusing
-when a known official release may be ahead of the feed; otherwise report the
-failure instead of substituting a web snippet or model memory. If the user then
-asks to track, alert, share, or publish, upgrade the route to a feed, signal,
-alert, or playbook.
+Start with the Financial Analysis tree and its answer gate. For broad analysis
+of one named equity, use [ticker-analysis.md](references/ticker-analysis.md).
+Verify the needed Data Skills/search route, compute live joins when needed, and
+fetch or qualify comparison baselines. For stale structured data around a known
+release, follow [data-skills.md](references/data-skills.md#structured-feed-lag).
+Only upgrade to an Automation, signal, alert, or playbook when the user asks.
 
 ### Hosted Playbook Workflow
 
@@ -783,6 +748,7 @@ Use this index to open only the file needed for the current task.
 | [preflight.md](references/preflight.md)                                               | Session start, Rule 0, CLI, auth, profile, Arrays JWT, memory load, user scope.                                                               |
 | [alva-knowledge.md](references/alva-knowledge.md)                                     | Required automation reasoning: bounded history, cross-run comparison, semantic notification novelty, quiet runs.                            |
 | [request-routing.md](references/request-routing.md)                                   | Route choice, post-Ask next steps, preferred Automation setup skills, Skillhub, Guided Planning, capability verification, completion gate.    |
+| [ticker-analysis.md](references/ticker-analysis.md)                                   | Default broad single-equity method: setup, WILF expectations, company events, anomaly context, thesis, catalysts, risks, and live debate.      |
 | [content-legitimacy.md](references/content-legitimacy.md)                             | Data provenance, prohibited sources, chat-as-artifact, feed isolation, conventions.                                                           |
 | [data-skills.md](references/data-skills.md)                                           | Data Skills discovery, endpoint calls, Arrays auth, search/data routing.                                                                      |
 | [feed-lifecycle.md](references/feed-lifecycle.md)                                     | Feed build and automation publish lifecycle, modeling summary, push sidecars, `before-automation-publish`.                                    |
@@ -831,25 +797,7 @@ Runtime artifacts:
 
 ### Company Page Links
 
-In every user-facing Alva response, link the first high-confidence mention of
-each covered stock company to its Alva company page:
-`[visible wording](https://alva.ai/company/{CANONICAL_TICKER})`.
-
-- Recognize explicit tickers such as `AAPL` or `$AAPL` and semantically clear
-  company names, common names, or localized aliases. Treat `Apple` as `AAPL`
-  when context refers to Apple Inc. Use semantic context, not token shape alone:
-  do not link `apple` when it means fruit, `Meta` as a general term, or `AI` as
-  a theme rather than a company.
-- Preserve the visible wording and use the canonical uppercase ticker only in
-  the URL. Prefer a company/ticker mapping already resolved by Alva data or
-  clearly established in the conversation. If the mapping, share class, or page
-  coverage is uncertain, leave it plain; do not call a tool just to add a link.
-- Link each company at most once per reply. Do not link non-company assets such
-  as ETFs, indices, crypto, FX, or commodities; code; raw URLs; existing links;
-  quoted passages; or verbatim tool output.
-- Always use an absolute production URL under `https://alva.ai/company/`. Never
-  use a staging host or relative URL for a company page. Do not add a separate
-  company-page footer or explain that a link was added.
+Apply [Company Page Links](references/user-facing-prose.md#company-page-links) to every user-facing Alva response.
 
 Lead with the result, not the machinery. Say what the user got, what was
 verified, and what remains. Avoid raw ALFS paths, API payloads, job ids,

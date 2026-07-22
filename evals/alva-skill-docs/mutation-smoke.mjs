@@ -19,6 +19,17 @@ const MUTATIONS = [
     expectFailedCases: ["issue592.financial-ask-contract", "scenario.simple-latest-price"],
   },
   {
+    id: "ticker-analysis-route",
+    file: "SKILL.md",
+    remove:
+      "For broad analysis of one named equity, read\n" +
+      "[ticker-analysis.md](references/ticker-analysis.md) and use it as the default method.\n",
+    expectFailedCases: [
+      "ticker-analysis.generic-single-ticker-method",
+      "scenario.broad-single-ticker-analysis",
+    ],
+  },
+  {
     id: "capability-before-refusal",
     file: "references/request-routing.md",
     remove: "Before saying Alva lacks a capability or recommending BYOD, verify the catalog:",

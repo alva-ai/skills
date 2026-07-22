@@ -12,7 +12,8 @@ Decision order:
    Skills, search, BYOD, `alva run` / jagent, and provenance checks are common
    to answers and artifacts.
 1. If the user wants an explanation, comparison, valuation, rank, or current
-   market fact in chat, route to Financial Analysis / Ask Question.
+   market fact in chat, route to Financial Analysis / Ask Question. Broad
+   analysis of one named equity uses the Ticker Analysis subroute.
 2. If the user wants persistence, cadence, alerting, trading signals, or a
    reusable dataset, route to the durable artifact that fits, not automatically
    to a playbook.
@@ -24,11 +25,39 @@ Decision order:
 | Request type | Objective |
 | --- | --- |
 | Financial Analysis / Ask Question | Answer market, asset, portfolio, valuation, comparison, and "why" questions with fresh data/search/`alva run` evidence. Comparison baselines are figures too: fetch or qualify them. Every answer must read [user-facing-prose.md](user-facing-prose.md), then pass the ask evidence gate. |
+| Financial Analysis: Ticker Analysis | For broad analysis of one named equity, read [ticker-analysis.md](ticker-analysis.md) and apply its setup, WILF expectations, company-information, anomaly, catalyst, risk, and live-debate method before answering. |
 | Playbook Creation | Build, remix, edit, release, or update a hosted/shareable playbook. Read [playbook-creation.md](playbook-creation.md) for the subroute tree and gates. |
 | Strategy / Trading Analysis | Use Altra for backtests, signals, portfolio simulation, rebalancing, or trading analysis; deliver an answer, feed, signal, or playbook as requested. |
 | Automation / Push | Read [alva-knowledge.md](alva-knowledge.md) before design, build or modify a feed that emits actionable `signal/targets` or `notify/message`, then verify subscription and delivery path. |
 | Debug / Edit | Inspect existing code, logs, playbook source, feed output, or annotations, then change the generator rather than rendered values. |
 | Capability Verification | Verify Data Skills, Skillhub, runtime, trading, or search coverage before saying Alva lacks a capability. |
+
+## Post-Ask Next Step
+
+After fully answering a one-off Ask, choose one outcome:
+
+- **Automation** when changing inputs can be reevaluated by the same method and
+  cadence, a trigger, or notification creates ongoing value. Push ideas also
+  need a meaningful-change and quiet-run boundary.
+- **One-off follow-up** when one concrete question would materially deepen,
+  test, compare, apply, or naturally extend the answer. It need not lead to
+  Automation.
+- **No suggestion** when neither option is specific, relevant, and clearly
+  useful. If uncertain, choose this and end the answer without a footer.
+
+Actively look for Automation, but hold both options to the same quality bar. If
+both pass, prefer Automation when recurring value justifies the setup; choose
+one-off only when it is clearly more useful now. Never recommend Automation
+merely because work is schedulable.
+
+When suggesting, append one short, opt-in sentence in the user's language.
+Describe the outcome and value, not the implementation; avoid generic
+conversation or product CTAs. Do not invent cadence, thresholds, tickers, KOL
+handles, portfolio state, account connections, or notification policy. Wait
+for acceptance, and do not repeat a declined suggestion unless the need changes.
+If Automation clears this bar or is already requested, apply
+[Preferred Automation Setup Skills](#preferred-automation-setup-skills) before
+suggesting or building it.
 
 ## Preferred Automation Setup Skills
 
@@ -103,6 +132,10 @@ or computing evidence, but first read
 sourced-vs-inference boundary. Simple asks can satisfy the gate with one hop.
 Simple/latest-fact asks stop there. Only complex judgment asks also pass the
 Complex Ask Router below before the answer is written.
+
+For a broad single-ticker equity ask, read [ticker-analysis.md](ticker-analysis.md)
+before research. It supplies the default method; the gates below still apply to
+every matching thesis, earnings, valuation, and news/social dimension.
 
 ### Complex Ask Router
 

@@ -255,7 +255,7 @@ as though it were a regular-session return.
 | `symbol`                                | Attributed company                                |
 | `headline`                              | Short likely-driver statement                     |
 | `summary`                               | Full attribution narrative                        |
-| `summaryWithCitationsMarkdown`          | Same narrative as `summary`, with inline Markdown source links (`([source](url))`) after sourced claims, drawn only from `supportingEvents` / `sourceLinks`; falls back to `summary` when absent |
+| `summaryWithCitationsMarkdown`          | Same narrative as `summary`, with inline Markdown source links after sourced claims, drawn only from `supportingEvents` / `sourceLinks`; falls back to `summary` when absent |
 | `driverMarket` / `driverSector` / `driverAssetSpecific` | Per-layer **narrative** ("why"), LLM-generated — the market, sector, and asset-specific drivers (no single `drivers` field) |
 | `decompositionJson`                     | Computed **quantitative** 3-way split ("how much") — `market.movePct`, `sector.beyondMarketPct`, `idiosyncratic.beyondSectorPct` (each with a `z`), plus `dominant` / `dominantOrder` |
 | `confidence`                            | Confidence classification                         |

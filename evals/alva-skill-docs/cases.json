@@ -379,6 +379,56 @@
       ]
     },
     {
+      "id": "ticker-analysis.generic-single-ticker-method",
+      "group": "ticker-analysis",
+      "target": "corpus",
+      "description": "Broad analysis of one named equity routes through a reusable ticker-analysis method that combines setup, expectations, company evidence, anomaly context, and the live debate.",
+      "section_includes": [
+        {
+          "file": "SKILL.md",
+          "heading": "Request Routing",
+          "label": "top-level request route",
+          "includes": [
+            "broad analysis of one named equity or ticker",
+            "Financial Analysis: Ticker Analysis",
+            "Read [ticker-analysis.md](references/ticker-analysis.md)"
+          ]
+        },
+        {
+          "file": "SKILL.md",
+          "heading": "Financial Analysis / Ask Question Tree",
+          "label": "financial-analysis pointer",
+          "includes": [
+            "For broad analysis of one named equity",
+            "[ticker-analysis.md](references/ticker-analysis.md)",
+            "the default method",
+            "Company Anomaly"
+          ]
+        },
+        {
+          "file": "references/ticker-analysis.md",
+          "heading": "Ticker Analysis",
+          "label": "method chapter",
+          "includes": [
+            "Answer first",
+            "Do not lead with the last price or the day's move",
+            "buyable here",
+            "needs a pullback or confirmation",
+            "extended",
+            "no clean entry",
+            "what would improve or break the setup",
+            "WILF",
+            "expectations baseline",
+            "Company Anomaly",
+            "company-information sweep",
+            "one identifiable investor, operator, analyst, or industry expert",
+            "original post or source",
+            "confirm company guidance, financial figures, and event facts with stronger evidence"
+          ]
+        }
+      ]
+    },
+    {
       "id": "issue592.scoped-eval-checks",
       "group": "issue592",
       "target": "eval",
@@ -873,7 +923,7 @@
     {
       "id": "communication.company-page-links",
       "group": "communication",
-      "target": "skill",
+      "target": "corpus",
       "description": "User-facing replies link high-confidence company mentions to production Alva company pages without extra lookups or ambiguous company matches.",
       "excludes": [
         "https://stg.alva.ai/company/",
@@ -881,7 +931,7 @@
       ],
       "section_includes": [
         {
-          "file": "SKILL.md",
+          "file": "references/user-facing-prose.md",
           "heading": "Company Page Links",
           "label": "company page link contract",
           "includes": [

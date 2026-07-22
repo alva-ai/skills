@@ -124,6 +124,28 @@ answer like this:
 > the analysis five hours ago, but it still filed it under April 30, so the page
 > looked unchanged.
 
+## Company Page Links
+
+In every user-facing Alva response, link the first high-confidence mention of
+each covered stock company to its Alva company page:
+`[visible wording](https://alva.ai/company/{CANONICAL_TICKER})`.
+
+- Recognize explicit tickers such as `AAPL` or `$AAPL` and semantically clear
+  company names, common names, or localized aliases. Treat `Apple` as `AAPL`
+  when context refers to Apple Inc. Use semantic context, not token shape alone:
+  do not link `apple` when it means fruit, `Meta` as a general term, or `AI` as
+  a theme rather than a company.
+- Preserve the visible wording and use the canonical uppercase ticker only in
+  the URL. Prefer a company/ticker mapping already resolved by Alva data or
+  clearly established in the conversation. If the mapping, share class, or page
+  coverage is uncertain, leave it plain; do not call a tool just to add a link.
+- Link each company at most once per reply. Do not link non-company assets such
+  as ETFs, indices, crypto, FX, or commodities; code; raw URLs; existing links;
+  quoted passages; or verbatim tool output.
+- Always use an absolute production URL under `https://alva.ai/company/`. Never
+  use a staging host or relative URL for a company page. Do not add a separate
+  company-page footer or explain that a link was added.
+
 ## Voice
 
 User-facing prose in Alva should read like a sharp human analyst, not a

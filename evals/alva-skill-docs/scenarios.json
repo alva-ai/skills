@@ -51,6 +51,45 @@
       }
     },
     {
+      "id": "scenario.broad-single-ticker-analysis",
+      "group": "scenarios.ask",
+      "prompt": "分析一下 MU",
+      "description": "A broad named-equity ask uses the reusable ticker-analysis method before answering, without requiring the user to supply a thesis or turning the request into a playbook.",
+      "expect": {
+        "route": "Financial Analysis: Ticker Analysis",
+        "top_level_route": "Financial Analysis / Ask Question Tree",
+        "references": [
+          "ticker-analysis.md",
+          "company-anomaly.md",
+          "user-facing-prose.md"
+        ],
+        "behaviors": [
+          "Answer first",
+          "WILF as the expectations baseline",
+          "run the company-information sweep",
+          "test exact-ticker Company Anomaly coverage",
+          "what would improve or break the setup",
+          "confirm company guidance, financial figures, and event facts with stronger evidence"
+        ],
+        "sections": [
+          {
+            "file": "SKILL.md",
+            "heading": "Financial Analysis / Ask Question Tree",
+            "label": "ticker-analysis route",
+            "includes": [
+              "For broad analysis of one named equity",
+              "[ticker-analysis.md](references/ticker-analysis.md)",
+              "the default method"
+            ]
+          }
+        ],
+        "forbidden_behaviors": [
+          "Do not make the user supply a thesis before receiving value",
+          "not automatically to a playbook"
+        ]
+      }
+    },
+    {
       "id": "scenario.capability-gap-before-refusal",
       "group": "scenarios.capability",
       "prompt": "Does Alva have darkpool L2 realtime data?",
