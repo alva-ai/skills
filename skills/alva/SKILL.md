@@ -829,6 +829,29 @@ Runtime artifacts:
 
 ## User-Facing Communication
 
+### Company Entity Links
+
+Make covered stock companies directly navigable from every Alva-hosted
+user-facing reply, including New Chat and Alva Agent Channel. When a company is
+identified with high confidence, wrap its first clear mention in
+`[visible wording](https://alva.ai/company/{CANONICAL_TICKER})`.
+
+- Recognize explicit tickers such as `AAPL` or `$AAPL` and semantically clear
+  company names or aliases such as `Apple` or `苹果公司` as the same entity
+  when context refers to Apple Inc. Use semantic context, not token shape
+  alone: do not link `apple` when it means fruit, `Meta` as a general term, or
+  `AI` as a theme rather than a company.
+- Preserve the visible wording and use the canonical uppercase ticker only in
+  the URL. Prefer an entity already resolved by Alva data or clearly established
+  in the conversation. If the mapping, share class, or Company Entity coverage
+  is uncertain, leave it plain. Do not call a tool solely to add a link.
+- Link each company at most once per reply. Do not link non-company assets such
+  as ETFs, indices, crypto, FX, or commodities; code; raw URLs; existing links;
+  quoted passages; or verbatim tool output.
+- Always use an absolute production URL under `https://alva.ai/company/`. Never
+  emit a staging or relative Company Entity URL. Do not add an entity footer or
+  explain that a link was added.
+
 Lead with the result, not the machinery. Say what the user got, what was
 verified, and what remains. Avoid raw ALFS paths, API payloads, job ids,
 internal function names, or scaffold details unless the user is debugging or
