@@ -79,6 +79,15 @@ const MUTATIONS = [
     remove: "  channel-session id. Topic-channel delivery is web-only. In a channel turn,\n",
     expectFailedCases: ["subscriptions.delivery-destination", "scenario.current-topic-channel-alert"],
   },
+  {
+    id: "company-performance-first-tier-route",
+    file: "SKILL.md",
+    remove: "read [company-performance.md](references/company-performance.md) before source selection",
+    expectFailedCases: [
+      "platform-data.company-performance-sources",
+      "scenario.company-performance-broad-analysis",
+    ],
+  },
 ];
 
 function parseArgs(argv) {

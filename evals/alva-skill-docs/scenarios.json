@@ -293,6 +293,85 @@
       }
     },
     {
+      "id": "scenario.company-performance-broad-analysis",
+      "group": "scenarios.company-performance",
+      "prompt": "分析一下 MU 最近的公司表现，重点说清楚市场现在在看什么、最近异动和催化剂。",
+      "description": "A broad named-company analysis checks the official direct-read company-performance sources before generic search, selects rather than blindly running them all, and still uses Data Skills for live financial facts.",
+      "expect": {
+        "route": "Financial Analysis / Ask Question",
+        "references": [
+          "company-performance.md",
+          "company-anomaly.md",
+          "request-routing.md",
+          "user-facing-prose.md"
+        ],
+        "behaviors": [
+          "Treat these as first-tier company-performance sources",
+          "For every broad named-company analysis, check the Direct-read lane before generic search",
+          "alva/what-investors-are-looking-for",
+          "alva/company-anomaly-read",
+          "alva/query-breaking-news-feed",
+          "Data Skills remain the source for live price, fundamentals, valuation",
+          "Do not execute every source by default",
+          "Continue with the remaining available Platform Data sources"
+        ],
+        "sections": [
+          {
+            "file": "SKILL.md",
+            "heading": "Request Routing",
+            "label": "company performance route",
+            "includes": [
+              "read [company-performance.md](references/company-performance.md) before source selection"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "scenario.company-performance-uncovered-move",
+      "group": "scenarios.company-performance",
+      "prompt": "三星电子 005930.KS 昨天为什么大涨？",
+      "description": "An uncovered or non-US move falls back from the published anomaly feed to custom aggregation and attribution without pretending that aggregation itself detected an anomaly.",
+      "expect": {
+        "route": "Financial Analysis / Ask Question",
+        "references": [
+          "company-performance.md",
+          "request-routing.md",
+          "data-skills.md"
+        ],
+        "behaviors": [
+          "off-list, non-US, user-defined, or otherwise uncovered move",
+          "alva/company-data-aggregate",
+          "alva/company-move-attribution",
+          "Attribution assumes an already-identified anomalous move",
+          "no web search inside attribution",
+          "does not silently become an Automation or Playbook",
+          "If either method is unavailable in the active profile"
+        ]
+      }
+    },
+    {
+      "id": "scenario.company-performance-investor-news",
+      "group": "scenarios.company-performance",
+      "prompt": "TSLA 现在投资者最关注什么？今天有没有可能影响它的突发事件？",
+      "description": "Investor-focus and breaking-event questions combine WILF with the macro breaking-news feed while preserving each source's freshness, coverage, and evidence limits.",
+      "expect": {
+        "route": "Financial Analysis / Ask Question",
+        "references": [
+          "company-performance.md",
+          "request-routing.md"
+        ],
+        "behaviors": [
+          "Weekly investor focus",
+          "current macro/cross-market event discovery",
+          "surface `gaps`",
+          "supports_event: true",
+          "not a company-by-company news feed",
+          "did not surface a matching event"
+        ]
+      }
+    },
+    {
       "id": "scenario.remix-existing-playbook",
       "group": "scenarios.playbook",
       "prompt": "<remix https://alva.ai/u/alva/playbooks/screener> make my own version",

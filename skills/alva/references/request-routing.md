@@ -23,12 +23,36 @@ Decision order:
 
 | Request type | Objective |
 | --- | --- |
-| Financial Analysis / Ask Question | Answer market, asset, portfolio, valuation, comparison, and "why" questions with fresh data/search/`alva run` evidence. Comparison baselines are figures too: fetch or qualify them. Every answer must read [user-facing-prose.md](user-facing-prose.md), then pass the ask evidence gate. |
+| Financial Analysis / Ask Question | Answer market, asset, portfolio, valuation, comparison, company-performance, and "why" questions with fresh data/search/`alva run` evidence. Named-company performance asks first read [company-performance.md](company-performance.md). Comparison baselines are figures too: fetch or qualify them. Every answer must read [user-facing-prose.md](user-facing-prose.md), then pass the ask evidence gate. |
 | Playbook Creation | Build, remix, edit, release, or update a hosted/shareable playbook. Read [playbook-creation.md](playbook-creation.md) for the subroute tree and gates. |
 | Strategy / Trading Analysis | Use Altra for backtests, signals, portfolio simulation, rebalancing, or trading analysis; deliver an answer, feed, signal, or playbook as requested. |
 | Automation / Push | Read [alva-knowledge.md](alva-knowledge.md) before design, build or modify a feed that emits actionable `signal/targets` or `notify/message`, then verify subscription and delivery path. |
 | Debug / Edit | Inspect existing code, logs, playbook source, feed output, or annotations, then change the generator rather than rendered values. |
 | Capability Verification | Verify Data Skills, Skillhub, runtime, trading, or search coverage before saying Alva lacks a capability. |
+
+## Official Company Performance Sources
+
+For a named-company performance ask, read
+[company-performance.md](company-performance.md) before generic Skillhub search
+or open-web discovery. It routes five known official methods across a
+Direct-read lane and a Build-on-demand lane:
+
+- `alva/what-investors-are-looking-for`
+- `alva/company-anomaly-read`
+- `alva/query-breaking-news-feed`
+- `alva/company-data-aggregate`
+- `alva/company-move-attribution`
+
+Select by intent and coverage; do not run all five mechanically. The direct
+sources provide investor focus, current anomaly intelligence, and breaking
+macro/cross-market discovery. Aggregation plus attribution is the fallback for
+custom, off-list, non-US, or otherwise uncovered moves. Data Skills remain the
+source for live price, fundamentals, valuation, and peer facts.
+
+The methods live in Skillhub, but using them as first-tier analysis sources does
+not turn the ask into the Skillhub Blueprint or Playbook Creation route. Fetch
+the selected official method's instructions fresh, perform the answer, and stop
+unless the user requests a durable artifact.
 
 ## Preferred Automation Setup Skills
 
@@ -114,6 +138,7 @@ Q&A.
 
 | Problem type | Trigger | Minimum gate |
 | --- | --- | --- |
+| Company performance | analyze a company, company performance, why did it move, investor focus, recent catalysts | read `company-performance.md`; resolve ticker and horizon; select official direct-read/build sources; state freshness, coverage/gaps, and fact/computation/model-analysis boundaries; add live Data Skills facts |
 | Thesis/fundamental | thesis, moat, quality, fundamental | thesis driver, key KPI, metric source, peer/baseline, missing KPI impact |
 | Earnings/catalyst | earnings, guide, catalyst, revision | event date, source, expected vs actual/consensus, forward catalyst, stale-data caveat |
 | Event-study/backtest | backtest, after/before, event window, forward returns, sample, bias-controlled | event definition, data source, sample count, date range, non-overlap rule, look-ahead control, benchmark, horizons, formula, friction/assumptions; missing sample count or event definition means incomplete and no strong trading conclusion |
