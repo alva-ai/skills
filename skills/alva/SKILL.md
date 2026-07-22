@@ -837,10 +837,10 @@ identified with high confidence, wrap its first clear mention in
 `[visible wording](https://alva.ai/company/{CANONICAL_TICKER})`.
 
 - Recognize explicit tickers such as `AAPL` or `$AAPL` and semantically clear
-  company names or aliases such as `Apple` or `苹果公司` as the same entity
-  when context refers to Apple Inc. Use semantic context, not token shape
-  alone: do not link `apple` when it means fruit, `Meta` as a general term, or
-  `AI` as a theme rather than a company.
+  company names, common names, or localized aliases. Treat `Apple` as `AAPL`
+  when context refers to Apple Inc. Use semantic context, not token shape alone:
+  do not link `apple` when it means fruit, `Meta` as a general term, or `AI` as
+  a theme rather than a company.
 - Preserve the visible wording and use the canonical uppercase ticker only in
   the URL. Prefer an entity already resolved by Alva data or clearly established
   in the conversation. If the mapping, share class, or Company Entity coverage

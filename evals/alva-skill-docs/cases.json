@@ -887,9 +887,9 @@
           "includes": [
             "including New Chat and Alva Agent Channel",
             "[visible wording](https://alva.ai/company/{CANONICAL_TICKER})",
-            "semantically clear company names or aliases",
+            "semantically clear company names",
+            "common names, or localized aliases",
             "Apple",
-            "苹果公司",
             "Use semantic context, not token shape alone",
             "mapping, share class, or Company Entity coverage",
             "Do not call a tool solely to add a link",
