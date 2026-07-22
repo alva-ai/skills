@@ -871,10 +871,10 @@
       ]
     },
     {
-      "id": "communication.company-entity-links",
+      "id": "communication.company-page-links",
       "group": "communication",
       "target": "skill",
-      "description": "User-facing replies link high-confidence company mentions to production Entity Pages without extra lookups or ambiguous entity matches.",
+      "description": "User-facing replies link high-confidence company mentions to production Alva company pages without extra lookups or ambiguous company matches.",
       "excludes": [
         "https://stg.alva.ai/company/",
         "https://stg.alva.xyz/company/"
@@ -882,22 +882,23 @@
       "section_includes": [
         {
           "file": "SKILL.md",
-          "heading": "Company Entity Links",
-          "label": "company entity link contract",
+          "heading": "Company Page Links",
+          "label": "company page link contract",
           "includes": [
             "In every user-facing Alva response",
-            "each covered stock company to its Company Entity Page",
+            "each covered stock company to its Alva company page",
             "[visible wording](https://alva.ai/company/{CANONICAL_TICKER})",
             "semantically clear company names",
             "common names, or localized aliases",
             "Apple",
             "Use semantic context, not token shape alone",
-            "mapping, share class, or Company Entity coverage",
-            "Do not call a tool solely to add a link",
+            "company/ticker mapping already resolved by Alva data",
+            "mapping, share class, or page coverage",
+            "do not call a tool just to add a link",
             "Link each company at most once per reply",
             "non-company assets",
-            "Never emit a staging or relative Company Entity URL",
-            "Do not add an entity footer"
+            "Never use a staging host or relative URL for a company page",
+            "Do not add a separate company-page footer"
           ]
         }
       ]
