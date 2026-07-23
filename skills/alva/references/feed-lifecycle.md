@@ -1,7 +1,7 @@
 # Feed Lifecycle
 
 Feeds are persistent data pipelines. Use them whenever data needs freshness,
-history, public reads, charts, playbook backing, push sidecars, or release.
+history, public reads, charts, playbook backing, alert outputs, or release.
 The feed is the object and identity; `alva automation` is the product-facing
 lifecycle CLI for that same feed, while an `alva deploy` cronjob is its
 subordinate data producer.
@@ -129,22 +129,25 @@ After publish, when public access is required, verify:
 3. Before building or releasing dependent HTML, at least one public `@last`
    path used by the HTML is non-empty.
 
-## Push Sidecars
+## Alert Outputs
 
-Push-capable feeds write one of these streams:
+New push-capable feeds wrap the TypeDoc of each push-worthy output with
+`alertOutput(typeDoc)`. The output source may be any valid, non-reserved
+`group/output`; its root `body` field is required and `title` is optional.
+Other declared fields remain available as ordinary ALFS data.
 
-| Output stream    | Use                                                                |
-| ---------------- | ------------------------------------------------------------------ |
-| `signal/targets` | Playbook signals, trading targets, actionable alerts.              |
-| `notify/message` | Feed results, AlvaAsk reports, heartbeat checks, proactive alerts. |
+A top-level script execution may return at most one alert record per declared
+source and at most 16 alert records in total, including when it calls multiple
+successful `Feed.run()` callbacks. A quiet run appends nothing to the alert
+output. `--push-notify` marks the cronjob publisher as capable of delivering
+those records; it does not create an alert binding or bypass notification
+preferences. Scheduled runs and `alva deploy trigger` use the same delivery
+semantics.
 
-Both dispatch `feed_alert_ready`. Do not use legacy names such as
-`playbook_data_ready` or `feed_run_complete` in new docs.
-
-`--push-notify` marks the cronjob publisher as capable of emitting alerts. It
-does not create an alert binding or bypass notification preferences. For
-`notify/message`, `<|SKIP_NOTIFICATION|>` advances fanout
-without sending a visible push.
+Existing `signal/targets` and `notify/message` producers remain compatible
+through legacy fanout. They are reserved sources and must not be wrapped in
+`alertOutput()`. Keep Altra-owned `signal/targets` unchanged. The
+`<|SKIP_NOTIFICATION|>` sentinel applies only to legacy `notify/message`.
 
 See [push-notifications.md](push-notifications.md) for alert destination and
 verification workflows.

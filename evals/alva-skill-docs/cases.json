@@ -239,6 +239,7 @@
         "alva playbooks trending",
         "annotation-driven edits",
         "feed_alert_ready",
+        "alertOutput(typeDoc)",
         "<|SKIP_NOTIFICATION|>",
         "subscriptions"
       ]
@@ -635,7 +636,7 @@
             "alva alert enable --automation",
             "alva alert enable --automation-ids",
             "There is no playbook alert target",
-            "read `@last/1` of the sidecar",
+            "read `@last/1` of the declared output",
             "do not claim push is set up"
           ]
         },
@@ -997,7 +998,7 @@
       "target": "corpus",
       "description": "Latest mainline Alva skill updates remain integrated after rebasing the refactor.",
       "includes": [
-        "version: v1.19.0",
+        "version: v1.19.1",
         "Capability Help",
         "Reply 1, 2, or 3 to start",
         "feedback",

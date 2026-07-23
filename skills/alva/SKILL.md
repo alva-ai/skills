@@ -75,7 +75,7 @@ surface, a monitoring feed, a strategy, a thesis tracker, or a repeatable
 research process. It is also useful for single-shot questions, but the agent
 should not overbuild. A user asking "what is BTC doing now?" needs a fresh fetch
 and a concise answer. A user asking "track BTC dominance and alert me on
-breakouts" needs a feed, cadence, push sidecar, and verification.
+breakouts" needs a feed, cadence, declared alert output, and verification.
 
 Think in artifacts:
 
@@ -574,20 +574,22 @@ authentication, `alva functions` creator registration and allowance tools,
 #### Action Layer: Alerts
 
 Alerts are personal notification opt-ins for automations (feeds). Playbook
-follows are independent and never enable or disable alerts. A feed may emit
-`signal/targets` or `notify/message`; both dispatch `feed_alert_ready`.
-`--push-notify` only marks the publisher capable of alerts. It does not
-subscribe users or bypass preferences.
+follows are independent and never enable or disable alerts. New feeds declare
+push-worthy outputs with `alertOutput(typeDoc)` and may use any valid,
+non-reserved `group/output` source. `--push-notify` lets successful scheduled
+and Run Now executions deliver those outputs; it does not subscribe users or
+bypass preferences.
 
-Open [push-notifications.md](references/push-notifications.md) for sidecar creation,
-automation publish, alert setup, and verification. Quiet runs use `<|SKIP_NOTIFICATION|>`.
+Open [push-notifications.md](references/push-notifications.md) for alert-output
+authoring, automation publish, alert setup, and verification. A quiet V2 run
+does not append an alert record.
 
 After releasing or keeping a playbook as draft, scan whether any backing feed is
 push-worthy. Recommend specific feeds, not generic "notifications". A push setup
-is not complete until the feed sidecar exists, `alva automation publish` ran
-after that sidecar was added, the publisher has `--push-notify`, and the
-intended alert binding is enabled. That proves configuration, not that a
-message has already been delivered.
+is not complete until the Feed declares an alert output, the automation has an
+active published binding, the publisher has `--push-notify`, and the intended
+alert binding is enabled. That proves configuration, not that a message has
+already been delivered.
 
 #### Playbook Subroute: Remix
 
@@ -786,9 +788,9 @@ Use this index to open only the file needed for the current task.
 | [request-routing.md](references/request-routing.md)                                   | Route choice, post-Ask next steps, preferred Automation setup skills, Skillhub, Guided Planning, capability verification, completion gate.    |
 | [content-legitimacy.md](references/content-legitimacy.md)                             | Data provenance, prohibited sources, chat-as-artifact, feed isolation, conventions.                                                           |
 | [data-skills.md](references/data-skills.md)                                           | Data Skills discovery, endpoint calls, Arrays auth, search/data routing.                                                                      |
-| [feed-lifecycle.md](references/feed-lifecycle.md)                                     | Feed build and automation publish lifecycle, modeling summary, push sidecars, `before-automation-publish`.                                    |
+| [feed-lifecycle.md](references/feed-lifecycle.md)                                     | Feed build and automation publish lifecycle, modeling summary, alert outputs, `before-automation-publish`.                                    |
 | [playbook-creation.md](references/playbook-creation.md)                               | HTML build, browser-safe reads, README, draft, release, screenshot, tier flow.                                                                |
-| [push-notifications.md](references/push-notifications.md)                             | Push-worthy feeds, sidecars, alerts, delivery verification.                                                                                   |
+| [push-notifications.md](references/push-notifications.md)                             | Push-worthy feeds, declared alert outputs, alert bindings, delivery verification.                                                             |
 | [operational-pitfalls.md](references/operational-pitfalls.md)                         | Runtime, ALFS, chart, watermark, and resource pitfalls.                                                                                       |
 | [jagent-runtime.md](references/jagent-runtime.md)                                     | V8 runtime, modules, async model, constraints, built-ins.                                                                                     |
 | [feed-sdk.md](references/feed-sdk.md)                                                 | Feed SDK API, schemas, time series, grouped records, upstreams, examples.                                                                     |
