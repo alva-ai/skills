@@ -75,8 +75,8 @@ Capture these session variables:
 
 - `username`: public URLs and ALFS paths.
 - `subscription_tier`: `pro` or `free`; controls private/paid playbook flow.
-- `active_channel`: `telegram`, `discord`, `slack`, or null; web notifications
-  always work, external delivery depends on this field.
+- `active_im_provider`: `telegram`, `discord`, `slack`, or empty; web
+  notifications always work, external delivery depends on this field.
 - `telegram_username` / `discord_username` / `slack_username`: external IM
   display fields.
 

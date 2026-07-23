@@ -662,7 +662,8 @@
       "excludes": [
         "External IM group",
         "alva alert group",
-        "group-subscriptions"
+        "group-subscriptions",
+        "active_channel"
       ],
       "section_includes": [
         {
@@ -678,6 +679,8 @@
             "delivery is web-only",
             "current Alva topic channel (channel id <id>)",
             "`channel_id=0`",
+            "`active_im_provider`",
+            "active IM provider",
             "moves the personal alert"
           ]
         },
@@ -1000,7 +1003,7 @@
       "target": "corpus",
       "description": "Latest mainline Alva skill updates remain integrated after rebasing the refactor.",
       "includes": [
-        "version: v1.19.1",
+        "version: v1.19.3",
         "Capability Help",
         "Reply 1, 2, or 3 to start",
         "feedback",
