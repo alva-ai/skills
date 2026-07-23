@@ -302,10 +302,8 @@ Source routing:
 - Direct latest/realtime price for covered US equities and crypto: intraday
   klines, not daily-level bars or closes.
 - Non-US equities (dotted-suffix tickers like `0700.HK`, `000660.KS`): try Data
-  Skills non-US kline first — it now serves intraday intervals (`1min`–`1m`)
-  as well as daily, though intraday covers a narrower subset than daily. Fall
-  back to `searchPerplexityFinance` for uncovered tickers, or when intraday
-  comes back empty for a covered one.
+  Skills non-US kline first (intraday `1min`–`1m` plus daily; intraday covers a
+  narrower subset) — `searchPerplexityFinance` if uncovered or intraday empty.
 
 #### Data Access: Platform Data
 
