@@ -60,9 +60,11 @@ Direct latest-price routing:
   structured intraday kline data. Do not use daily-level bars or daily closes as
   current prices.
 - Non-US equities (dotted-suffix tickers like `0700.HK`, `000660.KS`): try Data
-  Skills first for daily (`1d`) kline and company detail. Coverage is a curated,
-  daily-only subset, so fall back to `searchPerplexityFinance` when the ticker
-  isn't covered or you need an intraday / live price. See [search.md](search.md).
+  Skills first for kline and company detail. The non-US kline now serves
+  intraday intervals (`1min` `5min` `15min` `30min` `1h` `4h`) plus `1d`/`1w`/`1m`;
+  coverage is a curated subset, and intraday covers a narrower subset than
+  daily. Fall back to `searchPerplexityFinance` when the ticker isn't covered,
+  or when intraday returns empty for it. See [search.md](search.md).
 - Forex, major index levels, and commodity futures prices (gold, oil, etc.)
   are covered via the macro Data Skills (historical and real-time) — route
   there. For asset classes genuinely outside the catalog, state the limitation
