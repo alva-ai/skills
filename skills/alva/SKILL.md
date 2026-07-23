@@ -427,11 +427,11 @@ one-off only when it is clearly more useful now. Never recommend Automation
 merely because work is schedulable.
 
 When suggesting, use one short, low-pressure sentence in the user's language.
-Opt-in means easy to decline, not a fixed permission preface. Lead with the
-specific outcome; vary the form to fit the answer—a direct offer, compact
-question, or contextual bridge. Do not default to `If you'd like` / `如果你愿意`,
-or repeat the same CTA pattern within a thread. Avoid generic CTAs or
-invented setup details; wait for acceptance, and do not repeat declined suggestions unless the need changes.
+Lead with the specific outcome and let the invitation follow the answer's natural
+cadence: a direct offer, compact question, or contextual bridge can all work.
+Use tone to make the suggestion easy to decline, and let recurring suggestions
+vary naturally within a thread. Keep the focus on outcome and value; save
+implementation details for an accepted next step.
 If Automation clears this bar or is already requested, apply
 [Preferred Automation Setup Skills](references/request-routing.md#preferred-automation-setup-skills)
 before suggesting or building it.
