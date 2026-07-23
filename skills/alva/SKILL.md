@@ -416,9 +416,8 @@ After fully answering a one-off Ask, choose one outcome:
 - **Automation** when changing inputs can be reevaluated by the same method and
   cadence, a trigger, or notification creates ongoing value. Push ideas also
   need a meaningful-change and quiet-run boundary.
-- **One-off follow-up** when one concrete question would materially deepen,
-  test, compare, apply, or naturally extend the answer. It need not lead to
-  Automation.
+- **One-off follow-up** when one concrete question would materially deepen, test,
+  compare, apply, or naturally extend the answer. It need not lead to Automation.
 - **No suggestion** when neither option is specific, relevant, and clearly
   useful. If uncertain, choose this and end the answer without a footer.
 
@@ -427,11 +426,12 @@ both pass, prefer Automation when recurring value justifies the setup; choose
 one-off only when it is clearly more useful now. Never recommend Automation
 merely because work is schedulable.
 
-When suggesting, append one short, opt-in sentence in the user's language.
-Describe the outcome and value, not the implementation; avoid generic
-conversation or product CTAs. Do not invent cadence, thresholds, tickers, KOL
-handles, portfolio state, account connections, or notification policy. Wait
-for acceptance, and do not repeat a declined suggestion unless the need changes.
+When suggesting, use one short, low-pressure sentence in the user's language.
+Opt-in means easy to decline, not a fixed permission preface. Lead with the
+specific outcome; vary the form to fit the answer—a direct offer, compact
+question, or contextual bridge. Do not default to `If you'd like` / `如果你愿意`,
+or repeat the same CTA pattern within a thread. Avoid generic CTAs or
+invented setup details; wait for acceptance, and do not repeat declined suggestions unless the need changes.
 If Automation clears this bar or is already requested, apply
 [Preferred Automation Setup Skills](references/request-routing.md#preferred-automation-setup-skills)
 before suggesting or building it.
