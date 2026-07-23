@@ -940,10 +940,11 @@
       "id": "communication.company-page-links",
       "group": "communication",
       "target": "skill",
-      "description": "User-facing replies link high-confidence company mentions to production Alva company pages without extra lookups or ambiguous company matches.",
+      "description": "User-facing replies link high-confidence U.S.-listed company mentions to production Alva company pages without extra lookups or ambiguous company matches.",
       "excludes": [
         "https://stg.alva.ai/company/",
-        "https://stg.alva.xyz/company/"
+        "https://stg.alva.xyz/company/",
+        "https://alva.ai/company/3986.HK"
       ],
       "section_includes": [
         {
@@ -952,14 +953,17 @@
           "label": "company page link contract",
           "includes": [
             "In every user-facing Alva response",
-            "each covered stock company to its Alva company page",
+            "each covered U.S.-listed company to its Alva company page",
             "[visible wording](https://alva.ai/company/{CANONICAL_TICKER})",
             "semantically clear company names",
             "common names, or localized aliases",
             "Apple",
             "Use semantic context, not token shape alone",
-            "company/ticker mapping already resolved by Alva data",
-            "mapping, share class, or page coverage",
+            "Only link U.S.-listed companies",
+            "non-U.S. listings such as `3986.HK`",
+            "never strip or rewrite an exchange suffix",
+            "company/ticker mapping and U.S. listing status already resolved by Alva data",
+            "mapping, listing market, share class, or page coverage",
             "do not call a tool just to add a link",
             "Link each company at most once per reply",
             "non-company assets",

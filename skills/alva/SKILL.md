@@ -834,7 +834,7 @@ Runtime artifacts:
 ### Company Page Links
 
 In every user-facing Alva response, link the first high-confidence mention of
-each covered stock company to its Alva company page:
+each covered U.S.-listed company to its Alva company page:
 `[visible wording](https://alva.ai/company/{CANONICAL_TICKER})`.
 
 - Recognize explicit tickers such as `AAPL` or `$AAPL` and semantically clear
@@ -842,10 +842,14 @@ each covered stock company to its Alva company page:
   when context refers to Apple Inc. Use semantic context, not token shape alone:
   do not link `apple` when it means fruit, `Meta` as a general term, or `AI` as
   a theme rather than a company.
+- Only link U.S.-listed companies. Leave non-U.S. listings such as `3986.HK`
+  plain even when the company is clear; never strip or rewrite an exchange
+  suffix to force a company-page match.
 - Preserve the visible wording and use the canonical uppercase ticker only in
-  the URL. Prefer a company/ticker mapping already resolved by Alva data or
-  clearly established in the conversation. If the mapping, share class, or page
-  coverage is uncertain, leave it plain; do not call a tool just to add a link.
+  the URL. Prefer a company/ticker mapping and U.S. listing status already
+  resolved by Alva data or clearly established in the conversation. If the
+  mapping, listing market, share class, or page coverage is uncertain, leave it
+  plain; do not call a tool just to add a link.
 - Link each company at most once per reply. Do not link non-company assets such
   as ETFs, indices, crypto, FX, or commodities; code; raw URLs; existing links;
   quoted passages; or verbatim tool output.
