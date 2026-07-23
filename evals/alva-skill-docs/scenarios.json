@@ -148,14 +148,16 @@
           "feed-lifecycle.md"
         ],
         "behaviors": [
-          "Build or modify a feed that emits actionable `signal/targets` or `notify/message`",
+          "Build or modify a feed that declares actionable outputs with `alertOutput(typeDoc)`",
           "bounded history source and lookback window",
           "Notification deduplication is semantic",
           "If no material delta exists",
           "A push is set up only after all of these succeed",
           "alva deploy update --id <ID> --push-notify",
           "alva alert enable --automation",
-          "read `@last/1` of the sidecar",
+          "read `@last/1` of the declared output",
+          "A quiet V2 run does not append an alert record",
+          "`alva deploy trigger` is not a dry run",
           "do not claim push is set up"
         ],
         "sections": [
@@ -176,10 +178,35 @@
             ]
           },
           {
+            "file": "SKILL.md",
+            "heading": "Push Monitor",
+            "includes": [
+              "declared `alertOutput(typeDoc)`",
+              "quiet branch that does not append",
+              "`signal/targets` or `notify/message` only when maintaining an existing",
+              "recognized legacy producer"
+            ]
+          },
+          {
+            "file": "SKILL.md",
+            "heading": "Action Layer: Alerts",
+            "includes": [
+              "New feeds declare push-worthy outputs with `alertOutput(typeDoc)`",
+              "legacy `signal/targets` or `notify/message` producer"
+            ]
+          },
+          {
             "file": "references/request-routing.md",
             "heading": "Routes",
             "includes": [
               "Read [alva-knowledge.md](alva-knowledge.md) before design"
+            ]
+          },
+          {
+            "file": "references/push-notifications.md",
+            "heading": "Configure And Verify",
+            "includes": [
+              "Declare the intended output with `alertOutput(typeDoc)`"
             ]
           }
         ],
@@ -218,7 +245,7 @@
           "Do not trigger the cronjob or wait for its next scheduled run solely to verify setup",
           "A successful enable proves that alert delivery is configured",
           "it does not prove that a message has already been delivered",
-          "A sidecar record alone is also not delivery proof",
+          "An ALFS record alone is also not delivery proof",
           "report it as an Alva web topic channel with its id"
         ],
         "forbidden_behaviors": [

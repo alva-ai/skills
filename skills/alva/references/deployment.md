@@ -45,18 +45,21 @@ alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js
 | --cron        | string | yes      | Standard cron expression                                                      |
 | --name        | string | yes      | Job name (1–63 lowercase alphanumeric or hyphens, no leading/trailing hyphen) |
 | --args        | JSON   | no       | JSON passed to `require("env").args` on each execution                        |
-| --push-notify | flag   | no       | Let this cronjob emit feed alert events after successful feed runs            |
+| --push-notify | flag   | no       | Let successful Feed runs deliver declared alert outputs to subscribers         |
 
-When `--push-notify` is set, every successful cronjob execution checks the
-feed's push sidecars. `signal/targets` and `notify/message` both dispatch the
-canonical `feed_alert_ready` event with different feed-alert sources. The push
-body is read from the _published_ automation: a cronjob with `--push-notify` but
-no `alva automation publish` dispatches an empty body. Delivery also requires an
-explicit alert binding to the automation's feed.
-Following a playbook that references the feed does not enable alerts;
-`--push-notify` does not subscribe the owner or any user. For
-`notify/message`, `<|SKIP_NOTIFICATION|>` in `body`/`text` skips the user-visible
-push while advancing fanout.
+When `--push-notify` is set, every successful scheduled or Run Now execution
+may deliver records written to outputs declared with `alertOutput(typeDoc)`.
+The Feed still needs an active published automation binding, and delivery
+requires an explicit alert binding to that Feed. Following a playbook that
+references the Feed does not enable alerts; `--push-notify` does not subscribe
+the owner or any user.
+
+`alva deploy trigger` is not a dry run. If publisher push and subscriber
+bindings are enabled, triggering the cronjob can send real notifications. Use
+`alva run` to test the script without backend alert fanout.
+
+Existing `signal/targets` and `notify/message` feeds remain compatible through
+legacy fanout. New general-purpose feeds should use `alertOutput()` instead.
 
 The CLI validates that the entry path exists on the filesystem before creating
 the cronjob.
