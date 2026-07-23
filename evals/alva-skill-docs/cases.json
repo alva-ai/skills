@@ -601,6 +601,8 @@
             "HTML fetches quantitative data from feeds, not inline literals",
             "Latest data from each referenced feed is fresh",
             "README exists, is current, and is passed via absolute `--readme-url`",
+            "New feeds declare push-worthy outputs with",
+            "existing Altra `signal/targets` or legacy",
             "alva lint playbook ./index.html"
           ]
         }

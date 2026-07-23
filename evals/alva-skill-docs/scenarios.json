@@ -178,6 +178,24 @@
             ]
           },
           {
+            "file": "SKILL.md",
+            "heading": "Push Monitor",
+            "includes": [
+              "declared `alertOutput(typeDoc)`",
+              "quiet branch that does not append",
+              "`signal/targets` or `notify/message` only when maintaining an existing",
+              "recognized legacy producer"
+            ]
+          },
+          {
+            "file": "SKILL.md",
+            "heading": "Action Layer: Alerts",
+            "includes": [
+              "New feeds declare push-worthy outputs with `alertOutput(typeDoc)`",
+              "legacy `signal/targets` or `notify/message` producer"
+            ]
+          },
+          {
             "file": "references/request-routing.md",
             "heading": "Routes",
             "includes": [

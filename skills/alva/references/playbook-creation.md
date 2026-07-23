@@ -194,8 +194,9 @@ Before `alva release playbook`, verify:
 8. Target user namespace is correct.
 9. README exists, is current, and is passed via absolute `--readme-url`.
 10. Push-only feeds with `push_notify: true` have an active published
-    automation binding and declare their push-worthy outputs with
-    `alertOutput(typeDoc)`.
+    automation binding. New feeds declare push-worthy outputs with
+    `alertOutput(typeDoc)`; existing Altra `signal/targets` or legacy
+    `notify/message` producers may retain those reserved sources.
 11. `alva lint playbook ./index.html` passes, or an intentional `--bypass-lint`
     is documented.
 12. Header duplication has been reviewed. If the iframe repeats the outer
