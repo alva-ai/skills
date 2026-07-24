@@ -24,7 +24,8 @@ create a second copy. Choose the destination before mutating it:
 
 - **Default personal destination:** omit `--channel-id`. The service stores
   `channel_id=0`; web delivery is available immediately, and external DM
-  delivery uses `active_channel` plus its matching username from `alva whoami`.
+  delivery uses `active_im_provider` plus its matching username from
+  `alva whoami`.
 - **Alva topic channel:** resolve the feed id and run
   `alva alert enable --automation-ids <id,id> --channel-id <channel_id>`. This
   binds the alert to that in-product web channel. Its channel id is not a
@@ -41,7 +42,7 @@ Do not infer Telegram, Discord, Slack, or another transport from the generic
 explicitly identifies it; otherwise describe a topic destination as the
 `current Alva topic channel (channel id <id>)`.
 
-If no active IM channel exists for the default personal destination, say web
+If no active IM provider exists for the default personal destination, say web
 notifications will work immediately and the user can connect Telegram,
 Discord, or Slack at <https://alva.ai/settings>.
 

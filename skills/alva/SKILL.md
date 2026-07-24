@@ -10,7 +10,7 @@ description: >-
   backtesting. Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v1.19.2
+  version: v1.19.3
 ---
 
 # Alva
@@ -120,7 +120,7 @@ make it this one.
    flags, response fields, and examples. Read
    [preflight.md](references/preflight.md) at session start.
 2. **Fresh identity and memory.** Run `alva whoami`, capture `username`,
-   `subscription_tier`, delivery channel fields, and Arrays JWT status. Load
+   `subscription_tier`, IM provider fields, and Arrays JWT status. Load
    `~/memory/MEMORY.md` if not already read. Memory is a *claim*, not truth.
 3. **Pipeline, not oracle.** Financial values must come from Data Skills,
    published Alva feeds, or validated BYOD sources. WebSearch, LLM output, agent
@@ -744,7 +744,7 @@ text does not fully cover.
 
 | Command / surface    | Purpose and extra reference                                                                                                                                                           |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `whoami` / `user`    | Identity, subscription tier, channels, username. See [preflight.md](references/preflight.md).                                                                                         |
+| `whoami` / `user`    | Identity, subscription tier, active IM provider, username. See [preflight.md](references/preflight.md).                                                                               |
 | `auth` / `configure` | Sign in, API key, profile configuration.                                                                                                                                              |
 | `arrays`             | Provision / refresh `ARRAYS_JWT`. See [preflight.md](references/preflight.md).                                                                                                        |
 | `data-skills`        | Structured Arrays endpoint discovery. See [data-skills.md](references/data-skills.md).                                                                                                |
