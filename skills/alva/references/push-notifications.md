@@ -13,8 +13,7 @@ Skip static fundamentals, historical snapshots, and low-frequency reference
 data.
 
 For heartbeat/watchlist/monitor feeds, recommend quiet behavior: notify only on
-material changes. In a new V2 feed, return without appending to the declared
-alert output when there is nothing worth sending.
+material changes and emit `<|SKIP_NOTIFICATION|>` otherwise.
 
 ## Choose The Delivery Destination
 
@@ -49,15 +48,14 @@ Discord, or Slack at <https://alva.ai/settings>.
 
 A push is set up only after all of these succeed:
 
-1. Declare the intended output with `alertOutput(typeDoc)`. The TypeDoc must
-   have a root `body` string field and may have a root `title` string field;
-   other fields remain ordinary ALFS data. Use a descriptive, non-reserved
-   source such as `market/brief` or `monitor/anomaly`.
+1. Add the intended push sidecar:
+   - `signal/targets` for playbook signals and trading targets.
+   - `notify/message` for feed completion, AlvaAsk reports, heartbeat checks,
+     and proactive alerts.
 2. Run the feed through [feed-lifecycle.md](feed-lifecycle.md), including
    `before-automation-publish`.
-3. Exercise a material branch with `alva run`, read `@last/1` of the declared
-   output, and confirm it contains a non-empty `body`. Exercise a quiet branch
-   and confirm it does not append a new record.
+3. Read `@last/1` of the sidecar written by the lifecycle test and confirm the
+   message is non-empty or contains `<|SKIP_NOTIFICATION|>` for a quiet run.
 4. Enable publisher push on the cronjob:
    `alva deploy update --id <ID> --push-notify`.
 5. Enable the FEED alert for the intended destination using
@@ -69,18 +67,14 @@ A push is set up only after all of these succeed:
    name-addressed default-personal command.
 
 Do not trigger the cronjob or wait for its next scheduled run solely to verify
-setup. `alva deploy trigger` is not a dry run: after publisher push and an alert
-binding are enabled, Run Now can notify real subscribers. Use `alva run` for
-non-delivering script checks before enablement. A successful enable proves that
-alert delivery is configured for the selected destination; it does not prove
-that a message has already been delivered. An ALFS record alone is also not
-delivery proof. Claim real delivery only when an existing
-`alva alert history` row for the intended destination records the run as
-`sent`.
+setup. A successful enable proves that alert delivery is configured for the
+selected destination; it does not prove that a message has already been
+delivered. A sidecar record alone is also not delivery proof. Claim real
+delivery only when an existing `alva alert history` row for the intended
+destination records the run as `sent`.
 
-If the automation is unpublished, the feed has no declared alert output, or
-the material test record has an empty body, do not claim push is set up.
-Diagnose and fix first.
+If the automation is unpublished, the feed has no sidecar record, or the record
+has an empty body, do not claim push is set up. Diagnose and fix first.
 
 Confirm to the user with specifics: which automation alerts are enabled, the
 intended destination, what the next push will say, and when it will fire. A
@@ -94,21 +88,6 @@ changes alerts. If the user explicitly asks to enable every current automation
 behind a playbook, resolve the feed ids from that playbook's latest release and
 submit those ids with `alva alert enable --automation-ids <id,id>`. Treat this
 as a snapshot: feeds added by a later release are not subscribed automatically.
-
-## Legacy Compatibility
-
-Existing `signal/targets` and `notify/message` producers continue to dispatch
-through the legacy fanout path. Keep existing Altra/trading producers intact:
-Altra owns `signal/targets`. Do not wrap either reserved source in
-`alertOutput()`, and do not use these paths as templates for a new general Feed.
-V2 and legacy deliveries both enter the canonical `feed_alert_ready`
-notification domain.
-
-`<|SKIP_NOTIFICATION|>` remains a legacy `notify/message` sentinel only. New
-V2 feeds express a quiet run by not appending to an alert output. Changing,
-adding, or removing an `alertOutput()` declaration in an already active Feed
-does not require republishing; the next successful scheduled or Run Now
-execution carries the current declarations and writes.
 
 ## Inventory And Unsubscribe
 

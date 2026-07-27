@@ -75,7 +75,7 @@ surface, a monitoring feed, a strategy, a thesis tracker, or a repeatable
 research process. It is also useful for single-shot questions, but the agent
 should not overbuild. A user asking "what is BTC doing now?" needs a fresh fetch
 and a concise answer. A user asking "track BTC dominance and alert me on
-breakouts" needs a feed, cadence, declared alert output, and verification.
+breakouts" needs a feed, cadence, push sidecar, and verification.
 
 Think in artifacts:
 
@@ -206,7 +206,7 @@ that section as mandatory, not optional debugging material.
 | dashboard, screener app, thesis tracker, hosted report, shareable surface                                                               | Playbook Creation                   | Build live feeds first, then read [playbook-creation.md](references/playbook-creation.md).                                                                                               |
 | `/use-skill:<username>/<name>`, user-referenced skill/method, or template-like research method                                          | Skillhub Blueprint                  | Fetch blueprint fresh; if it becomes a playbook, route through [playbook-creation.md](references/playbook-creation.md) and set `--skill-id`.                                             |
 | backtest, strategy, signal, rebalance, portfolio simulation                                                                             | Strategy / Trading Analysis         | Use Altra; package as answer, feed, or playbook only as the user goal requires.                                                                                                          |
-| recurring digest, threshold tracker, alert, stream watch                                                                                | Automation / Push                   | Read [alva-knowledge.md](references/alva-knowledge.md), then build a push-capable feed and verify the alert binding plus its declared alert output. Preserve a recognized legacy producer only when maintaining an existing feed. |
+| recurring digest, threshold tracker, alert, stream watch                                                                                | Automation / Push                   | Read [alva-knowledge.md](references/alva-knowledge.md), then build a push-capable feed and verify the alert binding plus sidecar output.                                                  |
 | `<remix ...>` or "remix this playbook"                                                                                                  | Remix                               | Read source files; preserve lineage and source UDFs.                                                                                                                                     |
 | `<annotation ...>` or "change this element"                                                                                             | Edit / Debug                        | Edit the generator behind the element, not rendered feed values.                                                                                                                         |
 | "does Alva have X?"                                                                                                                     | Capability Verification             | Run `alva data-skills list` and search for `<topic>` before saying no.                                                                                                                   |
@@ -574,21 +574,20 @@ authentication, `alva functions` creator registration and allowance tools,
 #### Action Layer: Alerts
 
 Alerts are personal notification opt-ins for automations (feeds). Playbook
-follows are independent and never enable or disable alerts. New feeds declare
-push-worthy outputs with `alertOutput(typeDoc)` and may use any valid,
-non-reserved `group/output` source. `--push-notify` lets successful scheduled
-and Run Now executions deliver those outputs; it does not subscribe users or
-bypass preferences.
+follows are independent and never enable or disable alerts. A feed may emit
+`signal/targets` or `notify/message`; both dispatch `feed_alert_ready`.
+`--push-notify` only marks the publisher capable of alerts. It does not
+subscribe users or bypass preferences.
 
-Open [push-notifications.md](references/push-notifications.md) for alert-output
-authoring, automation publish, alert setup, and verification. A quiet V2 run
-does not append an alert record.
+Open [push-notifications.md](references/push-notifications.md) for sidecar creation,
+automation publish, alert setup, and verification. Quiet runs use `<|SKIP_NOTIFICATION|>`.
 
 After releasing or keeping a playbook as draft, scan whether any backing feed is
-push-worthy. A push setup requires a declared alert output or a recognized
-legacy `signal/targets` or `notify/message` producer, plus an active published
-automation binding, publisher `--push-notify`, and the intended alert binding.
-That proves configuration, not that a message has already been delivered.
+push-worthy. Recommend specific feeds, not generic "notifications". A push setup
+is not complete until the feed sidecar exists, `alva automation publish` ran
+after that sidecar was added, the publisher has `--push-notify`, and the
+intended alert binding is enabled. That proves configuration, not that a
+message has already been delivered.
 
 #### Playbook Subroute: Remix
 
@@ -722,11 +721,11 @@ generator behind the selected element rather than the rendered DOM.
 
 ### Push Monitor
 
-For a new recurring alert, design the declared `alertOutput(typeDoc)`, material
-branch, quiet branch that does not append, cadence, and subscriber first. Keep
-`signal/targets` or `notify/message` only when maintaining an existing
-recognized legacy producer. Verify an active automation binding, publisher `--push-notify`,
-and the intended alert binding. Do not trigger or wait solely to verify setup.
+For a recurring alert, design the feed output first: signal target or message,
+quiet-run sentinel, cadence, and subscriber. Publish the automation after adding
+the sidecar, then enable the intended alert. Do not trigger or wait for a run
+solely to verify setup. A cronjob with `--push-notify` and no alert binding is
+not a completed push setup.
 
 ### Chat-as-Artifact (`answer_only` / query mode)
 
@@ -787,9 +786,9 @@ Use this index to open only the file needed for the current task.
 | [request-routing.md](references/request-routing.md)                                   | Route choice, post-Ask next steps, preferred Automation setup skills, Skillhub, Guided Planning, capability verification, completion gate.    |
 | [content-legitimacy.md](references/content-legitimacy.md)                             | Data provenance, prohibited sources, chat-as-artifact, feed isolation, conventions.                                                           |
 | [data-skills.md](references/data-skills.md)                                           | Data Skills discovery, endpoint calls, Arrays auth, search/data routing.                                                                      |
-| [feed-lifecycle.md](references/feed-lifecycle.md)                                     | Feed build and automation publish lifecycle, modeling summary, alert outputs, `before-automation-publish`.                                    |
+| [feed-lifecycle.md](references/feed-lifecycle.md)                                     | Feed build and automation publish lifecycle, modeling summary, push sidecars, `before-automation-publish`.                                    |
 | [playbook-creation.md](references/playbook-creation.md)                               | HTML build, browser-safe reads, README, draft, release, screenshot, tier flow.                                                                |
-| [push-notifications.md](references/push-notifications.md)                             | Push-worthy feeds, declared alert outputs, alert bindings, delivery verification.                                                             |
+| [push-notifications.md](references/push-notifications.md)                             | Push-worthy feeds, sidecars, alerts, delivery verification.                                                                                   |
 | [operational-pitfalls.md](references/operational-pitfalls.md)                         | Runtime, ALFS, chart, watermark, and resource pitfalls.                                                                                       |
 | [jagent-runtime.md](references/jagent-runtime.md)                                     | V8 runtime, modules, async model, constraints, built-ins.                                                                                     |
 | [feed-sdk.md](references/feed-sdk.md)                                                 | Feed SDK API, schemas, time series, grouped records, upstreams, examples.                                                                     |
@@ -901,9 +900,8 @@ Before finishing an Alva task, ask:
 - Did design work read [design.md](references/design.md) and lint where needed?
 - Did Skillhub work fetch the blueprint fresh and set `--skill-id` if used?
 - Did backtesting or signal work use Altra?
-- Did push work verify publisher `--push-notify`, an active automation binding,
-  the declared alert output (or recognized legacy producer), and the intended
-  alert target without claiming an unobserved delivery?
+- Did push work verify the publisher sidecar plus the intended alert target
+  without claiming an unobserved delivery?
 - If Alva-owned behavior blocked the task, did I offer the confirmed feedback
   flow after reading [api/feedback.md](references/api/feedback.md)?
 - Did the final response describe the delivered result without leaking

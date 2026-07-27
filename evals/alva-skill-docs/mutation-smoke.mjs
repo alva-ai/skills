@@ -80,12 +80,6 @@ const MUTATIONS = [
     expectFailedCases: ["subscriptions.delivery-destination", "scenario.current-topic-channel-alert"],
   },
   {
-    id: "feed-alert-output-authoring",
-    file: "references/push-notifications.md",
-    remove: "1. Declare the intended output with `alertOutput(typeDoc)`. The TypeDoc must\n",
-    expectFailedCases: ["scenario.alert-push-monitor"],
-  },
-  {
     id: "ticker-read-first-tier-route",
     file: "SKILL.md",
     remove: "read [ticker-read.md](references/ticker-read.md) before source selection",

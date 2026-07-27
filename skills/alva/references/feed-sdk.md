@@ -162,12 +162,15 @@ await feed.run(async (ctx) => {
 
 Read `@last/N` (where N >= batch size) to get the most recent batch.
 
-### Pattern D: Declared Alert Output
+### Pattern D: Signal Feed Push Notification
 
-New feeds opt an ordinary output into delivery by wrapping its TypeDoc with
-`alertOutput()`. The output keeps its normal ALFS representation; the wrapper
-only declares that a successful Feed execution may return the record for
-subscriber delivery.
+For feeds that produce actionable signals worth pushing to subscribed alert
+destinations. Write signal records to the **`signal`** group
+with a **`targets`** output -- the resulting path
+`~/feeds/{name}/v{major}/data/signal/targets` is one source the platform reads
+when dispatching the canonical `feed_alert_ready` notification event.
+
+The target format follows the same structure used by Altra trading strategies:
 
 ```javascript
 const {
@@ -175,124 +178,173 @@ const {
   feedPath,
   makeDoc,
   str,
-  alertOutput,
+  num,
+  obj,
+  arr,
+  fld,
 } = require("@alva/feed");
 
-const feed = new Feed({ path: feedPath("market-breakout") });
+const feed = new Feed({ path: feedPath("my-signal") });
 
-feed.def("market", {
-  brief: alertOutput(
-    makeDoc("Market Brief", "Material breakout alert", [
-      str("title"),
-      str("body"),
-      str("ticker"),
-    ]),
+feed.def("signal", {
+  targets: makeDoc(
+    "Signal Targets",
+    "Actionable signal alerts",
+    [
+      obj("instruction", [
+        str("type"), // "allocate" | "orders"
+        arr("weights", [
+          // for type: "allocate"
+          str("symbol"),
+          num("weight"),
+        ]),
+        arr("orders", [
+          // for type: "orders"
+          str("symbol"),
+          str("side"), // "buy" | "sell"
+          fld("amount", "object"),
+        ]),
+      ]),
+      obj("meta", [
+        str("reason"), // Markdown push-notification body
+      ]),
+    ],
   ),
 });
 
-(async () => {
-  await feed.run(async (ctx) => {
-    const breakout = getMaterialBreakout();
-    if (!breakout) return; // Quiet run: do not append an alert record.
+await feed.run(async (ctx) => {
+  const now = Date.now();
 
-    await ctx.self.ts("market", "brief").append([
-      {
-        date: Date.now(),
-        title: `${breakout.ticker} breakout`,
-        body: breakout.summary,
-        ticker: breakout.ticker,
+  await ctx.self.ts("signal", "targets").append([
+    {
+      date: now,
+      instruction: {
+        type: "allocate",
+        weights: [
+          { symbol: "BINANCE_SPOT_BTC_USDT", weight: 0.6 },
+          { symbol: "BINANCE_SPOT_ETH_USDT", weight: 0.4 },
+        ],
       },
-    ]);
-  });
-})();
+      meta: { reason: "EMA crossover: shift to 60/40 BTC/ETH" },
+    },
+  ]);
+});
 ```
 
-Alert-output rules:
+When this feed runs as a cronjob with `--push-notify`, the platform reads
+`/data/signal/targets` and dispatches the signal content as `feed_alert_ready`
+to eligible FEED alert subscribers. Telegram delivery chunks long
+messages at the platform's per-message limit; the feed SDK does not require a
+500-character summary.
 
-- The TypeDoc must declare a root `body` string. A root `title` string is
-  optional. Additional fields such as `ticker`, `url`, or structured analysis
-  remain available in ALFS but do not change the standard notification text.
-- Use any descriptive, valid `group/output` except the reserved legacy sources
-  `signal/targets` and `notify/message`.
-- A top-level script execution may return at most one alert record for a given
-  source and at most 16 alert records across all sources. If a script calls
-  multiple successful `Feed.run()` callbacks, do not emit the same alert source
-  from more than one callback.
-- Declare outputs before `feed.run()`. Do not call `feed.def()` conditionally or
-  from inside the callback.
-- A callback failure reports no V2 alerts. Successful ALFS writes and delivery
-  reporting are best-effort; a delivery bridge failure does not undo stored
-  Feed data.
-- `--push-notify` enables publisher-side delivery but does not subscribe anyone.
-  Real delivery also requires an active published automation and an explicit
-  FEED alert binding.
-- Scheduled runs and `alva deploy trigger` both deliver eligible records.
-  `deploy trigger` is not a dry run; use `alva run` for non-delivering script
-  checks.
-- Changing the declaration or source in an already active Feed does not require
-  republishing. The next run uses the current script and declarations.
+**Key points:**
 
-### Pattern E: AlvaAsk + Declared Alert Output
+- The group **must** be named `signal` and the output **must** be named
+  `targets` -- this is the path the notification system looks for.
+- `--push-notify` and `alva automation publish --cronjob-id ...` only make the
+  feed publisher capable of emitting alerts. They do **not** create an alert
+  binding.
+- Real delivery requires an explicit FEED alert: `alva alert enable
+  --automation <owner>/<feed>` or — from inside a playbook iframe — a
+  parent-confirmed `window.alva.subscribe.propose()` (see
+  `references/api/udf-runtime.md` § Feed Subscribe Proposal). A playbook must
+  never call a subscribe API directly.
+- Use `meta.reason` to provide the push-notification body -- this is what
+  recipients see when the signal is delivered.
+- `meta.reason` is **Markdown**. Write it as the push body itself, using
+  Markdown for emphasis, lists, and links; the platform renders Markdown on the
+  delivery side (Telegram, in-app surfaces). Keep it short and push-friendly --
+  headings and heavy formatting don't translate well to a notification.
+- Keep `meta.reason` close to the user-facing feed output when the feed is
+  notification-native. Use a push-safe projection only when a channel has a real
+  hard limit or cannot render the feed's richer format.
+- One record per run is typical; the platform reads `@last/1`.
+- Altra strategies write to this path automatically. Use this pattern only for
+  non-Altra feeds that want to produce push-worthy signals.
 
-Use `@alva/alvaask` when a scheduled Feed needs Alva's full agent behavior.
-Store its push-worthy result in a descriptive alert output rather than the
-legacy `notify/message` path.
+### Pattern E: AlvaAsk + Feed Notification (notify/message)
+
+**Preferred pattern for scheduled tasks.** Use `@alva/alvaask` instead of a
+custom alpi loop for cronjob feeds when you need Alva's full agent behavior —
+it's simpler (no sandbox/session management) and the `ask()` call handles tool
+use, web search, and ALFS access automatically.
+
+For feeds that use `@alva/alvaask` to call Alva's agent and publish the result
+as a feed completion notification. Common use cases: scheduled market reports,
+periodic research summaries, heartbeat monitoring, and proactive alerts.
+
+Write the agent's response to the **`notify`** group with a **`message`**
+output. When the cronjob completes with `--push-notify`, the platform reads this
+path and dispatches `feed_alert_ready` to eligible alert destinations.
 
 ```javascript
 const { ask } = require("@alva/alvaask");
-const {
-  Feed,
-  feedPath,
-  makeDoc,
-  str,
-  alertOutput,
-} = require("@alva/feed");
+const { Feed, feedPath, makeDoc, str } = require("@alva/feed");
 
 const feed = new Feed({ path: feedPath("daily-briefing") });
-feed.def("reports", {
-  briefing: alertOutput(
-    makeDoc("Daily Briefing", "Agent-generated market briefing", [
-      str("title"),
-      str("body"),
-    ]),
-  ),
+feed.def("notify", {
+  message: makeDoc("Notification", "Agent-generated push content", [
+    str("title"),
+    str("body"),
+  ]),
 });
 
 (async () => {
   const result = ask(`Give a brief crypto market update with key levels.
 If there is no material update worth notifying about, output only
-NO_MATERIAL_UPDATE.`);
+<|SKIP_NOTIFICATION|>.`);
 
   await feed.run(async (ctx) => {
-    const body = result.text.trim();
-    if (!body || body === "NO_MATERIAL_UPDATE") return;
-
-    await ctx.self.ts("reports", "briefing").append([
+    await ctx.self.ts("notify", "message").append([
       {
         date: Date.now(),
         title: "Daily Crypto Briefing",
-        body,
+        body: result.text,
       },
     ]);
   });
 })();
 ```
 
-Deploy still requires a cronjob with `--push-notify`, an active
-`alva automation publish` binding, and an explicit FEED alert subscription.
-Publishing establishes the Feed/cronjob identity; adding or changing an alert
-output later does not require another publish.
+Deploy requires **two steps** — cronjob + feed registration:
 
-### Legacy Compatibility
+```bash
+# 1. Create the cronjob with push notification enabled
+alva deploy create --name daily-briefing \
+  --path '~/feeds/daily-briefing/v1/src/index.js' \
+  --cron "0 8 * * *" --push-notify
 
-Existing `signal/targets` and `notify/message` feeds continue to work through
-legacy fanout. Keep them when maintaining an existing producer, and keep
-Altra-owned `signal/targets` unchanged. Do not wrap either reserved source in
-`alertOutput()` and do not copy them into new general-purpose Feed templates.
+# 2. Publish the automation (REQUIRED for push content to work)
+# Without this, notifications arrive without title/text content.
+alva automation publish --name daily-briefing --version 1.0.0 \
+  --cronjob-id <ID_FROM_STEP_1> \
+  --description "Generates a morning briefing each day at 08:00 summarizing overnight crypto market moves and pushes it as a notification"
+```
 
-The `<|SKIP_NOTIFICATION|>` body sentinel and legacy `text` fallback apply only
-to `notify/message`. New V2 alert outputs require `body` and express a quiet run
-by not appending.
+**Key points:**
+
+- The group **must** be named `notify` and the output **must** be named
+  `message` — this is the path the notification system looks for.
+- `title` is optional — if provided, the notification renders as
+  `**title**\n\nbody`.
+- `body` is the notification body (required for content push). The legacy field
+  name `text` is still accepted for backwards compatibility, but `body` is the
+  canonical name and matches FCM / APNS / Web Push / HTTP / email convention —
+  prefer `body` in new feeds. If both `body` and `text` are set on the same
+  record, `body` wins.
+- If `body`/`text` contains `<|SKIP_NOTIFICATION|>`, fanout state advances but
+  no user-visible notification is sent. Teach AlvaAsk to output this sentinel
+  when there is no material update.
+- **`alva automation publish` is required** — without it, the push is still
+  dispatched but arrives with an empty body (no `title`/`body`).
+- `--push-notify` only enables publisher-side fanout. It does **not** create
+  alert bindings.
+- Real delivery requires an explicit FEED alert such as `alva alert enable
+  --automation <owner>/<feed>`. Following a playbook does not subscribe any of
+  its feeds. For inventory and unsubscribe (including deleted feed rows), see
+  [push-notifications.md](push-notifications.md) § Inventory And Unsubscribe.
+- Combine with Pattern D if you want both feed completion notifications and
+  signal-style notifications.
 
 ### Deduplication
 

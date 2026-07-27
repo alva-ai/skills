@@ -239,7 +239,6 @@
         "alva playbooks trending",
         "annotation-driven edits",
         "feed_alert_ready",
-        "alertOutput(typeDoc)",
         "<|SKIP_NOTIFICATION|>",
         "subscriptions"
       ]
@@ -601,8 +600,6 @@
             "HTML fetches quantitative data from feeds, not inline literals",
             "Latest data from each referenced feed is fresh",
             "README exists, is current, and is passed via absolute `--readme-url`",
-            "New feeds declare push-worthy outputs with",
-            "existing Altra `signal/targets` or legacy",
             "alva lint playbook ./index.html"
           ]
         }
@@ -638,7 +635,7 @@
             "alva alert enable --automation",
             "alva alert enable --automation-ids",
             "There is no playbook alert target",
-            "read `@last/1` of the declared output",
+            "read `@last/1` of the sidecar",
             "do not claim push is set up"
           ]
         },
@@ -1000,7 +997,7 @@
       "target": "corpus",
       "description": "Latest mainline Alva skill updates remain integrated after rebasing the refactor.",
       "includes": [
-        "version: v1.19.1",
+        "version: v1.19.0",
         "Capability Help",
         "Reply 1, 2, or 3 to start",
         "feedback",
