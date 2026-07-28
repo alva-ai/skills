@@ -1,0 +1,101 @@
+{
+  "contract_version": "v1",
+  "skill_release_min_version": "v1.20.0",
+  "not_applicable_outcome": "not-applicable",
+  "unknown_fallback": "unknown",
+  "side_effect_scope_semantics": "goal_owned_only",
+  "account_dependency_semantics": "Alva portfolio-account context only; input data may be public, authorized private, or BYOD.",
+  "live_execution_authorized": false,
+  "intents": [
+    {
+      "id": "trade-setup",
+      "summary": "Build a time-bounded, conditional plan for one instrument.",
+      "reference": "goal-trade-setup.md",
+      "final_output": "trade_plan",
+      "account_dependency": "optional_read",
+      "side_effect_scopes": [],
+      "domain_verdicts": ["ready", "conditional", "no_setup"],
+      "minimum_outputs": ["resolved_instrument", "as_of", "scenario", "entry", "invalidation", "stop", "targets", "risk", "risk_reward", "expiry", "evidence_refs", "coverage", "gaps"]
+    },
+    {
+      "id": "earnings-evidence",
+      "summary": "Reconcile one earnings period into an auditable evidence conclusion.",
+      "reference": "goal-earnings-evidence.md",
+      "final_output": "earnings_evidence",
+      "account_dependency": "none",
+      "side_effect_scopes": [],
+      "domain_verdicts": ["supported", "mixed", "refuted", "unresolved"],
+      "minimum_outputs": ["period_identity", "source_manifest", "actual_consensus", "surprise", "guidance_delta", "management_evidence", "market_reaction", "thesis_assessment", "unresolved_claims"]
+    },
+    {
+      "id": "screen-and-rank",
+      "summary": "Filter and deterministically rank an open universe.",
+      "reference": "goal-screen-and-rank.md",
+      "final_output": "ranked_universe",
+      "account_dependency": "none",
+      "side_effect_scopes": [],
+      "domain_verdicts": ["ranked", "zero_match"],
+      "minimum_outputs": ["universe_snapshot", "formula_version", "coverage", "filter_funnel", "factor_values", "component_scores", "ranking", "exclusions", "near_misses"]
+    },
+    {
+      "id": "build-and-run-monitor",
+      "summary": "Compile, deploy, and operate a persistent condition monitor.",
+      "reference": "goal-build-and-run-monitor.md",
+      "final_output": "durable_monitor",
+      "account_dependency": "depends_on_rule",
+      "side_effect_scopes": ["filesystem:write", "feed:write", "cronjob:write", "notification:write"],
+      "domain_verdicts": [],
+      "minimum_outputs": ["compiled_rule", "rule_version", "current_config", "resource_refs", "evidence_packets", "condition_result", "run_history", "delivery_receipt", "revision_history"]
+    },
+    {
+      "id": "event-risk-and-impact",
+      "summary": "Verify a discrete event and assess pre-event risk or post-event impact.",
+      "reference": "goal-event-risk-and-impact.md",
+      "final_output": "event_assessment",
+      "account_dependency": "optional_read",
+      "side_effect_scopes": [],
+      "domain_verdicts": ["follow", "watch", "reject"],
+      "minimum_outputs": ["event_dossier", "source_manifest", "affected_assets", "scenario_or_reaction", "materiality", "causal_confidence", "evidence_gaps"]
+    },
+    {
+      "id": "portfolio-intelligence",
+      "summary": "Diagnose an existing portfolio without constructing a target state.",
+      "reference": "goal-portfolio-intelligence.md",
+      "final_output": "portfolio_diagnosis",
+      "account_dependency": "account_or_user_snapshot",
+      "side_effect_scopes": [],
+      "domain_verdicts": ["healthy", "attention", "critical"],
+      "minimum_outputs": ["portfolio_snapshot_ref", "coverage", "exposure_map", "supported_attribution", "risk_findings", "materiality_confidence", "unresolved_gaps"]
+    },
+    {
+      "id": "research-and-compare",
+      "summary": "Build a thesis or compare a closed set of issuers, instruments, or themes.",
+      "reference": "goal-research-and-compare.md",
+      "final_output": "research_comparison",
+      "account_dependency": "optional_read",
+      "side_effect_scopes": [],
+      "domain_verdicts": ["conditional_preference", "indifferent", "not_comparable"],
+      "minimum_outputs": ["evidence_manifest", "comparability_matrix", "comparison_tables", "thesis", "counter_thesis", "scenario_or_valuation_range", "catalysts", "risks", "invalidation", "unknowns"]
+    },
+    {
+      "id": "backtest-and-validate",
+      "summary": "Validate a historical rule with costs, regimes, and bias controls.",
+      "reference": "goal-backtest-and-validate.md",
+      "final_output": "historical_validation",
+      "account_dependency": "none",
+      "side_effect_scopes": [],
+      "domain_verdicts": ["supported", "fragile", "rejected"],
+      "minimum_outputs": ["strategy_spec", "data_manifest", "signals", "trades", "equity_curve", "risk_metrics", "regime_results", "sensitivity", "cost_assumptions", "bias_audit"]
+    },
+    {
+      "id": "portfolio-plan-and-allocate",
+      "summary": "Construct a target portfolio or rebalance model under declared constraints.",
+      "reference": "goal-portfolio-plan-and-allocate.md",
+      "final_output": "target_allocation",
+      "account_dependency": "optional_read",
+      "side_effect_scopes": [],
+      "domain_verdicts": ["feasible", "constraint_conflict", "no_action"],
+      "minimum_outputs": ["goal_feasibility", "target_ranges", "current_target_deltas", "cash_residual", "warnings", "staged_plan", "alternatives", "review_gates"]
+    }
+  ]
+}

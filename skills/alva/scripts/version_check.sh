@@ -4,6 +4,7 @@ set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+source "$SCRIPT_DIR/version_compare.sh"
 
 REPO="alva-ai/skills"
 SKILL_MD="$SKILL_DIR/SKILL.md"
@@ -58,8 +59,9 @@ if [ -z "$local_tag" ]; then
   exit 0
 fi
 
-# Compare — notify only when a new release is published
-if [ "$local_tag" != "$remote_tag" ]; then
+# Compare semantically so a development copy newer than the latest release is
+# never told to downgrade.
+if alva_version_is_newer "$remote_tag" "$local_tag"; then
   cat <<EOF
 Alva skill update available.
   Installed: $local_tag

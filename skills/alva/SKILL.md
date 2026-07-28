@@ -10,7 +10,7 @@ description: >-
   backtesting. Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v1.19.3
+  version: v1.20.0
 ---
 
 # Alva
@@ -187,9 +187,9 @@ notification novelty.
 
 ## Request Routing
 
-Open [request-routing.md](references/request-routing.md) whenever the task is
-not an obvious single-fetch answer. It owns route selection, Skillhub, Guided
-Planning, capability verification, and completion gates.
+For every financial request, read [goal-routing.md](references/goal-routing.md) and choose one goal, `not-applicable`, or `unknown`; then use [request-routing.md](references/request-routing.md) for delivery.
+The axes are independent. Read [goal-contracts.md](references/goal-contracts.md) for selected goals and account/resource/action requests;
+[goal-registry.json](references/goal-registry.json) is canonical. Goal routing never grants access, writes, publication, notifications, subscriptions, or trading.
 
 Open [operational-pitfalls.md](references/operational-pitfalls.md) step by step
 whenever the route enters runtime, feed, ALFS, playbook HTML, deploy, release,

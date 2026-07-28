@@ -5,12 +5,16 @@ on:
     paths:
       - "skills/alva/**"
       - "evals/alva-skill-docs/**"
+      - "evals/goal-routing/**"
+      - "tests/test_goal_contract.py"
       - ".github/workflows/alva-skill-doc-evals.yml"
   push:
     branches: [main]
     paths:
       - "skills/alva/**"
       - "evals/alva-skill-docs/**"
+      - "evals/goal-routing/**"
+      - "tests/test_goal_contract.py"
       - ".github/workflows/alva-skill-doc-evals.yml"
   workflow_dispatch:
 
@@ -34,3 +38,6 @@ jobs:
 
       - name: Run mutation smoke
         run: node evals/alva-skill-docs/mutation-smoke.mjs --skill-dir skills/alva
+
+      - name: Validate goal contracts and routing fixtures
+        run: python3 -m unittest tests/test_goal_contract.py

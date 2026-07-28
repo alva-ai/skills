@@ -6,6 +6,11 @@ build with evidence. Do not let playbook creation become the default: only enter
 that tree when the user wants a hosted/shareable surface, remix, release, or
 playbook edit.
 
+Delivery routing is independent from investment-goal routing. Classify the goal
+axis first with [goal-routing.md](goal-routing.md); `not-applicable` means no
+goal controller is needed, not that this file may skip a requested artifact or
+action route. Goal routing never broadens the permissions of the delivery route.
+
 Decision order:
 
 0. Route every financial task through shared data and execution first: Data
@@ -160,8 +165,11 @@ Exactly one blocking question per session:
    comparison baselines. For playbooks, name feeds, widgets, release path, and
    defaults.
 
-If the user says "just do it", skip further clarifying questions for the rest
-of the session and proceed after the short plan.
+If the user says "just do it", skip further clarifying questions for the
+current requested build and proceed after the short plan. It does not waive
+route-specific hard gates or authorize account reads, resource mutations,
+publication, alert bindings, subscriptions, or trading. Re-enter the applicable
+gate when a later operation materially changes the target or scope.
 
 ## Capability Verification
 

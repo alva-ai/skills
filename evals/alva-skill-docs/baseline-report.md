@@ -6,7 +6,7 @@ SKILL.md lines: 910
 
 Cases: 63/64
 
-Checks: 646/649 (99.54%)
+Checks: 648/649 (99.85%)
 
 ## Scoring Diagnosis
 
@@ -15,7 +15,7 @@ Classify the gap before editing: missing capability summary, missing routing poi
 Do not expose eval scores as product copy, and do not patch demos to hide a weak result.
 Instead, fix the canonical skill text or eval case, then rerun baseline and final reports so the regression mechanism proves the gap is closed.
 
-- target.auto-trade-consent-exemption: inspect for a skill gap before editing. Missing checks: verification checks only that the consent record exists; timestamp is provenance, not a match key; is not a mismatch
+- target.mainline-updates: inspect for a skill gap before editing. Missing checks: version: v1.20.0
 
 ## retained
 
@@ -496,7 +496,7 @@ The general skill distinguishes the default personal destination from an Alva to
 
 ## target
 
-10/11 cases, 129/132 checks
+10/11 cases, 131/132 checks
 
 ### PASS target.top-level-size
 
@@ -635,11 +635,11 @@ Operational pitfalls are a mandatory stepwise gate, not an optional debugging ap
 - [x] Touch ALFS paths
 - [x] Build or edit playbook HTML/charts
 
-### PASS target.mainline-updates
+### FAIL target.mainline-updates
 
 Latest mainline Alva skill updates remain integrated after rebasing the refactor.
 
-- [x] version: v1.19.3
+- [ ] version: v1.20.0
 - [x] Capability Help
 - [x] Reply 1, 2, or 3 to start
 - [x] feedback
@@ -663,7 +663,7 @@ Latest mainline Alva skill updates remain integrated after rebasing the refactor
 - [x] headers-only tables
 - [x] fetch failures
 
-### FAIL target.auto-trade-consent-exemption
+### PASS target.auto-trade-consent-exemption
 
 A consent-referenced, record-verified channel-loop tick is exempt from per-order confirmation while staying dry-run/intent-id/risk bound.
 
@@ -673,9 +673,9 @@ A consent-referenced, record-verified channel-loop tick is exempt from per-order
 - [x] place live orders without per-order user confirmation
 - [x] missing or unreadable record
 - [x] applies only to loop ticks
-- [ ] verification checks only that the consent record exists
-- [ ] timestamp is provenance, not a match key
-- [ ] is not a mismatch
+- [x] verification checks only that the consent record exists
+- [x] timestamp is provenance, not a match key
+- [x] is not a mismatch
 
 ### PASS target.auto-trade-consent-references
 

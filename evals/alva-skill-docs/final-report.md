@@ -1,6 +1,6 @@
 # alva-skill-doc-regression
 
-Source: `/home/forge/mono-meta/code/public/skills/skills/alva`
+Source: `HEAD`
 
 SKILL.md lines: 910
 
@@ -639,7 +639,7 @@ Operational pitfalls are a mandatory stepwise gate, not an optional debugging ap
 
 Latest mainline Alva skill updates remain integrated after rebasing the refactor.
 
-- [x] version: v1.19.3
+- [x] version: v1.20.0
 - [x] Capability Help
 - [x] Reply 1, 2, or 3 to start
 - [x] feedback
