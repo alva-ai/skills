@@ -89,7 +89,7 @@ bounded in runes. Compose the config to pass validation the first time.
 | `comparators` | ticker[] | no | 0–8 peer/relative-value tickers. |
 | `setup_revision` | integer ≥1 | yes | Monotonic edit counter. Start at `1`; bump on every edit. |
 | `init_context_note` | string \| null | no | One-shot background used only on the first (init) run, ≤2000 runes. Not evidence; never supplied again. |
-| `language` | `zh-CN` \| `en-US` | no | Output language, default `zh-CN`. `zh`/`en` normalize. |
+| `language` | `zh-CN` \| `en-US` | no | Output language, default `en-US`. `zh`/`en` normalize. Always set it from the conversation language (see the creation flow). |
 | `timezone` | IANA tz | yes | Validated via `Intl` (e.g. `America/New_York`). |
 
 ### `schedule` — when the run is active
