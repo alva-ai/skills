@@ -180,7 +180,9 @@ the whole automation.
    card on the first run.
 5. **Provision** through the four steps below.
 6. **Relay the receipt.** The first run creates the Setup Card and delivers a
-   **"Trade Setup 已就绪"** init receipt to the user's bound channel. Confirm in
+   **"Trade Setup Ready"** init receipt (title localized per the profile
+   `language`, e.g. "Trade Setup 已就绪" for `zh-CN`) to the user's bound
+   channel. Confirm in
    chat that the automation is live and summarize the card it created.
 
 ## Provisioning: Four Steps, Order Matters
@@ -219,7 +221,7 @@ failure mode when skipped; do all four, in order.
 
    Returns the `feed_id`, and this is the step that first makes the automation
    real: the first validating run fires here, creating Setup Card v1 and
-   delivering the **"Trade Setup 已就绪"** init receipt push. *Missed:* the
+   delivering the **"Trade Setup Ready"** init receipt push. *Missed:* the
    automation is invisible in the Alva App and every push arrives with an EMPTY
    body.
 
@@ -252,7 +254,8 @@ what's being watched:
 4. On the **next run**, the Trader Agent reconciles the existing Setup Card
    *minimally* against the new setup description (preserving position, instrument,
    and language; changing only what the revision changes) and delivers a
-   **"Trade Setup 已更新"** receipt. Relay that to the user.
+   **"Trade Setup Updated"** receipt (localized per profile `language`). Relay
+   that to the user.
 
 Never rebuild the card yourself, never edit `setup/current`, and never edit any
 field outside the editable surface to "fix" a card — a revision bump is the only
