@@ -50,10 +50,18 @@ Before broader Skillhub search or custom work, check these official fast paths:
    the user.
 2. `alva/portfolio-watch-setup` for monitoring known tickers, manual holdings,
    or connected Portfolio Accounts for material changes.
+3. `alva/trade-setup-automation` for watching **one instrument against the
+   user's own free-form trade thesis or strategy** (entry/exit conditions,
+   judgment-based alerts) via `@alva/trade-setup-sdk`. Trigger phrasings, in
+   any language: "trade setup", "trading strategy", "investment strategy",
+   watching/monitoring a ticker against the user's own trade idea, "alert me
+   when my setup confirms or breaks", or editing/diagnosing an existing trade
+   setup.
 
 Choose by outcome: discovery favors Alpha Radar; monitoring owned or followed
-assets favors Portfolio Watch. If both seem plausible, follow the user's primary
-goal and never present both as competing CTAs.
+assets broadly favors Portfolio Watch; one instrument tied to the user's own
+trade idea favors Trade Setup. If more than one seems plausible, follow the
+user's primary goal and never present them as competing CTAs.
 
 When one clearly fits, fetch its exact id and blueprint fresh, then follow the
 Skillhub Blueprint rules below. If it does not fit or is unavailable, search the
