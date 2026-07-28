@@ -111,8 +111,7 @@ the corresponding latest prompt, then route through
 
 ## First Principles
 
-These rules are the high-signal foundation. If you only remember one section,
-make it this one.
+These are the high-signal rules to remember.
 
 1. **Help-first CLI.** Before using any `alva` command you have not used in this
    session, run `alva <command> --help`. CLI help is authoritative for commands,
@@ -145,6 +144,7 @@ make it this one.
 9. **References own depth.** Top-level sections tell you what the capability is,
    what rule is easy to miss, and which file to open. Long examples, commands,
    and checklists live in the linked reference.
+10. **Mandatory disclaimer.** Any answer involving a security price or investment strategy MUST include an investment disclaimer. See [user-facing-prose.md](references/user-facing-prose.md#investment-disclaimer).
 
 Two consequences are worth making explicit. First, a useful Alva answer can be
 small: a financial-analysis question should not become a playbook unless the

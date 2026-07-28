@@ -847,6 +847,42 @@
       ]
     },
     {
+      "id": "target.mandatory-investment-disclaimer",
+      "group": "target",
+      "target": "corpus",
+      "description": "Security-price and investment-strategy answers have one mandatory disclaimer contract wired into prose and routing.",
+      "section_includes": [
+        {
+          "file": "SKILL.md",
+          "heading": "First Principles",
+          "label": "top-level requirement",
+          "includes": [
+            "Mandatory disclaimer",
+            "Any answer involving a security price or investment strategy MUST include an investment disclaimer"
+          ]
+        },
+        {
+          "file": "references/user-facing-prose.md",
+          "heading": "Investment Disclaimer",
+          "label": "user-facing prose requirement",
+          "includes": [
+            "investment disclaimer is required",
+            "security price or investment strategy",
+            "This content is for informational purposes only and does not constitute investment advice."
+          ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "heading": "Routes",
+          "label": "Ask and strategy routing",
+          "includes": [
+            "apply its required Investment Disclaimer",
+            "Strategy answers apply the required [Investment Disclaimer]"
+          ]
+        }
+      ]
+    },
+    {
       "id": "target.financial-analysis-prose-gate",
       "group": "target",
       "target": "corpus",

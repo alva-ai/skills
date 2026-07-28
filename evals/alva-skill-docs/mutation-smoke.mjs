@@ -19,6 +19,16 @@ const MUTATIONS = [
     expectFailedCases: ["issue592.financial-ask-contract", "scenario.simple-latest-price"],
   },
   {
+    id: "mandatory-investment-disclaimer",
+    file: "SKILL.md",
+    remove: "10. **Mandatory disclaimer.** Any answer involving a security price or investment strategy MUST include an investment disclaimer. See [user-facing-prose.md](references/user-facing-prose.md#investment-disclaimer).\n",
+    expectFailedCases: [
+      "target.mandatory-investment-disclaimer",
+      "scenario.equity-price-disclaimer",
+      "scenario.backtest-strategy",
+    ],
+  },
+  {
     id: "capability-before-refusal",
     file: "references/request-routing.md",
     remove: "Before saying Alva lacks a capability or recommending BYOD, verify the catalog:",
