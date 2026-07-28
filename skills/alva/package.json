@@ -1,7 +1,8 @@
 {
   "name": "@alva/skill",
   "version": "1.19.3",
-  "private": true,
+  "description": "Official Alva agent skill",
+  "license": "MIT",
   "files": [
     "SKILL.md",
     "references",
@@ -9,5 +10,8 @@
   ],
   "alpkg": {
     "kind": "skill"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

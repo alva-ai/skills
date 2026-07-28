@@ -11,14 +11,14 @@ recursive release tree matched the registry contract.
 
 This companion change packages the existing bytes; it does not turn the Skill
 into JavaScript. The 44 tracked artifacts at source commit
-`0f60737b2867150126d95c92516b3a1e2e358e15` remain unchanged.
+`fdf43250da716a7ff6faf85ac03b444591151d54` are published unchanged.
 
 ## 2. End-to-End Behavior
 
-- `@alva/skill@1.19.3` is a private, data-only project manifest with ALPKG kind
-  `skill` and no Node or ALPKG entrypoints.
+- `@alva/skill@1.19.3` is a public, data-only npm and ALPKG package with ALPKG
+  kind `skill` and no Node or ALPKG entrypoints.
 - Explicit roots `SKILL.md`, `references`, and `scripts` recursively produce 44
-  artifact files totaling 591,813 bytes. `package.json` and repository/runtime
+  artifact files totaling 593,719 bytes. `package.json` and repository/runtime
   files are not artifacts.
 - A reusable Node validator rejects identity, kind, version, entrypoint, root,
   path, link, file-count, and total-byte violations before a release command.
@@ -46,8 +46,8 @@ into JavaScript. The 44 tracked artifacts at source commit
 
 ## 4. Change Specification
 
-- Add `skills/alva/package.json` with exact name/version/kind, `private: true`,
-  the three explicit roots, and no executable or typed entrypoint fields.
+- Add `skills/alva/package.json` with exact name/version/kind, public npm publish
+  configuration, the three explicit roots, and no executable or typed entrypoint fields.
 - Add `tools/alva-skill-package/validate.mjs` as both an importable validator
   and a CLI. Permit a separate `--package-json` so a detached artifact commit
   can be checked against reviewed tooling without adding metadata to the
@@ -68,7 +68,9 @@ into JavaScript. The 44 tracked artifacts at source commit
 - Direct real-tree command:
   `node tools/alva-skill-package/validate.mjs --skill-dir skills/alva`.
 - The valid case asserts the exact package identity, root order, 44 paths, and
-  591,813-byte total while confirming `package.json` is excluded.
+  593,719-byte total while confirming `package.json` is excluded from ALPKG.
+- An npm dry-run asserts that npm includes `package.json` and the same three
+  data roots without requiring a Node entrypoint.
 - Fixture mutations cover wrong identity/kind/version, representative
   prohibited entrypoint forms, root drift, hidden/reserved/backslash/traversal paths,
   symlinks, more than 64 files, and more than 32 MiB.
@@ -88,8 +90,8 @@ was given release credentials or permission to publish automatically.
 
 ### Changes made
 
-- `skills/alva/package.json` declares data-only `@alva/skill@1.19.3` with the
-  exact three artifact roots and no executable entrypoint.
+- `skills/alva/package.json` declares public, data-only `@alva/skill@1.19.3`
+  for npm and ALPKG, with the exact three artifact roots and no executable entrypoint.
 - `tools/alva-skill-package/validate.mjs` validates identity, metadata, paths,
   node types, registry limits, and the complete recursive artifact set;
   `validate.test.mjs` supplies the mutation fixtures.
@@ -101,7 +103,7 @@ was given release credentials or permission to publish automatically.
 ### Tests added and verification
 
 - Validator unit suite: 24/24 PASS.
-- Real package validation: 44 files and 591,813 bytes, with `package.json`
+- Real ALPKG validation: 44 files and 593,719 bytes, with `package.json`
   excluded.
 - Documentation regression: 64/64 cases and 646/646 checks PASS.
 - Mutation smoke: 12/12 PASS.

@@ -110,8 +110,11 @@ function validatePackageMetadata(packageJSON) {
   if (packageJSON.version !== EXPECTED_VERSION) {
     throw new Error(`package.json version must be ${EXPECTED_VERSION}`);
   }
-  if (packageJSON.private !== true) {
-    throw new Error("package.json private must be true");
+  if (packageJSON.private === true) {
+    throw new Error("package.json must be publishable to npm");
+  }
+  if (packageJSON.publishConfig?.access !== "public") {
+    throw new Error("package.json publishConfig.access must be public");
   }
   if (
     packageJSON.alpkg === null ||

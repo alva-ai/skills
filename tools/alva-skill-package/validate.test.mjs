@@ -73,6 +73,22 @@ test("validates the real 44-file data-only Skill package", async () => {
   assert.equal(result.files.some(({ path }) => path === "package.json"), false);
 });
 
+test("packs the same Skill for npm without a Node entrypoint", () => {
+  const result = spawnSync(
+    "npm",
+    ["pack", "--dry-run", "--json", "--ignore-scripts"],
+    { cwd: REAL_SKILL_DIR, encoding: "utf8" },
+  );
+
+  assert.equal(result.status, 0, result.stderr);
+  const [{ files }] = JSON.parse(result.stdout);
+  const paths = files.map(({ path }) => path);
+  assert.equal(paths.includes("package.json"), true);
+  assert.equal(paths.includes("SKILL.md"), true);
+  assert.equal(paths.some((path) => path.startsWith("references/")), true);
+  assert.equal(paths.some((path) => path.startsWith("scripts/")), true);
+});
+
 test("validates a detached artifact tree against separate reviewed package metadata", async (t) => {
   const skillDir = makeFixture(t);
   const packageJSONPath = join(dirname(skillDir), "package.json");
@@ -126,6 +142,26 @@ test("rejects a non-skill ALPKG kind", async (t) => {
   });
 
   await assert.rejects(validateSkillPackage({ skillDir }), /alpkg\.kind must be skill/);
+});
+
+test("rejects npm-private or non-public package metadata", async (t) => {
+  await t.test("private", async (subtest) => {
+    const skillDir = makeFixture(subtest);
+    updatePackage(skillDir, (packageJSON) => {
+      packageJSON.private = true;
+    });
+
+    await assert.rejects(validateSkillPackage({ skillDir }), /publishable to npm/);
+  });
+
+  await t.test("publishConfig.access", async (subtest) => {
+    const skillDir = makeFixture(subtest);
+    updatePackage(skillDir, (packageJSON) => {
+      packageJSON.publishConfig.access = "restricted";
+    });
+
+    await assert.rejects(validateSkillPackage({ skillDir }), /access must be public/);
+  });
 });
 
 test("rejects executable or typed package entrypoint fields", async (t) => {

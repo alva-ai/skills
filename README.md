@@ -173,10 +173,10 @@ Turn your work into a hosted web app at `https://alva.ai/u/<username>/playbooks/
 
 ## Official ALPKG Package
 
-The same Skill is maintained as the data-only ALPKG package
-`@alva/skill@1.19.3`. Its `package.json` is release metadata, not a Node module:
-it is private, declares `alpkg.kind` as `skill`, and has no `main`, `module`,
-`types`, `typings`, or executable entrypoint. Only these roots are artifacts:
+The same Skill is published as `@alva/skill@1.19.3` to both npm and ALPKG. Its
+`package.json` is public package metadata, but it is not a Node module: it has
+no `main`, `module`, `types`, `typings`, or executable entrypoint, and declares
+`alpkg.kind` as `skill`. Only these roots are ALPKG artifacts:
 
 - `SKILL.md`
 - `references`
@@ -198,7 +198,7 @@ Publishing is intentionally never performed by GitHub Actions. A maintainer
 must release from a detached, clean checkout of the reviewed artifact commit,
 using a separately reviewed checkout for the validator and package metadata.
 For `1.19.3`, the artifact source is
-`0f60737b2867150126d95c92516b3a1e2e358e15` (44 files, 591,813 bytes).
+`fdf43250da716a7ff6faf85ac03b444591151d54` (44 files, 593,719 bytes).
 
 Set the absolute paths below for the two checkouts and the private `alpkg` CLI.
 Keep `ALVA_API_KEY` only in the release process environment; never put it in a
@@ -208,7 +208,7 @@ command argument, file, log, or release record.
 export TOOLS_ROOT=/absolute/path/to/reviewed/skills-tooling
 export RELEASE_ROOT=/absolute/path/to/detached/skills-source
 export ALPKG_CLI=/absolute/path/to/alpkg/bin/alpkg.js
-export SOURCE_COMMIT=0f60737b2867150126d95c92516b3a1e2e358e15
+export SOURCE_COMMIT=fdf43250da716a7ff6faf85ac03b444591151d54
 export ALVA_ENDPOINT=https://api-llm.prd.alva.ai
 
 test "$(git -C "$RELEASE_ROOT" rev-parse HEAD)" = "$SOURCE_COMMIT"
@@ -233,7 +233,7 @@ node "$ALPKG_CLI" publish \
 ```
 
 Read every dry-run path and confirm the identity, kind, version, absent
-entrypoints, source ref, 44-file count, 591,813-byte total, and the three-root
+entrypoints, source ref, 44-file count, 593,719-byte total, and the three-root
 set. Before removing `--dry-run`, query the exact coordinate with the first
 `info` command below. If it exists, compare its complete bundle with the
 detached source and reuse it only when identical; never attempt to replace it.
@@ -263,6 +263,17 @@ byte/hash comparison with a real non-admin user key, and then run the owning
 runtime's consumer smoke. A conflict or bad release is never overwritten; fix
 the source, bump the Skill and package patch versions together, and publish a
 new immutable coordinate.
+
+Publish the same reviewed package to npm from the detached checkout. Inspect
+the tarball before publishing; it must contain only `package.json` and the same
+three data roots, with no Node entrypoint:
+
+```bash
+cd "$RELEASE_ROOT/skills/alva"
+npm pack --dry-run --json --ignore-scripts
+npm publish --access public --ignore-scripts
+npm view @alva/skill@1.19.3 version dist.integrity
+```
 
 ---
 
