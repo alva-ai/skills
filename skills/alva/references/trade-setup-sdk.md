@@ -170,16 +170,22 @@ the whole automation.
    becomes `setup_text` verbatim-in-spirit. Ask what would confirm it and what
    would invalidate it — that sharpens the text the Agent formalizes into the
    card, but keep it the user's language, not yours.
-3. **Gather optional facts.** Time horizon (default to a sensible `swing` /
+3. **Set the output language from the conversation.** Set `language` to match
+   the language the user is speaking (`zh-CN` for a Chinese conversation,
+   `en-US` for English) unless they explicitly ask for something else. The SDK
+   does not detect conversation language itself — this field is the only thing
+   that controls the language of the Card, alerts, daily summaries, and receipt
+   titles.
+4. **Gather optional facts.** Time horizon (default to a sensible `swing` /
    `intraday` and confirm); position **only if the user states one** (never
    infer); benchmarks/comparators if relevant; news keywords (ticker + company
    name + theme terms).
-4. **Compose and confirm `setup_text`.** Read the composed setup back to the
+5. **Compose and confirm `setup_text`.** Read the composed setup back to the
    user in one or two sentences and get explicit agreement before provisioning.
    This is the point of no cheap return — a wrong `setup_text` means a wrong
    card on the first run.
-5. **Provision** through the four steps below.
-6. **Relay the receipt.** The first run creates the Setup Card and delivers a
+6. **Provision** through the four steps below.
+7. **Relay the receipt.** The first run creates the Setup Card and delivers a
    **"Trade Setup Ready"** init receipt (title localized per the profile `language`) to the user's bound
    channel. Confirm in
    chat that the automation is live and summarize the card it created.
