@@ -50,7 +50,7 @@ Before broader Skillhub search or custom work, check these official fast paths:
    the user.
 2. `alva/portfolio-watch-setup` for monitoring known tickers, manual holdings,
    or connected Portfolio Accounts for material changes.
-3. `alva/trade-setup-setup` for watching **one instrument against the user's
+3. `alva/trade-setup-automation` for watching **one instrument against the user's
    own free-form trade thesis or strategy** (entry/exit conditions,
    judgment-based alerts) via `@alva/trade-setup-sdk`.
 
