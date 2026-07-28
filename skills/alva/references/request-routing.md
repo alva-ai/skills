@@ -50,9 +50,16 @@ Before broader Skillhub search or custom work, check these official fast paths:
    the user.
 2. `alva/portfolio-watch-setup` for monitoring known tickers, manual holdings,
    or connected Portfolio Accounts for material changes.
-3. `alva/trade-setup-automation` for watching **one instrument against the user's
-   own free-form trade thesis or strategy** (entry/exit conditions,
-   judgment-based alerts) via `@alva/trade-setup-sdk`.
+3. `alva/trade-setup-automation` for watching **one instrument against the
+   user's own free-form trade thesis or strategy** (entry/exit conditions,
+   judgment-based alerts) via `@alva/trade-setup-sdk`. Trigger phrasings, in
+   any language: "trade setup", "trading strategy", "investment strategy",
+   watching/monitoring a ticker against the user's own trade idea, "alert me
+   when my setup confirms or breaks", or editing/diagnosing an existing trade
+   setup. Boundary with Strategy / Trading Analysis: a strategy expressible as
+   mechanical rules on bars (backtest, systematic signals, auto-execution) is
+   Altra; a strategy stated in natural language that needs judgment over news,
+   earnings, and context with explanatory alerts comes here.
 
 Choose by outcome: discovery favors Alpha Radar; monitoring owned or followed
 assets broadly favors Portfolio Watch; one instrument tied to the user's own
