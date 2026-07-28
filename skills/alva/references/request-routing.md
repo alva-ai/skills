@@ -50,11 +50,9 @@ Before broader Skillhub search or custom work, check these official fast paths:
    the user.
 2. `alva/portfolio-watch-setup` for monitoring known tickers, manual holdings,
    or connected Portfolio Accounts for material changes.
-3. Trade Setup for watching **one instrument against the user's own free-form
-   trade thesis or strategy** (entry/exit conditions, judgment-based alerts).
-   This fast path is reference-driven, not a Skillhub blueprint: read
-   [trade-setup-sdk.md](trade-setup-sdk.md) and follow its creation flow
-   directly.
+3. `alva/trade-setup-setup` for watching **one instrument against the user's
+   own free-form trade thesis or strategy** (entry/exit conditions,
+   judgment-based alerts) via `@alva/trade-setup-sdk`.
 
 Choose by outcome: discovery favors Alpha Radar; monitoring owned or followed
 assets broadly favors Portfolio Watch; one instrument tied to the user's own
