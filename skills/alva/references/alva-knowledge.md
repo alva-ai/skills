@@ -7,6 +7,20 @@ automations. Feed construction and delivery mechanics remain in
 [feed-lifecycle.md](feed-lifecycle.md) and
 [push-notifications.md](push-notifications.md).
 
+## Use Memory During Setup
+
+When creating any automation, use relevant Global or Channel Memory already in
+context to prefill editable suggestions such as topics or tickers, timezone and
+cadence, thresholds, and notification preferences. Do not do extra Memory
+digging when nothing relevant is available, and never present a suggestion as a
+decision the user already made.
+
+If updated user context could improve later runs, ask one short setup question:
+should each run use relevant Memory, or keep today's confirmed setup fixed? Ask
+only when the choice would materially change the result. If the user opts in,
+use Memory as preference context and still fetch current facts from live
+sources; never expose private Memory content in public or shared output.
+
 ## Use History To Improve Judgment
 
 Do not default an automation to an isolated scheduled run. First decide whether

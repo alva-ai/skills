@@ -26,6 +26,21 @@
       }
     },
     {
+      "id": "scenario.equity-price-disclaimer",
+      "group": "scenarios.ask",
+      "prompt": "What is NVDA trading at right now?",
+      "description": "A direct equity-price Ask applies the mandatory disclaimer rule.",
+      "expect": {
+        "route": "Financial Analysis / Ask Question",
+        "references": [
+          "user-facing-prose.md"
+        ],
+        "behaviors": [
+          "Any answer involving a security price or investment strategy MUST include an investment disclaimer"
+        ]
+      }
+    },
+    {
       "id": "scenario.complex-valuation-ask",
       "group": "scenarios.ask",
       "prompt": "Is NVDA cheap versus peers after the latest earnings revision?",
@@ -262,14 +277,16 @@
         "route": "Strategy / Trading Analysis",
         "references": [
           "altra-trading.md",
-          "api/trading.md"
+          "api/trading.md",
+          "user-facing-prose.md"
         ],
         "behaviors": [
           "Always use Altra for backtesting",
           "FeedAltra",
           "look-ahead bias",
           "drawdown",
-          "package results as a concise answer, feed, signal, or visual playbook depending on the request"
+          "package results as a concise answer, feed, signal, or visual playbook depending on the request",
+          "Any answer involving a security price or investment strategy MUST include an investment disclaimer"
         ]
       }
     },

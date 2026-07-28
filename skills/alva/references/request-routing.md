@@ -23,9 +23,9 @@ Decision order:
 
 | Request type | Objective |
 | --- | --- |
-| Financial Analysis / Ask Question | Answer market, asset, portfolio, valuation, comparison, single-ticker, and "why" questions with fresh data/search/`alva run` evidence. A named-ticker read first opens [ticker-read.md](ticker-read.md). Comparison baselines are figures too: fetch or qualify them. Every answer must read [user-facing-prose.md](user-facing-prose.md), then pass the ask evidence gate. |
+| Financial Analysis / Ask Question | Answer market, asset, portfolio, valuation, comparison, single-ticker, and "why" questions with fresh data/search/`alva run` evidence. A named-ticker read first opens [ticker-read.md](ticker-read.md). Comparison baselines are figures too: fetch or qualify them. Every answer must read [user-facing-prose.md](user-facing-prose.md), apply its required Investment Disclaimer, then pass the ask evidence gate. |
 | Playbook Creation | Build, remix, edit, release, or update a hosted/shareable playbook. Read [playbook-creation.md](playbook-creation.md) for the subroute tree and gates. |
-| Strategy / Trading Analysis | Use Altra for backtests, signals, portfolio simulation, rebalancing, or trading analysis; deliver an answer, feed, signal, or playbook as requested. |
+| Strategy / Trading Analysis | Use Altra for backtests, signals, portfolio simulation, rebalancing, or trading analysis; deliver an answer, feed, signal, or playbook as requested. Strategy answers apply the required [Investment Disclaimer](user-facing-prose.md#investment-disclaimer). |
 | Automation / Push | Read [alva-knowledge.md](alva-knowledge.md) before design, build or modify a feed that declares actionable outputs with `alertOutput(typeDoc)`, then verify publisher, subscription, and delivery paths. |
 | Debug / Edit | Inspect existing code, logs, playbook source, feed output, or annotations, then change the generator rather than rendered values. |
 | Capability Verification | Verify Data Skills, Skillhub, runtime, trading, or search coverage before saying Alva lacks a capability. |
@@ -50,10 +50,18 @@ Before broader Skillhub search or custom work, check these official fast paths:
    the user.
 2. `alva/portfolio-watch-setup` for monitoring known tickers, manual holdings,
    or connected Portfolio Accounts for material changes.
+3. `alva/trade-setup-automation` for watching **one instrument against the
+   user's own free-form trade thesis or strategy** (entry/exit conditions,
+   judgment-based alerts) via `@alva/trade-setup-sdk`. Trigger phrasings, in
+   any language: "trade setup", "trading strategy", "investment strategy",
+   watching/monitoring a ticker against the user's own trade idea, "alert me
+   when my setup confirms or breaks", or editing/diagnosing an existing trade
+   setup.
 
 Choose by outcome: discovery favors Alpha Radar; monitoring owned or followed
-assets favors Portfolio Watch. If both seem plausible, follow the user's primary
-goal and never present both as competing CTAs.
+assets broadly favors Portfolio Watch; one instrument tied to the user's own
+trade idea favors Trade Setup. If more than one seems plausible, follow the
+user's primary goal and never present them as competing CTAs.
 
 When one clearly fits, fetch its exact id and blueprint fresh, then follow the
 Skillhub Blueprint rules below. If it does not fit or is unavailable, search the

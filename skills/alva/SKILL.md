@@ -24,8 +24,7 @@ This file is the platform encyclopedia and operating guide. Read it to
 understand what Alva can do, how the concepts fit together, which path a user
 request belongs to, and which focused reference owns the detailed procedure. It
 is intentionally not the full playbook-building manual. Long command sequences,
-API gotchas, release checklists, design rules, examples, and debugging recipes
-live in `references/`.
+API gotchas, release checklists, design rules, examples, and debugging recipes live in `references/`.
 
 ## Mental Model
 
@@ -112,8 +111,7 @@ the corresponding latest prompt, then route through
 
 ## First Principles
 
-These rules are the high-signal foundation. If you only remember one section,
-make it this one.
+These are the high-signal rules to remember.
 
 1. **Help-first CLI.** Before using any `alva` command you have not used in this
    session, run `alva <command> --help`. CLI help is authoritative for commands,
@@ -146,6 +144,7 @@ make it this one.
 9. **References own depth.** Top-level sections tell you what the capability is,
    what rule is easy to miss, and which file to open. Long examples, commands,
    and checklists live in the linked reference.
+10. **Mandatory disclaimer.** Any answer involving a security price or investment strategy MUST include an investment disclaimer. See [user-facing-prose.md](references/user-facing-prose.md#investment-disclaimer).
 
 Two consequences are worth making explicit. First, a useful Alva answer can be
 small: a financial-analysis question should not become a playbook unless the
@@ -248,13 +247,13 @@ This per-order confirmation rule holds for any order placed in an ordinary
 conversation. *Exemption (channel-loop ticks only):* a channel-loop tick whose
 loop `--goal` carries the consent reference line `[auto-trade-consent: granted
 <ISO8601-UTC> record=~/memory/auto-trade-consent.md]` AND whose one-read
-verification (`alva fs read` of `~/memory/auto-trade-consent.md`) finds the
-consent record MAY place live orders without per-order user confirmation. It
-stays subject to dry-run validation first, a fresh idempotent intent-id, and
-trex risk rules; a missing or unreadable record means NO live orders. This
-exemption applies only to loop ticks — never to interactive conversation orders.
-The creation-side consent protocol (disclaimer, consent recording, revocation)
-lives in the channel profile's "Channel loops" section.
+verification finds the consent record MAY place live orders without per-order
+user confirmation, subject to dry-run validation first, a fresh idempotent
+intent-id, and trex risk rules. Verification checks only that the consent record
+exists: the `granted` timestamp is provenance, not a match key; a `granted_at`
+differing after a re-grant is not a mismatch and must not refuse live orders. A
+missing or unreadable record is the only verification failure and means NO live
+orders; applies only to loop ticks, never interactive. Creation-side consent: see "Channel loops".
 
 ## Capability Map
 
