@@ -326,6 +326,47 @@ Work outside-in; most questions are answered by the first two tables.
   config revision is strictly greater; if you updated `--args` but didn't bump
   the revision, the run treats it as a stale re-render and does nothing.
 
+## Lifecycle: Updates And Redeploys
+
+Most changes do **not** need a redeploy. Pick the lightest path that fits:
+
+- **Config change (setup edit, keywords, source toggles, schedule):**
+  `alva deploy update --id <cronjob> --args '<new profile JSON>'` in place —
+  the cronjob, feed, and binding are untouched. This is the normal editing
+  flow; remember the `setup_revision` bump for setup edits.
+- **SDK upgrade:** publish the new package version to the registry. The thin
+  entry does not change; runs resolve the package from the registry, so an
+  upgrade is a registry release, not a per-automation redeploy.
+- **Entry-script change:** overwrite `~/tasks/<name>/src/index.js` via
+  `alva fs write` — the existing cronjob picks it up on the next run. No
+  cronjob replacement needed.
+
+A **true redeploy** — replacing the cronjob itself — is the only dangerous
+case, and it has a strict discipline (each step below skipped has caused a
+real production incident):
+
+1. Create the NEW cronjob first (`deploy create`, same name pattern).
+2. `automation publish` for the same name returns `ALREADY_EXISTS` (409).
+   **That is NOT success.** The existing automation may still be bound to the
+   old cronjob, and no CLI or API surface exposes which cronjob is bound — an
+   `ACTIVE` status proves nothing. Deterministically rebind:
+   `PATCH /api/v1/automation/<feed_id>` with body `{"cronjob_id": <new id>}`
+   and header `X-Alva-Api-Key` (rebinding the same id is a harmless no-op;
+   the CLI has no `automation update` verb yet).
+3. Verify the binding: automation status is `ACTIVE` **and** its
+   `cron_expression` equals the cron you just configured. Do not proceed on
+   status alone.
+4. **Only after** the binding is verified (and a validating run has passed),
+   delete superseded same-name cronjobs — old generations left behind will
+   multi-run the same feed, and deleting them *before* rebinding severs push
+   delivery for the whole automation.
+
+If a redeploy is done out of order, the symptom is silent: runs keep
+completing and feeds keep writing, but the platform drops every push with no
+error anywhere. Check `alva notification-history list-feed` — an active
+automation with an empty delivery history after a redeploy means the binding
+is severed; rebind per step 2.
+
 ## Red Lines
 
 These are hard constraints. Violating them has corrupted live automations in
