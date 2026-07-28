@@ -21,7 +21,7 @@ const MUTATIONS = [
   {
     id: "mandatory-investment-disclaimer",
     file: "SKILL.md",
-    remove: "10. **Mandatory disclaimer.** Any answer involving a security price or investment strategy MUST end with the matching text: Chinese `免责声明：以上内容仅供信息与研究参考，不构成投资建议。投资有风险，请根据自身情况独立判断。`; English `Disclaimer: This content is for informational and research purposes only and does not constitute investment advice. Investing involves risk; make decisions based on your own circumstances.`\n",
+    remove: "10. **Mandatory disclaimer.** Any answer involving a security price or investment strategy MUST include an investment disclaimer. See [user-facing-prose.md](references/user-facing-prose.md#investment-disclaimer).\n",
     expectFailedCases: [
       "target.mandatory-investment-disclaimer",
       "scenario.equity-price-disclaimer",

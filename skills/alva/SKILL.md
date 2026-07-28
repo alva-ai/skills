@@ -144,7 +144,7 @@ These are the high-signal rules to remember.
 9. **References own depth.** Top-level sections tell you what the capability is,
    what rule is easy to miss, and which file to open. Long examples, commands,
    and checklists live in the linked reference.
-10. **Mandatory disclaimer.** Any answer involving a security price or investment strategy MUST end with the matching text: Chinese `免责声明：以上内容仅供信息与研究参考，不构成投资建议。投资有风险，请根据自身情况独立判断。`; English `Disclaimer: This content is for informational and research purposes only and does not constitute investment advice. Investing involves risk; make decisions based on your own circumstances.`
+10. **Mandatory disclaimer.** Any answer involving a security price or investment strategy MUST include an investment disclaimer. See [user-facing-prose.md](references/user-facing-prose.md#investment-disclaimer).
 
 Two consequences are worth making explicit. First, a useful Alva answer can be
 small: a financial-analysis question should not become a playbook unless the

@@ -32,8 +32,11 @@
       "description": "A direct equity-price Ask applies the mandatory disclaimer rule.",
       "expect": {
         "route": "Financial Analysis / Ask Question",
+        "references": [
+          "user-facing-prose.md"
+        ],
         "behaviors": [
-          "Any answer involving a security price or investment strategy MUST end with the matching text"
+          "Any answer involving a security price or investment strategy MUST include an investment disclaimer"
         ]
       }
     },
@@ -274,7 +277,8 @@
         "route": "Strategy / Trading Analysis",
         "references": [
           "altra-trading.md",
-          "api/trading.md"
+          "api/trading.md",
+          "user-facing-prose.md"
         ],
         "behaviors": [
           "Always use Altra for backtesting",
@@ -282,7 +286,7 @@
           "look-ahead bias",
           "drawdown",
           "package results as a concise answer, feed, signal, or visual playbook depending on the request",
-          "Any answer involving a security price or investment strategy MUST end with the matching text"
+          "Any answer involving a security price or investment strategy MUST include an investment disclaimer"
         ]
       }
     },

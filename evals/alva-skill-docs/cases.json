@@ -849,13 +849,36 @@
     {
       "id": "target.mandatory-investment-disclaimer",
       "group": "target",
-      "target": "skill",
-      "description": "Security-price and investment-strategy answers have one mandatory localized disclaimer rule.",
-      "includes": [
-        "Mandatory disclaimer",
-        "Any answer involving a security price or investment strategy MUST end with the matching text",
-        "免责声明：以上内容仅供信息与研究参考，不构成投资建议。投资有风险，请根据自身情况独立判断。",
-        "Disclaimer: This content is for informational and research purposes only and does not constitute investment advice. Investing involves risk; make decisions based on your own circumstances."
+      "target": "corpus",
+      "description": "Security-price and investment-strategy answers have one mandatory disclaimer contract wired into prose and routing.",
+      "section_includes": [
+        {
+          "file": "SKILL.md",
+          "heading": "First Principles",
+          "label": "top-level requirement",
+          "includes": [
+            "Mandatory disclaimer",
+            "Any answer involving a security price or investment strategy MUST include an investment disclaimer"
+          ]
+        },
+        {
+          "file": "references/user-facing-prose.md",
+          "heading": "Investment Disclaimer",
+          "label": "user-facing prose requirement",
+          "includes": [
+            "investment disclaimer is required",
+            "security price or investment strategy"
+          ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "heading": "Routes",
+          "label": "Ask and strategy routing",
+          "includes": [
+            "apply its required Investment Disclaimer",
+            "Strategy answers apply the required [Investment Disclaimer]"
+          ]
+        }
       ]
     },
     {
