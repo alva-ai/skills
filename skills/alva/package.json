@@ -1,0 +1,13 @@
+{
+  "name": "@alva/skill",
+  "version": "1.19.3",
+  "private": true,
+  "files": [
+    "SKILL.md",
+    "references",
+    "scripts"
+  ],
+  "alpkg": {
+    "kind": "skill"
+  }
+}

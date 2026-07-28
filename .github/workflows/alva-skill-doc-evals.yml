@@ -4,12 +4,14 @@ on:
   pull_request:
     paths:
       - "skills/alva/**"
+      - "tools/alva-skill-package/**"
       - "evals/alva-skill-docs/**"
       - ".github/workflows/alva-skill-doc-evals.yml"
   push:
     branches: [main]
     paths:
       - "skills/alva/**"
+      - "tools/alva-skill-package/**"
       - "evals/alva-skill-docs/**"
       - ".github/workflows/alva-skill-doc-evals.yml"
   workflow_dispatch:
@@ -28,6 +30,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
+      - name: Test Skill package validator
+        run: node --test tools/alva-skill-package/validate.test.mjs
+
+      - name: Validate official Skill package
+        run: node tools/alva-skill-package/validate.mjs --skill-dir skills/alva
 
       - name: Run doc regression eval
         run: node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva
