@@ -173,7 +173,7 @@ Turn your work into a hosted web app at `https://alva.ai/u/<username>/playbooks/
 
 ## Official ALPKG Package
 
-The same Skill is published as `@alva/skill@1.19.3` to both npm and ALPKG. Its
+The same Skill is published as `@alva/skill@1.19.4` to both npm and ALPKG. Its
 `package.json` is public package metadata, but it is not a Node module: it has
 no `main`, `module`, `types`, `typings`, or executable entrypoint, and declares
 `alpkg.kind` as `skill`. Only these roots are ALPKG artifacts:
@@ -197,8 +197,8 @@ node tools/alva-skill-package/validate.mjs --skill-dir skills/alva
 Publishing is intentionally never performed by GitHub Actions. A maintainer
 must release from a detached, clean checkout of the reviewed artifact commit,
 using a separately reviewed checkout for the validator and package metadata.
-For `1.19.3`, the artifact source is
-`fdf43250da716a7ff6faf85ac03b444591151d54` (44 files, 593,719 bytes).
+For `1.19.4`, the artifact source is
+`23e404a11dadbe8fcdcde226af187fed91f116f7` (44 files, 593,719 bytes).
 
 Set the absolute paths below for the two checkouts and the private `alpkg` CLI.
 Keep `ALVA_API_KEY` only in the release process environment; never put it in a
@@ -223,7 +223,7 @@ node "$ALPKG_CLI" publish \
   --endpoint "$ALVA_ENDPOINT" \
   --kind skill \
   --package @alva/skill \
-  --version 1.19.3 \
+  --version 1.19.4 \
   --files SKILL.md \
   --files references \
   --files scripts \
@@ -243,7 +243,7 @@ reuse, run exact `info` again before checking the dynamic highest-stable
 selection:
 
 ```bash
-node "$ALPKG_CLI" info @alva/skill@v1.19.3 \
+node "$ALPKG_CLI" info @alva/skill@v1.19.4 \
   --kind skill --endpoint "$ALVA_ENDPOINT"
 node "$ALPKG_CLI" info @alva/skill \
   --kind skill --endpoint "$ALVA_ENDPOINT"
@@ -272,7 +272,7 @@ three data roots, with no Node entrypoint:
 cd "$RELEASE_ROOT/skills/alva"
 npm pack --dry-run --json --ignore-scripts
 npm publish --access public --ignore-scripts
-npm view @alva/skill@1.19.3 version dist.integrity
+npm view @alva/skill@1.19.4 version dist.integrity
 ```
 
 ---

@@ -5,7 +5,7 @@ Primary design: `code/backend/jagent/alpi/ext/adapters/jagent/docs/changelogs/20
 ## 1. Background
 
 Layer 3 needs the public Alva Skill through ALPKG's first-class `skill` kind.
-The reviewed `v1.19.3` source already contains the complete agent instructions,
+The reviewed `v1.19.4` source contains the complete agent instructions,
 but the repository did not declare a package coordinate or enforce that its
 recursive release tree matched the registry contract.
 
@@ -15,7 +15,7 @@ into JavaScript. The 44 tracked artifacts at source commit
 
 ## 2. End-to-End Behavior
 
-- `@alva/skill@1.19.3` is a public, data-only npm and ALPKG package with ALPKG
+- `@alva/skill@1.19.4` is a public, data-only npm and ALPKG package with ALPKG
   kind `skill` and no Node or ALPKG entrypoints.
 - Explicit roots `SKILL.md`, `references`, and `scripts` recursively produce 44
   artifact files totaling 593,719 bytes. `package.json` and repository/runtime
@@ -55,7 +55,7 @@ into JavaScript. The 44 tracked artifacts at source commit
 - Validate the package contract before walking the real roots; recursively
   reject unsafe paths, symlinks and special files; sort the resulting file
   list; enforce registry limits; and verify `SKILL.md` metadata version
-  `v1.19.3` against package version `1.19.3`.
+  `v1.19.4` against package version `1.19.4`.
 - Add the focused validator suite and run it plus real-tree validation in the
   existing Skill workflow ahead of documentation evaluations.
 - Document the manual production procedure and immutable recovery rules in the
@@ -90,7 +90,7 @@ was given release credentials or permission to publish automatically.
 
 ### Changes made
 
-- `skills/alva/package.json` declares public, data-only `@alva/skill@1.19.3`
+- `skills/alva/package.json` declares public, data-only `@alva/skill@1.19.4`
   for npm and ALPKG, with the exact three artifact roots and no executable entrypoint.
 - `tools/alva-skill-package/validate.mjs` validates identity, metadata, paths,
   node types, registry limits, and the complete recursive artifact set;
@@ -108,8 +108,8 @@ was given release credentials or permission to publish automatically.
 - Documentation regression: 64/64 cases and 646/646 checks PASS.
 - Mutation smoke: 12/12 PASS.
 - Production read-only verification of
-  `/alva/registry/skill/alva/skill/releases/v1.19.3/SKILL.md` succeeded through
-  the logged-in Alva CLI: stat reported a 68,797-byte regular file and readback
+  `/alva/registry/skill/alva/skill/releases/v1.19.4/SKILL.md` succeeds through
+  the logged-in Alva CLI: the manifest reports a 69,008-byte regular file and readback
   contained the expected name/version metadata.
 - `git diff --check`: PASS.
 
