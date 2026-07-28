@@ -1049,7 +1049,10 @@
         "one-read verification",
         "place live orders without per-order user confirmation",
         "missing or unreadable record",
-        "applies only to loop ticks"
+        "applies only to loop ticks",
+        "verification checks only that the consent record exists",
+        "timestamp is provenance, not a match key",
+        "is not a mismatch"
       ]
     },
     {
