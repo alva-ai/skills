@@ -46,3 +46,21 @@ alva trading execute \
   fails until you `unsubscribe` the existing one.
 - `--execute-latest` on subscribe fires the playbook's last signal
   immediately — only works if the feed has a stored `lastSignal`.
+
+## Goal-routed handoffs
+
+A GoalResult may supply a research model, target, or signal candidate. It never
+grants account access or authorizes an order, subscription, unsubscribe, or
+risk-rule mutation. Resolve the exact user-owned account and operation through
+the current trading workflow and CLI help.
+
+For interactive orders, preserve the dry-run and per-order confirmation rule
+above. Classifying a request into a goal does not create the channel-loop
+auto-trading exemption: that exception applies only when the loop carries and
+successfully verifies the consent record required by `SKILL.md`.
+
+Before a subscription mutation, show the exact account, source owner, Feed,
+playbook ID/version, subscription ID when applicable, and the value of
+`--execute-latest`. Treat `--execute-latest` as execution. Before a risk-rule
+mutation, read the current rules and show the exact diff and affected account.
+Never infer either permission from a GoalResult or from another trading action.

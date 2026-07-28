@@ -3,6 +3,8 @@
 .env.*
 node_modules/
 *.log
+__pycache__/
+*.py[cod]
 
 # Skill runtime config (API key, version state — created by pre-flight)
 .alva.json
