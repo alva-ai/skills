@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/investment-answer-disclaimer/skills/alva`
+Source: `/home/forge/mono-meta/code/public/skills/skills/alva`
 
-SKILL.md lines: 909
+SKILL.md lines: 910
 
-Cases: 66/66
+Cases: 64/64
 
-Checks: 682/682 (100.00%)
+Checks: 649/649 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -496,13 +496,13 @@ The general skill distinguishes the default personal destination from an Alva to
 
 ## target
 
-12/12 cases, 156/156 checks
+11/11 cases, 132/132 checks
 
 ### PASS target.top-level-size
 
 Top-level SKILL.md stays below the current guide ceiling without forcing a minimum size that would block future compression.
 
-- [x] line count <= 910 (actual 909)
+- [x] line count <= 910 (actual 910)
 
 ### PASS target.playbook-task-offload
 
@@ -609,35 +609,6 @@ Complex financial asks classify the problem type and apply source, methodology, 
 - [x] attempted/found/missing/impact
 - [x] required calculation not done caps at B-/C
 - [x] hard cap
-
-### PASS target.investment-answer-disclaimer
-
-Price and investment-strategy answers share one localized final disclaimer across Ask, strategy, answer_only, and user-facing Agent.ask output.
-
-- [x] canonical disclaimer contract: references/user-facing-prose.md#Financial Answer Disclaimer includes Price/strategy answers must end with the financial-answer disclaimer below
-- [x] canonical disclaimer contract: references/user-facing-prose.md#Financial Answer Disclaimer includes current, historical, forecast, or target price
-- [x] canonical disclaimer contract: references/user-facing-prose.md#Financial Answer Disclaimer includes investment strategy, backtest, signal, allocation, rebalance, or trade decision
-- [x] canonical disclaimer contract: references/user-facing-prose.md#Financial Answer Disclaimer includes final standalone paragraph
-- [x] canonical disclaimer contract: references/user-facing-prose.md#Financial Answer Disclaimer includes 免责声明：以上内容仅供信息与研究参考，不构成投资建议。投资有风险，请根据自身情况独立判断。
-- [x] canonical disclaimer contract: references/user-facing-prose.md#Financial Answer Disclaimer includes Disclaimer: This content is for informational and research purposes only and does not constitute investment advice. Investing involves risk; make decisions based on your own circumstances.
-- [x] canonical disclaimer contract: references/user-facing-prose.md#Financial Answer Disclaimer includes Financial Analysis / Ask Question
-- [x] canonical disclaimer contract: references/user-facing-prose.md#Financial Answer Disclaimer includes Trade Setup conversational replies
-- [x] canonical disclaimer contract: references/user-facing-prose.md#Financial Answer Disclaimer includes `answer_only`
-- [x] canonical disclaimer contract: references/user-facing-prose.md#Financial Answer Disclaimer includes `Agent.ask()`
-- [x] canonical disclaimer contract: references/user-facing-prose.md#Financial Answer Disclaimer includes ZH-CN EXACT
-- [x] canonical disclaimer contract: references/user-facing-prose.md#Financial Answer Disclaimer includes EN-US EXACT
-- [x] canonical disclaimer contract: references/user-facing-prose.md#Financial Answer Disclaimer includes Do not write anything after it
-- [x] canonical disclaimer contract: references/user-facing-prose.md#Financial Answer Disclaimer includes Pure capability, code/debug, configuration, and operational-status replies
-- [x] canonical disclaimer contract: references/user-facing-prose.md#Financial Answer Disclaimer includes does not repair unsourced prices or unsupported actionable guidance
-- [x] Ask route trigger: SKILL.md#Financial Analysis / Ask Question Tree includes financial-answer disclaimer
-- [x] strategy answer trigger: SKILL.md#Strategy And Trading Analysis includes financial-answer disclaimer
-- [x] trade setup conversational trigger: references/trade-setup-sdk.md#Conversational Reply Boundary includes Financial Answer Disclaimer
-- [x] trade setup conversational trigger: references/trade-setup-sdk.md#Conversational Reply Boundary includes setup, edit, and diagnosis replies
-- [x] trade setup conversational trigger: references/trade-setup-sdk.md#Conversational Reply Boundary includes investment strategy or a security price
-- [x] trade setup conversational trigger: references/trade-setup-sdk.md#Conversational Reply Boundary includes do not rewrite
-- [x] trade setup conversational trigger: references/trade-setup-sdk.md#Conversational Reply Boundary includes SDK-owned Alert, Routine Summary, or receipt bodies
-- [x] answer_only trigger and anti-laundering boundary: references/content-legitimacy.md#Chat-as-Artifact (`answer_only` / Query Mode) includes financial-answer disclaimer
-- [x] answer_only trigger and anti-laundering boundary: references/content-legitimacy.md#Chat-as-Artifact (`answer_only` / Query Mode) includes does not sanitize a body structured as actionable buy/sell guidance
 
 ### PASS target.financial-analysis-prose-gate
 
@@ -791,7 +762,7 @@ Post-deployment and multi-step updates report only new outcome evidence and unre
 
 ## scenarios.ask
 
-3/3 cases, 25/25 checks
+2/2 cases, 19/19 checks
 
 ### PASS scenario.simple-latest-price
 
@@ -806,19 +777,6 @@ Prompt: `What is BTC doing right now?`
 - [x] Do not answer until you can name the decomposition
 - [x] Do not let playbook creation become the default
 - [x] not automatically to a playbook
-- [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
-
-### PASS scenario.equity-price-disclaimer
-
-A direct equity-price Ask uses fresh evidence and ends with the canonical localized investment disclaimer.
-
-Prompt: `What is NVDA trading at right now?`
-
-- [x] user-facing-prose.md
-- [x] content-legitimacy.md
-- [x] Price/strategy answers must end with the financial-answer disclaimer below
-- [x] current, historical, forecast, or target price
-- [x] final standalone paragraph
 - [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
 
 ### PASS scenario.complex-valuation-ask
@@ -841,7 +799,7 @@ Prompt: `Is NVDA cheap versus peers after the latest earnings revision?`
 
 ## scenarios.capability
 
-1/1 cases, 9/9 checks
+1/1 cases, 8/8 checks
 
 ### PASS scenario.capability-gap-before-refusal
 
@@ -852,7 +810,6 @@ Prompt: `Does Alva have darkpool L2 realtime data?`
 - [x] data-skills.md
 - [x] search.md
 - [x] custom data source URL / BYOD source
-- [x] Pure capability, code/debug, configuration, and operational-status replies
 - [x] expected route: references/request-routing.md#Routes includes Capability Verification
 - [x] before refusal: references/request-routing.md#Capability Verification includes Before saying Alva lacks a capability
 - [x] before refusal: references/request-routing.md#Capability Verification includes alva data-skills list | grep -i <topic>
@@ -983,7 +940,7 @@ Prompt: `<session-prefill-channel-memory channel-id="44" root="/alva/home/ymchco
 
 ## scenarios.strategy
 
-1/1 cases, 10/10 checks
+1/1 cases, 8/8 checks
 
 ### PASS scenario.backtest-strategy
 
@@ -993,13 +950,11 @@ Prompt: `Backtest a weekly NVDA momentum strategy and show drawdowns.`
 
 - [x] altra-trading.md
 - [x] api/trading.md
-- [x] user-facing-prose.md
 - [x] Always use Altra for backtesting
 - [x] FeedAltra
 - [x] look-ahead bias
 - [x] drawdown
 - [x] package results as a concise answer, feed, signal, or visual playbook depending on the request
-- [x] Price/strategy answers must end with the financial-answer disclaimer below
 - [x] expected route: references/request-routing.md#Routes includes Strategy / Trading Analysis
 
 ## scenarios.skillhub

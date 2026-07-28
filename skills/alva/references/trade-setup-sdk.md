@@ -6,15 +6,6 @@ config the SDK accepts, the provisioning flow, the editing flow, and how to
 read a run for diagnosis. This is a behavior guide for you, the Alva agent —
 not an end-user manual and not the SDK's internal API reference.
 
-## Conversational Reply Boundary
-
-Before composing, relaying, or explaining a Trade Setup in chat, read the
-[Financial Answer Disclaimer](user-facing-prose.md#financial-answer-disclaimer).
-Apply its financial-answer disclaimer to setup, edit, and diagnosis replies
-that state or analyze the user's investment strategy or a security price. This
-prompt-level rule governs the Agent's conversational reply; do not rewrite
-SDK-owned Alert, Routine Summary, or receipt bodies when relaying them.
-
 A Trade Setup watches **one instrument** against **one free-form trade setup**
 the user describes in their own words. The SDK (`@alva/trade-setup-sdk`) owns
 the pipeline; your job is to compose a correct config with the user, provision

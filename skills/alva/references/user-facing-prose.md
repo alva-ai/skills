@@ -124,55 +124,6 @@ answer like this:
 > the analysis five hours ago, but it still filed it under April 30, so the page
 > looked unchanged.
 
-## Financial Answer Disclaimer
-
-Price/strategy answers must end with the financial-answer disclaimer below.
-
-Apply this rule whenever user-facing prose states or analyzes either:
-
-- a security's current, historical, forecast, or target price, including price
-  moves and price-based conclusions; or
-- an investment strategy, backtest, signal, allocation, rebalance, or trade
-  decision, including analysis that stops short of an explicit Buy/Sell label.
-
-The rule applies to Financial Analysis / Ask Question, Strategy / Trading
-Analysis delivered as an answer, Trade Setup conversational replies,
-`answer_only` chat artifacts, and any `Agent.ask()` output consumed as
-user-facing prose. Simple latest-price Ask answers are not exempt.
-
-Use the answer's language and copy the matching text exactly:
-
-```text
-免责声明：以上内容仅供信息与研究参考，不构成投资建议。投资有风险，请根据自身情况独立判断。
-```
-
-```text
-Disclaimer: This content is for informational and research purposes only and does not constitute investment advice. Investing involves risk; make decisions based on your own circumstances.
-```
-
-Place citations, conclusions, and any useful-next-step sentence before the
-disclaimer. The disclaimer is the final standalone paragraph; do not add a CTA,
-follow-up question, or other prose after it.
-
-Pure capability, code/debug, configuration, and operational-status replies do
-not add the footer unless they also state or analyze a security price or
-investment strategy. The footer also does not repair unsourced prices or
-unsupported actionable guidance: satisfy provenance, computation, confidence,
-and refusal rules first.
-
-Any `Agent.ask()` call that can produce covered user-facing prose must include
-this block in `initialState.systemPrompt`, using the output language:
-
-```text
-FINANCIAL DISCLAIMER — REQUIRED. If the answer states or analyzes a security
-price or investment strategy, end with the matching-language line below as the
-final standalone paragraph. Do not write anything after it.
-ZH-CN EXACT: 免责声明：以上内容仅供信息与研究参考，不构成投资建议。投资有风险，请根据自身情况独立判断。
-EN-US EXACT: Disclaimer: This content is for informational and research purposes only and does not constitute investment advice. Investing involves risk; make decisions based on your own circumstances.
-This footer never substitutes for source, computation, confidence, or refusal
-requirements.
-```
-
 ## Voice
 
 User-facing prose in Alva should read like a sharp human analyst, not a
