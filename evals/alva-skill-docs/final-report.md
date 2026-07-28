@@ -2,11 +2,11 @@
 
 Source: `/home/forge/mono-meta/code/public/skills/skills/alva`
 
-SKILL.md lines: 850
+SKILL.md lines: 910
 
-Cases: 58/58
+Cases: 64/64
 
-Checks: 545/545 (100.00%)
+Checks: 649/649 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -19,7 +19,7 @@ No failed cases. Keep the eval in place as a regression mechanism.
 
 ## retained
 
-19/19 cases, 110/110 checks
+19/19 cases, 111/111 checks
 
 ### PASS retained.platform-panorama
 
@@ -207,6 +207,7 @@ Remix, annotation edits, and push notification workflows remain covered.
 - [x] alva playbooks trending
 - [x] annotation-driven edits
 - [x] feed_alert_ready
+- [x] alertOutput(typeDoc)
 - [x] <|SKIP_NOTIFICATION|>
 - [x] subscriptions
 
@@ -314,7 +315,7 @@ When structured data lags a known official release, web is an official-source fa
 
 ## platform-data
 
-1/1 cases, 8/8 checks
+2/2 cases, 31/31 checks
 
 ### PASS platform-data.kol-surfaces
 
@@ -329,9 +330,37 @@ KOL data and the KOL digest SDK are routed together as Alva-maintained Platform 
 - [x] request routing: SKILL.md#Request Routing includes Platform Data: Fintwit Intelligence
 - [x] request routing: SKILL.md#Request Routing includes Platform Data: Fintwit Digest SDK
 
+### PASS platform-data.ticker-read-sources
+
+A single-ticker read routes through the five official Skillhub sources as a first-tier Platform Data lane with explicit read, build, freshness, and fallback boundaries.
+
+- [x] platform data section: SKILL.md#Data Access: Platform Data includes Ticker Read
+- [x] platform data section: SKILL.md#Data Access: Platform Data includes Read [ticker-read.md](references/ticker-read.md)
+- [x] platform data section: SKILL.md#Data Access: Platform Data includes first-tier sources
+- [x] platform data section: SKILL.md#Data Access: Platform Data includes select the smallest sufficient combination
+- [x] ticker read route: SKILL.md#Request Routing includes ticker read, analyze a named ticker
+- [x] ticker read route: SKILL.md#Request Routing includes read [ticker-read.md](references/ticker-read.md) before source selection
+- [x] official source router: references/ticker-read.md#Source Router includes alva/company-anomaly-read
+- [x] official source router: references/ticker-read.md#Source Router includes alva/company-move-attribution
+- [x] official source router: references/ticker-read.md#Source Router includes alva/company-data-aggregate
+- [x] official source router: references/ticker-read.md#Source Router includes alva/what-investors-are-looking-for
+- [x] official source router: references/ticker-read.md#Source Router includes alva/query-breaking-news-feed
+- [x] official source router: references/ticker-read.md#Source Router includes Direct-read lane
+- [x] official source router: references/ticker-read.md#Source Router includes Build-on-demand lane
+- [x] official source router: references/ticker-read.md#Source Router includes Use `alva/company-anomaly-read` as the first direct-read check for intraday and hourly-scale market tracking
+- [x] profile availability: references/ticker-read.md#Availability Gate includes Local source files are not proof that a method is published
+- [x] profile availability: references/ticker-read.md#Availability Gate includes Continue with the remaining available Platform Data sources
+- [x] profile availability: references/ticker-read.md#Availability Gate includes Method availability is rollout state, not company coverage
+- [x] ticker read directory: references/request-routing.md#Official Ticker Read Sources includes [ticker-read.md](ticker-read.md) owns source selection
+- [x] ticker read directory: references/request-routing.md#Official Ticker Read Sources includes alva/company-anomaly-read
+- [x] ticker read directory: references/request-routing.md#Official Ticker Read Sources includes alva/what-investors-are-looking-for
+- [x] ticker read directory: references/request-routing.md#Official Ticker Read Sources includes alva/query-breaking-news-feed
+- [x] ticker read directory: references/request-routing.md#Official Ticker Read Sources includes alva/company-data-aggregate
+- [x] ticker read directory: references/request-routing.md#Official Ticker Read Sources includes alva/company-move-attribution
+
 ## issue592
 
-5/5 cases, 77/77 checks
+5/5 cases, 79/79 checks
 
 ### PASS issue592.scoped-eval-checks
 
@@ -417,6 +446,8 @@ Playbook draft and release remain protected by behavior-level gates for visibili
 - [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes HTML fetches quantitative data from feeds, not inline literals
 - [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes Latest data from each referenced feed is fresh
 - [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes README exists, is current, and is passed via absolute `--readme-url`
+- [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes New feeds declare push-worthy outputs with
+- [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes existing Altra `signal/targets` or legacy
 - [x] release gate: references/playbook-creation.md<HARD-GATE:before-playbook-release> includes alva lint playbook ./index.html
 
 ### PASS issue592.push-delivery-behavior
@@ -429,7 +460,7 @@ Push setup is evaluated as a full delivery path instead of a single publisher fl
 - [x] push setup: references/push-notifications.md#Configure And Verify includes alva alert enable --automation
 - [x] push setup: references/push-notifications.md#Configure And Verify includes alva alert enable --automation-ids
 - [x] push setup: references/push-notifications.md#Configure And Verify includes There is no playbook alert target
-- [x] push setup: references/push-notifications.md#Configure And Verify includes read `@last/1` of the sidecar
+- [x] push setup: references/push-notifications.md#Configure And Verify includes read `@last/1` of the declared output
 - [x] push setup: references/push-notifications.md#Configure And Verify includes do not claim push is set up
 - [x] push inventory: references/push-notifications.md#Inventory And Unsubscribe includes alva alert list --first 200
 - [x] push inventory: references/push-notifications.md#Inventory And Unsubscribe includes alva alert follows --limit 100
@@ -437,7 +468,7 @@ Push setup is evaluated as a full delivery path instead of a single publisher fl
 
 ## subscriptions
 
-1/1 cases, 16/16 checks
+1/1 cases, 19/19 checks
 
 ### PASS subscriptions.delivery-destination
 
@@ -446,6 +477,7 @@ The general skill distinguishes the default personal destination from an Alva to
 - [x] excludes External IM group
 - [x] excludes alva alert group
 - [x] excludes group-subscriptions
+- [x] excludes active_channel
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes Default personal destination
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes Alva topic channel
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes --automation-ids <id,id> --channel-id <channel_id>
@@ -454,6 +486,8 @@ The general skill distinguishes the default personal destination from an Alva to
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes delivery is web-only
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes current Alva topic channel (channel id <id>)
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes `channel_id=0`
+- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes `active_im_provider`
+- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes active IM provider
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes moves the personal alert
 - [x] destination verification: references/push-notifications.md#Configure And Verify includes intended destination
 - [x] destination verification: references/push-notifications.md#Configure And Verify includes global "subscribed" state is not sufficient
@@ -468,7 +502,7 @@ The general skill distinguishes the default personal destination from an Alva to
 
 Top-level SKILL.md stays below the current guide ceiling without forcing a minimum size that would block future compression.
 
-- [x] line count <= 850 (actual 850)
+- [x] line count <= 910 (actual 910)
 
 ### PASS target.playbook-task-offload
 
@@ -605,7 +639,7 @@ Operational pitfalls are a mandatory stepwise gate, not an optional debugging ap
 
 Latest mainline Alva skill updates remain integrated after rebasing the refactor.
 
-- [x] version: v1.18.1
+- [x] version: v1.19.3
 - [x] Capability Help
 - [x] Reply 1, 2, or 3 to start
 - [x] feedback
@@ -690,7 +724,33 @@ Manual trigger commands remain discoverable without becoming a required deployme
 
 ## communication
 
-1/1 cases, 3/3 checks
+2/2 cases, 24/24 checks
+
+### PASS communication.company-page-links
+
+User-facing replies link high-confidence U.S.-listed company mentions to production Alva company pages without extra lookups or ambiguous company matches.
+
+- [x] excludes https://alva.ai/company/
+- [x] excludes https://stg.alva.ai/market/
+- [x] excludes https://stg.alva.xyz/market/
+- [x] excludes https://alva.ai/market/3986.HK
+- [x] company page link contract: SKILL.md#Company Page Links includes In every user-facing Alva response
+- [x] company page link contract: SKILL.md#Company Page Links includes each covered U.S.-listed company to its Alva company page
+- [x] company page link contract: SKILL.md#Company Page Links includes [visible wording](https://alva.ai/market/{CANONICAL_TICKER})
+- [x] company page link contract: SKILL.md#Company Page Links includes semantically clear company names
+- [x] company page link contract: SKILL.md#Company Page Links includes common names, or localized aliases
+- [x] company page link contract: SKILL.md#Company Page Links includes Apple
+- [x] company page link contract: SKILL.md#Company Page Links includes Use semantic context, not token shape alone
+- [x] company page link contract: SKILL.md#Company Page Links includes Only link U.S.-listed companies
+- [x] company page link contract: SKILL.md#Company Page Links includes non-U.S. listings such as `3986.HK`
+- [x] company page link contract: SKILL.md#Company Page Links includes never strip or rewrite an exchange suffix
+- [x] company page link contract: SKILL.md#Company Page Links includes company/ticker mapping and U.S. listing status already resolved by Alva data
+- [x] company page link contract: SKILL.md#Company Page Links includes mapping, listing market, share class, or page coverage
+- [x] company page link contract: SKILL.md#Company Page Links includes do not call a tool just to add a link
+- [x] company page link contract: SKILL.md#Company Page Links includes Link each company at most once per reply
+- [x] company page link contract: SKILL.md#Company Page Links includes non-company assets
+- [x] company page link contract: SKILL.md#Company Page Links includes Never use a staging host or relative URL for a company page
+- [x] company page link contract: SKILL.md#Company Page Links includes Do not add a separate company-page footer
 
 ### PASS communication.concise-completion
 
@@ -818,7 +878,7 @@ Prompt: `<annotation id="hero-title">make this chart title shorter</annotation>`
 
 ## scenarios.push
 
-2/2 cases, 35/35 checks
+2/2 cases, 44/44 checks
 
 ### PASS scenario.alert-push-monitor
 
@@ -829,21 +889,30 @@ Prompt: `Track BTC dominance and notify me when it breaks out.`
 - [x] alva-knowledge.md
 - [x] push-notifications.md
 - [x] feed-lifecycle.md
-- [x] Build or modify a feed that emits actionable `signal/targets` or `notify/message`
+- [x] Build or modify a feed that declares actionable outputs with `alertOutput(typeDoc)`
 - [x] bounded history source and lookback window
 - [x] Notification deduplication is semantic
 - [x] If no material delta exists
 - [x] A push is set up only after all of these succeed
 - [x] alva deploy update --id <ID> --push-notify
 - [x] alva alert enable --automation
-- [x] read `@last/1` of the sidecar
+- [x] read `@last/1` of the declared output
+- [x] A quiet V2 run does not append an alert record
+- [x] `alva deploy trigger` is not a dry run
 - [x] do not claim push is set up
 - [x] expected route: references/request-routing.md#Routes includes Automation / Push
 - [x] Alva Knowledge (Required Reading): SKILL.md#Alva Knowledge (Required Reading) includes [alva-knowledge.md](references/alva-knowledge.md)
 - [x] Alva Knowledge (Required Reading): SKILL.md#Alva Knowledge (Required Reading) includes Every automation must decide
 - [x] Reference Library: SKILL.md#Reference Library includes [alva-knowledge.md](references/alva-knowledge.md)
 - [x] Reference Library: SKILL.md#Reference Library includes Required automation reasoning
+- [x] Push Monitor: SKILL.md#Push Monitor includes declared `alertOutput(typeDoc)`
+- [x] Push Monitor: SKILL.md#Push Monitor includes quiet branch that does not append
+- [x] Push Monitor: SKILL.md#Push Monitor includes `signal/targets` or `notify/message` only when maintaining an existing
+- [x] Push Monitor: SKILL.md#Push Monitor includes recognized legacy producer
+- [x] Action Layer: Alerts: SKILL.md#Action Layer: Alerts includes New feeds declare push-worthy outputs with `alertOutput(typeDoc)`
+- [x] Action Layer: Alerts: SKILL.md#Action Layer: Alerts includes legacy `signal/targets` or `notify/message` producer
 - [x] Routes: references/request-routing.md#Routes includes Read [alva-knowledge.md](alva-knowledge.md) before design
+- [x] Configure And Verify: references/push-notifications.md#Configure And Verify includes Declare the intended output with `alertOutput(typeDoc)`
 - [x] automation knowledge: references/feed-lifecycle.md<HARD-GATE:before-automation-publish> includes [Alva Knowledge](alva-knowledge.md)
 - [x] automation knowledge: references/feed-lifecycle.md<HARD-GATE:before-automation-publish> includes longitudinal or decision automations compare bounded history
 - [x] automation knowledge: references/feed-lifecycle.md<HARD-GATE:before-automation-publish> includes push-capable automations suppress non-material repeats
@@ -864,7 +933,7 @@ Prompt: `<session-prefill-channel-memory channel-id="44" root="/alva/home/ymchco
 - [x] Do not trigger the cronjob or wait for its next scheduled run solely to verify setup
 - [x] A successful enable proves that alert delivery is configured
 - [x] it does not prove that a message has already been delivered
-- [x] A sidecar record alone is also not delivery proof
+- [x] An ALFS record alone is also not delivery proof
 - [x] report it as an Alva web topic channel with its id
 - [x] never as Telegram or another external DM
 - [x] expected route: references/request-routing.md#Routes includes Automation / Push
@@ -927,6 +996,83 @@ Prompt: `Use the thesis skill for NVDA AI capex read-through.`
 - [x] Do not turn every Skillhub task into a playbook
 - [x] --skill-id <username>/<name>
 - [x] expected route: references/request-routing.md#Routes includes Playbook Creation
+
+## scenarios.ticker-read
+
+4/4 cases, 45/45 checks
+
+### PASS scenario.ticker-read-broad-analysis
+
+A broad single-ticker read checks the official direct-read sources before generic search, selects rather than blindly running them all, and still uses Data Skills for live financial facts.
+
+Prompt: `分析一下 MU 最近的公司表现，重点说清楚市场现在在看什么、最近异动和催化剂。`
+
+- [x] ticker-read.md
+- [x] company-anomaly.md
+- [x] request-routing.md
+- [x] user-facing-prose.md
+- [x] Treat these as first-tier ticker-read sources
+- [x] For every broad ticker read, check the Direct-read lane before generic search
+- [x] alva/what-investors-are-looking-for
+- [x] alva/company-anomaly-read
+- [x] alva/query-breaking-news-feed
+- [x] Data Skills remain the source for live price, fundamentals, valuation
+- [x] Do not execute every source by default
+- [x] Continue with the remaining available Platform Data sources
+- [x] Use `alva/company-anomaly-read` as the first direct-read check for intraday and hourly-scale market tracking
+- [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
+- [x] ticker read route: SKILL.md#Request Routing includes read [ticker-read.md](references/ticker-read.md) before source selection
+
+### PASS scenario.ticker-read-hourly-tracking
+
+An hour-scale ticker check prioritizes the published anomaly timeline and current episode attribution before slower investor-focus or generic discovery sources.
+
+Prompt: `帮我看看 NVDA 过去一小时有没有异常，为什么？`
+
+- [x] ticker-read.md
+- [x] company-anomaly.md
+- [x] data-skills.md
+- [x] Use `alva/company-anomaly-read` as the first direct-read check for intraday and hourly-scale market tracking
+- [x] roughly every 15 minutes during US market hours
+- [x] anomaly/timeline
+- [x] @last/1
+- [x] A quiet state does not prove that price was flat
+- [x] Data Skills for the live price
+- [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
+
+### PASS scenario.ticker-read-uncovered-move
+
+An uncovered or non-US move falls back from the published anomaly feed to custom aggregation and attribution without pretending that aggregation itself detected an anomaly.
+
+Prompt: `三星电子 005930.KS 昨天为什么大涨？`
+
+- [x] ticker-read.md
+- [x] request-routing.md
+- [x] data-skills.md
+- [x] off-list, non-US, user-defined, or otherwise uncovered move
+- [x] alva/company-data-aggregate
+- [x] alva/company-move-attribution
+- [x] Attribution assumes an already-identified anomalous move
+- [x] no web search inside attribution
+- [x] does not silently become an Automation or Playbook
+- [x] If either method is unavailable in the active profile
+- [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
+
+### PASS scenario.ticker-read-investor-news
+
+Investor-focus and breaking-event questions combine WILF with the macro breaking-news feed while preserving each source's freshness, coverage, and evidence limits.
+
+Prompt: `TSLA 现在投资者最关注什么？今天有没有可能影响它的突发事件？`
+
+- [x] ticker-read.md
+- [x] request-routing.md
+- [x] Weekly investor focus
+- [x] current macro/cross-market event discovery
+- [x] surface `gaps`
+- [x] supports_event: true
+- [x] not a company-by-company news feed
+- [x] did not surface a matching event
+- [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
 
 ## scenarios.udf
 
