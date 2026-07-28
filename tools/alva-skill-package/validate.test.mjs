@@ -26,7 +26,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(HERE, "../..");
 const REAL_SKILL_DIR = join(REPO_ROOT, "skills/alva");
 const EXPECTED_FILE_COUNT = 44;
-const EXPECTED_TOTAL_BYTES = 591_813;
+const EXPECTED_TOTAL_BYTES = 593_719;
 
 function makeFixture(t) {
   const temporaryRoot = mkdtempSync(join(tmpdir(), "alva-skill-package-"));
