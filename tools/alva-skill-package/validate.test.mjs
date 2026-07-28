@@ -182,6 +182,19 @@ test("rejects package and Skill metadata version drift", async (t) => {
   });
 });
 
+test("accepts valid YAML frontmatter formatting variants", async (t) => {
+  const skillDir = makeFixture(t);
+  const skillPath = join(skillDir, "SKILL.md");
+  const skill = readFileSync(skillPath, "utf8")
+    .replace("metadata:", "metadata: # release metadata")
+    .replace("  author: alva", "  author: alva\n# root-level comment")
+    .replace("  version: v1.19.3", '  version: "v1.19.3" # package version');
+  writeFileSync(skillPath, `\uFEFF${skill}`);
+
+  const result = await validateSkillPackage({ skillDir });
+  assert.equal(result.version, "1.19.3");
+});
+
 test("requires exactly SKILL.md, references, and scripts publish roots", async (t) => {
   const skillDir = makeFixture(t);
   updatePackage(skillDir, (packageJSON) => {

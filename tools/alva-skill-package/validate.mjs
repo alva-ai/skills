@@ -219,7 +219,8 @@ function assertCanonicalArtifactPath(value) {
 }
 
 async function validateSkillMetadataVersion(skillPath, expectedVersion) {
-  const skill = await readFile(skillPath, "utf8");
+  const content = await readFile(skillPath, "utf8");
+  const skill = content.replace(/^\uFEFF/, "");
   const frontmatter = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/.exec(skill)?.[1];
   if (frontmatter === undefined) {
     throw new Error("SKILL.md must begin with YAML frontmatter");
@@ -229,13 +230,15 @@ async function validateSkillMetadataVersion(skillPath, expectedVersion) {
   let inMetadata = false;
   let version;
   for (const line of lines) {
-    if (line === "metadata:") {
+    const trimmed = line.trim();
+    if (trimmed === "" || trimmed.startsWith("#")) continue;
+    if (/^metadata:\s*(?:#.*)?$/.test(line)) {
       inMetadata = true;
       continue;
     }
     if (!inMetadata) continue;
-    if (/^\S/.test(line)) break;
-    const match = /^\s+version:\s*(\S+)\s*$/.exec(line);
+    if (/^[^\s#]/.test(line)) break;
+    const match = /^\s+version:\s*["']?([^\s#'"]+)["']?\s*(?:#.*)?$/.exec(line);
     if (match) {
       version = match[1];
       break;
