@@ -24,8 +24,7 @@ This file is the platform encyclopedia and operating guide. Read it to
 understand what Alva can do, how the concepts fit together, which path a user
 request belongs to, and which focused reference owns the detailed procedure. It
 is intentionally not the full playbook-building manual. Long command sequences,
-API gotchas, release checklists, design rules, examples, and debugging recipes
-live in `references/`.
+API gotchas, release checklists, design rules, examples, and debugging recipes live in `references/`.
 
 ## Mental Model
 
