@@ -4,9 +4,9 @@ Source: `origin/main`
 
 SKILL.md lines: 910
 
-Cases: 63/64
+Cases: 62/66
 
-Checks: 646/649 (99.54%)
+Checks: 654/664 (98.49%)
 
 ## Scoring Diagnosis
 
@@ -15,7 +15,10 @@ Classify the gap before editing: missing capability summary, missing routing poi
 Do not expose eval scores as product copy, and do not patch demos to hide a weak result.
 Instead, fix the canonical skill text or eval case, then rerun baseline and final reports so the regression mechanism proves the gap is closed.
 
-- target.auto-trade-consent-exemption: inspect for a skill gap before editing. Missing checks: verification checks only that the consent record exists; timestamp is provenance, not a match key; is not a mismatch
+- target.investment-answer-disclaimer: inspect for a skill gap before editing. Missing checks: canonical disclaimer contract: references/user-facing-prose.md#Financial Answer Disclaimer section exists; Ask route trigger: SKILL.md#Financial Analysis / Ask Question Tree includes financial-answer disclaimer; strategy answer trigger: SKILL.md#Strategy And Trading Analysis includes financial-answer disclaimer; trade setup conversational trigger: references/trade-setup-sdk.md#Conversational Reply Boundary section exists; answer_only trigger and anti-laundering boundary: references/content-legitimacy.md#Chat-as-Artifact (`answer_only` / Query Mode) includes financial-answer disclaimer
+- scenario.equity-price-disclaimer: inspect for a skill gap before editing. Missing checks: Price/strategy answers must end with the financial-answer disclaimer below; current, historical, forecast, or target price; final standalone paragraph
+- scenario.capability-gap-before-refusal: inspect for a skill gap before editing. Missing checks: Pure capability, code/debug, configuration, and operational-status replies
+- scenario.backtest-strategy: inspect for a skill gap before editing. Missing checks: Price/strategy answers must end with the financial-answer disclaimer below
 
 ## retained
 
@@ -496,7 +499,7 @@ The general skill distinguishes the default personal destination from an Alva to
 
 ## target
 
-10/11 cases, 129/132 checks
+11/12 cases, 133/138 checks
 
 ### PASS target.top-level-size
 
@@ -610,6 +613,17 @@ Complex financial asks classify the problem type and apply source, methodology, 
 - [x] required calculation not done caps at B-/C
 - [x] hard cap
 
+### FAIL target.investment-answer-disclaimer
+
+Price and investment-strategy answers share one localized final disclaimer across Ask, strategy, answer_only, and user-facing Agent.ask output.
+
+- [ ] canonical disclaimer contract: references/user-facing-prose.md#Financial Answer Disclaimer section exists
+- [ ] Ask route trigger: SKILL.md#Financial Analysis / Ask Question Tree includes financial-answer disclaimer
+- [ ] strategy answer trigger: SKILL.md#Strategy And Trading Analysis includes financial-answer disclaimer
+- [ ] trade setup conversational trigger: references/trade-setup-sdk.md#Conversational Reply Boundary section exists
+- [ ] answer_only trigger and anti-laundering boundary: references/content-legitimacy.md#Chat-as-Artifact (`answer_only` / Query Mode) includes financial-answer disclaimer
+- [x] answer_only trigger and anti-laundering boundary: references/content-legitimacy.md#Chat-as-Artifact (`answer_only` / Query Mode) includes does not sanitize a body structured as actionable buy/sell guidance
+
 ### PASS target.financial-analysis-prose-gate
 
 Financial Analysis answers must read the merged user-facing prose reference before answering.
@@ -663,7 +677,7 @@ Latest mainline Alva skill updates remain integrated after rebasing the refactor
 - [x] headers-only tables
 - [x] fetch failures
 
-### FAIL target.auto-trade-consent-exemption
+### PASS target.auto-trade-consent-exemption
 
 A consent-referenced, record-verified channel-loop tick is exempt from per-order confirmation while staying dry-run/intent-id/risk bound.
 
@@ -673,9 +687,9 @@ A consent-referenced, record-verified channel-loop tick is exempt from per-order
 - [x] place live orders without per-order user confirmation
 - [x] missing or unreadable record
 - [x] applies only to loop ticks
-- [ ] verification checks only that the consent record exists
-- [ ] timestamp is provenance, not a match key
-- [ ] is not a mismatch
+- [x] verification checks only that the consent record exists
+- [x] timestamp is provenance, not a match key
+- [x] is not a mismatch
 
 ### PASS target.auto-trade-consent-references
 
@@ -762,7 +776,7 @@ Post-deployment and multi-step updates report only new outcome evidence and unre
 
 ## scenarios.ask
 
-2/2 cases, 19/19 checks
+2/3 cases, 22/25 checks
 
 ### PASS scenario.simple-latest-price
 
@@ -777,6 +791,19 @@ Prompt: `What is BTC doing right now?`
 - [x] Do not answer until you can name the decomposition
 - [x] Do not let playbook creation become the default
 - [x] not automatically to a playbook
+- [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
+
+### FAIL scenario.equity-price-disclaimer
+
+A direct equity-price Ask uses fresh evidence and ends with the canonical localized investment disclaimer.
+
+Prompt: `What is NVDA trading at right now?`
+
+- [x] user-facing-prose.md
+- [x] content-legitimacy.md
+- [ ] Price/strategy answers must end with the financial-answer disclaimer below
+- [ ] current, historical, forecast, or target price
+- [ ] final standalone paragraph
 - [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
 
 ### PASS scenario.complex-valuation-ask
@@ -799,9 +826,9 @@ Prompt: `Is NVDA cheap versus peers after the latest earnings revision?`
 
 ## scenarios.capability
 
-1/1 cases, 8/8 checks
+0/1 cases, 8/9 checks
 
-### PASS scenario.capability-gap-before-refusal
+### FAIL scenario.capability-gap-before-refusal
 
 A capability-gap question verifies live coverage before saying no or moving to BYOD.
 
@@ -810,6 +837,7 @@ Prompt: `Does Alva have darkpool L2 realtime data?`
 - [x] data-skills.md
 - [x] search.md
 - [x] custom data source URL / BYOD source
+- [ ] Pure capability, code/debug, configuration, and operational-status replies
 - [x] expected route: references/request-routing.md#Routes includes Capability Verification
 - [x] before refusal: references/request-routing.md#Capability Verification includes Before saying Alva lacks a capability
 - [x] before refusal: references/request-routing.md#Capability Verification includes alva data-skills list | grep -i <topic>
@@ -940,9 +968,9 @@ Prompt: `<session-prefill-channel-memory channel-id="44" root="/alva/home/ymchco
 
 ## scenarios.strategy
 
-1/1 cases, 8/8 checks
+0/1 cases, 9/10 checks
 
-### PASS scenario.backtest-strategy
+### FAIL scenario.backtest-strategy
 
 A backtest routes through Strategy / Trading Analysis and requires Altra instead of hand-rolled loops.
 
@@ -950,11 +978,13 @@ Prompt: `Backtest a weekly NVDA momentum strategy and show drawdowns.`
 
 - [x] altra-trading.md
 - [x] api/trading.md
+- [x] user-facing-prose.md
 - [x] Always use Altra for backtesting
 - [x] FeedAltra
 - [x] look-ahead bias
 - [x] drawdown
 - [x] package results as a concise answer, feed, signal, or visual playbook depending on the request
+- [ ] Price/strategy answers must end with the financial-answer disclaimer below
 - [x] expected route: references/request-routing.md#Routes includes Strategy / Trading Analysis
 
 ## scenarios.skillhub

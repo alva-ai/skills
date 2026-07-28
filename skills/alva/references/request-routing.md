@@ -23,9 +23,9 @@ Decision order:
 
 | Request type | Objective |
 | --- | --- |
-| Financial Analysis / Ask Question | Answer market, asset, portfolio, valuation, comparison, single-ticker, and "why" questions with fresh data/search/`alva run` evidence. A named-ticker read first opens [ticker-read.md](ticker-read.md). Comparison baselines are figures too: fetch or qualify them. Every answer must read [user-facing-prose.md](user-facing-prose.md), then pass the ask evidence gate. |
+| Financial Analysis / Ask Question | Answer market, asset, portfolio, valuation, comparison, single-ticker, and "why" questions with fresh data/search/`alva run` evidence. A named-ticker read first opens [ticker-read.md](ticker-read.md). Comparison baselines are figures too: fetch or qualify them. Every answer must read [user-facing-prose.md](user-facing-prose.md), apply its financial-answer disclaimer when triggered, then pass the ask evidence gate. |
 | Playbook Creation | Build, remix, edit, release, or update a hosted/shareable playbook. Read [playbook-creation.md](playbook-creation.md) for the subroute tree and gates. |
-| Strategy / Trading Analysis | Use Altra for backtests, signals, portfolio simulation, rebalancing, or trading analysis; deliver an answer, feed, signal, or playbook as requested. |
+| Strategy / Trading Analysis | Use Altra for backtests, signals, portfolio simulation, rebalancing, or trading analysis; deliver an answer, feed, signal, or playbook as requested. Strategy answers must read [user-facing-prose.md](user-facing-prose.md) and end with its financial-answer disclaimer. |
 | Automation / Push | Read [alva-knowledge.md](alva-knowledge.md) before design, build or modify a feed that declares actionable outputs with `alertOutput(typeDoc)`, then verify publisher, subscription, and delivery paths. |
 | Debug / Edit | Inspect existing code, logs, playbook source, feed output, or annotations, then change the generator rather than rendered values. |
 | Capability Verification | Verify Data Skills, Skillhub, runtime, trading, or search coverage before saying Alva lacks a capability. |
@@ -112,8 +112,9 @@ or computing evidence, but first read
 [user-facing-prose.md](user-facing-prose.md), then apply the answer gate from
 `SKILL.md`: decomposition, source path, coverage gaps, and
 sourced-vs-inference boundary. Simple asks can satisfy the gate with one hop.
-Simple/latest-fact asks stop there. Only complex judgment asks also pass the
-Complex Ask Router below before the answer is written.
+Simple/latest-fact asks stop there, but still apply the financial-answer
+disclaimer when triggered. Only complex judgment asks also pass the Complex Ask
+Router below before the answer is written.
 
 ### Complex Ask Router
 

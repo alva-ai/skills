@@ -26,6 +26,24 @@
       }
     },
     {
+      "id": "scenario.equity-price-disclaimer",
+      "group": "scenarios.ask",
+      "prompt": "What is NVDA trading at right now?",
+      "description": "A direct equity-price Ask uses fresh evidence and ends with the canonical localized investment disclaimer.",
+      "expect": {
+        "route": "Financial Analysis / Ask Question",
+        "references": [
+          "user-facing-prose.md",
+          "content-legitimacy.md"
+        ],
+        "behaviors": [
+          "Price/strategy answers must end with the financial-answer disclaimer below",
+          "current, historical, forecast, or target price",
+          "final standalone paragraph"
+        ]
+      }
+    },
+    {
       "id": "scenario.complex-valuation-ask",
       "group": "scenarios.ask",
       "prompt": "Is NVDA cheap versus peers after the latest earnings revision?",
@@ -63,6 +81,9 @@
         ],
         "behaviors": [
           "custom data source URL / BYOD source"
+        ],
+        "forbidden_behaviors": [
+          "Pure capability, code/debug, configuration, and operational-status replies"
         ],
         "sections": [
           {
@@ -262,14 +283,16 @@
         "route": "Strategy / Trading Analysis",
         "references": [
           "altra-trading.md",
-          "api/trading.md"
+          "api/trading.md",
+          "user-facing-prose.md"
         ],
         "behaviors": [
           "Always use Altra for backtesting",
           "FeedAltra",
           "look-ahead bias",
           "drawdown",
-          "package results as a concise answer, feed, signal, or visual playbook depending on the request"
+          "package results as a concise answer, feed, signal, or visual playbook depending on the request",
+          "Price/strategy answers must end with the financial-answer disclaimer below"
         ]
       }
     },

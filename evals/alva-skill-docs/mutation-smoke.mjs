@@ -15,8 +15,18 @@ const MUTATIONS = [
   {
     id: "simple-latest-one-hop",
     file: "SKILL.md",
-    remove: "Simple latest-fact asks stop there after one\nsourced hop; ",
+    remove: "Simple latest-fact asks stop there\nafter one sourced hop; ",
     expectFailedCases: ["issue592.financial-ask-contract", "scenario.simple-latest-price"],
+  },
+  {
+    id: "investment-answer-disclaimer",
+    file: "references/user-facing-prose.md",
+    remove: "Price/strategy answers must end with the financial-answer disclaimer below.\n",
+    expectFailedCases: [
+      "target.investment-answer-disclaimer",
+      "scenario.equity-price-disclaimer",
+      "scenario.backtest-strategy",
+    ],
   },
   {
     id: "capability-before-refusal",

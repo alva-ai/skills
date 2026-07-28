@@ -847,6 +847,73 @@
       ]
     },
     {
+      "id": "target.investment-answer-disclaimer",
+      "group": "target",
+      "target": "corpus",
+      "description": "Price and investment-strategy answers share one localized final disclaimer across Ask, strategy, answer_only, and user-facing Agent.ask output.",
+      "section_includes": [
+        {
+          "file": "references/user-facing-prose.md",
+          "heading": "Financial Answer Disclaimer",
+          "label": "canonical disclaimer contract",
+          "includes": [
+            "Price/strategy answers must end with the financial-answer disclaimer below",
+            "current, historical, forecast, or target price",
+            "investment strategy, backtest, signal, allocation, rebalance, or trade decision",
+            "final standalone paragraph",
+            "免责声明：以上内容仅供信息与研究参考，不构成投资建议。投资有风险，请根据自身情况独立判断。",
+            "Disclaimer: This content is for informational and research purposes only and does not constitute investment advice. Investing involves risk; make decisions based on your own circumstances.",
+            "Financial Analysis / Ask Question",
+            "Trade Setup conversational replies",
+            "`answer_only`",
+            "`Agent.ask()`",
+            "ZH-CN EXACT",
+            "EN-US EXACT",
+            "Do not write anything after it",
+            "Pure capability, code/debug, configuration, and operational-status replies",
+            "does not repair unsourced prices or unsupported actionable guidance"
+          ]
+        },
+        {
+          "file": "SKILL.md",
+          "heading": "Financial Analysis / Ask Question Tree",
+          "label": "Ask route trigger",
+          "includes": [
+            "financial-answer disclaimer"
+          ]
+        },
+        {
+          "file": "SKILL.md",
+          "heading": "Strategy And Trading Analysis",
+          "label": "strategy answer trigger",
+          "includes": [
+            "financial-answer disclaimer"
+          ]
+        },
+        {
+          "file": "references/trade-setup-sdk.md",
+          "heading": "Conversational Reply Boundary",
+          "label": "trade setup conversational trigger",
+          "includes": [
+            "Financial Answer Disclaimer",
+            "setup, edit, and diagnosis replies",
+            "investment strategy or a security price",
+            "do not rewrite",
+            "SDK-owned Alert, Routine Summary, or receipt bodies"
+          ]
+        },
+        {
+          "file": "references/content-legitimacy.md",
+          "heading": "Chat-as-Artifact (`answer_only` / Query Mode)",
+          "label": "answer_only trigger and anti-laundering boundary",
+          "includes": [
+            "financial-answer disclaimer",
+            "does not sanitize a body structured as actionable buy/sell guidance"
+          ]
+        }
+      ]
+    },
+    {
       "id": "target.financial-analysis-prose-gate",
       "group": "target",
       "target": "corpus",
