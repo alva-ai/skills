@@ -59,7 +59,7 @@ test("validates the real 44-file data-only Skill package", async () => {
   const result = await validateSkillPackage({ skillDir: REAL_SKILL_DIR });
 
   assert.equal(result.canonicalPackage, "@alva/skill");
-  assert.equal(result.version, "1.19.3");
+  assert.equal(result.version, "1.19.4");
   assert.equal(result.kind, "skill");
   assert.deepEqual(result.roots, ALLOWED_ROOTS);
   assert.equal(result.fileCount, EXPECTED_FILE_COUNT);
@@ -196,24 +196,24 @@ test("rejects package and Skill metadata version drift", async (t) => {
   await t.test("package.json", async (subtest) => {
     const skillDir = makeFixture(subtest);
     updatePackage(skillDir, (packageJSON) => {
-      packageJSON.version = "1.19.4";
+      packageJSON.version = "1.19.5";
     });
 
-    await assert.rejects(validateSkillPackage({ skillDir }), /version must be 1\.19\.3/);
+    await assert.rejects(validateSkillPackage({ skillDir }), /version must be 1\.19\.4/);
   });
 
   await t.test("SKILL.md", async (subtest) => {
     const skillDir = makeFixture(subtest);
     const skillPath = join(skillDir, "SKILL.md");
     const skill = readFileSync(skillPath, "utf8").replace(
-      "  version: v1.19.3",
       "  version: v1.19.4",
+      "  version: v1.19.5",
     );
     writeFileSync(skillPath, skill);
 
     await assert.rejects(
       validateSkillPackage({ skillDir }),
-      /SKILL\.md metadata version must be v1\.19\.3/,
+      /SKILL\.md metadata version must be v1\.19\.4/,
     );
   });
 });
@@ -224,11 +224,11 @@ test("accepts valid YAML frontmatter formatting variants", async (t) => {
   const skill = readFileSync(skillPath, "utf8")
     .replace("metadata:", "metadata: # release metadata")
     .replace("  author: alva", "  author: alva\n# root-level comment")
-    .replace("  version: v1.19.3", '  version: "v1.19.3" # package version');
+    .replace("  version: v1.19.4", '  version: "v1.19.4" # package version');
   writeFileSync(skillPath, `\uFEFF${skill}`);
 
   const result = await validateSkillPackage({ skillDir });
-  assert.equal(result.version, "1.19.3");
+  assert.equal(result.version, "1.19.4");
 });
 
 test("requires exactly SKILL.md, references, and scripts publish roots", async (t) => {

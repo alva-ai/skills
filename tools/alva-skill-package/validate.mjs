@@ -7,7 +7,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DEFAULT_SKILL_DIR = resolve(HERE, "../../skills/alva");
 const EXPECTED_NAME = "@alva/skill";
-const EXPECTED_VERSION = "1.19.3";
+const EXPECTED_VERSION = "1.19.4";
 const FORBIDDEN_ENTRYPOINT_FIELDS = Object.freeze([
   "main",
   "module",
