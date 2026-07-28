@@ -180,8 +180,7 @@ the whole automation.
    card on the first run.
 5. **Provision** through the four steps below.
 6. **Relay the receipt.** The first run creates the Setup Card and delivers a
-   **"Trade Setup Ready"** init receipt (title localized per the profile
-   `language`, e.g. "Trade Setup 已就绪" for `zh-CN`) to the user's bound
+   **"Trade Setup Ready"** init receipt (title localized per the profile `language`) to the user's bound
    channel. Confirm in
    chat that the automation is live and summarize the card it created.
 
