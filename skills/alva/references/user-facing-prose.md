@@ -129,6 +129,8 @@ answer like this:
 The investment disclaimer is required in user-facing prose that involves a
 security price or investment strategy.
 
+> This content is for informational purposes only and does not constitute investment advice.
+
 ## Voice
 
 User-facing prose in Alva should read like a sharp human analyst, not a

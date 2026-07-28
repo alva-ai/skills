@@ -867,7 +867,8 @@
           "label": "user-facing prose requirement",
           "includes": [
             "investment disclaimer is required",
-            "security price or investment strategy"
+            "security price or investment strategy",
+            "This content is for informational purposes only and does not constitute investment advice."
           ]
         },
         {
