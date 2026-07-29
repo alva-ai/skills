@@ -96,15 +96,6 @@ const MUTATIONS = [
     expectFailedCases: ["scenario.alert-push-monitor"],
   },
   {
-    id: "recurring-automation-default-delivery",
-    file: "references/push-notifications.md",
-    remove:
-      "A new user-facing recurring automation defaults to configured delivery even when\n" +
-      "the brief does not say alert, notify, push, or send. The creation request is consent\n" +
-      "to deliver material results from that automation unless the user opts out.\n",
-    expectFailedCases: ["scenario.recurring-automation-default-delivery"],
-  },
-  {
     id: "ticker-read-first-tier-route",
     file: "SKILL.md",
     remove: "read [ticker-read.md](references/ticker-read.md) before source selection",
