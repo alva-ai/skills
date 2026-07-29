@@ -643,6 +643,16 @@
           ]
         },
         {
+          "file": "references/deployment.md",
+          "heading": "Create Cronjob",
+          "label": "automation push default",
+          "includes": [
+            "new Automation producer",
+            "`--push-notify` by default",
+            "only when the user explicitly asks"
+          ]
+        },
+        {
           "file": "references/push-notifications.md",
           "heading": "Inventory And Unsubscribe",
           "label": "push inventory",

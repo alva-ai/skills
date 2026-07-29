@@ -47,6 +47,9 @@ alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js
 | --args        | JSON   | no       | JSON passed to `require("env").args` on each execution                        |
 | --push-notify | flag   | no       | Let successful Feed runs deliver declared alert outputs to subscribers         |
 
+For a new Automation producer, pass `--push-notify` by default. Leave it off
+only when the user explicitly asks.
+
 When `--push-notify` is set, every successful scheduled or Run Now execution
 may deliver records written to outputs declared with `alertOutput(typeDoc)`.
 The Feed still needs an active published automation binding, and delivery
