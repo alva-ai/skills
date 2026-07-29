@@ -10,7 +10,7 @@ description: >-
   backtesting. Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v1.19.3
+  version: v1.20.0
 ---
 
 # Alva
