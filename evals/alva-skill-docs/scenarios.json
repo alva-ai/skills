@@ -441,7 +441,7 @@
     {
       "id": "scenario.remix-existing-playbook",
       "group": "scenarios.playbook",
-      "prompt": "<remix https://alva.ai/u/alva/playbooks/screener> make my own version",
+      "prompt": "<remix https://alva.ai/u/alva/playbooks/live-screener> make my own version",
       "description": "A remix reads source artifacts and preserves lineage instead of regenerating from memory.",
       "expect": {
         "route": "Debug / Edit",
