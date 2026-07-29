@@ -995,9 +995,9 @@
       "description": "User-facing replies link high-confidence U.S.-listed company mentions to production Alva company pages without extra lookups or ambiguous company matches.",
       "excludes": [
         "https://alva.ai/company/",
-        "https://stg.alva.ai/market/",
-        "https://stg.alva.xyz/market/",
-        "https://alva.ai/market/3986.HK"
+        "https://stg.alva.ai/markets/",
+        "https://stg.alva.xyz/markets/",
+        "https://alva.ai/markets/3986.HK"
       ],
       "section_includes": [
         {
@@ -1007,7 +1007,7 @@
           "includes": [
             "In every user-facing Alva response",
             "each covered U.S.-listed company to its Alva company page",
-            "[visible wording](https://alva.ai/market/{CANONICAL_TICKER})",
+            "[visible wording](https://alva.ai/markets/{CANONICAL_TICKER})",
             "semantically clear company names",
             "common names, or localized aliases",
             "Apple",
