@@ -835,7 +835,7 @@ Runtime artifacts:
 
 In every user-facing Alva response, link the first high-confidence mention of
 each covered U.S.-listed company to its Alva company page:
-`[visible wording](https://alva.ai/market/{CANONICAL_TICKER})`.
+`[visible wording](https://alva.ai/markets/{CANONICAL_TICKER})`.
 
 - Recognize explicit tickers such as `AAPL` or `$AAPL` and semantically clear
   company names, common names, or localized aliases. Treat `Apple` as `AAPL`
@@ -853,7 +853,7 @@ each covered U.S.-listed company to its Alva company page:
 - Link each company at most once per reply. Do not link non-company assets such
   as ETFs, indices, crypto, FX, or commodities; code; raw URLs; existing links;
   quoted passages; or verbatim tool output.
-- Always use an absolute production URL under `https://alva.ai/market/`. Never
+- Always use an absolute production URL under `https://alva.ai/markets/`. Never
   use a staging host or relative URL for a company page. Do not add a separate
   company-page footer or explain that a link was added.
 
