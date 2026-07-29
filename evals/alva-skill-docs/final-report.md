@@ -639,7 +639,7 @@ Operational pitfalls are a mandatory stepwise gate, not an optional debugging ap
 
 Latest mainline Alva skill updates remain integrated after rebasing the refactor.
 
-- [x] version: v1.19.3
+- [x] version: v1.19.4
 - [x] Capability Help
 - [x] Reply 1, 2, or 3 to start
 - [x] feedback
