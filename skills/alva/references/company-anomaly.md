@@ -24,6 +24,7 @@ state does not mean the stock did not move or that no news exists.
 - [Core Model: Run, Episode, Attribution](#core-model-run-episode-attribution)
 - [Source And Access](#source-and-access)
 - [Consumer Contract: Is A Ticker In An Anomaly?](#consumer-contract-is-a-ticker-in-an-anomaly)
+- [Historical Anomalies](#historical-anomalies)
 - [Timeline Fields](#timeline-fields)
 - [Attribution Fields](#attribution-fields)
 - [Internal Surfaces (Not The Contract)](#internal-surfaces-not-the-contract)
@@ -211,6 +212,27 @@ attribution. For `not_triggered`, `candidate`, or `no_material`, do not attach
 an older driver to the current tick unless the user separately asks for the
 latest prior attribution. When you do surface a prior attribution, report both
 timestamps and never pair an old driver with current metrics.
+
+## Historical Anomalies
+
+Same two partitions as the current-state contract, just read over a time window
+instead of `@last/1`. Both are keyed by `runAtMs`, so use the range/last
+time-series suffixes (see [Source And Access](#source-and-access)) —
+`@range/{startMs}..{endMs}` (Unix-ms epochs) or `@last/N` — to pull a window in
+run-time order. Group by `anomalyEpisodeId`, never by array order.
+
+- **Past confirmed anomalies (with drivers):** read `finding/attribution` over
+  the range. Each row is a confirmed attribution; the distinct
+  `anomalyEpisodeId`s are the past episodes. `attributionClassKey: new_anomaly`
+  is an episode's first attribution; later rows with the same `anomalyEpisodeId`
+  are re-attributions as it evolved (the last is that episode's freshest driver).
+- **Full run history (including quiet):** read `anomaly/timeline` over the range.
+  A past episode is a run of rows sharing one `anomalyEpisodeId` with
+  `isActiveAnomaly: "true"`; it opens on `new_anomaly` and closes at the first
+  following inactive row (`not_triggered` / quiet).
+
+Each row is self-contained for its own time — read its `movePct` / `latestPrice`
+(as-of `latestPriceAsOfMs`); do not pair a past episode with current metrics.
 
 ## Timeline Fields
 
