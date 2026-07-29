@@ -16,6 +16,35 @@ For heartbeat/watchlist/monitor feeds, recommend quiet behavior: notify only on
 material changes. In a new V2 feed, return without appending to the declared
 alert output when there is nothing worth sending.
 
+## Default Delivery For Recurring Automations
+
+A new user-facing recurring automation defaults to configured delivery even when
+the brief does not say alert, notify, push, or send. The creation request is consent
+to deliver material results from that automation unless the user opts out.
+
+Default delivery means completing the whole path: declare an `alertOutput`,
+publish the automation, enable publisher push, and create the intended alert
+binding. `--push-notify` alone is not delivery.
+
+Choose the destination from established context:
+
+1. In an Alva topic channel, bind the automation to the current Alva topic
+   channel using its exact channel id.
+2. In an ordinary personal session, use the default personal destination.
+3. If neither destination is established by context, ask one delivery question
+   before deployment. Do not silently create a scheduled automation with no
+   result destination.
+
+Do not default delivery for work the user explicitly marks as silent,
+data-only, or producer-only, including test producers and non-user-facing
+playbook backing feeds. Static fundamentals, historical snapshots, and
+low-frequency reference data remain non-push-worthy. These are exceptions to
+delivery, not reasons to skip the automation's schedule or persisted output.
+
+When an exception leaves delivery disabled, lead the completion response with
+the consequence: the automation runs on schedule but alerts are off. State how
+to enable them; do not bury the disabled state in implementation details.
+
 ## Choose The Delivery Destination
 
 A personal FEED alert has one delivery binding per viewer and feed. Enabling

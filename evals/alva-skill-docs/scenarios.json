@@ -241,6 +241,60 @@
       }
     },
     {
+      "id": "scenario.recurring-automation-default-delivery",
+      "group": "issue798",
+      "prompt": "Build me a Congressional + Insider Cluster Screener that runs every weekday at 8:30 AM ET.",
+      "description": "A user-facing recurring automation defaults to quiet, configured delivery even when the brief does not explicitly ask for alerts.",
+      "expect": {
+        "route": "Automation / Push",
+        "references": [
+          "alva-knowledge.md",
+          "push-notifications.md",
+          "feed-lifecycle.md"
+        ],
+        "behaviors": [
+          "A new user-facing recurring automation defaults to configured delivery",
+          "even when the brief does not say alert, notify, push, or send",
+          "Declare the intended output with `alertOutput(typeDoc)`",
+          "alva deploy update --id <ID> --push-notify",
+          "Enable the FEED alert for the intended destination",
+          "current Alva topic channel",
+          "default personal destination",
+          "If neither destination is established by context, ask one delivery question before deployment",
+          "silent, data-only, or producer-only",
+          "quiet behavior",
+          "alerts are off"
+        ],
+        "sections": [
+          {
+            "file": "SKILL.md",
+            "heading": "Request Routing",
+            "includes": [
+              "recurring automation",
+              "defaults to delivery"
+            ]
+          },
+          {
+            "file": "references/request-routing.md",
+            "heading": "Routes",
+            "includes": [
+              "user-facing recurring automation",
+              "defaults to delivery"
+            ]
+          },
+          {
+            "file": "references/push-notifications.md",
+            "heading": "Default Delivery For Recurring Automations",
+            "includes": [
+              "creation request is consent",
+              "publisher push",
+              "alert binding"
+            ]
+          }
+        ]
+      }
+    },
+    {
       "id": "scenario.current-topic-channel-alert",
       "group": "scenarios.push",
       "prompt": "<session-prefill-channel-memory channel-id=\"44\" root=\"/alva/home/ymchcom/channels/research/memory\"> Notify this channel every minute with hello111.",
