@@ -384,6 +384,11 @@
       "group": "platform-data",
       "target": "corpus",
       "description": "A single-ticker read routes through the five official Skillhub sources as a first-tier Platform Data lane with explicit read, build, freshness, and fallback boundaries.",
+      "excludes": [
+        "company-anomaly.md",
+        "/alva/home/mia/feeds/<ticker-slug>-portfolio-watch-anomaly/v1",
+        "anomaly/timeline/@last/1"
+      ],
       "section_includes": [
         {
           "file": "SKILL.md",
@@ -427,6 +432,7 @@
           "includes": [
             "Local source files are not proof that a method is published",
             "Continue with the remaining available Platform Data sources",
+            "do not bypass an unavailable Skillhub method",
             "Method availability is rollout state, not company coverage"
           ]
         },
@@ -1050,7 +1056,7 @@
       "target": "corpus",
       "description": "Latest mainline Alva skill updates remain integrated after rebasing the refactor.",
       "includes": [
-        "version: v1.19.3",
+        "version: v1.20.1",
         "Capability Help",
         "Reply 1, 2, or 3 to start",
         "feedback",

@@ -115,6 +115,17 @@ const MUTATIONS = [
       "scenario.ticker-read-hourly-tracking",
     ],
   },
+  {
+    id: "ticker-read-company-anomaly-skillhub-owner",
+    file: "references/ticker-read.md",
+    remove:
+      "- For Company Anomaly reads, do not bypass an unavailable Skillhub method by\n",
+    expectFailedCases: [
+      "platform-data.ticker-read-sources",
+      "scenario.ticker-read-broad-analysis",
+      "scenario.ticker-read-hourly-tracking",
+    ],
+  },
 ];
 
 function parseArgs(argv) {

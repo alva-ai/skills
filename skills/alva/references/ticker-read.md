@@ -74,9 +74,9 @@ claim the method was used and do not block the whole answer:
 
 - Continue with the remaining available Platform Data sources plus ordinary
   Data Skills and primary-source search.
-- For Company Anomaly reads, the bundled
-  [company-anomaly.md](company-anomaly.md) remains the maintained public-feed
-  consumer contract even when the standalone Skillhub method is not published.
+- For Company Anomaly reads, do not bypass an unavailable Skillhub method by
+  reconstructing its ALFS paths or field contract from memory or a stale bundled
+  copy. Report the method gap and continue with evidence that is actually available.
 - If either build-on-demand method is unavailable, do not reconstruct its
   script from memory. Explain that custom aggregation/attribution is unavailable
   in the active profile, answer with the evidence that can be sourced, and mark
@@ -92,11 +92,9 @@ covered.
 
 1. Use Data Skills for the live price, the move basis, and the requested
    one-hour or intraday window.
-2. Read `alva/company-anomaly-read` first. Start with
-   `anomaly/timeline/@last/1` for current state and timestamp; use a bounded
-   range only when the user asks about the preceding hour or another window.
-3. If active, join the current `anomalyEpisodeId` to the latest confirmed
-   attribution in that episode. Do not attach an old episode's driver.
+2. Fresh-load and follow `alva/company-anomaly-read` first.
+3. Use its current-state or bounded-history workflow for the requested horizon,
+   including its rules for keeping current and prior attributions distinct.
 4. Add Breaking News only when a current macro/sector event may explain the
    move. Add WILF only when weekly investor focus helps interpret it.
 
@@ -126,9 +124,8 @@ context; it does not replace the financial evidence needed by the answer.
 ### Why did it move?
 
 1. Establish the ticker, move, time window, and price basis with Data Skills.
-2. For a covered ticker, use `alva/company-anomaly-read`. Join the current
-   timeline state to confirmed attribution by `anomalyEpisodeId`; do not attach
-   a prior episode's driver to current metrics.
+2. For a covered ticker, fresh-load and follow `alva/company-anomaly-read` for
+   current state and attribution instead of reproducing its ALFS contract here.
 3. For an off-list, non-US, user-defined, or otherwise uncovered move, use
    `alva/company-data-aggregate`, confirm the supplied move is the one being
    explained, then run `alva/company-move-attribution` over the kept records. If
