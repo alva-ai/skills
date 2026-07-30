@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/home/forge/mono-meta/code/public/skills/skills/alva`
+Source: `/Users/ming/workspace/alva/mono-meta/code/public/skills/.worktrees/company-anomaly-skillhub-routing/skills/alva`
 
-SKILL.md lines: 910
+SKILL.md lines: 908
 
-Cases: 64/64
+Cases: 66/66
 
-Checks: 649/649 (100.00%)
+Checks: 667/667 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -315,7 +315,7 @@ When structured data lags a known official release, web is an official-source fa
 
 ## platform-data
 
-2/2 cases, 31/31 checks
+2/2 cases, 35/35 checks
 
 ### PASS platform-data.kol-surfaces
 
@@ -334,6 +334,9 @@ KOL data and the KOL digest SDK are routed together as Alva-maintained Platform 
 
 A single-ticker read routes through the five official Skillhub sources as a first-tier Platform Data lane with explicit read, build, freshness, and fallback boundaries.
 
+- [x] excludes company-anomaly.md
+- [x] excludes /alva/home/mia/feeds/<ticker-slug>-portfolio-watch-anomaly/v1
+- [x] excludes anomaly/timeline/@last/1
 - [x] platform data section: SKILL.md#Data Access: Platform Data includes Ticker Read
 - [x] platform data section: SKILL.md#Data Access: Platform Data includes Read [ticker-read.md](references/ticker-read.md)
 - [x] platform data section: SKILL.md#Data Access: Platform Data includes first-tier sources
@@ -350,6 +353,7 @@ A single-ticker read routes through the five official Skillhub sources as a firs
 - [x] official source router: references/ticker-read.md#Source Router includes Use `alva/company-anomaly-read` as the first direct-read check for intraday and hourly-scale market tracking
 - [x] profile availability: references/ticker-read.md#Availability Gate includes Local source files are not proof that a method is published
 - [x] profile availability: references/ticker-read.md#Availability Gate includes Continue with the remaining available Platform Data sources
+- [x] profile availability: references/ticker-read.md#Availability Gate includes do not bypass an unavailable Skillhub method
 - [x] profile availability: references/ticker-read.md#Availability Gate includes Method availability is rollout state, not company coverage
 - [x] ticker read directory: references/request-routing.md#Official Ticker Read Sources includes [ticker-read.md](ticker-read.md) owns source selection
 - [x] ticker read directory: references/request-routing.md#Official Ticker Read Sources includes alva/company-anomaly-read
@@ -360,7 +364,7 @@ A single-ticker read routes through the five official Skillhub sources as a firs
 
 ## issue592
 
-5/5 cases, 79/79 checks
+5/5 cases, 82/82 checks
 
 ### PASS issue592.scoped-eval-checks
 
@@ -462,6 +466,9 @@ Push setup is evaluated as a full delivery path instead of a single publisher fl
 - [x] push setup: references/push-notifications.md#Configure And Verify includes There is no playbook alert target
 - [x] push setup: references/push-notifications.md#Configure And Verify includes read `@last/1` of the declared output
 - [x] push setup: references/push-notifications.md#Configure And Verify includes do not claim push is set up
+- [x] automation push default: references/deployment.md#Create Cronjob includes new Automation producer
+- [x] automation push default: references/deployment.md#Create Cronjob includes `--push-notify` by default
+- [x] automation push default: references/deployment.md#Create Cronjob includes only when the user explicitly asks
 - [x] push inventory: references/push-notifications.md#Inventory And Unsubscribe includes alva alert list --first 200
 - [x] push inventory: references/push-notifications.md#Inventory And Unsubscribe includes alva alert follows --limit 100
 - [x] push inventory: references/push-notifications.md#Inventory And Unsubscribe includes has_next
@@ -496,13 +503,13 @@ The general skill distinguishes the default personal destination from an Alva to
 
 ## target
 
-11/11 cases, 132/132 checks
+12/12 cases, 139/139 checks
 
 ### PASS target.top-level-size
 
 Top-level SKILL.md stays below the current guide ceiling without forcing a minimum size that would block future compression.
 
-- [x] line count <= 910 (actual 910)
+- [x] line count <= 910 (actual 908)
 
 ### PASS target.playbook-task-offload
 
@@ -610,6 +617,18 @@ Complex financial asks classify the problem type and apply source, methodology, 
 - [x] required calculation not done caps at B-/C
 - [x] hard cap
 
+### PASS target.mandatory-investment-disclaimer
+
+Security-price and investment-strategy answers have one mandatory disclaimer contract wired into prose and routing.
+
+- [x] top-level requirement: SKILL.md#First Principles includes Mandatory disclaimer
+- [x] top-level requirement: SKILL.md#First Principles includes Any answer involving a security price or investment strategy MUST include an investment disclaimer
+- [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes investment disclaimer is required
+- [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes security price or investment strategy
+- [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes This content is for informational purposes only and does not constitute investment advice.
+- [x] Ask and strategy routing: references/request-routing.md#Routes includes apply its required Investment Disclaimer
+- [x] Ask and strategy routing: references/request-routing.md#Routes includes Strategy answers apply the required [Investment Disclaimer]
+
 ### PASS target.financial-analysis-prose-gate
 
 Financial Analysis answers must read the merged user-facing prose reference before answering.
@@ -639,7 +658,7 @@ Operational pitfalls are a mandatory stepwise gate, not an optional debugging ap
 
 Latest mainline Alva skill updates remain integrated after rebasing the refactor.
 
-- [x] version: v1.19.3
+- [x] version: v1.20.1
 - [x] Capability Help
 - [x] Reply 1, 2, or 3 to start
 - [x] feedback
@@ -731,12 +750,12 @@ Manual trigger commands remain discoverable without becoming a required deployme
 User-facing replies link high-confidence U.S.-listed company mentions to production Alva company pages without extra lookups or ambiguous company matches.
 
 - [x] excludes https://alva.ai/company/
-- [x] excludes https://stg.alva.ai/market/
-- [x] excludes https://stg.alva.xyz/market/
-- [x] excludes https://alva.ai/market/3986.HK
+- [x] excludes https://stg.alva.ai/markets/
+- [x] excludes https://stg.alva.xyz/markets/
+- [x] excludes https://alva.ai/markets/3986.HK
 - [x] company page link contract: SKILL.md#Company Page Links includes In every user-facing Alva response
 - [x] company page link contract: SKILL.md#Company Page Links includes each covered U.S.-listed company to its Alva company page
-- [x] company page link contract: SKILL.md#Company Page Links includes [visible wording](https://alva.ai/market/{CANONICAL_TICKER})
+- [x] company page link contract: SKILL.md#Company Page Links includes [visible wording](https://alva.ai/markets/{CANONICAL_TICKER})
 - [x] company page link contract: SKILL.md#Company Page Links includes semantically clear company names
 - [x] company page link contract: SKILL.md#Company Page Links includes common names, or localized aliases
 - [x] company page link contract: SKILL.md#Company Page Links includes Apple
@@ -762,7 +781,7 @@ Post-deployment and multi-step updates report only new outcome evidence and unre
 
 ## scenarios.ask
 
-2/2 cases, 19/19 checks
+3/3 cases, 22/22 checks
 
 ### PASS scenario.simple-latest-price
 
@@ -777,6 +796,16 @@ Prompt: `What is BTC doing right now?`
 - [x] Do not answer until you can name the decomposition
 - [x] Do not let playbook creation become the default
 - [x] not automatically to a playbook
+- [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
+
+### PASS scenario.equity-price-disclaimer
+
+A direct equity-price Ask applies the mandatory disclaimer rule.
+
+Prompt: `What is NVDA trading at right now?`
+
+- [x] user-facing-prose.md
+- [x] Any answer involving a security price or investment strategy MUST include an investment disclaimer
 - [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
 
 ### PASS scenario.complex-valuation-ask
@@ -940,7 +969,7 @@ Prompt: `<session-prefill-channel-memory channel-id="44" root="/alva/home/ymchco
 
 ## scenarios.strategy
 
-1/1 cases, 8/8 checks
+1/1 cases, 10/10 checks
 
 ### PASS scenario.backtest-strategy
 
@@ -950,11 +979,13 @@ Prompt: `Backtest a weekly NVDA momentum strategy and show drawdowns.`
 
 - [x] altra-trading.md
 - [x] api/trading.md
+- [x] user-facing-prose.md
 - [x] Always use Altra for backtesting
 - [x] FeedAltra
 - [x] look-ahead bias
 - [x] drawdown
 - [x] package results as a concise answer, feed, signal, or visual playbook depending on the request
+- [x] Any answer involving a security price or investment strategy MUST include an investment disclaimer
 - [x] expected route: references/request-routing.md#Routes includes Strategy / Trading Analysis
 
 ## scenarios.skillhub
@@ -999,7 +1030,7 @@ Prompt: `Use the thesis skill for NVDA AI capex read-through.`
 
 ## scenarios.ticker-read
 
-4/4 cases, 45/45 checks
+4/4 cases, 44/44 checks
 
 ### PASS scenario.ticker-read-broad-analysis
 
@@ -1008,7 +1039,6 @@ A broad single-ticker read checks the official direct-read sources before generi
 Prompt: `分析一下 MU 最近的公司表现，重点说清楚市场现在在看什么、最近异动和催化剂。`
 
 - [x] ticker-read.md
-- [x] company-anomaly.md
 - [x] request-routing.md
 - [x] user-facing-prose.md
 - [x] Treat these as first-tier ticker-read sources
@@ -1019,23 +1049,23 @@ Prompt: `分析一下 MU 最近的公司表现，重点说清楚市场现在在�
 - [x] Data Skills remain the source for live price, fundamentals, valuation
 - [x] Do not execute every source by default
 - [x] Continue with the remaining available Platform Data sources
+- [x] do not bypass an unavailable Skillhub method
 - [x] Use `alva/company-anomaly-read` as the first direct-read check for intraday and hourly-scale market tracking
 - [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
 - [x] ticker read route: SKILL.md#Request Routing includes read [ticker-read.md](references/ticker-read.md) before source selection
 
 ### PASS scenario.ticker-read-hourly-tracking
 
-An hour-scale ticker check prioritizes the published anomaly timeline and current episode attribution before slower investor-focus or generic discovery sources.
+An hour-scale ticker check fresh-loads the published Company Anomaly method before slower investor-focus or generic discovery sources.
 
 Prompt: `帮我看看 NVDA 过去一小时有没有异常，为什么？`
 
 - [x] ticker-read.md
-- [x] company-anomaly.md
 - [x] data-skills.md
 - [x] Use `alva/company-anomaly-read` as the first direct-read check for intraday and hourly-scale market tracking
 - [x] roughly every 15 minutes during US market hours
-- [x] anomaly/timeline
-- [x] @last/1
+- [x] Fetch the selected method's current instructions from Skillhub before using it
+- [x] do not bypass an unavailable Skillhub method
 - [x] A quiet state does not prove that price was flat
 - [x] Data Skills for the live price
 - [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
