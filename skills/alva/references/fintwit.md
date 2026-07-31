@@ -12,9 +12,11 @@ X/Twitter handle is tracked, what an account thinks about a ticker or theme, or 
 account's track record — read it here and answer from real data.
 
 **Not raw tweet search.** For "what is @X tweeting right now" with no
-curation/scoring, use Content Search (`getTwitterFeed`, see [search.md](search.md)).
-Fintwit Intelligence returns *processed* records: classified signals, extracted
-theses, backtested performance, computed rankings.
+curation/scoring, use Data Skills per-handle history / full-text over the X
+accounts Arrays tracks (see [data-skills.md](data-skills.md)); reach for Content
+Search (`searchGrokX`, see [search.md](search.md)) only for global X search
+beyond Arrays' tracked index. Fintwit Intelligence returns *processed* records:
+classified signals, extracted theses, backtested performance, computed rankings.
 
 ## Access
 
