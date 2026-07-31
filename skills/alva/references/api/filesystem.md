@@ -1,9 +1,33 @@
 # Filesystem — extras not in CLI help
 
 Run `alva fs --help` first for subcommands, flags, path conventions, and
-grant subjects. This file only covers the supported synth-mount suffixes
-(the help text is partly wrong / incomplete here) plus the synth-mount
+grant subjects. This file adds ordinary-file append semantics that help cannot
+fully express, the authoritative synth-mount suffixes, and the synth-mount
 grant gotcha.
+
+## Ordinary ALFS file append
+
+For an ordinary ALFS file, `alva fs write --append` concatenates text or raw
+file bytes to the existing content instead of replacing it:
+
+```bash
+alva fs write --path '~/notes.md' --data $'\n## Update\n- New note\n' --append
+alva fs write --path '~/notes.md' --file ./new-note.md --append
+```
+
+The operation does not add a newline or Markdown structure; include separators
+in `--data` or the local file. Without `--append`, `alva fs write` overwrites the
+ordinary file.
+
+Ordinary-file append is implemented as a read-modify-write by the backing file
+provider and is not concurrency-safe. Simultaneous writers can lose an update.
+Use it only for explicit manual or otherwise low-contention writes. A workflow
+that must preserve concurrent edits should read, merge, and conditional-write
+through a service that exposes the file ETag/version.
+
+Do not confuse this flag with Synth `@append`: `--append` concatenates ordinary
+file bytes, while `@append` writes structured time-series records to a Synth
+mount and upserts records that reuse a timestamp.
 
 ## Synth-mount virtual suffixes (authoritative set)
 
@@ -45,6 +69,9 @@ consumers don't.
 | Suffix    | Description                                          | Example                          |
 | --------- | ---------------------------------------------------- | -------------------------------- |
 | `@append` | Append data points; expects flat records like `[{"date":1000,"close":100}]` | `.../prices/@append` |
+
+`@append` is timestamp-keyed: writing a record with an existing timestamp is an
+upsert, not a strictly immutable append.
 
 ### Schema / state
 
