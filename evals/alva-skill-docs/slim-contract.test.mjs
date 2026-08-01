@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import test from "node:test";
@@ -14,8 +14,8 @@ const contract = JSON.parse(
 function packageJson(overrides = {}) {
   return {
     name: "@alva/alva-slim",
-    version: "0.0.2",
-    files: ["SKILL.md", "references"],
+    version: "0.0.3",
+    files: ["SKILL.md", "references", "scripts"],
     alpkg: { kind: "skill" },
     ...overrides,
   };
@@ -28,7 +28,7 @@ name: alva
 description: Slim Alva routing fixture.
 metadata:
   author: alva
-  version: v0.0.2
+  version: v0.0.3
 ---
 
 # Alva Slim
@@ -43,15 +43,27 @@ function markdownTargets(markdown) {
     .filter((target) => !target.includes(":"));
 }
 
-function writeTree(root, { skill = skillText(), pkg = packageJson(), references = {} } = {}) {
+const validSlimUpdater = `#!/usr/bin/env bash
+PACKAGE="@alva/alva-slim"
+RELEASES_PATH="/alva/registry/skill/alva/alva-slim/releases"
+REGISTRY_ENDPOINT="https://api-llm.prd.alva.ai"
+`;
+
+function writeTree(root, { skill = skillText(), pkg = packageJson(), references = {}, updater = validSlimUpdater } = {}) {
   mkdirSync(join(root, "references"), { recursive: true });
+  mkdirSync(join(root, "scripts"), { recursive: true });
   writeFileSync(join(root, "SKILL.md"), skill);
   writeFileSync(join(root, "package.json"), `${JSON.stringify(pkg, null, 2)}\n`);
+  writeFileSync(join(root, "scripts", "version_check.sh"), updater);
+  chmodSync(join(root, "scripts", "version_check.sh"), 0o755);
 
   const requiredReferences = Object.fromEntries(
     markdownTargets(skill)
       .filter((target) => target.startsWith("references/"))
-      .map((target) => [target.slice("references/".length), "fixture reference\n"]),
+      .map((target) => {
+        const path = target.slice("references/".length);
+        return [path, path === "preflight.md" ? "Run scripts/version_check.sh.\n" : "fixture reference\n"];
+      }),
   );
   const fillerCount = 42 - Object.keys(requiredReferences).length;
   assert.ok(fillerCount >= 0, "fixture contract cannot require more than 42 references");
@@ -136,7 +148,7 @@ function withFixture(options, fn) {
   }
 }
 
-test("accepts a valid v0.0.2 Slim package", () => {
+test("accepts a valid v0.0.3 Slim package", () => {
   withFixture({}, (instance) => {
     const result = validate(instance);
     assert.equal(result.valid, true);
@@ -175,7 +187,7 @@ for (const testCase of [
     name: "wrong package version",
     mutate(instance) {
       const path = join(instance.candidateDir, "package.json");
-      writeFileSync(path, `${JSON.stringify(packageJson({ version: "0.0.3" }), null, 2)}\n`);
+      writeFileSync(path, `${JSON.stringify(packageJson({ version: "0.0.2" }), null, 2)}\n`);
     },
     expected: "PACKAGE_VERSION",
   },
@@ -183,7 +195,7 @@ for (const testCase of [
     name: "wrong frontmatter version",
     mutate(instance) {
       const path = join(instance.candidateDir, "SKILL.md");
-      writeFileSync(path, readFileSync(path, "utf8").replace("version: v0.0.2", "version: v0.0.3"));
+      writeFileSync(path, readFileSync(path, "utf8").replace("version: v0.0.3", "version: v0.0.2"));
     },
     expected: "FRONTMATTER_VERSION",
   },
@@ -199,7 +211,7 @@ for (const testCase of [
     name: "v1 frontmatter version is forbidden",
     mutate(instance) {
       const path = join(instance.candidateDir, "SKILL.md");
-      writeFileSync(path, readFileSync(path, "utf8").replace("version: v0.0.2", "version: v1.0.0"));
+      writeFileSync(path, readFileSync(path, "utf8").replace("version: v0.0.3", "version: v1.0.0"));
     },
     expected: "VERSION_MAJOR_DISALLOWED",
   },
@@ -207,7 +219,7 @@ for (const testCase of [
     name: "package files allowlist is exact",
     mutate(instance) {
       const path = join(instance.candidateDir, "package.json");
-      writeFileSync(path, `${JSON.stringify(packageJson({ files: ["SKILL.md", "references", "scripts"] }), null, 2)}\n`);
+      writeFileSync(path, `${JSON.stringify(packageJson({ files: ["SKILL.md", "references"] }), null, 2)}\n`);
     },
     expected: "PACKAGE_FILES",
   },
@@ -234,7 +246,7 @@ test("reports missing, extra, and changed references independently", () => {
         const changed = result.violations.find((item) => item.code === "REFERENCE_CHANGED");
         assert.equal(
           changed.expectedSha256,
-          createHash("sha256").update("fixture reference\n").digest("hex"),
+          createHash("sha256").update("Run scripts/version_check.sh.\n").digest("hex"),
         );
         assert.equal(
           changed.actualSha256,
@@ -269,17 +281,30 @@ test("rejects a baseline with the wrong locked reference fingerprint", () => {
   });
 });
 
-test("rejects an updater script and updater invocation", () => {
+test("rejects a contract descriptor for another Slim release", () => {
   withFixture({}, (instance) => {
-    mkdirSync(join(instance.candidateDir, "scripts"));
-    writeFileSync(join(instance.candidateDir, "scripts", "version_check.sh"), "#!/bin/sh\n");
-    assert.ok(codes(validate(instance)).includes("UPDATER_SCRIPT"));
+    const result = validate(instance, 45_000, { ...instance.topLevelContract, releaseVersion: "v0.0.2" });
+    assert.ok(codes(result).includes("CONTRACT_RELEASE_VERSION"));
+  });
+});
+
+test("requires an executable Slim-scoped updater at the preflight path", () => {
+  withFixture({}, (instance) => {
+    rmSync(join(instance.candidateDir, "scripts", "version_check.sh"));
+    assert.ok(codes(validate(instance)).includes("SLIM_UPDATER_MISSING"));
   });
 
   withFixture({}, (instance) => {
-    const path = join(instance.candidateDir, "SKILL.md");
-    writeFileSync(path, `${readFileSync(path, "utf8")}Run scripts/version_check.sh.\n`);
-    assert.ok(codes(validate(instance)).includes("UPDATER_INVOCATION"));
+    const path = join(instance.candidateDir, "scripts", "version_check.sh");
+    chmodSync(path, 0o644);
+    assert.ok(codes(validate(instance)).includes("SLIM_UPDATER_NOT_EXECUTABLE"));
+  });
+
+  withFixture({}, (instance) => {
+    const path = join(instance.candidateDir, "scripts", "version_check.sh");
+    writeFileSync(path, `${validSlimUpdater}\nREPO="alva-ai/skills"\n`);
+    chmodSync(path, 0o755);
+    assert.ok(codes(validate(instance)).includes("SLIM_UPDATER_SCOPE"));
   });
 });
 
@@ -301,7 +326,9 @@ test("accepts valid relative links and reports broken relative links", () => {
 });
 
 test("allows broken runtime-path links inherited in byte-identical references", () => {
-  const inherited = { references: { "preflight.md": "See runtime [user](user.md).\n" } };
+  const inherited = {
+    references: { "preflight.md": "Run scripts/version_check.sh.\nSee runtime [user](user.md).\n" },
+  };
   withFixture({ baseline: inherited, candidate: inherited }, (instance) => {
     assert.equal(validate(instance).valid, true);
   });

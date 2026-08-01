@@ -8,9 +8,9 @@ import {
 import { dirname, relative, resolve, sep } from "node:path";
 
 const EXPECTED_PACKAGE_NAME = "@alva/alva-slim";
-const EXPECTED_PACKAGE_VERSION = "0.0.2";
-const EXPECTED_FRONTMATTER_VERSION = "v0.0.2";
-const EXPECTED_FILES = ["SKILL.md", "references"];
+const EXPECTED_PACKAGE_VERSION = "0.0.3";
+const EXPECTED_FRONTMATTER_VERSION = "v0.0.3";
+const EXPECTED_FILES = ["SKILL.md", "references", "scripts"];
 
 function violation(code, path, message, details = {}) {
   return { code, path, message, ...details };
@@ -104,7 +104,7 @@ function validatePackageJson(candidateDir, violations) {
   const files = Array.isArray(pkg.files) ? [...pkg.files].sort() : pkg.files;
   if (!Array.isArray(files) || JSON.stringify(files) !== JSON.stringify([...EXPECTED_FILES].sort())) {
     violations.push(
-      violation("PACKAGE_FILES", "package.json", "Package files allowlist must contain only SKILL.md and references.", {
+      violation("PACKAGE_FILES", "package.json", "Package files allowlist must contain only SKILL.md, references, and scripts.", {
         actual: pkg.files,
         expected: EXPECTED_FILES,
       }),
@@ -269,23 +269,41 @@ function validateRelativeLinks(candidateDir, violations) {
   }
 }
 
-function validateNoUpdater(candidateDir, violations) {
-  const files = listFiles(candidateDir);
-  for (const file of files) {
-    if (file === "scripts/version_check.sh" || file.endsWith("/version_check.sh")) {
-      violations.push(violation("UPDATER_SCRIPT", file, "Slim must not ship the official updater script."));
-    }
+function validateSlimUpdater(candidateDir, violations) {
+  const updaterRelative = "scripts/version_check.sh";
+  const updaterPath = resolve(candidateDir, updaterRelative);
+  if (!existsSync(updaterPath) || !lstatSync(updaterPath).isFile()) {
+    violations.push(
+      violation("SLIM_UPDATER_MISSING", updaterRelative, "Slim must ship the updater path required by preflight.md."),
+    );
+    return;
   }
-
-  for (const file of files.filter((path) => !path.startsWith("references/"))) {
-    const path = resolve(candidateDir, file);
-    const contents = readFileSync(path);
-    if (contents.includes(0)) continue;
-    if (contents.toString("utf8").includes("version_check.sh")) {
-      violations.push(
-        violation("UPDATER_INVOCATION", file, "Slim must not invoke or mention version_check.sh."),
-      );
-    }
+  if ((lstatSync(updaterPath).mode & 0o111) === 0) {
+    violations.push(
+      violation("SLIM_UPDATER_NOT_EXECUTABLE", updaterRelative, "Slim version checker must be executable."),
+    );
+  }
+  const source = readFileSync(updaterPath, "utf8");
+  const required = [
+    "@alva/alva-slim",
+    "/alva/registry/skill/alva/alva-slim/releases",
+    "https://api-llm.prd.alva.ai",
+  ];
+  const forbidden = ["alva-ai/skills", "@alva/skill", "npx skills", "clawhub", "git clone"];
+  if (required.some((text) => !source.includes(text)) || forbidden.some((text) => source.includes(text))) {
+    violations.push(
+      violation(
+        "SLIM_UPDATER_SCOPE",
+        updaterRelative,
+        "Version checker must query and notify only the Alva Slim registry line.",
+      ),
+    );
+  }
+  const preflightPath = resolve(candidateDir, "references/preflight.md");
+  if (!existsSync(preflightPath) || !readFileSync(preflightPath, "utf8").includes(updaterRelative)) {
+    violations.push(
+      violation("PREFLIGHT_UPDATER_PATH", "references/preflight.md", "Preflight must invoke the packaged Slim version checker."),
+    );
   }
 }
 
@@ -295,6 +313,15 @@ function validateTopLevelContract(skill, topLevelContract, violations) {
       violation("CONTRACT_INVALID", "slim-top-level-contract.json", "Top-level contract must define a rows array."),
     );
     return;
+  }
+  if (topLevelContract.releaseVersion !== EXPECTED_FRONTMATTER_VERSION) {
+    violations.push(
+      violation(
+        "CONTRACT_RELEASE_VERSION",
+        "slim-top-level-contract.json",
+        `Top-level contract must describe ${EXPECTED_FRONTMATTER_VERSION}.`,
+      ),
+    );
   }
   for (const row of topLevelContract.rows) {
     const requiredText = Array.isArray(row.requiredText) ? row.requiredText : [];
@@ -346,7 +373,7 @@ export function validateSlimPackage({ candidateDir, baselineDir, maxSkillBytes, 
     topLevelContract?.baselineReferences,
     violations,
   );
-  validateNoUpdater(candidateRoot, violations);
+  validateSlimUpdater(candidateRoot, violations);
   validateRelativeLinks(candidateRoot, violations);
   if (skillExists) validateTopLevelContract(skill, topLevelContract, violations);
 
