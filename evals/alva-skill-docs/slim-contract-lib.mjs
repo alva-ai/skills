@@ -8,8 +8,8 @@ import {
 import { dirname, relative, resolve, sep } from "node:path";
 
 const EXPECTED_PACKAGE_NAME = "@alva/alva-slim";
-const EXPECTED_PACKAGE_VERSION = "0.0.4";
-const EXPECTED_FRONTMATTER_VERSION = "v0.0.4";
+const EXPECTED_PACKAGE_VERSION = "0.0.5";
+const EXPECTED_FRONTMATTER_VERSION = "v0.0.5";
 const EXPECTED_FILES = ["SKILL.md", "references", "scripts"];
 
 function violation(code, path, message, details = {}) {

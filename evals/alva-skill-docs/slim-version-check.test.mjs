@@ -48,7 +48,7 @@ test("version checker contains no official updater target", () => {
 });
 
 test("version checker requests the exact anonymous Slim releases directory and stays silent when current", () => {
-  const result = runCheck(releases("v0.0.1", "v0.0.3", "v0.0.4"));
+  const result = runCheck(releases("v0.0.1", "v0.0.4", "v0.0.5"));
   assert.equal(result.status, 0);
   assert.equal(result.stdout, "");
   assert.equal(result.stderr, "");
@@ -64,11 +64,11 @@ test("version checker requests the exact anonymous Slim releases directory and s
 });
 
 test("version checker reports only the newer Slim coordinate", () => {
-  const result = runCheck(releases("v0.0.5", "v0.0.2", "v0.0.4"));
+  const result = runCheck(releases("v0.0.6", "v0.0.2", "v0.0.5"));
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /Installed: v0\.0\.4/u);
-  assert.match(result.stdout, /Latest:\s+v0\.0\.5/u);
-  assert.match(result.stdout, /@alva\/alva-slim@v0\.0\.5/u);
+  assert.match(result.stdout, /Installed: v0\.0\.5/u);
+  assert.match(result.stdout, /Latest:\s+v0\.0\.6/u);
+  assert.match(result.stdout, /@alva\/alva-slim@v0\.0\.6/u);
   assert.doesNotMatch(result.stdout, /alva-ai\/skills|@alva\/skill(?:\s|@|$)|npx skills|clawhub|git clone/u);
 });
 
@@ -79,16 +79,17 @@ test("version checker diagnoses registry failures", () => {
 });
 
 for (const [name, body] of [
-  ["malformed prefix", `garbage${releases("v0.0.4")}`],
-  ["trailing garbage", `${releases("v0.0.4")}garbage`],
+  ["malformed prefix", `garbage${releases("v0.0.5")}`],
+  ["trailing garbage", `${releases("v0.0.5")}garbage`],
   ["wrong root type", JSON.stringify([])],
   ["missing entries", JSON.stringify({})],
   ["wrong entries type", JSON.stringify({ entries: {} })],
   ["empty entries", JSON.stringify({ entries: [] })],
-  ["invalid entry type", JSON.stringify({ entries: ["v0.0.4"] })],
-  ["invalid version name", releases("v0.0.4", "latest")],
-  ["noncanonical leading zero", releases("v0.00.4")],
-  ["wrong directory flag", JSON.stringify({ entries: [{ name: "v0.0.4", is_dir: false }] })],
+  ["invalid entry type", JSON.stringify({ entries: ["v0.0.5"] })],
+  ["invalid version name", releases("v0.0.5", "latest")],
+  ["noncanonical leading zero", releases("v0.00.5")],
+  ["duplicate version", releases("v0.0.5", "v0.0.5")],
+  ["wrong directory flag", JSON.stringify({ entries: [{ name: "v0.0.5", is_dir: false }] })],
 ]) {
   test(`version checker rejects ${name}`, () => {
     const result = runCheck(body);
@@ -97,3 +98,33 @@ for (const [name, body] of [
     assert.equal(result.stdout, "");
   });
 }
+
+test("version checker orders arbitrary-length minor components without overflow", () => {
+  const newest = "v0.18446744073709551616.0";
+  const result = runCheck(releases("v0.0.5", "v0.7.0", newest));
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, new RegExp(`Latest:\\s+${newest.replaceAll(".", "\\.")}`, "u"));
+  assert.match(result.stdout, new RegExp(`@alva/alva-slim@${newest.replaceAll(".", "\\.")}`, "u"));
+});
+
+test("version checker orders arbitrary-length patch components without overflow", () => {
+  const newest = "v0.0.18446744073709551616";
+  const result = runCheck(releases("v0.0.5", "v0.0.7", newest));
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, new RegExp(`Latest:\\s+${newest.replaceAll(".", "\\.")}`, "u"));
+});
+
+test("version checker respects a newer minor over an arbitrary-length older patch", () => {
+  const hugePatch = "v0.7.999999999999999999999999999999999999999999999999";
+  const result = runCheck(releases("v0.0.5", hugePatch, "v0.8.0"));
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /Latest:\s+v0\.8\.0/u);
+  assert.doesNotMatch(result.stdout, new RegExp(`Latest:\\s+${hugePatch.replaceAll(".", "\\.")}`, "u"));
+});
+
+test("version checker stays silent for equal and older arbitrary-precision candidates", () => {
+  const result = runCheck(releases("v0.0.5", "v0.0.4", "v0.0.0"));
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, "");
+  assert.equal(result.stderr, "");
+});

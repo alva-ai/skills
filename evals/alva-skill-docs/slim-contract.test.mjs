@@ -14,7 +14,7 @@ const contract = JSON.parse(
 function packageJson(overrides = {}) {
   return {
     name: "@alva/alva-slim",
-    version: "0.0.4",
+    version: "0.0.5",
     files: ["SKILL.md", "references", "scripts"],
     alpkg: { kind: "skill" },
     ...overrides,
@@ -28,7 +28,7 @@ name: alva
 description: Slim Alva routing fixture.
 metadata:
   author: alva
-  version: v0.0.4
+  version: v0.0.5
 ---
 
 # Alva Slim
@@ -149,7 +149,7 @@ function withFixture(options, fn) {
   }
 }
 
-test("accepts a valid v0.0.4 Slim package", () => {
+test("accepts a valid v0.0.5 Slim package", () => {
   withFixture({}, (instance) => {
     const result = validate(instance);
     assert.equal(result.valid, true);
@@ -188,7 +188,7 @@ for (const testCase of [
     name: "wrong package version",
     mutate(instance) {
       const path = join(instance.candidateDir, "package.json");
-      writeFileSync(path, `${JSON.stringify(packageJson({ version: "0.0.3" }), null, 2)}\n`);
+      writeFileSync(path, `${JSON.stringify(packageJson({ version: "0.0.4" }), null, 2)}\n`);
     },
     expected: "PACKAGE_VERSION",
   },
@@ -196,7 +196,7 @@ for (const testCase of [
     name: "wrong frontmatter version",
     mutate(instance) {
       const path = join(instance.candidateDir, "SKILL.md");
-      writeFileSync(path, readFileSync(path, "utf8").replace("version: v0.0.4", "version: v0.0.3"));
+      writeFileSync(path, readFileSync(path, "utf8").replace("version: v0.0.5", "version: v0.0.4"));
     },
     expected: "FRONTMATTER_VERSION",
   },
@@ -212,7 +212,7 @@ for (const testCase of [
     name: "v1 frontmatter version is forbidden",
     mutate(instance) {
       const path = join(instance.candidateDir, "SKILL.md");
-      writeFileSync(path, readFileSync(path, "utf8").replace("version: v0.0.4", "version: v1.0.0"));
+      writeFileSync(path, readFileSync(path, "utf8").replace("version: v0.0.5", "version: v1.0.0"));
     },
     expected: "VERSION_MAJOR_DISALLOWED",
   },

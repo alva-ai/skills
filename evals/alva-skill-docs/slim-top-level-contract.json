@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "releaseVersion": "v0.0.4",
+  "releaseVersion": "v0.0.5",
   "baselineReferences": {
     "count": 42,
     "fingerprint": "a431580d357cd485601e74f1b46a2cca583d6615e007d995bc94fd0ad2a47416"
