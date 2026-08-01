@@ -1,0 +1,11 @@
+{
+  "name": "@alva/alva-slim",
+  "version": "0.0.2",
+  "files": [
+    "SKILL.md",
+    "references"
+  ],
+  "alpkg": {
+    "kind": "skill"
+  }
+}

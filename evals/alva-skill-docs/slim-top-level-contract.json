@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "baselineReferences": {
+    "count": 42,
+    "fingerprint": "a431580d357cd485601e74f1b46a2cca583d6615e007d995bc94fd0ad2a47416"
+  },
+  "rows": [
+    {
+      "id": "mental-model-smallest-artifact",
+      "label": "Mental model and smallest artifact",
+      "requiredText": [
+        "Choose the smallest artifact that satisfies the user's verb."
+      ]
+    },
+    {
+      "id": "preflight",
+      "label": "Session preflight",
+      "requiredText": [
+        "Before Alva work, read [preflight.md](references/preflight.md), run current command help, and confirm identity."
+      ]
+    },
+    {
+      "id": "provenance",
+      "label": "Financial-data provenance",
+      "requiredText": [
+        "Financial facts require fresh Data Skills, feed, or validated BYOD/search provenance; never use model memory as data."
+      ]
+    },
+    {
+      "id": "financial-analysis-answer-gate",
+      "label": "Financial Analysis answer gate and disclaimer",
+      "requiredText": [
+        "Before Financial Analysis answers, read [user-facing-prose.md](references/user-facing-prose.md), pass the answer gate, and include the mandatory investment disclaimer for any security price or strategy."
+      ]
+    },
+    {
+      "id": "automation-knowledge",
+      "label": "Automation knowledge",
+      "requiredText": [
+        "Before automation work, read [alva-knowledge.md](references/alva-knowledge.md); use bounded history when useful and suppress non-material push repeats."
+      ]
+    },
+    {
+      "id": "automation-push-default",
+      "label": "New Automation push default",
+      "requiredText": [
+        "New Automations default to `--push-notify`; read [feed-lifecycle.md](references/feed-lifecycle.md) and [push-notifications.md](references/push-notifications.md) for producer and subscriber verification.",
+        "New Automation producers include `--push-notify` by default unless the user explicitly opts out; read [deployment.md](references/deployment.md), [feed-lifecycle.md](references/feed-lifecycle.md), and [push-notifications.md](references/push-notifications.md) for the full lifecycle and delivery contract."
+      ]
+    },
+    {
+      "id": "skillhub",
+      "label": "Skillhub blueprints",
+      "requiredText": [
+        "For `/use-skill:` or a named method, fetch the Skillhub blueprint fresh and preserve its `--skill-id` when releasing."
+      ]
+    },
+    {
+      "id": "altra",
+      "label": "Altra strategy ownership",
+      "requiredText": [
+        "Use Altra for every backtest, strategy, signal, portfolio simulation, order stream, or rebalance."
+      ]
+    },
+    {
+      "id": "alpi",
+      "label": "alpi reasoning boundary",
+      "requiredText": [
+        "Use alpi only for scheduled reasoning over real upstream data, never to invent financial facts."
+      ]
+    },
+    {
+      "id": "playbook-release",
+      "label": "Playbook and release gates",
+      "requiredText": [
+        "For hosted playbooks, build live feeds before HTML, then pass README, lint, screenshot, and release gates."
+      ]
+    },
+    {
+      "id": "alerts",
+      "label": "Alert contract",
+      "requiredText": [
+        "For alerts, declare the alert output and verify publisher push, active automation binding, and intended subscriber without claiming delivery."
+      ]
+    },
+    {
+      "id": "remix-route",
+      "label": "Remix route and preservation boundary",
+      "requiredText": [
+        "Remix; read [remix-workflow.md](references/remix-workflow.md), inspect source scripts, HTML, README, metadata, and UDFs, and preserve lineage and source UDFs."
+      ]
+    },
+    {
+      "id": "annotation-edit-route",
+      "label": "Annotation edit route and generator boundary",
+      "requiredText": [
+        "Edit / Debug; read [annotation-edits.md](references/annotation-edits.md) and edit the generator behind the element, never rendered feed values."
+      ]
+    },
+    {
+      "id": "trading-confirmation",
+      "label": "Trading confirmation",
+      "requiredText": [
+        "Actual orders require a dry run and explicit user confirmation before non-dry-run execution, except the documented channel-loop consent path."
+      ]
+    },
+    {
+      "id": "user-scope",
+      "label": "User namespace scope",
+      "requiredText": [
+        "Write, deploy, publish, release, and visibility operations stay in the requesting user's namespace unless explicitly authorized otherwise."
+      ]
+    },
+    {
+      "id": "reference-ownership",
+      "label": "Reference ownership",
+      "requiredText": [
+        "Top-level guidance routes decisions; focused references own commands, examples, gotchas, and detailed checklists."
+      ]
+    },
+    {
+      "id": "communication",
+      "label": "User-facing communication",
+      "requiredText": [
+        "Lead user-facing updates with the verified result, provenance, and remaining issue; omit unnecessary internal machinery."
+      ]
+    },
+    {
+      "id": "final-checklist",
+      "label": "Final verification checklist",
+      "requiredText": [
+        "Before finishing, verify the selected route's required references, data provenance, hard gates, user scope, and delivered artifact."
+      ]
+    }
+  ]
+}

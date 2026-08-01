@@ -1050,7 +1050,7 @@
       "target": "corpus",
       "description": "Latest mainline Alva skill updates remain integrated after rebasing the refactor.",
       "includes": [
-        "version: v1.19.3",
+        "production v1.20.1 corpus",
         "Capability Help",
         "Reply 1, 2, or 3 to start",
         "feedback",
