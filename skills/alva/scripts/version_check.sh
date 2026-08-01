@@ -30,11 +30,34 @@ if ! response=$(curl -fsS --max-time 5 --get \
   fail "registry request failed"
 fi
 
-versions=$(printf '%s' "$response" \
-  | grep -oE '"name"[[:space:]]*:[[:space:]]*"v0\.[0-9]+\.[0-9]+"' \
-  | sed -E 's/.*"(v0\.[0-9]+\.[0-9]+)"/\1/')
-if [ -z "$versions" ]; then
-  fail "no stable v0 releases were returned"
+if ! versions=$(printf '%s' "$response" | node -e '
+let input = "";
+process.stdin.setEncoding("utf8");
+process.stdin.on("data", (chunk) => { input += chunk; });
+process.stdin.on("end", () => {
+  try {
+    const body = JSON.parse(input);
+    if (body === null || typeof body !== "object" || Array.isArray(body)) throw new Error();
+    if (!Array.isArray(body.entries) || body.entries.length === 0) throw new Error();
+    const names = [];
+    const seen = new Set();
+    for (const entry of body.entries) {
+      if (entry === null || typeof entry !== "object" || Array.isArray(entry)) throw new Error();
+      if (entry.is_dir !== true) throw new Error();
+      if (typeof entry.name !== "string" || !/^v0\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(entry.name)) {
+        throw new Error();
+      }
+      if (seen.has(entry.name)) throw new Error();
+      seen.add(entry.name);
+      names.push(entry.name);
+    }
+    process.stdout.write(names.join("\n"));
+  } catch {
+    process.exitCode = 1;
+  }
+});
+'); then
+  fail "registry response is invalid"
 fi
 
 version_is_newer() {

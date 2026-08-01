@@ -8,8 +8,8 @@ import {
 import { dirname, relative, resolve, sep } from "node:path";
 
 const EXPECTED_PACKAGE_NAME = "@alva/alva-slim";
-const EXPECTED_PACKAGE_VERSION = "0.0.3";
-const EXPECTED_FRONTMATTER_VERSION = "v0.0.3";
+const EXPECTED_PACKAGE_VERSION = "0.0.4";
+const EXPECTED_FRONTMATTER_VERSION = "v0.0.4";
 const EXPECTED_FILES = ["SKILL.md", "references", "scripts"];
 
 function violation(code, path, message, details = {}) {
@@ -278,16 +278,19 @@ function validateSlimUpdater(candidateDir, violations) {
     );
     return;
   }
-  if ((lstatSync(updaterPath).mode & 0o111) === 0) {
+  if ((lstatSync(updaterPath).mode & 0o444) === 0) {
     violations.push(
-      violation("SLIM_UPDATER_NOT_EXECUTABLE", updaterRelative, "Slim version checker must be executable."),
+      violation("SLIM_UPDATER_NOT_READABLE", updaterRelative, "Slim version checker must be readable for bash invocation."),
     );
+    return;
   }
   const source = readFileSync(updaterPath, "utf8");
   const required = [
     "@alva/alva-slim",
     "/alva/registry/skill/alva/alva-slim/releases",
     "https://api-llm.prd.alva.ai",
+    "JSON.parse",
+    "node",
   ];
   const forbidden = ["alva-ai/skills", "@alva/skill", "npx skills", "clawhub", "git clone"];
   if (required.some((text) => !source.includes(text)) || forbidden.some((text) => source.includes(text))) {

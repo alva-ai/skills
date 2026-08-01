@@ -14,7 +14,7 @@ const contract = JSON.parse(
 function packageJson(overrides = {}) {
   return {
     name: "@alva/alva-slim",
-    version: "0.0.3",
+    version: "0.0.4",
     files: ["SKILL.md", "references", "scripts"],
     alpkg: { kind: "skill" },
     ...overrides,
@@ -28,7 +28,7 @@ name: alva
 description: Slim Alva routing fixture.
 metadata:
   author: alva
-  version: v0.0.3
+  version: v0.0.4
 ---
 
 # Alva Slim
@@ -47,6 +47,7 @@ const validSlimUpdater = `#!/usr/bin/env bash
 PACKAGE="@alva/alva-slim"
 RELEASES_PATH="/alva/registry/skill/alva/alva-slim/releases"
 REGISTRY_ENDPOINT="https://api-llm.prd.alva.ai"
+node -e 'JSON.parse(input)'
 `;
 
 function writeTree(root, { skill = skillText(), pkg = packageJson(), references = {}, updater = validSlimUpdater } = {}) {
@@ -55,7 +56,7 @@ function writeTree(root, { skill = skillText(), pkg = packageJson(), references 
   writeFileSync(join(root, "SKILL.md"), skill);
   writeFileSync(join(root, "package.json"), `${JSON.stringify(pkg, null, 2)}\n`);
   writeFileSync(join(root, "scripts", "version_check.sh"), updater);
-  chmodSync(join(root, "scripts", "version_check.sh"), 0o755);
+  chmodSync(join(root, "scripts", "version_check.sh"), 0o644);
 
   const requiredReferences = Object.fromEntries(
     markdownTargets(skill)
@@ -148,7 +149,7 @@ function withFixture(options, fn) {
   }
 }
 
-test("accepts a valid v0.0.3 Slim package", () => {
+test("accepts a valid v0.0.4 Slim package", () => {
   withFixture({}, (instance) => {
     const result = validate(instance);
     assert.equal(result.valid, true);
@@ -187,7 +188,7 @@ for (const testCase of [
     name: "wrong package version",
     mutate(instance) {
       const path = join(instance.candidateDir, "package.json");
-      writeFileSync(path, `${JSON.stringify(packageJson({ version: "0.0.2" }), null, 2)}\n`);
+      writeFileSync(path, `${JSON.stringify(packageJson({ version: "0.0.3" }), null, 2)}\n`);
     },
     expected: "PACKAGE_VERSION",
   },
@@ -195,7 +196,7 @@ for (const testCase of [
     name: "wrong frontmatter version",
     mutate(instance) {
       const path = join(instance.candidateDir, "SKILL.md");
-      writeFileSync(path, readFileSync(path, "utf8").replace("version: v0.0.3", "version: v0.0.2"));
+      writeFileSync(path, readFileSync(path, "utf8").replace("version: v0.0.4", "version: v0.0.3"));
     },
     expected: "FRONTMATTER_VERSION",
   },
@@ -211,7 +212,7 @@ for (const testCase of [
     name: "v1 frontmatter version is forbidden",
     mutate(instance) {
       const path = join(instance.candidateDir, "SKILL.md");
-      writeFileSync(path, readFileSync(path, "utf8").replace("version: v0.0.3", "version: v1.0.0"));
+      writeFileSync(path, readFileSync(path, "utf8").replace("version: v0.0.4", "version: v1.0.0"));
     },
     expected: "VERSION_MAJOR_DISALLOWED",
   },
@@ -288,7 +289,7 @@ test("rejects a contract descriptor for another Slim release", () => {
   });
 });
 
-test("requires an executable Slim-scoped updater at the preflight path", () => {
+test("requires a readable Slim-scoped checker at the preflight bash path", () => {
   withFixture({}, (instance) => {
     rmSync(join(instance.candidateDir, "scripts", "version_check.sh"));
     assert.ok(codes(validate(instance)).includes("SLIM_UPDATER_MISSING"));
@@ -296,14 +297,14 @@ test("requires an executable Slim-scoped updater at the preflight path", () => {
 
   withFixture({}, (instance) => {
     const path = join(instance.candidateDir, "scripts", "version_check.sh");
-    chmodSync(path, 0o644);
-    assert.ok(codes(validate(instance)).includes("SLIM_UPDATER_NOT_EXECUTABLE"));
+    chmodSync(path, 0o000);
+    assert.ok(codes(validate(instance)).includes("SLIM_UPDATER_NOT_READABLE"));
   });
 
   withFixture({}, (instance) => {
     const path = join(instance.candidateDir, "scripts", "version_check.sh");
     writeFileSync(path, `${validSlimUpdater}\nREPO="alva-ai/skills"\n`);
-    chmodSync(path, 0o755);
+    chmodSync(path, 0o644);
     assert.ok(codes(validate(instance)).includes("SLIM_UPDATER_SCOPE"));
   });
 });

@@ -40,39 +40,60 @@ function releases(...versions) {
   return JSON.stringify({ entries: versions.map((name) => ({ name, is_dir: true })) });
 }
 
-test("version checker is Slim-scoped and contains no official updater target", () => {
+test("version checker contains no official updater target", () => {
   const source = readFileSync(script, "utf8");
-  assert.match(source, /@alva\/alva-slim/u);
-  assert.match(source, /\/alva\/registry\/skill\/alva\/alva-slim\/releases/u);
   for (const forbidden of ["alva-ai/skills", "@alva/skill", "npx skills", "clawhub", "git clone"]) {
     assert.equal(source.includes(forbidden), false, forbidden);
   }
 });
 
-test("version checker stays silent when v0.0.3 is latest", () => {
-  const result = runCheck(releases("v0.0.1", "v0.0.2", "v0.0.3"));
+test("version checker requests the exact anonymous Slim releases directory and stays silent when current", () => {
+  const result = runCheck(releases("v0.0.1", "v0.0.3", "v0.0.4"));
   assert.equal(result.status, 0);
   assert.equal(result.stdout, "");
   assert.equal(result.stderr, "");
-  assert.match(result.curlArgs, /https:\/\/registry\.invalid\/api\/v1\/fs\/readdir/u);
-  assert.match(result.curlArgs, /\/alva\/registry\/skill\/alva\/alva-slim\/releases/u);
+  assert.deepEqual(result.curlArgs.trimEnd().split("\n"), [
+    "-fsS",
+    "--max-time",
+    "5",
+    "--get",
+    "--data-urlencode",
+    "path=/alva/registry/skill/alva/alva-slim/releases",
+    "https://registry.invalid/api/v1/fs/readdir",
+  ]);
 });
 
 test("version checker reports only the newer Slim coordinate", () => {
-  const result = runCheck(releases("v0.0.4", "v0.0.2", "v0.0.3"));
+  const result = runCheck(releases("v0.0.5", "v0.0.2", "v0.0.4"));
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /Installed: v0\.0\.3/u);
-  assert.match(result.stdout, /Latest:\s+v0\.0\.4/u);
-  assert.match(result.stdout, /@alva\/alva-slim@v0\.0\.4/u);
+  assert.match(result.stdout, /Installed: v0\.0\.4/u);
+  assert.match(result.stdout, /Latest:\s+v0\.0\.5/u);
+  assert.match(result.stdout, /@alva\/alva-slim@v0\.0\.5/u);
   assert.doesNotMatch(result.stdout, /alva-ai\/skills|@alva\/skill(?:\s|@|$)|npx skills|clawhub|git clone/u);
 });
 
-test("version checker diagnoses registry and malformed-response failures", () => {
+test("version checker diagnoses registry failures", () => {
   const unavailable = runCheck("", { curlExit: 22 });
   assert.notEqual(unavailable.status, 0);
   assert.match(unavailable.stderr, /Alva Slim version check failed: registry request failed/u);
-
-  const malformed = runCheck(JSON.stringify({ entries: [] }));
-  assert.notEqual(malformed.status, 0);
-  assert.match(malformed.stderr, /Alva Slim version check failed: no stable v0 releases/u);
 });
+
+for (const [name, body] of [
+  ["malformed prefix", `garbage${releases("v0.0.4")}`],
+  ["trailing garbage", `${releases("v0.0.4")}garbage`],
+  ["wrong root type", JSON.stringify([])],
+  ["missing entries", JSON.stringify({})],
+  ["wrong entries type", JSON.stringify({ entries: {} })],
+  ["empty entries", JSON.stringify({ entries: [] })],
+  ["invalid entry type", JSON.stringify({ entries: ["v0.0.4"] })],
+  ["invalid version name", releases("v0.0.4", "latest")],
+  ["noncanonical leading zero", releases("v0.00.4")],
+  ["wrong directory flag", JSON.stringify({ entries: [{ name: "v0.0.4", is_dir: false }] })],
+]) {
+  test(`version checker rejects ${name}`, () => {
+    const result = runCheck(body);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Alva Slim version check failed: registry response is invalid/u);
+    assert.equal(result.stdout, "");
+  });
+}
