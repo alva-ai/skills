@@ -716,7 +716,7 @@ records if some timestamps have multiple items.
     metrics/
       prices/         # Time series output
         @last/100                       # Virtual: last 100 points
-        @range/{start}..{end}           # Virtual: between two timestamps
+        @range/{startMs}..{endMs}       # Virtual: between Unix-ms timestamps
         @count                          # Virtual: point count
 ```
 
