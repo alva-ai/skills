@@ -457,6 +457,8 @@ automation. Read [feed-lifecycle.md](references/feed-lifecycle.md) and
 short creation lifecycle is: write schema and logic to ALFS, `alva run`,
 deploy, publish once with `alva automation publish`, then use its returned
 `feed_id` with `alva feed set-visibility` when public access is required.
+Publish creates an ACTIVE owner alert binding and starts the producer once by
+default; `--skip-auto-trigger` skips only that run, not the binding.
 For an existing automation, keep that identity: ALFS source edits are already
 live, while registered version, producer, or metadata changes use
 `alva automation update --id <feed_id>`. Never delete and recreate merely to
@@ -577,7 +579,7 @@ follows are independent and never enable or disable alerts. New feeds declare
 push-worthy outputs with `alertOutput(typeDoc)` and may use any valid,
 non-reserved `group/output` source. `--push-notify` lets successful scheduled
 and Run Now executions deliver those outputs; it does not subscribe users or
-bypass preferences.
+bypass preferences by itself.
 
 Open [push-notifications.md](references/push-notifications.md) for alert-output
 authoring, automation publish, alert setup, and verification. A quiet V2 run
@@ -724,8 +726,8 @@ generator behind the selected element rather than the rendered DOM.
 For a new recurring alert, design the declared `alertOutput(typeDoc)`, material
 branch, quiet branch that does not append, cadence, and subscriber first. Keep
 `signal/targets` or `notify/message` only when maintaining an existing
-recognized legacy producer. Verify an active automation binding, publisher `--push-notify`,
-and the intended alert binding. Do not trigger or wait solely to verify setup.
+recognized legacy producer. Verify the automation, publisher `--push-notify`, and alert binding. For explicit routing,
+use `--skip-auto-trigger`, route, and trigger at most once only if a real run is required; never trigger solely to verify setup.
 
 ### Chat-as-Artifact (`answer_only` / query mode)
 

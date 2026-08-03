@@ -129,6 +129,25 @@
       ]
     },
     {
+      "id": "target.automation-publish-side-effects",
+      "group": "target",
+      "target": "corpus",
+      "description": "Automation publish documents its owner binding and first-run side effects, including the run-only opt-out and duplicate-trigger guardrail.",
+      "section_includes": [
+        {
+          "file": "references/feed-lifecycle.md",
+          "heading": "Lifecycle",
+          "includes": [
+            "Publish creates an ACTIVE owner alert binding",
+            "Default: let publish start the producer",
+            "do not call `alva deploy trigger` again",
+            "`--skip-auto-trigger` suppresses only the publish-time run",
+            "It does not suppress the owner alert binding"
+          ]
+        }
+      ]
+    },
+    {
       "id": "retained.playbook-release",
       "group": "retained",
       "target": "corpus",

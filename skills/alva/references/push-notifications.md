@@ -22,6 +22,12 @@ A personal FEED alert has one delivery binding per viewer and feed. Enabling
 the same alert for another destination moves the personal alert; it does not
 create a second copy. Choose the destination before mutating it:
 
+Creating a new automation with `alva automation publish` immediately creates
+the owner's ACTIVE binding. It uses the owned origin-session channel when one
+can be resolved and otherwise uses the default personal destination. Pass
+`--skip-auto-trigger` when this binding must be inspected or moved before the
+first producer run; the flag skips the run, not the binding.
+
 - **Default personal destination:** omit `--channel-id`. The service stores
   `channel_id=0`; web delivery is available immediately, and external DM
   delivery uses `active_im_provider` plus its matching username from
@@ -55,27 +61,33 @@ A push is set up only after all of these succeed:
    other fields remain ordinary ALFS data. Use a descriptive, non-reserved
    source such as `market/brief` or `monitor/anomaly`.
 2. Run the feed through [feed-lifecycle.md](feed-lifecycle.md), including
-   `before-automation-publish`.
+   `before-automation-publish`. Publish creates the owner binding and starts the
+   producer once by default. When the destination must be selected explicitly,
+   publish with `--skip-auto-trigger`.
 3. Exercise a material branch with `alva run`, read `@last/1` of the declared
    output, and confirm it contains a non-empty `body`. Exercise a quiet branch
    and confirm it does not append a new record.
 4. Enable publisher push on the cronjob:
    `alva deploy update --id <ID> --push-notify`.
-5. Enable the FEED alert for the intended destination using
-   [Choose The Delivery Destination](#choose-the-delivery-destination). For the
-   default personal destination, use `alva alert enable --automation
-   <owner>/<feed>` or `alva alert enable --automation-ids <id,id>`. For the
-   current Alva topic channel, use `alva alert enable --automation-ids <id,id>
-   --channel-id <current_channel_id>`; never replace this with the
-   name-addressed default-personal command.
+5. Inspect the owner FEED alert created by publish and confirm its destination.
+   If it is already correct, do not re-enable it. To move it to the default
+   personal destination, use `alva alert enable --automation <owner>/<feed>` or
+   `alva alert enable --automation-ids <id,id>`. For the current Alva topic
+   channel, use `alva alert enable --automation-ids <id,id> --channel-id
+   <current_channel_id>`; never replace this with the name-addressed
+   default-personal command.
 
 Do not trigger the cronjob or wait for its next scheduled run solely to verify
-setup. `alva deploy trigger` is not a dry run: after publisher push and an alert
-binding are enabled, Run Now can notify real subscribers. Use `alva run` for
-non-delivering script checks before enablement. A successful enable proves that
-alert delivery is configured for the selected destination; it does not prove
-that a message has already been delivered. An ALFS record alone is also not
-delivery proof. Claim real delivery only when an existing
+setup. A default publish already admitted the first producer run; triggering it
+again duplicates the pipeline. `alva deploy trigger` is not a dry run: after
+publish creates the owner binding, Run Now can notify that destination. Use
+`alva run` for non-delivering script checks before publish. When publish used
+`--skip-auto-trigger`, route the binding first and trigger at most once only if
+a real delivery run is required. A successful enable proves that alert delivery
+is configured for the selected destination; an already-correct binding proves
+the same without another mutation. It does not prove that a message has already
+been delivered. An ALFS record alone is also not delivery proof.
+Claim real delivery only when an existing
 `alva alert history` row for the intended destination records the run as
 `sent`.
 

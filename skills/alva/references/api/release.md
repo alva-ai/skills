@@ -1,11 +1,11 @@
-# Release And Automation Publish — extras not in CLI help
+# Release And Automation Publish
 
 Run `alva release --help` for playbook workflows and `alva automation --help` for
 automation publish/update flags before acting. CLI help is authoritative for
-subcommands, flags, display-name conventions, and examples. This file covers
-only:
+subcommands, flags, display-name conventions, and examples. This file adds
+lifecycle guidance for:
 
-1. Automation publish `--description` wording rules
+1. Automation publish side effects and `--description` wording rules
 2. Playbook README content shape (the big one — referenced by SKILL.md and the
    `--readme-url` flag)
 3. `--trading-symbols` and `--tags` semantics, person-name discovery tags, and
@@ -17,6 +17,18 @@ only:
 existing automation, use `alva automation update --id <feed_id>` for registered
 metadata, version, or producer changes; ALFS source edits themselves need no
 republish. See [feed-lifecycle.md](../feed-lifecycle.md).
+
+## Automation Publish Side Effects
+
+Publishing a new automation creates an ACTIVE owner alert binding and then
+starts the producer once by default. The first run can deliver a real alert when
+the producer has `--push-notify` and emits a material alert output.
+
+Pass `--skip-auto-trigger` when the agent needs to route the binding or trigger
+the producer explicitly after publish. The flag suppresses only the automatic
+run; it does not suppress the owner binding. Do not follow a default publish
+with `alva deploy trigger` for the same verification, because that creates a
+duplicate full pipeline run.
 
 ## Automation Publish `--description` conventions
 

@@ -65,6 +65,15 @@ const MUTATIONS = [
     expectFailedCases: ["scenario.alert-push-monitor"],
   },
   {
+    id: "automation-publish-side-effects",
+    file: "references/feed-lifecycle.md",
+    remove:
+      "`--skip-auto-trigger` suppresses only the publish-time run. It does not suppress\n" +
+      "the owner alert binding. Because the binding exists immediately after publish,\n" +
+      "an explicit `deploy trigger` may deliver a real alert.\n",
+    expectFailedCases: ["target.automation-publish-side-effects"],
+  },
+  {
     id: "automation-knowledge-required-reading",
     file: "SKILL.md",
     remove:
