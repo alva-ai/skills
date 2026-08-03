@@ -1091,6 +1091,36 @@
       ]
     },
     {
+      "id": "target.one-off-lightweight-charts",
+      "group": "target",
+      "target": "corpus",
+      "description": "One-off OHLC artifacts use a concise pinned Lightweight Charts v5 reference without changing Playbook rendering.",
+      "file_includes": [
+        {
+          "file": "references/design-widgets.md",
+          "includes": [
+            "Renderer Routing",
+            "OHLC, candlestick, price-volume, or technical analysis",
+            "lightweight-charts.md",
+            "Existing Playbook charts remain on ECharts"
+          ]
+        },
+        {
+          "file": "references/lightweight-charts.md",
+          "includes": [
+            "lightweight-charts@5.2.0/dist/lightweight-charts.standalone.production.js",
+            "window.LightweightCharts",
+            "chart.addSeries(LightweightCharts.CandlestickSeries",
+            "chart.addSeries(LightweightCharts.LineSeries",
+            "LightweightCharts.HistogramSeries",
+            "Unix timestamps are seconds, not milliseconds",
+            "chart.timeScale().fitContent()",
+            "createPriceLine()"
+          ]
+        }
+      ]
+    },
+    {
       "id": "target.auto-trade-consent-exemption",
       "group": "target",
       "target": "skill",

@@ -261,6 +261,11 @@ No border/outline on widgets (only Tag elements may have borders). Background:
 | Table Card  | None (transparent)         |
 | Others      | `var(--grey-g01)`          |
 
+Exception: a one-off chat artifact rendered with TradingView Lightweight
+Charts may use the solid financial-chart surface described in
+[lightweight-charts.md](./lightweight-charts.md). This does not change Playbook
+Chart Cards or other ECharts charts.
+
 ### Divider
 
 Use `.divider-v` / `.divider-h` — both ends align with content padding (not full
@@ -269,6 +274,15 @@ width). Do not use `border-bottom` / `border-right` for widget dividers.
 ---
 
 ## Chart Card
+
+### Renderer Routing
+
+- For one-off chat artifacts whose main view is OHLC, candlestick,
+  price-volume, or technical analysis, use **TradingView Lightweight Charts**
+  and follow [lightweight-charts.md](./lightweight-charts.md).
+- Use ECharts for other chart types. Existing Playbook charts remain on ECharts
+  unless the user explicitly asks otherwise.
+- Plain HTML/CSS remains appropriate for small KPI and table-only layouts.
 
 ### CSS
 
@@ -386,7 +400,12 @@ Legend marker class by chart type:
 
 ### Chart Rules
 
-1. Use ECharts. Legend and chart must not overlap.
+The rules below are the ECharts and Playbook defaults. The one-off Lightweight
+Charts variant follows [lightweight-charts.md](./lightweight-charts.md), including
+its narrowly scoped solid-background exception.
+
+1. Use ECharts except for the one-off financial charts covered by Renderer
+   Routing. Legend and chart must not overlap.
 2. Do NOT set ECharts `backgroundColor` — dotted pattern handles it.
 3. Colors from chart palette in [design-tokens.css](./design-tokens.css). No
    duplicates. Grey (`--chart-grey-*`) only when ≥ 3 series.
