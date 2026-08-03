@@ -489,6 +489,25 @@
       }
     },
     {
+      "id": "scenario.one-off-technical-chart",
+      "group": "scenarios.ask",
+      "prompt": "Draw a one-off BTC candlestick chart with volume, EMA20, support, and resistance in this chat.",
+      "description": "A one-off technical chart stays in chat, routes financial time-series rendering to Lightweight Charts, and does not become a Playbook.",
+      "expect": {
+        "route": "Financial Analysis / Ask Question",
+        "references": [
+          "design-widgets.md",
+          "lightweight-charts.md"
+        ],
+        "behaviors": [
+          "TradingView Lightweight Charts",
+          "OHLC, candlestick, price-volume, or technical analysis",
+          "Use ECharts for other chart types",
+          "Existing Playbook charts remain on ECharts"
+        ]
+      }
+    },
+    {
       "id": "scenario.udf-strict-opt-in",
       "group": "scenarios.udf",
       "prompt": "Add a button so viewers can run my custom analysis function.",
