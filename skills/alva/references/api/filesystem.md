@@ -1,16 +1,14 @@
 # Filesystem — extras not in CLI help
 
 Run `alva fs --help` first for subcommands, flags, path conventions, and
-grant subjects. This file only covers the supported synth-mount suffixes
-(the help text is partly wrong / incomplete here) plus the synth-mount
-grant gotcha.
+grant subjects. This file adds synth-mount write/schema details and the
+synth-mount grant gotcha.
 
 ## Synth-mount virtual suffixes (authoritative set)
 
 These are the suffixes actually wired up at a feed data mount. Anything
-not on this list is unsupported even if older docs or `alva fs --help`
-mention it (e.g. `@now`, `@all`, `@at`, `@range/{duration}`,
-`@range/@bounds` — do **not** use those).
+not on this list is unsupported. In particular, do **not** use `@now`,
+`@all`, `@at`, `@range/{duration}`, or `@range/@bounds`.
 
 Common ALFS layout:
 
@@ -25,16 +23,16 @@ Common ALFS layout:
 
 ### Time-series reads
 
-| Suffix                  | Description                                  | Example                                                        |
-| ----------------------- | -------------------------------------------- | -------------------------------------------------------------- |
-| `@last/{n}`             | Last N points (chronological)                | `.../prices/@last/100`                                         |
-| `@count`                | Data point count                             | `.../prices/@count`                                            |
-| `@range/{start}..{end}` | Between two timestamps (from..to only)       | `.../prices/@range/2026-01-01T00:00:00Z..2026-03-01T00:00:00Z` |
-| `@before/{ts}/{limit}`  | Up to `limit` points strictly before `ts`    | `.../prices/@before/1737988200/10`                             |
-| `@after/{ts}/{limit}`   | Up to `limit` points strictly after `ts`     | `.../prices/@after/1737988200/10`                              |
+| Suffix                             | Description                                           | Example                                          |
+| ---------------------------------- | ----------------------------------------------------- | ------------------------------------------------ |
+| `@last/{n}`                        | Last N points (chronological)                         | `.../prices/@last/100`                           |
+| `@count`                           | Data point count                                      | `.../prices/@count`                              |
+| `@range/{start_ms}..{end_ms}`      | Between two timestamps (from..to only)                | `.../prices/@range/1735689600000..1740787200000` |
+| `@before/{timestamp_ms}/{limit}`   | Up to `limit` points strictly before the timestamp    | `.../prices/@before/1737988200000/10`            |
+| `@after/{timestamp_ms}/{limit}`    | Up to `limit` points strictly after the timestamp     | `.../prices/@after/1737988200000/10`             |
 
-**Timestamp formats**: RFC 3339 (`2026-01-15T14:30:00Z`), Unix seconds
-(`1737988200`), Unix milliseconds (`1737988200000`).
+**Timestamp format**: Unix milliseconds only (`1737988200000`). RFC 3339
+and Unix-second timestamps are not supported by feed synth mounts.
 
 For grouped records (multiple events appended at the same timestamp), the
 response is `{date, items: [...]}`. The Feed SDK auto-flattens, CLI
