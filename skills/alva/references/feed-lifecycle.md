@@ -20,13 +20,26 @@ Every feed follows the same path:
 3. Test with `alva run --entry-path '~/feeds/<name>/v1/src/index.js'`.
 4. Deploy the script with `alva deploy create`.
 5. Publish the automation with `alva automation publish` using the cronjob id
-   from deploy, and record the returned `feed_id`.
+   from deploy, and record the returned `feed_id`. Publish creates an ACTIVE
+   owner alert binding and, by default, starts the producer once.
 6. When a playbook or public user needs the feed, publish its visibility with
    `alva feed set-visibility --id <feed_id> --visibility public`.
 7. Verify an unauthenticated read of a public feed path returns HTTP 200.
 
 `automation publish` is create-only. Run it once to register a new automation;
 do not treat it as create-or-update.
+
+Choose exactly one first-run path:
+
+- Default: let publish start the producer, and do not call `alva deploy
+  trigger` again for the same verification.
+- Controlled routing or manual verification: publish with
+  `--skip-auto-trigger`, inspect or move the already-created owner alert
+  binding, then trigger the producer at most once if a real run is required.
+
+`--skip-auto-trigger` suppresses only the publish-time run. It does not suppress
+the owner alert binding. Because the binding exists immediately after publish,
+an explicit `deploy trigger` may deliver a real alert.
 
 ## Updating An Existing Automation
 
@@ -116,6 +129,9 @@ Before `alva automation publish`, verify:
 3. Output groups and fields match the feed contract.
 4. Evidence is fresh; if source changed after the run, rerun.
 5. The producer cronjob exists and its id is known.
+6. The first-run path is explicit: either rely on publish's automatic run, or
+   pass `--skip-auto-trigger` because the binding will be routed or the producer
+   will be triggered manually afterward.
 
 If any evidence is missing or stale, do not publish. Fix the feed, rerun, and
 re-enter the gate.
@@ -129,6 +145,10 @@ After publish, when public access is required, verify:
 3. Before building or releasing dependent HTML, at least one public `@last`
    path used by the HTML is non-empty.
 
+For push-capable automations, also verify the owner alert binding created by
+publish targets the intended destination. Move it with `alva alert enable`
+before an explicit trigger when the publish request used `--skip-auto-trigger`.
+
 ## Alert Outputs
 
 New push-capable feeds wrap the TypeDoc of each push-worthy output with
@@ -140,9 +160,10 @@ A top-level script execution may return at most one alert record per declared
 source and at most 16 alert records in total, including when it calls multiple
 successful `Feed.run()` callbacks. A quiet run appends nothing to the alert
 output. `--push-notify` marks the cronjob publisher as capable of delivering
-those records; it does not create an alert binding or bypass notification
-preferences. Scheduled runs and `alva deploy trigger` use the same delivery
-semantics.
+those records; that deploy flag alone does not create an alert binding or bypass
+notification preferences. Creating a new automation with `alva automation
+publish` does create an ACTIVE owner alert binding before its default first run.
+Scheduled runs and `alva deploy trigger` use the same delivery semantics.
 
 Existing `signal/targets` and `notify/message` producers remain compatible
 through legacy fanout. They are reserved sources and must not be wrapped in

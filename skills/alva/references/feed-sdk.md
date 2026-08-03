@@ -223,9 +223,10 @@ Alert-output rules:
 - A callback failure reports no V2 alerts. Successful ALFS writes and delivery
   reporting are best-effort; a delivery bridge failure does not undo stored
   Feed data.
-- `--push-notify` enables publisher-side delivery but does not subscribe anyone.
-  Real delivery also requires an active published automation and an explicit
-  FEED alert binding.
+- `--push-notify` enables publisher-side delivery but does not itself subscribe
+  anyone. Publishing a new automation creates an ACTIVE owner FEED alert
+  binding before the default first run. Other viewers and destination changes
+  still require an explicit alert binding mutation.
 - Scheduled runs and `alva deploy trigger` both deliver eligible records.
   `deploy trigger` is not a dry run; use `alva run` for non-delivering script
   checks.
@@ -278,10 +279,12 @@ NO_MATERIAL_UPDATE.`);
 })();
 ```
 
-Deploy still requires a cronjob with `--push-notify`, an active
-`alva automation publish` binding, and an explicit FEED alert subscription.
-Publishing establishes the Feed/cronjob identity; adding or changing an alert
-output later does not require another publish.
+Deploy still requires a cronjob with `--push-notify` and an active
+`alva automation publish` binding. Initial publish creates the owner's FEED
+alert binding automatically; use `alva alert enable` to move it to a different
+destination or to bind another viewer. Publishing also starts the producer once
+unless `--skip-auto-trigger` is present. Adding or changing an alert output
+later does not require another publish.
 
 ### Legacy Compatibility
 

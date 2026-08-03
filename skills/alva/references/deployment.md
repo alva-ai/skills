@@ -52,10 +52,17 @@ only when the user explicitly asks.
 
 When `--push-notify` is set, every successful scheduled or Run Now execution
 may deliver records written to outputs declared with `alertOutput(typeDoc)`.
-The Feed still needs an active published automation binding, and delivery
-requires an explicit alert binding to that Feed. Following a playbook that
-references the Feed does not enable alerts; `--push-notify` does not subscribe
-the owner or any user.
+The Feed still needs an active published automation binding. `--push-notify`
+does not itself subscribe the owner or any user, but creating the automation
+with `alva automation publish` does create an ACTIVE owner alert binding before
+its default first run. Following a playbook that references the Feed does not
+enable alerts. Other viewers and destination changes require an explicit alert
+binding mutation.
+
+Publish with `--skip-auto-trigger` when the owner binding must be routed before
+the first real producer run or when the agent will trigger the producer
+explicitly. The flag does not suppress the binding. Do not manually trigger
+after a default publish for the same verification.
 
 `alva deploy trigger` is not a dry run. If publisher push and subscriber
 bindings are enabled, triggering the cronjob can send real notifications. Use
