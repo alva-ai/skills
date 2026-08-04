@@ -144,7 +144,7 @@ These are the high-signal rules to remember.
 9. **References own depth.** Top-level sections tell you what the capability is,
    what rule is easy to miss, and which file to open. Long examples, commands,
    and checklists live in the linked reference.
-10. **Mandatory disclaimer.** Any answer involving a security price or investment strategy MUST include an investment disclaimer. See [user-facing-prose.md](references/user-facing-prose.md#investment-disclaimer).
+10. **Mandatory investment framing.** Any answer involving a security price or investment strategy MUST include an investment disclaimer. If the user asks for any "financial advice" or "analyst advice," the response MUST also begin with the exact advice-request header. See [user-facing-prose.md](references/user-facing-prose.md#investment-disclaimer).
 
 Two consequences are worth making explicit. First, a useful Alva answer can be
 small: a financial-analysis question should not become a playbook unless the

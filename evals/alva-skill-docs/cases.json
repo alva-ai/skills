@@ -885,15 +885,18 @@
       "id": "target.mandatory-investment-disclaimer",
       "group": "target",
       "target": "corpus",
-      "description": "Security-price and investment-strategy answers have one mandatory disclaimer contract wired into prose and routing.",
+      "description": "Security-price and investment-strategy answers have a mandatory disclaimer, while explicit advice requests also receive the required opening header.",
       "section_includes": [
         {
           "file": "SKILL.md",
           "heading": "First Principles",
           "label": "top-level requirement",
           "includes": [
-            "Mandatory disclaimer",
-            "Any answer involving a security price or investment strategy MUST include an investment disclaimer"
+            "Mandatory investment framing",
+            "Any answer involving a security price or investment strategy MUST include an investment disclaimer",
+            "financial advice",
+            "analyst advice",
+            "exact advice-request header"
           ]
         },
         {
@@ -903,7 +906,10 @@
           "includes": [
             "investment disclaimer is required",
             "security price or investment strategy",
-            "This content is for informational purposes only and does not constitute investment advice."
+            "This content is for informational purposes only and does not constitute investment advice.",
+            "begin the response with this exact header",
+            "I'll share an analysis, but keep in mind I'm not a licensed analyst or adviser, and this isn't personalized advice for you specifically.",
+            "This advice-request header is additive"
           ]
         },
         {
