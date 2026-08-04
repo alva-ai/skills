@@ -21,11 +21,26 @@ const MUTATIONS = [
   {
     id: "mandatory-investment-disclaimer",
     file: "SKILL.md",
-    remove: "10. **Mandatory disclaimer.** Any answer involving a security price or investment strategy MUST include an investment disclaimer. See [user-facing-prose.md](references/user-facing-prose.md#investment-disclaimer).\n",
+    remove: "10. **Mandatory investment framing.** Any answer involving a security price or investment strategy MUST include an investment disclaimer. If the user asks for any \"financial advice\" or \"analyst advice,\" the response MUST also begin with the exact advice-request header. See [user-facing-prose.md](references/user-facing-prose.md#investment-disclaimer).\n",
     expectFailedCases: [
       "target.mandatory-investment-disclaimer",
       "scenario.equity-price-disclaimer",
+      "scenario.explicit-analyst-advice-header",
       "scenario.backtest-strategy",
+    ],
+  },
+  {
+    id: "explicit-advice-request-header",
+    file: "references/user-facing-prose.md",
+    remove:
+      "If the user asks for any \"financial advice\" or \"analyst advice,\" begin the\n" +
+      "response with this exact header before providing the analysis:\n\n" +
+      "> I'll share an analysis, but keep in mind I'm not a licensed analyst or adviser, and this isn't personalized advice for you specifically.\n\n" +
+      "This advice-request header is additive: when the answer involves a security\n" +
+      "price or investment strategy, also include the investment disclaimer above.\n",
+    expectFailedCases: [
+      "target.mandatory-investment-disclaimer",
+      "scenario.explicit-analyst-advice-header",
     ],
   },
   {

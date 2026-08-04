@@ -41,6 +41,24 @@
       }
     },
     {
+      "id": "scenario.explicit-analyst-advice-header",
+      "group": "scenarios.ask",
+      "prompt": "Give me your analyst advice on whether I should buy NVDA.",
+      "description": "An explicit analyst-advice request begins with the required header and retains the investment disclaimer.",
+      "expect": {
+        "route": "Financial Analysis / Ask Question",
+        "references": [
+          "user-facing-prose.md"
+        ],
+        "behaviors": [
+          "If the user asks for any \"financial advice\" or \"analyst advice,\" the response MUST also begin with the exact advice-request header",
+          "I'll share an analysis, but keep in mind I'm not a licensed analyst or adviser, and this isn't personalized advice for you specifically.",
+          "This advice-request header is additive",
+          "This content is for informational purposes only and does not constitute investment advice."
+        ]
+      }
+    },
+    {
       "id": "scenario.complex-valuation-ask",
       "group": "scenarios.ask",
       "prompt": "Is NVDA cheap versus peers after the latest earnings revision?",
