@@ -779,7 +779,7 @@
       "group": "target",
       "target": "skill",
       "description": "Top-level SKILL.md stays below the current guide ceiling without forcing a minimum size that would block future compression.",
-      "max_lines": 910
+      "max_lines": 911
     },
     {
       "id": "target.playbook-task-offload",
@@ -1161,13 +1161,18 @@
       "id": "target.one-off-lightweight-charts",
       "group": "target",
       "target": "corpus",
-      "description": "One-off OHLC artifacts use a concise pinned Lightweight Charts v5 reference without changing Playbook rendering.",
+      "description": "One-off price-series artifacts route to a pinned Lightweight Charts v5 reference by intent — including price-level annotation — without changing Playbook rendering.",
+      "excludes": [
+        "Charts** thereafter."
+      ],
       "file_includes": [
         {
           "file": "references/design-widgets.md",
           "includes": [
             "Renderer Routing",
-            "OHLC, candlestick, price-volume, or technical analysis",
+            "a price series over time",
+            "annotates price levels such as support, resistance, entry, target, or stop",
+            "Use ECharts for non-price chart types",
             "lightweight-charts.md",
             "Existing Playbook charts remain on ECharts"
           ]
@@ -1183,6 +1188,12 @@
             "Unix timestamps are seconds, not milliseconds",
             "chart.timeScale().fitContent()",
             "createPriceLine()"
+          ]
+        },
+        {
+          "file": "SKILL.md",
+          "includes": [
+            "[lightweight-charts.md](references/lightweight-charts.md)"
           ]
         }
       ]

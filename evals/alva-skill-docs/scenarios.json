@@ -558,9 +558,28 @@
         ],
         "behaviors": [
           "TradingView Lightweight Charts",
-          "OHLC, candlestick, price-volume, or technical analysis",
-          "Use ECharts for other chart types",
+          "a price series over time",
+          "annotates price levels",
+          "Use ECharts for non-price chart types",
           "Existing Playbook charts remain on ECharts"
+        ]
+      }
+    },
+    {
+      "id": "scenario.one-off-price-trend-no-keyword",
+      "group": "scenarios.ask",
+      "prompt": "How has BTC been trending lately? Mark the key levels I should watch.",
+      "description": "A price-trend question with no chart-form keyword still routes to Lightweight Charts and reads its reference, because intent — a price series over time plus price-level annotation — is the trigger, not the words OHLC or candlestick.",
+      "expect": {
+        "route": "Financial Analysis / Ask Question",
+        "references": [
+          "design-widgets.md",
+          "lightweight-charts.md"
+        ],
+        "behaviors": [
+          "TradingView Lightweight Charts",
+          "a price series over time",
+          "annotates price levels"
         ]
       }
     },
