@@ -259,6 +259,45 @@
       }
     },
     {
+      "id": "scenario.rich-feed-alert",
+      "group": "scenarios.push",
+      "prompt": "Create a scheduled market Feed alert with a red Discord card, a View report link button, and an Analyze impact follow-up button.",
+      "description": "A rich Feed alert uses the declared portable action and presentation fields, preserving title/body fallback and keeping PresentActions out of Feed code.",
+      "expect": {
+        "route": "Automation / Push",
+        "references": [
+          "feed-sdk.md",
+          "push-notifications.md"
+        ],
+        "behaviors": [
+          "messageActionsField()",
+          "messagePresentationField()",
+          "openUrlAction(",
+          "sendPromptAction(",
+          "cardPresentation(",
+          "Discord can render the card and both action kinds on the same final message",
+          "Clients without card support retain `title` + `body`",
+          "`PresentActions` is a conversation-reply tool, not a Feed API"
+        ],
+        "forbidden_behaviors": [
+          "A free-standing `url` field does not become a button",
+          "never call it from a Feed script"
+        ],
+        "sections": [
+          {
+            "file": "references/feed-sdk.md",
+            "heading": "Portable Actions And Card Presentation",
+            "includes": [
+              "accentColor: \"#FF2020\"",
+              "openUrlAction(\"View report\"",
+              "sendPromptAction(",
+              "cardPresentation({"
+            ]
+          }
+        ]
+      }
+    },
+    {
       "id": "scenario.current-topic-channel-alert",
       "group": "scenarios.push",
       "prompt": "<session-prefill-channel-memory channel-id=\"44\" root=\"/alva/home/ymchcom/channels/research/memory\"> Notify this channel every minute with hello111.",

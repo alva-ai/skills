@@ -120,6 +120,15 @@ const MUTATIONS = [
     expectFailedCases: ["scenario.alert-push-monitor"],
   },
   {
+    id: "feed-rich-alert-authoring",
+    file: "references/feed-sdk.md",
+    remove: "#### Portable Actions And Card Presentation\n",
+    expectFailedCases: [
+      "alerts.portable-actions-and-cards",
+      "scenario.rich-feed-alert",
+    ],
+  },
+  {
     id: "ticker-read-first-tier-route",
     file: "SKILL.md",
     remove: "read [ticker-read.md](references/ticker-read.md) before source selection",

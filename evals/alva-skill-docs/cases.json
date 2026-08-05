@@ -264,6 +264,48 @@
       ]
     },
     {
+      "id": "alerts.portable-actions-and-cards",
+      "group": "alerts",
+      "target": "corpus",
+      "description": "Declared Feed alerts can carry portable CTA actions and card presentation without confusing them with conversational PresentActions.",
+      "section_includes": [
+        {
+          "file": "SKILL.md",
+          "heading": "Action Layer: Alerts",
+          "label": "rich alert summary",
+          "includes": [
+            "portable actions and card presentation",
+            "[push-notifications.md](references/push-notifications.md)"
+          ]
+        },
+        {
+          "file": "references/feed-sdk.md",
+          "heading": "Portable Actions And Card Presentation",
+          "label": "Feed SDK rich alert authoring",
+          "includes": [
+            "messageActionsField()",
+            "messagePresentationField()",
+            "openUrlAction(",
+            "sendPromptAction(",
+            "cardPresentation(",
+            "accentColor",
+            "Discord can render the card and both action kinds on the same final message",
+            "never call it from a Feed script"
+          ]
+        },
+        {
+          "file": "references/push-notifications.md",
+          "heading": "Configure And Verify",
+          "label": "rich alert delivery boundary",
+          "includes": [
+            "A free-standing `url` field does not become a button",
+            "conversational `PresentActions` must not be used by a Feed",
+            "falls back to canonical `title` + `body`"
+          ]
+        }
+      ]
+    },
+    {
       "id": "retained.memory-secrets",
       "group": "retained",
       "target": "corpus",

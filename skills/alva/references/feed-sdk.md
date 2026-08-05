@@ -210,8 +210,10 @@ feed.def("market", {
 Alert-output rules:
 
 - The TypeDoc must declare a root `body` string. A root `title` string is
-  optional. Additional fields such as `ticker`, `url`, or structured analysis
-  remain available in ALFS but do not change the standard notification text.
+  optional. Ordinary additional fields such as `ticker`, a free-standing
+  `url`, or structured analysis remain available in ALFS but do not change the
+  notification. Only the SDK's declared `actions` and `presentation` fields
+  opt into portable buttons and card rendering.
 - Use any descriptive, valid `group/output` except the reserved legacy sources
   `signal/targets` and `notify/message`.
 - A top-level script execution may return at most one alert record for a given
@@ -232,6 +234,80 @@ Alert-output rules:
   checks.
 - Changing the declaration or source in an already active Feed does not require
   republishing. The next run uses the current script and declarations.
+
+#### Portable Actions And Card Presentation
+
+Declare optional message actions with `messageActionsField()` and an optional
+card with `messagePresentationField()`. Build records with the matching helpers;
+do not hand-shape platform payloads:
+
+```javascript
+const {
+  Feed,
+  feedPath,
+  makeDoc,
+  str,
+  alertOutput,
+  messageActionsField,
+  messagePresentationField,
+  openUrlAction,
+  sendPromptAction,
+  cardPresentation,
+} = require("@alva/feed");
+
+const feed = new Feed({ path: feedPath("market-radar") });
+feed.def("market", {
+  alerts: alertOutput(
+    makeDoc("Market Alert", "Push-ready market event", [
+      str("title"),
+      str("body"),
+      messageActionsField(),
+      messagePresentationField(),
+    ]),
+  ),
+});
+
+await feed.run(async (ctx) => {
+  const event = getMaterialEvent();
+  if (!event) return;
+
+  await ctx.self.ts("market", "alerts").append([
+    {
+      date: Date.now(),
+      title: `${event.ticker} halted down`,
+      body: `Price: ${event.price}\nChange: ${event.change}`,
+      actions: [
+        openUrlAction("View report", event.reportUrl),
+        sendPromptAction(
+          "Analyze impact",
+          `Analyze the impact of this ${event.ticker} alert.`,
+        ),
+      ],
+      presentation: cardPresentation({
+        accentColor: "#FF2020",
+        url: event.reportUrl,
+        thumbnailUrl: event.logoUrl,
+        footer: "Market Radar",
+        fields: [
+          { label: "Volume", value: event.volume, inline: true },
+          { label: "Status", value: event.status, inline: true },
+        ],
+      }),
+    },
+  ]);
+});
+```
+
+`openUrlAction()` creates an HTTPS destination action. `sendPromptAction()`
+creates a follow-up in the same Alva conversation; never place secrets in its
+prompt. A card uses the alert `title` and `body` as its canonical title and
+description, with optional `accentColor`, `url`, `thumbnailUrl`, `footer`, and
+up to 25 `fields`.
+
+Discord can render the card and both action kinds on the same final message.
+Clients without card support retain `title` + `body`, and delivery remains
+useful even when presentation is unavailable. `PresentActions` is a
+conversation-reply tool, not a Feed API; never call it from a Feed script.
 
 ### Pattern E: AlvaAsk + Declared Alert Output
 

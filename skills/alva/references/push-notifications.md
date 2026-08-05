@@ -58,8 +58,17 @@ A push is set up only after all of these succeed:
 
 1. Declare the intended output with `alertOutput(typeDoc)`. The TypeDoc must
    have a root `body` string field and may have a root `title` string field;
-   other fields remain ordinary ALFS data. Use a descriptive, non-reserved
-   source such as `market/brief` or `monitor/anomaly`.
+   ordinary extra fields remain ALFS data. For portable buttons, also declare
+   `messageActionsField()` and write `openUrlAction()` or
+   `sendPromptAction()` values. For a platform-neutral card, declare
+   `messagePresentationField()` and write `cardPresentation()`. Discord renders
+   the card as one Embed and can attach both action kinds to it; unsupported
+   presentation falls back to canonical `title` + `body`. A free-standing
+   `url` field does not become a button, and conversational `PresentActions`
+   must not be used by a Feed. See
+   [Portable Actions And Card Presentation](feed-sdk.md#portable-actions-and-card-presentation).
+   Use a descriptive, non-reserved source such as `market/brief` or
+   `monitor/anomaly`.
 2. Run the feed through [feed-lifecycle.md](feed-lifecycle.md), including
    `before-automation-publish`. Publish creates the owner binding and starts the
    producer once by default. When the destination must be selected explicitly,

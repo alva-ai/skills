@@ -582,8 +582,8 @@ and Run Now executions deliver those outputs; it does not subscribe users or
 bypass preferences by itself.
 
 Open [push-notifications.md](references/push-notifications.md) for alert-output
-authoring, automation publish, alert setup, and verification. A quiet V2 run
-does not append an alert record.
+authoring, portable actions and card presentation, automation publish, alert
+setup, and verification. A quiet V2 run does not append an alert record.
 
 After releasing or keeping a playbook as draft, scan whether any backing feed is
 push-worthy. A push setup requires a declared alert output or a recognized
