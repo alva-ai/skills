@@ -1,9 +1,10 @@
 # TradingView Lightweight Charts For One-Off Artifacts
 
 Use **TradingView Lightweight Charts** for a one-off chat artifact whose main
-view is OHLC, candlestick, price-volume, or technical analysis. Use **Lightweight
-Charts** thereafter. Keep ECharts for other chart types and for Playbooks unless
-the user explicitly asks otherwise.
+view is a price series over time — OHLC, candlestick, a single price line,
+price-volume, or technical analysis — or that annotates price levels such as
+support, resistance, entry, target, or stop. Keep ECharts for non-price chart
+types and for Playbooks unless the user explicitly asks otherwise.
 
 ## Load The Standalone v5 Build
 

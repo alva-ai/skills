@@ -277,11 +277,16 @@ width). Do not use `border-bottom` / `border-right` for widget dividers.
 
 ### Renderer Routing
 
-- For one-off chat artifacts whose main view is OHLC, candlestick,
-  price-volume, or technical analysis, use **TradingView Lightweight Charts**
-  and follow [lightweight-charts.md](./lightweight-charts.md).
-- Use ECharts for other chart types. Existing Playbook charts remain on ECharts
-  unless the user explicitly asks otherwise.
+- Prefer **TradingView Lightweight Charts** for any one-off chat artifact whose
+  main view is a price series over time — OHLC, candlestick, a single price
+  line, price-volume, or technical analysis — and for any one-off artifact that
+  annotates price levels such as support, resistance, entry, target, or stop.
+  Follow [lightweight-charts.md](./lightweight-charts.md); its v5 series API is
+  not the v4 API you may recall.
+- Use ECharts for non-price chart types: category bars, pie/donut, scatter,
+  heatmap, correlation matrices, and distribution charts.
+- Existing Playbook charts remain on ECharts unless the user explicitly asks
+  otherwise.
 - Plain HTML/CSS remains appropriate for small KPI and table-only layouts.
 
 ### CSS
