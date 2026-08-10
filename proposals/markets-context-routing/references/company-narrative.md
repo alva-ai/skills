@@ -1,119 +1,79 @@
 # Company Narrative Context
 
-Status: proposed consumer contract. The canonical API does not yet expose all
-required selection and point-in-time behavior.
+Status: proposed Skill consumer contract for the current Markets backend view.
 
 ## Contents
 
-- [Purpose and boundary](#purpose-and-boundary)
-- [Request](#request)
-- [Response](#response)
-- [Selection and time rules](#selection-and-time-rules)
-- [Change semantics](#change-semantics)
-- [Synthesis and degradation](#synthesis-and-degradation)
+- [Command](#command)
+- [What it supplies](#what-it-supplies)
+- [Consumption rules](#consumption-rules)
+- [Synthesis](#synthesis)
+- [Failure and degradation](#failure-and-degradation)
 
-## Purpose And Boundary
+## Command
 
-Company Narrative supplies the Markets view of the investor debate: the dated
-one-line read, current questions, competitive context, what would move the
-debate, recent changes, and known evidence gaps.
-
-It is analytical context, not authority for live price, official results,
-guidance, filings, event timing, or raw news. The Skill consumes a normalized
-API result; it does not read the page, locate a source record, select a version,
-or parse legacy storage shapes.
-
-## Request
-
-```json
-{
-  "symbol": "AAPL",
-  "query_as_of": "optional ISO-8601 timestamp",
-  "version": { "generated_at": "optional exact version timestamp" },
-  "detail": "summary | evidence"
-}
+```text
+alva markets narrative --ticker <CANONICAL_TICKER>
 ```
 
-- No cutoff means the latest valid version available now.
-- An exact version is used for page-selected history.
-- `summary` is the default for broad company questions.
-- `evidence` adds bounded change history and supporting fields when requested.
+The command accepts only `--ticker`. The Toolkit/backend owns company
+resolution and source normalization. The Skill must not construct source paths,
+derive source-specific slugs, or scrape the Markets page.
 
-## Response
+## What It Supplies
 
-```json
-{
-  "status": "AVAILABLE | NOT_AVAILABLE_YET | UNAVAILABLE",
-  "unavailable_reason": null,
-  "symbol": "AAPL",
-  "selected_version": {
-    "generated_at": "ISO-8601",
-    "evidence_cutoff_at": "ISO-8601",
-    "selection_reason": "LATEST_VALID | EXACT_VERSION | AS_OF"
-  },
-  "summary": {
-    "oneliner": "...",
-    "focusing_now": ["..."],
-    "competitive_landscape": ["..."],
-    "what_would_move": ["..."],
-    "street_stands": ["..."]
-  },
-  "changes": {
-    "run_change_summary": [],
-    "material_narrative_changes": []
-  },
-  "gaps": [],
-  "warnings": []
-}
-```
+The normalized Narrative response is expected to cover:
 
-The backend may retain additional provenance internally. The Toolkit should
-return only the bounded fields needed by the caller.
+- current market narrative and investor questions;
+- bullish and bearish catalysts;
+- focus across the latest four reported quarters;
+- changes in Street expectations;
+- comparable companies;
+- dated Narrative snapshots and material change records;
+- data gaps and warnings when present.
 
-## Selection And Time Rules
+Narrative is Alva analysis. It is not authority for live price, official
+results, guidance, filing contents, or earnings timing.
 
-The backend must:
+## Consumption Rules
 
-1. Resolve the canonical security and reject a mismatched record.
-2. Select latest valid, exact version, or newest valid version at
-   `query_as_of`.
-3. Require both `generated_at` and `evidence_cutoff_at` to be at or before an
-   explicit historical cutoff.
-4. Exclude a record whose evidence cannot be proven to respect its cutoff.
-5. Return the selection reason, timestamp, gaps, and any legacy normalization
-   warning.
+- Use the current record for present-tense investor-focus questions.
+- Use returned history only to explain changes leading to the current record.
+- Keep ordinary version changes distinct from material narrative changes.
+- Treat an empty material-change log as “no recorded material change,” not proof
+  that the thesis is unchanged.
+- Preserve Narrative timestamps and disclose staleness or material gaps.
+- Do not answer a historical point-in-time question from the latest record.
 
-The Skill must not simulate these checks in prompting. A later record cannot
-be used merely because it discusses an earlier event.
+The current command has no exact-version or `query_as_of` selector. A question
+such as “What did Alva believe on January 15?” is unsupported even when the
+response contains historical snapshots, because later knowledge may affect the
+current normalized view.
 
-## Change Semantics
+## Synthesis
 
-Keep two products distinct:
+For a broad company answer, use only:
 
-| Field | Meaning |
-| --- | --- |
-| `run_change_summary` | Ordinary differences between generated Narrative versions. |
-| `material_narrative_changes` | An event changed the investor question, mechanism, or decision variable. |
-
-An empty material-change list is normal; it does not prove that “nothing
-happened” or that the thesis is unchanged. Legacy string arrays, object arrays,
-null values, and malformed entries are normalized or rejected by the backend,
-not interpreted ad hoc by each channel.
-
-## Synthesis And Degradation
-
-For a broad answer, use at most:
-
-1. The dated one-line view.
-2. Two or three current investor questions.
-3. The decision variables most likely to change the debate.
-4. A material recent change only when relevant.
+1. The dated one-line market view.
+2. Two or three decision-relevant investor questions.
+3. The catalysts or evidence that would change the view.
+4. One material recent Narrative change when relevant.
 5. Material gaps or staleness.
 
-Label the content as Alva analysis and preserve its timestamp. Fetch current
-facts from their authoritative sources.
+For a narrow Narrative question, add only the relevant competitive, Street, or
+change-history detail. Do not dump every Narrative section.
 
-If Narrative is unavailable, continue with other company evidence but do not
-claim “Alva's current narrative.” Return one of these reasons with
-`UNAVAILABLE`: `SOURCE_MISSING`, `NOT_ENTITLED`, `INVALID_SOURCE`,
-`UPSTREAM_FAILURE`, or `OUTSIDE_AS_OF`.
+Label conclusions as Alva analysis and source current factual claims
+separately.
+
+## Failure And Degradation
+
+- If current Narrative is available but one history row is invalid, the backend
+  should preserve the current result and return the history problem as a typed
+  gap.
+- If the command fails or the current record is invalid, continue with other
+  company sources but do not claim “Alva's current Narrative.”
+- Missing history does not make a valid current Narrative unavailable; it only
+  limits change analysis.
+- A mismatched security, malformed current record, or upstream failure must not
+  be rephrased as a neutral market view.
