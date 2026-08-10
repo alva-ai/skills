@@ -1,95 +1,94 @@
-# Proposed Routing Integration
+# Routing Integration
 
-Status: designed, not shipped. This RFC defines the boundary engineering must
-implement before changing the live Skill.
+Status: designed, not shipped. The Toolkit command is available in the current
+rollout build; the live Skill has not adopted it.
 
-## 1. Ownership
+## 1. Single Routing Owner
 
-| Layer | Owns |
+Only `skills/alva/references/ticker-read.md` should own the Company Context
+intent table.
+
+- `SKILL.md`: point named-ticker analysis to `ticker-read.md`; add no parallel
+  Markets router.
+- `request-routing.md`: keep the generic Financial Analysis gate; add no
+  Narrative/Earnings intent table.
+- `company-narrative.md` and `earnings.md`: define command use, consumption,
+  synthesis, and degradation only.
+
+## 2. Command Router
+
+| User ask | Command |
 | --- | --- |
-| `ticker-read.md` | The only Company Context intent table; decides whether to request Narrative, Earnings, or both. |
-| Narrative/Earnings references | Module inputs, normalized outputs, synthesis, and degradation rules. No intent tables or storage recipes. |
-| Toolkit | One authenticated, channel-independent command that calls the canonical API and returns bounded JSON. |
-| Backend CompanyService | Symbol resolution, version/event selection, point-in-time validation, source priority, typed gaps, and transcript selection. |
-| Producers | Evidence cutoffs, timestamps, event identity, and source integrity. |
+| Simple price or isolated fact | Do not call Markets unless interpretation is requested. |
+| Investor focus, current debate, narrative change, peers | `alva markets narrative --ticker <TICKER>` |
+| Latest completed earnings, results, call, thesis impact | `alva markets earnings --ticker <TICKER>` |
+| Next confirmed earnings setup | `alva markets earnings --ticker <TICKER> --event next-confirmed` |
+| Explicit fiscal period | Add both `--fiscal-year <YEAR>` and `--fiscal-quarter <Q1..Q4>`. |
+| Broad view such as “How does Alva view AMD?” | Call Narrative plus default Earnings; synthesize compactly. |
 
-Do not add parallel routing paragraphs to `SKILL.md` or
-`request-routing.md`. Those files should only point named-ticker analysis to
-the existing ticker-read chain.
+Command invariants:
 
-## 2. Ticker-Read Route
+- `--event` accepts `latest-completed` or `next-confirmed`; default is
+  `latest-completed`.
+- Do not combine `--event` with fiscal-year/quarter flags.
+- Fiscal year and quarter must be provided together.
+- A typed event-not-found response means no matching confirmed event; do not
+  silently substitute another quarter.
 
-The future intent table in `ticker-read.md` should be no larger than this:
+## 3. Current Boundary
 
-| User ask | Company Context request |
-| --- | --- |
-| Simple price or isolated fact | None unless interpretation is requested. |
-| Investor focus, debate, narrative, or narrative change | `scope=narrative` |
-| Earnings setup, result, guidance, call, transcript, or thesis impact | `scope=earnings` |
-| Broad view such as “How does Alva view AMD?” | `scope=broad`, summary detail |
-| Historical or page-selected question | Same scope plus explicit selector and `query_as_of` |
+The commands return the latest backend view. They do not accept
+`query_as_of`, an exact Narrative version, or a historical evidence cutoff.
 
-Broad responses begin with compact Narrative and Earnings summaries. History,
-full evidence, and transcript passages are fetched only when the question
-requires them.
+Therefore:
 
-## 3. Stable Agent Interface
+- current and explicitly selected fiscal-period questions are supported;
+- Narrative history may explain how the current record changed;
+- “What would I have seen on date X?” is unsupported and must be disclosed;
+- the Skill must not simulate historical point-in-time correctness from current
+  records.
 
-Expose one logical operation across web, IM, and direct Skill calls:
+## 4. Readiness Gaps
 
-```text
-alva company context \
-  --symbol <canonical-symbol> \
-  --scope narrative|earnings|broad \
-  --detail summary|evidence \
-  [--as-of <timestamp>] \
-  [--fiscal-year <year> --fiscal-quarter <quarter>] \
-  [--narrative-version <generated-at>]
-```
+Before enabling automatic broad routing:
 
-The concrete command name may change, but all channels must call the same
-backend contract. The result must include selected identities, source
-timestamps, selection reasons, typed gaps, warnings, and bounded content. It
-must never expose storage addressing as part of the public contract.
+1. Narrative must return a usable current record even when one history row is
+   malformed; invalid history should be isolated or returned as a typed gap.
+2. Pre-Earnings records generated after the release must be repaired or rejected
+   when they contain post-event evidence.
+3. Default Earnings output must be bounded. The current response includes the
+   full transcript; add a summary mode that returns transcript status and
+   selected passages only.
+4. Keep a detailed transcript mode for explicit call questions, with a query or
+   section selector and a hard passage/character budget.
 
-## 4. Required Platform Work
+The first two are backend/data-integrity work. Transcript bounding may be
+implemented in the backend or Toolkit, but the Skill-facing output must be
+bounded before broad auto-routing.
 
-Before the Skill integration:
+Historical `query_as_of` support is a later capability and does not block
+current-view routing once the four readiness gaps above pass.
 
-1. Repair and backfill any Pre-Earnings record containing evidence published
-   after its declared cutoff.
-2. Add producer fields `generated_at` and `evidence_cutoff_at`; reject evidence
-   observed or published after the cutoff.
-3. Extend CompanyService and its gateway surface with `query_as_of`, exact
-   Narrative selection, fiscal-event selection, release publication time,
-   typed gaps, selection reasons, and bounded transcript retrieval.
-4. Normalize current and legacy Narrative change-log shapes server-side.
-5. Expose the stable Toolkit command and verify authenticated access from every
-   supported channel.
+## 5. Rollout Sequence
 
-## 5. Delivery Sequence
-
-1. Approve this API-first RFC.
-2. Fix producer integrity and affected historical data.
-3. Ship backend and gateway selection/PIT behavior.
-4. Ship the Toolkit command and contract tests.
-5. Add compact Narrative/Earnings references and the single ticker-read route.
-6. Run gray and cross-channel parity tests before enabling broad routing.
+1. Fix Narrative invalid-history isolation and contaminated Pre records.
+2. Add bounded default Earnings output and targeted transcript retrieval.
+3. Smoke-test the commands on AAPL, AMD, `BRK.B`, an upcoming event, an explicit
+   quarter, and a ticker with no matching event.
+4. Add the two references and one compact intent table to `ticker-read.md`.
+5. Confirm price-only and non-company routes do not call Markets.
+6. Verify equivalent normalized results from web, IM, and direct Skill calls.
 
 ## 6. Acceptance Criteria
 
-- The same request returns the same selected Narrative version, fiscal event,
-  stage eligibility, timestamps, and gap reasons in web, IM, and direct calls.
-- A historical cutoff cannot return later Narrative, Release, Transcript,
-  Post, estimates, or producer-generated evidence.
-- Pre, Release, Transcript, and Post always belong to one validated fiscal
-  event; a missing stage does not remove available stages.
-- Current, upcoming, post-call, and explicitly historical scenarios pass.
-- Share classes such as `BRK.B`, ordinary US tickers, and at least one non-US
-  symbol pass without Skill-side symbol-to-source logic.
-- `AVAILABLE`, `NOT_AVAILABLE_YET`, and `UNAVAILABLE` are distinguished; the
-  unavailable reason distinguishes missing source, entitlement, invalid data,
-  upstream failure, and outside-cutoff evidence.
-- Existing price-only and non-company routes do not load Company Context.
-- The final `skills/alva/**` diff contains no source-addressing or deployment
-  configuration details.
+- Broad reads return compact Narrative plus latest-completed Earnings context.
+- Next-confirmed and explicit-quarter selectors follow the documented flag
+  constraints.
+- Earnings preserves the validated fiscal event across Pre, Release,
+  Transcript, and Post; a missing stage does not erase available stages.
+- Malformed Narrative history does not destroy a valid current Narrative.
+- Default broad reads never inject an entire transcript into model context.
+- A Pre record containing post-release evidence is excluded or clearly invalid.
+- Historical point-in-time questions receive an explicit unsupported response.
+- The final `skills/alva/**` diff contains no deployment configuration or
+  underlying source-addressing details.
