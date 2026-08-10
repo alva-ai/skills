@@ -1,70 +1,42 @@
-# Markets Context Routing Proposal
+# Markets Company Context RFC
 
-Status: review-only proposal. Nothing in this directory is loaded by the
+Status: API-first design proposal. Nothing in this directory is loaded by the
 current Alva Skill.
 
 ## Goal
 
-Make the company context already available in Markets readable from every Alva
-conversation surface: alva.ai chat, supported IM channels, and direct Agent
-Skill calls.
+Let a user ask about a company from alva.ai, an IM channel, or a direct Skill
+call and receive the same Markets context: Company Narrative plus the relevant
+Earnings lifecycle.
 
-The proposal adds two internal consumer references to the existing top-level
-`alva` Skill:
-
-- [Company Narrative](references/company-narrative.md): reads the Markets
-  Narrative/WILF feed, including versions, change semantics, timestamps, and
-  gaps.
-- [Earnings Context](references/earnings.md): resolves one fiscal event and
-  reads every eligible Pre-Earnings, Official Release, Transcript, and
-  Post-Earnings stage.
-
-These are not proposed as separate installable Skills. They are internal
-modules selected by the existing Alva ticker router.
-
-## Why This Lives Under `proposals/`
-
-The first review should not modify `skills/alva/**`. Engineering can review the
-feed contracts, time boundaries, fallback behavior, and routing shape before
-integrating them into the live Skill.
-
-The proposed production destination after approval is:
+## Proposed Boundary
 
 ```text
-skills/alva/
-├── SKILL.md
-└── references/
-    ├── request-routing.md
-    ├── ticker-read.md
-    ├── company-narrative.md   # new
-    └── earnings.md            # new
+Ticker intent router
+  -> stable Company Context API / Toolkit command
+  -> backend CompanyService
+  -> validated Narrative and Earnings sources
 ```
 
-## Design Decisions
+- Keep one installable `alva` Skill.
+- Make `ticker-read.md` the sole owner of company-context intent routing.
+- Keep Narrative and Earnings as internal consumer contracts, not separate
+  Skills.
+- Keep source addressing, event selection, point-in-time enforcement, status
+  normalization, and transcript bounding behind the API.
+- Let the Skill request bounded context and synthesize the answer.
 
-1. Keep one top-level `alva` Skill. Narrative and Earnings are reference
-   modules, not independently triggered Skills.
-2. Treat WILF as the base Narrative record, while preserving Markets-only
-   version and `narrative_change_log` semantics.
-3. Treat Earnings as one lifecycle workflow rather than four modules. Resolve
-   one fiscal event, calculate an information cutoff, then read every stage
-   that existed by that cutoff.
-4. Missing one source must not erase other valid context. Return typed stage
-   gaps and continue.
-5. Use the feeds and Data Skills directly. Do not scrape the Markets UI.
-6. Apply the same normalized contracts in web, IM, and direct Skill calls.
+The Skill must not read the Markets web page or reconstruct backend selection
+logic from storage records.
 
-## What Engineering Should Review
+## Documents
 
-- Environment owner configuration and absolute ALFS paths.
-- Canonical ticker-to-feed-slug resolver, especially share classes and non-US
-  symbols.
-- Shared fiscal-event selector for broad company questions.
-- Publication timestamps used for release and transcript point-in-time gates.
-- Transcript retrieval/filtering outside model context.
-- Whether current runtime tools expose all required reads in every supported
-  channel.
-- Evaluation coverage before merging into `skills/alva/**`.
+- [Routing integration](routing-integration.md): ownership, API surface,
+  rollout sequence, and acceptance criteria.
+- [Company Narrative](references/company-narrative.md): normalized Narrative
+  contract and synthesis rules.
+- [Earnings Context](references/earnings.md): unified Pre, Release, Transcript,
+  and Post contract.
 
-See [routing-integration.md](routing-integration.md) for the exact proposed
-router changes and acceptance tests.
+The proposal can move into `skills/alva/references/` only after producer,
+backend, Toolkit, and cross-channel parity checks pass.
