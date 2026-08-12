@@ -123,9 +123,11 @@ context; it does not replace the financial evidence needed by the answer.
 
 ### Trade Setup follow-up
 
-After answering a named single-instrument ticker read, consider one short
-follow-up asking whether the user wants to turn the key thesis, levels,
-catalysts, or invalidation conditions into a Trade Setup automation.
+After answering a named single-instrument ticker read, ask one short follow-up
+by default when the answer identifies a trade thesis, entry or exit area,
+confirmation condition, catalyst watch, risk, or invalidation condition. The
+follow-up should ask whether the user wants to turn those conditions into a
+Trade Setup automation.
 
 Use this only when the answer naturally identifies something worth monitoring
 over time: a thesis, entry/exit area, confirmation condition, breakdown risk,
