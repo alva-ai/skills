@@ -495,6 +495,132 @@
       }
     },
     {
+      "id": "scenario.ticker-read-markets-narrative",
+      "group": "scenarios.ticker-read.markets",
+      "prompt": "给我看 TSLA 当前 Company Narrative 和最近的 narrative change。",
+      "description": "An explicit Markets Narrative request uses the normalized narrative command and preserves the current-view boundary.",
+      "expect": {
+        "route": "Financial Analysis / Ask Question",
+        "references": [
+          "ticker-read.md",
+          "request-routing.md"
+        ],
+        "behaviors": [
+          "Current Company Narrative, Narrative history, or change log",
+          "alva markets narrative --ticker <TICKER>",
+          "Markets returns the current backend view, not historical point-in-time truth"
+        ]
+      }
+    },
+    {
+      "id": "scenario.ticker-read-markets-latest-earnings",
+      "group": "scenarios.ticker-read.markets",
+      "prompt": "NVDA 最新财报怎么样？",
+      "description": "A latest-results question uses the default latest-completed Earnings selector and preserves evidence roles.",
+      "expect": {
+        "route": "Financial Analysis / Ask Question",
+        "references": [
+          "ticker-read.md",
+          "request-routing.md"
+        ],
+        "behaviors": [
+          "Latest completed earnings",
+          "alva markets earnings --ticker <TICKER>",
+          "Treat Pre as a dated expectation baseline",
+          "Release as the official source for reported facts"
+        ]
+      }
+    },
+    {
+      "id": "scenario.ticker-read-markets-earnings-call",
+      "group": "scenarios.ticker-read.markets",
+      "prompt": "管理层在 NVDA 最新电话会怎么说毛利率？",
+      "description": "An earnings-call question uses latest-completed Earnings and treats Transcript as management evidence without discarding other valid stages.",
+      "expect": {
+        "route": "Financial Analysis / Ask Question",
+        "references": [
+          "ticker-read.md",
+          "request-routing.md"
+        ],
+        "behaviors": [
+          "alva markets earnings --ticker <TICKER>",
+          "Transcript as management statements",
+          "Preserve valid stages when another is unavailable"
+        ]
+      }
+    },
+    {
+      "id": "scenario.ticker-read-markets-next-earnings",
+      "group": "scenarios.ticker-read.markets",
+      "prompt": "AAPL 下一次财报看什么？",
+      "description": "A next-event question uses next-confirmed and never substitutes another fiscal event.",
+      "expect": {
+        "route": "Financial Analysis / Ask Question",
+        "references": [
+          "ticker-read.md",
+          "request-routing.md"
+        ],
+        "behaviors": [
+          "Next confirmed earnings",
+          "alva markets earnings --ticker <TICKER> --event next-confirmed",
+          "never substitute a different event for the requested one"
+        ]
+      }
+    },
+    {
+      "id": "scenario.ticker-read-markets-explicit-period",
+      "group": "scenarios.ticker-read.markets",
+      "prompt": "AAPL FY2026 Q3 怎么改变公司叙事？",
+      "description": "An explicit fiscal-period thesis question pairs fiscal flags and can combine Earnings with the requested Company Narrative context.",
+      "expect": {
+        "route": "Financial Analysis / Ask Question",
+        "references": [
+          "ticker-read.md",
+          "request-routing.md"
+        ],
+        "behaviors": [
+          "Explicit period: provide `--fiscal-year` and `--fiscal-quarter` together",
+          "alva markets earnings --ticker <TICKER>",
+          "alva markets narrative --ticker <TICKER>"
+        ]
+      }
+    },
+    {
+      "id": "scenario.ticker-read-markets-price-only",
+      "group": "scenarios.ticker-read.markets",
+      "prompt": "AAPL 现在多少钱？",
+      "description": "A price-only request stays on Data Skills and does not call Markets for enrichment.",
+      "expect": {
+        "route": "Financial Analysis / Ask Question",
+        "references": [
+          "ticker-read.md",
+          "data-skills.md"
+        ],
+        "behaviors": [
+          "Data Skills remain the source for live price"
+        ],
+        "forbidden_behaviors": [
+          "Price-only and fundamentals-only asks do not call Markets for enrichment"
+        ]
+      }
+    },
+    {
+      "id": "scenario.ticker-read-markets-point-in-time",
+      "group": "scenarios.ticker-read.markets",
+      "prompt": "一月十五日当时 Alva 怎么看 AAPL？",
+      "description": "A historical point-in-time request discloses the current-view limitation instead of reconstructing past truth.",
+      "expect": {
+        "route": "Financial Analysis / Ask Question",
+        "references": [
+          "ticker-read.md",
+          "request-routing.md"
+        ],
+        "forbidden_behaviors": [
+          "Markets returns the current backend view, not historical point-in-time truth"
+        ]
+      }
+    },
+    {
       "id": "scenario.remix-existing-playbook",
       "group": "scenarios.playbook",
       "prompt": "<remix https://alva.ai/u/alva/playbooks/screener> make my own version",

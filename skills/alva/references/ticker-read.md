@@ -86,6 +86,31 @@ Method availability is rollout state, not company coverage. Keep a catalog 404
 separate from a published method reporting that a particular ticker is not
 covered.
 
+### Markets company context
+
+Run `alva markets --help` once before first use in a session.
+
+- Current Company Narrative, Narrative history, or change log:
+  `alva markets narrative --ticker <TICKER>`
+- Latest completed earnings:
+  `alva markets earnings --ticker <TICKER>`
+- Next confirmed earnings:
+  `alva markets earnings --ticker <TICKER> --event next-confirmed`
+- Explicit period: provide `--fiscal-year` and `--fiscal-quarter` together.
+
+Add Earnings only for an explicit earnings/call question or when the selected
+evidence makes a fiscal event material. Price-only and fundamentals-only asks
+do not call Markets for enrichment.
+
+Treat Pre as a dated expectation baseline, Release as the official source for
+reported facts, Transcript as management statements, and Post as Alva analysis.
+Preserve valid stages when another is unavailable; never substitute a different
+event for the requested one.
+
+Markets returns the current backend view, not historical point-in-time truth.
+If the command is unavailable, continue with available sources; do not construct
+GraphQL, ALFS paths, owners, or environment mappings.
+
 ## Intent Routing
 
 ### Intraday and hourly-scale tracking

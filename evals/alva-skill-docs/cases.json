@@ -556,6 +556,54 @@
       ]
     },
     {
+      "id": "platform-data.markets-context-routing",
+      "group": "platform-data",
+      "target": "corpus",
+      "description": "Named-ticker narrative and earnings questions route through one compact Markets Context contract without fixed source-count wording or internal addressing details.",
+      "excludes": [
+        "Treat the five official methods",
+        "staging owner",
+        "production owner"
+      ],
+      "section_includes": [
+        {
+          "file": "SKILL.md",
+          "heading": "Request Routing",
+          "label": "markets intent and anti-drift route",
+          "includes": [
+            "company narrative, earnings, earnings call",
+            "Use the smallest sufficient source set",
+            "read [ticker-read.md](references/ticker-read.md) before source selection"
+          ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "heading": "Routes",
+          "label": "named-ticker markets intent",
+          "includes": [
+            "company narrative, earnings, or earnings call questions",
+            "first opens [ticker-read.md](ticker-read.md)"
+          ]
+        },
+        {
+          "file": "references/ticker-read.md",
+          "heading": "Markets company context",
+          "label": "markets context contract",
+          "includes": [
+            "alva markets --help",
+            "alva markets narrative --ticker <TICKER>",
+            "alva markets earnings --ticker <TICKER>",
+            "--event next-confirmed",
+            "--fiscal-year",
+            "--fiscal-quarter",
+            "Price-only and fundamentals-only asks do not call Markets for enrichment",
+            "Markets returns the current backend view, not historical point-in-time truth",
+            "do not construct GraphQL, ALFS paths, owners, or environment mappings"
+          ]
+        }
+      ]
+    },
+    {
       "id": "platform-data.ticker-read-trade-setup-follow-up",
       "group": "platform-data",
       "target": "corpus",
