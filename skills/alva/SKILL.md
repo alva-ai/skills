@@ -570,7 +570,7 @@ function.
 Open [api/udf-runtime.md](references/api/udf-runtime.md). It owns PBSV browser
 authentication, `alva functions` creator registration and allowance tools,
 `window.alva.udf`, allowance consent, `UdfButton`, caller identity,
-`allow_charges=false` defaults, and release checks.
+`allow_charges=false` defaults, author-owned result contracts, and release checks.
 
 #### Action Layer: Alerts
 

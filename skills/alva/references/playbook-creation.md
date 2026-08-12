@@ -101,6 +101,13 @@ covers PBSV browser authentication, `alva functions` creator registration,
 `window.alva.udf`, allowance consent, and release checks. Never hand-write
 bearer headers in playbook HTML or raw service requests for UDF setup.
 
+When creating or editing a UDF, keep a single UDF contract in your working notes
+and implementation: `function_name`, `params_schema`, result shape, entry script
+path, and HTML renderer fields. `params_schema` is input-only, so the entry
+script return value and browser renderer must be authored from the same result
+contract and smoke-tested together. Do not ask the user to restate the return
+shape after you created the function.
+
 ## README
 
 Every released playbook ships a README at:
@@ -184,9 +191,10 @@ Before `alva release playbook`, verify:
    to pass this gate.
 3. Cronjobs for referenced feeds are active.
 4. HTML fetches quantitative data from feeds, not inline literals.
-5. If UDFs exist, [api/udf-runtime.md](api/udf-runtime.md) has been read, the
-   function is registered with `alva functions`, and HTML uses
-   `window.alva.udf`.
+5. If UDFs exist, [api/udf-runtime.md](api/udf-runtime.md) has been read, each
+   function is registered with `alva functions`, HTML uses `window.alva.udf`,
+   and the UDF result contract is verified: smoke invoke returned the declared
+   result shape and HTML consumes the declared result fields.
 6. Latest data from each referenced feed is fresh; if older than 2x cron
    interval, warn the user or fix the feed.
 7. Description and README source/frequency claims match actual scripts and

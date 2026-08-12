@@ -205,6 +205,49 @@
       ]
     },
     {
+      "id": "retained.udf-author-owned-contract",
+      "group": "retained",
+      "target": "corpus",
+      "description": "UDF authoring keeps params, result shape, entry script, and HTML renderer tied to one contract.",
+      "includes": [
+        "Author-Owned UDF Contract",
+        "result_contract",
+        "params_schema is input-only",
+        "entry script, registration, smoke test, and browser renderer",
+        "Do not ask the user to restate that return shape",
+        "smoke tests must assert the returned `result` shape"
+      ],
+      "file_includes": [
+        {
+          "file": "references/api/udf-runtime.md",
+          "includes": [
+            "The result contract is author-owned.",
+            "The browser renderer must consume the exact declared result fields.",
+            "If the smoke result and browser renderer disagree, fix the script or renderer before release."
+          ]
+        },
+        {
+          "file": "references/playbook-creation.md",
+          "includes": [
+            "result shape",
+            "HTML renderer fields",
+            "Do not ask the user to restate the return shape after you created the function."
+          ]
+        }
+      ],
+      "hard_gate_includes": [
+        {
+          "file": "references/playbook-creation.md",
+          "id": "before-playbook-release",
+          "includes": [
+            "UDF result contract",
+            "smoke invoke returned the declared result shape",
+            "HTML consumes the declared result fields"
+          ]
+        }
+      ]
+    },
+    {
       "id": "retained.credits-cli",
       "group": "retained",
       "target": "corpus",
