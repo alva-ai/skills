@@ -55,8 +55,11 @@ Before broader Skillhub search or custom work, check these official fast paths:
    judgment-based alerts) via `@alva/trade-setup-sdk`. Trigger phrasings, in
    any language: "trade setup", "trading strategy", "investment strategy",
    watching/monitoring a ticker against the user's own trade idea, "alert me
-   when my setup confirms or breaks", or editing/diagnosing an existing trade
-   setup.
+   when my setup confirms or breaks", editing/diagnosing an existing trade
+   setup, or accepting a post-answer Trade Setup suggestion after a named
+   single-instrument ticker read. In the post-answer path, reuse the answered
+   ticker, thesis, key levels, catalysts, risk, and invalidation conditions as
+   setup context, then fetch the blueprint fresh before building.
 
 Choose by outcome: discovery favors Alpha Radar; monitoring owned or followed
 assets broadly favors Portfolio Watch; one instrument tied to the user's own
