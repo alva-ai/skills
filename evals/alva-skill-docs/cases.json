@@ -596,6 +596,8 @@
             "--event next-confirmed",
             "--fiscal-year",
             "--fiscal-quarter",
+            "--fiscal-year 2026 --fiscal-quarter Q3",
+            "Do not read WILF in parallel for the same request",
             "Price-only and fundamentals-only asks do not call Markets for enrichment",
             "Markets returns the current backend view, not historical point-in-time truth",
             "do not construct GraphQL, ALFS paths, owners, or environment mappings"

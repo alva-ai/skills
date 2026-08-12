@@ -26,7 +26,7 @@ primary ticker-state source for hour-scale tracking, not a live quote.
 | Official Skillhub id | Choose it for | Coverage and boundary |
 | --- | --- | --- |
 | `alva/company-anomaly-read` | Primary intraday/hourly-scale tracking: whether a covered US ticker is anomalous now, its current signal, the latest confirmed attribution in the active episode, or anomaly history. | Public read-only coverage is a curated roughly 3,000-symbol US universe with roughly 15-minute checks during US market hours. A quiet state does not prove that price was flat or that no news exists. |
-| `alva/what-investors-are-looking-for` | Weekly investor focus, the one-line read, competitive landscape, bullish/bearish movers, four-quarter focus, recent official events, Street positioning, or what changed between weekly cards. | Per-ticker WILF cards cover roughly 2,960 symbols. During the catalog rename rollout, the active profile may still expose this method as `alva/wilf`. The feed contains generated card content, not prices, charts, fundamentals, or raw source documents. |
+| `alva/what-investors-are-looking-for` | An explicit raw WILF-card request, or compatibility fallback when Markets Narrative is unavailable. | Markets Narrative is the default reader for ordinary investor-focus questions. Per-ticker WILF cards cover roughly 2,960 symbols; the feed contains generated card content, not prices, charts, fundamentals, or raw source documents. During the catalog rename rollout, the active profile may still expose it as `alva/wilf`. |
 | `alva/query-breaking-news-feed` | Current macro/cross-market event discovery that may explain market, sector, or highly watched-company behavior. | It is not a company-by-company news feed. Missing coverage means the feed did not surface a matching event, not that no event exists. |
 
 ### Build-on-demand lane
@@ -96,7 +96,13 @@ Run `alva markets --help` once before first use in a session.
   `alva markets earnings --ticker <TICKER>`
 - Next confirmed earnings:
   `alva markets earnings --ticker <TICKER> --event next-confirmed`
-- Explicit period: provide `--fiscal-year` and `--fiscal-quarter` together.
+- Explicit period: pass both flags, e.g.
+  `--fiscal-year 2026 --fiscal-quarter Q3`.
+
+Use Narrative as the default reader for current investor focus, debate,
+competitive context, what could move the stock, four-quarter focus, Street
+positioning, and narrative changes. Do not read WILF in parallel for the same
+request; use it only when explicitly requested or when Narrative is unavailable.
 
 Add Earnings only for an explicit earnings/call question or when the selected
 evidence makes a fiscal event material. Price-only and fundamentals-only asks
@@ -121,7 +127,7 @@ GraphQL, ALFS paths, owners, or environment mappings.
 3. Use its current-state or bounded-history workflow for the requested horizon,
    including its rules for keeping current and prior attributions distinct.
 4. Add Breaking News only when a current macro/sector event may explain the
-   move. Add WILF only when weekly investor focus helps interpret it.
+   move. Add Markets Narrative only when investor context helps interpret it.
 
 A quiet state does not prove that price was flat. It means no anomaly rule
 crossed in that run; report the live move from Data Skills separately.
@@ -134,9 +140,9 @@ For every broad ticker read, check the Direct-read lane before generic search:
 2. Check Company Anomaly exact-ticker coverage and current state first. When
    covered, add the anomaly state and freshness; when uncovered, continue
    without treating the missing feed as a company signal.
-3. Read WILF when the question needs current investor priorities, debate,
-   competitive context, or recent changes. Surface `gaps` and the card's `date`
-   / `as_of`.
+3. Read Markets Narrative when the question needs current investor priorities,
+   debate, competitive context, or recent changes. Report `asOf` and
+   `generatedAtMs`.
 4. Query Breaking News when the user asks about recent catalysts, today's
    context, or a move that may be market- or sector-driven.
 5. Use Data Skills for live price, returns, fundamentals, valuation, estimates,
@@ -185,16 +191,12 @@ confirms or breaks?"
 
 ### What are investors watching?
 
-Use `alva/what-investors-are-looking-for` as the primary source. Read `@last/1`
-for the current card and `@last/N` only when the user asks how focus changed.
-Report the weekly card timestamp and surface `gaps`; a 404 means not covered
-yet, not a bearish or empty result.
+Use Markets Narrative for current focus and its history only when the user asks
+how focus changed. Report `asOf` and `generatedAtMs`. If the compatibility
+fallback reaches WILF, report its `date` / `as_of` and `gaps`; never generate
+missing WILF coverage for a read-only request.
 
-Do not generate a missing WILF card merely to answer a read-only question. The
-generation path spends credits and persists a new feed; use it only when the
-user explicitly asks to create coverage and has authorized that mutation.
-
-When the question also asks what may matter today, combine the WILF frame with
+When the question also asks what may matter today, combine the Narrative with
 `alva/query-breaking-news-feed` for current macro/cross-market event discovery.
 Verify material event claims against source entries marked
 `supports_event: true`; `sourceConfidence` and `primarySourceUrl` alone are not
@@ -219,7 +221,7 @@ Before answering, keep each layer and timestamp explicit:
 | Layer | Preferred evidence | State clearly |
 | --- | --- | --- |
 | Performance now | Data Skills | Price/return basis, as-of time, fundamentals or valuation periods. |
-| Investor focus | WILF | Weekly `date` / `as_of`, changed vs unchanged, and `gaps`. |
+| Investor focus | Markets Narrative; WILF only as compatibility fallback | Narrative `asOf` / `generatedAtMs`; on WILF fallback, weekly `date` / `as_of` and `gaps`. |
 | Anomaly state | Company Anomaly | Current timeline timestamp, active/quiet state, episode identity, and attribution timestamp. |
 | Current catalysts | Breaking News plus supporting sources | Observation/update time, whether a source supports the event, and coverage limits. |
 | Custom move explanation | Aggregate + Move Attribution | Records run time, supplied move basis, decomposition, dated evidence, and confidence. |

@@ -477,7 +477,7 @@
       "id": "scenario.ticker-read-investor-news",
       "group": "scenarios.ticker-read",
       "prompt": "TSLA 现在投资者最关注什么？今天有没有可能影响它的突发事件？",
-      "description": "Investor-focus and breaking-event questions combine WILF with the macro breaking-news feed while preserving each source's freshness, coverage, and evidence limits.",
+      "description": "Investor-focus and breaking-event questions use Markets Narrative as the canonical company-context reader, then add the macro breaking-news feed without a parallel WILF read.",
       "expect": {
         "route": "Financial Analysis / Ask Question",
         "references": [
@@ -485,9 +485,10 @@
           "request-routing.md"
         ],
         "behaviors": [
-          "Weekly investor focus",
+          "Use Narrative as the default reader",
+          "Do not read WILF in parallel for the same request",
+          "Report `asOf` and `generatedAtMs`",
           "current macro/cross-market event discovery",
-          "surface `gaps`",
           "supports_event: true",
           "not a company-by-company news feed",
           "did not surface a matching event"
@@ -579,7 +580,7 @@
           "request-routing.md"
         ],
         "behaviors": [
-          "Explicit period: provide `--fiscal-year` and `--fiscal-quarter` together",
+          "--fiscal-year 2026 --fiscal-quarter Q3",
           "alva markets earnings --ticker <TICKER>",
           "alva markets narrative --ticker <TICKER>"
         ]
