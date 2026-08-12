@@ -1211,7 +1211,7 @@
       "target": "corpus",
       "description": "Latest mainline Alva skill updates remain integrated after rebasing the refactor.",
       "includes": [
-        "version: v1.21.1",
+        "version: v1.21.2",
         "Capability Help",
         "Reply 1, 2, or 3 to start",
         "feedback",
