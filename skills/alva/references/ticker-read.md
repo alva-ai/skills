@@ -104,9 +104,9 @@ competitive context, what could move the stock, four-quarter focus, Street
 positioning, and narrative changes. Do not read WILF in parallel for the same
 request; use it only when explicitly requested or when Narrative is unavailable.
 
-Add Earnings only for an explicit earnings/call question or when the selected
-evidence makes a fiscal event material. Price-only and fundamentals-only asks
-do not call Markets for enrichment.
+Add latest completed Earnings for a broad company assessment or thesis, an
+explicit earnings/call question, or when selected evidence makes a fiscal event
+material. Price-only and fundamentals-only asks do not call Markets for enrichment.
 
 Treat Pre as a dated expectation baseline, Release as the official source for
 reported facts, Transcript as management statements, and Post as Alva analysis.

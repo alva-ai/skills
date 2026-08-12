@@ -397,7 +397,7 @@
       "id": "scenario.ticker-read-broad-analysis",
       "group": "scenarios.ticker-read",
       "prompt": "分析一下 MU 最近的公司表现，重点说清楚市场现在在看什么、最近异动和催化剂。",
-      "description": "A broad single-ticker read checks the official direct-read sources before generic search, selects rather than blindly running them all, and still uses Data Skills for live financial facts.",
+      "description": "A broad single-ticker assessment checks the official direct-read sources, adds latest completed Earnings, and still uses Data Skills for live financial facts without running every source.",
       "expect": {
         "route": "Financial Analysis / Ask Question",
         "references": [
@@ -411,6 +411,7 @@
           "alva/what-investors-are-looking-for",
           "alva/company-anomaly-read",
           "alva/query-breaking-news-feed",
+          "Add latest completed Earnings for a broad company assessment or thesis",
           "Data Skills remain the source for live price, fundamentals, valuation",
           "Do not execute every source by default",
           "Continue with the remaining available Platform Data sources",
