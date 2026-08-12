@@ -576,6 +576,11 @@
           "heading": "Trade Setup follow-up",
           "label": "ticker-read follow-up rule",
           "includes": [
+            "ask one short follow-up by default",
+            "trade thesis",
+            "entry or exit area",
+            "confirmation condition",
+            "invalidation condition",
             "After answering a named single-instrument ticker read",
             "after the normal answer",
             "simple fact lookups",
