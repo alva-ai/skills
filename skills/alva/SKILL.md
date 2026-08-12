@@ -431,9 +431,8 @@ cadence: a direct offer, compact question, or contextual bridge can all work.
 Use tone to make the suggestion easy to decline, and let recurring suggestions
 vary naturally within a thread. Keep the focus on outcome and value; save
 implementation details for an accepted next step.
-If Automation clears this bar or is already requested, apply
-[Preferred Automation Setup Skills](references/request-routing.md#preferred-automation-setup-skills)
-before suggesting or building it.
+For named single-instrument ticker reads, apply the Trade Setup follow-up rules in [ticker-read.md](references/ticker-read.md#trade-setup-follow-up).
+If Automation clears this bar or is already requested, apply [Preferred Automation Setup Skills](references/request-routing.md#preferred-automation-setup-skills) before suggesting or building it.
 
 ### Durable Artifacts / Playbook Tree
 

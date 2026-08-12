@@ -556,6 +556,46 @@
       ]
     },
     {
+      "id": "platform-data.ticker-read-trade-setup-follow-up",
+      "group": "platform-data",
+      "target": "corpus",
+      "description": "A named single-instrument ticker read can suggest Trade Setup automation after the normal answer, and accepting that suggestion routes through the official setup skill.",
+      "section_includes": [
+        {
+          "file": "SKILL.md",
+          "heading": "Useful Next Step After Ask",
+          "label": "post-answer pointer",
+          "includes": [
+            "Trade Setup follow-up rules",
+            "references/ticker-read.md#trade-setup-follow-up",
+            "Preferred Automation Setup Skills"
+          ]
+        },
+        {
+          "file": "references/ticker-read.md",
+          "heading": "Trade Setup follow-up",
+          "label": "ticker-read follow-up rule",
+          "includes": [
+            "After answering a named single-instrument ticker read",
+            "after the normal answer",
+            "simple fact lookups",
+            "Alpha Radar / Portfolio Watch"
+          ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "heading": "Preferred Automation Setup Skills",
+          "label": "accepted follow-up route",
+          "includes": [
+            "alva/trade-setup-automation",
+            "accepting a post-answer Trade Setup suggestion after a named single-instrument ticker read",
+            "reuse the answered ticker",
+            "fetch the blueprint fresh before building"
+          ]
+        }
+      ]
+    },
+    {
       "id": "issue592.scoped-eval-checks",
       "group": "issue592",
       "target": "eval",

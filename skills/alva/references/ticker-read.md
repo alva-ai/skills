@@ -121,6 +121,23 @@ Data Skills remain the source for live price, fundamentals, valuation, and
 other ordinary financial facts. Platform Data contributes processed company
 context; it does not replace the financial evidence needed by the answer.
 
+### Trade Setup follow-up
+
+After answering a named single-instrument ticker read, consider one short
+follow-up asking whether the user wants to turn the key thesis, levels,
+catalysts, or invalidation conditions into a Trade Setup automation.
+
+Use this only when the answer naturally identifies something worth monitoring
+over time: a thesis, entry/exit area, confirmation condition, breakdown risk,
+catalyst watch, or user-facing decision condition. Do not suggest it for simple
+fact lookups, broad multi-ticker discovery, portfolio monitoring, or when Alpha
+Radar / Portfolio Watch is the better durable route.
+
+Ask after the normal answer, in the user's language, and keep it low-pressure.
+Example: "Want me to turn these key levels, catalysts, and invalidation
+conditions into a Trade Setup automation so you can be notified if the setup
+confirms or breaks?"
+
 ### Why did it move?
 
 1. Establish the ticker, move, time window, and price basis with Data Skills.
