@@ -123,11 +123,17 @@ context; it does not replace the financial evidence needed by the answer.
 
 ### Trade Setup follow-up
 
-After answering a named single-instrument ticker read, ask one short follow-up
-by default when the answer identifies a trade thesis, entry or exit area,
-confirmation condition, catalyst watch, risk, or invalidation condition. The
-follow-up should ask whether the user wants to turn those conditions into a
-Trade Setup automation.
+After answering a named single-instrument ticker read, end with one short Trade
+Setup automation follow-up when the answer identifies a trade thesis, entry or
+exit area, confirmation condition, catalyst watch, risk, or invalidation
+condition. This is mandatory for setup-like asks such as "can I go long/short",
+"key levels", "catalysts", "stop/invalidated if", "breakout/breakdown", or
+"what would confirm this trade". Do not omit it merely because the normal
+answer already contains the levels, risk, or conclusion.
+
+The follow-up must be the final sentence or final short paragraph of the answer.
+It should ask whether the user wants to turn the specific conditions just
+answered into a Trade Setup automation.
 
 Use this only when the answer naturally identifies something worth monitoring
 over time: a thesis, entry/exit area, confirmation condition, breakdown risk,
@@ -136,6 +142,7 @@ fact lookups, broad multi-ticker discovery, portfolio monitoring, or when Alpha
 Radar / Portfolio Watch is the better durable route.
 
 Ask after the normal answer, in the user's language, and keep it low-pressure.
+For a setup-like ask, the answer is incomplete without this final invitation.
 Example: "Want me to turn these key levels, catalysts, and invalidation
 conditions into a Trade Setup automation so you can be notified if the setup
 confirms or breaks?"

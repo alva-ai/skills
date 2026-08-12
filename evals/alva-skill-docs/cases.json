@@ -576,7 +576,11 @@
           "heading": "Trade Setup follow-up",
           "label": "ticker-read follow-up rule",
           "includes": [
-            "ask one short follow-up by default",
+            "end with one short Trade Setup automation follow-up",
+            "mandatory for setup-like asks",
+            "can I go long/short",
+            "The follow-up must be the final sentence or final short paragraph",
+            "the answer is incomplete without this final invitation",
             "trade thesis",
             "entry or exit area",
             "confirmation condition",
