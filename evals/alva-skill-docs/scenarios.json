@@ -600,7 +600,9 @@
           "window.alva.udf",
           "alva functions",
           "allowance consent",
-          "Never hand-write bearer headers"
+          "Never hand-write bearer headers",
+          "result contract",
+          "smoke invoke returned the declared result shape"
         ]
       }
     }

@@ -65,6 +65,12 @@ const MUTATIONS = [
     expectFailedCases: ["scenario.udf-strict-opt-in"],
   },
   {
+    id: "udf-author-owned-result-contract",
+    file: "references/api/udf-runtime.md",
+    remove: "The result contract is author-owned. ",
+    expectFailedCases: ["retained.udf-author-owned-contract"],
+  },
+  {
     id: "automation-knowledge-route",
     file: "references/request-routing.md",
     remove: "Read [alva-knowledge.md](alva-knowledge.md) before design, ",

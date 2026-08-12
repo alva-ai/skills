@@ -32,6 +32,52 @@ not register a function without wiring the intended viewer-facing use.
 Do not hand-roll REST, GraphQL, or curl for function registration, invocation
 smoke tests, or allowance management when the CLI is available.
 
+## Author-Owned UDF Contract
+
+Before writing either side of a UDF, define one contract and keep the entry
+script, registration, smoke test, and browser renderer aligned to it:
+
+```json
+{
+  "function_name": "analyze",
+  "entry_script_path": "/alva/home/<username>/playbooks/<name>/udf/analyze.js",
+  "params_schema": {
+    "type": "object",
+    "required": ["ticker"],
+    "properties": {
+      "ticker": { "type": "string" }
+    }
+  },
+  "result_contract": {
+    "summary": "string",
+    "score": "number",
+    "drivers": "array<string>"
+  }
+}
+```
+
+The result contract is author-owned. Plainly: params_schema is input-only.
+`params_schema` lets `list()` expose parameters so the browser can render or
+validate inputs, but it does not describe the value returned by `call()`. If you
+create the UDF, the return value is already known from the entry script you
+wrote. Do not ask the user to restate that return shape, add generic "unknown
+result" branches as the main UI path, or wait for runtime errors to discover the
+contract.
+
+Hard authoring rules:
+
+- The entry script must return one stable JSON-serializable object matching
+  `result_contract`; throw for execution failures instead of alternating between
+  incompatible success shapes.
+- The browser renderer must consume the exact declared result fields. Do not
+  ship a final UI that only `JSON.stringify`s the result unless the user asked
+  for a raw debug view.
+- `alva functions invoke` smoke tests must assert the returned `result` shape,
+  not merely that invocation exits without an error. If the smoke result and
+  browser renderer disagree, fix the script or renderer before release.
+- Re-registration after editing a UDF must update the same contract everywhere:
+  `params_schema`, entry script, smoke-test params, and HTML result consumption.
+
 ## Runtime Model
 
 Alva renders released playbooks inside an iframe. The parent Alva page mints a
@@ -143,7 +189,11 @@ recreate it with `fetch()`.
 
 ```json
 {
-  "result": {},
+  "result": {
+    "summary": "AAPL shows...",
+    "score": 72,
+    "drivers": ["earnings revision", "relative strength"]
+  },
   "logs": [],
   "credits_used_total": 3,
   "credits_charged_owner": 0,
@@ -166,11 +216,9 @@ Mounts a simple `UdfButton` for one-click interactions.
   });
 
   button.addEventListener("alva:udf-button:result", (event) => {
-    document.querySelector("#analysis-output").textContent = JSON.stringify(
-      event.detail.result,
-      null,
-      2,
-    );
+    const { summary, score, drivers } = event.detail.result;
+    document.querySelector("#analysis-output").textContent =
+      `${summary}\nScore: ${score}\nDrivers: ${drivers.join(", ")}`;
   });
 </script>
 ```
@@ -282,6 +330,10 @@ CLI gotchas the help text may not make obvious:
   schemas so shell quoting does not corrupt the JSON Schema. In PI/jagent
   agent tool mode, pass inline `--params-schema` instead. The schema must
   match both UI inputs and server-side validation.
+- Keep the `params_schema` file/flag next to the UDF result contract in your
+  working notes. Backend registration persists only `params_schema`; the browser
+  result renderer must still be kept in lockstep with the entry script return
+  shape you authored.
 - Registration is no-charge by default; pass `--no-allow-charges` unless the
   user explicitly wants viewer-credit charging and the consent flow is wired.
   Do not silently opt viewers into charges.
@@ -315,6 +367,8 @@ not custom allowance forms inside the iframe.
 - UDF controls handle unauthenticated viewers by disabling controls or showing a
   sign-in prompt; do not expose raw tokens.
 - `params_schema` matches the UI inputs and server-side validation.
+- The UDF result contract is explicit, entry script returns that shape, smoke
+  invoke asserted it, and HTML consumes the same fields.
 - Error UI handles auth, consent denied, insufficient credits, function not
   found, disabled function, rate limit, and execution failures.
 - Viewer-facing copy explains that allowance is a cap, not an immediate charge.

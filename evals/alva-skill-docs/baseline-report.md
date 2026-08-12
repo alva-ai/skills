@@ -2,11 +2,11 @@
 
 Source: `origin/main`
 
-SKILL.md lines: 909
+SKILL.md lines: 911
 
-Cases: 63/66
+Cases: 72/74
 
-Checks: 661/667 (99.10%)
+Checks: 744/761 (97.77%)
 
 ## Scoring Diagnosis
 
@@ -15,13 +15,12 @@ Classify the gap before editing: missing capability summary, missing routing poi
 Do not expose eval scores as product copy, and do not patch demos to hide a weak result.
 Instead, fix the canonical skill text or eval case, then rerun baseline and final reports so the regression mechanism proves the gap is closed.
 
-- platform-data.ticker-read-sources: inspect for a skill gap before editing. Missing checks: excludes company-anomaly.md; excludes /alva/home/mia/feeds/<ticker-slug>-portfolio-watch-anomaly/v1; excludes anomaly/timeline/@last/1; profile availability: references/ticker-read.md#Availability Gate includes do not bypass an unavailable Skillhub method
-- scenario.ticker-read-broad-analysis: inspect for a skill gap before editing. Missing checks: do not bypass an unavailable Skillhub method
-- scenario.ticker-read-hourly-tracking: inspect for a skill gap before editing. Missing checks: do not bypass an unavailable Skillhub method
+- retained.udf-author-owned-contract: inspect for a skill gap before editing. Missing checks: Author-Owned UDF Contract; result_contract; params_schema is input-only; entry script, registration, smoke test, and browser renderer; Do not ask the user to restate that return shape; smoke tests must assert the returned `result` shape; references/api/udf-runtime.md includes The result contract is author-owned.; references/api/udf-runtime.md includes The browser renderer must consume the exact declared result fields.; references/api/udf-runtime.md includes If the smoke result and browser renderer disagree, fix the script or renderer before release.; references/playbook-creation.md includes result shape; references/playbook-creation.md includes HTML renderer fields; references/playbook-creation.md includes Do not ask the user to restate the return shape after you created the function.; references/playbook-creation.md<HARD-GATE:before-playbook-release> includes UDF result contract; references/playbook-creation.md<HARD-GATE:before-playbook-release> includes smoke invoke returned the declared result shape; references/playbook-creation.md<HARD-GATE:before-playbook-release> includes HTML consumes the declared result fields
+- scenario.udf-strict-opt-in: inspect for a skill gap before editing. Missing checks: result contract; smoke invoke returned the declared result shape
 
 ## retained
 
-19/19 cases, 111/111 checks
+19/20 cases, 111/126 checks
 
 ### PASS retained.platform-panorama
 
@@ -166,6 +165,26 @@ Creator-side UDF setup and allowance management route through the functions CLI 
 - [x] alva functions allowance create
 - [x] Do not hand-roll REST, GraphQL, or curl
 
+### FAIL retained.udf-author-owned-contract
+
+UDF authoring keeps params, result shape, entry script, and HTML renderer tied to one contract.
+
+- [ ] Author-Owned UDF Contract
+- [ ] result_contract
+- [ ] params_schema is input-only
+- [ ] entry script, registration, smoke test, and browser renderer
+- [ ] Do not ask the user to restate that return shape
+- [ ] smoke tests must assert the returned `result` shape
+- [ ] references/api/udf-runtime.md includes The result contract is author-owned.
+- [ ] references/api/udf-runtime.md includes The browser renderer must consume the exact declared result fields.
+- [ ] references/api/udf-runtime.md includes If the smoke result and browser renderer disagree, fix the script or renderer before release.
+- [ ] references/playbook-creation.md includes result shape
+- [ ] references/playbook-creation.md includes HTML renderer fields
+- [ ] references/playbook-creation.md includes Do not ask the user to restate the return shape after you created the function.
+- [ ] references/playbook-creation.md<HARD-GATE:before-playbook-release> includes UDF result contract
+- [ ] references/playbook-creation.md<HARD-GATE:before-playbook-release> includes smoke invoke returned the declared result shape
+- [ ] references/playbook-creation.md<HARD-GATE:before-playbook-release> includes HTML consumes the declared result fields
+
 ### PASS retained.credits-cli
 
 Viewer-scoped credit balance and consumption-history lookup remains discoverable through the credits CLI.
@@ -228,6 +247,268 @@ Memory and secret-manager operating rules remain covered.
 Interactive orders keep the per-order confirmation rule: the exemption does not weaken it.
 
 - [x] explicit user confirmation before non-dry-run execution
+
+## target
+
+14/14 cases, 166/166 checks
+
+### PASS target.automation-publish-side-effects
+
+Automation publish documents its owner binding and first-run side effects, including the run-only opt-out and duplicate-trigger guardrail.
+
+- [x] references/feed-lifecycle.md#Lifecycle includes Publish creates an ACTIVE owner alert binding
+- [x] references/feed-lifecycle.md#Lifecycle includes Default: let publish start the producer
+- [x] references/feed-lifecycle.md#Lifecycle includes do not call `alva deploy trigger` again
+- [x] references/feed-lifecycle.md#Lifecycle includes `--skip-auto-trigger` suppresses only the publish-time run
+- [x] references/feed-lifecycle.md#Lifecycle includes It does not suppress the owner alert binding
+
+### PASS target.top-level-size
+
+Top-level SKILL.md stays below the current guide ceiling without forcing a minimum size that would block future compression.
+
+- [x] line count <= 911 (actual 911)
+
+### PASS target.playbook-task-offload
+
+Playbook creation is a concrete task reference rather than the dominant top-level body.
+
+- [x] playbook-creation.md
+- [x] Playbook Creation Tree
+- [x] The playbook tree has subroutes
+- [x] hosted or shareable playbook surface
+- [x] ordinary financial-analysis questions should answer directly
+- [x] before-playbook-release
+- [x] AlvaToolkit.AlvaClient
+- [x] Free users
+- [x] Pro users
+
+### PASS target.top-level-playbook-routing
+
+Top-level routing keeps playbook work as route-plus-boundary-plus-pointer instead of duplicating the manual.
+
+- [x] playbook route: SKILL.md#Publication Layer: Playbook Creation Tree includes Enter this branch only when the user wants a hosted/shareable surface
+- [x] playbook route: SKILL.md#Publication Layer: Playbook Creation Tree includes Read [playbook-creation.md](references/playbook-creation.md)
+- [x] playbook route: SKILL.md#Publication Layer: Playbook Creation Tree includes owns the build order, Browser-safe feed reads, README, draft/release gates, screenshot verification, tier/visibility flow, and push-after-release handoff
+- [x] playbook route: SKILL.md#Publication Layer: Playbook Creation Tree includes feed-first and live-read
+- [x] playbook route: SKILL.md#Publication Layer: Playbook Creation Tree includes Keep procedure, release, screenshot, and tier details in the owning references
+- [x] playbook route: SKILL.md#Publication Layer: Playbook Creation Tree includes Do not let every financial question inherit playbook gates
+- [x] common workflow: SKILL.md#Hosted Playbook Workflow includes First choose the artifact shape
+- [x] common workflow: SKILL.md#Hosted Playbook Workflow includes turn the request into a data contract before UI work
+- [x] common workflow: SKILL.md#Hosted Playbook Workflow includes they own the procedure
+- [x] final checklist: SKILL.md#Final Sanity Checklist includes Did playbook work read [playbook-creation.md](references/playbook-creation.md)
+- [x] final checklist: SKILL.md#Final Sanity Checklist includes relevant hard gates
+
+### PASS target.financial-analysis-routing
+
+Ask-question work is grouped as financial analysis instead of a low-level Data Query route.
+
+- [x] Shared Data And Execution Layer
+- [x] Do not treat data access or `alva run` as playbook-only
+- [x] A direct answer may still need Alva Cloud execution
+- [x] Execution: Jagent Runtime And `alva run`
+- [x] Financial Analysis / Ask Question
+- [x] Financial Analysis / Ask Question Tree
+- [x] It is not merely "Data Query"
+- [x] data access and execution are steps inside an analysis answer
+- [x] an `alva run` computation over live data
+- [x] latest fact
+- [x] comparison/valuation
+- [x] Data Access: Data Sources
+- [x] Data Access: Content Search And BYOD
+- [x] comparison baselines are financial facts
+- [x] historical average
+- [x] peer multiple
+- [x] Do not let playbook creation become the default
+- [x] Do not turn every Skillhub task into a playbook
+
+### PASS target.ask-evidence-gate
+
+Direct financial asks have compact evidence gates instead of a free-form memo contract.
+
+- [x] ask evidence gate
+- [x] Do not answer until
+- [x] decomposition
+- [x] data/source path for each hop
+- [x] fetched vs missing coverage
+- [x] sourced facts, computed values, or inference
+- [x] Simple latest-fact asks stop there after one sourced hop
+- [x] Simple/latest-fact asks stop there
+- [x] cap confidence when required evidence
+- [x] KPI coverage
+- [x] computation is missing
+
+### PASS target.financial-ask-quality-gates
+
+Complex financial asks classify the problem type and apply source, methodology, KPI, and confidence gates.
+
+- [x] Complex Ask Router
+- [x] Only complex judgment asks also pass the Complex Ask Router
+- [x] treat complex judgments as high-risk financial analysis
+- [x] Simple/latest-fact asks stop there
+- [x] Complex Ask Router only for complex judgment asks
+- [x] thesis/fundamental
+- [x] earnings/catalyst
+- [x] event-study/backtest
+- [x] screener/ranking
+- [x] macro/cross-asset
+- [x] news/social sentiment
+- [x] portfolio/scenario
+- [x] valuation/accounting
+- [x] event definition
+- [x] sample count
+- [x] non-overlap rule
+- [x] look-ahead control
+- [x] benchmark/sector ETF
+- [x] missing-field handling
+- [x] evidence table with source
+- [x] authority/relevance
+- [x] duplicate status
+- [x] synchronized as-of time
+- [x] implied-probability source/proxy
+- [x] weights/exposure assumption
+- [x] beta/correlation/proxy method
+- [x] drawdown table
+- [x] current multiple/FCF/EPS
+- [x] multiple/earnings sensitivity
+- [x] attempted/found/missing/impact
+- [x] required calculation not done caps at B-/C
+- [x] hard cap
+
+### PASS target.mandatory-investment-disclaimer
+
+Security-price and investment-strategy answers have a mandatory disclaimer, while explicit advice requests also receive the required opening header.
+
+- [x] top-level requirement: SKILL.md#First Principles includes Mandatory investment framing
+- [x] top-level requirement: SKILL.md#First Principles includes Any answer involving a security price or investment strategy MUST include an investment disclaimer
+- [x] top-level requirement: SKILL.md#First Principles includes financial advice
+- [x] top-level requirement: SKILL.md#First Principles includes analyst advice
+- [x] top-level requirement: SKILL.md#First Principles includes exact advice-request header
+- [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes investment disclaimer is required
+- [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes security price or investment strategy
+- [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes This content is for informational purposes only and does not constitute investment advice.
+- [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes begin the response with this exact header
+- [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes I'll share an analysis, but keep in mind I'm not a licensed analyst or adviser, and this isn't personalized advice for you specifically.
+- [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes This advice-request header is additive
+- [x] Ask and strategy routing: references/request-routing.md#Routes includes apply its required Investment Disclaimer
+- [x] Ask and strategy routing: references/request-routing.md#Routes includes Strategy answers apply the required [Investment Disclaimer]
+
+### PASS target.financial-analysis-prose-gate
+
+Financial Analysis answers must read the merged user-facing prose reference before answering.
+
+- [x] Financial-analysis answer gate
+- [x] before answering any Financial Analysis / Ask Question
+- [x] read [user-facing-prose.md](references/user-facing-prose.md)
+- [x] then satisfy the ask evidence gate
+- [x] Every answer must read [user-facing-prose.md](user-facing-prose.md)
+- [x] user-facing prose reference read
+- [x] Product vocabulary, voice rules, and alpi prose prompt block
+- [x] Chat answers for Financial Analysis / Ask Question
+
+### PASS target.pitfalls-stepwise-required
+
+Operational pitfalls are a mandatory stepwise gate, not an optional debugging appendix.
+
+- [x] step by step
+- [x] before each step
+- [x] mandatory
+- [x] runtime, feed, ALFS, playbook HTML, deploy, release, chart, or cron work
+- [x] Write or run jagent code
+- [x] Touch ALFS paths
+- [x] Build or edit playbook HTML/charts
+
+### PASS target.mainline-updates
+
+Latest mainline Alva skill updates remain integrated after rebasing the refactor.
+
+- [x] version: v1.21.0
+- [x] Capability Help
+- [x] Reply 1, 2, or 3 to start
+- [x] feedback
+- [x] api/feedback.md
+- [x] alva feedback --help
+- [x] alva alert enable --automation
+- [x] alva alert enable --automation-ids
+- [x] There is no playbook alert target
+- [x] publish publicly by default
+- [x] registered UDFs
+- [x] implementation internals
+- [x] Skillhub to users as a catalog of methodologies
+- [x] callerUserId
+- [x] allow_charges=false
+- [x] no-charge
+- [x] Browser request rule
+- [x] AlvaToolkit.AlvaClient
+- [x] api_origin
+- [x] public and private playbooks
+- [x] real feed-backed chart marks
+- [x] headers-only tables
+- [x] fetch failures
+
+### PASS target.one-off-lightweight-charts
+
+One-off price-series artifacts route to a pinned Lightweight Charts v5 reference by intent — including price-level annotation — without changing Playbook rendering.
+
+- [x] excludes Charts** thereafter.
+- [x] references/design-widgets.md includes Renderer Routing
+- [x] references/design-widgets.md includes a price series over time
+- [x] references/design-widgets.md includes annotates price levels such as support, resistance, entry, target, or stop
+- [x] references/design-widgets.md includes Use ECharts for non-price chart types
+- [x] references/design-widgets.md includes lightweight-charts.md
+- [x] references/design-widgets.md includes Existing Playbook charts remain on ECharts
+- [x] references/lightweight-charts.md includes lightweight-charts@5.2.0/dist/lightweight-charts.standalone.production.js
+- [x] references/lightweight-charts.md includes window.LightweightCharts
+- [x] references/lightweight-charts.md includes chart.addSeries(LightweightCharts.CandlestickSeries
+- [x] references/lightweight-charts.md includes chart.addSeries(LightweightCharts.LineSeries
+- [x] references/lightweight-charts.md includes LightweightCharts.HistogramSeries
+- [x] references/lightweight-charts.md includes Unix timestamps are seconds, not milliseconds
+- [x] references/lightweight-charts.md includes chart.timeScale().fitContent()
+- [x] references/lightweight-charts.md includes createPriceLine()
+- [x] SKILL.md includes [lightweight-charts.md](references/lightweight-charts.md)
+
+### PASS target.auto-trade-consent-exemption
+
+A consent-referenced, record-verified channel-loop tick is exempt from per-order confirmation while staying dry-run/intent-id/risk bound.
+
+- [x] auto-trade-consent:
+- [x] ~/memory/auto-trade-consent.md
+- [x] one-read verification
+- [x] place live orders without per-order user confirmation
+- [x] missing or unreadable record
+- [x] applies only to loop ticks
+- [x] verification checks only that the consent record exists
+- [x] timestamp is provenance, not a match key
+- [x] is not a mismatch
+
+### PASS target.auto-trade-consent-references
+
+The broker and trading references reconcile their per-order confirm lines with the loop-tick consent exemption instead of demanding unqualified confirmation.
+
+- [x] consented auto-trading loop tick
+- [x] recorded consent
+- [x] stands in for this per-order confirmation
+
+## alerts
+
+1/1 cases, 13/13 checks
+
+### PASS alerts.portable-actions-and-cards
+
+Declared Feed alerts can carry portable CTA actions and card presentation without confusing them with conversational PresentActions.
+
+- [x] rich alert summary: SKILL.md#Action Layer: Alerts includes portable actions and card presentation
+- [x] rich alert summary: SKILL.md#Action Layer: Alerts includes [push-notifications.md](references/push-notifications.md)
+- [x] Feed SDK rich alert authoring: references/feed-sdk.md#Portable Actions And Card Presentation includes messageActionsField()
+- [x] Feed SDK rich alert authoring: references/feed-sdk.md#Portable Actions And Card Presentation includes messagePresentationField()
+- [x] Feed SDK rich alert authoring: references/feed-sdk.md#Portable Actions And Card Presentation includes openUrlAction(
+- [x] Feed SDK rich alert authoring: references/feed-sdk.md#Portable Actions And Card Presentation includes sendPromptAction(
+- [x] Feed SDK rich alert authoring: references/feed-sdk.md#Portable Actions And Card Presentation includes cardPresentation(
+- [x] Feed SDK rich alert authoring: references/feed-sdk.md#Portable Actions And Card Presentation includes accentColor
+- [x] Feed SDK rich alert authoring: references/feed-sdk.md#Portable Actions And Card Presentation includes Discord can render the card and both action kinds on the same final message
+- [x] Feed SDK rich alert authoring: references/feed-sdk.md#Portable Actions And Card Presentation includes never call it from a Feed script
+- [x] rich alert delivery boundary: references/push-notifications.md#Configure And Verify includes A free-standing `url` field does not become a button
+- [x] rich alert delivery boundary: references/push-notifications.md#Configure And Verify includes conversational `PresentActions` must not be used by a Feed
+- [x] rich alert delivery boundary: references/push-notifications.md#Configure And Verify includes falls back to canonical `title` + `body`
 
 ## pr353
 
@@ -317,7 +598,7 @@ When structured data lags a known official release, web is an official-source fa
 
 ## platform-data
 
-1/2 cases, 31/35 checks
+2/2 cases, 35/35 checks
 
 ### PASS platform-data.kol-surfaces
 
@@ -332,13 +613,13 @@ KOL data and the KOL digest SDK are routed together as Alva-maintained Platform 
 - [x] request routing: SKILL.md#Request Routing includes Platform Data: Fintwit Intelligence
 - [x] request routing: SKILL.md#Request Routing includes Platform Data: Fintwit Digest SDK
 
-### FAIL platform-data.ticker-read-sources
+### PASS platform-data.ticker-read-sources
 
 A single-ticker read routes through the five official Skillhub sources as a first-tier Platform Data lane with explicit read, build, freshness, and fallback boundaries.
 
-- [ ] excludes company-anomaly.md
-- [ ] excludes /alva/home/mia/feeds/<ticker-slug>-portfolio-watch-anomaly/v1
-- [ ] excludes anomaly/timeline/@last/1
+- [x] excludes company-anomaly.md
+- [x] excludes /alva/home/mia/feeds/<ticker-slug>-portfolio-watch-anomaly/v1
+- [x] excludes anomaly/timeline/@last/1
 - [x] platform data section: SKILL.md#Data Access: Platform Data includes Ticker Read
 - [x] platform data section: SKILL.md#Data Access: Platform Data includes Read [ticker-read.md](references/ticker-read.md)
 - [x] platform data section: SKILL.md#Data Access: Platform Data includes first-tier sources
@@ -355,7 +636,7 @@ A single-ticker read routes through the five official Skillhub sources as a firs
 - [x] official source router: references/ticker-read.md#Source Router includes Use `alva/company-anomaly-read` as the first direct-read check for intraday and hourly-scale market tracking
 - [x] profile availability: references/ticker-read.md#Availability Gate includes Local source files are not proof that a method is published
 - [x] profile availability: references/ticker-read.md#Availability Gate includes Continue with the remaining available Platform Data sources
-- [ ] profile availability: references/ticker-read.md#Availability Gate includes do not bypass an unavailable Skillhub method
+- [x] profile availability: references/ticker-read.md#Availability Gate includes do not bypass an unavailable Skillhub method
 - [x] profile availability: references/ticker-read.md#Availability Gate includes Method availability is rollout state, not company coverage
 - [x] ticker read directory: references/request-routing.md#Official Ticker Read Sources includes [ticker-read.md](ticker-read.md) owns source selection
 - [x] ticker read directory: references/request-routing.md#Official Ticker Read Sources includes alva/company-anomaly-read
@@ -503,209 +784,6 @@ The general skill distinguishes the default personal destination from an Alva to
 - [x] destination verification: references/push-notifications.md#Configure And Verify includes report it as an Alva web topic channel with its id
 - [x] destination verification: references/push-notifications.md#Configure And Verify includes never as Telegram or another external DM
 
-## target
-
-12/12 cases, 139/139 checks
-
-### PASS target.top-level-size
-
-Top-level SKILL.md stays below the current guide ceiling without forcing a minimum size that would block future compression.
-
-- [x] line count <= 910 (actual 909)
-
-### PASS target.playbook-task-offload
-
-Playbook creation is a concrete task reference rather than the dominant top-level body.
-
-- [x] playbook-creation.md
-- [x] Playbook Creation Tree
-- [x] The playbook tree has subroutes
-- [x] hosted or shareable playbook surface
-- [x] ordinary financial-analysis questions should answer directly
-- [x] before-playbook-release
-- [x] AlvaToolkit.AlvaClient
-- [x] Free users
-- [x] Pro users
-
-### PASS target.top-level-playbook-routing
-
-Top-level routing keeps playbook work as route-plus-boundary-plus-pointer instead of duplicating the manual.
-
-- [x] playbook route: SKILL.md#Publication Layer: Playbook Creation Tree includes Enter this branch only when the user wants a hosted/shareable surface
-- [x] playbook route: SKILL.md#Publication Layer: Playbook Creation Tree includes Read [playbook-creation.md](references/playbook-creation.md)
-- [x] playbook route: SKILL.md#Publication Layer: Playbook Creation Tree includes owns the build order, Browser-safe feed reads, README, draft/release gates, screenshot verification, tier/visibility flow, and push-after-release handoff
-- [x] playbook route: SKILL.md#Publication Layer: Playbook Creation Tree includes feed-first and live-read
-- [x] playbook route: SKILL.md#Publication Layer: Playbook Creation Tree includes Keep procedure, release, screenshot, and tier details in the owning references
-- [x] playbook route: SKILL.md#Publication Layer: Playbook Creation Tree includes Do not let every financial question inherit playbook gates
-- [x] common workflow: SKILL.md#Hosted Playbook Workflow includes First choose the artifact shape
-- [x] common workflow: SKILL.md#Hosted Playbook Workflow includes turn the request into a data contract before UI work
-- [x] common workflow: SKILL.md#Hosted Playbook Workflow includes they own the procedure
-- [x] final checklist: SKILL.md#Final Sanity Checklist includes Did playbook work read [playbook-creation.md](references/playbook-creation.md)
-- [x] final checklist: SKILL.md#Final Sanity Checklist includes relevant hard gates
-
-### PASS target.financial-analysis-routing
-
-Ask-question work is grouped as financial analysis instead of a low-level Data Query route.
-
-- [x] Shared Data And Execution Layer
-- [x] Do not treat data access or `alva run` as playbook-only
-- [x] A direct answer may still need Alva Cloud execution
-- [x] Execution: Jagent Runtime And `alva run`
-- [x] Financial Analysis / Ask Question
-- [x] Financial Analysis / Ask Question Tree
-- [x] It is not merely "Data Query"
-- [x] data access and execution are steps inside an analysis answer
-- [x] an `alva run` computation over live data
-- [x] latest fact
-- [x] comparison/valuation
-- [x] Data Access: Data Sources
-- [x] Data Access: Content Search And BYOD
-- [x] comparison baselines are financial facts
-- [x] historical average
-- [x] peer multiple
-- [x] Do not let playbook creation become the default
-- [x] Do not turn every Skillhub task into a playbook
-
-### PASS target.ask-evidence-gate
-
-Direct financial asks have compact evidence gates instead of a free-form memo contract.
-
-- [x] ask evidence gate
-- [x] Do not answer until
-- [x] decomposition
-- [x] data/source path for each hop
-- [x] fetched vs missing coverage
-- [x] sourced facts, computed values, or inference
-- [x] Simple latest-fact asks stop there after one sourced hop
-- [x] Simple/latest-fact asks stop there
-- [x] cap confidence when required evidence
-- [x] KPI coverage
-- [x] computation is missing
-
-### PASS target.financial-ask-quality-gates
-
-Complex financial asks classify the problem type and apply source, methodology, KPI, and confidence gates.
-
-- [x] Complex Ask Router
-- [x] Only complex judgment asks also pass the Complex Ask Router
-- [x] treat complex judgments as high-risk financial analysis
-- [x] Simple/latest-fact asks stop there
-- [x] Complex Ask Router only for complex judgment asks
-- [x] thesis/fundamental
-- [x] earnings/catalyst
-- [x] event-study/backtest
-- [x] screener/ranking
-- [x] macro/cross-asset
-- [x] news/social sentiment
-- [x] portfolio/scenario
-- [x] valuation/accounting
-- [x] event definition
-- [x] sample count
-- [x] non-overlap rule
-- [x] look-ahead control
-- [x] benchmark/sector ETF
-- [x] missing-field handling
-- [x] evidence table with source
-- [x] authority/relevance
-- [x] duplicate status
-- [x] synchronized as-of time
-- [x] implied-probability source/proxy
-- [x] weights/exposure assumption
-- [x] beta/correlation/proxy method
-- [x] drawdown table
-- [x] current multiple/FCF/EPS
-- [x] multiple/earnings sensitivity
-- [x] attempted/found/missing/impact
-- [x] required calculation not done caps at B-/C
-- [x] hard cap
-
-### PASS target.mandatory-investment-disclaimer
-
-Security-price and investment-strategy answers have one mandatory disclaimer contract wired into prose and routing.
-
-- [x] top-level requirement: SKILL.md#First Principles includes Mandatory disclaimer
-- [x] top-level requirement: SKILL.md#First Principles includes Any answer involving a security price or investment strategy MUST include an investment disclaimer
-- [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes investment disclaimer is required
-- [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes security price or investment strategy
-- [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes This content is for informational purposes only and does not constitute investment advice.
-- [x] Ask and strategy routing: references/request-routing.md#Routes includes apply its required Investment Disclaimer
-- [x] Ask and strategy routing: references/request-routing.md#Routes includes Strategy answers apply the required [Investment Disclaimer]
-
-### PASS target.financial-analysis-prose-gate
-
-Financial Analysis answers must read the merged user-facing prose reference before answering.
-
-- [x] Financial-analysis answer gate
-- [x] before answering any Financial Analysis / Ask Question
-- [x] read [user-facing-prose.md](references/user-facing-prose.md)
-- [x] then satisfy the ask evidence gate
-- [x] Every answer must read [user-facing-prose.md](user-facing-prose.md)
-- [x] user-facing prose reference read
-- [x] Product vocabulary, voice rules, and alpi prose prompt block
-- [x] Chat answers for Financial Analysis / Ask Question
-
-### PASS target.pitfalls-stepwise-required
-
-Operational pitfalls are a mandatory stepwise gate, not an optional debugging appendix.
-
-- [x] step by step
-- [x] before each step
-- [x] mandatory
-- [x] runtime, feed, ALFS, playbook HTML, deploy, release, chart, or cron work
-- [x] Write or run jagent code
-- [x] Touch ALFS paths
-- [x] Build or edit playbook HTML/charts
-
-### PASS target.mainline-updates
-
-Latest mainline Alva skill updates remain integrated after rebasing the refactor.
-
-- [x] version: v1.20.1
-- [x] Capability Help
-- [x] Reply 1, 2, or 3 to start
-- [x] feedback
-- [x] api/feedback.md
-- [x] alva feedback --help
-- [x] alva alert enable --automation
-- [x] alva alert enable --automation-ids
-- [x] There is no playbook alert target
-- [x] publish publicly by default
-- [x] registered UDFs
-- [x] implementation internals
-- [x] Skillhub to users as a catalog of methodologies
-- [x] callerUserId
-- [x] allow_charges=false
-- [x] no-charge
-- [x] Browser request rule
-- [x] AlvaToolkit.AlvaClient
-- [x] api_origin
-- [x] public and private playbooks
-- [x] real feed-backed chart marks
-- [x] headers-only tables
-- [x] fetch failures
-
-### PASS target.auto-trade-consent-exemption
-
-A consent-referenced, record-verified channel-loop tick is exempt from per-order confirmation while staying dry-run/intent-id/risk bound.
-
-- [x] auto-trade-consent:
-- [x] ~/memory/auto-trade-consent.md
-- [x] one-read verification
-- [x] place live orders without per-order user confirmation
-- [x] missing or unreadable record
-- [x] applies only to loop ticks
-- [x] verification checks only that the consent record exists
-- [x] timestamp is provenance, not a match key
-- [x] is not a mismatch
-
-### PASS target.auto-trade-consent-references
-
-The broker and trading references reconcile their per-order confirm lines with the loop-tick consent exemption instead of demanding unqualified confirmation.
-
-- [x] consented auto-trading loop tick
-- [x] recorded consent
-- [x] stands in for this per-order confirmation
-
 ## automation
 
 1/1 cases, 10/10 checks
@@ -783,7 +861,7 @@ Post-deployment and multi-step updates report only new outcome evidence and unre
 
 ## scenarios.ask
 
-3/3 cases, 22/22 checks
+6/6 cases, 42/42 checks
 
 ### PASS scenario.simple-latest-price
 
@@ -810,6 +888,19 @@ Prompt: `What is NVDA trading at right now?`
 - [x] Any answer involving a security price or investment strategy MUST include an investment disclaimer
 - [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
 
+### PASS scenario.explicit-analyst-advice-header
+
+An explicit analyst-advice request begins with the required header and retains the investment disclaimer.
+
+Prompt: `Give me your analyst advice on whether I should buy NVDA.`
+
+- [x] user-facing-prose.md
+- [x] If the user asks for any "financial advice" or "analyst advice," the response MUST also begin with the exact advice-request header
+- [x] I'll share an analysis, but keep in mind I'm not a licensed analyst or adviser, and this isn't personalized advice for you specifically.
+- [x] This advice-request header is additive
+- [x] This content is for informational purposes only and does not constitute investment advice.
+- [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
+
 ### PASS scenario.complex-valuation-ask
 
 A complex valuation ask uses the ask evidence gate plus Complex Ask Router without becoming a playbook by default.
@@ -826,6 +917,34 @@ Prompt: `Is NVDA cheap versus peers after the latest earnings revision?`
 - [x] multiple/earnings sensitivity
 - [x] cap confidence when required evidence
 - [x] not automatically to a playbook
+- [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
+
+### PASS scenario.one-off-technical-chart
+
+A one-off technical chart stays in chat, routes financial time-series rendering to Lightweight Charts, and does not become a Playbook.
+
+Prompt: `Draw a one-off BTC candlestick chart with volume, EMA20, support, and resistance in this chat.`
+
+- [x] design-widgets.md
+- [x] lightweight-charts.md
+- [x] TradingView Lightweight Charts
+- [x] a price series over time
+- [x] annotates price levels
+- [x] Use ECharts for non-price chart types
+- [x] Existing Playbook charts remain on ECharts
+- [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
+
+### PASS scenario.one-off-price-trend-no-keyword
+
+A price-trend question with no chart-form keyword still routes to Lightweight Charts and reads its reference, because intent — a price series over time plus price-level annotation — is the trigger, not the words OHLC or candlestick.
+
+Prompt: `How has BTC been trending lately? Mark the key levels I should watch.`
+
+- [x] design-widgets.md
+- [x] lightweight-charts.md
+- [x] TradingView Lightweight Charts
+- [x] a price series over time
+- [x] annotates price levels
 - [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
 
 ## scenarios.capability
@@ -909,7 +1028,7 @@ Prompt: `<annotation id="hero-title">make this chart title shorter</annotation>`
 
 ## scenarios.push
 
-2/2 cases, 44/44 checks
+3/3 cases, 61/61 checks
 
 ### PASS scenario.alert-push-monitor
 
@@ -947,6 +1066,30 @@ Prompt: `Track BTC dominance and notify me when it breaks out.`
 - [x] automation knowledge: references/feed-lifecycle.md<HARD-GATE:before-automation-publish> includes [Alva Knowledge](alva-knowledge.md)
 - [x] automation knowledge: references/feed-lifecycle.md<HARD-GATE:before-automation-publish> includes longitudinal or decision automations compare bounded history
 - [x] automation knowledge: references/feed-lifecycle.md<HARD-GATE:before-automation-publish> includes push-capable automations suppress non-material repeats
+
+### PASS scenario.rich-feed-alert
+
+A rich Feed alert uses the declared portable action and presentation fields, preserving title/body fallback and keeping PresentActions out of Feed code.
+
+Prompt: `Create a scheduled market Feed alert with a red Discord card, a View report link button, and an Analyze impact follow-up button.`
+
+- [x] feed-sdk.md
+- [x] push-notifications.md
+- [x] messageActionsField()
+- [x] messagePresentationField()
+- [x] openUrlAction(
+- [x] sendPromptAction(
+- [x] cardPresentation(
+- [x] Discord can render the card and both action kinds on the same final message
+- [x] Clients without card support retain `title` + `body`
+- [x] `PresentActions` is a conversation-reply tool, not a Feed API
+- [x] A free-standing `url` field does not become a button
+- [x] never call it from a Feed script
+- [x] expected route: references/request-routing.md#Routes includes Automation / Push
+- [x] Portable Actions And Card Presentation: references/feed-sdk.md#Portable Actions And Card Presentation includes accentColor: "#FF2020"
+- [x] Portable Actions And Card Presentation: references/feed-sdk.md#Portable Actions And Card Presentation includes openUrlAction("View report"
+- [x] Portable Actions And Card Presentation: references/feed-sdk.md#Portable Actions And Card Presentation includes sendPromptAction(
+- [x] Portable Actions And Card Presentation: references/feed-sdk.md#Portable Actions And Card Presentation includes cardPresentation({
 
 ### PASS scenario.current-topic-channel-alert
 
@@ -1032,9 +1175,9 @@ Prompt: `Use the thesis skill for NVDA AI capex read-through.`
 
 ## scenarios.ticker-read
 
-2/4 cases, 42/44 checks
+4/4 cases, 44/44 checks
 
-### FAIL scenario.ticker-read-broad-analysis
+### PASS scenario.ticker-read-broad-analysis
 
 A broad single-ticker read checks the official direct-read sources before generic search, selects rather than blindly running them all, and still uses Data Skills for live financial facts.
 
@@ -1051,12 +1194,12 @@ Prompt: `分析一下 MU 最近的公司表现，重点说清楚市场现在在�
 - [x] Data Skills remain the source for live price, fundamentals, valuation
 - [x] Do not execute every source by default
 - [x] Continue with the remaining available Platform Data sources
-- [ ] do not bypass an unavailable Skillhub method
+- [x] do not bypass an unavailable Skillhub method
 - [x] Use `alva/company-anomaly-read` as the first direct-read check for intraday and hourly-scale market tracking
 - [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
 - [x] ticker read route: SKILL.md#Request Routing includes read [ticker-read.md](references/ticker-read.md) before source selection
 
-### FAIL scenario.ticker-read-hourly-tracking
+### PASS scenario.ticker-read-hourly-tracking
 
 An hour-scale ticker check fresh-loads the published Company Anomaly method before slower investor-focus or generic discovery sources.
 
@@ -1067,7 +1210,7 @@ Prompt: `帮我看看 NVDA 过去一小时有没有异常，为什么？`
 - [x] Use `alva/company-anomaly-read` as the first direct-read check for intraday and hourly-scale market tracking
 - [x] roughly every 15 minutes during US market hours
 - [x] Fetch the selected method's current instructions from Skillhub before using it
-- [ ] do not bypass an unavailable Skillhub method
+- [x] do not bypass an unavailable Skillhub method
 - [x] A quiet state does not prove that price was flat
 - [x] Data Skills for the live price
 - [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
@@ -1108,9 +1251,9 @@ Prompt: `TSLA 现在投资者最关注什么？今天有没有可能影响它的
 
 ## scenarios.udf
 
-1/1 cases, 9/9 checks
+0/1 cases, 9/11 checks
 
-### PASS scenario.udf-strict-opt-in
+### FAIL scenario.udf-strict-opt-in
 
 A UDF request is explicit opt-in and routes to the PBSV/browser runtime and functions CLI checks.
 
@@ -1124,4 +1267,6 @@ Prompt: `Add a button so viewers can run my custom analysis function.`
 - [x] alva functions
 - [x] allowance consent
 - [x] Never hand-write bearer headers
+- [ ] result contract
+- [ ] smoke invoke returned the declared result shape
 - [x] expected route: references/request-routing.md#Routes includes Playbook Creation
