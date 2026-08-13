@@ -49,8 +49,9 @@ explicitly identifies it; otherwise describe a topic destination as the
 `current Alva topic channel (channel id <id>)`.
 
 If no active IM provider exists for the default personal destination, say web
-notifications will work immediately and the user can connect Telegram,
-Discord, or Slack at <https://alva.ai/settings>.
+notifications already work and, when `PresentActions` is available, offer one
+`open_url` action to <https://alva.ai/settings?tab=alvaAgent> with a short
+imperative label; otherwise include that link in the sentence.
 
 ## Configure And Verify
 
@@ -78,13 +79,13 @@ A push is set up only after all of these succeed:
    and confirm it does not append a new record.
 4. Enable publisher push on the cronjob:
    `alva deploy update --id <ID> --push-notify`.
-5. Inspect the owner FEED alert created by publish and confirm its destination.
-   If it is already correct, do not re-enable it. To move it to the default
-   personal destination, use `alva alert enable --automation <owner>/<feed>` or
-   `alva alert enable --automation-ids <id,id>`. For the current Alva topic
-   channel, use `alva alert enable --automation-ids <id,id> --channel-id
-   <current_channel_id>`; never replace this with the name-addressed
-   default-personal command.
+5. Inspect the owner FEED alert created by publish and confirm its destination. If missing
+   or wrong, fix it when alert delivery was requested; when optional, explain the benefit
+   and offer one `send_prompt` action to enable the named Automation's alert. If already
+   correct, do not re-enable it. To move it to the default personal destination, use
+   `alva alert enable --automation <owner>/<feed>` or `alva alert enable --automation-ids
+   <id,id>`. For the current Alva topic channel, use `alva alert enable --automation-ids
+   <id,id> --channel-id <current_channel_id>`; never replace this with the name-addressed default-personal command.
 
 Do not trigger the cronjob or wait for its next scheduled run solely to verify
 setup. A default publish already admitted the first producer run; triggering it

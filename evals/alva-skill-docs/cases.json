@@ -900,7 +900,9 @@
             "`channel_id=0`",
             "`active_im_provider`",
             "active IM provider",
-            "moves the personal alert"
+            "moves the personal alert",
+            "`open_url` action",
+            "https://alva.ai/settings?tab=alvaAgent"
           ]
         },
         {
@@ -911,7 +913,10 @@
             "intended destination",
             "global \"subscribed\" state is not sufficient",
             "report it as an Alva web topic channel with its id",
-            "never as Telegram or another external DM"
+            "never as Telegram or another external DM",
+            "fix it when alert delivery was requested",
+            "when optional, explain the benefit",
+            "`send_prompt` action to enable the named Automation's alert"
           ]
         }
       ]
@@ -1023,6 +1028,20 @@
         "cap confidence when required evidence",
         "KPI coverage",
         "computation is missing"
+      ]
+    },
+    {
+      "id": "target.useful-next-step-actions",
+      "group": "target",
+      "target": "skill",
+      "description": "Useful post-answer suggestions pair explanatory prose with the correct compact action when the tool is available.",
+      "includes": [
+        "If `PresentActions` is available",
+        "`send_prompt` when the Agent should continue",
+        "`open_url`",
+        "short imperative",
+        "button condenses the action",
+        "Required questions use `AskUserQuestion`"
       ]
     },
     {

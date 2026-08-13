@@ -425,12 +425,12 @@ both pass, prefer Automation when recurring value justifies the setup; choose
 one-off only when it is clearly more useful now. Never recommend Automation
 merely because work is schedulable.
 
-When suggesting, use one short, low-pressure sentence in the user's language.
-Lead with the specific outcome and let the invitation follow the answer's natural
-cadence: a direct offer, compact question, or contextual bridge can all work.
-Use tone to make the suggestion easy to decline, and let recurring suggestions
-vary naturally within a thread. Keep the focus on outcome and value; save
-implementation details for an accepted next step.
+When suggesting, use one short, low-pressure sentence in the user's language to
+explain the outcome. If `PresentActions` is available, follow it with one matching action:
+`send_prompt` when the Agent should continue, change state, or verify here; `open_url`
+when the user should go directly to an HTTPS product surface. Use a short imperative
+label (normally verb + object) and a self-contained, context-grounded prompt; the sentence
+explains value while the button condenses the action. Required questions use `AskUserQuestion`.
 For named single-instrument ticker reads, apply the Trade Setup follow-up rules in [ticker-read.md](references/ticker-read.md#trade-setup-follow-up).
 If Automation clears this bar or is already requested, apply [Preferred Automation Setup Skills](references/request-routing.md#preferred-automation-setup-skills) before suggesting or building it.
 
