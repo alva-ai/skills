@@ -85,7 +85,8 @@ A push is set up only after all of these succeed:
    correct, do not re-enable it. To move it to the default personal destination, use
    `alva alert enable --automation <owner>/<feed>` or `alva alert enable --automation-ids
    <id,id>`. For the current Alva topic channel, use `alva alert enable --automation-ids
-   <id,id> --channel-id <current_channel_id>`; never replace this with the name-addressed default-personal command.
+   <id,id> --channel-id <current_channel_id>`; never replace this with the
+   name-addressed default-personal command.
 
 Do not trigger the cronjob or wait for its next scheduled run solely to verify
 setup. A default publish already admitted the first producer run; triggering it
