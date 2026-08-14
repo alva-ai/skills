@@ -18,9 +18,40 @@ alert output when there is nothing worth sending.
 
 ## Choose The Delivery Destination
 
-A personal FEED alert has one delivery binding per viewer and feed. Enabling
-the same alert for another destination moves the personal alert; it does not
-create a second copy. Choose the destination before mutating it:
+A personal FEED alert has one viewer-scoped delivery resource per Automation.
+That resource can contain Alva channel destinations and verified-account email
+at the same time. Updating email does not move or clear the current Alva/IM
+destination, and updating Alva channels does not change email.
+
+Read the canonical state before deciding whether a mutation is needed:
+
+```bash
+alva automation delivery get --id <automation_id>
+```
+
+Update only the field the user requested. Do not read-modify-write the whole
+resource:
+
+```bash
+# Enable email while preserving every Alva/IM destination.
+alva automation delivery update --id <automation_id> --email-enabled
+
+# Disable email while preserving every Alva/IM destination.
+alva automation delivery update --id <automation_id> --no-email-enabled
+
+# Replace only Alva destinations. 0 is the default Agent destination.
+alva automation delivery update --id <automation_id> --alva-channel-ids 0,123
+
+# Clear only Alva destinations.
+alva automation delivery update --id <automation_id> --alva-channel-ids=
+```
+
+Email can be enabled only when the account currently has an eligible verified
+address. The get/update result returns the complete address because this is an
+owner-scoped authenticated resource. Never ask the user to supply an arbitrary
+recipient address.
+
+Choose Alva delivery destinations as follows:
 
 Creating a new automation with `alva automation publish` immediately creates
 the owner's ACTIVE binding. It uses the owned origin-session channel when one
@@ -79,10 +110,14 @@ A push is set up only after all of these succeed:
    and confirm it does not append a new record.
 4. Enable publisher push on the cronjob:
    `alva deploy update --id <ID> --push-notify`.
-5. Inspect the owner FEED alert created by publish and confirm its destination. If missing
-   or wrong, fix it when alert delivery was requested; when optional, explain the benefit
-   and offer one `send_prompt` action to enable the named Automation's alert. If already
-   correct, do not re-enable it. To move it to the default personal destination, use
+5. Inspect the owner FEED alert created by publish with `alva automation
+   delivery get --id <automation_id>` and confirm every requested destination.
+   If email was requested, update only email with `alva automation delivery
+   update`; this preserves the Alva/IM destination. If an Alva destination is
+   missing or wrong, fix it when alert delivery was requested; when optional,
+   explain the benefit and offer one `send_prompt` action to enable the named
+   Automation's alert. If already correct, do not re-enable it. To select the
+   default personal destination, use
    `alva alert enable --automation <owner>/<feed>` or `alva alert enable --automation-ids
    <id,id>`. For the current Alva topic channel, use `alva alert enable --automation-ids
    <id,id> --channel-id <current_channel_id>`; never replace this with the
@@ -94,10 +129,11 @@ again duplicates the pipeline. `alva deploy trigger` is not a dry run: after
 publish creates the owner binding, Run Now can notify that destination. Use
 `alva run` for non-delivering script checks before publish. When publish used
 `--skip-auto-trigger`, route the binding first and trigger at most once only if
-a real delivery run is required. A successful enable proves that alert delivery
-is configured for the selected destination; an already-correct binding proves
-the same without another mutation. It does not prove that a message has already
-been delivered. An ALFS record alone is also not delivery proof.
+a real delivery run is required. A successful partial update proves that alert
+delivery is configured for that destination without changing the other medium;
+an already-correct resource proves the same without another mutation. It does
+not prove that a message has already been delivered. An ALFS record alone is
+also not delivery proof.
 Claim real delivery only when an existing
 `alva alert history` row for the intended destination records the run as
 `sent`.

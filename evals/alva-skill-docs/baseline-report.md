@@ -2,11 +2,11 @@
 
 Source: `origin/main`
 
-SKILL.md lines: 911
+SKILL.md lines: 910
 
-Cases: 72/74
+Cases: 82/84
 
-Checks: 744/761 (97.77%)
+Checks: 851/857 (99.30%)
 
 ## Scoring Diagnosis
 
@@ -15,12 +15,12 @@ Classify the gap before editing: missing capability summary, missing routing poi
 Do not expose eval scores as product copy, and do not patch demos to hide a weak result.
 Instead, fix the canonical skill text or eval case, then rerun baseline and final reports so the regression mechanism proves the gap is closed.
 
-- retained.udf-author-owned-contract: inspect for a skill gap before editing. Missing checks: Author-Owned UDF Contract; result_contract; params_schema is input-only; entry script, registration, smoke test, and browser renderer; Do not ask the user to restate that return shape; smoke tests must assert the returned `result` shape; references/api/udf-runtime.md includes The result contract is author-owned.; references/api/udf-runtime.md includes The browser renderer must consume the exact declared result fields.; references/api/udf-runtime.md includes If the smoke result and browser renderer disagree, fix the script or renderer before release.; references/playbook-creation.md includes result shape; references/playbook-creation.md includes HTML renderer fields; references/playbook-creation.md includes Do not ask the user to restate the return shape after you created the function.; references/playbook-creation.md<HARD-GATE:before-playbook-release> includes UDF result contract; references/playbook-creation.md<HARD-GATE:before-playbook-release> includes smoke invoke returned the declared result shape; references/playbook-creation.md<HARD-GATE:before-playbook-release> includes HTML consumes the declared result fields
-- scenario.udf-strict-opt-in: inspect for a skill gap before editing. Missing checks: result contract; smoke invoke returned the declared result shape
+- subscriptions.delivery-destination: inspect for a skill gap before editing. Missing checks: alert destination: references/push-notifications.md#Choose The Delivery Destination includes can contain Alva channel destinations and verified-account email at the same time; alert destination: references/push-notifications.md#Choose The Delivery Destination includes Updating email does not move or clear the current Alva/IM destination; alert destination: references/push-notifications.md#Choose The Delivery Destination includes alva automation delivery get --id <automation_id>; alert destination: references/push-notifications.md#Choose The Delivery Destination includes alva automation delivery update --id <automation_id> --email-enabled; alert destination: references/push-notifications.md#Choose The Delivery Destination includes Do not read-modify-write the whole resource
+- scenario.current-topic-channel-alert: inspect for a skill gap before editing. Missing checks: A successful partial update proves that alert delivery is configured
 
 ## retained
 
-19/20 cases, 111/126 checks
+20/20 cases, 126/126 checks
 
 ### PASS retained.platform-panorama
 
@@ -165,25 +165,25 @@ Creator-side UDF setup and allowance management route through the functions CLI 
 - [x] alva functions allowance create
 - [x] Do not hand-roll REST, GraphQL, or curl
 
-### FAIL retained.udf-author-owned-contract
+### PASS retained.udf-author-owned-contract
 
 UDF authoring keeps params, result shape, entry script, and HTML renderer tied to one contract.
 
-- [ ] Author-Owned UDF Contract
-- [ ] result_contract
-- [ ] params_schema is input-only
-- [ ] entry script, registration, smoke test, and browser renderer
-- [ ] Do not ask the user to restate that return shape
-- [ ] smoke tests must assert the returned `result` shape
-- [ ] references/api/udf-runtime.md includes The result contract is author-owned.
-- [ ] references/api/udf-runtime.md includes The browser renderer must consume the exact declared result fields.
-- [ ] references/api/udf-runtime.md includes If the smoke result and browser renderer disagree, fix the script or renderer before release.
-- [ ] references/playbook-creation.md includes result shape
-- [ ] references/playbook-creation.md includes HTML renderer fields
-- [ ] references/playbook-creation.md includes Do not ask the user to restate the return shape after you created the function.
-- [ ] references/playbook-creation.md<HARD-GATE:before-playbook-release> includes UDF result contract
-- [ ] references/playbook-creation.md<HARD-GATE:before-playbook-release> includes smoke invoke returned the declared result shape
-- [ ] references/playbook-creation.md<HARD-GATE:before-playbook-release> includes HTML consumes the declared result fields
+- [x] Author-Owned UDF Contract
+- [x] result_contract
+- [x] params_schema is input-only
+- [x] entry script, registration, smoke test, and browser renderer
+- [x] Do not ask the user to restate that return shape
+- [x] smoke tests must assert the returned `result` shape
+- [x] references/api/udf-runtime.md includes The result contract is author-owned.
+- [x] references/api/udf-runtime.md includes The browser renderer must consume the exact declared result fields.
+- [x] references/api/udf-runtime.md includes If the smoke result and browser renderer disagree, fix the script or renderer before release.
+- [x] references/playbook-creation.md includes result shape
+- [x] references/playbook-creation.md includes HTML renderer fields
+- [x] references/playbook-creation.md includes Do not ask the user to restate the return shape after you created the function.
+- [x] references/playbook-creation.md<HARD-GATE:before-playbook-release> includes UDF result contract
+- [x] references/playbook-creation.md<HARD-GATE:before-playbook-release> includes smoke invoke returned the declared result shape
+- [x] references/playbook-creation.md<HARD-GATE:before-playbook-release> includes HTML consumes the declared result fields
 
 ### PASS retained.credits-cli
 
@@ -250,7 +250,7 @@ Interactive orders keep the per-order confirmation rule: the exemption does not 
 
 ## target
 
-14/14 cases, 166/166 checks
+15/15 cases, 172/172 checks
 
 ### PASS target.automation-publish-side-effects
 
@@ -266,7 +266,7 @@ Automation publish documents its owner binding and first-run side effects, inclu
 
 Top-level SKILL.md stays below the current guide ceiling without forcing a minimum size that would block future compression.
 
-- [x] line count <= 911 (actual 911)
+- [x] line count <= 911 (actual 910)
 
 ### PASS target.playbook-task-offload
 
@@ -336,6 +336,17 @@ Direct financial asks have compact evidence gates instead of a free-form memo co
 - [x] cap confidence when required evidence
 - [x] KPI coverage
 - [x] computation is missing
+
+### PASS target.useful-next-step-actions
+
+Useful post-answer suggestions pair explanatory prose with the correct compact action when the tool is available.
+
+- [x] If `PresentActions` is available
+- [x] `send_prompt` when the Agent should continue
+- [x] `open_url`
+- [x] short imperative
+- [x] button condenses the action
+- [x] Required questions use `AskUserQuestion`
 
 ### PASS target.financial-ask-quality-gates
 
@@ -421,7 +432,7 @@ Operational pitfalls are a mandatory stepwise gate, not an optional debugging ap
 
 Latest mainline Alva skill updates remain integrated after rebasing the refactor.
 
-- [x] version: v1.21.0
+- [x] version: v1.21.2
 - [x] Capability Help
 - [x] Reply 1, 2, or 3 to start
 - [x] feedback
@@ -598,7 +609,7 @@ When structured data lags a known official release, web is an official-source fa
 
 ## platform-data
 
-2/2 cases, 35/35 checks
+4/4 cases, 74/74 checks
 
 ### PASS platform-data.kol-surfaces
 
@@ -644,6 +655,55 @@ A single-ticker read routes through the five official Skillhub sources as a firs
 - [x] ticker read directory: references/request-routing.md#Official Ticker Read Sources includes alva/query-breaking-news-feed
 - [x] ticker read directory: references/request-routing.md#Official Ticker Read Sources includes alva/company-data-aggregate
 - [x] ticker read directory: references/request-routing.md#Official Ticker Read Sources includes alva/company-move-attribution
+
+### PASS platform-data.markets-context-routing
+
+Named-ticker narrative and earnings questions route through one compact Markets Context contract without fixed source-count wording or internal addressing details.
+
+- [x] excludes Treat the five official methods
+- [x] excludes staging owner
+- [x] excludes production owner
+- [x] markets intent and anti-drift route: SKILL.md#Request Routing includes company narrative, earnings, earnings call
+- [x] markets intent and anti-drift route: SKILL.md#Request Routing includes Use the smallest sufficient source set
+- [x] markets intent and anti-drift route: SKILL.md#Request Routing includes read [ticker-read.md](references/ticker-read.md) before source selection
+- [x] named-ticker markets intent: references/request-routing.md#Routes includes company narrative, earnings, or earnings call questions
+- [x] named-ticker markets intent: references/request-routing.md#Routes includes first opens [ticker-read.md](ticker-read.md)
+- [x] markets context contract: references/ticker-read.md#Markets company context includes alva markets --help
+- [x] markets context contract: references/ticker-read.md#Markets company context includes alva markets narrative --ticker <TICKER>
+- [x] markets context contract: references/ticker-read.md#Markets company context includes alva markets earnings --ticker <TICKER>
+- [x] markets context contract: references/ticker-read.md#Markets company context includes --event next-confirmed
+- [x] markets context contract: references/ticker-read.md#Markets company context includes --fiscal-year
+- [x] markets context contract: references/ticker-read.md#Markets company context includes --fiscal-quarter
+- [x] markets context contract: references/ticker-read.md#Markets company context includes --fiscal-year 2026 --fiscal-quarter Q3
+- [x] markets context contract: references/ticker-read.md#Markets company context includes Do not read WILF in parallel for the same request
+- [x] markets context contract: references/ticker-read.md#Markets company context includes Price-only and fundamentals-only asks do not call Markets for enrichment
+- [x] markets context contract: references/ticker-read.md#Markets company context includes Markets returns the current backend view, not historical point-in-time truth
+- [x] markets context contract: references/ticker-read.md#Markets company context includes do not construct GraphQL, ALFS paths, owners, or environment mappings
+
+### PASS platform-data.ticker-read-trade-setup-follow-up
+
+A named single-instrument ticker read can suggest Trade Setup automation after the normal answer, and accepting that suggestion routes through the official setup skill.
+
+- [x] post-answer pointer: SKILL.md#Useful Next Step After Ask includes Trade Setup follow-up rules
+- [x] post-answer pointer: SKILL.md#Useful Next Step After Ask includes references/ticker-read.md#trade-setup-follow-up
+- [x] post-answer pointer: SKILL.md#Useful Next Step After Ask includes Preferred Automation Setup Skills
+- [x] ticker-read follow-up rule: references/ticker-read.md#Trade Setup follow-up includes end with one short Trade Setup automation follow-up
+- [x] ticker-read follow-up rule: references/ticker-read.md#Trade Setup follow-up includes mandatory for setup-like asks
+- [x] ticker-read follow-up rule: references/ticker-read.md#Trade Setup follow-up includes can I go long/short
+- [x] ticker-read follow-up rule: references/ticker-read.md#Trade Setup follow-up includes The follow-up must be the final sentence or final short paragraph
+- [x] ticker-read follow-up rule: references/ticker-read.md#Trade Setup follow-up includes the answer is incomplete without this final invitation
+- [x] ticker-read follow-up rule: references/ticker-read.md#Trade Setup follow-up includes trade thesis
+- [x] ticker-read follow-up rule: references/ticker-read.md#Trade Setup follow-up includes entry or exit area
+- [x] ticker-read follow-up rule: references/ticker-read.md#Trade Setup follow-up includes confirmation condition
+- [x] ticker-read follow-up rule: references/ticker-read.md#Trade Setup follow-up includes invalidation condition
+- [x] ticker-read follow-up rule: references/ticker-read.md#Trade Setup follow-up includes After answering a named single-instrument ticker read
+- [x] ticker-read follow-up rule: references/ticker-read.md#Trade Setup follow-up includes after the normal answer
+- [x] ticker-read follow-up rule: references/ticker-read.md#Trade Setup follow-up includes simple fact lookups
+- [x] ticker-read follow-up rule: references/ticker-read.md#Trade Setup follow-up includes Alpha Radar / Portfolio Watch
+- [x] accepted follow-up route: references/request-routing.md#Preferred Automation Setup Skills includes alva/trade-setup-automation
+- [x] accepted follow-up route: references/request-routing.md#Preferred Automation Setup Skills includes accepting a post-answer Trade Setup suggestion after a named single-instrument ticker read
+- [x] accepted follow-up route: references/request-routing.md#Preferred Automation Setup Skills includes reuse the answered ticker
+- [x] accepted follow-up route: references/request-routing.md#Preferred Automation Setup Skills includes fetch the blueprint fresh before building
 
 ## issue592
 
@@ -758,11 +818,11 @@ Push setup is evaluated as a full delivery path instead of a single publisher fl
 
 ## subscriptions
 
-1/1 cases, 19/19 checks
+0/1 cases, 23/28 checks
 
-### PASS subscriptions.delivery-destination
+### FAIL subscriptions.delivery-destination
 
-The general skill distinguishes the default personal destination from an Alva topic channel; external-group operations stay profile-owned.
+The skill models concurrent Alva and email destinations, distinguishes the default personal destination from an Alva topic channel, and keeps external-group operations profile-owned.
 
 - [x] excludes External IM group
 - [x] excludes alva alert group
@@ -778,11 +838,20 @@ The general skill distinguishes the default personal destination from an Alva to
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes `channel_id=0`
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes `active_im_provider`
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes active IM provider
-- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes moves the personal alert
+- [ ] alert destination: references/push-notifications.md#Choose The Delivery Destination includes can contain Alva channel destinations and verified-account email at the same time
+- [ ] alert destination: references/push-notifications.md#Choose The Delivery Destination includes Updating email does not move or clear the current Alva/IM destination
+- [ ] alert destination: references/push-notifications.md#Choose The Delivery Destination includes alva automation delivery get --id <automation_id>
+- [ ] alert destination: references/push-notifications.md#Choose The Delivery Destination includes alva automation delivery update --id <automation_id> --email-enabled
+- [ ] alert destination: references/push-notifications.md#Choose The Delivery Destination includes Do not read-modify-write the whole resource
+- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes `open_url` action
+- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes https://alva.ai/settings?tab=alvaAgent
 - [x] destination verification: references/push-notifications.md#Configure And Verify includes intended destination
 - [x] destination verification: references/push-notifications.md#Configure And Verify includes global "subscribed" state is not sufficient
 - [x] destination verification: references/push-notifications.md#Configure And Verify includes report it as an Alva web topic channel with its id
 - [x] destination verification: references/push-notifications.md#Configure And Verify includes never as Telegram or another external DM
+- [x] destination verification: references/push-notifications.md#Configure And Verify includes fix it when alert delivery was requested
+- [x] destination verification: references/push-notifications.md#Configure And Verify includes when optional, explain the benefit
+- [x] destination verification: references/push-notifications.md#Configure And Verify includes `send_prompt` action to enable the named Automation's alert
 
 ## automation
 
@@ -1028,7 +1097,7 @@ Prompt: `<annotation id="hero-title">make this chart title shorter</annotation>`
 
 ## scenarios.push
 
-3/3 cases, 61/61 checks
+2/3 cases, 60/61 checks
 
 ### PASS scenario.alert-push-monitor
 
@@ -1091,7 +1160,7 @@ Prompt: `Create a scheduled market Feed alert with a red Discord card, a View re
 - [x] Portable Actions And Card Presentation: references/feed-sdk.md#Portable Actions And Card Presentation includes sendPromptAction(
 - [x] Portable Actions And Card Presentation: references/feed-sdk.md#Portable Actions And Card Presentation includes cardPresentation({
 
-### PASS scenario.current-topic-channel-alert
+### FAIL scenario.current-topic-channel-alert
 
 A request made in an Alva web topic channel binds the feed to that exact channel id and never invents Telegram delivery.
 
@@ -1105,7 +1174,7 @@ Prompt: `<session-prefill-channel-memory channel-id="44" root="/alva/home/ymchco
 - [x] Do not infer Telegram, Discord, Slack, or another transport
 - [x] current Alva topic channel (channel id <id>)
 - [x] Do not trigger the cronjob or wait for its next scheduled run solely to verify setup
-- [x] A successful enable proves that alert delivery is configured
+- [ ] A successful partial update proves that alert delivery is configured
 - [x] it does not prove that a message has already been delivered
 - [x] An ALFS record alone is also not delivery proof
 - [x] report it as an Alva web topic channel with its id
@@ -1175,11 +1244,11 @@ Prompt: `Use the thesis skill for NVDA AI capex read-through.`
 
 ## scenarios.ticker-read
 
-4/4 cases, 44/44 checks
+4/4 cases, 46/46 checks
 
 ### PASS scenario.ticker-read-broad-analysis
 
-A broad single-ticker read checks the official direct-read sources before generic search, selects rather than blindly running them all, and still uses Data Skills for live financial facts.
+A broad single-ticker assessment checks the official direct-read sources, adds latest completed Earnings, and still uses Data Skills for live financial facts without running every source.
 
 Prompt: `分析一下 MU 最近的公司表现，重点说清楚市场现在在看什么、最近异动和催化剂。`
 
@@ -1191,6 +1260,7 @@ Prompt: `分析一下 MU 最近的公司表现，重点说清楚市场现在在�
 - [x] alva/what-investors-are-looking-for
 - [x] alva/company-anomaly-read
 - [x] alva/query-breaking-news-feed
+- [x] Add latest completed Earnings for a broad company assessment or thesis
 - [x] Data Skills remain the source for live price, fundamentals, valuation
 - [x] Do not execute every source by default
 - [x] Continue with the remaining available Platform Data sources
@@ -1235,25 +1305,119 @@ Prompt: `三星电子 005930.KS 昨天为什么大涨？`
 
 ### PASS scenario.ticker-read-investor-news
 
-Investor-focus and breaking-event questions combine WILF with the macro breaking-news feed while preserving each source's freshness, coverage, and evidence limits.
+Investor-focus and breaking-event questions use Markets Narrative as the canonical company-context reader, then add the macro breaking-news feed without a parallel WILF read.
 
 Prompt: `TSLA 现在投资者最关注什么？今天有没有可能影响它的突发事件？`
 
 - [x] ticker-read.md
 - [x] request-routing.md
-- [x] Weekly investor focus
+- [x] Use Narrative as the default reader
+- [x] Do not read WILF in parallel for the same request
+- [x] Report `asOf` and `generatedAtMs`
 - [x] current macro/cross-market event discovery
-- [x] surface `gaps`
 - [x] supports_event: true
 - [x] not a company-by-company news feed
 - [x] did not surface a matching event
 - [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
 
+## scenarios.ticker-read.markets
+
+7/7 cases, 40/40 checks
+
+### PASS scenario.ticker-read-markets-narrative
+
+An explicit Markets Narrative request uses the normalized narrative command and preserves the current-view boundary.
+
+Prompt: `给我看 TSLA 当前 Company Narrative 和最近的 narrative change。`
+
+- [x] ticker-read.md
+- [x] request-routing.md
+- [x] Current Company Narrative, Narrative history, or change log
+- [x] alva markets narrative --ticker <TICKER>
+- [x] Markets returns the current backend view, not historical point-in-time truth
+- [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
+
+### PASS scenario.ticker-read-markets-latest-earnings
+
+A latest-results question uses the default latest-completed Earnings selector and preserves evidence roles.
+
+Prompt: `NVDA 最新财报怎么样？`
+
+- [x] ticker-read.md
+- [x] request-routing.md
+- [x] Latest completed earnings
+- [x] alva markets earnings --ticker <TICKER>
+- [x] Treat Pre as a dated expectation baseline
+- [x] Release as the official source for reported facts
+- [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
+
+### PASS scenario.ticker-read-markets-earnings-call
+
+An earnings-call question uses latest-completed Earnings and treats Transcript as management evidence without discarding other valid stages.
+
+Prompt: `管理层在 NVDA 最新电话会怎么说毛利率？`
+
+- [x] ticker-read.md
+- [x] request-routing.md
+- [x] alva markets earnings --ticker <TICKER>
+- [x] Transcript as management statements
+- [x] Preserve valid stages when another is unavailable
+- [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
+
+### PASS scenario.ticker-read-markets-next-earnings
+
+A next-event question uses next-confirmed and never substitutes another fiscal event.
+
+Prompt: `AAPL 下一次财报看什么？`
+
+- [x] ticker-read.md
+- [x] request-routing.md
+- [x] Next confirmed earnings
+- [x] alva markets earnings --ticker <TICKER> --event next-confirmed
+- [x] never substitute a different event for the requested one
+- [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
+
+### PASS scenario.ticker-read-markets-explicit-period
+
+An explicit fiscal-period thesis question pairs fiscal flags and can combine Earnings with the requested Company Narrative context.
+
+Prompt: `AAPL FY2026 Q3 怎么改变公司叙事？`
+
+- [x] ticker-read.md
+- [x] request-routing.md
+- [x] --fiscal-year 2026 --fiscal-quarter Q3
+- [x] alva markets earnings --ticker <TICKER>
+- [x] alva markets narrative --ticker <TICKER>
+- [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
+
+### PASS scenario.ticker-read-markets-price-only
+
+A price-only request stays on Data Skills and does not call Markets for enrichment.
+
+Prompt: `AAPL 现在多少钱？`
+
+- [x] ticker-read.md
+- [x] data-skills.md
+- [x] Data Skills remain the source for live price
+- [x] Price-only and fundamentals-only asks do not call Markets for enrichment
+- [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
+
+### PASS scenario.ticker-read-markets-point-in-time
+
+A historical point-in-time request discloses the current-view limitation instead of reconstructing past truth.
+
+Prompt: `一月十五日当时 Alva 怎么看 AAPL？`
+
+- [x] ticker-read.md
+- [x] request-routing.md
+- [x] Markets returns the current backend view, not historical point-in-time truth
+- [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
+
 ## scenarios.udf
 
-0/1 cases, 9/11 checks
+1/1 cases, 11/11 checks
 
-### FAIL scenario.udf-strict-opt-in
+### PASS scenario.udf-strict-opt-in
 
 A UDF request is explicit opt-in and routes to the PBSV/browser runtime and functions CLI checks.
 
@@ -1267,6 +1431,6 @@ Prompt: `Add a button so viewers can run my custom analysis function.`
 - [x] alva functions
 - [x] allowance consent
 - [x] Never hand-write bearer headers
-- [ ] result contract
-- [ ] smoke invoke returned the declared result shape
+- [x] result contract
+- [x] smoke invoke returned the declared result shape
 - [x] expected route: references/request-routing.md#Routes includes Playbook Creation

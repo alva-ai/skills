@@ -223,8 +223,15 @@ function extractMarkdownSection(text, heading) {
   const lines = text.split(/\r?\n/);
   let start = -1;
   let level = 0;
+  let fence = null;
 
   for (let i = 0; i < lines.length; i += 1) {
+    const fenceMatch = lines[i].match(/^\s*(`{3,}|~{3,})/);
+    if (fenceMatch) {
+      fence = fence ? null : fenceMatch[1][0];
+      continue;
+    }
+    if (fence) continue;
     const match = lines[i].match(/^(#{1,6})\s+(.+?)\s*$/);
     if (match && normalizeHeading(match[2]) === wanted) {
       start = i;
@@ -236,7 +243,14 @@ function extractMarkdownSection(text, heading) {
   if (start === -1) return null;
 
   let end = lines.length;
+  fence = null;
   for (let i = start + 1; i < lines.length; i += 1) {
+    const fenceMatch = lines[i].match(/^\s*(`{3,}|~{3,})/);
+    if (fenceMatch) {
+      fence = fence ? null : fenceMatch[1][0];
+      continue;
+    }
+    if (fence) continue;
     const match = lines[i].match(/^(#{1,6})\s+/);
     if (match && match[1].length <= level) {
       end = i;

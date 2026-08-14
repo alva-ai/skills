@@ -877,7 +877,7 @@
       "id": "subscriptions.delivery-destination",
       "group": "subscriptions",
       "target": "corpus",
-      "description": "The general skill distinguishes the default personal destination from an Alva topic channel; external-group operations stay profile-owned.",
+      "description": "The skill models concurrent Alva and email destinations, distinguishes the default personal destination from an Alva topic channel, and keeps external-group operations profile-owned.",
       "excludes": [
         "External IM group",
         "alva alert group",
@@ -900,7 +900,11 @@
             "`channel_id=0`",
             "`active_im_provider`",
             "active IM provider",
-            "moves the personal alert",
+            "can contain Alva channel destinations and verified-account email at the same time",
+            "Updating email does not move or clear the current Alva/IM destination",
+            "alva automation delivery get --id <automation_id>",
+            "alva automation delivery update --id <automation_id> --email-enabled",
+            "Do not read-modify-write the whole resource",
             "`open_url` action",
             "https://alva.ai/settings?tab=alvaAgent"
           ]

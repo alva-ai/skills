@@ -581,8 +581,9 @@ and Run Now executions deliver those outputs; it does not subscribe users or
 bypass preferences by itself.
 
 Open [push-notifications.md](references/push-notifications.md) for alert-output
-authoring, portable actions and card presentation, automation publish, alert
-setup, and verification. A quiet V2 run does not append an alert record.
+authoring, portable actions and card presentation, automation publish,
+per-Automation Alva plus email delivery, and verification. A quiet V2 run does
+not append an alert record.
 
 After releasing or keeping a playbook as draft, scan whether any backing feed is
 push-worthy. A push setup requires a declared alert output or a recognized
@@ -752,7 +753,7 @@ text does not fully cover.
 | `fs`                 | ALFS reads/writes/grants/time-series suffixes and shared modules under `~/library`. Must read [api/filesystem.md](references/api/filesystem.md) for synth suffixes and grant gotchas. |
 | `run`                | Execute jagent JS. See [jagent-runtime.md](references/jagent-runtime.md).                                                                                                             |
 | `deploy`             | Cronjob lifecycle for producer scripts: schedule, args, trigger, run-status, runs, logs. See [deployment.md](references/deployment.md).                                               |
-| `automation`         | Product-facing lifecycle CLI for feeds (`list`, `inspect`, `publish`, `update`, `stop`, `resume`, `delete`). Must read [feed-lifecycle.md](references/feed-lifecycle.md).               |
+| `automation`         | Product-facing lifecycle and per-Automation delivery CLI (`delivery get/update` supports independent Alva and email destinations). Must read [feed-lifecycle.md](references/feed-lifecycle.md) and [push-notifications.md](references/push-notifications.md). |
 | `release`            | Playbook draft/release; the release reference also covers automation publish metadata extras. Must read [api/release.md](references/api/release.md).                                   |
 | `lint playbook`      | Design-system linter, same gate as release. See [design-contract.yaml](references/design-contract.yaml).                                                                              |
 | `skillhub`           | Curated methodology blueprints. See [request-routing.md](references/request-routing.md#skillhub-blueprint).                                                                           |
