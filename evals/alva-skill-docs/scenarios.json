@@ -315,7 +315,7 @@
           "Do not infer Telegram, Discord, Slack, or another transport",
           "current Alva topic channel (channel id <id>)",
           "Do not trigger the cronjob or wait for its next scheduled run solely to verify setup",
-          "A successful enable proves that alert delivery is configured",
+          "A successful partial update proves that alert delivery is configured",
           "it does not prove that a message has already been delivered",
           "An ALFS record alone is also not delivery proof",
           "report it as an Alva web topic channel with its id"
