@@ -25,7 +25,7 @@
       "includes": [
         "alva <command> --help",
         "scripts/version_check.sh",
-        "alva whoami",
+        "alva account whoami",
         "ARRAYS_JWT",
         "alva fs read --path '~/memory/MEMORY.md'"
       ]
@@ -118,30 +118,29 @@
       "id": "retained.feed-lifecycle",
       "group": "retained",
       "target": "corpus",
-      "description": "Feed build, deploy, automation publish, and visibility hard gate remain preserved.",
+      "description": "Feed build, unified Automation creation, and visibility hard gate remain preserved.",
       "includes": [
         "Feed SDK",
         "alva run --entry-path",
-        "alva deploy create",
-        "alva automation publish",
-        "alva feed set-visibility --id <feed_id> --visibility public",
-        "before-automation-publish"
+        "alva automation create",
+        "alva automation set-visibility --id <automation_id> --visibility public",
+        "before-automation-create"
       ]
     },
     {
-      "id": "target.automation-publish-side-effects",
+      "id": "target.automation-create-side-effects",
       "group": "target",
       "target": "corpus",
-      "description": "Automation publish documents its owner binding and first-run side effects, including the run-only opt-out and duplicate-trigger guardrail.",
+      "description": "Automation creation documents its owner binding and first-run side effects, including the run-only opt-out and duplicate-trigger guardrail.",
       "section_includes": [
         {
           "file": "references/feed-lifecycle.md",
           "heading": "Lifecycle",
           "includes": [
-            "Publish creates an ACTIVE owner alert binding",
-            "Default: let publish start the producer",
-            "do not call `alva deploy trigger` again",
-            "`--skip-auto-trigger` suppresses only the publish-time run",
+            "Creation provisions the producer, adds an ACTIVE owner alert binding",
+            "Default: let creation start the producer",
+            "do not call `alva automation trigger` again",
+            "`--skip-auto-trigger` suppresses only the creation-time run",
             "It does not suppress the owner alert binding"
           ]
         }
@@ -156,10 +155,10 @@
         "before-build-html",
         "before-playbook-draft",
         "before-playbook-release",
-        "alva lint playbook",
+        "alva playbooks lint",
         "readme-url",
         "related people",
-        "alva screenshot",
+        "alva playbooks screenshot",
         "set-visibility"
       ]
     },
@@ -197,10 +196,10 @@
       "target": "corpus",
       "description": "Creator-side UDF setup and allowance management route through the functions CLI instead of manual service requests.",
       "includes": [
-        "alva functions --help",
-        "alva functions register",
-        "alva functions invoke",
-        "alva functions allowance create",
+        "alva playbooks functions --help",
+        "alva playbooks functions register",
+        "alva playbooks functions invoke",
+        "alva playbooks functions allowance create",
         "Do not hand-roll REST, GraphQL, or curl"
       ]
     },
@@ -253,11 +252,11 @@
       "target": "corpus",
       "description": "Viewer-scoped credit balance and consumption-history lookup remains discoverable through the credits CLI.",
       "includes": [
-        "alva credits --help",
-        "alva credits wallet",
-        "alva credits items --today",
-        "alva credits items --last 7d",
-        "alva credits items --start 2026-06-23 --end 2026-06-24",
+        "alva account credits --help",
+        "alva account credits wallet",
+        "alva account credits items --today",
+        "alva account credits items --last 7d",
+        "alva account credits items --start 2026-06-23 --end 2026-06-24",
         "--session-id <session_id>",
         "viewer-scoped",
         "Do not invent or request a `--user-id` flag",
@@ -802,7 +801,7 @@
           "id": "before-playbook-release",
           "label": "release gate",
           "includes": [
-            "Every backing feed passed `before-automation-publish`",
+            "Every backing feed passed `before-automation-create`",
             "for public playbooks",
             "for private or paid playbooks",
             "authenticated SDK/PBSV read instead",
@@ -812,7 +811,7 @@
             "README exists, is current, and is passed via absolute `--readme-url`",
             "New feeds declare push-worthy outputs with",
             "existing Altra `signal/targets` or legacy",
-            "alva lint playbook ./index.html"
+            "alva playbooks lint '~/playbooks/{name}/index.html'"
           ]
         }
       ],
@@ -842,8 +841,8 @@
           "label": "push setup",
           "includes": [
             "A push is set up only after all of these succeed",
-            "before-automation-publish",
-            "alva deploy update --id <ID> --push-notify",
+            "before-automation-create",
+            "alva automation update --id <ID> --push-notify",
             "alva alert enable --automation",
             "alva alert enable --automation-ids",
             "There is no playbook alert target",
@@ -853,12 +852,12 @@
         },
         {
           "file": "references/deployment.md",
-          "heading": "Create Cronjob",
+          "heading": "Create",
           "label": "automation push default",
           "includes": [
-            "new Automation producer",
-            "`--push-notify` by default",
-            "only when the user explicitly asks"
+            "For a new alert-capable Automation, pass `--push-notify`",
+            "unless the user asks otherwise",
+            "does not subscribe arbitrary viewers"
           ]
         },
         {
@@ -867,7 +866,7 @@
           "label": "push inventory",
           "includes": [
             "alva alert list --first 200",
-            "alva alert follows --limit 100",
+            "alva playbooks follows list --limit 100",
             "has_next"
           ]
         }
@@ -1155,7 +1154,7 @@
         "step by step",
         "before each step",
         "mandatory",
-        "runtime, feed, ALFS, playbook HTML, deploy, release, chart, or cron work",
+        "runtime, feed, ALFS, playbook HTML, Automation, release, chart, or cron work",
         "Write or run jagent code",
         "Touch ALFS paths",
         "Build or edit playbook HTML/charts"
@@ -1172,7 +1171,7 @@
           "heading": "Updating An Existing Automation",
           "label": "automation update lifecycle",
           "includes": [
-            "ALFS source writes take effect without republishing",
+            "ALFS source writes take effect without re-registration",
             "alva automation update --id <feed_id>",
             "Omitted fields keep their current values",
             "explicit empty metadata string clears",
@@ -1188,7 +1187,7 @@
           "label": "automation update gate",
           "includes": [
             "target numeric ID belongs to the intended owned automation",
-            "replacement cronjob exists",
+            "resolves to the intended backing producer",
             "resulting producer's exact script ran successfully via `alva run`",
             "do not fall back to delete-and-recreate"
           ]
@@ -1196,8 +1195,8 @@
       ]
     },
     {
-      "id": "deployment.manual-trigger-optional",
-      "group": "deployment",
+      "id": "automation.manual-trigger-optional",
+      "group": "automation",
       "target": "corpus",
       "description": "Manual trigger commands remain discoverable without becoming a required deployment, update, or push-verification workflow.",
       "excludes": [
@@ -1212,16 +1211,21 @@
       "file_includes": [
         {
           "file": "SKILL.md",
-          "label": "deploy command index",
+          "label": "automation command index",
           "includes": [
-            "Cronjob lifecycle for producer scripts: schedule, args, trigger, run-status, runs, logs."
+            "Unified producer, product lifecycle, visibility, trigger, and run history."
           ]
         },
         {
           "file": "references/deployment.md",
-          "label": "deploy command inventory",
+          "label": "automation command inventory",
           "includes": [
-            "`pause`, `resume`, `trigger`, `run-status`, `runs`, `run-logs`"
+            "alva automation pause",
+            "alva automation resume",
+            "alva automation trigger",
+            "alva automation runs status",
+            "alva automation runs list",
+            "alva automation runs logs"
           ]
         }
       ]
@@ -1288,7 +1292,7 @@
       "target": "corpus",
       "description": "Latest mainline Alva skill updates remain integrated after rebasing the refactor.",
       "includes": [
-        "version: v1.21.4",
+        "version: v1.22.0",
         "Capability Help",
         "Reply 1, 2, or 3 to start",
         "feedback",

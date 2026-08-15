@@ -72,19 +72,19 @@ or from a deployed cronjob.
 
 ## Programmatic CRUD API
 
-Authenticated CRUD is available via `alva secrets`. All operations are scoped
+Authenticated CRUD is available via `alva account secrets`. All operations are scoped
 to the current user.
 
 ### Create
 
 ```bash
-alva secrets create --name OPENAI_API_KEY --value "sk-..."
+alva account secrets create --name OPENAI_API_KEY --value "sk-..."
 ```
 
 ### List
 
 ```bash
-alva secrets list
+alva account secrets list
 ```
 
 Returns metadata only (name, keyVersion, createdAt, updatedAt, valueLength,
@@ -93,19 +93,19 @@ keyPrefix).
 ### Get plaintext value
 
 ```bash
-alva secrets get --name OPENAI_API_KEY
+alva account secrets get --name OPENAI_API_KEY
 ```
 
 ### Update
 
 ```bash
-alva secrets update --name OPENAI_API_KEY --value "sk-new-..."
+alva account secrets update --name OPENAI_API_KEY --value "sk-new-..."
 ```
 
 ### Delete
 
 ```bash
-alva secrets delete --name OPENAI_API_KEY
+alva account secrets delete --name OPENAI_API_KEY
 ```
 
 Validation and error behavior:

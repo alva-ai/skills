@@ -77,7 +77,7 @@ const MUTATIONS = [
     expectFailedCases: ["scenario.alert-push-monitor"],
   },
   {
-    id: "automation-knowledge-publish-gate",
+    id: "automation-knowledge-create-gate",
     file: "references/feed-lifecycle.md",
     remove:
       "1. The applicable [Alva Knowledge](alva-knowledge.md) requirements passed\n" +
@@ -86,13 +86,13 @@ const MUTATIONS = [
     expectFailedCases: ["scenario.alert-push-monitor"],
   },
   {
-    id: "automation-publish-side-effects",
+    id: "automation-create-side-effects",
     file: "references/feed-lifecycle.md",
     remove:
-      "`--skip-auto-trigger` suppresses only the publish-time run. It does not suppress\n" +
-      "the owner alert binding. Because the binding exists immediately after publish,\n" +
-      "an explicit `deploy trigger` may deliver a real alert.\n",
-    expectFailedCases: ["target.automation-publish-side-effects"],
+      "`--skip-auto-trigger` suppresses only the creation-time run. It does not\n" +
+      "suppress the owner alert binding. Because the binding exists immediately after\n" +
+      "creation, an explicit `automation trigger` may deliver a real alert.\n",
+    expectFailedCases: ["target.automation-create-side-effects"],
   },
   {
     id: "automation-knowledge-required-reading",

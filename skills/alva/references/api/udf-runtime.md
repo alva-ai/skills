@@ -5,7 +5,7 @@ made available for viewers to invoke from the playbook UI. A UDF flow always has
 two parts:
 
 1. **Registration**: the creator writes the entry script to ALFS, then
-   registers a named function and parameter schema with `alva functions`.
+   registers a named function and parameter schema with `alva playbooks functions`.
 2. **Use**: the playbook HTML lists or invokes registered functions through the
    browser SDK.
 
@@ -24,7 +24,7 @@ browser UI instead.
 
 If the trigger is met, implement both sides:
 
-- register or update the creator function with the `alva functions` CLI
+- register or update the creator function with the `alva playbooks functions` CLI
 - load the toolkit browser SDK and invoke the function with `window.alva.udf`
 
 Do not build only the browser button without registering the function, and do
@@ -72,7 +72,7 @@ Hard authoring rules:
 - The browser renderer must consume the exact declared result fields. Do not
   ship a final UI that only `JSON.stringify`s the result unless the user asked
   for a raw debug view.
-- `alva functions invoke` smoke tests must assert the returned `result` shape,
+- `alva playbooks functions invoke` smoke tests must assert the returned `result` shape,
   not merely that invocation exits without an error. If the smoke result and
   browser renderer disagree, fix the script or renderer before release.
 - Re-registration after editing a UDF must update the same contract everywhere:
@@ -306,30 +306,25 @@ Hard rules:
 ## Creator Function CLI
 
 Creator-side UDF management is a CLI flow. Before using it in a session, run
-`alva functions --help` and treat the help output as authoritative for current
+`alva playbooks functions --help` and treat the help output as authoritative for current
 flags, response fields, and examples.
 
 The stable flow is:
 
-Use ALFS-native write/edit tools for the entry script when available. The
-`--file` and `--params-schema-file` forms below are for shell-only CLI
-sessions; PI/jagent agent tool mode should pass inline `--params-schema`
-instead.
+Use ALFS-native write/edit tools for the entry script, then pass the parameter
+schema inline to the Slim CLI.
 
 ```bash
-alva fs write --path '/alva/home/<username>/playbooks/<name>/udf/analyze.js' --file ./analyze.js --mkdir-parents
-alva functions register --playbook-id <playbook-id> --function-name analyze --entry-script-path '/alva/home/<username>/playbooks/<name>/udf/analyze.js' --params-schema-file ./schema.json --no-allow-charges
-alva functions invoke --playbook-id <playbook-id> --function-name analyze --params '{"ticker":"AAPL"}'
+alva playbooks functions register --playbook-id <playbook-id> --function-name analyze --entry-script-path '/alva/home/<username>/playbooks/<name>/udf/analyze.js' --params-schema '{"type":"object","properties":{"ticker":{"type":"string"}},"required":["ticker"]}' --no-allow-charges
+alva playbooks functions invoke --playbook-id <playbook-id> --function-name analyze --params '{"ticker":"AAPL"}'
 ```
 
 CLI gotchas the help text may not make obvious:
 
 - `entry_script_path` is an absolute ALFS path under the creator's home and
   must point at a `.js` file. Do not pass a local filesystem path or `~/...`.
-- In shell-only CLI sessions, prefer `--params-schema-file` for nontrivial
-  schemas so shell quoting does not corrupt the JSON Schema. In PI/jagent
-  agent tool mode, pass inline `--params-schema` instead. The schema must
-  match both UI inputs and server-side validation.
+- Pass `--params-schema` as valid inline JSON. The schema must match both UI
+  inputs and server-side validation.
 - Keep the `params_schema` file/flag next to the UDF result contract in your
   working notes. Backend registration persists only `params_schema`; the browser
   result renderer must still be kept in lockstep with the entry script return
@@ -337,9 +332,9 @@ CLI gotchas the help text may not make obvious:
 - Registration is no-charge by default; pass `--no-allow-charges` unless the
   user explicitly wants viewer-credit charging and the consent flow is wired.
   Do not silently opt viewers into charges.
-- `alva functions invoke` is a creator/session smoke test. Released playbook
+- `alva playbooks functions invoke` is a creator/session smoke test. Released playbook
   HTML still invokes through `window.alva.udf`, not through the CLI.
-- Use `alva functions list` and `alva functions delete` for maintenance; do
+- Use `alva playbooks functions list` and `alva playbooks functions delete` for maintenance; do
   not recreate those operations with raw service requests.
 
 The service REST routes for register/list/delete/invoke are toolkit and gateway
@@ -352,8 +347,8 @@ Consumer allowance is normally managed by the Alva app through the consent
 modal. For agent-side session-user tools and smoke tests, use the functions
 CLI instead of GraphQL or raw gateway requests:
 
-The CLI surface is `alva functions allowance get|list|create|revoke`; for
-example, use `alva functions allowance create --playbook-id <playbook-id>
+The CLI surface is `alva playbooks functions allowance get|list|create|revoke`; for
+example, use `alva playbooks functions allowance create --playbook-id <playbook-id>
 --amount 25` to set a cap.
 
 PBSV is explicitly rejected from allowance-management APIs. Only signed-in

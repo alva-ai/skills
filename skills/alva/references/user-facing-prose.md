@@ -155,7 +155,7 @@ Any sentence that ends up in front of an end user must follow these rules:
 - Hand-written HTML copy: hero text, intro cards, methodology modal body,
   chart footnotes, rationale paragraphs, expandable card prose.
 - Playbook metadata: `description` and `display_name` passed to
-  `alva release playbook-draft` / `alva release playbook`.
+  `alva playbooks draft` / `alva playbooks release`.
 - alpi-generated narrative: TLDRs, daily digests, why-it-matters summaries,
   delta bodies, catalyst/risk notes, push-line headlines.
 

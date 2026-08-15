@@ -53,16 +53,16 @@ recipient address.
 
 Choose Alva delivery destinations as follows:
 
-Creating a new automation with `alva automation publish` immediately creates
-the owner's ACTIVE binding. It uses the owned origin-session channel when one
-can be resolved and otherwise uses the default personal destination. Pass
+Creating a new Automation with `alva automation create` immediately creates the
+owner's ACTIVE binding. It uses the owned origin-session channel when one can
+be resolved and otherwise uses the default personal destination. Pass
 `--skip-auto-trigger` when this binding must be inspected or moved before the
 first producer run; the flag skips the run, not the binding.
 
 - **Default personal destination:** omit `--channel-id`. The service stores
   `channel_id=0`; web delivery is available immediately, and external DM
   delivery uses `active_im_provider` plus its matching username from
-  `alva whoami`.
+  `alva account whoami`.
 - **Alva topic channel:** resolve the feed id and run
   `alva alert enable --automation-ids <id,id> --channel-id <channel_id>`. This
   binds the alert to that in-product web channel. Its channel id is not a
@@ -102,16 +102,17 @@ A push is set up only after all of these succeed:
    Use a descriptive, non-reserved source such as `market/brief` or
    `monitor/anomaly`.
 2. Run the feed through [feed-lifecycle.md](feed-lifecycle.md), including
-   `before-automation-publish`. Publish creates the owner binding and starts the
-   producer once by default. When the destination must be selected explicitly,
-   publish with `--skip-auto-trigger`.
+   `before-automation-create`. Automation creation creates the owner binding
+   and starts the producer once by default. When the destination must be
+   selected explicitly, create with `--skip-auto-trigger`.
 3. Exercise a material branch with `alva run`, read `@last/1` of the declared
    output, and confirm it contains a non-empty `body`. Exercise a quiet branch
    and confirm it does not append a new record.
 4. Enable publisher push on the cronjob:
-   `alva deploy update --id <ID> --push-notify`.
-5. Inspect the owner FEED alert created by publish with `alva automation
-   delivery get --id <automation_id>` and confirm every requested destination.
+   `alva automation update --id <ID> --push-notify`.
+5. Inspect the owner FEED alert created by Automation creation with
+   `alva automation delivery get --id <automation_id>` and confirm every
+   requested destination.
    If email was requested, update only email with `alva automation delivery
    update`; this preserves the Alva/IM destination. If an Alva destination is
    missing or wrong, fix it when alert delivery was requested; when optional,
@@ -124,10 +125,10 @@ A push is set up only after all of these succeed:
    name-addressed default-personal command.
 
 Do not trigger the cronjob or wait for its next scheduled run solely to verify
-setup. A default publish already admitted the first producer run; triggering it
-again duplicates the pipeline. `alva deploy trigger` is not a dry run: after
-publish creates the owner binding, Run Now can notify that destination. Use
-`alva run` for non-delivering script checks before publish. When publish used
+setup. A default creation already admitted the first producer run; triggering it
+again duplicates the pipeline. `alva automation trigger` is not a dry run: after
+creation creates the owner binding, Run Now can notify that destination. Use
+`alva run` for non-delivering script checks before creation. When create used
 `--skip-auto-trigger`, route the binding first and trigger at most once only if
 a real delivery run is required. A successful partial update proves that alert
 delivery is configured for that destination without changing the other medium;
@@ -138,7 +139,7 @@ Claim real delivery only when an existing
 `alva alert history` row for the intended destination records the run as
 `sent`.
 
-If the automation is unpublished, the feed has no declared alert output, or
+If the Automation has not been created, the feed has no declared alert output, or
 the material test record has an empty body, do not claim push is set up.
 Diagnose and fix first.
 
@@ -167,7 +168,7 @@ notification domain.
 `<|SKIP_NOTIFICATION|>` remains a legacy `notify/message` sentinel only. New
 V2 feeds express a quiet run by not appending to an alert output. Changing,
 adding, or removing an `alertOutput()` declaration in an already active Feed
-does not require republishing; the next successful scheduled or Run Now
+does not require re-registration; the next successful scheduled or Run Now
 execution carries the current declarations and writes.
 
 ## Inventory And Unsubscribe
@@ -177,7 +178,7 @@ execution carries the current declarations and writes.
   `total_count`, keep paginating; never report a truncated page as the full
   inventory. Alert enablement is an active `FEED_ALERT`. Social playbook follows
   are separate and must not be used as delivery state.
-- `alva alert follows --limit 100` — the playbook follow list. Keep paginating
+- `alva playbooks follows list --limit 100` — the playbook follow list. Keep paginating
   with `--cursor` when `has_next` is true.
 - Disable by name (`alva alert disable --automation owner/name`) for live
   targets; use `alva alert disable --automation-ids a,b` for bulk and for

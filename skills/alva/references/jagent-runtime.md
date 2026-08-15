@@ -134,7 +134,7 @@ Behavior:
 - `loadPlaintext(name)` returns `null` when the secret is missing
 - calling it without an authenticated execution context throws an error
 - the module is read-only from JS; writes happen through the web UI or
-  `alva secrets`
+  `alva account secrets`
 - do not log the returned value or write it into ALFS / released assets
 
 ### net/http -- HTTP Requests
@@ -299,8 +299,9 @@ const result = getRSI({ prices: closePrices, period: 14 });
 
 Most runtime library functions are **synchronous**.
 
-To discover function signatures and response shapes, use the SDK doc API
-(`alva sdk doc --name "..."`).
+Use the focused runtime references bundled with this Skill for supported
+function signatures and response shapes. Runtime-library discovery is not a
+Slim CLI surface.
 
 **Data APIs** (crypto, stock, macro, ETF) are now served by Arrays via HTTP
 endpoints — see the Data Skills section in SKILL.md. They are **not**

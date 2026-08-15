@@ -10,7 +10,7 @@ description: >-
   backtesting. Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v1.21.4
+  version: v1.22.0
 ---
 
 # Alva
@@ -38,7 +38,7 @@ The main objects are:
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
 | Data Skills        | 250+ structured Arrays endpoints for equities, options, crypto, macro, on-chain, semiconductor spot prices, news, prediction markets, and indexed Twitter/X. | You need factual financial data.                                                                               |
 | Runtime script     | JavaScript executed inside Alva's V8/jagent runtime through `alva run` or cronjobs.                                                                          | You need computation, HTTP, ALFS, secrets, alpi, ONNX, or Feed SDK.                                            |
-| Feed               | The persistent data pipeline and identity (`feed_id`) that writes outputs to ALFS. `alva automation` is its product-facing lifecycle CLI; `alva deploy` cronjobs produce its data. | Data needs freshness, history, public reads, charts, release, or push.                                         |
+| Feed               | The persistent data pipeline and identity (`feed_id`) that writes outputs to ALFS. The Slim `alva automation` tree owns both its producer and product lifecycle.                    | Data needs freshness, history, public reads, charts, release, or push.                                         |
 | Playbook           | A hosted investing app at `https://alva.ai/u/<username>/playbooks/<name>`.                                                                                   | The user wants a shareable dashboard, screener, thesis, what-if, or strategy surface.                          |
 | Skillhub blueprint | A catalog methodology addressed by `/use-skill:<username>/<name>` or discovered from a user skill/method reference.                                          | The user references a skill/method, or a task matches an official template family.                             |
 | Altra              | The Feed SDK trading engine for event-driven backtesting and signal feeds.                                                                                   | Any strategy, simulation, signal target, portfolio, order, equity curve, or rebalancing logic.                 |
@@ -47,25 +47,25 @@ The main objects are:
 
 Alva work usually flows from user intent to data discovery, then runtime/feed
 implementation, then a user-facing artifact. A direct answer may stop after a
-fresh data fetch. A playbook usually continues through automation publish, HTML,
+fresh data fetch. A playbook usually continues through automation creation, HTML,
 README, lint, screenshot, release, and optional alert setup.
 
 The stack is layered:
 
-1. **Discovery layer**: Data Skills, runtime SDK docs, Skillhub blueprints, and
+1. **Discovery layer**: Data Skills, bundled runtime references, Skillhub blueprints, and
    public playbook discovery tell the agent what exists now.
 2. **Computation layer**: jagent runtime scripts, `net/http`, secrets, alpi,
    ONNX, and Altra transform source data into repeatable outputs.
 3. **Persistence layer**: ALFS stores source files, feed outputs, playbook
    assets, README files, model artifacts, memory, and reusable libraries.
-4. **Publication layer**: automation publish, playbook draft/release, lint,
+4. **Publication layer**: automation creation, playbook draft/release, lint,
    screenshots, visibility, creator notes, and canonical share URLs turn a
    pipeline into something a user can inspect.
 5. **Action layer**: alerts, signal feeds, trading execution, and alert bindings
    connect the artifact to ongoing decisions.
 
 Those layers matter because most Alva bugs are layer violations: using search as
-data, using runtime code as a one-off local script, skipping automation publish
+data, using runtime code as a one-off local script, skipping automation creation
 before a playbook reads data, treating a blueprint as an optional suggestion, or
 presenting a deployed HTML URL as the share URL.
 
@@ -117,8 +117,8 @@ These are the high-signal rules to remember.
    session, run `alva <command> --help`. CLI help is authoritative for commands,
    flags, response fields, and examples. Read
    [preflight.md](references/preflight.md) at session start.
-2. **Fresh identity and memory.** Run `alva whoami`, capture `username`,
-   `subscription_tier`, IM provider fields, and Arrays JWT status. Load
+2. **Fresh identity and memory.** Run `alva account whoami`, capture `username`,
+   `subscription_tier`, and IM provider fields. Load
    `~/memory/MEMORY.md` if not already read. Memory is a *claim*, not truth.
 3. **Pipeline, not oracle.** Financial values must come from Data Skills,
    published Alva feeds, or validated BYOD sources. WebSearch, LLM output, agent
@@ -128,7 +128,7 @@ These are the high-signal rules to remember.
    blueprints, CLI help, and runtime docs in the current session. Do not act
    from remembered field names.
 5. **User scope is sacred.** Write, deploy, draft, release, and visibility
-   operations target only the requesting user's namespace from `alva whoami`
+   operations target only the requesting user's namespace from `alva account whoami`
    unless the user explicitly asks for cross-user work such as remix lineage.
 6. **Altra for trading.** Any backtest, portfolio simulation, target signal,
    equity curve, order logic, position tracking, or rebalancing uses Altra.
@@ -160,8 +160,7 @@ Before doing Alva work, open [preflight.md](references/preflight.md). It owns:
 - `scripts/version_check.sh`
 - `alva --help` and help-first command use
 - CLI install / upgrade
-- `alva whoami`, subscription tier, username, delivery fields
-- `ARRAYS_JWT` status and `alva arrays token ensure`
+- `alva account whoami`, subscription tier, username, delivery fields
 - `~/memory/MEMORY.md` loading
 - user-scope enforcement
 
@@ -191,7 +190,7 @@ not an obvious single-fetch answer. It owns route selection, Skillhub, Guided
 Planning, capability verification, and completion gates.
 
 Open [operational-pitfalls.md](references/operational-pitfalls.md) step by step
-whenever the route enters runtime, feed, ALFS, playbook HTML, deploy, release,
+whenever the route enters runtime, feed, ALFS, playbook HTML, Automation, release,
 chart, or cron work. Read only the relevant section before each step, but treat
 that section as mandatory, not optional debugging material.
 
@@ -351,7 +350,7 @@ code. Common modules:
 | user id, username, args       | `require("env")`                                                                                              |
 | third-party secrets           | `require("secret-manager")`; [secret-manager.md](references/secret-manager.md)                                |
 | HTTP                          | `require("net/http")`                                                                                         |
-| statistics / indicators       | `@alva/algorithm` or runtime `alva sdk` modules                                                               |
+| statistics / indicators       | `@alva/algorithm`; use this Skill's runtime references for bundled module APIs                                |
 | persistent feed output        | `@alva/feed`; [feed-sdk.md](references/feed-sdk.md)                                                           |
 | Platform Data digest module   | `@alva/fintwit-digest`; see Platform Data above and [fintwit-digest-sdk.md](references/fintwit-digest-sdk.md) |
 | trading engine                | `FeedAltra`; [altra-trading.md](references/altra-trading.md)                                                  |
@@ -453,24 +452,25 @@ reusable dataset, or future answer.
 Read [alva-knowledge.md](references/alva-knowledge.md) before designing an
 automation. Read [feed-lifecycle.md](references/feed-lifecycle.md) and
 [feed-sdk.md](references/feed-sdk.md) when creating or changing a feed. The
-short creation lifecycle is: write schema and logic to ALFS, `alva run`,
-deploy, publish once with `alva automation publish`, then use its returned
-`feed_id` with `alva feed set-visibility` when public access is required.
-Publish creates an ACTIVE owner alert binding and starts the producer once by
-default; `--skip-auto-trigger` skips only that run, not the binding.
+short creation lifecycle is: write schema and logic to ALFS, `alva run`, then
+call `alva automation create` once with producer, schedule, version, and release
+metadata. Use its returned automation id with `alva automation set-visibility`
+when public access is required. Creation adds an ACTIVE owner alert binding and
+starts the producer once by default; `--skip-auto-trigger` skips only that run,
+not the binding.
 For an existing automation, keep that identity: ALFS source edits are already
 live, while registered version, producer, or metadata changes use
 `alva automation update --id <feed_id>`. Never delete and recreate merely to
 apply an update.
 
-Before automation publish, satisfy `before-automation-publish`: fresh run,
-expected shape, fresh evidence, and a known producer cronjob id. After publish,
+Before automation creation, satisfy `before-automation-create`: fresh run,
+expected shape, fresh evidence, and complete creation inputs. After creation,
 set public visibility through the feed lifecycle command and verify public,
 non-empty data before dependent HTML work. Feed scripts fail fast on missing
-data; the detailed publish and visibility contract lives in the feed
+data; the detailed creation and visibility contract lives in the feed
 references. Read the matching
 [operational-pitfalls.md](references/operational-pitfalls.md) section before
-each feed, ALFS, deploy, and publish step.
+each feed, ALFS, and Automation step.
 
 #### Publication Layer: Playbook Creation Tree
 
@@ -551,7 +551,7 @@ and the canonical stylesheet. Then read:
 Runtime artifacts:
 
 - [design-contract.yaml](references/design-contract.yaml) is consumed by
-  `alva lint playbook` and `alva release playbook`.
+  `alva playbooks lint` and `alva playbooks release`.
 - [css/design-system.css](references/css/design-system.css) is the bundled
   stylesheet; use it, but read `.md` docs for rules.
 - [design-tokens.css](references/design-tokens.css) backs the bundle.
@@ -567,7 +567,7 @@ the user asks for a registerable function or a button that calls their analysis
 function.
 
 Open [api/udf-runtime.md](references/api/udf-runtime.md). It owns PBSV browser
-authentication, `alva functions` creator registration and allowance tools,
+authentication, `alva playbooks functions` creator registration and allowance tools,
 `window.alva.udf`, allowance consent, `UdfButton`, caller identity,
 `allow_charges=false` defaults, author-owned result contracts, and release checks.
 
@@ -581,13 +581,13 @@ and Run Now executions deliver those outputs; it does not subscribe users or
 bypass preferences by itself.
 
 Open [push-notifications.md](references/push-notifications.md) for alert-output
-authoring, portable actions and card presentation, automation publish,
-per-Automation Alva plus email delivery, and verification. A quiet V2 run does
-not append an alert record.
+authoring, portable actions and card presentation, automation creation, alert
+setup, per-Automation Alva plus verified-email delivery, and verification. A
+quiet V2 run does not append an alert record.
 
 After releasing or keeping a playbook as draft, scan whether any backing feed is
 push-worthy. A push setup requires a declared alert output or a recognized
-legacy `signal/targets` or `notify/message` producer, plus an active published
+legacy `signal/targets` or `notify/message` producer, plus an active registered
 automation binding, publisher `--push-notify`, and the intended alert binding.
 That proves configuration, not that a message has already been delivered.
 
@@ -598,7 +598,7 @@ the tag URL, read the source feed scripts, HTML, README, and playbook metadata,
 then build a new playbook under the requesting user's namespace. If the source
 has registered UDFs, preserve them unless the user explicitly asks otherwise.
 
-Open [remix-workflow.md](references/remix-workflow.md). `alva remix` records
+Open [remix-workflow.md](references/remix-workflow.md). `alva playbooks remix` records
 parent-child lineage only; use `alva fs read` to read playbook files. If the
 user asks to browse examples, use `alva playbooks trending` after help.
 
@@ -645,7 +645,7 @@ financial values. The quick checks:
   or validated BYOD provenance.
 - HTML values are fetched from feed outputs at runtime. Never hardcode data as
   inline JavaScript literals for financial values.
-- If `alva release playbook --feeds '[]'` is used, the HTML must render zero
+- If `alva playbooks release --feeds '[]'` is used, the HTML must render zero
   quantitative values.
 - WebSearch can discover docs or BYOD endpoints; it cannot become the data.
 - LLM/alpi output can synthesize real upstream data; it cannot invent facts,
@@ -743,32 +743,20 @@ scheduled digest.
 Always run command help before use. These rows point to extra rules the help
 text does not fully cover.
 
-| Command / surface    | Purpose and extra reference                                                                                                                                                           |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `whoami` / `user`    | Identity, subscription tier, active IM provider, username. See [preflight.md](references/preflight.md).                                                                               |
-| `auth` / `configure` | Sign in, API key, profile configuration.                                                                                                                                              |
-| `arrays`             | Provision / refresh `ARRAYS_JWT`. See [preflight.md](references/preflight.md).                                                                                                        |
-| `data-skills`        | Structured Arrays endpoint discovery. See [data-skills.md](references/data-skills.md).                                                                                                |
-| `sdk`                | Runtime library discovery. See [data-skills.md](references/data-skills.md#runtime-libraries-are-separate).                                                                            |
-| `fs`                 | ALFS reads/writes/grants/time-series suffixes and shared modules under `~/library`. Must read [api/filesystem.md](references/api/filesystem.md) for synth suffixes and grant gotchas. |
-| `run`                | Execute jagent JS. See [jagent-runtime.md](references/jagent-runtime.md).                                                                                                             |
-| `deploy`             | Cronjob lifecycle for producer scripts: schedule, args, trigger, run-status, runs, logs. See [deployment.md](references/deployment.md).                                               |
-| `automation`         | Product-facing lifecycle and per-Automation delivery CLI (`delivery get/update` supports independent Alva and email destinations). Must read [feed-lifecycle.md](references/feed-lifecycle.md) and [push-notifications.md](references/push-notifications.md). |
-| `release`            | Playbook draft/release; the release reference also covers automation publish metadata extras. Must read [api/release.md](references/api/release.md).                                   |
-| `lint playbook`      | Design-system linter, same gate as release. See [design-contract.yaml](references/design-contract.yaml).                                                                              |
-| `skillhub`           | Curated methodology blueprints. See [request-routing.md](references/request-routing.md#skillhub-blueprint).                                                                           |
-| `playbooks`          | Trending discovery and `set-visibility`.                                                                                                                                              |
-| `comments`           | Playbook comments and pinned creator notes. See [creators-note.md](references/creators-note.md).                                                                                      |
-| `alert`              | Personal FEED alert opt-ins and automation history. See [push-notifications.md](references/push-notifications.md).                                                                    |
-| `subscriptions`      | Playbook follow commands plus FEED alert commands. Following never changes alerts. See [push-notifications.md](references/push-notifications.md).                                    |
-| `trading`            | Accounts, portfolio, orders, subscriptions, execution. Must read [api/trading.md](references/api/trading.md).                                                                         |
-| `broker`             | Agentic order execution — place/cancel/read across venues (crypto + US equities). Run `alva broker describe` for live commands/capabilities; must read [api/broker.md](references/api/broker.md).                     |
-| `screenshot`         | PNG capture for released playbook verification. See [playbook-creation.md](references/playbook-creation.md#screenshot).                                                               |
-| `remix`              | Lineage registration only. See [remix-workflow.md](references/remix-workflow.md).                                                                                                     |
-| `functions`          | Playbook UDF registration, invoke smoke tests, and allowance management. Must read [api/udf-runtime.md](references/api/udf-runtime.md).                                               |
-| `credits`            | Current viewer credit wallet and self-scoped consumption rows. Must read [api/credits.md](references/api/credits.md).                                                                 |
-| `secrets`            | Secret CRUD for agent-managed setup. See [secret-manager.md](references/secret-manager.md).                                                                                           |
-| `feedback`           | Submit user-confirmed Alva platform feedback. Must read [api/feedback.md](references/api/feedback.md).                                                                                |
+| Command / surface | Purpose and extra reference |
+| ----------------- | --------------------------- |
+| `account` | Identity, credits, secrets, notification preferences, and service accounts. See [preflight.md](references/preflight.md), [api/credits.md](references/api/credits.md), and [secret-manager.md](references/secret-manager.md). |
+| `data-skills` | Structured Arrays endpoint discovery. See [data-skills.md](references/data-skills.md). |
+| `skillhub` | Curated methodology blueprints. Preserve this product term. See [request-routing.md](references/request-routing.md#skillhub-blueprint). |
+| `markets` | Market narrative and earnings context used by ticker reads. |
+| `fs` | ALFS reads/writes/grants/time-series suffixes and shared modules under `~/library`. See [api/filesystem.md](references/api/filesystem.md). |
+| `run` | Execute Jagent JavaScript. See [jagent-runtime.md](references/jagent-runtime.md). |
+| `automation` | Unified producer, product lifecycle, visibility, trigger, and run history. It also owns independent Alva/verified-email delivery destinations. See [deployment.md](references/deployment.md), [feed-lifecycle.md](references/feed-lifecycle.md), and [push-notifications.md](references/push-notifications.md). |
+| `playbooks` | Discovery, drafts, release/lint gates, screenshots, remix, comments, follows, and UDFs. See [playbook-creation.md](references/playbook-creation.md). |
+| `alert` | Personal automation alert opt-ins and history. Following a Playbook never changes alerts. See [push-notifications.md](references/push-notifications.md). |
+| `portfolio` | Connected-account assets, activity, detailed orders, and equity history. |
+| `trading` | Shared accounts/risk rules, isolated legacy Signals, and venue-native Broker execution. See [api/trading.md](references/api/trading.md) and [api/broker.md](references/api/broker.md). |
+| `feedback` | Submit user-confirmed Alva platform feedback. See [api/feedback.md](references/api/feedback.md). |
 
 Non-CLI references:
 
@@ -783,12 +771,12 @@ Use this index to open only the file needed for the current task.
 
 | File                                                                                  | Owns                                                                                                                                          |
 | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| [preflight.md](references/preflight.md)                                               | Session start, Rule 0, CLI, auth, profile, Arrays JWT, memory load, user scope.                                                               |
+| [preflight.md](references/preflight.md)                                               | Session start, Rule 0, Slim CLI help, identity, memory load, and user scope.                                                                  |
 | [alva-knowledge.md](references/alva-knowledge.md)                                     | Required automation reasoning: bounded history, cross-run comparison, semantic notification novelty, quiet runs.                            |
 | [request-routing.md](references/request-routing.md)                                   | Route choice, post-Ask next steps, preferred Automation setup skills, Skillhub, Guided Planning, capability verification, completion gate.    |
 | [content-legitimacy.md](references/content-legitimacy.md)                             | Data provenance, prohibited sources, chat-as-artifact, feed isolation, conventions.                                                           |
 | [data-skills.md](references/data-skills.md)                                           | Data Skills discovery, endpoint calls, Arrays auth, search/data routing.                                                                      |
-| [feed-lifecycle.md](references/feed-lifecycle.md)                                     | Feed build and automation publish lifecycle, modeling summary, alert outputs, `before-automation-publish`.                                    |
+| [feed-lifecycle.md](references/feed-lifecycle.md)                                     | Feed build and Automation creation lifecycle, modeling summary, alert outputs, `before-automation-create`.                                   |
 | [playbook-creation.md](references/playbook-creation.md)                               | HTML build, browser-safe reads, README, draft, release, screenshot, tier flow.                                                                |
 | [push-notifications.md](references/push-notifications.md)                             | Push-worthy feeds, declared alert outputs, alert bindings, delivery verification.                                                             |
 | [operational-pitfalls.md](references/operational-pitfalls.md)                         | Runtime, ALFS, chart, watermark, and resource pitfalls.                                                                                       |
@@ -797,7 +785,7 @@ Use this index to open only the file needed for the current task.
 | [altra-trading.md](references/altra-trading.md)                                       | Altra strategy engine, features, signals, tests, PIT compliance.                                                                              |
 | [alpi.md](references/alpi.md)                                                         | Scheduled LLM reasoning/tool-loop API and examples.                                                                                           |
 | [onnx.md](references/onnx.md)                                                         | ONNX artifact, inference, FeedAltra integration, release checks.                                                                              |
-| [deployment.md](references/deployment.md)                                             | Cronjob create/list/pause/resume/trigger/run-status/runs/run-logs.                                                                            |
+| [deployment.md](references/deployment.md)                                             | Unified Automation create/update/pause/resume/trigger/delete and run inspection.                                                              |
 | [search.md](references/search.md)                                                     | `unified_search`, finance search, Twitter/X, Reddit, YouTube, web gotchas.                                                                    |
 | [ticker-read.md](references/ticker-read.md)                                           | Platform Data / Ticker Read: routing across official investor-focus, anomaly, attribution, aggregation, and breaking-news methods.            |
 | [fintwit.md](references/fintwit.md)                                                   | Platform Data / Fintwit Intelligence: curated fintwit/KOL account data — views, signals, profiles; query recipes by account, ticker, ranking. |
@@ -895,8 +883,8 @@ Before finishing an Alva task, ask:
 - Did automation work read [alva-knowledge.md](references/alva-knowledge.md),
   apply bounded history when it improves judgment, and suppress push without a
   material delta?
-- Did automation publish pass `before-automation-publish`?
-- If public, did `alva feed set-visibility` and an unauthenticated read succeed?
+- Did automation creation pass `before-automation-create`?
+- If public, did `alva automation set-visibility` and an unauthenticated read succeed?
 - Did playbook work read [playbook-creation.md](references/playbook-creation.md)
   and pass the relevant hard gates?
 - Did design work read [design.md](references/design.md) and lint where needed?

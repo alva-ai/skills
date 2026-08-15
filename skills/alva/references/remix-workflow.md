@@ -78,7 +78,7 @@ carries both `feed_name` (for ALFS paths) and `feed_id` (for API calls).
 
 If the source playbook has registered UDFs, collect each function's
 `function_name`, `entry_script_path`, and `params_schema` before editing. Read
-[udf-runtime.md](api/udf-runtime.md) for the `alva functions` registration flow.
+[udf-runtime.md](api/udf-runtime.md) for the `alva playbooks functions` registration flow.
 A remix must preserve source UDF methods unless the user explicitly asks to
 remove or replace them: copy every source UDF entry script into the new
 playbook's ALFS tree, rewrite its path to the new playbook namespace, and later
@@ -199,38 +199,36 @@ request). Do not write fresh files from scratch.
    agent tool mode; shell-only fallback:
    `alva fs write --path '~/feeds/{new-name}/v1/src/index.js' --file ./{feed_name}.js --mkdir-parents`
 2. **Test** via `alva run --entry-path '~/feeds/{new-name}/v1/src/index.js'`
-3. **Deploy cronjob**:
-   `alva deploy create --name {new-name} --path '~/feeds/{new-name}/v1/src/index.js' --cron "..."`
-4. **Publish automation** and record the returned `feed_id`:
-   `alva automation publish --name {new-name} --version 1.0.0 --cronjob-id ID --description "..."`
-5. **Publish feed visibility** when the remixed playbook needs public reads:
-   `alva feed set-visibility --id <feed_id> --visibility public`
-6. **Verify public data** with an unauthenticated absolute-path read before the
+3. **Create the Automation** and record its returned id:
+   `alva automation create --name {new-name} --path '~/feeds/{new-name}/v1/src/index.js' --cron "..." --version 1.0.0 --description "..."`
+4. **Set feed visibility** when the remixed playbook needs public reads:
+   `alva automation set-visibility --id <feed_id> --visibility public`
+5. **Verify public data** with an unauthenticated absolute-path read before the
    HTML depends on it.
-7. **Write the edited HTML** to ALFS after updating data paths to point to your
+6. **Write the edited HTML** to ALFS after updating data paths to point to your
    own feed. Use the ALFS write/edit tool in agent tool mode; shell-only
    fallback:
    `alva fs write --path '~/playbooks/{new-name}/index.html' --file ./index.html --mkdir-parents`
-8. **Copy inherited UDF entry scripts when present**: for each source UDF, write
+7. **Copy inherited UDF entry scripts when present**: for each source UDF, write
    the edited entry script to a path under the new playbook. Use the ALFS
    write/edit tool in agent tool mode; shell-only fallback:
    `alva fs write --path '~/playbooks/{new-name}/udf/{function_name}.js' --file ./udf-{function_name}.js --mkdir-parents`.
-9. **Write README** (mandatory) — adapt the source playbook's README to your
+8. **Write README** (mandatory) — adapt the source playbook's README to your
    data sources and methodology, then write it to ALFS. Use the ALFS write/edit
    tool in agent tool mode; shell-only fallback:
    `alva fs write --path '~/playbooks/{new-name}/README.md' --file ./README.md --mkdir-parents`.
    See [release.md → Playbook README](api/release.md#playbook-readme).
 9. **Draft playbook**:
-   `alva release playbook-draft --name {new-name} --display-name "..." --feeds '[{"feed_id":ID}]'`
+   `alva playbooks draft --name {new-name} --display-name "..." --feeds '[{"feed_id":ID}]'`
 10. **Register inherited UDFs when present**: after the draft command returns
-    the remixed playbook ID, use `alva functions register` for each copied
+    the remixed playbook ID, use `alva playbooks functions register` for each copied
     method with the same `function_name` and `params_schema`, with
     `entry_script_path` pointing at the new absolute ALFS path. Do not leave
     inherited `window.alva.udf` UI controls pointing at an unregistered
     function.
 11. **Release playbook**:
-    `alva release playbook --name {new-name} --version v1.0.0 --feeds '[{"feed_id":ID}]' --changelog "..." --readme-url '/alva/home/<username>/playbooks/{new-name}/README.md'`
-    (absolute ALFS path; resolve `<username>` via `alva whoami` — the relative
+    `alva playbooks release --name {new-name} --version v1.0.0 --feeds '[{"feed_id":ID}]' --changelog "..." --readme-url '/alva/home/<username>/playbooks/{new-name}/README.md'`
+    (absolute ALFS path; resolve `<username>` via `alva account whoami` — the relative
     shorthand is no longer accepted)
 
 **Important**: The new playbook must use a unique name in your user space. The
@@ -244,7 +242,7 @@ data storage — copy the logic, not the paths.
 After the new playbook is created, record the parent-child relationship:
 
 ```bash
-alva remix --child-username {your_username} --child-name {new-name} --parents '[{"username":"{owner}","name":"{source-playbook-name}"}]'
+alva playbooks remix --child-username {your_username} --child-name {new-name} --parents '[{"username":"{owner}","name":"{source-playbook-name}"}]'
 ```
 
 ---
@@ -290,7 +288,7 @@ Save lineage (assuming current user is `bob`, new playbook name is
 
 ```bash
 # 6. Save remix lineage
-alva remix --child-username bob --child-name my-btc-strategy --parents '[{"username":"alice","name":"btc-momentum"}]'
+alva playbooks remix --child-username bob --child-name my-btc-strategy --parents '[{"username":"alice","name":"btc-momentum"}]'
 ```
 
 ---

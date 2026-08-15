@@ -226,14 +226,14 @@ Alert-output rules:
   reporting are best-effort; a delivery bridge failure does not undo stored
   Feed data.
 - `--push-notify` enables publisher-side delivery but does not itself subscribe
-  anyone. Publishing a new automation creates an ACTIVE owner FEED alert
+  anyone. Creating a new Automation creates an ACTIVE owner FEED alert
   binding before the default first run. Other viewers and destination changes
   still require an explicit alert binding mutation.
-- Scheduled runs and `alva deploy trigger` both deliver eligible records.
-  `deploy trigger` is not a dry run; use `alva run` for non-delivering script
+- Scheduled runs and `alva automation trigger` both deliver eligible records.
+  `automation trigger` is not a dry run; use `alva run` for non-delivering script
   checks.
 - Changing the declaration or source in an already active Feed does not require
-  republishing. The next run uses the current script and declarations.
+  re-registration. The next run uses the current script and declarations.
 
 #### Portable Actions And Card Presentation
 
@@ -355,12 +355,12 @@ NO_MATERIAL_UPDATE.`);
 })();
 ```
 
-Deploy still requires a cronjob with `--push-notify` and an active
-`alva automation publish` binding. Initial publish creates the owner's FEED
-alert binding automatically; use `alva alert enable` to move it to a different
-destination or to bind another viewer. Publishing also starts the producer once
-unless `--skip-auto-trigger` is present. Adding or changing an alert output
-later does not require another publish.
+Create the Automation with `--push-notify`. Creation provisions the scheduled
+producer, registers the feed, and creates the owner's FEED alert binding in one
+operation; use `alva alert enable` to move it to a different destination or to
+bind another viewer. Creation also starts the producer once unless
+`--skip-auto-trigger` is present. Adding or changing an alert output later does
+not require another registration step.
 
 ### Legacy Compatibility
 
@@ -803,12 +803,12 @@ records if some timestamps have multiple items.
 
 ## Making Feeds Public
 
-First deploy and publish the automation. The publish response returns the
-`feed_id`; use that id to make the feed public so the feed record and ALFS
-permission projection change together:
+First create the Automation. The create response returns its id; use that id to
+make the feed public so the feed record and ALFS permission projection change
+together:
 
 ```bash
-alva feed set-visibility --id <feed_id> --visibility public
+alva automation set-visibility --id <feed_id> --visibility public
 ```
 
 Do not grant `special:user:*` directly on a feed path with `alva fs grant`.
@@ -873,17 +873,20 @@ feed.def("metrics", {
 alva run --entry-path '~/feeds/btc-ema/v1/src/index.js'
 ```
 
-### Step 3: Deploy and publish the automation
+### Step 3: Create the automation
 
 ```bash
-alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js' --cron "0 */4 * * *"
-alva automation publish --name btc-ema --version 1.0.0 --cronjob-id <cronjob_id>
+alva automation create \
+  --name btc-ema \
+  --path '~/feeds/btc-ema/v1/src/index.js' \
+  --cron "0 */4 * * *" \
+  --version 1.0.0
 ```
 
-Record the `feed_id` returned by publish. If the feed must be public:
+Record the Automation id returned by create. If the feed must be public:
 
 ```bash
-alva feed set-visibility --id <feed_id> --visibility public
+alva automation set-visibility --id <feed_id> --visibility public
 ```
 
 ### Step 4: Read from any client

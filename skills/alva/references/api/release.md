@@ -1,11 +1,11 @@
-# Release And Automation Publish
+# Playbook Release And Automation Creation
 
-Run `alva release --help` for playbook workflows and `alva automation --help` for
-automation publish/update flags before acting. CLI help is authoritative for
+Run `alva playbooks --help` for Playbook workflows and `alva automation --help`
+for Automation create/update flags before acting. CLI help is authoritative for
 subcommands, flags, display-name conventions, and examples. This file adds
 lifecycle guidance for:
 
-1. Automation publish side effects and `--description` wording rules
+1. Automation creation side effects and `--description` wording rules
 2. Playbook README content shape (the big one — referenced by SKILL.md and the
    `--readme-url` flag)
 3. `--trading-symbols` and `--tags` semantics, person-name discovery tags, and
@@ -13,24 +13,25 @@ lifecycle guidance for:
 4. `--skill-id` — when it is required
 5. `--agent-type` — marking a feed as a prompt-editable agent
 
-`alva automation publish` registers a new automation and is create-only. For an
+`alva automation create` provisions and registers a new Automation and is
+create-only. For an
 existing automation, use `alva automation update --id <feed_id>` for registered
 metadata, version, or producer changes; ALFS source edits themselves need no
-republish. See [feed-lifecycle.md](../feed-lifecycle.md).
+re-registration. See [feed-lifecycle.md](../feed-lifecycle.md).
 
-## Automation Publish Side Effects
+## Automation Creation Side Effects
 
-Publishing a new automation creates an ACTIVE owner alert binding and then
+Creating a new Automation creates an ACTIVE owner alert binding and then
 starts the producer once by default. The first run can deliver a real alert when
 the producer has `--push-notify` and emits a material alert output.
 
 Pass `--skip-auto-trigger` when the agent needs to route the binding or trigger
-the producer explicitly after publish. The flag suppresses only the automatic
-run; it does not suppress the owner binding. Do not follow a default publish
-with `alva deploy trigger` for the same verification, because that creates a
+the producer explicitly after creation. The flag suppresses only the automatic
+run; it does not suppress the owner binding. Do not follow default creation
+with `alva automation trigger` for the same verification, because that creates a
 duplicate full pipeline run.
 
-## Automation Publish `--description` conventions
+## Automation Create `--description` conventions
 
 - Write a complete statement covering the feed's **data source**, **what it
   computes**, and the **output it produces**.
@@ -73,7 +74,7 @@ request carried a `/use-skill:<username>/<name>` directive, or the agent ran
 
 ## Agent type
 
-`alva automation publish --agent-type <kind>` marks the feed as a
+`alva automation create --agent-type <kind>` marks the Automation as a
 prompt-editable agent. `<kind>` must be in the catalog (the backend rejects
 unknown values with `InvalidArgument`); `alpi` is the only kind in v1:
 
@@ -95,7 +96,7 @@ source of truth — the README — not a separate per-template copy.
 
 ### Freshness and version updates
 
-Every `alva release playbook` call needs a freshly reviewed README for the
+Every `alva playbooks release` call needs a freshly reviewed README for the
 version being released. Initial releases, version bumps, and re-releases all
 follow the same rule: regenerate the README from the current HTML, feed scripts,
 feed ids, cron cadences, metadata, and known blind spots, then write it again to
@@ -116,7 +117,7 @@ value matches the canonical README location.
 
 - `/alva/home/<username>/playbooks/<name>/README.md` — e.g.
   `/alva/home/alice/playbooks/btc-dashboard/README.md`. Resolve `<username>`
-  once via `alva whoami` and pass the path verbatim (no `~` expansion, no
+  once via `alva account whoami` and pass the path verbatim (no `~` expansion, no
   relative shorthand).
 
 The previously-accepted relative form `<name>/README.md` (and any `~/...`

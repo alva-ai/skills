@@ -72,5 +72,6 @@ Editing playbook HTML re-enters the `before-build-html` gate: read
 ## Re-release
 
 After applying every annotation, write the HTML back to ALFS and re-release.
-A change to an already-released playbook is a version bump: `alva release
-playbook-draft` then `alva release playbook` with the new version (Step 7).
+A change to an already-released playbook is a version bump: run
+`alva playbooks draft`, then `alva playbooks release` with the new version
+(Step 7).

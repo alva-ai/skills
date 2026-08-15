@@ -27,9 +27,12 @@ bash "<this skill's directory>/scripts/version_check.sh"
 No output means up to date. Any output should be shown to the user, applied,
 and then rechecked.
 
-The Alva CLI (`@alva-ai/toolkit`) is the only supported platform interface for
-this skill. If `alva --help` is unavailable, install it. If it is present,
-upgrade to the latest version when a task depends on new commands or fixes.
+The embedded `alva` tool is the supported platform interface in Jagent. Its
+Slim command catalog is bundled and host-authenticated; do not install,
+configure, or upgrade a terminal CLI from inside the Agent.
+
+In a shell-only fallback session, use the packaged terminal CLI and install or
+upgrade it when required:
 
 ```bash
 npm install -g @alva-ai/toolkit
@@ -51,7 +54,7 @@ with ALFS paths or inline JSON/data:
   README, and schema files.
 - Use `alva run --entry-path <alfs-js-path>` or `alva run --code <inline-js>`;
   do not use `--local-file`.
-- Use `alva functions register --params-schema '<json>'` when the schema was
+- Use `alva playbooks functions register --params-schema '<json>'` when the schema was
   prepared in ALFS or memory; do not use `--params-schema-file`.
 
 CLI examples that use local files are fallback instructions for shell-only
@@ -65,11 +68,12 @@ Third-party vendor secrets belong in Alva Secret Manager
 Run:
 
 ```bash
-alva whoami
+alva account whoami
 ```
 
-If it fails because no API key is configured, run `alva auth login`, then rerun
-`alva whoami`.
+If it fails because credentials are unavailable, report that the Jagent host
+configuration is missing or invalid. Authentication, endpoints, and profiles
+are host-owned; the Slim Agent CLI does not expose login/configuration commands.
 
 Capture these session variables:
 
@@ -81,24 +85,9 @@ Capture these session variables:
   display fields.
 
 All write, deploy, draft, release, and visibility operations must target the
-requesting user from `alva whoami`. Do not write to or release under another
+requesting user from `alva account whoami`. Do not write to or release under another
 namespace unless the user explicitly asks for a cross-user operation such as
 remix lineage.
-
-## Arrays JWT
-
-Data Skills require `ARRAYS_JWT`. In `alva whoami`, inspect
-`_meta.arrays_jwt`. If it is missing, absent, or has `renewal_needed: true`,
-use:
-
-```bash
-alva arrays token status
-alva arrays token ensure
-```
-
-Runtime scripts load it with `secret.loadPlaintext("ARRAYS_JWT")` and call
-Arrays endpoints using `Authorization: Bearer <ARRAYS_JWT>`. Do not use
-`X-API-Key`.
 
 ## Memory
 

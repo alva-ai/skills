@@ -137,7 +137,7 @@
             "heading": "Freshness and version updates",
             "label": "readme freshness",
             "includes": [
-              "Every `alva release playbook` call needs a freshly reviewed README",
+              "Every `alva playbooks release` call needs a freshly reviewed README",
               "regenerate the README",
               "`~/playbooks/<name>/README.md`",
               "before release"
@@ -160,9 +160,9 @@
             "id": "before-playbook-release",
             "label": "playbook release",
             "includes": [
-              "Every backing feed passed `before-automation-publish`",
+              "Every backing feed passed `before-automation-create`",
               "README exists, is current, and is passed via absolute `--readme-url`",
-              "alva lint playbook ./index.html"
+              "alva playbooks lint '~/playbooks/{name}/index.html'"
             ]
           }
         ]
@@ -186,11 +186,11 @@
           "Notification deduplication is semantic",
           "If no material delta exists",
           "A push is set up only after all of these succeed",
-          "alva deploy update --id <ID> --push-notify",
+          "alva automation update --id <ID> --push-notify",
           "alva alert enable --automation",
           "read `@last/1` of the declared output",
           "A quiet V2 run does not append an alert record",
-          "`alva deploy trigger` is not a dry run",
+          "`alva automation trigger` is not a dry run",
           "do not claim push is set up"
         ],
         "sections": [
@@ -247,7 +247,7 @@
           {
             "type": "hard_gate",
             "file": "references/feed-lifecycle.md",
-            "id": "before-automation-publish",
+            "id": "before-automation-create",
             "label": "automation knowledge",
             "includes": [
               "[Alva Knowledge](alva-knowledge.md)",
@@ -726,7 +726,7 @@
           "User-Defined Functions are strict opt-in",
           "registerable/shareable interactive function",
           "window.alva.udf",
-          "alva functions",
+          "alva playbooks functions",
           "allowance consent",
           "Never hand-write bearer headers",
           "result contract",

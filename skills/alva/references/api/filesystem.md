@@ -63,11 +63,10 @@ under a group/output.
 
 ## Feed visibility
 
-After deploying and publishing the automation, use the returned `feed_id` to
-make the feed public:
+After creating the Automation, use the returned id to make the feed public:
 
 ```bash
-alva feed set-visibility --id <feed_id> --visibility public
+alva automation set-visibility --id <feed_id> --visibility public
 ```
 
 This keeps the feed visibility record and its inherited ALFS permission

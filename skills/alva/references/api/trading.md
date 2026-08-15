@@ -1,12 +1,33 @@
-# Trading — extras not in CLI help
+# Trading — Signal and Broker execution
 
-Run `alva trading --help` first for subcommands, flags, and examples.
-This file covers only details the help text omits.
+Run `alva trading --help` first. The Slim tree deliberately separates shared
+execution controls from the two execution models:
 
-## Exchange ↔ symbol naming
+```text
+trading
+├── accounts
+├── risk-rules
+├── signals
+│   ├── subscriptions
+│   │   ├── list
+│   │   ├── subscribe
+│   │   └── unsubscribe
+│   └── execute
+└── broker
+```
 
-No suffix on `exchange` = perpetuals, `_spot` = spot. Symbols mirror the
-exchange field. Mismatching symbol type to account exchange errors.
+`accounts` lists execution-capable TREX accounts. `risk-rules` is read-only and
+shows the admission limits enforced for both Signal and Broker orders. Account
+holdings, activity, order history, and equity history belong to the separate
+`alva portfolio` tree.
+
+## Legacy Signal surface
+
+Signal is the legacy playbook/copy-trading workflow. Keep it under
+`alva trading signals`; do not infer Signal semantics from Broker commands.
+
+Symbols must match the account's exchange type. No suffix on `exchange` means
+perpetuals and `_spot` means spot.
 
 | `exchange`     | Market      | Symbol format                    |
 | -------------- | ----------- | -------------------------------- |
@@ -16,33 +37,26 @@ exchange field. Mismatching symbol type to account exchange errors.
 | `hyperliquid`  | Unified     | `HYPERLIQUID_PERP_*` / `_SPOT_*` |
 | `alpaca`       | US Equities | `XNAS_SPOT_AAPL_USD`             |
 
-## `--signal` JSON schema for `alva trading execute`
+### Execute one Signal
 
-The CLI help example shows `{symbol, side, qty}` — that is **not** the
-accepted schema. `--signal` takes an array of signal objects with one of
-two `instruction.type` values:
-
-- **`allocate`** — target portfolio weights. `weight: 0` closes the
-  position; `weight: 0.5` sets it to 50% of equity.
-- **`predict`** — prediction market orders (Polymarket only).
+`--signal` takes an array of signal objects. `date` is epoch seconds, not
+milliseconds. Supported instruction types include `allocate` for target
+portfolio weights and `predict` for prediction-market orders.
 
 ```bash
-# Allocate 10% to BTC perp on a binance account (dry run)
-alva trading execute \
+alva trading signals execute \
   --account-id <id> \
-  --signal '[{"date":1735689600,"instruction":{"type":"allocate","weights":[{"symbol":"BINANCE_PERP_BTC_USDT","weight":0.1}]}}]' \
-  --dry-run
+  --signal '[{"date":1735689600,"instruction":{"type":"allocate","weights":[{"symbol":"BINANCE_PERP_BTC_USDT","weight":0.1}]}}]'
 ```
 
-`date` is **epoch seconds**, not milliseconds.
+Execution is dry-run by default. Show the simulated result and obtain the
+required confirmation before repeating the exact command with `--live`. For a
+consented auto-trading loop tick, the recorded consent defined by the main Skill
+trading rule stands in for per-order confirmation.
 
-## Operational rules
+### Subscriptions
 
-- **Always dry-run first.** Show simulated orders and confirm before
-  re-running without `--dry-run`. For a consented auto-trading loop tick, the
-  recorded consent per the SKILL.md trading rule stands in for this per-order
-  confirmation.
-- **One active subscription per account.** `alva trading subscribe`
-  fails until you `unsubscribe` the existing one.
-- `--execute-latest` on subscribe fires the playbook's last signal
-  immediately — only works if the feed has a stored `lastSignal`.
+Only one Signal subscription may be active per account. Unsubscribe the current
+one before subscribing to another. Subscription creation never executes the
+latest stored signal; use the explicit `signals execute` flow when execution is
+intended.

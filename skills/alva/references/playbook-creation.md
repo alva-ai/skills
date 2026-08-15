@@ -97,7 +97,7 @@ Do not introduce UDFs for ordinary dashboards, scheduled refresh, filters, or
 feed-backed charts.
 
 When triggered, read [api/udf-runtime.md](api/udf-runtime.md). The reference
-covers PBSV browser authentication, `alva functions` creator registration,
+covers PBSV browser authentication, `alva playbooks functions` creator registration,
 `window.alva.udf`, allowance consent, and release checks. Never hand-write
 bearer headers in playbook HTML or raw service requests for UDF setup.
 
@@ -124,7 +124,7 @@ The canonical content shape lives in
 
 ## Draft
 
-Before `alva release playbook-draft`, write:
+Before `alva playbooks draft`, write:
 
 Use ALFS-native write/edit tools when available. The `--file` examples below are
 for shell-only CLI sessions; in PI/jagent agent tool mode, write the same
@@ -136,15 +136,15 @@ alva fs write --path '~/playbooks/{name}/README.md' --file ./README.md --mkdir-p
 ```
 
 <HARD-GATE id="before-playbook-draft">
-Before `alva release playbook-draft`, verify:
+Before `alva playbooks draft`, verify:
 
 - HTML exists at `~/playbooks/{name}/index.html`.
 - README exists at `~/playbooks/{name}/README.md`.
-- Target name and owner namespace match `alva whoami`.
-- Every feed in `--feeds` has passed `before-automation-publish`.
+- Target name and owner namespace match `alva account whoami`.
+- Every feed in `--feeds` has passed `before-automation-create`.
 - Every feed the HTML reads appears in `--feeds` and passes the check for the
   planned playbook visibility: for public playbooks, set public visibility with
-  `alva feed set-visibility` and verify an unauthenticated read; for private or
+  `alva automation set-visibility` and verify an unauthenticated read; for private or
   paid playbooks, verify an authenticated SDK/PBSV read instead and do not make
   the feed public solely to pass this gate.
 - Draft metadata matches the approved plan.
@@ -161,38 +161,38 @@ generic-only names such as `Stock Dashboard`.
 
 ## Release
 
-`alva release playbook` requires `--readme-url`, and it must be the absolute
+`alva playbooks release` requires `--readme-url`, and it must be the absolute
 ALFS path:
 
 `/alva/home/<username>/playbooks/<name>/README.md`
 
-Resolve `<username>` once via `alva whoami`.
+Resolve `<username>` once via `alva account whoami`.
 
 After `playbook-draft` succeeds and `before-playbook-release` passes, call
-`alva release playbook` without asking whether to stop at the draft version,
+`alva playbooks release` without asking whether to stop at the draft version,
 unless the user explicitly requested draft-only/private. Draft is a separate
 version state; visibility (`public` / `private` / `paid`) applies after
 publication. The default published visibility is public.
 
 ```bash
-alva release playbook ... \
+alva playbooks release ... \
   --readme-url '/alva/home/<username>/playbooks/{name}/README.md'
 ```
 
 <HARD-GATE id="before-playbook-release">
-Before `alva release playbook`, verify:
+Before `alva playbooks release`, verify:
 
-1. Every backing feed passed `before-automation-publish`.
+1. Every backing feed passed `before-automation-create`.
 2. Every feed the HTML reads at runtime has a successful deploy, appears in
    `--feeds`, and passes the check for the release visibility: for public
-   playbooks, set public visibility with `alva feed set-visibility` and verify
+   playbooks, set public visibility with `alva automation set-visibility` and verify
    an unauthenticated read; for private or paid playbooks, verify an
    authenticated SDK/PBSV read instead and do not make the feed public solely
    to pass this gate.
 3. Cronjobs for referenced feeds are active.
 4. HTML fetches quantitative data from feeds, not inline literals.
 5. If UDFs exist, [api/udf-runtime.md](api/udf-runtime.md) has been read, each
-   function is registered with `alva functions`, HTML uses `window.alva.udf`,
+   function is registered with `alva playbooks functions`, HTML uses `window.alva.udf`,
    and the UDF result contract is verified: smoke invoke returned the declared
    result shape and HTML consumes the declared result fields.
 6. Latest data from each referenced feed is fresh; if older than 2x cron
@@ -205,7 +205,7 @@ Before `alva release playbook`, verify:
     automation binding. New feeds declare push-worthy outputs with
     `alertOutput(typeDoc)`; existing Altra `signal/targets` or legacy
     `notify/message` producers may retain those reserved sources.
-11. `alva lint playbook ./index.html` passes, or an intentional `--bypass-lint`
+11. `alva playbooks lint '~/playbooks/{name}/index.html'` passes, or an intentional `--bypass-lint`
     is documented.
 12. Header duplication has been reviewed. If the iframe repeats the outer
     playbook title, description, last-updated text, automation controls, or
@@ -222,12 +222,11 @@ After release, screenshot the deployed `published_url`, not the canonical share
 URL. Prefer compression:
 
 ```bash
-alva screenshot --url <published_url> --out /tmp/screenshot.png \
+alva playbooks screenshot --url <published_url> \
   --compress --compress-quality 70 --compress-max-width 1280
-head -c4 /tmp/screenshot.png | grep -q PNG || echo "SCREENSHOT_FAILED"
 ```
 
-If compressed capture fails with HTTP 500/403, `SCREENSHOT_FAILED`, or no file,
+If compressed capture fails with HTTP 500/403 or no image result,
 retry once without compression.
 
 A PNG or page shell is not enough. Pass screenshot verification only when the

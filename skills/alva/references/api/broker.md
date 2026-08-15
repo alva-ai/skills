@@ -1,10 +1,12 @@
 # Broker — agentic order execution (extras not in describe)
 
-Run `alva broker describe` first for the live command grammar and the
+Run `alva trading broker describe` first for the live command grammar and the
 per-venue capability matrix (`venues[]`). This file covers only the judgment
 `describe` cannot: the three-way result model, retry discipline, and venue
-quirks. `describe` is always authoritative for *what commands/venues exist*;
-this file is *how to use them safely*.
+quirks. `describe` is authoritative for what Broker commands and venues exist;
+this file explains how to use them safely. Shared account discovery and limits
+live at `alva trading accounts` and `alva trading risk-rules`, not under
+`broker`.
 
 ## Mental model
 
@@ -67,6 +69,6 @@ markets` per venue. Do not assume; check. Notably:
 ## Venue-native params & raw
 
 Anything the venue supports beyond the spine flags goes through repeatable
-`--param key=value` (passed to the venue untouched). `alva broker raw --venue
-<v> --method <m> --params <json>` is the read-only escape hatch for
-venue-specific endpoints.
+`--param key=value` (passed to the venue untouched).
+`alva trading broker raw --venue <v> --method <m> --params <json>` is the
+read-only escape hatch for venue-specific endpoints.

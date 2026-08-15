@@ -37,8 +37,10 @@ const resp = await http.fetch(url, {
 });
 ```
 
-If a call returns 401, rerun `alva arrays token ensure`. Do not use
-`X-API-Key`.
+If a runtime call returns 401, report that the host-managed Arrays credential
+is unavailable or stale. The Slim Agent CLI intentionally has no token
+bootstrap command. Do not use `X-API-Key` and do not ask the user to paste the
+credential into chat.
 
 ## Coverage
 
@@ -82,9 +84,10 @@ verify each ticker's sector or industry with live company-detail data such as
 Remove or flag mismatches before scoring, ranking, or releasing the artifact. A
 single wrong ticker can distort the whole theme.
 
-## Runtime Libraries Are Separate
+## Runtime Libraries Are Skill-Owned
 
-`alva sdk` surfaces runtime modules, not Data Skills endpoints:
+Runtime modules are not CLI discovery commands and are not Data Skills
+endpoints. Their supported APIs live in this Skill's focused references:
 
 - `feed_widgets`: rolling subscriptions for news, YouTube, Reddit, podcasts.
   For Twitter/X handle, URL, or indexed full-text queries, use Data Skills.
@@ -92,13 +95,10 @@ single wrong ticker can distort the whole theme.
 - `technical_indicator_calculation_helpers`: pure calculations such as RSI,
   MACD, Bollinger Bands.
 
-Discovery:
-
-```bash
-alva sdk partitions
-alva sdk partition-summary --partition <name>
-alva sdk doc --name <module>
-```
+Use [jagent-runtime.md](jagent-runtime.md) for module loading and constraints,
+[feed-sdk.md](feed-sdk.md) for `@alva/feed`, [alpi.md](alpi.md) for
+`@alva/pi`, [altra-trading.md](altra-trading.md) for Altra, and [onnx.md](onnx.md)
+for ONNX. Do not look for these APIs through the Slim CLI.
 
 ## Failure And Fallback
 

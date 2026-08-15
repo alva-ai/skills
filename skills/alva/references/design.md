@@ -44,7 +44,7 @@ Token quick reference:
 ## Design Contract
 
 The Alva design system is also expressed as a machine-readable contract for
-the **design linter** that runs inside `alva release playbook`:
+the **design linter** that runs inside `alva playbooks release`:
 
 - [design-contract.yaml](./design-contract.yaml) — token-free contract: the
   required global container, scroll/typography/link rules, and the registered
@@ -58,10 +58,10 @@ The linter is shipped in the `alva` CLI and runs as a hard gate. To pre-check
 a playbook before release:
 
 ```bash
-alva lint playbook ./index.html
+alva playbooks lint '~/playbooks/<name>/index.html'
 ```
 
-`alva release playbook` runs the same lint internally and refuses to release
+`alva playbooks release` runs the same lint internally and refuses to release
 if any error-severity finding fires. See
 [playbook-creation.md - Release](./playbook-creation.md#release).
 

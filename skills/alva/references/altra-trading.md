@@ -755,13 +755,12 @@ All output data is also persisted under the feed's ALFS path (quote in CLI, e.g.
 └── perf/metrics            -- Performance report
 ```
 
-`signal/targets` makes the feed push-capable, but delivery still requires the
-cronjob to be created or updated with `--push-notify` and
-`alva automation publish` to bind the feed to that cronjob. Initial publish
-creates the owner's alert binding and starts the producer once by default;
-other viewers or destinations require an explicit alert binding mutation. A
-playbook follow does not enable alerts for its feeds. See
-`references/deployment.md` for the deploy/publish flow.
+`signal/targets` makes the feed push-capable, but delivery still requires
+creating the Automation with `--push-notify`. Creation provisions its producer,
+registers the feed, creates the owner's alert binding, and starts the producer
+once by default. Other viewers or destinations require an explicit alert
+binding mutation. A playbook follow does not enable alerts for its feeds. See
+`references/deployment.md` for the unified Automation lifecycle.
 
 ---
 

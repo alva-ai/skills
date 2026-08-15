@@ -83,10 +83,10 @@ Wait for the user's response. Do not auto-post.
 On approval (or after user edits):
 
 ```bash
-alva comments create --username <username> --name <playbook_name> --content "<note>"
+alva playbooks comments create --username <username> --name <playbook_name> --content "<note>"
 # → {"id": <comment_id>, ...}
 
-alva comments pin --comment-id <comment_id>
+alva playbooks comments pin --comment-id <comment_id>
 ```
 
 ### 3. On skip
