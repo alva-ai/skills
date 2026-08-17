@@ -81,8 +81,7 @@ Think in artifacts:
 - **Answer**: a direct response grounded in fresh data. No feed or release
   required unless the user asks for persistence.
 - **Script**: an Alva Cloud computation that may be run manually or scheduled.
-- **Feed**: the persistent output of a script, with schema, history, grants, and
-  release metadata.
+- **Feed**: the persistent output of a script, with schema, history, grants, and release metadata.
 - **Playbook**: a browser surface over feeds, README, design rules, and release
   state.
 - **Signal**: an actionable feed output that may power trading execution or push
@@ -200,6 +199,7 @@ that section as mandatory, not optional debugging material.
 | price, valuation, holdings, compare peers, explain a thesis, rank in text                                                                 | Financial Analysis / Ask Question   | Use fresh Data Skills/search evidence and the Financial Analysis tree; fetch or qualify every comparison baseline.                                                                    |
 | ticker read, analyze a named ticker or company, company narrative, earnings, earnings call, past-hour tracking, "why did it move", investor focus, recent catalysts, unusual move | Financial Analysis + Platform Data: Ticker Read | Use the smallest sufficient source set; read [ticker-read.md](references/ticker-read.md) before source selection, starting with `alva/company-anomaly-read` for intraday/hourly-scale tracking. |
 | company anomaly, scan/check whether a company is anomalous, use Platform Data to analyze a company                                       | Platform Data: Company Anomaly      | Route through [ticker-read.md](references/ticker-read.md), then fresh-load `alva/company-anomaly-read` from Skillhub; verify exact-ticker coverage and freshness.                 |
+| GEX, gamma exposure, dealer positioning/gamma, gamma flip, call wall / put wall, options pinning, vanna, charm                           | Platform Data: GEX                  | Fresh-load `alva/gex` from Skillhub and run its `gex.js`; do not hand-compute GEX from the raw options chain — the skill owns the methodology, flip scan, and output discipline.   |
 | fintwit / KOL / leaderboard — top accounts or ranking, is @handle tracked, what an account thinks about a ticker or theme, track record | Platform Data: Fintwit Intelligence | Use the Platform Data section below, then read [fintwit.md](references/fintwit.md); cite the snapshot date; read-only, never fabricate rankings.                                         |
 | FinTwit digest SDK, alpha radar automation, custom digest module, `@alva/fintwit-digest`                                                | Platform Data: Fintwit Digest SDK   | Use the Platform Data section below, then read [fintwit-digest-sdk.md](references/fintwit-digest-sdk.md); follow the SDK API and ability contracts instead of copying runtime internals. |
 | dashboard, screener app, thesis tracker, hosted report, shareable surface                                                               | Playbook Creation                   | Build live feeds first, then read [playbook-creation.md](references/playbook-creation.md).                                                                                               |
