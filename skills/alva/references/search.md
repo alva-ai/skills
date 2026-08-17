@@ -21,16 +21,15 @@ below live in the `unified_search` partition.
 
 ### Finance Search
 
-- **Search**: `searchPerplexityFinance` — a live, source-cited finance answer engine covering quotes, company profiles, financial statements and ratios, valuation and pricing, earnings, analyst estimates, segment/KPI metrics, market movers, and ownership/corporate actions.
-- **Intended role**: the fallback for non-US equities outside the curated Data Skills set, and for asset classes outside the Alva data catalog.
-- **Non-US equities**: Data Skills carry a curated set of non-US listings (dotted-suffix tickers like `0700.HK`, `000660.KS`), now with intraday intervals (`1min`–`1m`) as well as daily — intraday covers a narrower subset than daily. Try Data Skills first for those; use finance search when the ticker isn't in the curated set, or intraday returns empty for it. Finance-search coverage is web-backed and best-effort, not a guaranteed dataset — depth and freshness track how well a market is reported online. Disambiguate the listing in the query — local ticker + exchange, or full company name (e.g. "Toyota 7203 on the Tokyo Stock Exchange", "HSBC on the LSE") — and verify the answer against the `sources` it returns.
-- **Forex, index & commodity**: in the catalog — Data Skills carry forex, major index levels, and commodity futures prices (e.g. gold, oil) via the macro endpoints (historical + real-time), so route them there, not to finance search. Crypto stays on the structured SDKs (`getCryptoKline`, perpetual-futures OHLCV, funding rates) — never route crypto to finance search. Use finance search only for asset classes genuinely outside the catalog.
-- **Query scoping**: state the business question first, then the company or ticker, then an explicit time window (`latest quarter`, `last 30 days`); it answers best when the prompt names the outcome, not the data shape.
-- **Fields**: `summary`, `data`/`arrays` result blocks, `tickers`, `sources`, and provider `usage` metadata when available.
-- **Gotcha**: a live search/answer tool, not a historical time-series endpoint. For US equities, crypto, and deterministic OHLCV / fundamentals / earnings / macro series, the structured Alva data SDKs are the source — finance search there adds only current context or source-backed enrichment.
+- **Data Skills first**: Data Skills (the structured Alva data) cover US and non-US equities, fundamentals (earnings, filings), options, crypto, macro (forex, index levels, commodity futures like gold/oil), on-chain, and prediction markets — route all of these there. `searchPerplexityFinance` is the fallback ONLY for non-US tickers outside the curated set (or when their intraday is empty) and asset classes genuinely outside the catalog.
+- **Search**: `searchPerplexityFinance` — a live, source-cited finance answer engine (quotes, profiles, statements/ratios, valuation, earnings, estimates, KPI metrics, market movers, ownership/corporate actions); current context or source-backed enrichment, not a historical time series.
+- **Non-US disambiguation**: name the local ticker + exchange or the full company name (e.g. "Toyota 7203 on the Tokyo Stock Exchange", "HSBC on the LSE"), and verify against the `sources` it returns. Coverage is web-backed and best-effort — depth and freshness track how well a market is reported online.
+- **Query scoping**: state the business question first, then the ticker, then a time window (`latest quarter`, `last 30 days`).
+- **Fields**: `summary`, `data`/`arrays` result blocks, `tickers`, `sources`, and provider `usage` when available.
 
 ### Twitter/X
 
+- **Data Skills first**: per-handle history, URL lookup, and full-text search over the X accounts Arrays tracks are served by Data Skills (see [data-skills.md](data-skills.md)). Use `searchGrokX` only for global X search beyond Arrays' tracked index.
 - **Search**: `searchGrokX` with `from_date`/`to_date` (YYYY-MM-DD format)
 - **Enrich**: Not needed — GrokX returns engagement natively
 - **Signals**: `like_count`, `retweet_count`, `reply_count`, `quote_count`

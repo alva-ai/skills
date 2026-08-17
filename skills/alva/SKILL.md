@@ -36,7 +36,7 @@ The main objects are:
 
 | Concept            | Meaning                                                                                                                                                      | Read when                                                                                                      |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| Data Skills        | 250+ structured Arrays endpoints for equities, options, crypto, macro, on-chain, semiconductor spot prices, news, prediction markets, and indexed Twitter/X. | You need factual financial data.                                                                               |
+| Data Skills        | 250+ structured Arrays endpoints for US and non-US equities, fundamentals (earnings, filings), options, crypto, macro, on-chain, semiconductor spot/contract prices, news, prediction markets, and indexed Twitter/X. | You need factual financial data.                                                                               |
 | Runtime script     | JavaScript executed inside Alva's V8/jagent runtime through `alva run` or cronjobs.                                                                          | You need computation, HTTP, ALFS, secrets, alpi, ONNX, or Feed SDK.                                            |
 | Feed               | The persistent data pipeline and identity (`feed_id`) that writes outputs to ALFS. `alva automation` is its product-facing lifecycle CLI; `alva deploy` cronjobs produce its data. | Data needs freshness, history, public reads, charts, release, or push.                                         |
 | Playbook           | A hosted investing app at `https://alva.ai/u/<username>/playbooks/<name>`.                                                                                   | The user wants a shareable dashboard, screener, thesis, what-if, or strategy surface.                          |
@@ -216,10 +216,10 @@ Alva has broad coverage, but the boundaries are part of the product contract.
 Naming them early prevents wasted build time.
 
 **Structured data vs search.** Data Skills are for deterministic datasets and
-repeatable fields. Search is for source-backed context, non-US finance, global
-X/Grok search, and off-catalog assets. Search results may inform a feed or a
-source-cited answer, but they do not become raw chart data by being pasted into
-HTML.
+repeatable fields; search is for source-backed context and off-catalog assets.
+Try Data Skills first for anything it may cover — including X/social and non-US
+equities — and use search only for X/Grok beyond Arrays' indexed accounts or
+non-US tickers/intraday outside its curated coverage. Search informs a cited answer, not chart data.
 
 **Runtime vs local agent.** Runtime code runs on Alva Cloud, not on the agent's
 machine. It cannot use local filesystem paths, shell commands, Node builtins, or
@@ -320,9 +320,9 @@ not copy private runtime internals into user scripts.
 
 #### Data Access: Content Search And BYOD
 
-Content search enriches a real data pipeline; it does not replace one. Use it
-for market narratives, source discovery, global X/Grok queries, news, Reddit,
-YouTube, podcasts, web search, non-US finance, and off-catalog assets.
+Content search enriches a real data pipeline; it does not replace one — a fallback,
+not a default source. Try Data Skills, owned feeds, and official sources first; use
+it only for off-catalog content they can't provide (see Source routing).
 
 Open [search.md](references/search.md) for source-specific usage and gotchas,
 and [content-legitimacy.md](references/content-legitimacy.md) before presenting
