@@ -608,13 +608,11 @@ on read, they are auto-flattened back into individual flat records.
 
 Feed outputs are accessible via the filesystem after the feed runs.
 
-### From the CLI
+### From Native File Tools
 
-```bash
-alva fs read --path '~/feeds/btc-ema/v1/data/metrics/prices/@last/100'
-
-alva fs read --path '/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100'
-```
+Use the native read tool on
+`~/feeds/btc-ema/v1/data/metrics/prices/@last/100`, or use the absolute path
+`/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100`.
 
 ### From JavaScript (inside jagent)
 
@@ -745,10 +743,8 @@ Public reads must use absolute paths:
 
 ### Step 1: Create the directory and write the script
 
-```bash
-# Prefer ALFS-native write/edit tools when available; --file is shell-only fallback.
-alva fs write --path '~/feeds/btc-ema/v1/src/index.js' --file ./index.js --mkdir-parents
-```
+Use the native write/edit tools to place source at
+`~/feeds/btc-ema/v1/src/index.js`.
 
 Where `index.js` contains:
 
@@ -809,9 +805,8 @@ alva feed set-visibility --id <feed_id> --visibility public
 
 ### Step 4: Read from any client
 
-```bash
-alva fs read --path '/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100'
-```
+Use the native read tool on
+`/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last/100`.
 
 ---
 

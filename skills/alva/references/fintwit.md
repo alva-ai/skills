@@ -20,7 +20,7 @@ theses, backtested performance, computed rankings.
 
 - **Host user is `zet`.** All paths are public-read under `/alva/home/zet/...`.
   Use **absolute paths** — never `~/` (that resolves to the querying user's home).
-- Read in chat with `alva fs read --path '/alva/home/zet/...'` (no auth needed —
+- Read in chat with the native read tool on `/alva/home/zet/...` (no auth needed —
   data is granted `special:user:*`); from playbook HTML use
   `fetch("$ALVA_ENDPOINT/api/v1/fs/read?path=" + encodeURIComponent(absPath))`.
 - Reads return a JSON array of flat records. Tabular outputs share one timestamp,

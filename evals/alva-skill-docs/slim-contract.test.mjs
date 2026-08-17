@@ -14,7 +14,7 @@ const contract = JSON.parse(
 function packageJson(overrides = {}) {
   return {
     name: "@alva/alva-slim",
-    version: "0.0.5",
+    version: "0.0.6",
     files: ["SKILL.md", "references", "scripts"],
     alpkg: { kind: "skill" },
     ...overrides,
@@ -28,7 +28,7 @@ name: alva
 description: Slim Alva routing fixture.
 metadata:
   author: alva
-  version: v0.0.5
+  version: v0.0.6
 ---
 
 # Alva Slim
@@ -149,7 +149,7 @@ function withFixture(options, fn) {
   }
 }
 
-test("accepts a valid v0.0.5 Slim package", () => {
+test("accepts a valid v0.0.6 Slim package", () => {
   withFixture({}, (instance) => {
     const result = validate(instance);
     assert.equal(result.valid, true);
@@ -196,7 +196,7 @@ for (const testCase of [
     name: "wrong frontmatter version",
     mutate(instance) {
       const path = join(instance.candidateDir, "SKILL.md");
-      writeFileSync(path, readFileSync(path, "utf8").replace("version: v0.0.5", "version: v0.0.4"));
+      writeFileSync(path, readFileSync(path, "utf8").replace("version: v0.0.6", "version: v0.0.5"));
     },
     expected: "FRONTMATTER_VERSION",
   },
@@ -212,7 +212,7 @@ for (const testCase of [
     name: "v1 frontmatter version is forbidden",
     mutate(instance) {
       const path = join(instance.candidateDir, "SKILL.md");
-      writeFileSync(path, readFileSync(path, "utf8").replace("version: v0.0.5", "version: v1.0.0"));
+      writeFileSync(path, readFileSync(path, "utf8").replace("version: v0.0.6", "version: v1.0.0"));
     },
     expected: "VERSION_MAJOR_DISALLOWED",
   },
@@ -254,6 +254,33 @@ test("reports missing, extra, and changed references independently", () => {
           createHash("sha256").update("changed\n").digest("hex"),
         );
       }
+    });
+  }
+});
+
+test("accepts a hash-locked intentional reference override", () => {
+  withFixture({}, (instance) => {
+    const path = join(instance.candidateDir, "references", "preflight.md");
+    writeFileSync(path, "Run scripts/version_check.sh.\nUse the native read tool.\n");
+    const overrideHash = createHash("sha256").update(readFileSync(path)).digest("hex");
+    const result = validate(instance, 45_000, {
+      ...instance.topLevelContract,
+      baselineReferences: {
+        ...instance.topLevelContract.baselineReferences,
+        overrides: { "preflight.md": overrideHash },
+      },
+    });
+    assert.equal(result.valid, true);
+  });
+});
+
+test("rejects CLI and local-file routing language across the Slim corpus", () => {
+  for (const forbiddenText of ["shell-only", "alva fs read", "--local-file", "--params-schema-file"]) {
+    withFixture({}, (instance) => {
+      const path = join(instance.candidateDir, "references", "preflight.md");
+      writeFileSync(path, `Run scripts/version_check.sh.\n${forbiddenText}\n`);
+      const result = validate(instance);
+      assert.ok(codes(result).includes("NATIVE_TOOL_ROUTING"), forbiddenText);
     });
   }
 });

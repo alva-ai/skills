@@ -263,14 +263,12 @@ flags, response fields, and examples.
 
 The stable flow is:
 
-Use ALFS-native write/edit tools for the entry script when available. The
-`--file` and `--params-schema-file` forms below are for shell-only CLI
-sessions; PI/jagent agent tool mode should pass inline `--params-schema`
-instead.
+Use the native write/edit tools to place the entry script at the absolute ALFS
+path, then use the `alva` tool for registration and invocation. Pass the JSON
+Schema inline with `--params-schema`.
 
 ```bash
-alva fs write --path '/alva/home/<username>/playbooks/<name>/udf/analyze.js' --file ./analyze.js --mkdir-parents
-alva functions register --playbook-id <playbook-id> --function-name analyze --entry-script-path '/alva/home/<username>/playbooks/<name>/udf/analyze.js' --params-schema-file ./schema.json --no-allow-charges
+alva functions register --playbook-id <playbook-id> --function-name analyze --entry-script-path '/alva/home/<username>/playbooks/<name>/udf/analyze.js' --params-schema '<json-schema>' --no-allow-charges
 alva functions invoke --playbook-id <playbook-id> --function-name analyze --params '{"ticker":"AAPL"}'
 ```
 
@@ -278,10 +276,9 @@ CLI gotchas the help text may not make obvious:
 
 - `entry_script_path` is an absolute ALFS path under the creator's home and
   must point at a `.js` file. Do not pass a local filesystem path or `~/...`.
-- In shell-only CLI sessions, prefer `--params-schema-file` for nontrivial
-  schemas so shell quoting does not corrupt the JSON Schema. In PI/jagent
-  agent tool mode, pass inline `--params-schema` instead. The schema must
-  match both UI inputs and server-side validation.
+- Build nontrivial schemas as structured JSON, serialize them once, and pass
+  the result through inline `--params-schema`. The schema must match both UI
+  inputs and server-side validation.
 - Registration is no-charge by default; pass `--no-allow-charges` unless the
   user explicitly wants viewer-credit charging and the consent flow is wired.
   Do not silently opt viewers into charges.

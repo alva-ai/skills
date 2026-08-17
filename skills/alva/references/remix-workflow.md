@@ -52,9 +52,8 @@ strength of the tag alone.
 
 ## Step 1 — Read Playbook Metadata
 
-```bash
-alva fs read --path '/alva/home/{owner}/playbooks/{name}/playbook.json'
-```
+Use the native read tool on
+`/alva/home/{owner}/playbooks/{name}/playbook.json`.
 
 Returns JSON with structure:
 
@@ -88,19 +87,10 @@ register the same `function_name` and `params_schema` on the remixed playbook.
 
 ## Step 2 — Read UI Layer (HTML Source)
 
-If ALFS-native read/write/edit tools are available, inspect and edit the ALFS
-source directly. Do not force a local download/upload loop in PI/jagent agent
-tool mode.
-
-In a shell-only CLI session, download to a local file; do not regenerate from
-memory. Redirect `alva fs read` output into a local file so you can edit it in
-place (e.g. with the `Edit` tool). Reconstructing the HTML from what you
-remember of the read output drops layout details, comments, and working code
-that the user expects to inherit.
-
-```bash
-alva fs read --path '/alva/home/{owner}/playbooks/{name}/index.html' > ./index.html
-```
+Use the native read tool to inspect
+`/alva/home/{owner}/playbooks/{name}/index.html`, then use the native edit tool
+on the inherited ALFS source. Reconstructing the HTML from memory drops layout
+details, comments, and working code that the user expects to inherit.
 
 This is the full HTML source of the playbook dashboard — the ECharts charts,
 metric cards, layout, and data-fetching logic. Edit this source directly in Step
@@ -110,34 +100,23 @@ metric cards, layout, and data-fetching logic. Edit this source directly in Step
 
 ## Step 3 — Read Code Layer (Feed Scripts)
 
-Each entry in `releases[0].feeds` carries `feed_name` — inspect each feed's
-script source the same way. In shell-only CLI sessions, download each source:
-
-```bash
-alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v1/src/index.js' > ./{feed_name}.js
-```
+Each entry in `releases[0].feeds` carries `feed_name` — use the native read tool
+to inspect `/alva/home/{owner}/feeds/{feed_name}/v1/src/index.js`.
 
 This contains the strategy logic, data fetching, and indicator computations. As
 with the HTML, **modify the inspected source in place** rather than re-typing
 the script from your reading of it.
 
-If Step 1 found registered UDFs, inspect each UDF entry script from its
-`entry_script_path` as well. In shell-only CLI sessions, download it:
-
-```bash
-alva fs read --path '{source_entry_script_path}' > ./udf-{function_name}.js
-```
+If Step 1 found registered UDFs, use the native read tool to inspect each UDF
+entry script from its `entry_script_path` as well.
 
 Treat these as inherited source code. Edit only the path-sensitive or
 topic-specific pieces required by the remix; do not recreate the methods from
 memory.
 
-Optionally, read sample feed output to understand the data schema (this one
-stays in stdout — it's reference, not a file you'll edit):
-
-```bash
-alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v1/data/{group}/{output}/@last/5'
-```
+Optionally, use the native read tool on
+`/alva/home/{owner}/feeds/{feed_name}/v1/data/{group}/{output}/@last/5` to
+understand the data schema.
 
 ---
 
@@ -188,16 +167,14 @@ didn't ask for the change, revert the structure and re-apply only the data swap.
 ## Step 5 — Deploy as New Playbook
 
 Follow the standard playbook creation flow (see SKILL.md), starting from the
-sources you inspected in Steps 2–3. With ALFS-native edit tools, edit those ALFS
-files directly. In shell-only CLI sessions, edit the downloaded local files in
-place with the `Edit` tool. Swap data paths to your own namespace, adjust
+sources you inspected in Steps 2–3. Edit those ALFS files directly with the
+native edit tool. Swap data paths to your own namespace, adjust
 strategy parameters, and apply the user's customization request **within the
 scope defined above** (data/topic by default; structure only on explicit
 request). Do not write fresh files from scratch.
 
-1. **Write the edited feed script** to ALFS. Use the ALFS write/edit tool in
-   agent tool mode; shell-only fallback:
-   `alva fs write --path '~/feeds/{new-name}/v1/src/index.js' --file ./{feed_name}.js --mkdir-parents`
+1. **Write the edited feed script** with the native write/edit tool at
+   `~/feeds/{new-name}/v1/src/index.js`.
 2. **Test** via `alva run --entry-path '~/feeds/{new-name}/v1/src/index.js'`
 3. **Deploy cronjob**:
    `alva deploy create --name {new-name} --path '~/feeds/{new-name}/v1/src/index.js' --cron "..."`
@@ -207,18 +184,15 @@ request). Do not write fresh files from scratch.
    `alva feed set-visibility --id <feed_id> --visibility public`
 6. **Verify public data** with an unauthenticated absolute-path read before the
    HTML depends on it.
-7. **Write the edited HTML** to ALFS after updating data paths to point to your
-   own feed. Use the ALFS write/edit tool in agent tool mode; shell-only
-   fallback:
-   `alva fs write --path '~/playbooks/{new-name}/index.html' --file ./index.html --mkdir-parents`
+7. **Write the edited HTML** with the native write/edit tool at
+   `~/playbooks/{new-name}/index.html` after updating data paths to point to
+   your own feed.
 8. **Copy inherited UDF entry scripts when present**: for each source UDF, write
-   the edited entry script to a path under the new playbook. Use the ALFS
-   write/edit tool in agent tool mode; shell-only fallback:
-   `alva fs write --path '~/playbooks/{new-name}/udf/{function_name}.js' --file ./udf-{function_name}.js --mkdir-parents`.
+   the edited entry script with the native write/edit tool at
+   `~/playbooks/{new-name}/udf/{function_name}.js`.
 9. **Write README** (mandatory) — adapt the source playbook's README to your
-   data sources and methodology, then write it to ALFS. Use the ALFS write/edit
-   tool in agent tool mode; shell-only fallback:
-   `alva fs write --path '~/playbooks/{new-name}/README.md' --file ./README.md --mkdir-parents`.
+   data sources and methodology, then write it with the native write/edit tool
+   at `~/playbooks/{new-name}/README.md`.
    See [release.md → Playbook README](api/release.md#playbook-readme).
 9. **Draft playbook**:
    `alva release playbook-draft --name {new-name} --display-name "..." --feeds '[{"feed_id":ID}]'`
@@ -262,23 +236,16 @@ Extracted from the `url` attribute: owner = `alice`, name = `btc-momentum`. The
 user's customization request is the text after the tag: "Add a summary section
 at the bottom."
 
-Agent inspects sources so they can be edited in place, not retyped. With
-ALFS-native tools, edit the ALFS sources directly; in shell-only CLI sessions,
-save them to local files:
+Agent inspects sources so they can be edited in place, not retyped. Use the
+native read tool for these paths, then edit inherited sources with the native
+edit tool:
 
-```bash
-# 1. Metadata — releases[0].feeds carries feed_name + feed_id per ref
-alva fs read --path '/alva/home/alice/playbooks/btc-momentum/playbook.json'
-
-# 2. HTML source — save locally only in shell-only CLI sessions
-alva fs read --path '/alva/home/alice/playbooks/btc-momentum/index.html' > ./index.html
-
-# 3. Feed source code (use feed_name from playbook.json) — same shell-only fallback
-alva fs read --path '/alva/home/alice/feeds/btc-momentum/v1/src/index.js' > ./btc-momentum.js
-
-# 4. (Optional) Sample data for schema understanding — reference only, no redirect
-alva fs read --path '/alva/home/alice/feeds/btc-momentum/v1/data/market/ohlcv/@last/3'
-```
+1. `/alva/home/alice/playbooks/btc-momentum/playbook.json`
+2. `/alva/home/alice/playbooks/btc-momentum/index.html`
+3. `/alva/home/alice/feeds/btc-momentum/v1/src/index.js`
+4. Optionally,
+   `/alva/home/alice/feeds/btc-momentum/v1/data/market/ohlcv/@last/3` for schema
+   understanding.
 
 Agent then runs the content-legitimacy audit on the inspected HTML and feed
 script (Step 4), edits them in place to apply the user's customization, then

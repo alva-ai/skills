@@ -8,8 +8,8 @@ import {
 import { dirname, relative, resolve, sep } from "node:path";
 
 const EXPECTED_PACKAGE_NAME = "@alva/alva-slim";
-const EXPECTED_PACKAGE_VERSION = "0.0.5";
-const EXPECTED_FRONTMATTER_VERSION = "v0.0.5";
+const EXPECTED_PACKAGE_VERSION = "0.0.6";
+const EXPECTED_FRONTMATTER_VERSION = "v0.0.6";
 const EXPECTED_FILES = ["SKILL.md", "references", "scripts"];
 
 function violation(code, path, message, details = {}) {
@@ -208,6 +208,9 @@ function validateReferences(candidateDir, baselineDir, baselineLock, violations)
       const candidateContents = readFileSync(resolve(candidateRoot, file));
       const baselineContents = readFileSync(resolve(baselineRoot, file));
       if (candidateContents.equals(baselineContents)) continue;
+      const override = baselineLock?.overrides?.[file];
+      const actualSha256 = sha256(candidateContents);
+      if (typeof override === "string" && actualSha256 === override) continue;
       violations.push(
         violation(
           "REFERENCE_CHANGED",
@@ -215,7 +218,7 @@ function validateReferences(candidateDir, baselineDir, baselineLock, violations)
           "Slim reference differs from the v1.20.1 baseline.",
           {
             expectedSha256: sha256(baselineContents),
-            actualSha256: sha256(candidateContents),
+            actualSha256,
           },
         ),
       );
@@ -229,6 +232,27 @@ function validateReferences(candidateDir, baselineDir, baselineLock, violations)
     }
   }
   return { candidateFiles, baselineFiles };
+}
+
+function validateNativeToolRouting(candidateDir, violations) {
+  const forbidden = [
+    ["shell-only", "shell-only file workflow"],
+    ["alva fs read", "CLI ALFS read"],
+    ["--local-file", "local-file upload"],
+    ["--params-schema-file", "local schema-file upload"],
+  ];
+  for (const relativePath of ["SKILL.md", ...listFiles(resolve(candidateDir, "references")).map((file) => `references/${file}`)]) {
+    const source = readFileSync(resolve(candidateDir, relativePath), "utf8");
+    for (const [needle, label] of forbidden) {
+      if (source.includes(needle)) {
+        violations.push(
+          violation("NATIVE_TOOL_ROUTING", relativePath, `Slim must express file work through native tools; found ${label}.`, {
+            forbiddenText: needle,
+          }),
+        );
+      }
+    }
+  }
 }
 
 function isInside(root, path) {
@@ -377,6 +401,7 @@ export function validateSlimPackage({ candidateDir, baselineDir, maxSkillBytes, 
     violations,
   );
   validateSlimUpdater(candidateRoot, violations);
+  validateNativeToolRouting(candidateRoot, violations);
   validateRelativeLinks(candidateRoot, violations);
   if (skillExists) validateTopLevelContract(skill, topLevelContract, violations);
 

@@ -1,9 +1,19 @@
 {
   "schemaVersion": 1,
-  "releaseVersion": "v0.0.5",
+  "releaseVersion": "v0.0.6",
   "baselineReferences": {
     "count": 42,
-    "fingerprint": "a431580d357cd485601e74f1b46a2cca583d6615e007d995bc94fd0ad2a47416"
+    "fingerprint": "a431580d357cd485601e74f1b46a2cca583d6615e007d995bc94fd0ad2a47416",
+    "overrides": {
+      "annotation-edits.md": "7e8b0ed39929a67f04d6ab2b079103f05980d04f6f766ad43dfbb1915b3f601e",
+      "api/udf-runtime.md": "10a35863bd980b64ada13fef482daa5668807bd0b49eb94af0a2706300baee58",
+      "deployment.md": "4adccffce6535ffe7a1c7d8e0d500ed178da62392a286d071bf956326657dc93",
+      "feed-sdk.md": "650b01feaba1b06146ac9b146bbb3b5dadf3215050477035974f00e34ce2e6e2",
+      "fintwit.md": "74b7ba7c69e866352aafa847f735ab238ae16b6327c0b7e88a7035025ae7b8ee",
+      "playbook-creation.md": "5b74441bfea0c7877d4aa0f5f10fb5af22c5db77c334da0b09b3a88954c8e515",
+      "preflight.md": "cb1f89f6d393ca2a085c850c6df8febeb2bfc01fec630a6edecb1c87dd338f5f",
+      "remix-workflow.md": "9ba30ba11f852b6aaa64ba79677c317ab91997bc12af23db552b7cc4c3ba0808"
+    }
   },
   "rows": [
     {

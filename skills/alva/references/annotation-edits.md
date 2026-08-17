@@ -24,7 +24,8 @@ already in session context (just built, remixed, or read). If none is in
 context, ask which playbook, then read its HTML locally before editing:
 
 ```bash
-alva fs read --path '/alva/home/{owner}/playbooks/{name}/index.html' > ./index.html
+Use the native read tool on `/alva/home/{owner}/playbooks/{name}/index.html`,
+then edit the inherited ALFS source with the native edit tool.
 ```
 
 Process each `index` as a separate, targeted edit — change only what the

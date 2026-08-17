@@ -10,7 +10,7 @@ description: >-
   backtesting. Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v0.0.5
+  version: v0.0.6
 ---
 
 # Alva Slim
@@ -346,8 +346,8 @@ For `<remix ...>`, Extract source owner/name from the tag URL, read the source
 feed scripts, HTML, README, and playbook metadata, and preserve them unless the
 user explicitly asks otherwise. Do not regenerate from memory. Read
 [remix-workflow.md](references/remix-workflow.md); `alva remix` records lineage,
-while `alva fs read` reads artifacts. Use `alva playbooks trending` only after
-current help when the user asks to browse examples.
+while the native read tool reads artifacts. Use `alva playbooks trending` only
+after current help when the user asks to browse examples.
 
 #### Playbook Subroute: Annotation Edits
 

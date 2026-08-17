@@ -38,24 +38,20 @@ npm install -g @alva-ai/toolkit@latest
 
 ## ALFS-Native Agent Tool Mode
 
-When this skill is running in a PI/jagent-style agent environment with an
-`alva` model tool plus ALFS-native `read`/`write`/`edit` tools, use those tools
-for file preparation. Do not route through local-file upload flags such as
-`alva fs write --file`, `alva run --local-file`, `--params-schema-file`, or
-screenshot `--out`.
+This skill runs with an authenticated `alva` model tool and ALFS-native
+`read`/`write`/`edit` tools. Use the native file tools for every ALFS artifact,
+including workspace files, memory, playbooks, feed source, feed output,
+directory projections such as `@last/N`, and readable cross-user paths. Use
+the `alva` tool for platform control-plane operations.
 
-In that mode, prepare or edit content directly in ALFS, then call Alva commands
-with ALFS paths or inline JSON/data:
+Prepare and edit content directly in ALFS, then call Alva commands with ALFS
+paths or inline JSON/data:
 
-- Use `alva fs write --data ...` or the ALFS write/edit tool for source, HTML,
-  README, and schema files.
-- Use `alva run --entry-path <alfs-js-path>` or `alva run --code <inline-js>`;
-  do not use `--local-file`.
-- Use `alva functions register --params-schema '<json>'` when the schema was
-  prepared in ALFS or memory; do not use `--params-schema-file`.
-
-CLI examples that use local files are fallback instructions for shell-only
-Node.js sessions.
+- Use the native write/edit tools for source, HTML, README, and schema files.
+- Use `alva run --entry-path <alfs-js-path>` or `alva run --code <inline-js>`.
+- Use `alva functions register --params-schema '<json>'` for JSON Schema.
+- Keep screenshot results in the tool response unless a task explicitly needs
+  a persisted ALFS artifact.
 
 Third-party vendor secrets belong in Alva Secret Manager
 (`require("secret-manager")`), not CLI config, source files, or chat.
@@ -102,11 +98,8 @@ Arrays endpoints using `Authorization: Bearer <ARRAYS_JWT>`. Do not use
 
 ## Memory
 
-If you have not read the user's Alva memory index in this conversation, read it:
-
-```bash
-alva fs read --path '~/memory/MEMORY.md'
-```
+If you have not read the user's Alva memory index in this conversation, use the
+native read tool on `~/memory/MEMORY.md`.
 
 If `~/memory/` is absent or empty, skip the global scope. `MEMORY.md` and
 `user.md` are default context when present; read `user.md` and topic files only

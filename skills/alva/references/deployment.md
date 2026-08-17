@@ -247,12 +247,8 @@ This example creates a BTC price feed that runs every 4 hours.
 alva fs mkdir --path '~/feeds/btc-hourly/v1/src'
 ```
 
-Write the script to ALFS. Prefer ALFS-native write/edit tools when available;
-the `--file` form is for shell-only CLI sessions:
-
-```bash
-alva fs write --path '~/feeds/btc-hourly/v1/src/index.js' --file ./index.js --mkdir-parents
-```
+Use the native write/edit tools to write the script directly to
+`~/feeds/btc-hourly/v1/src/index.js`.
 
 Where `index.js` contains:
 
@@ -340,9 +336,8 @@ alva deploy list
 
 ### 6. Read the data (from anywhere)
 
-```bash
-alva fs read --path '/alva/home/alice/feeds/btc-hourly/v1/data/market/ohlcv/@last/24'
-```
+Use the native read tool on
+`/alva/home/alice/feeds/btc-hourly/v1/data/market/ohlcv/@last/24`.
 
 ---
 

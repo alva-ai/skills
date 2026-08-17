@@ -117,16 +117,11 @@ The canonical content shape lives in
 
 ## Draft
 
-Before `alva release playbook-draft`, write:
+Before `alva release playbook-draft`, use the native write/edit tools to place
+the current HTML and README directly at:
 
-Use ALFS-native write/edit tools when available. The `--file` examples below are
-for shell-only CLI sessions; in PI/jagent agent tool mode, write the same
-content directly to the target ALFS paths.
-
-```bash
-alva fs write --path '~/playbooks/{name}/index.html' --file ./index.html --mkdir-parents
-alva fs write --path '~/playbooks/{name}/README.md' --file ./README.md --mkdir-parents
-```
+- `~/playbooks/{name}/index.html`
+- `~/playbooks/{name}/README.md`
 
 <HARD-GATE id="before-playbook-draft">
 Before `alva release playbook-draft`, verify:

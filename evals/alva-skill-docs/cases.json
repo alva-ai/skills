@@ -27,7 +27,7 @@
         "scripts/version_check.sh",
         "alva whoami",
         "ARRAYS_JWT",
-        "alva fs read --path '~/memory/MEMORY.md'"
+        "native read tool on `~/memory/MEMORY.md`"
       ]
     },
     {
