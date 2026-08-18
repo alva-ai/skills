@@ -300,7 +300,7 @@ alva run --code '(async () => {
       },
     },
   );
-  const body = response.json();
+  const body = await response.json();
   if (!response.ok || body.success === false) {
     throw new Error("trading-pair search failed with HTTP " + response.status);
   }
