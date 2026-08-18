@@ -1367,14 +1367,15 @@
       "id": "target.auto-trade-consent-exemption",
       "group": "target",
       "target": "skill",
-      "description": "A consent-referenced, record-verified channel-loop tick is exempt from per-order confirmation while staying dry-run/intent-id/risk bound.",
+      "description": "A consent-referenced, record-verified Agent Schedule occurrence or legacy Channel Loop tick is exempt from per-order confirmation while staying dry-run/intent-id/risk bound.",
       "includes": [
         "auto-trade-consent:",
         "~/memory/auto-trade-consent.md",
         "one-read verification",
         "place live orders without per-order user confirmation",
         "missing or unreadable record",
-        "applies only to loop ticks",
+        "applies only to Agent Schedule occurrences",
+        "verified legacy Channel Loop ticks",
         "verification checks only that the consent record exists",
         "timestamp is provenance, not a match key",
         "is not a mismatch"
@@ -1384,11 +1385,49 @@
       "id": "target.auto-trade-consent-references",
       "group": "target",
       "target": "corpus",
-      "description": "The broker and trading references reconcile their per-order confirm lines with the loop-tick consent exemption instead of demanding unqualified confirmation.",
+      "description": "The broker and trading references reconcile their per-order confirm lines with the scheduled-occurrence consent exemption instead of demanding unqualified confirmation.",
       "includes": [
-        "consented auto-trading loop tick",
+        "consented auto-trading Schedule occurrence",
+        "legacy Channel Loop tick",
         "recorded consent",
         "stands in for this per-order confirmation"
+      ]
+    },
+    {
+      "id": "target.agent-schedule-lifecycle",
+      "group": "target",
+      "target": "corpus",
+      "description": "Future Channel Agent turns use named Schedules with explicit rule, bounds, lifecycle, and target defaults.",
+      "includes": [
+        "Future Channel Agent Turns",
+        "Agent Schedule | Create or resume a named future Channel Agent turn",
+        "alva schedule put",
+        "exactly one of `--after`, `--at`, `--every`, or `--cron`",
+        "omit `--channel-id` for the authenticated user's Agent Channel",
+        "put replaces the complete definition",
+        "alva schedule pause",
+        "alva schedule resume",
+        "alva schedule delete"
+      ]
+    },
+    {
+      "id": "target.legacy-loop-compatibility",
+      "group": "target",
+      "target": "corpus",
+      "description": "Legacy Channel loops remain manageable through their Automation lifecycle without recreating the retired loop command.",
+      "includes": [
+        "Legacy Channel Loop Compatibility",
+        "alva schedule list does not list legacy loops",
+        "older Toolkit versions may still accept",
+        "a Toolkit upgrade is required",
+        "alva automation list --status all --json",
+        "alva automation inspect --id <automation_id> --json",
+        "Channel loop:",
+        "~/loops/_runner/index.js",
+        "do not create new legacy loops",
+        "alva automation stop --id <automation_id>",
+        "alva automation resume --id <automation_id>",
+        "alva automation delete --id <automation_id>"
       ]
     }
   ]

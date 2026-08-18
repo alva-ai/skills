@@ -14,8 +14,9 @@ Decision order:
 1. If the user wants an explanation, comparison, valuation, rank, or current
    market fact in chat, route to Financial Analysis / Ask Question.
 2. If the user wants persistence, cadence, alerting, trading signals, or a
-   reusable dataset, route to the durable artifact that fits, not automatically
-   to a playbook.
+   reusable dataset, route to the durable artifact that fits: Agent Schedule
+   for a future Agent turn, Automation for a feed/script pipeline, not
+   automatically to a playbook.
 3. If the user wants a hosted app, share URL, remix, annotation edit, release,
    or playbook version update, enter the Playbook Creation tree.
 
@@ -26,6 +27,7 @@ Decision order:
 | Financial Analysis / Ask Question | Answer market, asset, portfolio, valuation, comparison, single-ticker, and "why" questions with fresh data/search/`alva run` evidence. A named-ticker question — including company narrative, earnings, or earnings call questions — first opens [ticker-read.md](ticker-read.md). Comparison baselines are figures too: fetch or qualify them. Every answer must read [user-facing-prose.md](user-facing-prose.md), apply its required Investment Disclaimer, then pass the ask evidence gate. |
 | Playbook Creation | Build, remix, edit, release, or update a hosted/shareable playbook. Read [playbook-creation.md](playbook-creation.md) for the subroute tree and gates. |
 | Strategy / Trading Analysis | Use Altra for backtests, signals, portfolio simulation, rebalancing, or trading analysis; deliver an answer, feed, signal, or playbook as requested. Strategy answers apply the required [Investment Disclaimer](user-facing-prose.md#investment-disclaimer). |
+| Agent Schedule | Create or resume a named future Channel Agent turn. Read [agent-schedules.md](agent-schedules.md); use `schedule` for Agent instructions and `deploy` for scripts. |
 | Automation / Push | Read [alva-knowledge.md](alva-knowledge.md) before design, build or modify a feed that declares actionable outputs with `alertOutput(typeDoc)`, then verify publisher, subscription, and delivery paths. |
 | Debug / Edit | Inspect existing code, logs, playbook source, feed output, or annotations, then change the generator rather than rendered values. |
 | Capability Verification | Verify Data Skills, Skillhub, runtime, trading, or search coverage before saying Alva lacks a capability. |

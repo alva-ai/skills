@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/Users/yimingchen/alva/mono-meta/.codex-worktrees/notification-delivery-aip/skills/skills/alva`
+Source: `/Users/yimingchen/alva/mono-meta/.codex-worktrees/alva-skills-agent-schedule/skills/alva`
 
 SKILL.md lines: 911
 
-Cases: 84/84
+Cases: 86/86
 
-Checks: 857/857 (100.00%)
+Checks: 880/880 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -249,7 +249,7 @@ Interactive orders keep the per-order confirmation rule: the exemption does not 
 
 ## target
 
-15/15 cases, 172/172 checks
+17/17 cases, 195/195 checks
 
 ### PASS target.automation-publish-side-effects
 
@@ -431,7 +431,7 @@ Operational pitfalls are a mandatory stepwise gate, not an optional debugging ap
 
 Latest mainline Alva skill updates remain integrated after rebasing the refactor.
 
-- [x] version: v1.21.2
+- [x] version: v1.21.4
 - [x] Capability Help
 - [x] Reply 1, 2, or 3 to start
 - [x] feedback
@@ -478,25 +478,58 @@ One-off price-series artifacts route to a pinned Lightweight Charts v5 reference
 
 ### PASS target.auto-trade-consent-exemption
 
-A consent-referenced, record-verified channel-loop tick is exempt from per-order confirmation while staying dry-run/intent-id/risk bound.
+A consent-referenced, record-verified Agent Schedule occurrence or legacy Channel Loop tick is exempt from per-order confirmation while staying dry-run/intent-id/risk bound.
 
 - [x] auto-trade-consent:
 - [x] ~/memory/auto-trade-consent.md
 - [x] one-read verification
 - [x] place live orders without per-order user confirmation
 - [x] missing or unreadable record
-- [x] applies only to loop ticks
+- [x] applies only to Agent Schedule occurrences
+- [x] verified legacy Channel Loop ticks
 - [x] verification checks only that the consent record exists
 - [x] timestamp is provenance, not a match key
 - [x] is not a mismatch
 
 ### PASS target.auto-trade-consent-references
 
-The broker and trading references reconcile their per-order confirm lines with the loop-tick consent exemption instead of demanding unqualified confirmation.
+The broker and trading references reconcile their per-order confirm lines with the scheduled-occurrence consent exemption instead of demanding unqualified confirmation.
 
-- [x] consented auto-trading loop tick
+- [x] consented auto-trading Schedule occurrence
+- [x] legacy Channel Loop tick
 - [x] recorded consent
 - [x] stands in for this per-order confirmation
+
+### PASS target.agent-schedule-lifecycle
+
+Future Channel Agent turns use named Schedules with explicit rule, bounds, lifecycle, and target defaults.
+
+- [x] Future Channel Agent Turns
+- [x] Agent Schedule | Create or resume a named future Channel Agent turn
+- [x] alva schedule put
+- [x] exactly one of `--after`, `--at`, `--every`, or `--cron`
+- [x] omit `--channel-id` for the authenticated user's Agent Channel
+- [x] put replaces the complete definition
+- [x] alva schedule pause
+- [x] alva schedule resume
+- [x] alva schedule delete
+
+### PASS target.legacy-loop-compatibility
+
+Legacy Channel loops remain manageable through their Automation lifecycle without recreating the retired loop command.
+
+- [x] Legacy Channel Loop Compatibility
+- [x] alva schedule list does not list legacy loops
+- [x] older Toolkit versions may still accept
+- [x] a Toolkit upgrade is required
+- [x] alva automation list --status all --json
+- [x] alva automation inspect --id <automation_id> --json
+- [x] Channel loop:
+- [x] ~/loops/_runner/index.js
+- [x] do not create new legacy loops
+- [x] alva automation stop --id <automation_id>
+- [x] alva automation resume --id <automation_id>
+- [x] alva automation delete --id <automation_id>
 
 ## alerts
 
