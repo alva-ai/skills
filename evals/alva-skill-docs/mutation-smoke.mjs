@@ -30,6 +30,19 @@ const MUTATIONS = [
     ],
   },
   {
+    id: "altra-symbol-resolution",
+    file: "references/altra-trading.md",
+    remove:
+      "Never invent or assemble an Altra symbol from a ticker. Resolve the exact\n" +
+      "`trading_pair` from Arrays before writing the strategy, then pass it to Altra\n" +
+      "unchanged. Use the existing `alva run` surface; no dedicated trading-pair CLI\n" +
+      "command is required.\n",
+    expectFailedCases: [
+      "target.altra-symbol-resolution",
+      "scenario.backtest-symbol-resolution",
+    ],
+  },
+  {
     id: "explicit-advice-request-header",
     file: "references/user-facing-prose.md",
     remove:

@@ -272,8 +272,92 @@ const ohlcvProvider = createArraysOhlcvProvider({ jwt: ARRAYS_JWT });
 const altra = new FeedAltra(config, ohlcvProvider);
 ```
 
-**Symbol format**: Use the exact format from the system (e.g.
-`"BINANCE_SPOT_BTC_USDT"`, `"XNAS_SPOT_AAPL_USD"`).
+### Resolve Trading Pairs Before Backtesting
+
+Never invent or assemble an Altra symbol from a ticker. Resolve the exact
+`trading_pair` from Arrays before writing the strategy, then pass it to Altra
+unchanged. Use the existing `alva run` surface; no dedicated trading-pair CLI
+command is required.
+
+Run this bounded lookup with the user's intended instrument and venue filters:
+
+```bash
+alva run --code '(async () => {
+  const http = require("net/http");
+  const secret = require("secret-manager");
+  const env = require("env");
+  const args = env.args || {};
+  const rawQuery = String(args.query || "").trim().toUpperCase();
+  const query = rawQuery.includes(":") ? rawQuery.split(":").pop() : rawQuery;
+  if (!query) throw new Error("query is required");
+
+  const response = await http.fetch(
+    "https://data-tools.prd.space.id/api/v1/market/trading-pairs?symbol=" +
+      encodeURIComponent(query),
+    {
+      headers: {
+        Authorization: "Bearer " + secret.loadPlaintext("ARRAYS_JWT"),
+      },
+    },
+  );
+  const body = response.json();
+  if (!response.ok || body.success === false) {
+    throw new Error("trading-pair search failed with HTTP " + response.status);
+  }
+
+  const wanted = {
+    instrumentType: String(args.instrument_type || "").toUpperCase(),
+    underlyingType: String(args.underlying_type || "").toUpperCase(),
+    market: String(args.market || "").toUpperCase(),
+    quote: String(args.quote || "").toUpperCase(),
+  };
+  const candidates = [];
+  for (const match of body.data || []) {
+    for (const group of match.trading_pairs || []) {
+      for (const pair of group.pairs || []) {
+        const candidate = {
+          matchedSymbol: match.symbol,
+          tradingPair: pair.trading_pair,
+          instrumentType: group.instrument_type,
+          underlyingType: pair.underlying_type,
+          market: pair.market,
+          quote: pair.quote,
+        };
+        if (!candidate.tradingPair) continue;
+        if (wanted.instrumentType && String(candidate.instrumentType).toUpperCase() !== wanted.instrumentType) continue;
+        if (wanted.underlyingType && String(candidate.underlyingType).toUpperCase() !== wanted.underlyingType) continue;
+        if (wanted.market && String(candidate.market).toUpperCase() !== wanted.market) continue;
+        if (wanted.quote && String(candidate.quote).toUpperCase() !== wanted.quote) continue;
+        candidates.push(candidate);
+      }
+    }
+  }
+  return {
+    query,
+    candidates: candidates.slice(0, 20),
+    truncated: candidates.length > 20,
+  };
+})();' --args '{"query":"RKLB","instrument_type":"spot","underlying_type":"stock","market":"US","quote":"USD"}'
+```
+
+Selection rules:
+
+- Treat a prefix such as `NASDAQ:` or `XNAS:` as an intent hint. Search Arrays
+  with the base ticker and use the returned `tradingPair`; for example,
+  `NASDAQ:RKLB` resolves through `RKLB` to `US_SPOT_RKLB_USD`.
+- For US equities, filter to `spot` + `stock` + `US` + `USD`. For crypto,
+  filter `spot` or `perp` and the requested venue and quote.
+- Exclude options unless the user explicitly asks for an option contract.
+- Prefer an exact `matchedSymbol`. Never select the first unfiltered response.
+  If multiple filtered candidates still match the user's intent, ask one
+  blocking question instead of guessing.
+- Stop when the lookup errors or returns no eligible candidate. Do not silently
+  fall back to an invented symbol.
+
+The lookup proves naming and catalog membership, not OHLCV availability. Before
+the full-range backtest, run Altra with the selected symbol over a bounded smoke
+window that covers the maximum feature lookback. Require at least one real OHLCV
+bar and no provider error before expanding to the requested range.
 
 **Supported OHLCV intervals**:
 
