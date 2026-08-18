@@ -2,11 +2,11 @@
 
 Source: `origin/main`
 
-SKILL.md lines: 910
+SKILL.md lines: 911
 
-Cases: 82/84
+Cases: 82/86
 
-Checks: 851/857 (99.30%)
+Checks: 855/884 (96.72%)
 
 ## Scoring Diagnosis
 
@@ -15,8 +15,10 @@ Classify the gap before editing: missing capability summary, missing routing poi
 Do not expose eval scores as product copy, and do not patch demos to hide a weak result.
 Instead, fix the canonical skill text or eval case, then rerun baseline and final reports so the regression mechanism proves the gap is closed.
 
-- subscriptions.delivery-destination: inspect for a skill gap before editing. Missing checks: alert destination: references/push-notifications.md#Choose The Delivery Destination includes can contain Alva channel destinations and verified-account email at the same time; alert destination: references/push-notifications.md#Choose The Delivery Destination includes Updating email does not move or clear the current Alva/IM destination; alert destination: references/push-notifications.md#Choose The Delivery Destination includes alva automation delivery get --id <automation_id>; alert destination: references/push-notifications.md#Choose The Delivery Destination includes alva automation delivery update --id <automation_id> --email-enabled; alert destination: references/push-notifications.md#Choose The Delivery Destination includes Do not read-modify-write the whole resource
-- scenario.current-topic-channel-alert: inspect for a skill gap before editing. Missing checks: A successful partial update proves that alert delivery is configured
+- target.auto-trade-consent-exemption: inspect for a skill gap before editing. Missing checks: applies only to Agent Schedule occurrences; verified legacy Channel Loop ticks
+- target.auto-trade-consent-references: inspect for a skill gap before editing. Missing checks: consented auto-trading Schedule occurrence; legacy Channel Loop tick
+- target.agent-schedule-lifecycle: inspect for a skill gap before editing. Missing checks: Future Channel Agent Turns; Agent Schedule | Create or resume a named future Channel Agent turn; alva schedule put; exactly one of `--after`, `--at`, `--every`, or `--cron`; omit `--channel-id` for the authenticated user's Agent Channel; `put` replaces the complete definition; alva schedule pause; alva schedule resume; alva schedule delete
+- target.legacy-loop-compatibility: inspect for a skill gap before editing. Missing checks: Legacy Channel Loop Compatibility; alva schedule list; does not list legacy loops; older Toolkit versions may still accept; a Toolkit upgrade is required; alva automation list --status all --json; alva automation inspect --id <automation_id> --json; Channel loop:; ~/loops/_runner/index.js; do not create new legacy loops; alva automation stop --id <automation_id>; alva automation resume --id <automation_id>; alva automation delete --id <automation_id>; stop the old Automation and verify it is quiescent before creating; If quiescence cannot be confirmed, do not activate the replacement; never run both
 
 ## retained
 
@@ -250,7 +252,7 @@ Interactive orders keep the per-order confirmation rule: the exemption does not 
 
 ## target
 
-15/15 cases, 172/172 checks
+13/17 cases, 170/199 checks
 
 ### PASS target.automation-publish-side-effects
 
@@ -266,7 +268,7 @@ Automation publish documents its owner binding and first-run side effects, inclu
 
 Top-level SKILL.md stays below the current guide ceiling without forcing a minimum size that would block future compression.
 
-- [x] line count <= 911 (actual 910)
+- [x] line count <= 911 (actual 911)
 
 ### PASS target.playbook-task-offload
 
@@ -432,7 +434,7 @@ Operational pitfalls are a mandatory stepwise gate, not an optional debugging ap
 
 Latest mainline Alva skill updates remain integrated after rebasing the refactor.
 
-- [x] version: v1.21.2
+- [x] version: v1.21.4
 - [x] Capability Help
 - [x] Reply 1, 2, or 3 to start
 - [x] feedback
@@ -477,27 +479,64 @@ One-off price-series artifacts route to a pinned Lightweight Charts v5 reference
 - [x] references/lightweight-charts.md includes createPriceLine()
 - [x] SKILL.md includes [lightweight-charts.md](references/lightweight-charts.md)
 
-### PASS target.auto-trade-consent-exemption
+### FAIL target.auto-trade-consent-exemption
 
-A consent-referenced, record-verified channel-loop tick is exempt from per-order confirmation while staying dry-run/intent-id/risk bound.
+A consent-referenced, record-verified Agent Schedule occurrence or legacy Channel Loop tick is exempt from per-order confirmation while staying dry-run/intent-id/risk bound.
 
 - [x] auto-trade-consent:
 - [x] ~/memory/auto-trade-consent.md
 - [x] one-read verification
 - [x] place live orders without per-order user confirmation
 - [x] missing or unreadable record
-- [x] applies only to loop ticks
+- [ ] applies only to Agent Schedule occurrences
+- [ ] verified legacy Channel Loop ticks
 - [x] verification checks only that the consent record exists
 - [x] timestamp is provenance, not a match key
 - [x] is not a mismatch
 
-### PASS target.auto-trade-consent-references
+### FAIL target.auto-trade-consent-references
 
-The broker and trading references reconcile their per-order confirm lines with the loop-tick consent exemption instead of demanding unqualified confirmation.
+The broker and trading references reconcile their per-order confirm lines with the scheduled-occurrence consent exemption instead of demanding unqualified confirmation.
 
-- [x] consented auto-trading loop tick
+- [ ] consented auto-trading Schedule occurrence
+- [ ] legacy Channel Loop tick
 - [x] recorded consent
 - [x] stands in for this per-order confirmation
+
+### FAIL target.agent-schedule-lifecycle
+
+Future Channel Agent turns use named Schedules with explicit rule, bounds, lifecycle, and target defaults.
+
+- [ ] Future Channel Agent Turns
+- [ ] Agent Schedule | Create or resume a named future Channel Agent turn
+- [ ] alva schedule put
+- [ ] exactly one of `--after`, `--at`, `--every`, or `--cron`
+- [ ] omit `--channel-id` for the authenticated user's Agent Channel
+- [ ] `put` replaces the complete definition
+- [ ] alva schedule pause
+- [ ] alva schedule resume
+- [ ] alva schedule delete
+
+### FAIL target.legacy-loop-compatibility
+
+Legacy Channel loops remain manageable through their Automation lifecycle without recreating the retired loop command.
+
+- [ ] Legacy Channel Loop Compatibility
+- [ ] alva schedule list
+- [ ] does not list legacy loops
+- [ ] older Toolkit versions may still accept
+- [ ] a Toolkit upgrade is required
+- [ ] alva automation list --status all --json
+- [ ] alva automation inspect --id <automation_id> --json
+- [ ] Channel loop:
+- [ ] ~/loops/_runner/index.js
+- [ ] do not create new legacy loops
+- [ ] alva automation stop --id <automation_id>
+- [ ] alva automation resume --id <automation_id>
+- [ ] alva automation delete --id <automation_id>
+- [ ] stop the old Automation and verify it is quiescent before creating
+- [ ] If quiescence cannot be confirmed, do not activate the replacement
+- [ ] never run both
 
 ## alerts
 
@@ -818,9 +857,9 @@ Push setup is evaluated as a full delivery path instead of a single publisher fl
 
 ## subscriptions
 
-0/1 cases, 23/28 checks
+1/1 cases, 28/28 checks
 
-### FAIL subscriptions.delivery-destination
+### PASS subscriptions.delivery-destination
 
 The skill models concurrent Alva and email destinations, distinguishes the default personal destination from an Alva topic channel, and keeps external-group operations profile-owned.
 
@@ -838,11 +877,11 @@ The skill models concurrent Alva and email destinations, distinguishes the defau
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes `channel_id=0`
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes `active_im_provider`
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes active IM provider
-- [ ] alert destination: references/push-notifications.md#Choose The Delivery Destination includes can contain Alva channel destinations and verified-account email at the same time
-- [ ] alert destination: references/push-notifications.md#Choose The Delivery Destination includes Updating email does not move or clear the current Alva/IM destination
-- [ ] alert destination: references/push-notifications.md#Choose The Delivery Destination includes alva automation delivery get --id <automation_id>
-- [ ] alert destination: references/push-notifications.md#Choose The Delivery Destination includes alva automation delivery update --id <automation_id> --email-enabled
-- [ ] alert destination: references/push-notifications.md#Choose The Delivery Destination includes Do not read-modify-write the whole resource
+- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes can contain Alva channel destinations and verified-account email at the same time
+- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes Updating email does not move or clear the current Alva/IM destination
+- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes alva automation delivery get --id <automation_id>
+- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes alva automation delivery update --id <automation_id> --email-enabled
+- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes Do not read-modify-write the whole resource
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes `open_url` action
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes https://alva.ai/settings?tab=alvaAgent
 - [x] destination verification: references/push-notifications.md#Configure And Verify includes intended destination
@@ -1097,7 +1136,7 @@ Prompt: `<annotation id="hero-title">make this chart title shorter</annotation>`
 
 ## scenarios.push
 
-2/3 cases, 60/61 checks
+3/3 cases, 61/61 checks
 
 ### PASS scenario.alert-push-monitor
 
@@ -1160,7 +1199,7 @@ Prompt: `Create a scheduled market Feed alert with a red Discord card, a View re
 - [x] Portable Actions And Card Presentation: references/feed-sdk.md#Portable Actions And Card Presentation includes sendPromptAction(
 - [x] Portable Actions And Card Presentation: references/feed-sdk.md#Portable Actions And Card Presentation includes cardPresentation({
 
-### FAIL scenario.current-topic-channel-alert
+### PASS scenario.current-topic-channel-alert
 
 A request made in an Alva web topic channel binds the feed to that exact channel id and never invents Telegram delivery.
 
@@ -1174,7 +1213,7 @@ Prompt: `<session-prefill-channel-memory channel-id="44" root="/alva/home/ymchco
 - [x] Do not infer Telegram, Discord, Slack, or another transport
 - [x] current Alva topic channel (channel id <id>)
 - [x] Do not trigger the cronjob or wait for its next scheduled run solely to verify setup
-- [ ] A successful partial update proves that alert delivery is configured
+- [x] A successful partial update proves that alert delivery is configured
 - [x] it does not prove that a message has already been delivered
 - [x] An ALFS record alone is also not delivery proof
 - [x] report it as an Alva web topic channel with its id

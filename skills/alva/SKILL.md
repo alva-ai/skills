@@ -39,6 +39,7 @@ The main objects are:
 | Data Skills        | 250+ structured Arrays endpoints for US and non-US equities, fundamentals (earnings, filings), options, crypto, macro, on-chain, semiconductor spot/contract prices, news, prediction markets, and indexed Twitter/X. | You need factual financial data.                                                                               |
 | Runtime script     | JavaScript executed inside Alva's V8/jagent runtime through `alva run` or cronjobs.                                                                          | You need computation, HTTP, ALFS, secrets, alpi, ONNX, or Feed SDK.                                            |
 | Feed               | The persistent data pipeline and identity (`feed_id`) that writes outputs to ALFS. `alva automation` is its product-facing lifecycle CLI; `alva deploy` cronjobs produce its data. | Data needs freshness, history, public reads, charts, release, or push.                                         |
+| Agent Schedule     | A named future or recurring instruction that creates durable turns for a Channel Agent.                                                                      | The user wants the Agent itself to return later, continue work, or repeat a judgment.                          |
 | Playbook           | A hosted investing app at `https://alva.ai/u/<username>/playbooks/<name>`.                                                                                   | The user wants a shareable dashboard, screener, thesis, what-if, or strategy surface.                          |
 | Skillhub blueprint | A catalog methodology addressed by `/use-skill:<username>/<name>` or discovered from a user skill/method reference.                                          | The user references a skill/method, or a task matches an official template family.                             |
 | Altra              | The Feed SDK trading engine for event-driven backtesting and signal feeds.                                                                                   | Any strategy, simulation, signal target, portfolio, order, equity curve, or rebalancing logic.                 |
@@ -244,25 +245,20 @@ not require UDFs.
 orders require the trading surface, a dry run first, explicit user confirmation
 before non-dry-run execution, and [api/trading.md](references/api/trading.md).
 This per-order confirmation rule holds for any order placed in an ordinary
-conversation. *Exemption (channel-loop ticks only):* a channel-loop tick whose
-loop `--goal` carries the consent reference line `[auto-trade-consent: granted
-<ISO8601-UTC> record=~/memory/auto-trade-consent.md]` AND whose one-read
-verification finds the consent record MAY place live orders without per-order
-user confirmation, subject to dry-run validation first, a fresh idempotent
-intent-id, and trex risk rules. Verification checks only that the consent record
-exists: the `granted` timestamp is provenance, not a match key; a `granted_at`
-differing after a re-grant is not a mismatch and must not refuse live orders. A
-missing or unreadable record is the only verification failure and means NO live
-orders; applies only to loop ticks, never interactive. Creation-side consent: see "Channel loops".
+conversation. *Exemption (scheduled occurrences only):* an Agent Schedule
+`--message` or verified legacy Channel Loop goal carrying
+`[auto-trade-consent: granted <ISO8601-UTC>
+record=~/memory/auto-trade-consent.md]` AND whose one-read verification finds
+the record MAY place live orders without per-order user confirmation, subject
+to dry-run validation, a fresh idempotent intent-id, and trex risk rules.
+Verification checks only that the consent record exists: the timestamp is
+provenance, not a match key, and a differing `granted_at` after re-grant is not
+a mismatch. A missing or unreadable record means NO live orders. This applies
+only to Agent Schedule occurrences and verified legacy Channel Loop ticks,
+never interactive; recurring schedules also require `--until` or
+`--max-occurrences`. See [agent-schedules.md](references/agent-schedules.md).
 
 ## Capability Map
-
-The map is organized as one shared layer plus two decision trees. **Shared Data
-And Execution** is the common substrate: Data Skills, search, BYOD, `alva run`,
-jagent runtime, and provenance rules. **Financial Analysis / Ask Question** uses
-that layer for sourced chat answers. **Durable Artifacts / Playbook** uses that
-layer, then persists or publishes work through feeds, automations, signals,
-playbooks, or release flows. Choose the smallest tree that satisfies the verb.
 
 ### Shared Data And Execution Layer
 
@@ -753,6 +749,7 @@ text does not fully cover.
 | `fs`                 | ALFS reads/writes/grants/time-series suffixes and shared modules under `~/library`. Must read [api/filesystem.md](references/api/filesystem.md) for synth suffixes and grant gotchas. |
 | `run`                | Execute jagent JS. See [jagent-runtime.md](references/jagent-runtime.md).                                                                                                             |
 | `deploy`             | Cronjob lifecycle for producer scripts: schedule, args, trigger, run-status, runs, logs. See [deployment.md](references/deployment.md).                                               |
+| `schedule`           | Named future and recurring Channel Agent turns: list, put, pause, resume, delete. See [agent-schedules.md](references/agent-schedules.md).                                            |
 | `automation`         | Product-facing lifecycle and per-Automation delivery CLI (`delivery get/update` supports independent Alva and email destinations). Must read [feed-lifecycle.md](references/feed-lifecycle.md) and [push-notifications.md](references/push-notifications.md). |
 | `release`            | Playbook draft/release; the release reference also covers automation publish metadata extras. Must read [api/release.md](references/api/release.md).                                   |
 | `lint playbook`      | Design-system linter, same gate as release. See [design-contract.yaml](references/design-contract.yaml).                                                                              |
@@ -796,6 +793,7 @@ Use this index to open only the file needed for the current task.
 | [feed-sdk.md](references/feed-sdk.md)                                                 | Feed SDK API, schemas, time series, grouped records, upstreams, examples.                                                                     |
 | [altra-trading.md](references/altra-trading.md)                                       | Altra strategy engine, features, signals, tests, PIT compliance.                                                                              |
 | [alpi.md](references/alpi.md)                                                         | Scheduled LLM reasoning/tool-loop API and examples.                                                                                           |
+| [agent-schedules.md](references/agent-schedules.md)                                   | Named Channel Agent schedules, rule/bound contracts, lifecycle, and legacy Channel Loop compatibility.                                        |
 | [onnx.md](references/onnx.md)                                                         | ONNX artifact, inference, FeedAltra integration, release checks.                                                                              |
 | [deployment.md](references/deployment.md)                                             | Cronjob create/list/pause/resume/trigger/run-status/runs/run-logs.                                                                            |
 | [search.md](references/search.md)                                                     | `unified_search`, finance search, Twitter/X, Reddit, YouTube, web gotchas.                                                                    |
