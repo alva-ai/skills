@@ -6,7 +6,7 @@ SKILL.md lines: 911
 
 Cases: 82/86
 
-Checks: 855/880 (97.16%)
+Checks: 855/884 (96.72%)
 
 ## Scoring Diagnosis
 
@@ -17,8 +17,8 @@ Instead, fix the canonical skill text or eval case, then rerun baseline and fina
 
 - target.auto-trade-consent-exemption: inspect for a skill gap before editing. Missing checks: applies only to Agent Schedule occurrences; verified legacy Channel Loop ticks
 - target.auto-trade-consent-references: inspect for a skill gap before editing. Missing checks: consented auto-trading Schedule occurrence; legacy Channel Loop tick
-- target.agent-schedule-lifecycle: inspect for a skill gap before editing. Missing checks: Future Channel Agent Turns; Agent Schedule | Create or resume a named future Channel Agent turn; alva schedule put; exactly one of `--after`, `--at`, `--every`, or `--cron`; omit `--channel-id` for the authenticated user's Agent Channel; put replaces the complete definition; alva schedule pause; alva schedule resume; alva schedule delete
-- target.legacy-loop-compatibility: inspect for a skill gap before editing. Missing checks: Legacy Channel Loop Compatibility; alva schedule list does not list legacy loops; older Toolkit versions may still accept; a Toolkit upgrade is required; alva automation list --status all --json; alva automation inspect --id <automation_id> --json; Channel loop:; ~/loops/_runner/index.js; do not create new legacy loops; alva automation stop --id <automation_id>; alva automation resume --id <automation_id>; alva automation delete --id <automation_id>
+- target.agent-schedule-lifecycle: inspect for a skill gap before editing. Missing checks: Future Channel Agent Turns; Agent Schedule | Create or resume a named future Channel Agent turn; alva schedule put; exactly one of `--after`, `--at`, `--every`, or `--cron`; omit `--channel-id` for the authenticated user's Agent Channel; `put` replaces the complete definition; alva schedule pause; alva schedule resume; alva schedule delete
+- target.legacy-loop-compatibility: inspect for a skill gap before editing. Missing checks: Legacy Channel Loop Compatibility; alva schedule list; does not list legacy loops; older Toolkit versions may still accept; a Toolkit upgrade is required; alva automation list --status all --json; alva automation inspect --id <automation_id> --json; Channel loop:; ~/loops/_runner/index.js; do not create new legacy loops; alva automation stop --id <automation_id>; alva automation resume --id <automation_id>; alva automation delete --id <automation_id>; stop the old Automation and verify it is quiescent before creating; If quiescence cannot be confirmed, do not activate the replacement; never run both
 
 ## retained
 
@@ -252,7 +252,7 @@ Interactive orders keep the per-order confirmation rule: the exemption does not 
 
 ## target
 
-13/17 cases, 170/195 checks
+13/17 cases, 170/199 checks
 
 ### PASS target.automation-publish-side-effects
 
@@ -512,7 +512,7 @@ Future Channel Agent turns use named Schedules with explicit rule, bounds, lifec
 - [ ] alva schedule put
 - [ ] exactly one of `--after`, `--at`, `--every`, or `--cron`
 - [ ] omit `--channel-id` for the authenticated user's Agent Channel
-- [ ] put replaces the complete definition
+- [ ] `put` replaces the complete definition
 - [ ] alva schedule pause
 - [ ] alva schedule resume
 - [ ] alva schedule delete
@@ -522,7 +522,8 @@ Future Channel Agent turns use named Schedules with explicit rule, bounds, lifec
 Legacy Channel loops remain manageable through their Automation lifecycle without recreating the retired loop command.
 
 - [ ] Legacy Channel Loop Compatibility
-- [ ] alva schedule list does not list legacy loops
+- [ ] alva schedule list
+- [ ] does not list legacy loops
 - [ ] older Toolkit versions may still accept
 - [ ] a Toolkit upgrade is required
 - [ ] alva automation list --status all --json
@@ -533,6 +534,9 @@ Legacy Channel loops remain manageable through their Automation lifecycle withou
 - [ ] alva automation stop --id <automation_id>
 - [ ] alva automation resume --id <automation_id>
 - [ ] alva automation delete --id <automation_id>
+- [ ] stop the old Automation and verify it is quiescent before creating
+- [ ] If quiescence cannot be confirmed, do not activate the replacement
+- [ ] never run both
 
 ## alerts
 

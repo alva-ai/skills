@@ -1404,7 +1404,7 @@
         "alva schedule put",
         "exactly one of `--after`, `--at`, `--every`, or `--cron`",
         "omit `--channel-id` for the authenticated user's Agent Channel",
-        "put replaces the complete definition",
+        "`put` replaces the complete definition",
         "alva schedule pause",
         "alva schedule resume",
         "alva schedule delete"
@@ -1417,7 +1417,8 @@
       "description": "Legacy Channel loops remain manageable through their Automation lifecycle without recreating the retired loop command.",
       "includes": [
         "Legacy Channel Loop Compatibility",
-        "alva schedule list does not list legacy loops",
+        "alva schedule list",
+        "does not list legacy loops",
         "older Toolkit versions may still accept",
         "a Toolkit upgrade is required",
         "alva automation list --status all --json",
@@ -1427,7 +1428,10 @@
         "do not create new legacy loops",
         "alva automation stop --id <automation_id>",
         "alva automation resume --id <automation_id>",
-        "alva automation delete --id <automation_id>"
+        "alva automation delete --id <automation_id>",
+        "stop the old Automation and verify it is quiescent before creating",
+        "If quiescence cannot be confirmed, do not activate the replacement",
+        "never run both"
       ]
     }
   ]

@@ -2,11 +2,11 @@
 
 Source: `/Users/yimingchen/alva/mono-meta/.codex-worktrees/alva-skills-agent-schedule/skills/alva`
 
-SKILL.md lines: 911
+SKILL.md lines: 909
 
 Cases: 86/86
 
-Checks: 880/880 (100.00%)
+Checks: 884/884 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -249,7 +249,7 @@ Interactive orders keep the per-order confirmation rule: the exemption does not 
 
 ## target
 
-17/17 cases, 195/195 checks
+17/17 cases, 199/199 checks
 
 ### PASS target.automation-publish-side-effects
 
@@ -265,7 +265,7 @@ Automation publish documents its owner binding and first-run side effects, inclu
 
 Top-level SKILL.md stays below the current guide ceiling without forcing a minimum size that would block future compression.
 
-- [x] line count <= 911 (actual 911)
+- [x] line count <= 911 (actual 909)
 
 ### PASS target.playbook-task-offload
 
@@ -509,7 +509,7 @@ Future Channel Agent turns use named Schedules with explicit rule, bounds, lifec
 - [x] alva schedule put
 - [x] exactly one of `--after`, `--at`, `--every`, or `--cron`
 - [x] omit `--channel-id` for the authenticated user's Agent Channel
-- [x] put replaces the complete definition
+- [x] `put` replaces the complete definition
 - [x] alva schedule pause
 - [x] alva schedule resume
 - [x] alva schedule delete
@@ -519,7 +519,8 @@ Future Channel Agent turns use named Schedules with explicit rule, bounds, lifec
 Legacy Channel loops remain manageable through their Automation lifecycle without recreating the retired loop command.
 
 - [x] Legacy Channel Loop Compatibility
-- [x] alva schedule list does not list legacy loops
+- [x] alva schedule list
+- [x] does not list legacy loops
 - [x] older Toolkit versions may still accept
 - [x] a Toolkit upgrade is required
 - [x] alva automation list --status all --json
@@ -530,6 +531,9 @@ Legacy Channel loops remain manageable through their Automation lifecycle withou
 - [x] alva automation stop --id <automation_id>
 - [x] alva automation resume --id <automation_id>
 - [x] alva automation delete --id <automation_id>
+- [x] stop the old Automation and verify it is quiescent before creating
+- [x] If quiescence cannot be confirmed, do not activate the replacement
+- [x] never run both
 
 ## alerts
 

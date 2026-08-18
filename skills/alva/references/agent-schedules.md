@@ -45,19 +45,19 @@ alva schedule put --name thesis-check --message "Re-evaluate the thesis" \
 ```
 
 Cron rules require an IANA `--timezone`. `--starts-at`, `--until`, and
-`--max-occurrences` are recurrence bounds and therefore apply only to `every`
-and `cron`; `at` and `after` do not accept them. Schedule-semantic timestamps
-and durations use whole seconds. Do not truncate or round a fractional input;
-ask for or construct a whole-second value. `after` is resolved from the time of
-each request, so a retry must send `--after` again rather than reuse a previously
-calculated timestamp.
+`--max-occurrences` are recurrence bounds and therefore apply only to `--every`
+and `--cron`; `--at` and `--after` do not accept them. Schedule-semantic
+timestamps and durations use whole seconds. Do not truncate or round a
+fractional input; ask for or construct a whole-second value. `after` is resolved
+from the time of each request, so a retry must send `--after` again rather than
+reuse a previously calculated timestamp.
 
 Omit `--channel-id` for the authenticated user's Agent Channel. Supply it only
 when the user explicitly selected another owned Channel. The engine persists
 and hands off each occurrence as a durable Channel turn; the CLI does not need
 to stay running.
 
-put replaces the complete definition for that name. Read the existing
+`put` replaces the complete definition for that name. Read the existing
 Schedule before changing one field, then send the intended complete rule,
 bounds, and message:
 
@@ -95,8 +95,8 @@ Loop as three existing resources:
 - a producer Cronjob pointing to `~/loops/_runner/index.js`; and
 - the shared runner file in ALFS.
 
-These rows are not Agent Schedules. `alva schedule list does not list legacy
-loops`, and replacing a legacy Loop with a same-named Schedule does not stop the
+These rows are not Agent Schedules. `alva schedule list` does not list legacy
+loops, and replacing a legacy Loop with a same-named Schedule does not stop the
 old Cronjob. Do not create new legacy loops and do not recreate the retired
 `alva loop create` command in shell code.
 
@@ -122,13 +122,18 @@ alva automation resume --id <automation_id>
 alva automation delete --id <automation_id>
 ```
 
-Deletion removes the producer Cronjob best-effort. If cleanup matters, verify
-the returned result and confirm the former Cronjob no longer exists; do not
-delete the shared runner while any legacy Loop still references it.
+Deletion removes the producer Cronjob on a best-effort basis. If cleanup
+matters, verify the returned result and confirm the former Cronjob no longer
+exists; do not delete the shared runner while any legacy Loop still references
+it.
 
 When the user explicitly requests migration, inspect and record the legacy
-goal, cadence, remaining bounds, target Channel, and consent state first. Create
-and verify the named Schedule, then stop the old Automation before its next
-tick so both systems cannot deliver the same occurrence. Delete the old
-Automation only after the user accepts the cutover. There is no automatic
-history, run-count, or in-flight-occurrence migration.
+goal, cadence, remaining bounds, target Channel, producer id, and consent state.
+Then stop the old Automation and verify it is quiescent before creating the
+named Schedule: no future tick is admitted, and any already-admitted run has
+finished or failed. If quiescence cannot be confirmed, do not activate the
+replacement. After the new Schedule is created and verified, keep the old
+Automation stopped until the user accepts deletion. If Schedule creation is
+uncertain, list Schedules before deciding whether to resume the old Automation;
+never run both. There is no automatic history, run-count, or
+in-flight-occurrence migration.

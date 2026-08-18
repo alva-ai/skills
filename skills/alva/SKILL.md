@@ -246,21 +246,19 @@ orders require the trading surface, a dry run first, explicit user confirmation
 before non-dry-run execution, and [api/trading.md](references/api/trading.md).
 This per-order confirmation rule holds for any order placed in an ordinary
 conversation. *Exemption (scheduled occurrences only):* an Agent Schedule
-`--message` or verified legacy Channel Loop goal carrying `[auto-trade-consent: granted <ISO8601-UTC>
-record=~/memory/auto-trade-consent.md]` AND whose one-read verification finds the
-record MAY place live orders without per-order user confirmation, subject to
-dry-run validation, a fresh idempotent intent-id, and trex risk rules.
-Verification checks only that the consent record exists: the timestamp is provenance, not a match key, and a differing `granted_at` after re-grant is not a mismatch. A
-missing or unreadable record means NO live orders. This applies only to Agent Schedule occurrences and verified legacy Channel Loop ticks, never interactive; recurring schedules also require `--until` or `--max-occurrences`. See [agent-schedules.md](references/agent-schedules.md).
+`--message` or verified legacy Channel Loop goal carrying
+`[auto-trade-consent: granted <ISO8601-UTC>
+record=~/memory/auto-trade-consent.md]` AND whose one-read verification finds
+the record MAY place live orders without per-order user confirmation, subject
+to dry-run validation, a fresh idempotent intent-id, and trex risk rules.
+Verification checks only that the consent record exists: the timestamp is
+provenance, not a match key, and a differing `granted_at` after re-grant is not
+a mismatch. A missing or unreadable record means NO live orders. This applies
+only to Agent Schedule occurrences and verified legacy Channel Loop ticks,
+never interactive; recurring schedules also require `--until` or
+`--max-occurrences`. See [agent-schedules.md](references/agent-schedules.md).
 
 ## Capability Map
-
-The map is organized as one shared layer plus two decision trees. **Shared Data
-And Execution** is the common substrate: Data Skills, search, BYOD, `alva run`,
-jagent runtime, and provenance rules. **Financial Analysis / Ask Question** uses
-that layer for sourced chat answers. **Durable Artifacts / Playbook** uses that
-layer, then persists or publishes work through feeds, automations, signals,
-playbooks, or release flows. Choose the smallest tree that satisfies the verb.
 
 ### Shared Data And Execution Layer
 
