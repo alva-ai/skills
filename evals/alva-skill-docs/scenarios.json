@@ -362,7 +362,9 @@
           "alva run --code",
           "NASDAQ:RKLB",
           "US_SPOT_RKLB_USD",
-          "Never select the first unfiltered response",
+          "exact `matchedSymbol`",
+          "exactly one unique `tradingPair`",
+          "opaque canonical identity",
           "pass it to Altra unchanged",
           "bounded smoke window",
           "at least one real OHLCV bar"
@@ -373,7 +375,8 @@
             "heading": "Resolve Trading Pairs Before Backtesting",
             "includes": [
               "/api/v1/market/trading-pairs?symbol=",
-              "candidates.slice(0, 20)",
+              "candidatesByPair.set(candidate.tradingPair, candidate)",
+              "candidates.length !== 1",
               "Exclude options unless the user explicitly asks"
             ]
           }
