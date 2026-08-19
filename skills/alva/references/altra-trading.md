@@ -311,7 +311,7 @@ alva run --code '(async () => {
     market: String(args.market || "").toUpperCase(),
     quote: String(args.quote || "").toUpperCase(),
   };
-  const candidates = [];
+  const candidatesByPair = new Map();
   for (const match of body.data || []) {
     for (const group of match.trading_pairs || []) {
       for (const pair of group.pairs || []) {
@@ -328,31 +328,44 @@ alva run --code '(async () => {
         if (wanted.underlyingType && String(candidate.underlyingType).toUpperCase() !== wanted.underlyingType) continue;
         if (wanted.market && String(candidate.market).toUpperCase() !== wanted.market) continue;
         if (wanted.quote && String(candidate.quote).toUpperCase() !== wanted.quote) continue;
-        candidates.push(candidate);
+        if (String(candidate.matchedSymbol).toUpperCase() !== query) continue;
+        candidatesByPair.set(candidate.tradingPair, candidate);
       }
     }
   }
-  return {
-    query,
-    candidates: candidates.slice(0, 20),
-    truncated: candidates.length > 20,
-  };
+  const candidates = Array.from(candidatesByPair.values());
+  if (candidates.length !== 1) {
+    throw new Error(
+      "expected exactly one canonical trading pair for " + query +
+      ", received " + candidates.length,
+    );
+  }
+  return { query, ...candidates[0] };
 })();' --args '{"query":"RKLB","instrument_type":"spot","underlying_type":"stock","market":"US","quote":"USD"}'
 ```
+
+For an ETF such as SPY, use the same lookup with `"underlying_type":"etf"`; its
+canonical pair is still `US_SPOT_SPY_USD`.
 
 Selection rules:
 
 - Treat a prefix such as `NASDAQ:` or `XNAS:` as an intent hint. Search Arrays
   with the base ticker and use the returned `tradingPair`; for example,
   `NASDAQ:RKLB` resolves through `RKLB` to `US_SPOT_RKLB_USD`.
-- For US equities, filter to `spot` + `stock` + `US` + `USD`. For crypto,
-  filter `spot` or `perp` and the requested venue and quote.
+- For US stocks, filter to `spot` + `stock` + `US` + `USD`. For US ETFs, filter
+  to `spot` + `etf` + `US` + `USD`; both resolve to canonical
+  `US_SPOT_<TICKER>_USD` pairs. For crypto, filter `spot` or `perp` and the
+  requested venue and quote.
 - Exclude options unless the user explicitly asks for an option contract.
-- Prefer an exact `matchedSymbol`. Never select the first unfiltered response.
-  If multiple filtered candidates still match the user's intent, ask one
-  blocking question instead of guessing.
+- Require an exact `matchedSymbol` and exactly one unique `tradingPair`. Never
+  select the first response. If zero or multiple filtered candidates match the
+  user's intent, ask one blocking question instead of guessing.
 - Stop when the lookup errors or returns no eligible candidate. Do not silently
   fall back to an invented symbol.
+- Treat the returned `tradingPair` as an opaque canonical identity. Preserve its
+  case and spelling unchanged in OHLCV registration, targets, positions, and
+  orders. Do not convert `US` back to `XNAS`/`XNYS`, use `_ETF_` for ETFs, or
+  replace `PERP` with `FUTURES`.
 
 The lookup proves naming and catalog membership, not OHLCV availability. Before
 the full-range backtest, run Altra with the selected symbol over a bounded smoke
@@ -450,7 +463,7 @@ const altra = new FeedAltra(
 );
 
 dg.registerOhlcv("BINANCE_SPOT_BTC_USDT", "1d");
-dg.registerOhlcv("XNAS_SPOT_AAPL_USD", "1d");
+dg.registerOhlcv("US_SPOT_AAPL_USD", "1d");
 await altra.run(endDate);
 ```
 
@@ -647,7 +660,7 @@ e.raw("sentiment_score"); // Raw data update
 e.feature("rsi"); // Feature computed
 
 e.all(
-  e.ohlcv("XNAS_SPOT_AAPL_USD", "1d"),
+  e.ohlcv("US_SPOT_AAPL_USD", "1d"),
   e.ohlcv("BINANCE_SPOT_BTC_USDT", "1d"),
 ); // AND
 e.any(e.ohlcv("BINANCE_SPOT_BTC_USDT", "1h"), e.raw("funding")); // OR

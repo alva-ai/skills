@@ -14,7 +14,12 @@ exchange field. Mismatching symbol type to account exchange errors.
 | `binance_spot` | Spot        | `BINANCE_SPOT_BTC_USDT`          |
 | `okx`          | Unified     | `OKX_PERP_*` / `OKX_SPOT_*`      |
 | `hyperliquid`  | Unified     | `HYPERLIQUID_PERP_*` / `_SPOT_*` |
-| `alpaca`       | US Equities | `XNAS_SPOT_AAPL_USD`             |
+| `alpaca`       | US Equities | `US_SPOT_AAPL_USD`               |
+
+Symbols are canonical Arrays identities, not exchange aliases. Resolve them
+through Trading Pair Search and use the returned `tradingPair` unchanged;
+`XNAS_SPOT_AAPL_USD`, `US_ETF_SPY_USD`, lowercase variants, and
+`BINANCE_FUTURES_BTC_USDT` are invalid inputs.
 
 ## `--signal` JSON schema for `alva trading execute`
 
