@@ -291,8 +291,11 @@
             "Never invent or assemble an Altra symbol from a ticker",
             "alva run --code",
             "/api/v1/market/trading-pairs?symbol=",
-            "candidates.slice(0, 20)",
-            "Never select the first unfiltered response",
+            "candidatesByPair.set(candidate.tradingPair, candidate)",
+            "candidates.length !== 1",
+            "exact `matchedSymbol`",
+            "exactly one unique `tradingPair`",
+            "opaque canonical identity",
             "pass it to Altra unchanged",
             "bounded smoke window",
             "at least one real OHLCV bar"
@@ -1310,7 +1313,7 @@
       "target": "corpus",
       "description": "Latest mainline Alva skill updates remain integrated after rebasing the refactor.",
       "includes": [
-        "version: v1.21.4",
+        "version: v1.22.0",
         "Capability Help",
         "Reply 1, 2, or 3 to start",
         "feedback",
