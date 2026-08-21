@@ -359,7 +359,8 @@
         ],
         "behaviors": [
           "Never invent or assemble an Altra symbol from a ticker",
-          "alva run --code",
+          "resolveTradingPair",
+          "@alva/feed",
           "NASDAQ:RKLB",
           "US_SPOT_RKLB_USD",
           "exact `matchedSymbol`",
@@ -374,9 +375,9 @@
             "file": "references/altra-trading.md",
             "heading": "Resolve Trading Pairs Before Backtesting",
             "includes": [
-              "/api/v1/market/trading-pairs?symbol=",
-              "candidatesByPair.set(candidate.tradingPair, candidate)",
-              "candidates.length !== 1",
+              "resolveTradingPair",
+              "@alva/feed",
+              "resolved.tradingPair",
               "Exclude options unless the user explicitly asks"
             ]
           }

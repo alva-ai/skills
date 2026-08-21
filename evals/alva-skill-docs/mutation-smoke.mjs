@@ -34,9 +34,11 @@ const MUTATIONS = [
     file: "references/altra-trading.md",
     remove:
       "Never invent or assemble an Altra symbol from a ticker. Resolve the exact\n" +
-      "`trading_pair` from Arrays before writing the strategy, then pass it to Altra\n" +
-      "unchanged. Use the existing `alva run` surface; no dedicated trading-pair CLI\n" +
-      "command is required.\n",
+      "canonical pair through `resolveTradingPair` before writing the strategy, then\n" +
+      "pass `resolved.tradingPair` to Altra unchanged. Pass it to Altra unchanged in\n" +
+      "OHLCV registration, targets, positions, and orders. The helper owns the Arrays\n" +
+      "request, filtering, exact ticker match, deduplication, and unique-result check;\n" +
+      "no dedicated trading-pair CLI command or inline HTTP is required.\n",
     expectFailedCases: [
       "target.altra-symbol-resolution",
       "scenario.backtest-symbol-resolution",

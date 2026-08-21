@@ -289,10 +289,9 @@
           "heading": "Resolve Trading Pairs Before Backtesting",
           "includes": [
             "Never invent or assemble an Altra symbol from a ticker",
-            "alva run --code",
-            "/api/v1/market/trading-pairs?symbol=",
-            "candidatesByPair.set(candidate.tradingPair, candidate)",
-            "candidates.length !== 1",
+            "resolveTradingPair",
+            "@alva/feed",
+            "resolved.tradingPair",
             "exact `matchedSymbol`",
             "exactly one unique `tradingPair`",
             "opaque canonical identity",

@@ -254,6 +254,7 @@ const { FeedAltra, e, Amount, TIME, allocate, order, orders } = FeedAltraModule;
 | `num`, `str`, `bool`, `obj`, `arr`, `fld` | `@alva/feed` (top level) | Field type helpers (same as Feed SDK)            |
 | `makeDoc`                                 | `@alva/feed` (top level) | Type document helper                             |
 | `createArraysOhlcvProvider`               | `@alva/feed` (top level) | Builds the OHLCV provider used by Altra          |
+| `resolveTradingPair`                      | `@alva/feed` (top level) | Resolves one canonical Arrays trading pair      |
 
 ---
 
@@ -275,73 +276,25 @@ const altra = new FeedAltra(config, ohlcvProvider);
 ### Resolve Trading Pairs Before Backtesting
 
 Never invent or assemble an Altra symbol from a ticker. Resolve the exact
-`trading_pair` from Arrays before writing the strategy, then pass it to Altra
-unchanged. Use the existing `alva run` surface; no dedicated trading-pair CLI
-command is required.
+canonical pair through `resolveTradingPair` before writing the strategy, then
+pass `resolved.tradingPair` to Altra unchanged. Pass it to Altra unchanged in
+OHLCV registration, targets, positions, and orders. The helper owns the Arrays
+request, filtering, exact ticker match, deduplication, and unique-result check;
+no dedicated trading-pair CLI command or inline HTTP is required.
 
-Run this bounded lookup with the user's intended instrument and venue filters:
+```javascript
+const { resolveTradingPair } = require("@alva/feed");
+const secret = require("secret-manager");
 
-```bash
-alva run --code '(async () => {
-  const http = require("net/http");
-  const secret = require("secret-manager");
-  const env = require("env");
-  const args = env.args || {};
-  const rawQuery = String(args.query || "").trim().toUpperCase();
-  const query = rawQuery.includes(":") ? rawQuery.split(":").pop() : rawQuery;
-  if (!query) throw new Error("query is required");
-
-  const response = await http.fetch(
-    "https://data-tools.prd.space.id/api/v1/market/trading-pairs?symbol=" +
-      encodeURIComponent(query),
-    {
-      headers: {
-        Authorization: "Bearer " + secret.loadPlaintext("ARRAYS_JWT"),
-      },
-    },
-  );
-  const body = await response.json();
-  if (!response.ok || body.success === false) {
-    throw new Error("trading-pair search failed with HTTP " + response.status);
-  }
-
-  const wanted = {
-    instrumentType: String(args.instrument_type || "").toUpperCase(),
-    underlyingType: String(args.underlying_type || "").toUpperCase(),
-    market: String(args.market || "").toUpperCase(),
-    quote: String(args.quote || "").toUpperCase(),
-  };
-  const candidatesByPair = new Map();
-  for (const match of body.data || []) {
-    for (const group of match.trading_pairs || []) {
-      for (const pair of group.pairs || []) {
-        const candidate = {
-          matchedSymbol: match.symbol,
-          tradingPair: pair.trading_pair,
-          instrumentType: group.instrument_type,
-          underlyingType: pair.underlying_type,
-          market: pair.market,
-          quote: pair.quote,
-        };
-        if (!candidate.tradingPair) continue;
-        if (wanted.instrumentType && String(candidate.instrumentType).toUpperCase() !== wanted.instrumentType) continue;
-        if (wanted.underlyingType && String(candidate.underlyingType).toUpperCase() !== wanted.underlyingType) continue;
-        if (wanted.market && String(candidate.market).toUpperCase() !== wanted.market) continue;
-        if (wanted.quote && String(candidate.quote).toUpperCase() !== wanted.quote) continue;
-        if (String(candidate.matchedSymbol).toUpperCase() !== query) continue;
-        candidatesByPair.set(candidate.tradingPair, candidate);
-      }
-    }
-  }
-  const candidates = Array.from(candidatesByPair.values());
-  if (candidates.length !== 1) {
-    throw new Error(
-      "expected exactly one canonical trading pair for " + query +
-      ", received " + candidates.length,
-    );
-  }
-  return { query, ...candidates[0] };
-})();' --args '{"query":"RKLB","instrument_type":"spot","underlying_type":"stock","market":"US","quote":"USD"}'
+const resolved = await resolveTradingPair({
+  query: "NASDAQ:RKLB",
+  instrumentType: "spot",
+  underlyingType: "stock",
+  market: "US",
+  quote: "USD",
+  jwt: secret.loadPlaintext("ARRAYS_JWT"),
+});
+const pair = resolved.tradingPair; // "US_SPOT_RKLB_USD"
 ```
 
 For an ETF such as SPY, use the same lookup with `"underlying_type":"etf"`; its
