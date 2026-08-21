@@ -297,7 +297,7 @@ const resolved = await resolveTradingPair({
 const pair = resolved.tradingPair; // "US_SPOT_RKLB_USD"
 ```
 
-For an ETF such as SPY, use the same lookup with `"underlying_type":"etf"`; its
+For an ETF such as SPY, use the same lookup with `"underlyingType":"etf"`; its
 canonical pair is still `US_SPOT_SPY_USD`.
 
 Selection rules:
