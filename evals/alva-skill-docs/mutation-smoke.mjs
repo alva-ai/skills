@@ -33,10 +33,8 @@ const MUTATIONS = [
     id: "altra-symbol-resolution",
     file: "references/altra-trading.md",
     remove:
-      "Never invent or assemble an Altra symbol from a ticker. Resolve the exact\n" +
-      "canonical pair with the `alva trading-pairs` CLI before writing the strategy.\n" +
-      "Do not call the Arrays trading-pair endpoint directly, load `ARRAYS_JWT` in the\n" +
-      "Agent for this lookup, or assemble an alias in strategy code.\n",
+      "Use the `alva trading-pairs` CLI to resolve trading pairs before writing a\n" +
+      "strategy. Run `alva trading-pairs --help` for its search and resolve commands.\n",
     expectFailedCases: [
       "target.altra-symbol-resolution",
       "scenario.backtest-symbol-resolution",

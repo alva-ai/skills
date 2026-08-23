@@ -274,43 +274,8 @@ const altra = new FeedAltra(config, ohlcvProvider);
 
 ### Resolve Trading Pairs Before Backtesting
 
-Never invent or assemble an Altra symbol from a ticker. Resolve the exact
-canonical pair with the `alva trading-pairs` CLI before writing the strategy.
-Do not call the Arrays trading-pair endpoint directly, load `ARRAYS_JWT` in the
-Agent for this lookup, or assemble an alias in strategy code.
-
-First search for candidates. Use the user's base ticker; if the input includes
-an exchange prefix such as `NASDAQ:RKLB`, retain that prefix as an intent hint
-but query `RKLB` and add the appropriate market filter.
-
-```bash
-alva trading-pairs search \
-  --symbol RKLB \
-  --market US \
-  --instrument-type spot \
-  --quote USD \
-  --json
-```
-
-Search returns candidates. Narrow the filters using the user's venue, instrument,
-and quote intent. If zero or multiple candidates remain, ask the user; never
-choose the first result. Exclude options unless the user explicitly requests an
-option contract.
-
-After selecting a candidate, verify the complete identity before writing code
-or sending an order:
-
-```bash
-alva trading-pairs resolve --pair US_SPOT_RKLB_USD --json
-```
-
-Use its `tradingPair` value verbatim as the symbol in OHLCV
-registration, targets, positions, and orders. For US stocks and ETFs, use
-`--market US --instrument-type spot --quote USD`; for crypto, provide the
-requested venue, instrument, and quote.
-
-For an existing position or strategy target, preserve its stored complete
-`tradingPair`; resolve only new user-entered assets.
+Use the `alva trading-pairs` CLI to resolve trading pairs before writing a
+strategy. Run `alva trading-pairs --help` for its search and resolve commands.
 
 The lookup proves naming and catalog membership, not OHLCV availability. Before
 the full-range backtest, run Altra with the selected symbol over a bounded smoke
