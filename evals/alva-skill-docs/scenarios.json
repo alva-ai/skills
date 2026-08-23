@@ -351,7 +351,7 @@
       "id": "scenario.backtest-symbol-resolution",
       "group": "scenarios.strategy",
       "prompt": "Backtest a weekly momentum strategy for NASDAQ:RKLB.",
-      "description": "A stock backtest resolves an Arrays trading pair through the CLI, avoids ambiguous raw ordering, and verifies real OHLCV before the full run.",
+      "description": "A stock backtest resolves a trading pair through the CLI, stops on ambiguity, and verifies real OHLCV before the full run.",
       "expect": {
         "route": "Strategy / Trading Analysis",
         "references": [
@@ -366,9 +366,7 @@
           "--json",
           "NASDAQ:RKLB",
           "US_SPOT_RKLB_USD",
-          "exact ticker match",
-          "exactly one unique `tradingPair`",
-          "opaque canonical identity",
+          "If zero or multiple candidates remain, ask the user",
           "Use its `tradingPair` value verbatim as the symbol",
           "For an existing position or strategy target",
           "Resolve only new user-entered assets",
@@ -386,7 +384,7 @@
               "--quote USD",
               "--json",
               "tradingPair",
-              "Exclude options unless the user explicitly asks"
+              "Exclude options unless the user explicitly requests an option contract"
             ]
           }
         ]

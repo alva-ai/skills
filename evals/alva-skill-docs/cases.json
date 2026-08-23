@@ -282,7 +282,7 @@
       "id": "target.altra-symbol-resolution",
       "group": "target",
       "target": "corpus",
-      "description": "The Agent resolves Arrays trading pairs through the Alva CLI, filters ambiguous matches, and proves OHLCV availability before a full backtest.",
+      "description": "The Agent resolves trading pairs through the Alva CLI, stops on ambiguity, and proves OHLCV availability before a full backtest.",
       "section_includes": [
         {
           "file": "references/altra-trading.md",
@@ -295,9 +295,7 @@
             "--quote USD",
             "--json",
             "tradingPair",
-            "exact ticker match",
-            "exactly one unique `tradingPair`",
-            "opaque canonical identity",
+            "If zero or multiple candidates remain, ask the user",
             "Use its `tradingPair` value verbatim as the symbol",
             "For an existing position or strategy target",
             "Resolve only new user-entered assets",
