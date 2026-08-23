@@ -254,7 +254,6 @@ const { FeedAltra, e, Amount, TIME, allocate, order, orders } = FeedAltraModule;
 | `num`, `str`, `bool`, `obj`, `arr`, `fld` | `@alva/feed` (top level) | Field type helpers (same as Feed SDK)            |
 | `makeDoc`                                 | `@alva/feed` (top level) | Type document helper                             |
 | `createArraysOhlcvProvider`               | `@alva/feed` (top level) | Builds the OHLCV provider used by Altra          |
-| `resolveTradingPair`                      | `@alva/feed` (top level) | Resolves one canonical Arrays trading pair      |
 
 ---
 
@@ -276,49 +275,67 @@ const altra = new FeedAltra(config, ohlcvProvider);
 ### Resolve Trading Pairs Before Backtesting
 
 Never invent or assemble an Altra symbol from a ticker. Resolve the exact
-canonical pair through `resolveTradingPair` before writing the strategy, then
-pass `resolved.tradingPair` to Altra unchanged. Pass it to Altra unchanged in
-OHLCV registration, targets, positions, and orders. The helper owns the Arrays
-request, filtering, exact ticker match, deduplication, and unique-result check;
-no dedicated trading-pair CLI command or inline HTTP is required.
+canonical pair with the `alva trading-pairs` CLI before writing the strategy.
+The CLI owns the catalog request, filtering, exact ticker match, deduplication,
+and unique-result check. Do not call the Arrays endpoint directly, load
+`ARRAYS_JWT` in the Agent, or assemble an alias in strategy code.
 
-```javascript
-const { resolveTradingPair } = require("@alva/feed");
-const secret = require("secret-manager");
+First search for candidates. Use the user's base ticker; if the input includes
+an exchange prefix such as `NASDAQ:RKLB`, retain that prefix as an intent hint
+but query `RKLB` and add the appropriate market filter.
 
-const resolved = await resolveTradingPair({
-  query: "NASDAQ:RKLB",
-  instrumentType: "spot",
-  underlyingType: "stock",
-  market: "US",
-  quote: "USD",
-  jwt: secret.loadPlaintext("ARRAYS_JWT"),
-});
-const pair = resolved.tradingPair; // "US_SPOT_RKLB_USD"
+```bash
+alva trading-pairs search \
+  --symbol RKLB \
+  --market US \
+  --instrument-type spot \
+  --quote USD \
+  --json
 ```
 
-For an ETF such as SPY, use the same lookup with `"underlyingType":"etf"`; its
-canonical pair is still `US_SPOT_SPY_USD`.
+The search result is a candidate list. Multiple candidates are normal: narrow
+the filters when the user's intent supplies a venue, instrument, or quote; if
+more than one eligible pair remains, ask the user instead of choosing by array
+order. If no candidate remains, stop and ask for a clearer ticker or intent.
+
+After selecting a candidate, verify the complete identity before writing code
+or sending an order:
+
+```bash
+alva trading-pairs resolve --pair US_SPOT_RKLB_USD --json
+```
+
+The resolve command must return exactly one candidate. Use its
+`tradingPair` value verbatim as the symbol in OHLCV registration, targets,
+positions, and orders. For an ETF such as SPY, search with
+`--market US --instrument-type spot --quote USD`; its canonical pair is still
+`US_SPOT_SPY_USD`. Add `--underlying-type etf` only when the response includes
+that metadata.
 
 Selection rules:
 
 - Treat a prefix such as `NASDAQ:` or `XNAS:` as an intent hint. Search Arrays
   with the base ticker and use the returned `tradingPair`; for example,
   `NASDAQ:RKLB` resolves through `RKLB` to `US_SPOT_RKLB_USD`.
-- For US stocks, filter to `spot` + `stock` + `US` + `USD`. For US ETFs, filter
-  to `spot` + `etf` + `US` + `USD`; both resolve to canonical
-  `US_SPOT_<TICKER>_USD` pairs. For crypto, filter `spot` or `perp` and the
-  requested venue and quote.
+- For US stocks and ETFs, filter to `spot` + `US` + `USD`; both resolve to
+  canonical `US_SPOT_<TICKER>_USD` pairs. Add `--underlying-type stock` or
+  `--underlying-type etf` only when the CLI response includes that metadata;
+  older Gateway responses may omit it. For crypto, filter `spot` or `perp` and
+  the requested venue and quote.
 - Exclude options unless the user explicitly asks for an option contract.
-- Require an exact `matchedSymbol` and exactly one unique `tradingPair`. Never
-  select the first response. If zero or multiple filtered candidates match the
-  user's intent, ask one blocking question instead of guessing.
+- Require an exact ticker match and exactly one unique `tradingPair` at resolve
+  time. Never select the first response. If zero or multiple filtered
+  candidates match the user's intent, ask one blocking question instead of
+  guessing.
 - Stop when the lookup errors or returns no eligible candidate. Do not silently
   fall back to an invented symbol.
-- Treat the returned `tradingPair` as an opaque canonical identity. Preserve its
+- Treat the CLI's returned `tradingPair` as an opaque canonical identity. Preserve its
   case and spelling unchanged in OHLCV registration, targets, positions, and
   orders. Do not convert `US` back to `XNAS`/`XNYS`, use `_ETF_` for ETFs, or
   replace `PERP` with `FUTURES`.
+- For an existing position or strategy target, preserve the stored complete
+  `tradingPair`; do not resolve its ticker again and replace it with a newer
+  catalog result. Resolve only new user-entered assets.
 
 The lookup proves naming and catalog membership, not OHLCV availability. Before
 the full-range backtest, run Altra with the selected symbol over a bounded smoke

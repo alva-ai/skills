@@ -351,7 +351,7 @@
       "id": "scenario.backtest-symbol-resolution",
       "group": "scenarios.strategy",
       "prompt": "Backtest a weekly momentum strategy for NASDAQ:RKLB.",
-      "description": "A stock backtest resolves an Arrays trading pair without a new CLI command, avoids ambiguous raw ordering, and verifies real OHLCV before the full run.",
+      "description": "A stock backtest resolves an Arrays trading pair through the CLI, avoids ambiguous raw ordering, and verifies real OHLCV before the full run.",
       "expect": {
         "route": "Strategy / Trading Analysis",
         "references": [
@@ -359,14 +359,19 @@
         ],
         "behaviors": [
           "Never invent or assemble an Altra symbol from a ticker",
-          "resolveTradingPair",
-          "@alva/feed",
+          "alva trading-pairs search",
+          "alva trading-pairs resolve",
+          "--market US",
+          "--quote USD",
+          "--json",
           "NASDAQ:RKLB",
           "US_SPOT_RKLB_USD",
-          "exact `matchedSymbol`",
+          "exact ticker match",
           "exactly one unique `tradingPair`",
           "opaque canonical identity",
-          "pass it to Altra unchanged",
+          "Use its `tradingPair` value verbatim as the symbol",
+          "For an existing position or strategy target",
+          "Resolve only new user-entered assets",
           "bounded smoke window",
           "at least one real OHLCV bar"
         ],
@@ -375,9 +380,12 @@
             "file": "references/altra-trading.md",
             "heading": "Resolve Trading Pairs Before Backtesting",
             "includes": [
-              "resolveTradingPair",
-              "@alva/feed",
-              "resolved.tradingPair",
+              "alva trading-pairs search",
+              "alva trading-pairs resolve",
+              "--market US",
+              "--quote USD",
+              "--json",
+              "tradingPair",
               "Exclude options unless the user explicitly asks"
             ]
           }
