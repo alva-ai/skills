@@ -349,6 +349,7 @@ code. Common modules:
 | HTTP                          | `require("net/http")`                                                                                         |
 | statistics / indicators       | `@alva/algorithm` or runtime `alva sdk` modules                                                               |
 | persistent feed output        | `@alva/feed`; [feed-sdk.md](references/feed-sdk.md)                                                           |
+| Automation price chart        | `@alva/price-chart-sdk`; [price-chart-sdk.md](references/price-chart-sdk.md)                                  |
 | Platform Data digest module   | `@alva/fintwit-digest`; see Platform Data above and [fintwit-digest-sdk.md](references/fintwit-digest-sdk.md) |
 | trading engine                | `FeedAltra`; [altra-trading.md](references/altra-trading.md)                                                  |
 | scheduled LLM reasoning       | `@alva/pi`; [alpi.md](references/alpi.md)                                                                     |
@@ -448,7 +449,7 @@ reusable dataset, or future answer.
 
 Read [alva-knowledge.md](references/alva-knowledge.md) before designing an
 automation. Read [feed-lifecycle.md](references/feed-lifecycle.md) and
-[feed-sdk.md](references/feed-sdk.md) when creating or changing a feed. The
+[feed-sdk.md](references/feed-sdk.md) when creating or changing a feed; only if an Automation explicitly needs a price chart on each run, read [price-chart-sdk.md](references/price-chart-sdk.md). Do not add charts by default or apply this route to one-off chat or Playbook charts. The
 short creation lifecycle is: write schema and logic to ALFS, `alva run`,
 deploy, publish once with `alva automation publish`, then use its returned
 `feed_id` with `alva feed set-visibility` when public access is required.
@@ -791,6 +792,7 @@ Use this index to open only the file needed for the current task.
 | [operational-pitfalls.md](references/operational-pitfalls.md)                         | Runtime, ALFS, chart, watermark, and resource pitfalls.                                                                                       |
 | [jagent-runtime.md](references/jagent-runtime.md)                                     | V8 runtime, modules, async model, constraints, built-ins.                                                                                     |
 | [feed-sdk.md](references/feed-sdk.md)                                                 | Feed SDK API, schemas, time series, grouped records, upstreams, examples.                                                                     |
+| [price-chart-sdk.md](references/price-chart-sdk.md)                                   | Automation-only price chart rendering, publication inputs, and preview/interactive URL contract.                                              |
 | [altra-trading.md](references/altra-trading.md)                                       | Altra strategy engine, features, signals, tests, PIT compliance.                                                                              |
 | [alpi.md](references/alpi.md)                                                         | Scheduled LLM reasoning/tool-loop API and examples.                                                                                           |
 | [agent-schedules.md](references/agent-schedules.md)                                   | Named Channel Agent schedules, rule/bound contracts, lifecycle, and legacy Channel Loop compatibility.                                        |
