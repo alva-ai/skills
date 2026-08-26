@@ -748,6 +748,27 @@
       }
     },
     {
+      "id": "scenario.automation-price-chart",
+      "group": "scenarios.automation",
+      "prompt": "Create an hourly NVDA Automation that returns a static chart preview and opens an interactive Area/Candles chart.",
+      "description": "A chart produced on every scheduled run uses the Automation-only price chart SDK, not the one-off chat publisher or Playbook renderer.",
+      "expect": {
+        "route": "Automation / Push",
+        "top_level_route": "Data Product Layer: Feed Lifecycle And Automation",
+        "references": [
+          "price-chart-sdk.md",
+          "feed-sdk.md"
+        ],
+        "behaviors": [
+          "@alva/price-chart-sdk",
+          "does not fetch market data",
+          "previewUrl",
+          "publishedUrl",
+          "Do not add charts by default or apply this route to one-off chat or Playbook charts"
+        ]
+      }
+    },
+    {
       "id": "scenario.udf-strict-opt-in",
       "group": "scenarios.udf",
       "prompt": "Add a button so viewers can run my custom analysis function.",
