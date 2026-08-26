@@ -4,13 +4,6 @@ Use `@alva/price-chart-sdk` only when a deployed Automation/Feed producer is
 explicitly designed to publish a standard time-based price chart on each run.
 Do not add charts to Automations by default.
 
-Keep the other chart routes unchanged:
-
-- One-off Ask/chat chart: use [lightweight-charts.md](lightweight-charts.md) and
-  the existing `PublishChartHTML` flow.
-- Playbook chart: use [design-widgets.md](design-widgets.md).
-- Explicitly requested Automation chart published on every run: use this SDK.
-
 The SDK is deterministic infrastructure, not an Agent. It does not fetch market
 data, write Feed rows, run screenshot review loops, or decide whether a chart is
 needed. The Automation resolves legitimate price data first, calls the SDK, and
@@ -39,8 +32,8 @@ Pass one already-resolved immutable snapshot:
   ticker: string,
   dataAsOfMs: number,
   series:
-    | { type: "area" | "line"; data: { time, value }[] }
-    | { type: "candlestick"; data: { time, open, high, low, close }[] },
+    | { type: "area" | "line"; data: { time: number | string, value: number }[] }
+    | { type: "candlestick"; data: { time: number | string, open: number, high: number, low: number, close: number }[] },
   levels?: { label: string, price: number, color?: string }[],
   viewToggle?: { enabled: boolean, initialView?: "area" | "candlestick" }
 }
