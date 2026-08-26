@@ -1386,6 +1386,37 @@
       ]
     },
     {
+      "id": "target.automation-price-chart-sdk",
+      "group": "target",
+      "target": "corpus",
+      "description": "Scheduled Automation price charts route to the dedicated runtime SDK while one-off Ask/chat and Playbook chart paths stay separate.",
+      "file_includes": [
+        {
+          "file": "SKILL.md",
+          "includes": [
+            "@alva/price-chart-sdk",
+            "[price-chart-sdk.md](references/price-chart-sdk.md)",
+            "Do not add charts by default or apply this route to one-off chat or Playbook charts"
+          ]
+        },
+        {
+          "file": "references/price-chart-sdk.md",
+          "includes": [
+            "only when a deployed Automation/Feed producer is explicitly designed",
+            "Do not add charts to Automations by default",
+            "alva sdk doc --name @alva/price-chart-sdk",
+            "does not fetch market data",
+            "publishPriceChart()",
+            "PRICE_CHART_SCHEMA_VERSION",
+            "previewUrl?: string",
+            "publishedUrl: string",
+            "already includes `interactive=1`",
+            "Do not call `@alva/automation-chart` directly"
+          ]
+        }
+      ]
+    },
+    {
       "id": "target.auto-trade-consent-exemption",
       "group": "target",
       "target": "skill",
