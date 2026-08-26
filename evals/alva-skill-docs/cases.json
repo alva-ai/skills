@@ -1392,7 +1392,7 @@
       "id": "target.automation-price-chart-sdk",
       "group": "target",
       "target": "corpus",
-      "description": "Scheduled Automation price charts route to the dedicated runtime SDK while one-off Ask/chat and Playbook chart paths stay separate.",
+      "description": "Scheduled Automation price charts use the effect-producing SDK and correlate backend publication with the matching Feed source.",
       "file_includes": [
         {
           "file": "SKILL.md",
@@ -1405,15 +1405,15 @@
         {
           "file": "references/price-chart-sdk.md",
           "includes": [
-            "only when a deployed Automation/Feed producer is explicitly designed",
-            "Do not add charts to Automations by default",
+            "when an Automation explicitly needs",
             "does not fetch market data",
-            "publishPriceChart()",
+            "enqueuePriceChartPublication",
             "PRICE_CHART_SCHEMA_VERSION",
-            "previewUrl?: string",
+            "source: \"market/brief\"",
+            "same canonical `group/output`",
+            "previewUrl: string",
             "publishedUrl: string",
-            "already includes `interactive=1`",
-            "Do not call `@alva/automation-chart` directly"
+            "does not provide publication credentials"
           ]
         }
       ]
