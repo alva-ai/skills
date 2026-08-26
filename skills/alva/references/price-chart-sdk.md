@@ -48,7 +48,9 @@ Pass one already-resolved immutable snapshot:
 | `headers`        | Platform authentication such as `X-Alva-Api-Key`; load it from runtime configuration/Secret Manager, never inline or log it.                                                    |
 | `origin`         | `{ kind: "automation", ownerUserId, channelId, feedId?, cronjobRunId?, outputRowId? }`. Owner and channel are required and must come from the authenticated Automation context. |
 | `idempotencyKey` | Stable per logical chart output. A retry of the same output reuses the same key; multiple charts use distinct keys.                                                             |
-| `render`         | Optional capture dimensions. Omit for the deterministic 720 x 336 default unless the product contract requires another size.                                                    |
+
+Preview sizing and visual styling are SDK-owned. Do not pass render overrides
+from generated Automation code.
 
 Minimal jagent adapter shape:
 
