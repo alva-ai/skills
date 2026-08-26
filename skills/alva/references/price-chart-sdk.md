@@ -49,9 +49,6 @@ Pass one already-resolved immutable snapshot:
 | `origin`         | `{ kind: "automation", ownerUserId, channelId, feedId?, cronjobRunId?, outputRowId? }`. Owner and channel are required and must come from the authenticated Automation context. |
 | `idempotencyKey` | Stable per logical chart output. A retry of the same output reuses the same key; multiple charts use distinct keys.                                                             |
 
-Preview sizing and visual styling are SDK-owned. Do not pass render overrides
-from generated Automation code.
-
 Minimal jagent adapter shape:
 
 ```javascript
