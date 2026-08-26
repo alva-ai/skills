@@ -5,6 +5,9 @@ standard time-based price chart on each successful run. The SDK does not fetch
 market data. The Automation fetches and validates the price snapshot, then
 queues the chart for trusted backend publication.
 
+In the example, `dataAsOfMs` and `resolvedOhlc` are the already-fetched,
+validated snapshot values from the Automation.
+
 ```javascript
 const {
   PRICE_CHART_SCHEMA_VERSION,
