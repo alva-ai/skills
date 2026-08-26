@@ -1404,7 +1404,6 @@
           "includes": [
             "only when a deployed Automation/Feed producer is explicitly designed",
             "Do not add charts to Automations by default",
-            "alva sdk doc --name @alva/price-chart-sdk",
             "does not fetch market data",
             "publishPriceChart()",
             "PRICE_CHART_SCHEMA_VERSION",

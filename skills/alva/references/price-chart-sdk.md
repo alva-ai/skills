@@ -10,17 +10,6 @@ needed. The Automation resolves legitimate price data first, calls the SDK, and
 decides how to store or deliver the returned URLs. Do not call
 `@alva/automation-chart` directly or hand-write chart HTML for this route.
 
-## Before Coding
-
-Run `alva sdk --help`, then load the current public surface:
-
-```bash
-alva sdk doc --name @alva/price-chart-sdk
-```
-
-If the module is unavailable in the active environment, report the coverage gap;
-do not silently fall back to the one-off chart publisher.
-
 ## Business Input
 
 Pass one already-resolved immutable snapshot:
