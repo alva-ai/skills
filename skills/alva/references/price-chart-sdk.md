@@ -1,9 +1,9 @@
 # Automation Price Chart SDK
 
 Use `@alva/price-chart-sdk` when an Automation explicitly needs to publish a
-standard time-based price chart on each successful run. The Automation fetches
-and validates the price snapshot, then queues the chart for trusted backend
-publication.
+standard time-based price chart on each successful run. The SDK does not fetch
+market data. The Automation fetches and validates the price snapshot, then
+queues the chart for trusted backend publication.
 
 ```javascript
 const {
