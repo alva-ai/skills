@@ -21,12 +21,10 @@ const MUTATIONS = [
   {
     id: "mandatory-investment-disclaimer",
     file: "SKILL.md",
-    remove: "10. **Mandatory investment framing.** Any answer involving a security price or investment strategy MUST include an investment disclaimer. If the user asks for any \"financial advice\" or \"analyst advice,\" the response MUST also begin with the exact advice-request header. See [user-facing-prose.md](references/user-facing-prose.md#investment-disclaimer).\n",
+    remove: "10. **Contextual investment framing.** Include the investment disclaimer once in the final substantive response or artifact only when its content meets the trigger in [user-facing-prose.md](references/user-facing-prose.md#investment-disclaimer). Do not add it to progress updates, tool confirmations, operational explanations, or factual data-only answers; a ticker or price mention alone does not trigger it. If the user asks for any \"financial advice\" or \"analyst advice,\" the response MUST also begin with the exact advice-request header.\n",
     expectFailedCases: [
       "target.mandatory-investment-disclaimer",
-      "scenario.equity-price-disclaimer",
       "scenario.explicit-analyst-advice-header",
-      "scenario.backtest-strategy",
     ],
   },
   {
@@ -49,8 +47,8 @@ const MUTATIONS = [
       "If the user asks for any \"financial advice\" or \"analyst advice,\" begin the\n" +
       "response with this exact header before providing the analysis:\n\n" +
       "> I'll share an analysis, but keep in mind I'm not a licensed analyst or adviser, and this isn't personalized advice for you specifically.\n\n" +
-      "This advice-request header is additive: when the answer involves a security\n" +
-      "price or investment strategy, also include the investment disclaimer above.\n",
+      "This advice-request header is additive. Include the investment disclaimer once\n" +
+      "when the response also meets one of the triggers above.\n",
     expectFailedCases: [
       "target.mandatory-investment-disclaimer",
       "scenario.explicit-analyst-advice-header",

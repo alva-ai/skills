@@ -126,18 +126,25 @@ answer like this:
 
 ## Investment Disclaimer
 
-The investment disclaimer is required in user-facing prose that involves a
-security price or investment strategy.
+Include the investment disclaimer once, at the end of the final substantive
+response or artifact, when the output contains a forecast, scenario, investment
+strategy or backtest result, recommendation-like judgment, security selection
+or ranking, allocation or sizing guidance, personalized portfolio analysis, or
+trade action:
 
 > This content is for informational purposes only and does not constitute investment advice.
+
+Do not append it to progress updates, tool confirmations, operational
+explanations, or factual data-only answers. A ticker or price mention alone does
+not trigger it.
 
 If the user asks for any "financial advice" or "analyst advice," begin the
 response with this exact header before providing the analysis:
 
 > I'll share an analysis, but keep in mind I'm not a licensed analyst or adviser, and this isn't personalized advice for you specifically.
 
-This advice-request header is additive: when the answer involves a security
-price or investment strategy, also include the investment disclaimer above.
+This advice-request header is additive. Include the investment disclaimer once
+when the response also meets one of the triggers above.
 
 ## Voice
 

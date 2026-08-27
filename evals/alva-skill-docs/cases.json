@@ -1117,15 +1117,17 @@
       "id": "target.mandatory-investment-disclaimer",
       "group": "target",
       "target": "corpus",
-      "description": "Security-price and investment-strategy answers have a mandatory disclaimer, while explicit advice requests also receive the required opening header.",
+      "description": "Final substantive decision-oriented outputs receive one investment disclaimer; factual and progress messages do not, while explicit advice requests still receive the required opening header.",
       "section_includes": [
         {
           "file": "SKILL.md",
           "heading": "First Principles",
           "label": "top-level requirement",
           "includes": [
-            "Mandatory investment framing",
-            "Any answer involving a security price or investment strategy MUST include an investment disclaimer",
+            "Contextual investment framing",
+            "once in the final substantive response or artifact",
+            "a ticker or price mention alone",
+            "does not trigger it",
             "financial advice",
             "analyst advice",
             "exact advice-request header"
@@ -1136,8 +1138,10 @@
           "heading": "Investment Disclaimer",
           "label": "user-facing prose requirement",
           "includes": [
-            "investment disclaimer is required",
-            "security price or investment strategy",
+            "contains a forecast, scenario",
+            "recommendation-like judgment",
+            "Do not append it to progress updates",
+            "factual data-only answers",
             "This content is for informational purposes only and does not constitute investment advice.",
             "begin the response with this exact header",
             "I'll share an analysis, but keep in mind I'm not a licensed analyst or adviser, and this isn't personalized advice for you specifically.",
@@ -1149,8 +1153,8 @@
           "heading": "Routes",
           "label": "Ask and strategy routing",
           "includes": [
-            "apply its required Investment Disclaimer",
-            "Strategy answers apply the required [Investment Disclaimer]"
+            "apply its Investment Disclaimer only when the output meets that section's trigger",
+            "according to that reference"
           ]
         }
       ]
@@ -1313,7 +1317,7 @@
       "target": "corpus",
       "description": "Latest mainline Alva skill updates remain integrated after rebasing the refactor.",
       "includes": [
-        "version: v1.22.0",
+        "version: v1.22.1",
         "Capability Help",
         "Reply 1, 2, or 3 to start",
         "feedback",
