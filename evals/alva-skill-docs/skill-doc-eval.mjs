@@ -179,7 +179,7 @@ function loadCorpus(opts) {
     references += `\n\n--- ${file} ---\n${body}`;
     fileTexts.set(normalizeFilePath(relative(opts.skillDir, file)), body);
   }
-  return { label: opts.skillDir, skill, references, corpus: `${skill}${references}`, eval: evalText, files: fileTexts };
+  return { label: normalizeFilePath(relative(resolve("."), opts.skillDir)), skill, references, corpus: `${skill}${references}`, eval: evalText, files: fileTexts };
 }
 
 function includesAll(text, needles) {

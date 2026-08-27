@@ -1,6 +1,6 @@
 # alva-skill-doc-regression
 
-Source: `/Users/leozhou/.codex/worktrees/4cd1/mono-meta/code/public/skills/skills/alva`
+Source: `skills/alva`
 
 SKILL.md lines: 911
 
