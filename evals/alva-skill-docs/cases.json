@@ -282,21 +282,14 @@
       "id": "target.altra-symbol-resolution",
       "group": "target",
       "target": "corpus",
-      "description": "Altra resolves Arrays trading pairs through the existing runtime, filters ambiguous matches, and proves OHLCV availability before a full backtest.",
+      "description": "The Agent uses the trading-pairs CLI and proves OHLCV availability before a full backtest.",
       "section_includes": [
         {
           "file": "references/altra-trading.md",
           "heading": "Resolve Trading Pairs Before Backtesting",
           "includes": [
-            "Never invent or assemble an Altra symbol from a ticker",
-            "alva run --code",
-            "/api/v1/market/trading-pairs?symbol=",
-            "candidatesByPair.set(candidate.tradingPair, candidate)",
-            "candidates.length !== 1",
-            "exact `matchedSymbol`",
-            "exactly one unique `tradingPair`",
-            "opaque canonical identity",
-            "pass it to Altra unchanged",
+            "alva trading-pairs",
+            "alva trading-pairs --help",
             "bounded smoke window",
             "at least one real OHLCV bar"
           ]

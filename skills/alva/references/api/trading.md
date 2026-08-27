@@ -17,7 +17,9 @@ exchange field. Mismatching symbol type to account exchange errors.
 | `alpaca`       | US Equities | `US_SPOT_AAPL_USD`               |
 
 Symbols are canonical Arrays identities, not exchange aliases. Resolve them
-through Trading Pair Search and use the returned `tradingPair` unchanged;
+with `alva trading-pairs search` and then verify the selected complete pair
+with `alva trading-pairs resolve --pair <tradingPair> --json`. Use the returned
+`tradingPair` unchanged;
 `XNAS_SPOT_AAPL_USD`, `US_ETF_SPY_USD`, lowercase variants, and
 `BINANCE_FUTURES_BTC_USDT` are invalid inputs.
 
