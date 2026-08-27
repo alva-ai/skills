@@ -18,7 +18,8 @@
         "behaviors": [
           "Direct latest/realtime price for covered US equities and crypto: intraday klines, not daily-level bars or closes",
           "Do not answer until you can name the decomposition",
-          "Do not let playbook creation become the default"
+          "Do not let playbook creation become the default",
+          "A ticker or price mention alone does not trigger it"
         ],
         "forbidden_behaviors": [
           "not automatically to a playbook"
@@ -26,17 +27,19 @@
       }
     },
     {
-      "id": "scenario.equity-price-disclaimer",
+      "id": "scenario.forecast-disclaimer-once",
       "group": "scenarios.ask",
-      "prompt": "What is NVDA trading at right now?",
-      "description": "A direct equity-price Ask applies the mandatory disclaimer rule.",
+      "prompt": "Create an AAPL pre-earnings scenario chart and keep me updated while it runs.",
+      "description": "Progress messages omit the disclaimer while the final forecast artifact includes it once.",
       "expect": {
         "route": "Financial Analysis / Ask Question",
         "references": [
           "user-facing-prose.md"
         ],
         "behaviors": [
-          "Any answer involving a security price or investment strategy MUST include an investment disclaimer"
+          "once, at the end of the final substantive response or artifact",
+          "Do not append it to progress updates, tool confirmations, operational explanations, or factual data-only answers",
+          "This content is for informational purposes only and does not constitute investment advice."
         ]
       }
     },
@@ -343,7 +346,7 @@
           "look-ahead bias",
           "drawdown",
           "package results as a concise answer, feed, signal, or visual playbook depending on the request",
-          "Any answer involving a security price or investment strategy MUST include an investment disclaimer"
+          "once, at the end of the final substantive response or artifact"
         ]
       }
     },

@@ -1,12 +1,12 @@
 # alva-skill-doc-regression
 
-Source: `/Users/yimingchen/alva/mono-meta/.codex-worktrees/alva-skills-agent-schedule/skills/alva`
+Source: `skills/alva`
 
-SKILL.md lines: 909
+SKILL.md lines: 911
 
-Cases: 86/86
+Cases: 90/90
 
-Checks: 884/884 (100.00%)
+Checks: 939/939 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -249,7 +249,7 @@ Interactive orders keep the per-order confirmation rule: the exemption does not 
 
 ## target
 
-17/17 cases, 199/199 checks
+19/19 cases, 226/226 checks
 
 ### PASS target.automation-publish-side-effects
 
@@ -261,11 +261,27 @@ Automation publish documents its owner binding and first-run side effects, inclu
 - [x] references/feed-lifecycle.md#Lifecycle includes `--skip-auto-trigger` suppresses only the publish-time run
 - [x] references/feed-lifecycle.md#Lifecycle includes It does not suppress the owner alert binding
 
+### PASS target.altra-symbol-resolution
+
+Altra resolves Arrays trading pairs through the existing runtime, filters ambiguous matches, and proves OHLCV availability before a full backtest.
+
+- [x] references/altra-trading.md#Resolve Trading Pairs Before Backtesting includes Never invent or assemble an Altra symbol from a ticker
+- [x] references/altra-trading.md#Resolve Trading Pairs Before Backtesting includes alva run --code
+- [x] references/altra-trading.md#Resolve Trading Pairs Before Backtesting includes /api/v1/market/trading-pairs?symbol=
+- [x] references/altra-trading.md#Resolve Trading Pairs Before Backtesting includes candidatesByPair.set(candidate.tradingPair, candidate)
+- [x] references/altra-trading.md#Resolve Trading Pairs Before Backtesting includes candidates.length !== 1
+- [x] references/altra-trading.md#Resolve Trading Pairs Before Backtesting includes exact `matchedSymbol`
+- [x] references/altra-trading.md#Resolve Trading Pairs Before Backtesting includes exactly one unique `tradingPair`
+- [x] references/altra-trading.md#Resolve Trading Pairs Before Backtesting includes opaque canonical identity
+- [x] references/altra-trading.md#Resolve Trading Pairs Before Backtesting includes pass it to Altra unchanged
+- [x] references/altra-trading.md#Resolve Trading Pairs Before Backtesting includes bounded smoke window
+- [x] references/altra-trading.md#Resolve Trading Pairs Before Backtesting includes at least one real OHLCV bar
+
 ### PASS target.top-level-size
 
 Top-level SKILL.md stays below the current guide ceiling without forcing a minimum size that would block future compression.
 
-- [x] line count <= 911 (actual 909)
+- [x] line count <= 911 (actual 911)
 
 ### PASS target.playbook-task-offload
 
@@ -386,21 +402,25 @@ Complex financial asks classify the problem type and apply source, methodology, 
 
 ### PASS target.mandatory-investment-disclaimer
 
-Security-price and investment-strategy answers have a mandatory disclaimer, while explicit advice requests also receive the required opening header.
+Final substantive decision-oriented outputs receive one investment disclaimer; factual and progress messages do not, while explicit advice requests still receive the required opening header.
 
-- [x] top-level requirement: SKILL.md#First Principles includes Mandatory investment framing
-- [x] top-level requirement: SKILL.md#First Principles includes Any answer involving a security price or investment strategy MUST include an investment disclaimer
+- [x] top-level requirement: SKILL.md#First Principles includes Contextual investment framing
+- [x] top-level requirement: SKILL.md#First Principles includes once in the final substantive response or artifact
+- [x] top-level requirement: SKILL.md#First Principles includes a ticker or price mention alone
+- [x] top-level requirement: SKILL.md#First Principles includes does not trigger it
 - [x] top-level requirement: SKILL.md#First Principles includes financial advice
 - [x] top-level requirement: SKILL.md#First Principles includes analyst advice
 - [x] top-level requirement: SKILL.md#First Principles includes exact advice-request header
-- [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes investment disclaimer is required
-- [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes security price or investment strategy
+- [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes contains a forecast, scenario
+- [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes recommendation-like judgment
+- [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes Do not append it to progress updates
+- [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes factual data-only answers
 - [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes This content is for informational purposes only and does not constitute investment advice.
 - [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes begin the response with this exact header
 - [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes I'll share an analysis, but keep in mind I'm not a licensed analyst or adviser, and this isn't personalized advice for you specifically.
 - [x] user-facing prose requirement: references/user-facing-prose.md#Investment Disclaimer includes This advice-request header is additive
-- [x] Ask and strategy routing: references/request-routing.md#Routes includes apply its required Investment Disclaimer
-- [x] Ask and strategy routing: references/request-routing.md#Routes includes Strategy answers apply the required [Investment Disclaimer]
+- [x] Ask and strategy routing: references/request-routing.md#Routes includes apply its Investment Disclaimer only when the output meets that section's trigger
+- [x] Ask and strategy routing: references/request-routing.md#Routes includes according to that reference
 
 ### PASS target.financial-analysis-prose-gate
 
@@ -431,7 +451,7 @@ Operational pitfalls are a mandatory stepwise gate, not an optional debugging ap
 
 Latest mainline Alva skill updates remain integrated after rebasing the refactor.
 
-- [x] version: v1.21.4
+- [x] version: v1.22.1
 - [x] Capability Help
 - [x] Reply 1, 2, or 3 to start
 - [x] feedback
@@ -475,6 +495,23 @@ One-off price-series artifacts route to a pinned Lightweight Charts v5 reference
 - [x] references/lightweight-charts.md includes chart.timeScale().fitContent()
 - [x] references/lightweight-charts.md includes createPriceLine()
 - [x] SKILL.md includes [lightweight-charts.md](references/lightweight-charts.md)
+
+### PASS target.automation-price-chart-sdk
+
+Scheduled Automation price charts use the effect-producing SDK and correlate backend publication with the matching Feed source.
+
+- [x] SKILL.md includes @alva/price-chart-sdk
+- [x] SKILL.md includes [price-chart-sdk.md](references/price-chart-sdk.md)
+- [x] SKILL.md includes Do not add charts by default or apply this route to one-off chat or Playbook charts
+- [x] references/price-chart-sdk.md includes when an Automation explicitly needs
+- [x] references/price-chart-sdk.md includes does not fetch market data
+- [x] references/price-chart-sdk.md includes enqueuePriceChartPublication
+- [x] references/price-chart-sdk.md includes PRICE_CHART_SCHEMA_VERSION
+- [x] references/price-chart-sdk.md includes source: "market/brief"
+- [x] references/price-chart-sdk.md includes same canonical `group/output`
+- [x] references/price-chart-sdk.md includes previewUrl: string
+- [x] references/price-chart-sdk.md includes publishedUrl: string
+- [x] references/price-chart-sdk.md includes does not provide publication credentials
 
 ### PASS target.auto-trade-consent-exemption
 
@@ -966,7 +1003,7 @@ Post-deployment and multi-step updates report only new outcome evidence and unre
 
 ## scenarios.ask
 
-6/6 cases, 42/42 checks
+6/6 cases, 45/45 checks
 
 ### PASS scenario.simple-latest-price
 
@@ -980,17 +1017,20 @@ Prompt: `What is BTC doing right now?`
 - [x] Direct latest/realtime price for covered US equities and crypto: intraday klines, not daily-level bars or closes
 - [x] Do not answer until you can name the decomposition
 - [x] Do not let playbook creation become the default
+- [x] A ticker or price mention alone does not trigger it
 - [x] not automatically to a playbook
 - [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
 
-### PASS scenario.equity-price-disclaimer
+### PASS scenario.forecast-disclaimer-once
 
-A direct equity-price Ask applies the mandatory disclaimer rule.
+Progress messages omit the disclaimer while the final forecast artifact includes it once.
 
-Prompt: `What is NVDA trading at right now?`
+Prompt: `Create an AAPL pre-earnings scenario chart and keep me updated while it runs.`
 
 - [x] user-facing-prose.md
-- [x] Any answer involving a security price or investment strategy MUST include an investment disclaimer
+- [x] once, at the end of the final substantive response or artifact
+- [x] Do not append it to progress updates, tool confirmations, operational explanations, or factual data-only answers
+- [x] This content is for informational purposes only and does not constitute investment advice.
 - [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
 
 ### PASS scenario.explicit-analyst-advice-header
@@ -1219,7 +1259,7 @@ Prompt: `<session-prefill-channel-memory channel-id="44" root="/alva/home/ymchco
 
 ## scenarios.strategy
 
-1/1 cases, 10/10 checks
+2/2 cases, 26/26 checks
 
 ### PASS scenario.backtest-strategy
 
@@ -1235,8 +1275,31 @@ Prompt: `Backtest a weekly NVDA momentum strategy and show drawdowns.`
 - [x] look-ahead bias
 - [x] drawdown
 - [x] package results as a concise answer, feed, signal, or visual playbook depending on the request
-- [x] Any answer involving a security price or investment strategy MUST include an investment disclaimer
+- [x] once, at the end of the final substantive response or artifact
 - [x] expected route: references/request-routing.md#Routes includes Strategy / Trading Analysis
+
+### PASS scenario.backtest-symbol-resolution
+
+A stock backtest resolves an Arrays trading pair without a new CLI command, avoids ambiguous raw ordering, and verifies real OHLCV before the full run.
+
+Prompt: `Backtest a weekly momentum strategy for NASDAQ:RKLB.`
+
+- [x] altra-trading.md
+- [x] Never invent or assemble an Altra symbol from a ticker
+- [x] alva run --code
+- [x] NASDAQ:RKLB
+- [x] US_SPOT_RKLB_USD
+- [x] exact `matchedSymbol`
+- [x] exactly one unique `tradingPair`
+- [x] opaque canonical identity
+- [x] pass it to Altra unchanged
+- [x] bounded smoke window
+- [x] at least one real OHLCV bar
+- [x] expected route: references/request-routing.md#Routes includes Strategy / Trading Analysis
+- [x] Resolve Trading Pairs Before Backtesting: references/altra-trading.md#Resolve Trading Pairs Before Backtesting includes /api/v1/market/trading-pairs?symbol=
+- [x] Resolve Trading Pairs Before Backtesting: references/altra-trading.md#Resolve Trading Pairs Before Backtesting includes candidatesByPair.set(candidate.tradingPair, candidate)
+- [x] Resolve Trading Pairs Before Backtesting: references/altra-trading.md#Resolve Trading Pairs Before Backtesting includes candidates.length !== 1
+- [x] Resolve Trading Pairs Before Backtesting: references/altra-trading.md#Resolve Trading Pairs Before Backtesting includes Exclude options unless the user explicitly asks
 
 ## scenarios.skillhub
 
@@ -1448,6 +1511,26 @@ Prompt: `一月十五日当时 Alva 怎么看 AAPL？`
 - [x] request-routing.md
 - [x] Markets returns the current backend view, not historical point-in-time truth
 - [x] expected route: references/request-routing.md#Routes includes Financial Analysis / Ask Question
+
+## scenarios.automation
+
+1/1 cases, 9/9 checks
+
+### PASS scenario.automation-price-chart
+
+A chart produced on every scheduled run uses the Automation-only price chart SDK, not the one-off chat publisher or Playbook renderer.
+
+Prompt: `Create an hourly NVDA Automation that returns a static chart preview and opens an interactive Area/Candles chart.`
+
+- [x] Data Product Layer: Feed Lifecycle And Automation
+- [x] price-chart-sdk.md
+- [x] feed-sdk.md
+- [x] @alva/price-chart-sdk
+- [x] does not fetch market data
+- [x] previewUrl
+- [x] publishedUrl
+- [x] Do not add charts by default or apply this route to one-off chat or Playbook charts
+- [x] expected route: references/request-routing.md#Routes includes Automation / Push
 
 ## scenarios.udf
 
