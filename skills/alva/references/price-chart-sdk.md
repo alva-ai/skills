@@ -29,6 +29,14 @@ Pass one already-resolved immutable snapshot:
     color?: string,
     lineStyle?: "solid" | "dotted" | "dashed"
   }[],
+  markers?: {
+    time: number | string,
+    position: "aboveBar" | "belowBar" | "inBar" | "atPriceTop" | "atPriceMiddle" | "atPriceBottom",
+    price?: number,
+    shape?: "circle" | "square" | "arrowUp" | "arrowDown",
+    color?: string,
+    text?: string
+  }[],
   levels?: { label: string, price: number, color?: string }[],
   viewToggle?: { enabled: boolean, initialView?: "area" | "candlestick" }
 }
@@ -36,10 +44,12 @@ Pass one already-resolved immutable snapshot:
 
 - `dataAsOfMs` is epoch milliseconds.
 - Intraday `time` is Unix seconds; daily `time` is `YYYY-MM-DD`. Use one time
-  representation across the primary series and its overlays. Primary series
-  points must not be later than `dataAsOfMs`; overlay points may extend beyond
-  it.
+  representation across the primary series, overlays, and markers. Primary
+  series points must not be later than `dataAsOfMs`; overlay points may extend
+  beyond it.
 - `overlays` adds time-aligned lines on the primary series' price scale.
+- Each marker time must match an existing primary-series time. Positions that
+  start with `atPrice` require `price`.
 - `viewToggle` requires candlestick OHLC input. The Area view derives close
   values; `initialView` is the preview image view.
 - Financial values must come from Data Skills, a Feed, or validated BYOD data.

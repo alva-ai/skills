@@ -1409,6 +1409,8 @@
             "PRICE_CHART_SCHEMA_VERSION",
             "overlays?:",
             "overlay points may extend beyond",
+            "markers?:",
+            "marker time must match an existing primary-series time",
             "previewUrl?: string",
             "publishedUrl: string",
             "already includes `interactive=1`",
