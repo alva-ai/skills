@@ -23,14 +23,23 @@ Pass one already-resolved immutable snapshot:
   series:
     | { type: "area" | "line"; data: { time: number | string, value: number }[] }
     | { type: "candlestick"; data: { time: number | string, open: number, high: number, low: number, close: number }[] },
+  overlays?: {
+    type: "line",
+    data: { time: number | string, value: number }[],
+    color?: string,
+    lineStyle?: "solid" | "dotted" | "dashed"
+  }[],
   levels?: { label: string, price: number, color?: string }[],
   viewToggle?: { enabled: boolean, initialView?: "area" | "candlestick" }
 }
 ```
 
 - `dataAsOfMs` is epoch milliseconds.
-- Intraday `time` is Unix seconds; daily `time` is `YYYY-MM-DD`. Use one
-  representation per series and never include a point after `dataAsOfMs`.
+- Intraday `time` is Unix seconds; daily `time` is `YYYY-MM-DD`. Use one time
+  representation across the primary series and its overlays. Primary series
+  points must not be later than `dataAsOfMs`; overlay points may extend beyond
+  it.
+- `overlays` adds time-aligned lines on the primary series' price scale.
 - `viewToggle` requires candlestick OHLC input. The Area view derives close
   values; `initialView` is the preview image view.
 - Financial values must come from Data Skills, a Feed, or validated BYOD data.

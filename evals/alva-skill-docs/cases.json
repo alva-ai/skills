@@ -1407,6 +1407,8 @@
             "does not fetch market data",
             "publishPriceChart()",
             "PRICE_CHART_SCHEMA_VERSION",
+            "overlays?:",
+            "overlay points may extend beyond",
             "previewUrl?: string",
             "publishedUrl: string",
             "already includes `interactive=1`",
