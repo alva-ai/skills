@@ -41,6 +41,11 @@ Pass one already-resolved immutable snapshot:
 
 `publishPriceChart()` also needs platform-owned publication context:
 
+Every deployed Automation must load its creator-scoped platform credential in
+the main script with `require("secret-manager").loadPlaintext("ALVA_API_KEY")`
+and pass it as `X-Alva-Api-Key`. Never copy a Sandbox credential or ask the
+user to provide one.
+
 | Field            | Source / rule                                                                                                                                                                   |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `endpoint`       | Current environment's chart publication endpoint. Use explicit runtime/platform configuration; do not guess an environment.                                                     |
@@ -83,9 +88,7 @@ function jsonClient(http) {
   const dataAsOfMs = resolvedDataAsOfMs;
   const channelId = String(args.channelId || "");
   const endpoint = String(args.chartEndpoint || "");
-  const apiKey = await secrets.loadPlaintext(
-    args.chartApiKeySecretName || "ALVA_API_KEY",
-  );
+  const apiKey = secrets.loadPlaintext("ALVA_API_KEY");
   if (!channelId || !endpoint || !apiKey) {
     throw new Error("Missing chart publication context");
   }
