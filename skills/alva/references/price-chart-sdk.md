@@ -88,7 +88,7 @@ function jsonClient(http) {
   const dataAsOfMs = resolvedDataAsOfMs;
   const channelId = String(args.channelId || "");
   const endpoint = String(args.chartEndpoint || "");
-  const apiKey = await secrets.loadPlaintext("ALVA_API_KEY");
+  const apiKey = secrets.loadPlaintext("ALVA_API_KEY");
   if (!channelId || !endpoint || !apiKey) {
     throw new Error("Missing chart publication context");
   }
