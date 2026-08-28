@@ -50,7 +50,7 @@ Pass one already-resolved immutable snapshot:
 - Intraday `time` is Unix seconds; daily `time` is `YYYY-MM-DD`. Use one time
   representation across OHLCV, overlays, and markers. OHLCV points must not be
   later than `dataAsOfMs`; overlay points may extend beyond it.
-- `overlays` adds time-aligned lines on the primary series' price scale.
+- `overlays` adds time-aligned lines on the chart's price scale.
 - Each marker time must match an existing OHLCV time. Positions that
   start with `atPrice` require `price`.
 - The SDK derives the Area preview from close values. The published chart starts
