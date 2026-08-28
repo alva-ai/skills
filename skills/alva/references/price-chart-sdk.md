@@ -20,9 +20,14 @@ Pass one already-resolved immutable snapshot:
   title: string,
   ticker: string,
   dataAsOfMs: number,
-  series:
-    | { type: "area" | "line"; data: { time: number | string, value: number }[] }
-    | { type: "candlestick"; data: { time: number | string, open: number, high: number, low: number, close: number }[] },
+  ohlcv: {
+    time: number | string,
+    open: number,
+    high: number,
+    low: number,
+    close: number,
+    volume: number
+  }[],
   overlays?: {
     type: "line",
     data: { time: number | string, value: number }[],
@@ -37,21 +42,19 @@ Pass one already-resolved immutable snapshot:
     color?: string,
     text?: string
   }[],
-  levels?: { label: string, price: number, color?: string }[],
-  viewToggle?: { enabled: boolean, initialView?: "area" | "candlestick" }
+  levels?: { label: string, price: number, color?: string }[]
 }
 ```
 
 - `dataAsOfMs` is epoch milliseconds.
 - Intraday `time` is Unix seconds; daily `time` is `YYYY-MM-DD`. Use one time
-  representation across the primary series, overlays, and markers. Primary
-  series points must not be later than `dataAsOfMs`; overlay points may extend
-  beyond it.
+  representation across OHLCV, overlays, and markers. OHLCV points must not be
+  later than `dataAsOfMs`; overlay points may extend beyond it.
 - `overlays` adds time-aligned lines on the primary series' price scale.
-- Each marker time must match an existing primary-series time. Positions that
+- Each marker time must match an existing OHLCV time. Positions that
   start with `atPrice` require `price`.
-- `viewToggle` requires candlestick OHLC input. The Area view derives close
-  values; `initialView` is the preview image view.
+- The SDK derives the Area preview from close values. The published chart starts
+  in Candlestick view and provides the Area/Candles toggle.
 - Financial values must come from Data Skills, a Feed, or validated BYOD data.
   The generated HTML template is fixed; the Agent must not write financial
   values or chart HTML from memory.
@@ -137,14 +140,13 @@ function jsonClient(http) {
       title: ticker,
       ticker,
       dataAsOfMs,
-      series: { type: "candlestick", data: resolvedOhlc },
-      viewToggle: { enabled: true, initialView: "area" },
+      ohlcv: resolvedOhlcv,
     },
   });
 })();
 ```
 
-`resolvedTicker`, `resolvedDataAsOfMs`, and `resolvedOhlc` stand for data
+`resolvedTicker`, `resolvedDataAsOfMs`, and `resolvedOhlcv` stand for data
 already fetched and validated by the Automation; they are not literals to copy.
 
 ## Result Contract
@@ -160,8 +162,9 @@ already fetched and validated by the Automation; they are not literals to copy.
 - `previewUrl` is a static image without the Area/Candles toggle. It is optional
   because HTML publication may succeed when screenshot capture fails.
 - `publishedUrl` already includes `interactive=1`; pass it directly to an iframe
-  or Native WebView. Do not rewrite it in the client.
-- The interactive artifact fills its iframe/WebView and shows the toggle when
-  enabled. The SDK does not implement Feed cards, click handlers, or modals.
+  or Native WebView. It starts in Candlestick view and shows the Area/Candles
+  toggle. Do not rewrite it in the client.
+- The interactive artifact fills its iframe/WebView. The SDK does not implement
+  Feed cards, click handlers, or modals.
 - Do not fabricate either URL or fall back to embedding generated HTML in a Feed
   output when publication fails.
