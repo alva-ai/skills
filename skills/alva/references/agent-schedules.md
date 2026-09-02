@@ -1,9 +1,10 @@
 # Agent Schedules
 
-Agent Schedules create durable future turns for a Channel Agent. They do not
+Agent Schedules create durable future turns for a Channel Agent or an existing
+ALPI Session Inbox. They do not
 execute an ALFS script. Use `alva deploy` when the occurrence must run a
 deterministic producer script; use `alva schedule` when it must ask the Agent to
-resume reasoning or judgment in a Channel.
+resume reasoning or judgment in the selected Channel or Session.
 
 Run `alva schedule --help` before use. The active Toolkit contract is
 authoritative if these examples ever drift.
@@ -71,6 +72,49 @@ alva schedule delete --name market-open
 Pause and resume affect future occurrences. Delete removes the named Schedule.
 Do not claim an occurrence ran merely because `put` succeeded; use the returned
 status, `nextFireAt`, and subsequent Channel turn as the relevant evidence.
+
+## Existing Session Inbox
+
+In a standard ALPI Session with Inbox enabled, the embedded `alva` tool targets
+its own Inbox automatically. Use `schedule list`, `schedule put`, `schedule pause`,
+`schedule resume`, and `schedule delete` without a target argument. The host supplies
+the actual Inbox path; the model cannot change the target, identity, or endpoint.
+Without an Inbox, embedded schedule commands fail instead of falling back to a Channel.
+
+From the terminal CLI, select the existing Inbox explicitly on every operation:
+
+```bash
+alva schedule put --inbox-path /alva/home/alice/sessions/research.inbox.jsonl \
+  --name follow-up --message "Recheck the filing" --after PT30M
+alva schedule list --inbox-path /alva/home/alice/sessions/research.inbox.jsonl
+alva schedule pause --inbox-path /alva/home/alice/sessions/research.inbox.jsonl --name follow-up
+alva schedule resume --inbox-path /alva/home/alice/sessions/research.inbox.jsonl --name follow-up
+alva schedule delete --inbox-path /alva/home/alice/sessions/research.inbox.jsonl --name follow-up
+```
+
+`--inbox-path` and `--channel-id` are mutually exclusive. Omitting both in the
+terminal retains the Channel default above. Inbox paths must be canonical absolute
+paths under the current human owner's home, not `~`, relative paths, or aliases.
+The matching transcript must already exist with a valid Session header; the owner's
+managed Alva API key must already be valid. This does not create a Channel, an Agent
+record, a replacement Session, or a user-supplied script runner.
+
+The Backend Schedule service records the occurrence and a durable AutoRun wake.
+AutoRun means persisted work that the Backend worker executes later. It appends a
+stable-ID follow-up to the Inbox and starts the standard metered Jagent runner,
+restoring the same Session ID, cwd, and transcript after the original process exits.
+Future waking is the Backend's responsibility; no client process must stay alive.
+
+A busy Session lock defers the wake. A confirmed temporary failure before execution
+starts may also defer. Agent execution failure ends this AutoRun without retry.
+An unknown execution result is not blindly resent. Unacked messages remain pending
+and may replay on ordinary Inbox recovery; no new failure marker is introduced.
+An already-acked occurrence does not call the model again.
+
+Pause, resume, and delete affect future schedule admissions; they do not retract
+an already-admitted Inbox message or its wake. Verify processing via the transcript's
+ack and the AutoRun result, not merely a successful `put` or an appended line.
+See [alpi.md](alpi.md) for the distinction from application-level `Agent.ask()`.
 
 ## Auto-Trading Consent
 
