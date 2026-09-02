@@ -13,6 +13,18 @@ const DEFAULT_SKILL_DIR = resolve(REPO_ROOT, "skills/alva");
 
 const MUTATIONS = [
   {
+    id: "session-inbox-no-execution-retry",
+    file: "references/agent-schedules.md",
+    remove: "Agent execution failure ends this AutoRun without retry.\n",
+    expectFailedCases: ["target.session-inbox-schedule"],
+  },
+  {
+    id: "session-inbox-no-channel-fallback",
+    file: "references/agent-schedules.md",
+    remove: "Without an Inbox, embedded schedule commands fail instead of falling back to a Channel.\n",
+    expectFailedCases: ["target.session-inbox-schedule"],
+  },
+  {
     id: "simple-latest-one-hop",
     file: "SKILL.md",
     remove: "Simple latest-fact asks stop there after one\nsourced hop; ",

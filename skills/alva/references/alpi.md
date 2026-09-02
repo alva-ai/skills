@@ -9,6 +9,18 @@ inside a deterministic pipeline. The runtime module is `@alva/pi`; use
 > [user-facing-prose.md](user-facing-prose.md#voice-block) verbatim in
 > `systemPrompt`.
 
+## Resume the current Session later
+
+For a standard ALPI Session with Inbox enabled, use the embedded `alva` tool's
+`schedule` commands to return later. The host targets that Session's own Inbox.
+Backend Schedule and AutoRun wake the standard runner after the process exits;
+the model does not need a timer, a nested Agent, or an arbitrary scheduled script.
+The runner restores the existing Session ID, cwd, and transcript, and uses current
+host-managed model configuration rather than trusting model settings in JSONL.
+See [agent-schedules.md](agent-schedules.md#existing-session-inbox) for terminal
+`--inbox-path`, lifecycle, and execution-failure behavior. The `Agent.ask()` API
+below remains the application-level reasoning loop, not a Session scheduler.
+
 ## Quick Start
 
 ```javascript
