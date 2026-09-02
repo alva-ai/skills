@@ -20,6 +20,7 @@ Pass one already-resolved immutable snapshot:
   title: string,
   ticker: string,
   dataAsOfMs: number,
+  previewType?: "area" | "candlestick",
   ohlcv: {
     time: number | string,
     open: number,
@@ -53,8 +54,9 @@ Pass one already-resolved immutable snapshot:
 - `overlays` adds time-aligned lines on the chart's price scale.
 - Each marker time must match an existing OHLCV time. Positions that
   start with `atPrice` require `price`.
-- The SDK derives the Area preview from close values. The published chart starts
-  in Candlestick view and provides the Area/Candles toggle.
+- Omit `previewType` for the default Area preview. Set it to `"candlestick"`
+  only when the requested preview is intentionally a K-line chart. The published
+  chart starts in Candlestick view and provides the Area/Candles toggle.
 - Financial values must come from Data Skills, a Feed, or validated BYOD data.
   The generated HTML template is fixed; the Agent must not write financial
   values or chart HTML from memory.
