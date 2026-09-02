@@ -55,8 +55,8 @@ Pass one already-resolved immutable snapshot:
 - Each marker time must match an existing OHLCV time. Positions that
   start with `atPrice` require `price`.
 - Omit `previewType` for the default Area preview. Set it to `"candlestick"`
-  only when the requested preview is intentionally a K-line chart. The published
-  chart starts in Candlestick view and provides the Area/Candles toggle.
+  only when the requested preview is intentionally a candlestick chart. The
+  published chart starts in Candlestick view and provides the Area/Candles toggle.
 - Financial values must come from Data Skills, a Feed, or validated BYOD data.
   The generated HTML template is fixed; the Agent must not write financial
   values or chart HTML from memory.
