@@ -512,10 +512,10 @@ or choose a provider path that explicitly chunks requests.
 
 #### Reasoning Layer: alpi
 
-alpi embeds a fixed LLM reasoning/tool loop inside a deterministic scheduled
-pipeline. Use `@alva/pi` `Agent.ask()` for result-only classification,
-summarization, TLDRs, why-it-matters, and tool-loop reasoning over real upstream
-data.
+For persistent coding Agents, follow [durable-agent.md](references/durable-agent.md):
+one `cwd`, one saved `$cwd/agent.js`, using `runAlvaAgent` or `runAlpiAgent` on first launch and every wake.
+Save it before starting or scheduling; it reconstructs tools, prompt and config before draining Inbox. Use Agent Schedules for future turns.
+Within deterministic pipelines, use `@alva/pi` `Agent.ask()` for result-only classification, summarization, TLDRs, why-it-matters, and tool-loop reasoning over real upstream data.
 
 Do **not** use it for one-off research the user asks interactively, and do not
 use it to produce numbers or events that should come from real data. Read

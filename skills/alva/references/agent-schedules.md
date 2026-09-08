@@ -1,8 +1,8 @@
 # Agent Schedules
 
 Agent Schedules create durable future turns for a Channel Agent or an existing
-ALPI Session Inbox. They do not
-execute an ALFS script. Use `alva deploy` when the occurrence must run a
+ALPI Session Inbox. Each Session wake executes its fixed Agent entrypoint; it does not
+select an arbitrary producer script. Use `alva deploy` when the occurrence must run a
 deterministic producer script; use `alva schedule` when it must ask the Agent to
 resume reasoning or judgment in the selected Channel or Session.
 
@@ -97,12 +97,14 @@ terminal retains the Channel default above. Inbox paths must be canonical absolu
 paths under the current human owner's home, not `~`, relative paths, or aliases.
 The matching transcript must already exist with a valid Session header; the owner's
 managed Alva API key must already be valid. This does not create a Channel, an Agent
-record, a replacement Session, or a user-supplied script runner.
+record, a replacement Session, or an arbitrary script target.
 
 The Backend Schedule service records the occurrence and a durable AutoRun wake.
 AutoRun means persisted work that the Backend worker executes later. It appends a
-stable-ID follow-up to the Inbox and starts the standard metered Jagent runner,
-restoring the same Session ID, cwd, and transcript after the original process exits.
+stable-ID follow-up to the Inbox and executes `$cwd/agent.js` through metered Jagent.
+That program reconstructs its tools, prompt and other configuration, then resumes
+the same Session ID, cwd, and transcript. Provision the entry file before schedule
+creation; see the [durable Agent contract](durable-agent.md).
 Future waking is the Backend's responsibility; no client process must stay alive.
 
 A busy Session lock defers the wake. A confirmed temporary failure before execution
