@@ -5,6 +5,27 @@ its Session across runs. A Channel Agent can create this program in ALFS and sta
 it through `alva run`. Application-level `Agent.ask()` remains appropriate for a
 bounded reasoning step inside an Automation or Playbook.
 
+## Pi coding agent on Alva Cloud
+
+ALPI coding agent is the Pi coding agent running on Alva Cloud. `runAlvaAgent`
+uses the same Pi `AgentSession` programming model, with ALFS, persistent
+Session/Inbox, the official Alva Skill, an authenticated `alva` tool and managed
+execution lifetime. It is not a second reasoning framework. Users only need
+`runAlvaAgent`; internal implementation layers are not a choice to make.
+
+Reuse your Pi customization knowledge, or consult Pi documentation to understand
+a technique, then check the current `@alva/pi` types and runtime documentation.
+The current `@alva/pi` contract is authoritative. A local Pi example or a different
+Pi version does not establish support on Alva Cloud.
+
+ALPI supports Pi's high-level Agent and AgentSession customization model except
+for infrastructure dependencies and capabilities that Alva Cloud must own.
+The supported options and explicit exceptions below define that boundary; do not
+assume every local Pi API or constructor dependency is compatible.
+
+Full Skill teaches the outer Channel Agent to save and start this program. The
+constructed Alva Agent loads Slim Skill; both use this same durable contract.
+
 ## One directory, one Agent program
 
 The Agent's identity is its canonical owner-home `cwd`. Save its entrypoint at
@@ -51,7 +72,7 @@ return await runAlvaAgent({
       details: {},
     }),
   }],
-}, async ({ session }) => {
+}, async function run({ session }) {
   // Run-specific input belongs in args; durable configuration belongs above.
   if (!args.alpiWake && typeof args.prompt === "string") {
     await session.prompt(args.prompt);
@@ -136,6 +157,87 @@ does not retract accepted work. See [agent-schedules.md](agent-schedules.md).
 Every wake loads the current program and imports. Self-edits apply on the next
 execution without version activation. There is no Agent cwd execution lock,
 pre-entry wrapper or host ownership recovery protocol to manage.
+
+## Required options and Session methods
+
+`cwd` and `alvaApiKey` are required. The helper does not load `ALVA_API_KEY` for
+you: trusted entry code loads it afresh and passes `alvaApiKey` to construct the
+authenticated `alva` tool. This credential is separate from managed model and
+search authentication. `alvaEndpoint` is optional and defaults to the Toolkit
+Alva API endpoint; save an explicit endpoint together with the matching key for
+a non-default environment. It does not configure `web_search`.
+
+| Option | When to save it in live agent.js |
+| --- | --- |
+| `cwd` | Required workspace and program identity. Choose any valid owner-home directory, not a platform-mandated `agents` folder. |
+| `sessionId`, `sessionDir`, `sessionFile` | Omit for `main` in `$cwd/.pi/agent/sessions`. Use a stable `sessionId` and optional `sessionDir`, or a mutually exclusive exact `sessionFile`, to select a conversation. A scheduled wake strictly restores its host-selected existing Session instead. |
+| `model`, `thinkingLevel`, `scopedModels` | Save explicit model policy when managed defaults are insufficient. `scopedModels` contains `{ model, thinkingLevel? }` entries for Pi model selection/cycling; each model must be supported and authenticated. |
+| `resourceLoaderOptions` | Save prompt/context and additional Skill/template configuration, not a replacement loader. `appendSystemPrompt` is an array of extra prompt strings. ALPI does not auto-discover local `APPEND_SYSTEM.md`; pass the extra text explicitly. |
+| `alvaApiKey`, `alvaEndpoint` | Resolve the required key on each invocation; persist only its lookup code and optional matching endpoint, never its plaintext value. |
+
+The earlier configuration table covers `tools`, `excludeTools`, `noTools`,
+`customTools`, `secrets` and `isolateRequireAllowlist`, including their defaults.
+Save reusable configuration and tool implementations in the program/imports;
+put one-off manual input in args. Wakes rebuild composition from that live code.
+
+| Pi AgentSession method | Purpose inside a bounded run callback |
+| --- | --- |
+| `prompt(text)` | Start a manual turn and await it; guard manual input so a scheduled wake does not repeat it. |
+| `subscribe(listener)` | Observe Session events; keep the returned unsubscribe function for listener cleanup. It does not schedule future processes. |
+| `followUp(text)` | Queue follow-up work after the current turn. This Session API is not durable Schedule delivery; use embedded `alva schedule` for future work. |
+| `waitForIdle()` | Await current Agent work. It does not replace the helper's final Inbox drain or release its Session lock. |
+| `setModel(model)`, `setThinkingLevel(level)` | Change the running Session's model/reasoning policy. Use current API persistence options when intended; save repeatable policy in the program. |
+| `setScopedModels(entries)` | Update the Session's model-cycling choices using supported authenticated model objects. |
+| `compact(instructions?)` | Compact conversation history with optional instructions; await completion. |
+
+## Cloud-owned infrastructure and exceptions
+
+The durable helper owns Session selection, `SessionManager`, Session lock,
+Inbox admission/drain, idle settlement and cleanup. Here admission means opening
+the selected Session under its lock, not a Jagent pre-entry Agent protocol.
+Do not inject `sessionManager`, `fileSystem`, `resourceLoader` or
+`baseToolDefinitions`; these are not durable `runAlvaAgent` options. Do not pass
+`inbox` or `continueSession`, manually close the lifetime, or change conversation
+inside `run`. ALFS replaces Node filesystem dependencies; Jagent owns capability,
+network and process isolation. A Node shell/process example is not portable.
+
+Cloud composes base tools, ResourceLoader, the official Alva Slim Skill and the
+authenticated `alva` tool. `read` and `alva` are required even with `noTools` or
+exclusions. Custom tools cannot replace `read`, `alva` or `web_search` by name.
+The official Alva Skill cannot be disabled or replaced (`noSkills` and
+`skillsOverride` are not escape hatches). Extension hooks and theme replacement
+are not supported in this durable entry. Additional Skills/templates and prompt
+customization use `resourceLoaderOptions` instead of replacing that composition.
+
+Managed model and search defaults come from the host; the main execution context
+supplies the Alva credential. Only overrides explicitly present in the current
+public options may be used. For example `searchClient` replaces search transport
+when deliberately supplied; `alvaApiKey`/`alvaEndpoint` do not override it.
+Do not copy local credentials, filesystem or process adapters into the cloud.
+
+## The run callback
+
+The second argument is the optional **run callback** (`onRun` is another useful
+name). It runs once per process invocation, on both manual runs and scheduled
+wakes, including an empty Inbox. The successful lifecycle is:
+
+```text
+construct or restore the Pi AgentSession
+  -> run(agent) once
+  -> drain and settle pending Inbox work
+  -> close and release the Session lifetime
+```
+
+The callback receives the ALPI session result, commonly destructured as
+`async function run({ session })`. Use it for an initial manual prompt, bounded
+per-invocation setup or the Pi Session methods above. It runs before final Inbox
+drain. It is not an event listener, reasoning loop, polling loop or forever loop.
+Do not implement your own Inbox loop. The helper awaits the callback and owns
+final drain, idle settlement and close; it also closes on failure.
+
+Every actual invocation repeats callback side effects. Guard initial/manual
+input with `!args.alpiWake`, as in the example. Wakes supply scheduled input
+through Inbox, not by unconditionally replaying an initial `session.prompt`.
 
 ## Owner-only UDF entry
 
