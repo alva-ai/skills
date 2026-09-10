@@ -107,8 +107,8 @@ the same Session ID, cwd, and transcript. Provision the entry file before schedu
 creation; see the [durable Agent contract](durable-agent.md).
 Future waking is the Backend's responsibility; no client process must stay alive.
 
-A busy Session lock defers the wake. A confirmed temporary failure before execution
-starts may also defer. Agent execution failure ends this AutoRun without retry.
+A temporary delivery failure before dispatch may defer. After dispatch, a busy
+Session lock is terminal and is not retried. Agent execution failure ends this AutoRun without retry.
 An unknown execution result is not blindly resent. Unacked messages remain pending
 and may replay on ordinary Inbox recovery; no new failure marker is introduced.
 An already-acked occurrence does not call the model again.

@@ -17,22 +17,23 @@ imports. They are reconstructed on every launch; a transcript does not contain
 executable tool implementations. Omit model and reasoning options to follow the
 host default; explicit options in the program remain authoritative.
 
-Use `runAlvaAgent` for Layer 3 (coding tools, official Alva Skill and authenticated
-`alva` tool), or `runAlpiAgent` for Layer 2 coding sessions without that composition.
-The helpers enable Inbox, open the selected Session, run the optional application
-callback, drain pending work, await completion and release the lock before return.
-They do not keep a process alive until the next Schedule.
+Use `runAlvaAgent` from `@alva/pi`. It includes coding tools, the official Alva
+Skill and the authenticated `alva` tool. It opens the Session with Inbox enabled,
+runs the optional callback once, drains pending input and awaits cleanup.
+The process exits after this work; Backend owns future timing.
 
 ## Entrypoint example
 
-Save this as `~/agents/company-research/agent.js`:
+Save this as `~/agents/company-research/agent.js` (example path; directory names
+are your choice). `~/research/agent.js` is equally valid. Only the `agent.js`
+filename under the chosen cwd is conventional:
 
 ```javascript
 const { runAlvaAgent, Type } = require("@alva/pi");
 const env = require("env");
 const alfs = require("alfs");
 const args = env.args || {};
-const cwd = `/alva/home/${env.username}/agents/company-research`;
+const cwd = "~/agents/company-research"; // Example path, not a required directory.
 
 return await runAlvaAgent({
   cwd,
@@ -76,52 +77,79 @@ With no session selector, every launch uses `main` under
 existing `sessionId` and directory, or its exact `sessionFile`, in agent.js. Keep
 that selection stable; do not generate a fresh ID or use `continueSession`.
 
+## Configuration and Pi capabilities
+
+Keep configuration in agent.js or its imports so every launch reconstructs it.
+The callback receives the native Pi `session`; use `prompt`, `subscribe`,
+`setModel`, `setThinkingLevel`, `compact` and transcript inspection as needed.
+Await asynchronous operations. The standard helper owns final Inbox drain and
+close; do not switch to a new Session inside its callback.
+
+| Need | Configuration and default |
+| --- | --- |
+| System prompt and context | `resourceLoaderOptions.systemPrompt`, `appendSystemPrompt`, and context files in ALFS. Without an override, the Alva finance prompt and host runtime guidance apply. |
+| Custom tools | `customTools` with a schema and `execute` implementation; restore the implementation from code each launch. |
+| Tool selection | `tools` selects names; `excludeTools` removes optional tools; `noTools` disables optional defaults. `read` and `alva` remain required. `web_search` is available when the host supports it. |
+| Model and reasoning | Omit `model` and `thinkingLevel` for managed defaults, unless saved settings explicitly select a model. Set them in code for a fixed policy. Transcript model history alone does not pin future runs. |
+| Skills and templates | `resourceLoaderOptions.additionalSkillPaths` and `additionalPromptTemplatePaths` add ALFS resources. The official Alva Skill remains enabled; shell extensions and themes are unavailable. |
+| Worker secrets | Omitted `secrets` grants none. Prefer a scoped name-to-value map resolved afresh; `"inherit"` delegates all available secrets. Never persist values. |
+| Worker modules | Omitted `isolateRequireAllowlist` uses host defaults; an explicit list restricts capability modules. Standard computation modules remain available. A nonempty secret grant also permits `secret-manager`. |
+
+Pi manages conversation history, model turns, tool execution, compaction and
+resource loading. Cloud execution uses ALFS and the Jagent JavaScript worker;
+it does not provide a local shell or an indefinitely running process. Business
+state needed after exit belongs in ALFS. Use the authenticated `alva` tool for
+platform operations, without exposing its credential to model-written code.
+
+ALPI cwd and native `alfs` path arguments both expand `~` using the authenticated
+host username. `~/a/../b` stays inside that home; `~other` and `~/../other` fail.
+Native relative symlink targets retain their original meaning. This alias does
+not bypass ALFS permissions. Schedule CLI `--inbox-path` still requires its
+canonical absolute target; it is not a native ALFS path argument.
+
 ## Wake contract
 
-The scheduler appends a stable message to the existing Inbox. Jagent first owns
-the canonical Agent cwd, then its platform wrapper locks the exact Session and
-strictly checks the transcript, complete Inbox and required acknowledgement.
-Only pending work loads the live `$cwd/agent.js` and its dependencies. An already
-acknowledged target, or an explicitly targetless empty wake, returns
-`preflight_noop` without evaluating any user code or calling the model. A missing
-required message is `invalid_target`, even when the Inbox is otherwise empty.
+Backend durably accepts a wake intent, appends a stable-ID follow-up to Inbox,
+and dispatches ordinary execution of the live `$cwd/agent.js`. Delivery means both
+the intent and input are stored. A worker can complete an interrupted append.
 
-One Agent may own multiple Sessions. The host captures `inboxPath`, `messageId`,
-`expectedSessionId` and `expectedCwd` before evaluation. Its exact Session
-overrides the program's first-launch `sessionId` or `sessionFile` selector.
-Changing `env.args.alpiWake` cannot retarget it. A different program cwd fails.
-The metadata never supplies tool code, prompt or credentials. Call the helper
-once and return its result; never implement a polling or forever loop.
+`runAlvaAgent` reads `env.args.alpiWake` as a Session selector containing
+`inboxPath`, `expectedSessionId` and `expectedCwd`. It strictly opens that existing
+transcript and checks identity, overriding first-launch selectors. Missing or
+mismatched transcripts fail without creating a replacement. This metadata carries
+no tools, prompt or credentials and is not an authorization credential.
 
-The helper adopts the held Session lock, reconstructs composition, runs an
-optional bounded setup callback, drains Inbox and awaits cleanup. The wrapper
-retains the Session lock through the whole entrypoint; Jagent retains the Agent
-lock through child exit. All Sessions under one cwd serialize, regardless of the
-execution principal. Direct Session constructors remain available for ephemeral
-or nonstandard use; they do not provide this Agent admission guarantee.
+The helper acquires the Session lock, reconstructs configuration, runs the callback
+once, drains all pending messages and awaits close. Different Sessions under one
+cwd may run concurrently. Protect shared business files explicitly if needed.
+An empty Inbox still evaluates user code and runs the callback; it causes no model
+call by itself. Guard an initial prompt as in the example so wakes do not repeat it.
 
-Before user evaluation, contention returns `not_started` and AutoRun durably
-defers the same occurrence. After the first root or dependency evaluation,
-load/composition/tool/model failure is terminal `failed_after_entrypoint`;
-lost results are `execution_unknown`. Neither is automatically retried, including
-`EAGAIN` raised before a prompt. On `acknowledged`, Backend rereads the exact
-bound transcript/Inbox and requires that message's acknowledgement. An Agent
-owns this state, so it is a consistency check rather than a tamper-proof receipt.
+After dispatch, busy, errors and unknown results end that AutoRun without retry.
+Only temporary delivery failures before dispatch may defer. Execution success
+means the program completed; it does not certify an exact message acknowledgement.
+Unacknowledged work may replay on a later ordinary run or independent wake;
+already-acked input is not delivered to the model again. External effects need
+business idempotency where repetition matters. Pausing or deleting a Schedule
+does not retract accepted work. See [agent-schedules.md](agent-schedules.md).
 
-Missing/empty/aliased entry files and foreign owner directories fail validation.
-Missing or mismatched transcripts never create a replacement. See
-[agent-schedules.md](agent-schedules.md) for delivery and acknowledgement rules.
-Ordinary recovery still replays unacknowledged work; effects are not exactly once.
+Every wake loads the current program and imports. Self-edits apply on the next
+execution without version activation. There is no Agent cwd execution lock,
+pre-entry wrapper or host ownership recovery protocol to manage.
 
-Wakes execute the current saved program. The Agent may update agent.js and its
-imports for its next wake without version activation. Jagent logs the observed
-root SHA-256 for diagnosis; it does not identify the whole dependency graph or
-freeze old source. Save business state needed after exit in ALFS.
+## Owner-only UDF entry
 
-The host maintains `$cwd/.pi/agent/execution.lock` and a token-specific heartbeat
-outside V8. An expired deadline, stale heartbeat or lost RPC never authorizes
-takeover. Automatic recovery initially requires this same host's exact
-token/generation record that it killed and joined the child. Other host
-generations and abandoned `execution.lock.recovery` markers fail closed and need
-explicit operational repair after termination is proven. Never delete these
-files merely because they look old.
+If exposing this program as a UDF for its owner only, validate the authenticated
+caller before reading secrets or constructing the Agent:
+
+```javascript
+const env = require("env");
+const ownerUserId = "<owner-user-id>"; // Set from the intended owner's identity.
+if (env.callerUserId == null || String(env.callerUserId) !== ownerUserId) {
+  throw new Error("Only the owner may invoke this Agent");
+}
+// Only now load credentials and call runAlvaAgent.
+```
+
+`env.userId` is an execution identity, not a substitute for the UDF caller check.
+Do not add an invented platform `owner_only` registration field.
