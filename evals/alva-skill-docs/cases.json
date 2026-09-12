@@ -1469,6 +1469,31 @@
       ]
     },
     {
+      "id": "target.session-inbox-schedule",
+      "group": "target",
+      "target": "corpus",
+      "description": "Session schedules self-target in embedded tools, explicitly target in CLI, and preserve failure/recovery boundaries.",
+      "file_includes": [{
+        "file": "references/agent-schedules.md",
+        "includes": [
+          "Existing Session Inbox",
+          "its own Inbox automatically",
+          "Without an Inbox, embedded schedule commands fail instead of falling back to a Channel",
+          "alva schedule put --inbox-path",
+          "alva schedule list --inbox-path",
+          "alva schedule pause --inbox-path",
+          "alva schedule resume --inbox-path",
+          "alva schedule delete --inbox-path",
+          "`--inbox-path` and `--channel-id` are mutually exclusive",
+          "same Session ID, cwd, and transcript",
+          "Agent execution failure ends this AutoRun without retry",
+          "may replay on ordinary Inbox recovery",
+          "already-acked occurrence does not call the model again",
+          "do not retract"
+        ]
+      }]
+    },
+    {
       "id": "target.legacy-loop-compatibility",
       "group": "target",
       "target": "corpus",

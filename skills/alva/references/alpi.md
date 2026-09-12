@@ -9,6 +9,14 @@ inside a deterministic pipeline. The runtime module is `@alva/pi`; use
 > [user-facing-prose.md](user-facing-prose.md#voice-block) verbatim in
 > `systemPrompt`.
 
+## Resume the current Session later
+
+Build durable Layer 2/3 Agents using the [agent.js entrypoint contract](durable-agent.md).
+The embedded `alva` tool's `schedule` commands target that Agent's existing Inbox.
+Backend executes `$cwd/agent.js` on wake, reconstructing its custom configuration
+and opening the bound Session. See [agent-schedules.md](agent-schedules.md#existing-session-inbox).
+The `Agent.ask()` examples below cover bounded application-level reasoning.
+
 ## Quick Start
 
 ```javascript

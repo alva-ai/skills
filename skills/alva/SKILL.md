@@ -39,7 +39,7 @@ The main objects are:
 | Data Skills        | 250+ structured Arrays endpoints for US and non-US equities, fundamentals (earnings, filings), options, crypto, macro, on-chain, semiconductor spot/contract prices, news, prediction markets, and indexed Twitter/X. | You need factual financial data.                                                                               |
 | Runtime script     | JavaScript executed inside Alva's V8/jagent runtime through `alva run` or cronjobs.                                                                          | You need computation, HTTP, ALFS, secrets, alpi, ONNX, or Feed SDK.                                            |
 | Feed               | The persistent data pipeline and identity (`feed_id`) that writes outputs to ALFS. `alva automation` is its product-facing lifecycle CLI; `alva deploy` cronjobs produce its data. | Data needs freshness, history, public reads, charts, release, or push.                                         |
-| Agent Schedule     | A named future or recurring instruction that creates durable turns for a Channel Agent.                                                                      | The user wants the Agent itself to return later, continue work, or repeat a judgment.                          |
+| Agent Schedule     | A named future or recurring instruction for a Channel Agent or an existing ALPI Session Inbox.                                                               | The user wants the Agent itself to return later, continue work, or repeat a judgment.                          |
 | Playbook           | A hosted investing app at `https://alva.ai/u/<username>/playbooks/<name>`.                                                                                   | The user wants a shareable dashboard, screener, thesis, what-if, or strategy surface.                          |
 | Skillhub blueprint | A catalog methodology addressed by `/use-skill:<username>/<name>` or discovered from a user skill/method reference.                                          | The user references a skill/method, or a task matches an official template family.                             |
 | Altra              | The Feed SDK trading engine for event-driven backtesting and signal feeds.                                                                                   | Any strategy, simulation, signal target, portfolio, order, equity curve, or rebalancing logic.                 |
@@ -512,10 +512,10 @@ or choose a provider path that explicitly chunks requests.
 
 #### Reasoning Layer: alpi
 
-alpi embeds a fixed LLM reasoning/tool loop inside a deterministic scheduled
-pipeline. Use `@alva/pi` `Agent.ask()` for result-only classification,
-summarization, TLDRs, why-it-matters, and tool-loop reasoning over real upstream
-data.
+For persistent coding Agents, follow [durable-agent.md](references/durable-agent.md):
+one `cwd`, one saved `$cwd/agent.js`, using `runAlvaAgent` on first launch and every wake.
+Save it before starting or scheduling; it reconstructs tools, prompt and config before draining Inbox. Use Agent Schedules for future turns.
+Within deterministic pipelines, use `@alva/pi` `Agent.ask()` for result-only classification, summarization, TLDRs, why-it-matters, and tool-loop reasoning over real upstream data.
 
 Do **not** use it for one-off research the user asks interactively, and do not
 use it to produce numbers or events that should come from real data. Read
@@ -750,7 +750,7 @@ text does not fully cover.
 | `fs`                 | ALFS reads/writes/grants/time-series suffixes and shared modules under `~/library`. Must read [api/filesystem.md](references/api/filesystem.md) for synth suffixes and grant gotchas. |
 | `run`                | Execute jagent JS. See [jagent-runtime.md](references/jagent-runtime.md).                                                                                                             |
 | `deploy`             | Cronjob lifecycle for producer scripts: schedule, args, trigger, run-status, runs, logs. See [deployment.md](references/deployment.md).                                               |
-| `schedule`           | Named future and recurring Channel Agent turns: list, put, pause, resume, delete. See [agent-schedules.md](references/agent-schedules.md).                                            |
+| `schedule`           | Named future and recurring Channel or Session Inbox turns: list, put, pause, resume, delete. Terminal Inbox targets require `--inbox-path`; embedded tools target self. See [agent-schedules.md](references/agent-schedules.md). |
 | `automation`         | Product-facing lifecycle and per-Automation delivery CLI (`delivery get/update` supports independent Alva and email destinations). Must read [feed-lifecycle.md](references/feed-lifecycle.md) and [push-notifications.md](references/push-notifications.md). |
 | `release`            | Playbook draft/release; the release reference also covers automation publish metadata extras. Must read [api/release.md](references/api/release.md).                                   |
 | `lint playbook`      | Design-system linter, same gate as release. See [design-contract.yaml](references/design-contract.yaml).                                                                              |
@@ -795,7 +795,7 @@ Use this index to open only the file needed for the current task.
 | [price-chart-sdk.md](references/price-chart-sdk.md)                                   | Automation-only price chart rendering, publication inputs, and preview/interactive URL contract.                                              |
 | [altra-trading.md](references/altra-trading.md)                                       | Altra strategy engine, features, signals, tests, PIT compliance.                                                                              |
 | [alpi.md](references/alpi.md)                                                         | Scheduled LLM reasoning/tool-loop API and examples.                                                                                           |
-| [agent-schedules.md](references/agent-schedules.md)                                   | Named Channel Agent schedules, rule/bound contracts, lifecycle, and legacy Channel Loop compatibility.                                        |
+| [agent-schedules.md](references/agent-schedules.md)                                   | Channel and existing Session Inbox schedules, self-targeting, wake/retry boundaries, lifecycle, and legacy Channel Loop compatibility.          |
 | [onnx.md](references/onnx.md)                                                         | ONNX artifact, inference, FeedAltra integration, release checks.                                                                              |
 | [deployment.md](references/deployment.md)                                             | Cronjob create/list/pause/resume/trigger/run-status/runs/run-logs.                                                                            |
 | [search.md](references/search.md)                                                     | `unified_search`, finance search, Twitter/X, Reddit, YouTube, web gotchas.                                                                    |
