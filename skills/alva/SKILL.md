@@ -513,7 +513,7 @@ or choose a provider path that explicitly chunks requests.
 #### Reasoning Layer: alpi
 
 For persistent coding Agents, follow [durable-agent.md](references/durable-agent.md):
-one `cwd`, one saved `$cwd/agent.js`, using `runAlvaAgent` or `runAlpiAgent` on first launch and every wake.
+one `cwd`, one saved `$cwd/agent.js`, using `runAlvaAgent` on first launch and every wake.
 Save it before starting or scheduling; it reconstructs tools, prompt and config before draining Inbox. Use Agent Schedules for future turns.
 Within deterministic pipelines, use `@alva/pi` `Agent.ask()` for result-only classification, summarization, TLDRs, why-it-matters, and tool-loop reasoning over real upstream data.
 
