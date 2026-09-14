@@ -34,3 +34,6 @@ jobs:
 
       - name: Run mutation smoke
         run: node evals/alva-skill-docs/mutation-smoke.mjs --skill-dir skills/alva
+
+      - name: Verify durable Agent teaching and examples
+        run: node --test evals/alva-skill-docs/durable-agent.test.mjs
