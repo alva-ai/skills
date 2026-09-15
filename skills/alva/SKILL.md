@@ -4,7 +4,7 @@ description: >-
   Use this skill when the user asks for financial data ("price of BTC", "P/E
   ratio of NVDA"), market analysis, stock or crypto research, quant strategies,
   backtesting ("backtest a momentum strategy"), tracking assets or portfolios,
-  publishing or explicitly polishing a Thesis, or help turning investing ideas into live playbooks, dashboards, and analytics
+  Thesis publication or explicitly requested polishing, or help turning investing ideas into live playbooks, dashboards, and analytics
   on Alva. Powered by 250+ financial data sources across crypto, equities,
   macro, on-chain, and social data, along with cloud-side analytics and
   backtesting. Also use when the user asks about Alva platform capabilities.

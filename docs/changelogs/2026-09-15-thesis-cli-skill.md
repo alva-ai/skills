@@ -25,7 +25,7 @@ when commands are unavailable. Rewrite guidance matches Backend thesis_rewrite.g
 
 ## 5. Verification
 
-- `uv run --with pyyaml python /Users/ming/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/alva`: PASS.
+- With the Codex system Skill Creator installed: `uv run --with pyyaml python "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator/scripts/quick_validate.py" skills/alva`: PASS. This uses the local Codex skill, not a validator shipped in this repository.
 - `node evals/alva-skill-docs/skill-doc-eval.mjs --out /private/tmp/thesis-950-skills-eval.md`: PASS, 91/91 cases, 944/944 checks, top-level size 911 lines.
 - Independent source-only simulation of publish/analysis/rewrite/dashboard/
   ambiguous-response resubmission: appropriate routing and mutation boundaries
