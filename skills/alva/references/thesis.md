@@ -45,20 +45,38 @@ Keep every returned Thesis/version/entity ID as a decimal string.
 ## Explicit polishing only
 
 ```sh
-alva thesis rewrite --body '<text the user asked to polish>'
+alva thesis rewrite --body '<text the user asked to polish>' --mode reformat
 ```
 
-Polishing returns candidate text only. Preserve the original language,
-meaning, stance, uncertainty and qualifications; improve clarity and
-concision. One sentence is enough. Do not add facts, prices, evidence,
-citations, entities, causal claims or confidence the user did not supply.
-Do not impose a title, report template or minimum word count.
+Rewrite is explicit and returns candidate text only. Choose the mode the user
+asked for; otherwise omit `--mode`, which sends the canonical `reformat`
+default. Do not pass an empty, whitespace, `null`, or guessed mode. The only
+valid modes are:
+
+- `reformat` (default): improve structure, paragraphs, and readability while
+  preserving every substantive fact, reason, qualifier, and conclusion.
+- `shorten`: remove redundancy while retaining the core view, reasons, and
+  qualifiers.
+- `enrich`: expand the reasoning already supplied. State assumptions and
+  inferences conditionally; never invent evidence, numbers, citations, or
+  research, or present new entities/causal relationships as established facts.
+
+Every mode preserves the original language, stance, uncertainty, and
+qualifications. Do not choose a mode from body length or errors. Do not impose
+a title, report template, or minimum word count.
 
 Show the candidate to the user. Do not publish it or overwrite an existing
 Thesis unless the user subsequently selects it for that separate operation.
 An unavailable rewrite model is an error, not permission to pretend the
 service rewrote or saved the text. Original-text creation remains a separate
 operation and does not depend on subjective polishing quality.
+
+Rewrite does not create or update a Thesis, retry, or fall back to a different
+mode. Incomplete model output returns a readable `FailedPrecondition` HTTP 412
+error and no partial candidate. Unconfigured/unavailable service or admission
+returns HTTP 503; invalid model output is `Internal`/HTTP 500. Quota exhaustion
+is HTTP 429, with `Retry-After` when the server supplies a valid positive delay.
+Report actual errors; let the user decide whether to try again, without automatic retries.
 
 ## Updates and lifecycle
 
