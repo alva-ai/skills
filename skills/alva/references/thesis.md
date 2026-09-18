@@ -1,10 +1,10 @@
 # Thesis: publish the selected viewpoint
 
-Use this route when the user explicitly asks to publish/create a Thesis,
-maintain an existing Thesis, or polish a viewpoint using the Thesis capability.
-Merely discussing, researching, or remembering a viewpoint is not publication
-consent. When the selected original text is ambiguous, clarify that text only.
-An explicitly requested dashboard or custom tracker still uses Playbook Creation.
+Use this route when the user asks to publish/create a Thesis, maintain an
+existing Thesis, or polish a viewpoint using the Thesis capability. Merely
+discussing, researching, or remembering a viewpoint is not publication consent.
+When the selected original text is ambiguous, clarify that text only. An
+explicitly requested dashboard or custom tracker still uses Playbook Creation.
 
 ## Discover the available command
 
@@ -14,13 +14,27 @@ existing host/CLI setup. If the command or API is unavailable, report that
 dependency. Do not fall back to HTML, Playbook draft/release, direct gRPC/ALFS
 writes, custom Automation code, or an invented URL/Feed/Channel identity.
 
+## Confirm before creating
+
+The user's request to create or publish establishes the intent. Before invoking
+`alva thesis create`, show the final Thesis that will be created—at minimum the
+final body, and any title or visibility that will be used—and ask the user to
+confirm that result. Do not run `create` until the user confirms the displayed
+Thesis. If the user asks for changes, update the displayed result and ask again;
+if the user declines, stop without creating anything.
+
+This confirmation is about the final Thesis content, not a second approval of
+the user's original intent. Reads and candidate-only rewrites may proceed under
+their own rules below; showing a rewrite candidate does not confirm its later
+publication.
+
 ## Create without rewriting
 
 One sentence is enough. Title and entity IDs are optional. Creation is public
-by default; explain that default without adding a repeated confirmation when
-the user has already explicitly requested publication. Honor an explicit
-private request. Do not generate a title, expand the text, add arguments, or
-run `rewrite` as a prerequisite. Preserve whitespace, line breaks and language.
+by default; explain that default when displaying the final Thesis. Honor an
+explicit private request. Do not generate a title, expand the text, add
+arguments, or run `rewrite` as a prerequisite. Preserve whitespace, line breaks
+and language.
 
 Choose one new nonzero UUID per creation intent and retain it with the exact
 payload. Supply it as `--request-id`; do not ask the user to invent internal
