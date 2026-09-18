@@ -1349,7 +1349,7 @@
             "Return the created Thesis card",
             "authoritative readback",
             "The `alva thesis get --id",
-            "The `thesis get` response is authoritative",
+            "single authoritative source for the complete preview",
             "author_version_id",
             "response.author",
             "display_name",
