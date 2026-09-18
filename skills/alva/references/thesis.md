@@ -71,8 +71,9 @@ authoritative source for the complete preview. Read `response.thesis.body`,
 `response.thesis.author_version_id`, and `response.thesis.entity_ids`; read the
 author directly from `response.author` and the ordered ticker records directly
 from `response.entities`. The service assembles these details in the GET
-response, so do not make GraphQL requests, run `alva run`, run `alva whoami` for
-hydration, inspect undocumented endpoints, or issue secondary profile/entity
+response, so do not make GraphQL requests. Do not run `alva run` or run `alva
+whoami` for hydration; do not inspect undocumented endpoints or issue secondary
+profile/entity
 lookups. Do not infer tickers by scanning the body.
 
 Require a complete author object (`id`, `kind`, `display_name`, `avatar_url`,
@@ -84,9 +85,11 @@ containing only verified fields and identify the missing preview data.
 
 Populate the card with the authoritative GET response:
 
-- the author's `display_name` and `avatar_url` from `response.author`;
+- the author's display name and avatar URL (`display_name` and `avatar_url`) from
+  `response.author`;
 - the exact body from the post-create readback;
-- each entity's stable ID, `ticker`, and `icon_url` from `response.entities`; and
+- each entity's stable ID, ticker symbol, and icon URL (`id`, `ticker`, and
+  `icon_url`) from `response.entities`; and
 - the readback Thesis ID and `author_version_id` as `thesis-id` and
   `version-id`. The body is the author document, so do not substitute
   `material_version_id` when the two versions differ.
@@ -106,7 +109,8 @@ icon-url="..."/>` children. All three ticker attributes are required. Map
 them from the server-returned entity `id`, `ticker`, and `icon_url` fields
 respectively;
 do not put the symbol in ticker element text. Use `<tickers/>` for an
-authoritative empty entity set. Preserve the readback `entity_ids` order and
+authoritative empty entity set. Preserve the original `entity_ids` order from
+the readback and
 canonical ticker spelling.
 
 XML-escape `&`, `<`, `>`, `"`, and `'` as `&amp;`, `&lt;`, `&gt;`, `&quot;`,
