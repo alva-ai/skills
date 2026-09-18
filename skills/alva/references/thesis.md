@@ -1,10 +1,10 @@
 # Thesis: publish the selected viewpoint
 
-Use this route when the user explicitly asks to publish/create a Thesis,
-maintain an existing Thesis, or polish a viewpoint using the Thesis capability.
-Merely discussing, researching, or remembering a viewpoint is not publication
-consent. When the selected original text is ambiguous, clarify that text only.
-An explicitly requested dashboard or custom tracker still uses Playbook Creation.
+Use this route when the user asks to publish/create a Thesis, maintain an
+existing Thesis, or polish a viewpoint using the Thesis capability. Merely
+discussing, researching, or remembering a viewpoint is not publication consent.
+When the selected original text is ambiguous, clarify that text only. An
+explicitly requested dashboard or custom tracker still uses Playbook Creation.
 
 ## Discover the available command
 
@@ -14,13 +14,30 @@ existing host/CLI setup. If the command or API is unavailable, report that
 dependency. Do not fall back to HTML, Playbook draft/release, direct gRPC/ALFS
 writes, custom Automation code, or an invented URL/Feed/Channel identity.
 
+## Confirm before creating
+
+An initial request to create or publish is an intent to prepare, not the final
+confirmation to perform the persistent Thesis write. Before invoking
+`alva thesis create`, show the exact body that will be submitted, the
+visibility (public by default, or the user's explicit private choice), and any
+title or entity IDs. Explain that creation is a persistent Thesis publication,
+then ask for a clear user confirmation. Do not run `create` until that
+confirmation is received. This gate applies even when the initial request
+already said "create" or "publish"; do not treat that request as the
+confirmation. If confirmation is absent, ambiguous, or withdrawn, stop without
+creating anything.
+
+The confirmation gate is specific to the create write. Reads and candidate-only
+rewrites may proceed under their own rules below; showing a rewrite candidate
+does not confirm its later publication.
+
 ## Create without rewriting
 
 One sentence is enough. Title and entity IDs are optional. Creation is public
-by default; explain that default without adding a repeated confirmation when
-the user has already explicitly requested publication. Honor an explicit
-private request. Do not generate a title, expand the text, add arguments, or
-run `rewrite` as a prerequisite. Preserve whitespace, line breaks and language.
+by default; explain that default before asking for confirmation. Honor an
+explicit private request. Do not generate a title, expand the text, add
+arguments, or run `rewrite` as a prerequisite. Preserve whitespace, line breaks
+and language.
 
 Choose one new nonzero UUID per creation intent and retain it with the exact
 payload. Supply it as `--request-id`; do not ask the user to invent internal
