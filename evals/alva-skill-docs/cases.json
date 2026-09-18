@@ -1392,6 +1392,7 @@
         {
           "file": "SKILL.md",
           "includes": [
+            "accept a natural confirmation of that displayed content",
             "<thesis-preview>",
             "verified identity, author, exact body, and entity IDs/tickers/icons",
             "fixed element order and XML escaping"
