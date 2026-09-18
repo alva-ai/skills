@@ -24,9 +24,11 @@ Thesis. If the user asks for changes, update the displayed result and ask again;
 if the user declines, stop without creating anything.
 
 This confirmation is about the final Thesis content, not a second approval of
-the user's original intent. Reads and candidate-only rewrites may proceed under
-their own rules below; showing a rewrite candidate does not confirm its later
-publication.
+the user's original intent. A natural acknowledgement or direct instruction to
+create the displayed Thesis is enough; do not require a special confirmation
+phrase or repeat the publication warning. Reads and candidate-only rewrites may
+proceed under their own rules below; showing a rewrite candidate does not
+confirm its later publication.
 
 ## Create without rewriting
 
@@ -55,6 +57,37 @@ Body input is bounded to 65536 UTF-8 bytes, and an optional title to 500 bytes.
 These are transport limits, not minimum research/word-count requirements.
 Report invalid, empty or oversized input; do not silently truncate it.
 Keep every returned Thesis/version/entity ID as a decimal string.
+
+## Return the created Thesis card
+
+After `create` succeeds, run `alva thesis get --id '<returned thesis id>'` and
+treat that authoritative readback—not the submitted draft or prose in the
+conversation—as the created result. Then emit exactly one Thesis preview card
+through the host's native Thesis-card rendering surface. This completion card
+is not another confirmation gate.
+
+Populate the card with the canonical values available to the host:
+
+- the author's display name and avatar URL from authenticated canonical profile
+  or publication data;
+- the exact body from the post-create readback;
+- the ticker symbols resolved from the Thesis's authoritative entity set; and
+- the returned Thesis and version IDs when the rendering surface supports stable
+  identity fields.
+
+Do not derive tickers by scanning the body, substitute a username for a missing
+display name, invent an avatar, or otherwise guess presentation data. An
+authoritative empty entity set produces an empty ticker list. If profile or
+entity hydration is unavailable, identify the missing card fields and keep the
+successful Thesis/version identity plus exact readback factual; do not claim a
+complete card was rendered.
+
+Use the rendering surface actually exposed by the host. Do not invent a custom
+XML tag, JSON fence, MCP tool, or other wire format. If the host exposes no
+Thesis preview-card surface, report that rendering limitation and provide a
+human-readable fallback containing only verified fields. A failed readback
+means the create response may be reported, but no authoritative preview card
+may be claimed.
 
 ## Explicit polishing only
 

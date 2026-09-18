@@ -1336,6 +1336,39 @@
       ]
     },
     {
+      "id": "target.thesis-create-preview-card",
+      "group": "target",
+      "target": "corpus",
+      "description": "Thesis creation lightly confirms the displayed final content, then uses authoritative readback and canonical hydration for one native preview card without inventing a frontend protocol.",
+      "file_includes": [
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "A natural acknowledgement or direct instruction",
+            "do not require a special confirmation phrase",
+            "Return the created Thesis card",
+            "authoritative readback",
+            "exactly one Thesis preview card",
+            "author's display name and avatar URL",
+            "exact body from the post-create readback",
+            "ticker symbols resolved from the Thesis's authoritative entity set",
+            "Do not derive tickers by scanning the body",
+            "This completion card is not another confirmation gate",
+            "Do not invent a custom XML tag, JSON fence, MCP tool",
+            "human-readable fallback containing only verified fields"
+          ]
+        },
+        {
+          "file": "SKILL.md",
+          "includes": [
+            "host-native Thesis preview card",
+            "verified author name/avatar, exact body and resolved tickers",
+            "Do not invent a rendering protocol"
+          ]
+        }
+      ]
+    },
+    {
       "id": "retained.order-confirmation-rule",
       "group": "retained",
       "target": "skill",
