@@ -16,25 +16,22 @@ writes, custom Automation code, or an invented URL/Feed/Channel identity.
 
 ## Confirm before creating
 
-An initial request to create or publish is an intent to prepare, not the final
-confirmation to perform the persistent Thesis write. Before invoking
-`alva thesis create`, show the exact body that will be submitted, the
-visibility (public by default, or the user's explicit private choice), and any
-title or entity IDs. Explain that creation is a persistent Thesis publication,
-then ask for a clear user confirmation. Do not run `create` until that
-confirmation is received. This gate applies even when the initial request
-already said "create" or "publish"; do not treat that request as the
-confirmation. If confirmation is absent, ambiguous, or withdrawn, stop without
-creating anything.
+The user's request to create or publish establishes the intent. Before invoking
+`alva thesis create`, show the final Thesis that will be created—at minimum the
+final body, and any title or visibility that will be used—and ask the user to
+confirm that result. Do not run `create` until the user confirms the displayed
+Thesis. If the user asks for changes, update the displayed result and ask again;
+if the user declines, stop without creating anything.
 
-The confirmation gate is specific to the create write. Reads and candidate-only
-rewrites may proceed under their own rules below; showing a rewrite candidate
-does not confirm its later publication.
+This confirmation is about the final Thesis content, not a second approval of
+the user's original intent. Reads and candidate-only rewrites may proceed under
+their own rules below; showing a rewrite candidate does not confirm its later
+publication.
 
 ## Create without rewriting
 
 One sentence is enough. Title and entity IDs are optional. Creation is public
-by default; explain that default before asking for confirmation. Honor an
+by default; explain that default when displaying the final Thesis. Honor an
 explicit private request. Do not generate a title, expand the text, add
 arguments, or run `rewrite` as a prerequisite. Preserve whitespace, line breaks
 and language.
