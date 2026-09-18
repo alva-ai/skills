@@ -1352,10 +1352,10 @@
             "author's display name and avatar URL",
             "exact body from the post-create readback",
             "ticker symbols resolved from the Thesis's authoritative entity set",
-            "<alva:thesis-preview schema-version=\"1\" thesis-id=",
-            "<alva:body>",
-            "<alva:tickers>",
-            "<alva:ticker>NVDA</alva:ticker>",
+            "<thesis-preview schema-version=\"1\" thesis-id=",
+            "<body>",
+            "<tickers>",
+            "<ticker>NVDA</ticker>",
             "Use this exact wire format",
             "without a Markdown code fence",
             "frontend decodes those entities exactly once",
@@ -1371,7 +1371,7 @@
         {
           "file": "SKILL.md",
           "includes": [
-            "<alva:thesis-preview>",
+            "<thesis-preview>",
             "verified identity, author, exact body and tickers",
             "fixed element order and XML escaping"
           ]

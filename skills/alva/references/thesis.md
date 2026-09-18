@@ -77,30 +77,30 @@ Populate the card with the canonical values available to the host:
 Use this exact wire format, without a Markdown code fence:
 
 ```xml
-<alva:thesis-preview schema-version="1" thesis-id="123" version-id="456" author-name="Ada Lovelace" author-avatar-url="https://example.com/avatar.png"><alva:body>NVDA can compound if inference demand grows.</alva:body><alva:tickers><alva:ticker>NVDA</alva:ticker></alva:tickers></alva:thesis-preview>
+<thesis-preview schema-version="1" thesis-id="123" version-id="456" author-name="Ada Lovelace" author-avatar-url="https://example.com/avatar.png"><body>NVDA can compound if inference demand grows.</body><tickers><ticker>NVDA</ticker></tickers></thesis-preview>
 ```
 
 The example fence documents the contract only; actual replies emit the raw XML
 block. Keep the element and attribute names exactly as shown. The four
 identity/presentation attributes plus `schema-version="1"` are required.
-`<alva:body>` occurs exactly once, followed by exactly one `<alva:tickers>`
-container with zero or more `<alva:ticker>` children. Use `<alva:tickers/>` for
+`<body>` occurs exactly once, followed by exactly one `<tickers>` container
+with zero or more `<ticker>` children. Use `<tickers/>` for
 an authoritative empty entity set. Preserve the canonical ticker order and
 spelling.
 
 XML-escape `&`, `<`, `>`, `"`, and `'` as `&amp;`, `&lt;`, `&gt;`, `&quot;`,
 and `&apos;` in every attribute or text value. The frontend decodes those
-entities exactly once; the decoded `<alva:body>` value must equal the
+entities exactly once; the decoded `<body>` value must equal the
 post-create readback byte-for-byte, including whitespace and line breaks. Do
-not add indentation or formatting whitespace inside `<alva:body>`. Emit the
-block only after its closing `</alva:thesis-preview>` is complete; surrounding
+not add indentation or formatting whitespace inside `<body>`. Emit the block
+only after its closing `</thesis-preview>` is complete; surrounding
 explanatory prose stays outside the block. The frontend consumes a complete,
 valid block as one card segment and leaves malformed, unsupported-version, or
 unclosed markup as ordinary text.
 
 Do not derive tickers by scanning the body, substitute a username for a missing
 display name, invent an avatar, or otherwise guess presentation data. An
-authoritative empty entity set produces `<alva:tickers/>`. If a required
+authoritative empty entity set produces `<tickers/>`. If a required
 profile field or entity hydration is unavailable, do not emit a partial XML
 block: identify the missing card fields and provide a human-readable fallback
 containing only verified fields. An explicitly absent canonical avatar is
