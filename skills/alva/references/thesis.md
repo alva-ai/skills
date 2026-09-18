@@ -17,11 +17,40 @@ writes, custom Automation code, or an invented URL/Feed/Channel identity.
 ## Confirm before creating
 
 The user's request to create or publish establishes the intent. Before invoking
-`alva thesis create`, show the final Thesis that will be created—at minimum the
-final body, and any title or visibility that will be used—and ask the user to
-confirm that result. Do not run `create` until the user confirms the displayed
-Thesis. If the user asks for changes, update the displayed result and ask again;
-if the user declines, stop without creating anything.
+`alva thesis create`, show the final Thesis payload that will actually be
+submitted and ask the user to confirm that displayed content. Use this readable
+template (keep the field names and order; replace the placeholders with the
+actual values):
+
+```text
+准备创建以下 Thesis：
+
+Title: <title, or (none) when no title was provided>
+Visibility: <public (default), or the explicitly requested visibility>
+Body:
+<the exact final body>
+Entity IDs:
+- <entity id in the user-provided order>
+
+以上是实际会提交给 `alva thesis create` 的内容。是否创建？
+```
+
+The body is the one required content field and must be shown in full. Preserve
+its whitespace, line breaks, language, and wording byte-for-byte; do not show a
+summary in its place. If the user did not provide a title, display `Title:
+(none)` and do not invent one. If visibility was not specified, display
+`public (default)` and use that default. If entity IDs were not provided,
+display `Entity IDs: none`; never infer entities or tickers by scanning the
+body. When a file supplies the body, read the complete file before displaying
+the body rather than displaying only its filename.
+
+This is a preview of the final Thesis payload, not a prose summary. Do not
+rewrite, expand, correct, translate, add arguments, or otherwise alter the
+content merely for the confirmation display. If the user asks for changes,
+apply only those requested changes, then display the complete updated template
+and ask again. Do not run `create` before confirmation; a natural
+acknowledgement or direct instruction to create the displayed Thesis is enough.
+If the user declines, stop without creating anything.
 
 This confirmation is about the final Thesis content, not a second approval of
 the user's original intent. A natural acknowledgement or direct instruction to
