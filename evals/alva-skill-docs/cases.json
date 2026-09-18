@@ -1351,11 +1351,14 @@
             "exactly one Thesis preview XML block",
             "author's display name and avatar URL",
             "exact body from the post-create readback",
-            "ticker symbols resolved from the Thesis's authoritative entity set",
+            "each entity's stable ID, ticker symbol, and icon URL",
             "<thesis-preview schema-version=\"1\" thesis-id=",
             "<body>",
             "<tickers>",
-            "<ticker>NVDA</ticker>",
+            "<ticker entity-id=\"789\" symbol=\"NVDA\" icon-url=",
+            "canonical entity `id`, `ticker`, and `logo` fields",
+            "do not put the symbol in ticker element text",
+            "unknown avatar or logo is a hydration failure",
             "Use this exact wire format",
             "without a Markdown code fence",
             "frontend decodes those entities exactly once",
@@ -1372,7 +1375,7 @@
           "file": "SKILL.md",
           "includes": [
             "<thesis-preview>",
-            "verified identity, author, exact body and tickers",
+            "verified identity, author, exact body, and entity IDs/tickers/icons",
             "fixed element order and XML escaping"
           ]
         }

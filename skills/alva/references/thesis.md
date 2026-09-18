@@ -71,21 +71,25 @@ Populate the card with the canonical values available to the host:
 - the author's display name and avatar URL from authenticated canonical profile
   or publication data;
 - the exact body from the post-create readback;
-- the ticker symbols resolved from the Thesis's authoritative entity set; and
+- each entity's stable ID, ticker symbol, and icon URL resolved from the
+  Thesis's authoritative entity/publication data; and
 - the returned Thesis and version IDs as stable card identity fields.
 
 Use this exact wire format, without a Markdown code fence:
 
 ```xml
-<thesis-preview schema-version="1" thesis-id="123" version-id="456" author-name="Ada Lovelace" author-avatar-url="https://example.com/avatar.png"><body>NVDA can compound if inference demand grows.</body><tickers><ticker>NVDA</ticker></tickers></thesis-preview>
+<thesis-preview schema-version="1" thesis-id="123" version-id="456" author-name="Ada Lovelace" author-avatar-url="https://example.com/avatar.png"><body>NVDA can compound if inference demand grows.</body><tickers><ticker entity-id="789" symbol="NVDA" icon-url="https://example.com/nvda.svg"/></tickers></thesis-preview>
 ```
 
 The example fence documents the contract only; actual replies emit the raw XML
 block. Keep the element and attribute names exactly as shown. The four
 identity/presentation attributes plus `schema-version="1"` are required.
 `<body>` occurs exactly once, followed by exactly one `<tickers>` container
-with zero or more `<ticker>` children. Use `<tickers/>` for
-an authoritative empty entity set. Preserve the canonical ticker order and
+with zero or more self-closing `<ticker entity-id="..." symbol="..."
+icon-url="..."/>` children. All three ticker attributes are required. Map
+them from the canonical entity `id`, `ticker`, and `logo` fields respectively;
+do not put the symbol in ticker element text. Use `<tickers/>` for an
+authoritative empty entity set. Preserve the canonical entity order and ticker
 spelling.
 
 XML-escape `&`, `<`, `>`, `"`, and `'` as `&amp;`, `&lt;`, `&gt;`, `&quot;`,
@@ -101,12 +105,13 @@ unclosed markup as ordinary text.
 Do not derive tickers by scanning the body, substitute a username for a missing
 display name, invent an avatar, or otherwise guess presentation data. An
 authoritative empty entity set produces `<tickers/>`. If a required
-profile field or entity hydration is unavailable, do not emit a partial XML
-block: identify the missing card fields and provide a human-readable fallback
-containing only verified fields. An explicitly absent canonical avatar is
-represented by `author-avatar-url=""`; an unknown avatar is a hydration
-failure, not an empty value. A failed readback means the create response may be
-reported, but no authoritative preview card may be emitted.
+profile field or any entity's `id`, `ticker`, or `logo` hydration is
+unavailable, do not emit a partial XML block: identify the missing card fields
+and provide a human-readable fallback containing only verified fields. An
+explicitly absent canonical avatar or entity logo is represented by
+`author-avatar-url=""` or `icon-url=""`; an unknown avatar or logo is a
+hydration failure, not an empty value. A failed readback means the create
+response may be reported, but no authoritative preview card may be emitted.
 
 ## Explicit polishing only
 
