@@ -66,52 +66,27 @@ conversation—as the created result. Then emit exactly one Thesis preview XML
 block for the frontend to render. This completion card is not another
 confirmation gate.
 
-The `thesis get` response is authoritative for the Thesis ID,
-`author_version_id`, `material_version_id`, body, `entity_ids`, `author_kind`,
-and `author_ref`. It does not include the presentation metadata required by the
-card: author display name/avatar or entity ticker/logo. Do not claim those
-fields came from `thesis get`. Hydrate them through the current authenticated
-environment instead:
+The `alva thesis get --id '<returned thesis id>'` response is the single
+authoritative source for the complete preview. Read `response.thesis.body`,
+`response.thesis.author_version_id`, and `response.thesis.entity_ids`; read the
+author directly from `response.author` and the ordered ticker records directly
+from `response.entities`. The service assembles these details in the GET
+response, so do not make GraphQL requests, run `alva run`, run `alva whoami` for
+hydration, inspect undocumented endpoints, or issue secondary profile/entity
+lookups. Do not infer tickers by scanning the body.
 
-1. Run `alva whoami` and use `_meta.endpoint`; never hard-code staging or
-   production. Append `/query` after removing any trailing slash.
-2. Run `alva run` with `require("net/http").fetch` to POST GraphQL to that
-   query endpoint. Pass the endpoint and readback IDs through `--args`; do not
-   bake profile-specific values into the runtime script.
-3. For `author_kind: alva_user`, resolve `author_ref` with
-   `node(id: "PublicUser:<author_ref>")`, selecting `id`, `username`,
-   `displayName`, and `avatarUrl` on `PublicUser`. The card uses `displayName`
-   and `avatarUrl`. Treat another author kind as unsupported unless its
-   canonical profile lookup is documented and verified.
-4. Resolve every readback `entity_id` with
-   `market.entity(input: { id: "<entity_id>" })`, selecting `id`, `ticker`,
-   `name`, `logo`, and `kind`. Preserve the original `entity_ids` order when
-   building `<ticker>` children.
+Require a complete author object (`id`, `kind`, `display_name`, `avatar_url`,
+and `username`) and one entity object for each `response.thesis.entity_ids`, in
+the same order. Each entity must carry its stable `id`, `ticker`, `name`,
+`icon_url`, and `kind`. If the author or any entity detail is absent, malformed,
+or out of order, do not emit partial XML; provide a human-readable fallback
+containing only verified fields and identify the missing preview data.
 
-The runtime query shapes are:
+Populate the card with the authoritative GET response:
 
-```graphql
-node(id: "PublicUser:<author_ref>") {
-  __typename
-  ... on PublicUser { id username displayName avatarUrl }
-}
-
-market {
-  entity(input: { id: "<entity_id>" }) { id ticker name logo kind }
-}
-```
-
-Treat GraphQL errors, an unexpected author type, a missing requested entity, or
-an ID mismatch as hydration failure. `alva run` is the transport for this
-canonical lookup; scanning the body, web-searching a ticker, or substituting
-`alva whoami`'s username does not produce authoritative presentation data.
-
-Populate the card with the canonical readback and hydrated values:
-
-- the author's display name and avatar URL from the hydrated `PublicUser`;
+- the author's `display_name` and `avatar_url` from `response.author`;
 - the exact body from the post-create readback;
-- each entity's stable ID, ticker symbol, and icon URL resolved from its
-  canonical entity record; and
+- each entity's stable ID, `ticker`, and `icon_url` from `response.entities`; and
 - the readback Thesis ID and `author_version_id` as `thesis-id` and
   `version-id`. The body is the author document, so do not substitute
   `material_version_id` when the two versions differ.
@@ -128,7 +103,8 @@ identity/presentation attributes plus `schema-version="1"` are required.
 `<body>` occurs exactly once, followed by exactly one `<tickers>` container
 with zero or more self-closing `<ticker entity-id="..." symbol="..."
 icon-url="..."/>` children. All three ticker attributes are required. Map
-them from the canonical entity `id`, `ticker`, and `logo` fields respectively;
+them from the server-returned entity `id`, `ticker`, and `icon_url` fields
+respectively;
 do not put the symbol in ticker element text. Use `<tickers/>` for an
 authoritative empty entity set. Preserve the readback `entity_ids` order and
 canonical ticker spelling.
@@ -146,13 +122,13 @@ unclosed markup as ordinary text.
 Do not derive tickers by scanning the body, substitute a username for a missing
 display name, invent an avatar, or otherwise guess presentation data. An
 authoritative empty entity set produces `<tickers/>`. If a required
-profile field or any entity's `id`, `ticker`, or `logo` hydration is
+profile field or any entity's `id`, `ticker`, or `icon_url` is
 unavailable, do not emit a partial XML block: identify the missing card fields
 and provide a human-readable fallback containing only verified fields. An
-explicitly absent canonical avatar or entity logo is represented by
-`author-avatar-url=""` or `icon-url=""`; an unknown avatar or logo is a
-hydration failure, not an empty value. A failed readback means the create
-response may be reported, but no authoritative preview card may be emitted.
+explicitly empty avatar or icon URL may be represented by an empty attribute
+when the GET response explicitly contains that empty value; an omitted or
+malformed field is a failure. A failed readback means the create response may
+be reported, but no authoritative preview card may be emitted.
 
 ## Explicit polishing only
 
