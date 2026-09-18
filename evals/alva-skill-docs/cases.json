@@ -1339,7 +1339,7 @@
       "id": "target.thesis-create-preview-card",
       "group": "target",
       "target": "corpus",
-      "description": "Thesis creation lightly confirms the displayed final content, then uses authoritative readback and canonical hydration for one native preview card without inventing a frontend protocol.",
+      "description": "Thesis creation lightly confirms the displayed final content, then uses authoritative readback and canonical hydration for one deterministic XML preview-card contract.",
       "file_includes": [
         {
           "file": "references/thesis.md",
@@ -1348,22 +1348,32 @@
             "do not require a special confirmation phrase",
             "Return the created Thesis card",
             "authoritative readback",
-            "exactly one Thesis preview card",
+            "exactly one Thesis preview XML block",
             "author's display name and avatar URL",
             "exact body from the post-create readback",
             "ticker symbols resolved from the Thesis's authoritative entity set",
+            "<alva:thesis-preview schema-version=\"1\" thesis-id=",
+            "<alva:body>",
+            "<alva:tickers>",
+            "<alva:ticker>NVDA</alva:ticker>",
+            "Use this exact wire format",
+            "without a Markdown code fence",
+            "frontend decodes those entities exactly once",
+            "byte-for-byte, including whitespace and line breaks",
+            "unsupported-version",
+            "unclosed markup as ordinary text",
+            "do not emit a partial XML block",
             "Do not derive tickers by scanning the body",
             "This completion card is not another confirmation gate",
-            "Do not invent a custom XML tag, JSON fence, MCP tool",
             "human-readable fallback containing only verified fields"
           ]
         },
         {
           "file": "SKILL.md",
           "includes": [
-            "host-native Thesis preview card",
-            "verified author name/avatar, exact body and resolved tickers",
-            "Do not invent a rendering protocol"
+            "<alva:thesis-preview>",
+            "verified identity, author, exact body and tickers",
+            "fixed element order and XML escaping"
           ]
         }
       ]
