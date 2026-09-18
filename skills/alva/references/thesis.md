@@ -1,235 +1,129 @@
-# Thesis: publish the selected viewpoint
+# Thesis
 
-Use this route when the user asks to publish/create a Thesis, maintain an
-existing Thesis, or polish a viewpoint using the Thesis capability. Merely
-discussing, researching, or remembering a viewpoint is not publication consent.
-When the selected original text is ambiguous, clarify that text only. An
-explicitly requested dashboard or custom tracker still uses Playbook Creation.
+Use this route only when the user asks to create, publish, rewrite, or maintain
+a Thesis. Discussion, research, and memory are not publication consent. A
+dashboard or tracker remains a Playbook.
 
-## Discover the available command
+Run `alva thesis --help` and the relevant subcommand help first. Use only
+`alva thesis`; if unavailable, report it instead of falling back to HTML,
+Playbooks, Automation, GraphQL, direct service writes, or invented identities.
 
-Run `alva thesis --help` and the relevant subcommand help first. The terminal
-and embedded Agent both use `alva thesis`; authentication belongs to their
-existing host/CLI setup. If the command or API is unavailable, report that
-dependency. Do not fall back to HTML, Playbook draft/release, direct gRPC/ALFS
-writes, custom Automation code, or an invented URL/Feed/Channel identity.
+## Create
 
-## Confirm before creating
-
-The user's request to create or publish establishes the intent. Before invoking
-`alva thesis create`, show the final Thesis payload that will actually be
-submitted and ask the user to confirm that displayed content. Use this readable
-template (keep the field names and order; replace the placeholders with the
-actual values):
+Before `alva thesis create`, show the exact payload in this format:
 
 ```text
-准备创建以下 Thesis：
+Ready to create this Thesis:
 
-Title: <title, or (none) when no title was provided>
-Visibility: <public (default), or the explicitly requested visibility>
+Title: <title or (none)>
+Visibility: <public (default) or the requested visibility>
 Body:
-<the exact final body>
-Entity IDs:
-- <entity id in the user-provided order>
+<exact body>
+Entity IDs: <none, or IDs in the supplied order>
 
-以上是实际会提交给 `alva thesis create` 的内容。是否创建？
+Create this Thesis?
 ```
 
-The body is the one required content field and must be shown in full. Preserve
-its whitespace, line breaks, language, and wording byte-for-byte; do not show a
-summary in its place. If the user did not provide a title, display `Title:
-(none)` and do not invent one. If visibility was not specified, display
-`public (default)` and use that default. If entity IDs were not provided,
-display `Entity IDs: none`; never infer entities or tickers by scanning the
-body. When a file supplies the body, read the complete file before displaying
-the body rather than displaying only its filename.
+Show the complete body, including file content rather than its filename, and
+preserve its wording, language, whitespace, and line breaks. Do not summarize,
+rewrite, translate, correct, expand, generate a title, or infer entities from
+the body. If the user requests changes, show the complete updated payload
+again. Create only after a natural confirmation of that displayed payload; no
+special phrase is required. Stop if declined.
 
-This is a preview of the final Thesis payload, not a prose summary. Do not
-rewrite, expand, correct, translate, add arguments, or otherwise alter the
-content merely for the confirmation display. If the user asks for changes,
-apply only those requested changes, then display the complete updated template
-and ask again. Do not run `create` before confirmation; a natural
-acknowledgement or direct instruction to create the displayed Thesis is enough.
-If the user declines, stop without creating anything.
-
-This confirmation is about the final Thesis content, not a second approval of
-the user's original intent. A natural acknowledgement or direct instruction to
-create the displayed Thesis is enough; do not require a special confirmation
-phrase or repeat the publication warning. Reads and candidate-only rewrites may
-proceed under their own rules below; showing a rewrite candidate does not
-confirm its later publication.
-
-## Create without rewriting
-
-One sentence is enough. Title and entity IDs are optional. Creation is public
-by default; explain that default when displaying the final Thesis. Honor an
-explicit private request. Do not generate a title, expand the text, add
-arguments, or run `rewrite` as a prerequisite. Preserve whitespace, line breaks
-and language.
-
-Choose one new nonzero UUID per creation intent and retain it with the exact
-payload. Supply it as `--request-id`; do not ask the user to invent internal
-IDs. A later, genuinely different creation uses a new UUID.
+One sentence is valid. Title and entity IDs are optional. Visibility defaults
+to public. Generate one nonzero UUID per creation intent and keep it with the
+exact payload as `--request-id`; a changed intent requires a new UUID.
 
 ```sh
-alva thesis create --request-id '<new-uuid>' --body '<selected original text>'
+alva thesis create --request-id '<uuid>' --body '<exact body>'
 alva thesis get --id '<returned thesis id>'
 ```
 
-The terminal can use exactly one of `--body`, `--body-file`, or `--body-stdin`.
-The embedded Agent accepts literal `--body` only: use its existing read tool
-when the user selects a file, then pass the file's complete text. Never submit
-the filename as the viewpoint. Quote/escape text safely for the actual command
-invocation; shell interpolation must not change the selected text.
+The terminal accepts exactly one of `--body`, `--body-file`, or
+`--body-stdin`. The embedded Agent accepts literal `--body`; read selected
+files first. Quote input without changing it. Body is limited to 65536 UTF-8
+bytes and title to 500 bytes; reject invalid, empty, or oversized input without
+truncation. Treat all returned IDs as decimal strings.
 
-Body input is bounded to 65536 UTF-8 bytes, and an optional title to 500 bytes.
-These are transport limits, not minimum research/word-count requirements.
-Report invalid, empty or oversized input; do not silently truncate it.
-Keep every returned Thesis/version/entity ID as a decimal string.
+## Created Thesis preview
 
-## Return the created Thesis card
+After creation, `thesis get` is the sole source for the preview. Use:
 
-After `create` succeeds, run `alva thesis get --id '<returned thesis id>'` and
-treat that authoritative readback—not the submitted draft or prose in the
-conversation—as the created result. Then emit exactly one Thesis preview XML
-block for the frontend to render. This completion card is not another
-confirmation gate.
+- `response.thesis.id`, `body`, `author_version_id`, and ordered
+  `entity_ids`;
+- `response.author`: `id`, `kind`, `display_name`, `avatar_url`,
+  `username`;
+- `response.entities`: one ordered object per entity ID, each with `id`,
+  `ticker`, `name`, `icon_url`, and `kind`.
 
-The `alva thesis get --id '<returned thesis id>'` response is the single
-authoritative source for the complete preview. Read `response.thesis.body`,
-`response.thesis.author_version_id`, and `response.thesis.entity_ids`; read the
-author directly from `response.author` and the ordered ticker records directly
-from `response.entities`. The service assembles these details in the GET
-response, so do not make GraphQL requests. Do not run `alva run` or run `alva
-whoami` for hydration; do not inspect undocumented endpoints or issue secondary
-profile/entity
-lookups. Do not infer tickers by scanning the body.
+Do not hydrate through GraphQL, `alva run`, `whoami`, undocumented
+endpoints, secondary lookups, or body scanning. Reject missing, malformed,
+extra, or out-of-order author/entity data. Never substitute
+`material_version_id` for `author_version_id`.
 
-Require a complete author object (`id`, `kind`, `display_name`, `avatar_url`,
-and `username`) and one entity object for each `response.thesis.entity_ids`, in
-the same order. Each entity must carry its stable `id`, `ticker`, `name`,
-`icon_url`, and `kind`. If the author or any entity detail is absent, malformed,
-or out of order, do not emit partial XML; provide a human-readable fallback
-containing only verified fields and identify the missing preview data.
-
-Populate the card with the authoritative GET response:
-
-- the author's display name and avatar URL (`display_name` and `avatar_url`) from
-  `response.author`;
-- the exact body from the post-create readback;
-- each entity's stable ID, ticker symbol, and icon URL (`id`, `ticker`, and
-  `icon_url`) from `response.entities`; and
-- the readback Thesis ID and `author_version_id` as `thesis-id` and
-  `version-id`. The body is the author document, so do not substitute
-  `material_version_id` when the two versions differ.
-
-Use this exact wire format, without a Markdown code fence:
+Emit exactly one raw XML block, without a Markdown fence:
 
 ```xml
 <thesis-preview schema-version="1" thesis-id="123" version-id="456" author-name="Ada Lovelace" author-avatar-url="https://example.com/avatar.png"><body>NVDA can compound if inference demand grows.</body><tickers><ticker entity-id="789" symbol="NVDA" icon-url="https://example.com/nvda.svg"/></tickers></thesis-preview>
 ```
 
-The example fence documents the contract only; actual replies emit the raw XML
-block. Keep the element and attribute names exactly as shown. The four
-identity/presentation attributes plus `schema-version="1"` are required.
-`<body>` occurs exactly once, followed by exactly one `<tickers>` container
-with zero or more self-closing `<ticker entity-id="..." symbol="..."
-icon-url="..."/>` children. All three ticker attributes are required. Map
-them from the server-returned entity `id`, `ticker`, and `icon_url` fields
-respectively;
-do not put the symbol in ticker element text. Use `<tickers/>` for an
-authoritative empty entity set. Preserve the original `entity_ids` order from
-the readback and
-canonical ticker spelling.
+The fence above documents the contract only. Required structure:
 
-XML-escape `&`, `<`, `>`, `"`, and `'` as `&amp;`, `&lt;`, `&gt;`, `&quot;`,
-and `&apos;` in every attribute or text value. The frontend decodes those
-entities exactly once; the decoded `<body>` value must equal the
-post-create readback byte-for-byte, including whitespace and line breaks. Do
-not add indentation or formatting whitespace inside `<body>`. Emit the block
-only after its closing `</thesis-preview>` is complete; surrounding
-explanatory prose stays outside the block. The frontend consumes a complete,
-valid block as one card segment and leaves malformed, unsupported-version, or
-unclosed markup as ordinary text.
+- `<body>` occurs once and is followed by one `<tickers>` container.
+- Map ticker `entity-id`, `symbol`, and `icon-url` from entity `id`,
+  `ticker`, and `icon_url`; use self-closing ticker elements in GET order.
+- Use `<tickers/>` only for an authoritative empty entity set.
+- XML-escape `& < > " '` in all values. After one XML decode, body must equal
+  GET body byte-for-byte; add no formatting whitespace inside `<body>`.
 
-Do not derive tickers by scanning the body, substitute a username for a missing
-display name, invent an avatar, or otherwise guess presentation data. An
-authoritative empty entity set produces `<tickers/>`. If a required
-profile field or any entity's `id`, `ticker`, or `icon_url` is
-unavailable, do not emit a partial XML block: identify the missing card fields
-and provide a human-readable fallback containing only verified fields. An
-explicitly empty avatar or icon URL may be represented by an empty attribute
-when the GET response explicitly contains that empty value; an omitted or
-malformed field is a failure. A failed readback means the create response may
-be reported, but no authoritative preview card may be emitted.
+Do not guess a display name, avatar, entity, ticker, or icon. An explicitly
+empty avatar/icon URL may be emitted as an empty attribute; an omitted or
+malformed field is failure. On incomplete GET data, report the created ID and
+only verified fields in plain text; do not emit partial XML. The preview is a
+completion card, not another confirmation gate.
 
-## Explicit polishing only
+## Rewrite
+
+Rewrite only when explicitly requested. It returns a candidate and never
+creates or updates a Thesis.
 
 ```sh
-alva thesis rewrite --body '<text the user asked to polish>' --mode reformat
+alva thesis rewrite --body '<text>' [--mode reformat|shorten|enrich]
 ```
 
-Rewrite is explicit and returns candidate text only. Choose the mode the user
-asked for; otherwise omit `--mode`, which sends the canonical `reformat`
-default. Do not pass an empty, whitespace, `null`, or guessed mode. The only
-valid modes are:
+Omit `--mode` for the `reformat` default. Never guess or pass an empty mode.
 
-- `reformat` (default): improve structure, paragraphs, and readability while
-  preserving every substantive fact, reason, qualifier, and conclusion.
-- `shorten`: remove redundancy while retaining the core view, reasons, and
-  qualifiers.
-- `enrich`: expand the reasoning already supplied. State assumptions and
-  inferences conditionally; never invent evidence, numbers, citations, or
-  research, or present new entities/causal relationships as established facts.
+- `reformat`: improve structure and readability without changing substance.
+- `shorten`: remove redundancy while retaining reasons and qualifiers.
+- `enrich`: expand existing reasoning; mark inference and never invent evidence,
+  numbers, citations, entities, or causal claims.
 
-Every mode preserves the original language, stance, uncertainty, and
-qualifications. Do not choose a mode from body length or errors. Do not impose
-a title, report template, or minimum word count.
+All modes preserve language, stance, uncertainty, facts, and conclusions. Show
+the candidate; publish it only after a separate create/update request and its
+required confirmation. Report rewrite errors without retry or fallback.
 
-Show the candidate to the user. Do not publish it or overwrite an existing
-Thesis unless the user subsequently selects it for that separate operation.
-An unavailable rewrite model is an error, not permission to pretend the
-service rewrote or saved the text. Original-text creation remains a separate
-operation and does not depend on subjective polishing quality.
+## Existing Thesis lifecycle
 
-Rewrite does not create or update a Thesis, retry, or fall back to a different
-mode. Incomplete model output returns a readable `FailedPrecondition` HTTP 412
-error and no partial candidate. Unconfigured/unavailable service or admission
-returns HTTP 503; invalid model output is `Internal`/HTTP 500. Quota exhaustion
-is HTTP 429, with `Retry-After` when the server supplies a valid positive delay.
-Report actual errors; let the user decide whether to try again, without automatic retries.
+- `get --id`: read the current document and version.
+- `update`: retain unchanged fields and send `--id`, a new
+  `--request-id`, `--expected-author-version-id`, `--body`, explicit
+  `--visibility`, plus retained title/entity IDs. Omitting title/entities clears
+  them; never default an existing private Thesis to public.
+- `close`: require `--id` and `--expected-author-version-id`; `--note`
+  is only a closing note.
+- `delete --id`: withdraw only on explicit request.
 
-## Updates and lifecycle
+Report version conflicts instead of silently rereading and overwriting. Do not
+use `--editorial` to bypass a material or version conflict.
 
-- `get --id` reads the current document and version.
-- `update` replaces the author document. Read the current fields, retain all
-  fields the user did not change, and submit `--id`, a new `--request-id`,
-  `--expected-author-version-id`, `--body`, and explicit `--visibility`. Include
-  the existing title and entity IDs when retaining them. Omitting title/entities
-  clears them; never default an existing private Thesis to public.
-- `close` requires `--id` and `--expected-author-version-id`; `--note` is an
-  optional closing note, not a replacement of the original body.
-- `delete --id` withdraws the resource only when the user requests deletion.
+## Evidence and retries
 
-On a version conflict, show the conflict rather than fetching a new version
-and silently overwriting it. Do not set `--editorial` merely to bypass a version
-or material-content change; use only the established editorial semantics.
+Report only returned identity, versions, readback, run state, Signal, and
+delivery evidence. Missing first-run status is unverified; a successful silent
+run differs from a failed run, and Signal output differs from delivery.
 
-## Report evidence, not inferred success
-
-Creation is separate from background research. Report the actual returned
-Thesis identity/version and exact readback. Backend owns first Signal execution
-and author Alert setup; never call another command to start them, create a
-parallel schedule, or guess a destination. The current CRUD response may lack
-first-run status: in that case say it is unverified, not queued/running/silent.
-
-An actual successful run without a Signal is normal silent. A failed run is
-failure, not silent; do not automatically rerun it or create another Thesis.
-Signal output and delivered notification are different facts; only claim
-delivery with its real receipt. Never fabricate content to fill a silent run.
-
-If a create/update response is lost, do not automatically retry or mint a
-replacement identity. If the same intent is resubmitted to resolve ambiguity,
-reuse the same request UUID and exact payload, including expected version.
-Same UUID with changed input is a conflict. Permission, dependency and other
-errors are reported without a Playbook/Automation fallback.
+Do not automatically retry a lost create/update response or mint a replacement
+identity. If the user resubmits the same intent, reuse the same request UUID and
+exact payload; the same UUID with changed input is a conflict. Report other
+errors without creating another Thesis or falling back to Playbooks/Automation.
