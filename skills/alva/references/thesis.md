@@ -6,7 +6,7 @@ dashboard or tracker remains a Playbook.
 
 Run `alva thesis --help` and the relevant subcommand help first. Use only
 `alva thesis`; if unavailable, report it instead of falling back to HTML,
-Playbooks, Automation, GraphQL, direct service writes, or invented identities.
+Playbooks, Automation, direct service writes, or invented identities.
 
 ## Create
 
@@ -57,9 +57,9 @@ After creation, `thesis get` is the sole source for the preview. Use:
 - `response.entities`: one ordered object per entity ID, each with `id`,
   `ticker`, `name`, `icon_url`, and `kind`.
 
-Do not hydrate through GraphQL, `alva run`, `whoami`, undocumented
-endpoints, secondary lookups, or body scanning. Reject missing, malformed,
-extra, or out-of-order author/entity data. Never substitute
+Use only those returned fields; do not supplement them with secondary lookups
+or body scanning. Reject missing, malformed, extra, or out-of-order
+author/entity data. Never substitute
 `material_version_id` for `author_version_id`.
 
 Emit exactly one raw XML block, without a Markdown fence:
