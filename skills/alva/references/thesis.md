@@ -1,128 +1,129 @@
-# Thesis: publish the selected viewpoint
+# Thesis
 
-Use this route when the user asks to publish/create a Thesis, maintain an
-existing Thesis, or polish a viewpoint using the Thesis capability. Merely
-discussing, researching, or remembering a viewpoint is not publication consent.
-When the selected original text is ambiguous, clarify that text only. An
-explicitly requested dashboard or custom tracker still uses Playbook Creation.
+Use this route only when the user asks to create, publish, rewrite, or maintain
+a Thesis. Discussion, research, and memory are not publication consent. A
+dashboard or tracker remains a Playbook.
 
-## Discover the available command
+Run `alva thesis --help` and the relevant subcommand help first. Use only
+`alva thesis`; if unavailable, report it instead of falling back to HTML,
+Playbooks, Automation, GraphQL, direct service writes, or invented identities.
 
-Run `alva thesis --help` and the relevant subcommand help first. The terminal
-and embedded Agent both use `alva thesis`; authentication belongs to their
-existing host/CLI setup. If the command or API is unavailable, report that
-dependency. Do not fall back to HTML, Playbook draft/release, direct gRPC/ALFS
-writes, custom Automation code, or an invented URL/Feed/Channel identity.
+## Create
 
-## Confirm before creating
+Before `alva thesis create`, show the exact payload in this format:
 
-The user's request to create or publish establishes the intent. Before invoking
-`alva thesis create`, show the final Thesis that will be created—at minimum the
-final body, and any title or visibility that will be used—and ask the user to
-confirm that result. Do not run `create` until the user confirms the displayed
-Thesis. If the user asks for changes, update the displayed result and ask again;
-if the user declines, stop without creating anything.
+```text
+Ready to create this Thesis:
 
-This confirmation is about the final Thesis content, not a second approval of
-the user's original intent. Reads and candidate-only rewrites may proceed under
-their own rules below; showing a rewrite candidate does not confirm its later
-publication.
+Title: <title or (none)>
+Visibility: <public (default) or the requested visibility>
+Body:
+<exact body>
+Entity IDs: <none, or IDs in the supplied order>
 
-## Create without rewriting
+Create this Thesis?
+```
 
-One sentence is enough. Title and entity IDs are optional. Creation is public
-by default; explain that default when displaying the final Thesis. Honor an
-explicit private request. Do not generate a title, expand the text, add
-arguments, or run `rewrite` as a prerequisite. Preserve whitespace, line breaks
-and language.
+Show the complete body, including file content rather than its filename, and
+preserve its wording, language, whitespace, and line breaks. Do not summarize,
+rewrite, translate, correct, expand, generate a title, or infer entities from
+the body. If the user requests changes, show the complete updated payload
+again. Create only after a natural confirmation of that displayed payload; no
+special phrase is required. Stop if declined.
 
-Choose one new nonzero UUID per creation intent and retain it with the exact
-payload. Supply it as `--request-id`; do not ask the user to invent internal
-IDs. A later, genuinely different creation uses a new UUID.
+One sentence is valid. Title and entity IDs are optional. Visibility defaults
+to public. Generate one nonzero UUID per creation intent and keep it with the
+exact payload as `--request-id`; a changed intent requires a new UUID.
 
 ```sh
-alva thesis create --request-id '<new-uuid>' --body '<selected original text>'
+alva thesis create --request-id '<uuid>' --body '<exact body>'
 alva thesis get --id '<returned thesis id>'
 ```
 
-The terminal can use exactly one of `--body`, `--body-file`, or `--body-stdin`.
-The embedded Agent accepts literal `--body` only: use its existing read tool
-when the user selects a file, then pass the file's complete text. Never submit
-the filename as the viewpoint. Quote/escape text safely for the actual command
-invocation; shell interpolation must not change the selected text.
+The terminal accepts exactly one of `--body`, `--body-file`, or
+`--body-stdin`. The embedded Agent accepts literal `--body`; read selected
+files first. Quote input without changing it. Body is limited to 65536 UTF-8
+bytes and title to 500 bytes; reject invalid, empty, or oversized input without
+truncation. Treat all returned IDs as decimal strings.
 
-Body input is bounded to 65536 UTF-8 bytes, and an optional title to 500 bytes.
-These are transport limits, not minimum research/word-count requirements.
-Report invalid, empty or oversized input; do not silently truncate it.
-Keep every returned Thesis/version/entity ID as a decimal string.
+## Created Thesis preview
 
-## Explicit polishing only
+After creation, `thesis get` is the sole source for the preview. Use:
 
-```sh
-alva thesis rewrite --body '<text the user asked to polish>' --mode reformat
+- `response.thesis.id`, `body`, `author_version_id`, and ordered
+  `entity_ids`;
+- `response.author`: `id`, `kind`, `display_name`, `avatar_url`,
+  `username`;
+- `response.entities`: one ordered object per entity ID, each with `id`,
+  `ticker`, `name`, `icon_url`, and `kind`.
+
+Do not hydrate through GraphQL, `alva run`, `whoami`, undocumented
+endpoints, secondary lookups, or body scanning. Reject missing, malformed,
+extra, or out-of-order author/entity data. Never substitute
+`material_version_id` for `author_version_id`.
+
+Emit exactly one raw XML block, without a Markdown fence:
+
+```xml
+<thesis-preview schema-version="1" thesis-id="123" version-id="456" author-name="Ada Lovelace" author-avatar-url="https://example.com/avatar.png"><body>NVDA can compound if inference demand grows.</body><tickers><ticker entity-id="789" symbol="NVDA" icon-url="https://example.com/nvda.svg"/></tickers></thesis-preview>
 ```
 
-Rewrite is explicit and returns candidate text only. Choose the mode the user
-asked for; otherwise omit `--mode`, which sends the canonical `reformat`
-default. Do not pass an empty, whitespace, `null`, or guessed mode. The only
-valid modes are:
+The fence above documents the contract only. Required structure:
 
-- `reformat` (default): improve structure, paragraphs, and readability while
-  preserving every substantive fact, reason, qualifier, and conclusion.
-- `shorten`: remove redundancy while retaining the core view, reasons, and
-  qualifiers.
-- `enrich`: expand the reasoning already supplied. State assumptions and
-  inferences conditionally; never invent evidence, numbers, citations, or
-  research, or present new entities/causal relationships as established facts.
+- `<body>` occurs once and is followed by one `<tickers>` container.
+- Map ticker `entity-id`, `symbol`, and `icon-url` from entity `id`,
+  `ticker`, and `icon_url`; use self-closing ticker elements in GET order.
+- Use `<tickers/>` only for an authoritative empty entity set.
+- XML-escape `& < > " '` in all values. After one XML decode, body must equal
+  GET body byte-for-byte; add no formatting whitespace inside `<body>`.
 
-Every mode preserves the original language, stance, uncertainty, and
-qualifications. Do not choose a mode from body length or errors. Do not impose
-a title, report template, or minimum word count.
+Do not guess a display name, avatar, entity, ticker, or icon. An explicitly
+empty avatar/icon URL may be emitted as an empty attribute; an omitted or
+malformed field is failure. On incomplete GET data, report the created ID and
+only verified fields in plain text; do not emit partial XML. The preview is a
+completion card, not another confirmation gate.
 
-Show the candidate to the user. Do not publish it or overwrite an existing
-Thesis unless the user subsequently selects it for that separate operation.
-An unavailable rewrite model is an error, not permission to pretend the
-service rewrote or saved the text. Original-text creation remains a separate
-operation and does not depend on subjective polishing quality.
+## Rewrite
 
-Rewrite does not create or update a Thesis, retry, or fall back to a different
-mode. Incomplete model output returns a readable `FailedPrecondition` HTTP 412
-error and no partial candidate. Unconfigured/unavailable service or admission
-returns HTTP 503; invalid model output is `Internal`/HTTP 500. Quota exhaustion
-is HTTP 429, with `Retry-After` when the server supplies a valid positive delay.
-Report actual errors; let the user decide whether to try again, without automatic retries.
+Rewrite only when explicitly requested. It returns a candidate and never
+creates or updates a Thesis.
 
-## Updates and lifecycle
+```sh
+alva thesis rewrite --body '<text>' [--mode reformat|shorten|enrich]
+```
 
-- `get --id` reads the current document and version.
-- `update` replaces the author document. Read the current fields, retain all
-  fields the user did not change, and submit `--id`, a new `--request-id`,
-  `--expected-author-version-id`, `--body`, and explicit `--visibility`. Include
-  the existing title and entity IDs when retaining them. Omitting title/entities
-  clears them; never default an existing private Thesis to public.
-- `close` requires `--id` and `--expected-author-version-id`; `--note` is an
-  optional closing note, not a replacement of the original body.
-- `delete --id` withdraws the resource only when the user requests deletion.
+Omit `--mode` for the `reformat` default. Never guess or pass an empty mode.
 
-On a version conflict, show the conflict rather than fetching a new version
-and silently overwriting it. Do not set `--editorial` merely to bypass a version
-or material-content change; use only the established editorial semantics.
+- `reformat`: improve structure and readability without changing substance.
+- `shorten`: remove redundancy while retaining reasons and qualifiers.
+- `enrich`: expand existing reasoning; mark inference and never invent evidence,
+  numbers, citations, entities, or causal claims.
 
-## Report evidence, not inferred success
+All modes preserve language, stance, uncertainty, facts, and conclusions. Show
+the candidate; publish it only after a separate create/update request and its
+required confirmation. Report rewrite errors without retry or fallback.
 
-Creation is separate from background research. Report the actual returned
-Thesis identity/version and exact readback. Backend owns first Signal execution
-and author Alert setup; never call another command to start them, create a
-parallel schedule, or guess a destination. The current CRUD response may lack
-first-run status: in that case say it is unverified, not queued/running/silent.
+## Existing Thesis lifecycle
 
-An actual successful run without a Signal is normal silent. A failed run is
-failure, not silent; do not automatically rerun it or create another Thesis.
-Signal output and delivered notification are different facts; only claim
-delivery with its real receipt. Never fabricate content to fill a silent run.
+- `get --id`: read the current document and version.
+- `update`: retain unchanged fields and send `--id`, a new
+  `--request-id`, `--expected-author-version-id`, `--body`, explicit
+  `--visibility`, plus retained title/entity IDs. Omitting title/entities clears
+  them; never default an existing private Thesis to public.
+- `close`: require `--id` and `--expected-author-version-id`; `--note`
+  is only a closing note.
+- `delete --id`: withdraw only on explicit request.
 
-If a create/update response is lost, do not automatically retry or mint a
-replacement identity. If the same intent is resubmitted to resolve ambiguity,
-reuse the same request UUID and exact payload, including expected version.
-Same UUID with changed input is a conflict. Permission, dependency and other
-errors are reported without a Playbook/Automation fallback.
+Report version conflicts instead of silently rereading and overwriting. Do not
+use `--editorial` to bypass a material or version conflict.
+
+## Evidence and retries
+
+Report only returned identity, versions, readback, run state, Signal, and
+delivery evidence. Missing first-run status is unverified; a successful silent
+run differs from a failed run, and Signal output differs from delivery.
+
+Do not automatically retry a lost create/update response or mint a replacement
+identity. If the user resubmits the same intent, reuse the same request UUID and
+exact payload; the same UUID with changed input is a conflict. Report other
+errors without creating another Thesis or falling back to Playbooks/Automation.

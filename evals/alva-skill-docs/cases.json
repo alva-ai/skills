@@ -1336,6 +1336,59 @@
       ]
     },
     {
+      "id": "target.thesis-create-preview-card",
+      "group": "target",
+      "target": "corpus",
+      "description": "Thesis creation lightly confirms the displayed final content, then uses the complete thesis GET response for one deterministic XML preview-card contract.",
+      "file_includes": [
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "Ready to create this Thesis:",
+            "Title: <title or (none)>",
+            "Visibility: <public (default)",
+            "Entity IDs: <none",
+            "including file content rather than its filename",
+            "Do not summarize",
+            "infer entities from the body",
+            "natural confirmation of that displayed payload",
+            "no special phrase is required",
+            "After creation, `thesis get` is the sole source for the preview",
+            "author_version_id",
+            "response.author",
+            "display_name",
+            "avatar_url",
+            "response.entities",
+            "icon_url",
+            "entity_ids",
+            "Do not hydrate through GraphQL",
+            "extra, or out-of-order author/entity data",
+            "Never substitute",
+            "Emit exactly one raw XML block",
+            "<thesis-preview schema-version=\"1\" thesis-id=",
+            "<body>",
+            "<tickers>",
+            "<ticker entity-id=\"789\" symbol=\"NVDA\" icon-url=",
+            "from entity `id`,",
+            "use self-closing ticker elements in GET order",
+            "After one XML decode",
+            "GET body byte-for-byte",
+            "do not emit partial XML",
+            "completion card, not another confirmation gate"
+          ]
+        },
+        {
+          "file": "SKILL.md",
+          "includes": [
+            "Confirm the exact create payload",
+            "<thesis-preview>",
+            "Rewrite only when requested",
+            "For Thesis work, follow"
+          ]
+        }
+      ]
+    },
+    {
       "id": "retained.order-confirmation-rule",
       "group": "retained",
       "target": "skill",
