@@ -19,24 +19,25 @@ Title: <title or (none)>
 Visibility: <public (default) or the requested visibility>
 Body:
 <exact body>
-Entity IDs: <none, or IDs in the supplied order>
+Tickers: <none, or ticker symbols in the supplied order>
 
 Create this Thesis?
 ```
 
 Show the complete body, including file content rather than its filename, and
 preserve its wording, language, whitespace, and line breaks. Do not summarize,
-rewrite, translate, correct, expand, generate a title, or infer entities from
-the body. If the user requests changes, show the complete updated payload
-again. Create only after a natural confirmation of that displayed payload; no
+rewrite, translate, correct, expand, generate a title, infer tickers from
+context, or infer entities from the body. If the user requests changes, show
+the complete updated payload again. Create only after a natural confirmation
+of that displayed payload; no
 special phrase is required. Stop if declined.
 
-One sentence is valid. Title and entity IDs are optional. Visibility defaults
-to public. Generate one nonzero UUID per creation intent and keep it with the
+One sentence is valid. Title and tickers are optional. Visibility defaults to
+public. Generate one nonzero UUID per creation intent and keep it with the
 exact payload as `--request-id`; a changed intent requires a new UUID.
 
 ```sh
-alva thesis create --request-id '<uuid>' --body '<exact body>'
+alva thesis create --request-id '<uuid>' --body '<exact body>' [--tickers '<ticker,ticker>']
 alva thesis get --id '<returned thesis id>'
 ```
 
@@ -45,6 +46,13 @@ The terminal accepts exactly one of `--body`, `--body-file`, or
 files first. Quote input without changing it. Body is limited to 65536 UTF-8
 bytes and title to 500 bytes; reject invalid, empty, or oversized input without
 truncation. Treat all returned IDs as decimal strings.
+Ticker symbols are create-only inputs resolved by Backend to exact STOCK
+entities. Preserve the user's supplied symbols in the confirmation; do not
+substitute aliases or perform a separate lookup. On retry after an ambiguous
+response, Backend resolves the supplied tickers live again. Reuse the same
+request ID only while the effective ticker mapping is unchanged. If
+Backend reports a mapping-drift conflict, show the new resolved intent for
+confirmation and use a new request ID for that creation.
 
 ## Created Thesis preview
 
@@ -110,7 +118,7 @@ required confirmation. Report rewrite errors without retry or fallback.
   current access without publishing a new author version.
 - `update`: retain unchanged fields and send `--id`, a new
   `--request-id`, `--expected-author-version-id`, `--body`, explicit
-  `--visibility`, plus retained title/entity IDs. Omitting title/entities clears
+  `--visibility`, plus retained optional fields. Omitting optional fields clears
   them; never default an existing private Thesis to public.
 - `close`: require `--id` and `--expected-author-version-id`; `--note`
   is only a closing note.
