@@ -90,9 +90,11 @@ alva-ai/toolkit-ts/docs/changelogs/2026-09-20-add-thesis-set-visibility.md.
   21/21; durable-agent tests passed 5/5; git diff --check passed.
 - This proves documentation routing and regression coverage only. Toolkit and
   Gateway availability were not exercised through a live stack.
-- PR/CI/review outcome: pending push stage.
+- PR/CI/review outcome: Ready PR #639 created with alva-gateway#987 and
+  toolkit-ts#178 recorded as dependencies. Current-head CI/review state is
+  monitored in the push stage; no merge or publication was authorized.
 
 ## 8. Remaining Work
 
-- Publish after the Gateway and Toolkit PR dependencies are visible.
+- Merge after alva-gateway#987 and toolkit-ts#178.
 - Live/deployed command verification remains outside this task.
