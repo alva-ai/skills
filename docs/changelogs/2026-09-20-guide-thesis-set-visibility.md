@@ -86,7 +86,10 @@ alva-ai/toolkit-ts/docs/changelogs/2026-09-20-add-thesis-set-visibility.md.
   execution for explicit requests, and stop/no-retry/no-fallback behavior.
 - Added target.thesis-set-visibility without changing top-level routing or the
   creation confirmation/preview contract.
-- Skill doc eval passed 93/93 cases and 994/994 checks; mutation smoke passed
+- Reviewer feedback replaced the shell-sensitive public|private example with
+  two concrete executable commands and aligned readback comparisons to exact
+  JSON field names.
+- Skill doc eval passed 93/93 cases and 995/995 checks; mutation smoke passed
   21/21; durable-agent tests passed 5/5; git diff --check passed.
 - This proves documentation routing and regression coverage only. Toolkit and
   Gateway availability were not exercised through a live stack.

@@ -118,12 +118,15 @@ dedicated visibility command. Do not reconstruct a full update payload.
 3. Run exactly once:
 
    ```sh
-   alva thesis set-visibility --id '<thesis id>' --visibility public|private
+   alva thesis set-visibility --id '<thesis id>' --visibility public
+   # or
+   alva thesis set-visibility --id '<thesis id>' --visibility private
    ```
 
 4. Run `alva thesis get --id '<thesis id>'` again. Verify the requested
-   visibility is returned and the ID, body, author version, material version,
-   title, and ordered entity IDs are unchanged.
+   `visibility` is returned and the `id`, `body`,
+   `author_version_id`, `material_version_id`, `title`, and ordered
+   `entity_ids` are unchanged.
 
 Setting the current value is a valid idempotent request. On invalid input,
 authorization failure, missing Thesis, ambiguous write result, failed readback,
