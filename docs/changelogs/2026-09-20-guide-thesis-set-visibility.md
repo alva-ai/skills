@@ -78,3 +78,21 @@ alva-ai/toolkit-ts/docs/changelogs/2026-09-20-add-thesis-set-visibility.md.
   GET-only readback.
 - The human explicitly excluded alva-local-dev on 2026-09-20, so the final
   record must distinguish documentation/eval evidence from live execution.
+
+## 7. Outcome and Evidence
+
+- The Thesis reference now requires the dedicated get/set/get workflow,
+  public/private-only target, immutable publication-field comparison, direct
+  execution for explicit requests, and stop/no-retry/no-fallback behavior.
+- Added target.thesis-set-visibility without changing top-level routing or the
+  creation confirmation/preview contract.
+- Skill doc eval passed 93/93 cases and 994/994 checks; mutation smoke passed
+  21/21; durable-agent tests passed 5/5; git diff --check passed.
+- This proves documentation routing and regression coverage only. Toolkit and
+  Gateway availability were not exercised through a live stack.
+- PR/CI/review outcome: pending push stage.
+
+## 8. Remaining Work
+
+- Publish after the Gateway and Toolkit PR dependencies are visible.
+- Live/deployed command verification remains outside this task.
