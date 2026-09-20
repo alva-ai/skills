@@ -105,37 +105,9 @@ required confirmation. Report rewrite errors without retry or fallback.
 
 ## Existing Thesis lifecycle
 
-### Change visibility only
-
-For an explicit request to make an existing Thesis public or private, use the
-dedicated visibility command. Do not reconstruct a full update payload.
-
-1. Run `alva thesis get --id '<thesis id>'`. Record the returned Thesis
-   `id`, `visibility`, `body`, `author_version_id`,
-   `material_version_id`, `title`, and ordered `entity_ids`.
-2. State the current-to-target visibility change. An explicit request may
-   proceed directly; do not add another formal confirmation gate.
-3. Run exactly once:
-
-   ```sh
-   alva thesis set-visibility --id '<thesis id>' --visibility public
-   # or
-   alva thesis set-visibility --id '<thesis id>' --visibility private
-   ```
-
-4. Run `alva thesis get --id '<thesis id>'` again. Verify the requested
-   `visibility` is returned and the `id`, `body`,
-   `author_version_id`, `material_version_id`, `title`, and ordered
-   `entity_ids` are unchanged.
-
-Setting the current value is a valid idempotent request. On invalid input,
-authorization failure, missing Thesis, ambiguous write result, failed readback,
-or any comparison mismatch, report what is verified and stop. Do not retry,
-fall back to `thesis update`, call GraphQL, or use Playbook visibility
-commands. This maintenance action does not emit the creation-only
-`<thesis-preview>` block.
-
 - `get --id`: read the current document and version.
+- `set-visibility --id <id> --visibility public` (or `private`): change
+  current access without publishing a new author version.
 - `update`: retain unchanged fields and send `--id`, a new
   `--request-id`, `--expected-author-version-id`, `--body`, explicit
   `--visibility`, plus retained title/entity IDs. Omitting title/entities clears

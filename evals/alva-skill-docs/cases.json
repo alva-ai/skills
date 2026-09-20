@@ -1375,7 +1375,9 @@
             "After one XML decode",
             "GET body byte-for-byte",
             "do not emit partial XML",
-            "completion card, not another confirmation gate"
+            "completion card, not another confirmation gate",
+            "set-visibility --id <id> --visibility public",
+            "without publishing a new author version"
           ]
         },
         {
@@ -1385,34 +1387,6 @@
             "<thesis-preview>",
             "Rewrite only when requested",
             "For Thesis work, follow"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "target.thesis-set-visibility",
-      "group": "target",
-      "target": "corpus",
-      "description": "Explicit Thesis visibility changes use the dedicated command, preserve publication fields, and verify through GET without fallback or an extra formal confirmation gate.",
-      "file_includes": [
-        {
-          "file": "references/thesis.md",
-          "includes": [
-            "### Change visibility only",
-            "alva thesis set-visibility --id '<thesis id>' --visibility public",
-            "alva thesis set-visibility --id '<thesis id>' --visibility private",
-            "Do not reconstruct a full update payload",
-            "current-to-target visibility change",
-            "do not add another formal confirmation gate",
-            "author_version_id",
-            "material_version_id",
-            "ordered `entity_ids` are unchanged",
-            "Setting the current value is a valid idempotent request",
-            "Do not retry",
-            "fall back to",
-            "call GraphQL",
-            "use Playbook visibility commands",
-            "does not emit the creation-only"
           ]
         }
       ]
