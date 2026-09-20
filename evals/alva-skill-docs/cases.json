@@ -1347,7 +1347,7 @@
             "Ready to create this Thesis:",
             "Title: <title or (none)>",
             "Visibility: <public (default)",
-            "Entity IDs: <none",
+            "Tickers: <none",
             "including file content rather than its filename",
             "Do not summarize",
             "infer entities from the body",

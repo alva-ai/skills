@@ -4,11 +4,11 @@ Primary design: [Backend Thesis create tickers](https://github.com/alva-ai/alva-
 
 ## 1. Background and Current State
 
-- `skills/alva/references/thesis.md` currently asks for the exact create payload and lists only Entity IDs. It prohibits inferring entities from the body and requires confirmation before creation. This worktree starts at fetched `origin/main` on September 20, 2026.
+- `skills/alva/references/thesis.md` currently asks for the exact create payload and lists entity IDs alongside ticker input. It prohibits inferring entities from the body and requires confirmation before creation. This worktree starts at fetched `origin/main` on September 20, 2026.
 
 ## 2. Problem Model and End-to-End Behavior
 
-- B1 — The exact creation confirmation shows supplied tickers and entity IDs separately, including an explicit none/empty value. After confirmation, `alva thesis create` may pass `--tickers` and `--entity-ids` together. Preview still uses the authoritative `thesis get` result.
+- B1 — The exact creation confirmation shows supplied tickers, including an explicit none/empty value. After confirmation, `alva thesis create` uses direct ticker input; entity IDs are not exposed as a user-facing creation input. Preview still uses the authoritative `thesis get` result.
 - F1 — Do not infer or add tickers from body text, silently replace a user's ticker with another entity, or claim a failed create succeeded. Backend resolves ticker-bearing retries live; reuse the same `request_id` only while the effective mapping is unchanged. Mapping drift needs fresh confirmation and a new `request_id`.
 
 ## 3. Research, Findings, and Architecture Decision
@@ -18,11 +18,12 @@ Primary design: [Backend Thesis create tickers](https://github.com/alva-ai/alva-
 
 ## 4. Implementation Design
 
-- In `skills/alva/references/thesis.md` show both supplied ticker and ID lists in the full pre-create payload; update the create command example with optional `--tickers`. Do not change confirmation, no inference, GET-only preview or update guidance.
+- In `skills/alva/references/thesis.md` show the supplied ticker list in the full pre-create payload; update the create command example with optional `--tickers` and remove entity-ID input guidance. Do not change confirmation, no inference, GET-only preview or update behavior.
 
 ### Serial Implementation Checklist
 
 - [x] Update exact confirmation and command guidance, then review sample payload and command against actual CLI help.
+- [x] Remove entity-ID input guidance from the user-facing creation flow while retaining canonical GET preview hydration.
 
 ## 5. Verification and E2E Design
 
@@ -30,11 +31,11 @@ Primary design: [Backend Thesis create tickers](https://github.com/alva-ai/alva-
 
 ## 6. Human Decisions and Interaction
 
-- User wants direct plural ticker input with optional IDs, only on create, and approved this code-level plan.
+- User wants direct plural ticker input without exposing entity IDs in the Skill creation flow, only on create, and approved this documentation adjustment.
 
 ## 7. Outcome and Evidence
 
-- Create confirmation and command guidance now show tickers and IDs separately, forbid inference/alias substitution, describe live retry resolution and mapping-drift conflicts without claiming snapshot storage, and preserve GET-only preview. Toolkit help readback includes the create-only `--tickers` flag. The complete skill doc eval passed 980/980 checks, and mutation smoke passed 21/21 expected failures.
+- Create confirmation and command guidance now expose direct tickers without entity-ID input fields, forbid inference/alias substitution, describe live retry resolution and mapping-drift conflicts without claiming snapshot storage, and preserve GET-only preview hydration. Toolkit help readback includes the create-only `--tickers` flag.
 
 ## 8. Remaining Work
 
