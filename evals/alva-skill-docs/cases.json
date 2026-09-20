@@ -1375,7 +1375,9 @@
             "After one XML decode",
             "GET body byte-for-byte",
             "do not emit partial XML",
-            "completion card, not another confirmation gate"
+            "completion card, not another confirmation gate",
+            "set-visibility --id <id> --visibility public",
+            "without publishing a new author version"
           ]
         },
         {

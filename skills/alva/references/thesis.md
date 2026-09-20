@@ -106,6 +106,8 @@ required confirmation. Report rewrite errors without retry or fallback.
 ## Existing Thesis lifecycle
 
 - `get --id`: read the current document and version.
+- `set-visibility --id <id> --visibility public` (or `private`): change
+  current access without publishing a new author version.
 - `update`: retain unchanged fields and send `--id`, a new
   `--request-id`, `--expected-author-version-id`, `--body`, explicit
   `--visibility`, plus retained title/entity IDs. Omitting title/entities clears
