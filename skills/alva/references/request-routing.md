@@ -10,7 +10,7 @@ Decision order:
 
 For a question about an existing Thesis, including a
 `<reply_to context-type="thesis" thesis-id="…" author-version-id="…">` quote,
-first read [thesis-context.md](thesis-context.md). Resolve the selected version
+first read [Quoted Thesis context](thesis.md#quoted-thesis-context). Resolve the selected version
 and its evidence before supplementing with broader market research. This does
 not enter the Thesis publication route; explicit changes still follow that route.
 

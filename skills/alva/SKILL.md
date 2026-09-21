@@ -697,7 +697,7 @@ freshness, output groups, widgets, and release path. Then open
 
 ### Thesis, Digest, And Monitoring
 
-For questions about an existing or quoted Thesis, first read [thesis-context.md](references/thesis-context.md); keep this read-only and preserve the selected author version. For Thesis work, follow [thesis.md](references/thesis.md). Use guided creation when publication intent lacks a final body; do not build HTML, Automation, or a draft/release workflow.
+For questions about an existing or quoted Thesis, first read [Quoted Thesis context](references/thesis.md#quoted-thesis-context); keep this read-only and preserve the selected author version. For Thesis work, follow [thesis.md](references/thesis.md). Use guided creation when publication intent lacks a final body; do not build HTML, Automation, or a draft/release workflow.
 Discussion, analysis and remembering a viewpoint do not authorize public posting; explicitly requested tracker dashboards/custom feeds may combine structured metrics, content search and alpi over real data.
 Keep its prompt fixed, source records separate from analysis, and push lines faithful to actual thesis deltas.
 For `/use-skill:alva/thesis` or a named thesis blueprint, fetch it fresh and let its method drive the build.

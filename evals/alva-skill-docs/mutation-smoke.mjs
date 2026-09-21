@@ -15,13 +15,13 @@ const MUTATIONS = [
   {
     id: "thesis-quote-routing",
     file: "SKILL.md",
-    remove: "[thesis-context.md](references/thesis-context.md)",
+    remove: "[Quoted Thesis context](references/thesis.md#quoted-thesis-context)",
     expectFailedCases: ["target.thesis-quote-context"],
   },
   {
     id: "thesis-quote-exact-version",
-    file: "references/thesis-context.md",
-    remove: "Never replace the requested\nversion with `alva thesis get --id`",
+    file: "references/thesis.md",
+    remove: "Never substitute the latest `alva thesis get --id`",
     expectFailedCases: ["target.thesis-quote-context"],
   },
   {

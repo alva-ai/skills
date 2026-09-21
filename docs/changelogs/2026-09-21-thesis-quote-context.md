@@ -17,8 +17,9 @@ chat sessions. Research runtime IDs are not ordinary session IDs. No new CLI.
 
 ## 4. Implementation Design
 
-Add a focused thesis-context reference and route to it from SKILL.md and
-request-routing.md. Keep publication-only thesis.md unchanged. Primary record:
+Append a compact Quoted Thesis context section to thesis.md and route to its
+anchor from SKILL.md and request-routing.md. Preserve existing publication
+sections; scope the introductory CLI-only rule to that workflow. Primary record:
 frontend-monorepo repository,
 `docs/changelogs/2026-09-21-feed-thesis-quote-context.md`.
 
@@ -58,6 +59,15 @@ exact-version, multi-version evidence and private-session boundaries. Two mutati
 checks remove the skill route and exact-version guard independently. Doc eval:
 94/94 cases, 1016/1016 checks; mutation smoke: 23/23. These are documentation
 regression checks; live Agent E2E remains unverified.
+
+User-approved consolidation: removed the separate 138-line thesis-context.md
+and appended a 40-line section to thesis.md. Existing headings and publication
+instructions remain in their original order; only two introductory statements
+were scoped to the publication workflow. Shared authentication/runtime guidance
+is linked instead of repeated. Routing and regression/mutation checks now target
+`thesis.md#quoted-thesis-context`. This supersedes the separate-file design above.
+Validation: 94/94 doc cases (1016/1016 checks), 23/23 mutation checks, GraphQL
+schema validation and whitespace checks pass. No frontend behavior changed.
 
 ## 8. Remaining Work
 
