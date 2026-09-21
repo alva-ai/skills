@@ -19,8 +19,8 @@ chat sessions. Research runtime IDs are not ordinary session IDs. No new CLI.
 
 Add a focused thesis-context reference and route to it from SKILL.md and
 request-routing.md. Keep publication-only thesis.md unchanged. Primary record:
-[frontend changelog](../../../../frontend/frontend-monorepo/docs/changelogs/2026-09-21-feed-thesis-quote-context.md)
-(cross-repository link in the mono-meta checkout).
+frontend-monorepo repository,
+`docs/changelogs/2026-09-21-feed-thesis-quote-context.md`.
 
 ## 5. Verification and E2E Design
 
@@ -50,6 +50,14 @@ git diff --check
 Final results: exit 0; 93/93 cases, 1008/1008 checks; 21/21 mutation smoke;
 5/5 durable-agent tests; clean diff whitespace check. Document checks prove
 regression properties, not actual runtime retrieval. No commit, push or PR.
+
+External-review follow-up: closed the JSON inline-code delimiter, replaced the
+checkout-only cross-repository link with plain repository/path text, and added
+`target.thesis-quote-context` covering both routing entries and read-only,
+exact-version, multi-version evidence and private-session boundaries. Two mutation
+checks remove the skill route and exact-version guard independently. Doc eval:
+94/94 cases, 1016/1016 checks; mutation smoke: 23/23. These are documentation
+regression checks; live Agent E2E remains unverified.
 
 ## 8. Remaining Work
 

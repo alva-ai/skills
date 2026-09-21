@@ -43,7 +43,7 @@ user-supplied quote, explicitly distinguishing it from verified stored content.
 
 ## Read published Signal evidence
 
-Send GraphQL operations as JSON `{ "query": ..., "variables": ... } to the
+Send GraphQL operations as JSON `{ "query": ..., "variables": ... }` to the
 configured API origin's `POST /query`, with the same caller authentication.
 Check GraphQL `errors` even when HTTP status is 200; a failed field is not an
 empty result.

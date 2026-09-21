@@ -4,6 +4,37 @@
   "description": "Deterministic documentation capability checks for the Alva skill refactor. Retained cases describe behavior already present on main; pr353 cases encode the alva-ai/skills#353 chat-as-artifact standard; target cases describe this refactor's structure goals.",
   "cases": [
     {
+      "id": "target.thesis-quote-context",
+      "group": "target",
+      "target": "corpus",
+      "description": "Quoted Thesis questions retain their read-only selected-version route and existing authorization boundaries.",
+      "file_includes": [
+        {
+          "file": "SKILL.md",
+          "includes": [
+            "[thesis-context.md](references/thesis-context.md)"
+          ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "includes": [
+            "[thesis-context.md](thesis-context.md)"
+          ]
+        },
+        {
+          "file": "references/thesis-context.md",
+          "includes": [
+            "This is read-only question context",
+            "GET /api/v1/theses/123/versions/456",
+            "Never replace the requested\nversion with `alva thesis get --id`",
+            "This list\n  contains different versions",
+            "A visible Thesis never grants access to a private chat.",
+            "`thesis-<id>-signal-v1` is a separate backend research runtime identity, not an\nordinary numeric chat Session ID."
+          ]
+        }
+      ]
+    },
+    {
       "id": "retained.platform-panorama",
       "group": "retained",
       "target": "skill",
