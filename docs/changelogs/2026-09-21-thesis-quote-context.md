@@ -69,6 +69,10 @@ is linked instead of repeated. Routing and regression/mutation checks now target
 Validation: 94/94 doc cases (1016/1016 checks), 23/23 mutation checks, GraphQL
 schema validation and whitespace checks pass. No frontend behavior changed.
 
+PR review follow-up: split the Signal-version assertion across two independent
+includes so wrapping does not determine test success. Final doc eval: 94/94
+cases, 1017/1017 checks; mutation smoke: 23/23.
+
 ## 8. Remaining Work
 
 Live Agent context preservation, runtime authentication and permission-scoped
