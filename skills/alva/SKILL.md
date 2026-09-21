@@ -4,7 +4,7 @@ description: >-
   Use this skill when the user asks for financial data ("price of BTC", "P/E
   ratio of NVDA"), market analysis, stock or crypto research, quant strategies,
   backtesting ("backtest a momentum strategy"), tracking assets or portfolios,
-  Thesis publication or explicitly requested polishing, or help turning investing ideas into live playbooks, dashboards, and analytics
+  Thesis publication, guided Thesis drafting, explicitly requested polishing, or help turning investing ideas into live playbooks, dashboards, and analytics
   on Alva. Powered by 250+ financial data sources across crypto, equities,
   macro, on-chain, and social data, along with cloud-side analytics and
   backtesting. Also use when the user asks about Alva platform capabilities.
@@ -40,7 +40,7 @@ The main objects are:
 | Runtime script     | JavaScript executed inside Alva's V8/jagent runtime through `alva run` or cronjobs.                                                                          | You need computation, HTTP, ALFS, secrets, alpi, ONNX, or Feed SDK.                                            |
 | Feed               | The persistent data pipeline and identity (`feed_id`) that writes outputs to ALFS. `alva automation` is its product-facing lifecycle CLI; `alva deploy` cronjobs produce its data. | Data needs freshness, history, public reads, charts, release, or push.                                         |
 | Agent Schedule     | A named future or recurring instruction for a Channel Agent or an existing ALPI Session Inbox.                                                               | The user wants the Agent itself to return later, continue work, or repeat a judgment.                          |
-| Thesis             | A versioned authored investment viewpoint; one sentence is sufficient, title optional, public by default. | The user explicitly wants to publish a viewpoint or maintain an existing Thesis; read [thesis.md](references/thesis.md), not the Playbook builder. |
+| Thesis             | A versioned authored investment viewpoint; one sentence is sufficient, title optional, public by default. | The user explicitly wants to shape a viewpoint for publication, publish it, or maintain an existing Thesis; read [thesis.md](references/thesis.md), not the Playbook builder. |
 | Playbook           | A hosted investing app at `https://alva.ai/u/<username>/playbooks/<name>`.                                                                                   | The user wants a shareable dashboard, screener, thesis, what-if, or strategy surface.                          |
 | Skillhub blueprint | A catalog methodology addressed by `/use-skill:<username>/<name>` or discovered from a user skill/method reference.                                          | The user references a skill/method, or a task matches an official template family.                             |
 | Altra              | The Feed SDK trading engine for event-driven backtesting and signal feeds.                                                                                   | Any strategy, simulation, signal target, portfolio, order, equity curve, or rebalancing logic.                 |
@@ -199,7 +199,7 @@ that section as mandatory, not optional debugging material.
 | User asks for                                                                                                                           | Route                               | Must not miss                                                                                                                                                                            |
 | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | price, valuation, holdings, compare peers, explain a thesis, rank in text                                                                 | Financial Analysis / Ask Question   | Use fresh Data Skills/search evidence and the Financial Analysis tree; fetch or qualify every comparison baseline.                                                                    |
-| explicitly create/publish, maintain, or polish a Thesis | Thesis | Read [thesis.md](references/thesis.md). Confirm the exact create payload; after GET, emit its raw `<thesis-preview>` XML. Rewrite only when requested. |
+| explicitly create/publish, maintain, or polish a Thesis | Thesis | Read [thesis.md](references/thesis.md). Guide rough intent to a candidate when needed, confirm the exact create payload, then emit the GET-backed raw `<thesis-preview>` XML. Rewrite only when requested. |
 | ticker read, analyze a named ticker or company, company narrative, earnings, earnings call, past-hour tracking, "why did it move", investor focus, recent catalysts, unusual move | Financial Analysis + Platform Data: Ticker Read | Use the smallest sufficient source set; read [ticker-read.md](references/ticker-read.md) before source selection, starting with `alva/company-anomaly-read` for intraday/hourly-scale tracking. |
 | company anomaly, scan/check whether a company is anomalous, use Platform Data to analyze a company                                       | Platform Data: Company Anomaly      | Route through [ticker-read.md](references/ticker-read.md), then fresh-load `alva/company-anomaly-read` from Skillhub; verify exact-ticker coverage and freshness.                 |
 | GEX, gamma exposure, dealer positioning/gamma, gamma flip, call wall / put wall, options pinning, vanna, charm                           | Platform Data: GEX                  | Fresh-load `alva/gex` from Skillhub and run its `gex.js`; do not hand-compute GEX from the raw options chain — the skill owns the methodology, flip scan, and output discipline.   |
@@ -697,7 +697,7 @@ freshness, output groups, widgets, and release path. Then open
 
 ### Thesis, Digest, And Monitoring
 
-For Thesis work, follow [thesis.md](references/thesis.md); do not build HTML, Automation, or a draft/release workflow.
+For Thesis work, follow [thesis.md](references/thesis.md). Use guided creation when publication intent lacks a final body; do not build HTML, Automation, or a draft/release workflow.
 Discussion, analysis and remembering a viewpoint do not authorize public posting; explicitly requested tracker dashboards/custom feeds may combine structured metrics, content search and alpi over real data.
 Keep its prompt fixed, source records separate from analysis, and push lines faithful to actual thesis deltas.
 For `/use-skill:alva/thesis` or a named thesis blueprint, fetch it fresh and let its method drive the build.
