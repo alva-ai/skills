@@ -185,23 +185,16 @@ result or confuse `material_version_id` with the selected author version.
 History: `GET /api/v1/theses/123/versions?first=20`; follow `next_cursor` via
 URL-encoded `cursor` when needed, retaining the selected version as the anchor.
 
-For Signals, POST this query to `/query` with the same caller credentials:
+For Signals, use the CLI instead of constructing GraphQL:
 
-```graphql
-query QuotedThesisEvidence($id: ID!, $after: String) {
-  node(id: $id) { ... on Playbook {
-    thesisSignals(input: { first: 20, after: $after }) {
-      status research { state readComplete pendingWork lastCompletedMs }
-      edges { node { thesisSignal { authorVersionId statementSnapshot stance informationKind explanation evidenceExcerpt { text omittedBefore omittedAfter } source { title url publishedAtMs } } } }
-      pageInfo { hasNextPage endCursor }
-    }
-  } }
-}
+```sh
+alva thesis signals --id '123' --first 20
+alva thesis signals --id '123' --first 20 --cursor '<next_cursor>'
 ```
 
-Use `id: "Playbook:123"`; paginate with `endCursor` as `after`. Signals span
-versions: keep their version, stance and source attribution. Partial pages,
-pending research and GraphQL errors are not proof of absent evidence; source
+Paginate only while `next_cursor` is non-empty. Signals span versions: keep each
+entry's `author_version_id`, stance and source attribution. Partial pages,
+pending research and query errors are not proof of absent evidence; source
 publication time does not establish when the Signal was known.
 Only when useful, query `node(id: "Playbook:123") { ... on Playbook { agentSession { id } } }`,
 then `sessionMessagesV2(sessionId: "<returned numeric id>")`; inspect bounded relevant

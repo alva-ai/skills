@@ -12,8 +12,8 @@ publishing, editing or exposing private source sessions.
 
 ## 3. Research, Findings, and Architecture Decision
 
-Reuse exact-version/history REST, thesisSignals GraphQL and authorized numeric
-chat sessions. Research runtime IDs are not ordinary session IDs. No new CLI.
+Reuse exact-version/history REST, the Thesis Signal CLI and authorized numeric
+chat sessions. Research runtime IDs are not ordinary session IDs.
 
 ## 4. Implementation Design
 
@@ -26,7 +26,8 @@ frontend-monorepo repository,
 ## 5. Verification and E2E Design
 
 Run doc eval and mutation smoke; inspect request examples against Gateway's pinned
-schema. Live Agent read verification is separately required before release.
+schema and CLI contract. Live Agent read verification is separately required
+before release.
 
 ## 6. Human Decisions and Interaction
 
@@ -36,8 +37,8 @@ User approved hidden quote context and minimal scope; local review only, no PR.
 
 Added `references/thesis-context.md` and minimal entry points in SKILL.md and
 request-routing.md. Publication guide remains unchanged; top-level guide remains
-911 lines. Existing exact-version/history REST and Signal/session GraphQL shapes
-were checked against the pinned Gateway source.
+911 lines. Existing exact-version/history REST, Signal CLI and session GraphQL
+shapes were checked against current source contracts.
 
 From this repository:
 
