@@ -172,6 +172,49 @@
       }
     },
     {
+      "id": "scenario.thesis-guided-create",
+      "group": "scenarios.thesis",
+      "prompt": "帮我创建一个关于 NVDA AI capex 延续性的 Thesis，我只有一个大概想法。",
+      "description": "An explicit but unfinished Thesis publication request gets one guided drafting pass, evidence boundaries, and exact-payload confirmation instead of being rejected or turned into a Playbook.",
+      "expect": {
+        "route": "Thesis",
+        "references": [
+          "thesis.md",
+          "request-routing.md"
+        ],
+        "behaviors": [
+          "Guide an explicit publication request from rough intent or a finished body",
+          "discussion without publication intent stays an answer"
+        ],
+        "sections": [
+          {
+            "file": "references/thesis.md",
+            "heading": "Guided creation",
+            "label": "guided drafting",
+            "includes": [
+              "Ask at most one blocking question",
+              "Present one short plan",
+              "complete the Financial Analysis evidence route",
+              "open-ended create request permits drafting a candidate",
+              "it does not permit publication",
+              "exact-payload confirmation"
+            ]
+          },
+          {
+            "file": "references/request-routing.md",
+            "heading": "Guided Planning",
+            "label": "Thesis plan",
+            "includes": [
+              "a Thesis request that does not yet contain the final body",
+              "core claim, scope/tickers, horizon",
+              "main risks or invalidation",
+              "default visibility"
+            ]
+          }
+        ]
+      }
+    },
+    {
       "id": "scenario.alert-push-monitor",
       "group": "scenarios.push",
       "prompt": "Track BTC dominance and notify me when it breaks out.",

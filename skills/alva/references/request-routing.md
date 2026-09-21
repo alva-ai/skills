@@ -13,11 +13,14 @@ Decision order:
    to answers and artifacts.
 1. If the user wants an explanation, comparison, valuation, rank, or current
    market fact in chat, route to Financial Analysis / Ask Question.
-2. If the user wants persistence, cadence, alerting, trading signals, or a
+2. If the user explicitly wants to shape a viewpoint for publication, create or
+   publish a Thesis, or maintain an existing Thesis, route to Thesis. Discussion
+   or research without publication intent remains Financial Analysis.
+3. If the user wants persistence, cadence, alerting, trading signals, or a
    reusable dataset, route to the durable artifact that fits: Agent Schedule
    for a future Agent turn, Automation for a feed/script pipeline, not
    automatically to a playbook.
-3. If the user wants a hosted app, share URL, remix, annotation edit, release,
+4. If the user wants a hosted app, share URL, remix, annotation edit, release,
    or playbook version update, enter the Playbook Creation tree.
 
 ## Routes
@@ -25,6 +28,7 @@ Decision order:
 | Request type | Objective |
 | --- | --- |
 | Financial Analysis / Ask Question | Answer market, asset, portfolio, valuation, comparison, single-ticker, and "why" questions with fresh data/search/`alva run` evidence. A named-ticker question — including company narrative, earnings, or earnings call questions — first opens [ticker-read.md](ticker-read.md). Comparison baselines are figures too: fetch or qualify them. Every answer must read [user-facing-prose.md](user-facing-prose.md), apply its Investment Disclaimer only when the output meets that section's trigger, then pass the ask evidence gate. |
+| Thesis | Guide an explicit publication request from rough intent or a finished body to one exact, user-confirmed Thesis payload. Read [thesis.md](thesis.md); research-dependent drafting first uses the Financial Analysis evidence route, while discussion without publication intent stays an answer. |
 | Playbook Creation | Build, remix, edit, release, or update a hosted/shareable playbook. Read [playbook-creation.md](playbook-creation.md) for the subroute tree and gates. |
 | Strategy / Trading Analysis | Use Altra for backtests, signals, portfolio simulation, rebalancing, or trading analysis; deliver an answer, feed, signal, or playbook as requested. Apply the [Investment Disclaimer](user-facing-prose.md#investment-disclaimer) according to that reference. |
 | Agent Schedule | Create or resume a named future Channel Agent turn. Read [agent-schedules.md](agent-schedules.md); use `schedule` for Agent instructions and `deploy` for scripts. |
@@ -160,7 +164,8 @@ without structured data downgrades source/data coverage; social/KOL without
 denoising downgrades source quality; missing key KPIs with strong conclusion
 requires confidence downgrade or a hard cap.
 
-For build routes, present a plan once before building.
+For build routes, and for a Thesis request that does not yet contain the final
+body, present a plan once before building or drafting.
 
 Exactly one blocking question per session:
 
@@ -171,7 +176,8 @@ Exactly one blocking question per session:
 3. If the request is clear, or a `/use-skill:` directive pins the shape, give a
    5-8 line plan naming the intended artifact. For analysis, name sources and
    comparison baselines. For playbooks, name feeds, widgets, release path, and
-   defaults.
+   defaults. For a Thesis, name the core claim, scope/tickers, horizon, evidence
+   path, main risks or invalidation, and default visibility.
 
 If the user says "just do it", skip further clarifying questions for the rest
 of the session and proceed after the short plan.

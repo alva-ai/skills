@@ -1339,11 +1339,22 @@
       "id": "target.thesis-create-preview-card",
       "group": "target",
       "target": "corpus",
-      "description": "Thesis creation lightly confirms the displayed final content, then uses the complete thesis GET response for one deterministic XML preview-card contract.",
+      "description": "Thesis creation guides rough publication intent to one evidence-bounded candidate, lightly confirms the displayed final content, then uses the complete thesis GET response for one deterministic XML preview-card contract.",
       "file_includes": [
         {
           "file": "references/thesis.md",
           "includes": [
+            "## Guided creation",
+            "a rough view, or only a topic",
+            "Ask at most one blocking question",
+            "Do not turn Thesis creation into a questionnaire",
+            "Present one short plan",
+            "core claim, scope/tickers, horizon",
+            "complete the Financial Analysis evidence route",
+            "Never invent evidence, numbers, citations, entities, or causal claims",
+            "open-ended create request permits drafting a candidate",
+            "it does not permit publication",
+            "Do not call `thesis rewrite` merely to make the first draft",
             "Ready to create this Thesis:",
             "Title: <title or (none)>",
             "Visibility: <public (default)",

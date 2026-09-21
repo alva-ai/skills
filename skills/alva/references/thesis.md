@@ -8,6 +8,36 @@ Run `alva thesis --help` and the relevant subcommand help first. Use only
 `alva thesis`; if unavailable, report it instead of falling back to HTML,
 Playbooks, Automation, direct service writes, or invented identities.
 
+## Guided creation
+
+An explicit create or publish request may begin with a finished body, a rough
+view, or only a topic. It establishes publication intent, but it does not
+confirm text that has not been shown yet. If the user already supplied the
+exact final body and did not ask for drafting help, skip this section and go
+directly to the Create confirmation.
+
+Otherwise, guide the request to one candidate before confirmation:
+
+1. Ask at most one blocking question, choosing the missing answer that most
+   changes the viewpoint: usually the core stance, scope/tickers, or horizon.
+   Do not turn Thesis creation into a questionnaire. If the request already
+   supplies enough direction, or the user says to just do it, do not ask.
+2. Present one short plan covering the core claim, scope/tickers, horizon,
+   supporting reasons or evidence, and main risks or invalidation. Use public
+   visibility as the stated default unless the user requested private.
+3. When the candidate depends on current facts or the user requests a
+   research-backed Thesis, complete the Financial Analysis evidence route in
+   [request-routing.md](request-routing.md) first. Use verified facts, label
+   assumptions and inference, and identify material missing evidence. Never
+   invent evidence, numbers, citations, entities, or causal claims.
+4. Draft one candidate from the user's stated view and verified evidence. An
+   open-ended create request permits drafting a candidate and optional title;
+   it does not permit publication. Do not call `thesis rewrite` merely to make
+   the first draft.
+
+Show the candidate and let the user revise it naturally. Once the user selects
+the text to publish, enter the exact-payload confirmation below.
+
 ## Create
 
 Before `alva thesis create`, show the exact payload in this format:
@@ -24,13 +54,14 @@ Tickers: <none, or ticker symbols in the supplied order>
 Create this Thesis?
 ```
 
-Show the complete body, including file content rather than its filename, and
-preserve its wording, language, whitespace, and line breaks. Do not summarize,
-rewrite, translate, correct, expand, generate a title, infer tickers from
-context, or infer entities from the body. If the user requests changes, show
-the complete updated payload again. Create only after a natural confirmation
-of that displayed payload; no
-special phrase is required. Stop if declined.
+In this confirmation step, show the complete body, including file content
+rather than its filename, and preserve its wording, language, whitespace, and
+line breaks. Do not summarize, rewrite, translate, correct, expand, generate a
+title, infer tickers from context, or infer entities from the body while
+assembling the payload. If the user requests changes, return to the candidate,
+then show the complete updated payload again. Create only after a natural
+confirmation of that displayed payload; no special phrase is required. Stop if
+declined.
 
 One sentence is valid. Title and tickers are optional. Visibility defaults to
 public. Generate one nonzero UUID per creation intent and keep it with the
