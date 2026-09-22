@@ -13,6 +13,24 @@ const DEFAULT_SKILL_DIR = resolve(REPO_ROOT, "skills/alva");
 
 const MUTATIONS = [
   {
+    id: "thesis-quote-routing",
+    file: "SKILL.md",
+    remove: "[Quoted Thesis context](references/thesis.md#quoted-thesis-context)",
+    expectFailedCases: ["target.thesis-quote-context"],
+  },
+  {
+    id: "thesis-quote-exact-version",
+    file: "references/thesis.md",
+    remove: "never the latest `alva thesis get --id`",
+    expectFailedCases: ["target.thesis-quote-context"],
+  },
+  {
+    id: "thesis-quote-version-cli",
+    file: "references/thesis.md",
+    remove: "alva thesis version get --id '123' --author-version-id '456'",
+    expectFailedCases: ["target.thesis-quote-context"],
+  },
+  {
     id: "session-inbox-no-execution-retry",
     file: "references/agent-schedules.md",
     remove: "Agent execution failure ends this AutoRun without retry.\n",

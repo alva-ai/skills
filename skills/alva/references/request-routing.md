@@ -8,6 +8,12 @@ playbook edit.
 
 Decision order:
 
+For a question about an existing Thesis, including a
+`<reply_to context-type="thesis" thesis-id="…" author-version-id="…">` quote,
+first read [Quoted Thesis context](thesis.md#quoted-thesis-context). Resolve the selected version
+and its evidence before supplementing with broader market research. This does
+not enter the Thesis publication route; explicit changes still follow that route.
+
 0. Route every financial task through shared data and execution first: Data
    Skills, search, BYOD, `alva run` / jagent, and provenance checks are common
    to answers and artifacts.
