@@ -21,7 +21,13 @@ const MUTATIONS = [
   {
     id: "thesis-quote-exact-version",
     file: "references/thesis.md",
-    remove: "Never substitute the latest `alva thesis get --id`",
+    remove: "never the latest `alva thesis get --id`",
+    expectFailedCases: ["target.thesis-quote-context"],
+  },
+  {
+    id: "thesis-quote-version-cli",
+    file: "references/thesis.md",
+    remove: "alva thesis version get --id '123' --author-version-id '456'",
     expectFailedCases: ["target.thesis-quote-context"],
   },
   {

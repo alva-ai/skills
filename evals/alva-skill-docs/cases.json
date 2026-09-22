@@ -25,14 +25,13 @@
           "file": "references/thesis.md",
           "includes": [
             "use the IDs as read-only question context",
-            "GET /api/v1/theses/123/versions/456",
-            "Never substitute the latest `alva thesis get --id`",
+            "alva thesis version get --id '123' --author-version-id '456'",
+            "never the latest `alva thesis get --id`",
             "alva thesis signals --id '123' --first 20",
-            "use the CLI instead of constructing GraphQL",
+            "do not fall back to direct HTTP, GraphQL",
             "Signals span",
             "entry's `author_version_id`",
-            "A public Thesis does not grant private-session access.",
-            "`thesis-<id>-signal-v1` is a research runtime ID, not a chat Session ID;"
+            "another user's private session"
           ]
         }
       ]

@@ -12,8 +12,9 @@ publishing, editing or exposing private source sessions.
 
 ## 3. Research, Findings, and Architecture Decision
 
-Reuse exact-version/history REST, the Thesis Signal CLI and authorized numeric
-chat sessions. Research runtime IDs are not ordinary session IDs.
+Use the selected author version and published Signals through the Toolkit CLI.
+The exact-version CLI became available in toolkit-ts#180; a versions-list or
+private-session query is not needed for the quoted Thesis question.
 
 ## 4. Implementation Design
 
@@ -74,9 +75,19 @@ PR review follow-up: split the Signal-version assertion across two independent
 includes so wrapping does not determine test success. Final doc eval: 94/94
 cases, 1017/1017 checks; mutation smoke: 23/23.
 
+Post-merge CLI follow-up: toolkit-ts#180 added exact author-version GET after
+Gateway and Signal CLI merged. The quoted context now reads the exact author
+version and Signal history using CLI only. Removed the unused versions-list,
+hand-written HTTP authentication/URL encoding and private-session GraphQL
+paths. The tests now protect the exact-version command and CLI-only boundary.
+Final check: doc eval 94/94 cases (1018/1018 checks), mutation smoke 24/24,
+durable-agent tests 5/5 and `git diff --check` pass. The generic Skill
+validator could not start because the local Python lacks PyYAML; the
+repository-specific evals passed. No deployed Agent/CLI read was tested.
+
 ## 8. Remaining Work
 
-Live Agent context preservation, runtime authentication and permission-scoped
+Live Agent context preservation, CLI package availability and permission-scoped
 retrieval remain unverified. Local backend startup failed because the local-dev
 submodule is uninitialized (no go.mod). See the primary changelog for evidence.
 The frontend and this skill must both be available for the full feature; neither
