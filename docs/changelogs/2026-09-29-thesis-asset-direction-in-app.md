@@ -55,8 +55,8 @@ The exact Skill CI commands passed in a Node 20.19.5 container:
 `node evals/alva-skill-docs/mutation-smoke.mjs --skill-dir skills/alva`
 (24/24 expected mutation failures), and
 `node --test evals/alva-skill-docs/durable-agent.test.mjs` (5/5 tests).
-`node -e` JSON parsing and `git diff --check` also passed. CI and App rollout
-remain pending.
+`node -e` JSON parsing and `git diff --check` also passed. PR #643's `eval`
+check passed on the published head. App rollout remains pending.
 
 ## 8. Remaining Work
 
