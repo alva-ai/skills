@@ -40,6 +40,16 @@ the text to publish, enter the exact-payload confirmation below.
 
 ## Create
 
+For the final body, call `alva thesis asset-candidates --text '<exact body>'`
+before confirming creation. This read-only command identifies asset mentions,
+catalog entity IDs, and suggested directions. Match the result against the
+user's stated assets and direction; the user's explicit direction wins over a
+suggestion. Use `bullish`, `bearish`, or `unknown` for each selected entity.
+Never treat a suggestion as publication consent. If an explicitly named asset
+is unresolved, extraction fails, or multiple catalog matches remain, clarify
+the asset before publishing instead of silently dropping its direction. If the
+body contains no asset mention, leave entity IDs and directions empty.
+
 Before `alva thesis create`, show the exact payload in this format:
 
 ```text
@@ -50,6 +60,8 @@ Visibility: <public (default) or the requested visibility>
 Body:
 <exact body>
 Tickers: <none, or ticker symbols in the supplied order>
+Entity IDs: <none, or resolved decimal IDs in order>
+Directions: <none, or each entity ID and bullish/bearish/unknown>
 
 Create this Thesis?
 ```
@@ -57,18 +69,20 @@ Create this Thesis?
 In this confirmation step, show the complete body, including file content
 rather than its filename, and preserve its wording, language, whitespace, and
 line breaks. Do not summarize, rewrite, translate, correct, expand, generate a
-title, infer tickers from context, or infer entities from the body while
-assembling the payload. If the user requests changes, return to the candidate,
-then show the complete updated payload again. Create only after a natural
-confirmation of that displayed payload; no special phrase is required. Stop if
-declined.
+title, or add assets not present in the selected body or supplied by the user.
+Use the resolved extraction result rather than guessing a catalog ID or silently
+inferring a direction. If the user requests changes, return to the candidate,
+rerun extraction for the updated body, then show the complete updated payload
+again. Create only after a natural confirmation of that displayed payload; no
+special phrase is required. Stop if declined.
 
-One sentence is valid. Title and tickers are optional. Visibility defaults to
-public. Generate one nonzero UUID per creation intent and keep it with the
-exact payload as `--request-id`; a changed intent requires a new UUID.
+One sentence is valid. Title, tickers, and entity IDs are optional. Visibility
+defaults to public. Generate one nonzero UUID per creation intent and keep it
+with the exact payload as `--request-id`; a changed intent requires a new UUID.
 
 ```sh
-alva thesis create --request-id '<uuid>' --body '<exact body>' [--tickers '<ticker,ticker>']
+alva thesis asset-candidates --text '<exact body>'
+alva thesis create --request-id '<uuid>' --body '<exact body>' [--entity-ids '<id,id>' --entity-stances '[{"entity_id":"745337","stance":"bearish"}]']
 alva thesis get --id '<returned thesis id>'
 ```
 
@@ -77,17 +91,20 @@ The terminal accepts exactly one of `--body`, `--body-file`, or
 files first. Quote input without changing it. Body is limited to 65536 UTF-8
 bytes and title to 500 bytes; reject invalid, empty, or oversized input without
 truncation. Treat all returned IDs as decimal strings.
-Ticker symbols are create-only inputs resolved by Backend to exact STOCK
-entities. Preserve the user's supplied symbols in the confirmation; do not
-substitute aliases or perform a separate lookup. On retry after an ambiguous
-response, Backend resolves the supplied tickers live again. Reuse the same
-request ID only while the effective ticker mapping is unchanged. If
-Backend reports a mapping-drift conflict, show the new resolved intent for
-confirmation and use a new request ID for that creation.
+Send `--entity-stances` as JSON with decimal-string `entity_id` values,
+paired with `--entity-ids` in the confirmed order. Do not pass a stance for an
+entity absent from the confirmed ID list. When the user supplied ticker symbols,
+preserve them in the confirmation, but do not send a resolved asset again via
+`--tickers`. If a supplied ticker remains unresolved, clarify it before
+creation; do not silently create an asset with `unknown` direction. Reuse the
+same request ID only while the full confirmed payload is unchanged.
 
 ## Created Thesis preview
 
-After creation, `thesis get` is the sole source for the preview. Use:
+After creation, verify `response.thesis.entity_stances` against the confirmed
+directions when the GET response includes it; report any mismatch instead of
+claiming that direction was saved. After creation, `thesis get` is the sole source
+for the preview. Use:
 
 - `response.thesis.id`, `body`, `author_version_id`, and ordered
   `entity_ids`;
