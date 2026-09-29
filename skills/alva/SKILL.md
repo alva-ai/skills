@@ -10,7 +10,7 @@ description: >-
   backtesting. Also use when the user asks about Alva platform capabilities.
 metadata:
   author: alva
-  version: v1.23.0
+  version: v1.23.1
 ---
 
 # Alva
@@ -199,7 +199,7 @@ that section as mandatory, not optional debugging material.
 | User asks for                                                                                                                           | Route                               | Must not miss                                                                                                                                                                            |
 | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | price, valuation, holdings, compare peers, explain a thesis, rank in text                                                                 | Financial Analysis / Ask Question   | Use fresh Data Skills/search evidence and the Financial Analysis tree; fetch or qualify every comparison baseline.                                                                    |
-| explicitly create/publish, maintain, or polish a Thesis | Thesis | Read [thesis.md](references/thesis.md). Guide rough intent to a candidate when needed, confirm the exact create payload, then emit the GET-backed raw `<thesis-preview>` XML. Rewrite only when requested. |
+| explicitly create/publish, maintain, or polish a Thesis | Thesis | Read [thesis.md](references/thesis.md). Guide rough intent to a candidate when needed, resolve asset IDs and directions before confirming the exact create payload, then emit the GET-backed raw `<thesis-preview>` XML. Rewrite only when requested. |
 | ticker read, analyze a named ticker or company, company narrative, earnings, earnings call, past-hour tracking, "why did it move", investor focus, recent catalysts, unusual move | Financial Analysis + Platform Data: Ticker Read | Use the smallest sufficient source set; read [ticker-read.md](references/ticker-read.md) before source selection, starting with `alva/company-anomaly-read` for intraday/hourly-scale tracking. |
 | company anomaly, scan/check whether a company is anomalous, use Platform Data to analyze a company                                       | Platform Data: Company Anomaly      | Route through [ticker-read.md](references/ticker-read.md), then fresh-load `alva/company-anomaly-read` from Skillhub; verify exact-ticker coverage and freshness.                 |
 | GEX, gamma exposure, dealer positioning/gamma, gamma flip, call wall / put wall, options pinning, vanna, charm                           | Platform Data: GEX                  | Fresh-load `alva/gex` from Skillhub and run its `gex.js`; do not hand-compute GEX from the raw options chain — the skill owns the methodology, flip scan, and output discipline.   |
