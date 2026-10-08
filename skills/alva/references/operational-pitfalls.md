@@ -40,6 +40,26 @@ Before building a full feed around a new endpoint, run a small shape check via
 `alva run` and print a short JSON slice. Verify actual response nesting before
 writing parser logic.
 
+### Reading `alva run` Output
+
+- End the script with the value itself (an object or array), not
+  `JSON.stringify(value)`. `alva run` already prints `result` as JSON; a
+  stringified return only adds a layer of escaping to read back.
+- Return only what the next step needs: a slice, counts, or the fields you are
+  checking. Every printed byte stays in the conversation.
+- When a result is large or you will inspect it more than once, run the script
+  once with `--output` and query the file instead of re-running the script:
+
+  ```bash
+  alva run --local-file ./research.js --output ./research.json
+  jq -c '.income[:4]' ./research.json
+  jq -c '.balance | keys' ./research.json
+  ```
+
+  The command prints the file's path, size, and top-level shape instead of the
+  result. Use `jq -c` so query output stays compact. `--output` writes a local
+  file, so it is unavailable in the embedded Agent runtime.
+
 Development-only reset examples:
 
 ```bash

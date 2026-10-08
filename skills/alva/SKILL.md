@@ -362,8 +362,9 @@ Runtime code should be boring and inspectable: small shape checks before full
 feeds, explicit precondition errors, no silent fallback records, and no local
 simulation when the blueprint requires Alva Cloud behavior. If a script throws
 `ReferenceError: <X> is not defined`, rewrite for the jagent runtime instead of
-retrying the same code. Before each write/run/debug step, read the matching
-section in [operational-pitfalls.md](references/operational-pitfalls.md).
+retrying the same code. Return values, not `JSON.stringify(...)`, and write
+large results once with `--output`. Before each write/run/debug step, read the
+matching section in [operational-pitfalls.md](references/operational-pitfalls.md).
 
 #### Provenance: Financial Values
 
