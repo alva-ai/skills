@@ -68,3 +68,23 @@ now decodes results, prints compact JSON off a TTY, and adds
 
 - The operator ruled out changing Codex's native rollout format. The fix stays
   on Alva's side: CLI output and Skill guidance.
+
+## 7. Outcome and Evidence
+
+- `skill-doc-eval`: 94/95 cases, 1025/1026 checks. The one failure is
+  `target.mainline-updates` (`version: v1.22.2` pin vs SKILL.md v1.23.0),
+  which also fails on main since #642 and is fixed by open PR #643. With
+  that pin aligned locally: 95/95 and 1026/1026. `mutation-smoke`: 24/24
+  mutations failed as expected. `durable-agent.test.mjs`: 5/5.
+  `git diff --check`: clean.
+- Falsifiability: deleting the new pitfalls subsection fails
+  `target.alva-run-output-discipline` on all six of its pitfalls checks.
+- E2E: the toolkit local-dev run baked these skill files into the sandbox
+  image. In a Codex turn, `alva run --output` followed by `jq -c` returned
+  the 215-byte summary and the queried slice. Full numbers are in the primary
+  changelog §7.
+
+## 8. Remaining Work
+
+- Rebase after #643 merges so CI's base eval is green.
+- Merge only after the toolkit release and the sandbox toolkit pin bump (R1).
