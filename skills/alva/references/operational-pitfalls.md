@@ -22,6 +22,40 @@ execution step, read the matching section below, then do the step.
 - V8 heap is 256 MB by default. For memory-heavy `alva run`, use
   `--max-heap-size-mb <mb>` up to 2048.
 
+### Reading `alva run` Output
+
+- End the script with the value itself (an object or array), not
+  `JSON.stringify(value)`. `alva run` already prints `result` as JSON; a
+  stringified return only adds a layer of escaping to read back.
+- Return only what the next step needs: a slice, counts, or the fields you are
+  checking. Every printed byte stays in the conversation.
+- When a result is large or you will inspect it more than once, produce it once
+  and query the stored copy instead of re-running the script.
+  - Shell sessions: redirect stdout to a file, then query it with `jq -c`.
+
+    ```bash
+    alva run --local-file ./research.js > research.json
+    jq -c '{status, error}' research.json
+    jq -c '.result.income[:4]' research.json
+    ```
+
+  - [ALFS-native agent tool mode](preflight.md#alfs-native-agent-tool-mode)
+    (no shell): the script writes the full result to ALFS and returns only the
+    path and a summary. Later reads are short scripts that return a slice.
+
+    ```javascript
+    // end of the research script
+    const out = home + "/tmp/research.json";
+    (async () => {
+      await alfs.writeFile(out, JSON.stringify(data));
+      return { path: out, income: data.income.length };
+    })();
+    ```
+
+    ```bash
+    alva run --code 'const alfs = require("alfs"); (async () => JSON.parse(await alfs.readFile("/alva/home/<username>/tmp/research.json")).income.slice(0, 4))();'
+    ```
+
 ## ALFS And Feed Paths
 
 - Quote `~` paths in shell commands so local shell expansion does not rewrite
@@ -39,26 +73,6 @@ execution step, read the matching section below, then do the step.
 Before building a full feed around a new endpoint, run a small shape check via
 `alva run` and print a short JSON slice. Verify actual response nesting before
 writing parser logic.
-
-### Reading `alva run` Output
-
-- End the script with the value itself (an object or array), not
-  `JSON.stringify(value)`. `alva run` already prints `result` as JSON; a
-  stringified return only adds a layer of escaping to read back.
-- Return only what the next step needs: a slice, counts, or the fields you are
-  checking. Every printed byte stays in the conversation.
-- When a result is large or you will inspect it more than once, run the script
-  once with stdout redirected to a file, then query the file instead of
-  re-running the script:
-
-  ```bash
-  alva run --local-file ./research.js > research.json
-  jq -c '{status, error}' research.json
-  jq -c '.result.income[:4]' research.json
-  ```
-
-  Nothing reaches the conversation until you query it. Use `jq -c` so query
-  output stays compact.
 
 Development-only reset examples:
 

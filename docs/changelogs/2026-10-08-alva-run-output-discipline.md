@@ -23,16 +23,25 @@ is not a TTY.
 - B1: Runtime scripts end with the value itself, not `JSON.stringify(value)`.
 - B2: Scripts return only what the next step needs.
 - B3: A large result, or one that will be inspected more than once, is
-  produced once with stdout redirected to a file, then queried with `jq -c`.
-  The script is not re-run to read another field.
+  produced once and the stored copy is queried; the script is not re-run to
+  read another field. Shell sessions redirect stdout to a file and use
+  `jq -c`.
+- B4: In ALFS-native agent tool mode (no shell, no local files), the script
+  writes the full result to ALFS and returns only the path and a summary;
+  later reads are short scripts that return a slice.
 
 ## 3. Research, Findings, and Architecture Decision
 
-- D1: The guidance lives in `references/operational-pitfalls.md` under "Data
-  And Runtime Debugging". SKILL.md already sends agents to the matching
-  pitfalls section before every run/debug step, and the toolkit's
-  `run --help` carries the same instruction, so SKILL.md is unchanged and its
-  line budget stays at 911.
+- D4 (withdraws D1's placement): The guidance lives under `## Runtime` in
+  `references/operational-pitfalls.md`. The file's mandatory routing table
+  sends "Write or run jagent code" to `Runtime`. The first placement, under
+  "Data And Runtime Debugging", is routed only when wrapping a new endpoint in
+  feed logic, so ordinary runs never reached it (review comment on #644).
+  SKILL.md is unchanged; its routing already lands in `Runtime`, and its line
+  budget stays at 911.
+- D5: The read-once recipe is mode-specific (B3/B4). `preflight.md` forbids
+  `--local-file` and has no shell in ALFS-native agent tool mode, so a
+  redirect-only recipe had no executable path there (review comment on #644).
 - D3 (withdraws D2): Read-once uses shell redirection (`alva run … > file`),
   not a CLI flag. An earlier revision taught `alva run --output`. The flag was
   dropped from toolkit-ts#189 as redundant with redirection, which also removes
@@ -45,9 +54,10 @@ is not a TTY.
 ## 4. Implementation Design
 
 - `references/operational-pitfalls.md`: new "Reading `alva run` Output"
-  subsection.
+  subsection under `## Runtime`.
 - `evals/alva-skill-docs/cases.json`: new
-  `target.alva-run-output-discipline` case.
+  `target.alva-run-output-discipline` case, scoped with `section_includes` to
+  the `Runtime` section so a misplaced subsection fails.
 
 ### Serial Implementation Checklist
 
@@ -55,6 +65,8 @@ is not a TTY.
 - [x] Eval case.
 - [x] Switch from `--output` to redirection (D3); revert the SKILL.md
       sentence and its budget bump (D1).
+- [x] Move under `Runtime` (D4); add the ALFS-native recipe (D5); merge main
+      for #643.
 
 ## 5. Verification and E2E Design
 
@@ -72,24 +84,29 @@ is not a TTY.
 - The operator asked for the most elegant version after the first revision.
   That produced D1 (no SKILL.md change) and D3 (redirect instead of
   `--output`).
+- Review on #644 found the routing gap and the missing ALFS-native path. The
+  operator asked to merge and test on stg; those fixes (D4, D5) were applied
+  first.
 
 ## 7. Outcome and Evidence
 
-All checks below were run on the final content.
+All checks below were run on the final content, with main merged (#643
+included).
 
-- `skill-doc-eval`: 94/95 cases, 1023/1024 checks. The one failure is
-  `target.mainline-updates`: the `version: v1.22.2` pin disagrees with
-  SKILL.md v1.23.0. It also fails on main since #642 and is fixed by open PR
-  #643. With that pin aligned locally: 95/95 and 1024/1024.
+- `skill-doc-eval`: 95/95 cases, 1032/1032 checks. SKILL.md: 911 lines,
+  unchanged.
 - `mutation-smoke`: 24/24 mutations failed as expected.
-  `durable-agent.test.mjs`: 5/5. `git diff --check`: clean. SKILL.md: 911
-  lines, unchanged.
-- E2E: the toolkit local-dev run baked these skill files into the sandbox
-  image. In a Codex turn, `alva run … > research.json` followed by
-  `jq -c '.result.cashflow[:2]'` returned the slice, and the two commands cost
-  1,925 transcript bytes. Full numbers are in the primary changelog §7.
+  `durable-agent.test.mjs`: 5/5. `git diff --check`: clean.
+- Falsifiability: moving the subsection back under "Data And Runtime
+  Debugging" fails `target.alva-run-output-discipline`.
+- ALFS-native recipe, run verbatim on stg jagent through `alva run`: the write
+  step returned `{path: "/alva/home/<user>/tmp/research.json", income: 40}`,
+  and the read step returned the 4-row slice.
+- Shell recipe: in a local-dev Codex turn, `alva run … > research.json`
+  followed by `jq -c '.result.cashflow[:2]'` returned the slice, and the two
+  commands cost 1,925 transcript bytes. Full numbers are in the primary
+  changelog §7.
 
 ## 8. Remaining Work
 
-- Rebase after #643 merges so CI's base eval is green.
 - Bump this Skill's pin after the toolkit-ts#189 pin (R1).

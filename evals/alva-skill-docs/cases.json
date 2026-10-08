@@ -1626,17 +1626,21 @@
       "id": "target.alva-run-output-discipline",
       "group": "target",
       "target": "corpus",
-      "description": "alva run scripts return values instead of JSON strings, and large results are redirected to a file once and queried from it.",
-      "file_includes": [
+      "description": "Every alva run is routed to read-once guidance: return values instead of JSON strings, and store a large result once, via shell redirection or ALFS in agent tool mode.",
+      "section_includes": [
         {
           "file": "references/operational-pitfalls.md",
+          "heading": "Runtime",
           "includes": [
             "### Reading `alva run` Output",
             "adds a layer of escaping",
             "instead of re-running the script",
+            "Shell sessions: redirect stdout to a file",
             "alva run --local-file ./research.js > research.json",
-            "jq -c '{status, error}' research.json",
-            "jq -c '.result.income[:4]' research.json"
+            "jq -c '.result.income[:4]' research.json",
+            "[ALFS-native agent tool mode](preflight.md#alfs-native-agent-tool-mode)",
+            "await alfs.writeFile(out, JSON.stringify(data));",
+            "return { path: out, income: data.income.length };"
           ]
         }
       ]
