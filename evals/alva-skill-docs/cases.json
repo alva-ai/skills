@@ -981,7 +981,7 @@
       "group": "target",
       "target": "skill",
       "description": "Top-level SKILL.md stays below the current guide ceiling without forcing a minimum size that would block future compression.",
-      "max_lines": 912
+      "max_lines": 911
     },
     {
       "id": "target.playbook-task-offload",
@@ -1621,24 +1621,17 @@
       "id": "target.alva-run-output-discipline",
       "group": "target",
       "target": "corpus",
-      "description": "alva run scripts return values instead of JSON strings, and large results are written once with --output and queried from the file.",
+      "description": "alva run scripts return values instead of JSON strings, and large results are redirected to a file once and queried from it.",
       "file_includes": [
-        {
-          "file": "SKILL.md",
-          "includes": [
-            "Return values, not `JSON.stringify(...)`",
-            "large results once with `--output`"
-          ]
-        },
         {
           "file": "references/operational-pitfalls.md",
           "includes": [
             "### Reading `alva run` Output",
             "adds a layer of escaping",
             "instead of re-running the script",
-            "alva run --local-file ./research.js --output ./research.json",
-            "jq -c '.income[:4]' ./research.json",
-            "unavailable in the embedded Agent runtime"
+            "alva run --local-file ./research.js > research.json",
+            "jq -c '{status, error}' research.json",
+            "jq -c '.result.income[:4]' research.json"
           ]
         }
       ]
