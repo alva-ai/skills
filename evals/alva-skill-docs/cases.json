@@ -1621,6 +1621,29 @@
         "If quiescence cannot be confirmed, do not activate the replacement",
         "never run both"
       ]
+    },
+    {
+      "id": "target.alva-run-output-discipline",
+      "group": "target",
+      "target": "corpus",
+      "description": "Every alva run is routed to read-once guidance: return values instead of JSON strings, and store a large result once, via shell redirection or ALFS in agent tool mode.",
+      "section_includes": [
+        {
+          "file": "references/operational-pitfalls.md",
+          "heading": "Runtime",
+          "includes": [
+            "### Reading `alva run` Output",
+            "adds a layer of escaping",
+            "instead of re-running the script",
+            "Shell sessions: redirect stdout to a file",
+            "alva run --local-file ./research.js > research.json",
+            "jq -c '.result.income[:4]' research.json",
+            "[ALFS-native agent tool mode](preflight.md#alfs-native-agent-tool-mode)",
+            "await alfs.writeFile(out, JSON.stringify(data));",
+            "return { path: out, income: data.income.length };"
+          ]
+        }
+      ]
     }
   ]
 }
