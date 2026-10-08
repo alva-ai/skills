@@ -37,7 +37,7 @@ now decodes results, prints compact JSON off a TTY, and adds
   top-level size budget rises by exactly that one line (911 → 912), following
   the #596 precedent.
 - R1: `--output` exists only in a toolkit release that includes
-  alva-ai/toolkit-ts `jaxxjj/compact-cli-output`. Merge this after that release
+  alva-ai/toolkit-ts#189. Merge this after that release
   and the sandbox pin bump, or the agent may hit `unknown flag`.
 
 ## 4. Implementation Design
