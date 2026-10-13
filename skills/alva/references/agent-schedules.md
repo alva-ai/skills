@@ -1,5 +1,12 @@
 # Agent Schedules
 
+User agents support OpenAI models only. Omit model/provider for platform
+defaults. Do not use Claude models, Anthropic SDK clients or BYOK, or Claude
+relay routes. This also applies to automations, feed cronjobs, retries, and
+durable agents. Retain historical Claude messages; use OpenAI for subsequent
+runs.
+
+
 Agent Schedules create durable future turns for a Channel Agent or an existing
 ALPI Session Inbox. Each Session wake executes its fixed Agent entrypoint; it does not
 select an arbitrary producer script. Use `alva deploy` when the occurrence must run a

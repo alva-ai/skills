@@ -1,5 +1,12 @@
 # Jagent Runtime Guide
 
+User agents support OpenAI models only. Omit model/provider for platform
+defaults. Do not use Claude models, Anthropic SDK clients or BYOK, or Claude
+relay routes. This also applies to automations, feed cronjobs, retries, and
+durable agents. Retain historical Claude messages; use OpenAI for subsequent
+runs.
+
+
 The jagent runtime executes JavaScript inside a V8 isolate. Scripts are invoked
 via `alva run` (inline code or filesystem entry path) or triggered by cronjobs.
 

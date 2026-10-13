@@ -15,6 +15,12 @@ metadata:
 
 # Alva
 
+User agents support OpenAI models only. Omit model/provider for platform
+defaults. Do not use Claude models, Anthropic SDK clients or BYOK, or Claude
+relay routes. This also applies to automations, feed cronjobs, retries, and
+durable agents. Retain historical Claude messages; use OpenAI for subsequent
+runs.
+
 Alva is an agentic finance platform. It gives an AI agent access to 250+
 financial data sources, market research, cloud JavaScript execution, persistent
 feeds, scheduled automations, the Altra trading engine, trading signals, hosted

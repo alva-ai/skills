@@ -1,5 +1,12 @@
 # Deployment Guide
 
+User agents support OpenAI models only. Omit model/provider for platform
+defaults. Do not use Claude models, Anthropic SDK clients or BYOK, or Claude
+relay routes. This also applies to automations, feed cronjobs, retries, and
+durable agents. Retain historical Claude messages; use OpenAI for subsequent
+runs.
+
+
 Deploy scripts as cronjobs for scheduled, automated execution. A deploy cronjob
 is the subordinate producer for a feed: it runs the source script, creates or
 refreshes feed data, and exposes run history/logs. The feed's lifecycle is
