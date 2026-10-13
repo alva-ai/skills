@@ -6,7 +6,6 @@ relay routes. This also applies to automations, feed cronjobs, retries, and
 durable agents. Retain historical Claude messages; use OpenAI for subsequent
 runs.
 
-
 Use this contract when the user asks you to create a coding Agent that must keep
 its Session across runs. A Channel Agent can create this program in ALFS and start
 it through `alva run`. Application-level `Agent.ask()` remains appropriate for a
