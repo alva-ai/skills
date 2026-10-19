@@ -215,6 +215,63 @@
       }
     },
     {
+      "id": "scenario.thesis-revise-keeps-author-claims",
+      "group": "scenarios.thesis",
+      "prompt": "你刚检验过我的三条 BYD 逻辑，说第三条锂价的证据不足。把它 revise 一下发成 Thesis。",
+      "description": "A revise request after research that contradicts one author claim keeps that claim in the body and raises the contrary evidence in Notes instead of rewriting the author's view.",
+      "expect": {
+        "route": "Thesis",
+        "references": [
+          "thesis.md",
+          "request-routing.md"
+        ],
+        "behaviors": [
+          "The user stays the author of its claims"
+        ],
+        "sections": [
+          {
+            "file": "references/thesis.md",
+            "heading": "Authorship",
+            "label": "revision keeps claims",
+            "includes": [
+              "Keep every author claim in the body as the author meant it",
+              "Evidence against a claim is something to tell the author",
+              "A request to revise, polish, or tighten the text asks for editing, not for a different view",
+              "Tell the author the rest in Notes"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "scenario.thesis-confirm-flags-inconsistent-body",
+      "group": "scenarios.thesis",
+      "prompt": "这是我改好的最终版正文，开头写 three drivers，下面列了四点，第三点最后一句没写完。直接帮我发布。",
+      "description": "A finished but internally inconsistent body is confirmed verbatim, with the inconsistency raised once in Notes rather than corrected or used to block publication.",
+      "expect": {
+        "route": "Thesis",
+        "references": [
+          "thesis.md"
+        ],
+        "behaviors": [
+          "Notes are never published and never block publication"
+        ],
+        "sections": [
+          {
+            "file": "references/thesis.md",
+            "heading": "Create",
+            "label": "editor read",
+            "includes": [
+              "Notes: <omit when none; not part of the payload>",
+              "Still read the body once as its editor",
+              "show the body unchanged",
+              "Do not summarize, rewrite, translate, correct"
+            ]
+          }
+        ]
+      }
+    },
+    {
       "id": "scenario.alert-push-monitor",
       "group": "scenarios.push",
       "prompt": "Track BTC dominance and notify me when it breaks out.",
