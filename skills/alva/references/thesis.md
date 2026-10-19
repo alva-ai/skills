@@ -44,7 +44,7 @@ division: guided drafting, revision requests, `thesis rewrite`, and `update`.
 
 For example, if the author holds that CUDA is NVDA's durable moat and your
 research shows competitors closing the software gap, keep the moat claim in
-the body and put the competing evidence in Notes. Restate the claim only after
+the body and put the competing evidence in Notes. Change the claim only after
 the author agrees.
 
 ## Guided creation
