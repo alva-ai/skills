@@ -7,7 +7,7 @@ description: >-
   explicit Thesis publication or maintenance, and requested Thesis rewriting.
 metadata:
   author: alva
-  version: v1.24.1
+  version: v1.25.0
 ---
 
 # Alva
@@ -145,7 +145,7 @@ for "NVDA today" or "does the latest earnings report support this thesis?".
 | Price, security identity, or another simple factual lookup | [data-skills.md](references/data-skills.md): fetch the relevant fact with its source and as-of time |
 | Explanation requiring evidence, comparison, valuation, ranking, or complex research | [request-routing.md](references/request-routing.md): Ask evidence, matching Complex Ask Router gates, and useful follow-up only when justified |
 | Discuss or check a quoted Thesis | [Quoted Thesis context](references/thesis.md#quoted-thesis-context): preserve the selected author version; discussion does not authorize publication |
-| Explicit Thesis publication, guided drafting, update, close, deletion, or polishing | [thesis.md](references/thesis.md): preserve selected original text, draft only when needed, rewrite only when requested, resolve assets and directions, and after creation return the GET-backed `<thesis-preview>` |
+| Explicit Thesis publication, guided drafting, update, close, deletion, or polishing | [thesis.md](references/thesis.md): preserve selected original text and author claims, put your assessment in Notes, draft only when needed, rewrite only when requested, resolve assets and directions, and after creation return the GET-backed `<thesis-preview>` |
 | Company analysis, earnings interpretation, move attribution, past-hour tracking, investor focus, or catalysts | Use the smallest sufficient source set; read [ticker-read.md](references/ticker-read.md) before source selection. Start with `alva/company-anomaly-read` for intraday/hourly tracking, not a simple latest-price lookup |
 | GEX, dealer gamma, gamma flip, call/put walls, vanna, or charm | Fetch the current `alva/gex` Skillhub blueprint and follow its methodology rather than hand-computing from raw chains |
 | FinTwit / KOL views, profiles, rankings, or track record | [fintwit.md](references/fintwit.md): structured Platform Data, snapshot date, read-only account and ticker queries |

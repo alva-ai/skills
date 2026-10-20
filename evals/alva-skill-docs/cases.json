@@ -1326,7 +1326,7 @@
       "target": "corpus",
       "description": "Latest mainline Alva skill updates remain integrated after rebasing the refactor.",
       "includes": [
-        "version: v1.24.1",
+        "version: v1.25.0",
         "Capability Help",
         "Reply 1, 2, or 3 to start",
         "feedback",
@@ -1416,6 +1416,71 @@
             "<thesis-preview>",
             "rewrite only when requested",
             "[thesis.md](references/thesis.md)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "target.thesis-authorship",
+      "group": "target",
+      "target": "corpus",
+      "description": "Every path that produces Thesis body text keeps the author's claims; the agent's assessment, contrary evidence, and body inconsistencies go to unpublished Notes instead of edits.",
+      "section_includes": [
+        {
+          "file": "references/thesis.md",
+          "heading": "Authorship",
+          "label": "author owns claims",
+          "includes": [
+            "The user is the author and you are their editor",
+            "guided drafting, revision requests, `thesis rewrite`, and `update`",
+            "Keep every author claim in the body as the author meant it",
+            "Do not drop, merge, replace, reverse, hedge, or strengthen a claim unless the author asks",
+            "Evidence against a claim is something to tell the author, not a reason to edit the claim",
+            "A request to revise, polish, or tighten the text asks for editing, not for a different view",
+            "Edit freely for expression",
+            "label your own inference as inference",
+            "proposals that become theirs when they confirm",
+            "Tell the author the rest in Notes",
+            "a stated count that does not match the listed points",
+            "Keep Notes to the few points that could change what the author publishes",
+            "Notes are never published and never block publication",
+            "Change the claim only after the author agrees"
+          ]
+        },
+        {
+          "file": "references/thesis.md",
+          "heading": "Guided creation",
+          "label": "evidence informs the author",
+          "includes": [
+            "report contrary evidence, unverified premises, and material missing evidence in Notes",
+            "carries the author's claims as described in [Authorship](#authorship)",
+            "Show the candidate with its Notes"
+          ]
+        },
+        {
+          "file": "references/thesis.md",
+          "heading": "Create",
+          "label": "editor read at confirmation",
+          "includes": [
+            "Notes are not part of the payload; omit them when none.",
+            "Still read the body once as its editor",
+            "say so in Notes and show the body unchanged"
+          ]
+        },
+        {
+          "file": "references/thesis.md",
+          "heading": "Rewrite",
+          "label": "rewrite within authorship",
+          "includes": [
+            "All modes work within [Authorship](#authorship)"
+          ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "heading": "Routes",
+          "label": "routing names authorship",
+          "includes": [
+            "The user stays the author of its claims and your own assessment goes in Notes"
           ]
         }
       ]

@@ -1,5 +1,9 @@
 # Thesis
 
+A Thesis is a versioned investment viewpoint published under its author's
+name. Readers follow it as the author's view, and Signals and research attach
+to its claims, so the published body must say what the author means.
+
 Use the publication workflow below only when the user asks to create, publish,
 rewrite, or maintain a Thesis. Discussion, research, and memory are not publication
 consent. A dashboard or tracker remains a Playbook.
@@ -7,6 +11,41 @@ consent. A dashboard or tracker remains a Playbook.
 For that workflow, run `alva thesis --help` and the relevant subcommand help first.
 Use only `alva thesis`; if unavailable, report it instead of falling back to HTML,
 Playbooks, Automation, direct service writes, or invented identities.
+
+## Authorship
+
+The user is the author and you are their editor. The author owns what the
+Thesis claims: each view, reason, driver, prediction, and condition they
+supplied, with its direction and conviction. You own how clearly it reads and
+how well it is grounded. Every path that produces body text follows this
+division: guided drafting, revision requests, `thesis rewrite`, and `update`.
+
+- Keep every author claim in the body as the author meant it. Do not drop,
+  merge, replace, reverse, hedge, or strengthen a claim unless the author asks
+  for that change. Evidence against a claim is something to tell the author,
+  not a reason to edit the claim. A request to revise, polish, or tighten the
+  text asks for editing, not for a different view.
+- Edit freely for expression: wording, order, structure, grammar, formatting,
+  and asset naming such as `1211 HK` to `BYD Company Limited (1211.HK)`. While
+  drafting you may also add what the author did not supply, such as a title, a
+  verified supporting fact, or an invalidation condition; label your own
+  inference as inference. When the author gave only a topic or a rough
+  direction, the claims you draft are proposals that become theirs when they
+  confirm.
+- Tell the author the rest in Notes, directly after the body, whenever you
+  show a candidate or a confirmation payload: evidence against a claim, an
+  unverified premise a claim depends on, a substantive change you would
+  suggest (phrased so the author can accept or ignore it), and problems inside
+  the body itself, such as a stated count that does not match the listed
+  points or a point that stops mid-sentence. Keep Notes to the few points that
+  could change what the author publishes, most important first, and leave
+  wording nits in the author's own text alone. Notes are never published and
+  never block publication. Omit them when nothing material remains.
+
+For example, if the author holds that CUDA is NVDA's durable moat and your
+research shows competitors closing the software gap, keep the moat claim in
+the body and put the competing evidence in Notes. Change the claim only after
+the author agrees.
 
 ## Thesis discussion
 
@@ -36,17 +75,18 @@ Otherwise, guide the request to one candidate before confirmation:
    visibility as the stated default unless the user requested private.
 3. When the candidate depends on current facts or the user requests a
    research-backed Thesis, complete the Financial Analysis evidence route in
-   [request-routing.md](request-routing.md) first. Use verified facts, label
-   assumptions and inference, and identify material missing evidence. Never
-   invent evidence, numbers, citations, entities, or causal claims.
-4. Draft one candidate from the user's stated view and verified evidence. An
-   open-ended create request permits drafting a candidate and optional title;
-   it does not permit publication. Do not call `thesis rewrite` merely to make
-   the first draft.
+   [request-routing.md](request-routing.md) first. Bring verified support into
+   the body where it strengthens the author's case, and report contrary
+   evidence, unverified premises, and material missing evidence in Notes.
+   Never invent evidence, numbers, citations, entities, or causal claims.
+4. Draft one candidate that carries the author's claims as described in
+   [Authorship](#authorship). An open-ended create request permits drafting a
+   candidate and optional title; it does not permit publication. Do not call
+   `thesis rewrite` merely to make the first draft.
 
-Show the candidate and let the user revise it naturally. Once the user selects
-the text to publish, follow Create below; that explicit selection need not be
-confirmed again.
+Show the candidate with its Notes and let the user revise it naturally. Once
+the user selects the text to publish, follow Create below; that explicit
+selection need not be confirmed again.
 
 ## Create
 
@@ -63,6 +103,9 @@ body contains no asset mention, leave entity IDs and directions empty.
 Preserve the selected body exactly, including wording, language, whitespace and
 line breaks. Do not summarize, rewrite, translate, correct, expand, generate a
 title, or add assets absent from that body or the user's request.
+Still read the body once as its editor: when it contradicts itself or looks
+unfinished, say so in Notes and show the body unchanged.
+Notes are not part of the payload; omit them when none.
 
 An explicit request to publish the supplied original, or the user's selection
 of a displayed candidate for publication, authorizes that exact body. State the
@@ -156,7 +199,8 @@ Omit `--mode` for the `reformat` default. Never guess or pass an empty mode.
 - `enrich`: expand existing reasoning; mark inference and never invent evidence,
   numbers, citations, entities, or causal claims.
 
-All modes preserve language, stance, uncertainty, facts, and conclusions. Show
+All modes work within [Authorship](#authorship): they preserve language,
+stance, uncertainty, facts, and conclusions. Show
 the candidate; publish it only after an explicit create/update request selecting
 that exact candidate. Report rewrite errors without retry or fallback.
 
@@ -165,7 +209,8 @@ that exact candidate. Report rewrite errors without retry or fallback.
 - `get --id`: read the current document and version.
 - `set-visibility --id <id> --visibility public` (or `private`): change
   current access without publishing a new author version.
-- `update`: retain unchanged fields and send `--id`, a new
+- `update`: publish the author's revised view under
+  [Authorship](#authorship); retain unchanged fields and send `--id`, a new
   `--request-id`, `--expected-author-version-id`, `--body`, explicit
   `--visibility`, plus retained optional fields. Omitting optional fields clears
   them; never default an existing private Thesis to public.

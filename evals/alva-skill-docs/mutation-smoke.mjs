@@ -31,6 +31,33 @@ const MUTATIONS = [
     expectFailedCases: ["target.thesis-quote-context"],
   },
   {
+    id: "thesis-authorship-keep-claims",
+    file: "references/thesis.md",
+    remove: "Keep every author claim in the body as the author meant it.",
+    expectFailedCases: [
+      "target.thesis-authorship",
+      "scenario.thesis-revise-keeps-author-claims",
+    ],
+  },
+  {
+    id: "thesis-authorship-notes-line",
+    file: "references/thesis.md",
+    remove: "Notes are not part of the payload; omit them when none.\n",
+    expectFailedCases: [
+      "target.thesis-authorship",
+      "scenario.thesis-confirm-flags-inconsistent-body",
+    ],
+  },
+  {
+    id: "thesis-authorship-editor-read",
+    file: "references/thesis.md",
+    remove: "Still read the body once as its editor",
+    expectFailedCases: [
+      "target.thesis-authorship",
+      "scenario.thesis-confirm-flags-inconsistent-body",
+    ],
+  },
+  {
     id: "session-inbox-no-execution-retry",
     file: "references/agent-schedules.md",
     remove: "Agent execution failure ends this AutoRun without retry.\n",
