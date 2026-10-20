@@ -93,16 +93,18 @@ covered.
 
 ### Markets company context
 
-Run `alva markets --help` once before first use in a session.
+Use the signatures below; consult command help if syntax is uncertain or the
+call reports a contract mismatch.
 
 - Current Company Narrative, Narrative history, or change log:
   `alva markets narrative --ticker <TICKER>`
-- Latest completed earnings:
-  `alva markets earnings --ticker <TICKER>`
+- Latest completed earnings (default selector):
+  `alva markets earnings --ticker <TICKER> --event latest-completed`
 - Next confirmed earnings:
   `alva markets earnings --ticker <TICKER> --event next-confirmed`
-- Explicit period: pass both flags, e.g.
-  `--fiscal-year 2026 --fiscal-quarter Q3`.
+- Explicit period:
+  `alva markets earnings --ticker <TICKER> --fiscal-year <YEAR> --fiscal-quarter <Q1|Q2|Q3|Q4>`
+  Supply both fiscal flags; do not combine them with `--event`.
 
 Use Narrative as the default reader for current investor focus, debate,
 competitive context, what could move the stock, four-quarter focus, Street

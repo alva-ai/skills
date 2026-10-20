@@ -6,7 +6,9 @@ to its claims, so the published body must say what the author means.
 
 Use the publication workflow below only when the user asks to create, publish,
 rewrite, or maintain a Thesis. Discussion, research, and memory are not publication
-consent. A dashboard or tracker remains a Playbook.
+consent. Active Theses, public or private, receive platform-managed research
+and Signals after submission. Do not create an Automation or Playbook to
+duplicate that tracking; a custom dashboard is a separate, explicit request.
 
 For that workflow, run `alva thesis --help` and the relevant subcommand help first.
 Use only `alva thesis`; if unavailable, report it instead of falling back to HTML,
@@ -83,6 +85,9 @@ Otherwise, guide the request to one candidate before confirmation:
    [Authorship](#authorship). An open-ended create request permits drafting a
    candidate and optional title; it does not permit publication. Do not call
    `thesis rewrite` merely to make the first draft.
+
+Do not add Alva company-page links to candidate or published bodies. Preserve
+the author's links and legitimate supporting citations.
 
 Show the candidate with its Notes and let the user revise it naturally. Once
 the user selects the text to publish, follow Create below; that explicit
@@ -232,6 +237,31 @@ Do not automatically retry a lost create/update response or mint a replacement
 identity. If the user resubmits the same intent, reuse the same request UUID and
 exact payload; the same UUID with changed input is a conflict. Report other
 errors without creating another Thesis or falling back to Playbooks/Automation.
+
+## Thesis tracking
+
+For "how is this Thesis doing?" or new evidence, resolve the Thesis from a
+quote, a prior creation result, or an identifiable reminder/card. Do not invent
+an ID or use another user's private context; ask when the target is ambiguous.
+Read `alva thesis get --id '<id>'` for its current claims and
+`alva thesis signals --id '<id>' --first 20` for evidence and research status.
+A selected author version instead follows [Quoted Thesis context](#quoted-thesis-context).
+
+Compare the evidence with the author's actual claims. Signals are research
+outputs, not conclusions to adopt: use their explanation, source and excerpts,
+retaining the author-version association. Apply the pagination, access and
+timing boundaries below. The signals response's `research` fields (`state`,
+`pending_work`, `read_complete`, `last_completed_ms`) describe research coverage;
+completion time is not the date of the evidence. Empty or unfinished research
+does not establish that nothing changed or that the Thesis still holds.
+
+Platform tracking does not require a subscription or another Agent-built
+monitor. Paused, closed, archived or deleted Theses stop that research; verify
+returned state before promising ongoing tracking or delivery.
+For an unpublished view the user wants to follow, offer a Thesis, including
+private visibility, and obtain publication consent through Create. For a price
+alert, trading setup or custom recurring check, use the matching alert/Automation
+route; do not turn every monitoring request into Thesis publication.
 
 ## Quoted Thesis context
 

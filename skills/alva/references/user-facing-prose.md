@@ -309,7 +309,8 @@ each covered U.S.-listed company to its Alva company page:
   plain; do not call a tool just to add a link.
 - Link each company at most once per reply. Do not link non-company assets such
   as ETFs, indices, crypto, FX, or commodities; code; raw URLs; existing links;
-  quoted passages; or verbatim tool output.
+  Thesis bodies or candidates; user originals or quoted passages; raw XML/payloads;
+  or verbatim tool output. Preserve legitimate source citations.
 - Always use an absolute production URL under `https://alva.ai/markets/`. Never
   use a staging host or relative URL for a company page. Do not add a separate
   company-page footer or explain that a link was added.

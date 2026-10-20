@@ -49,10 +49,19 @@ requires selection. These Notes are separate from Playbook Creator Notes.
   Detailed build, chart and scheduled-trading procedures remain in references.
   Company-page linking and user-confirmed feedback for Alva-owned blockers
   remain explicit at entry. Completion no longer requires a whole-prose read;
-  detailed link exceptions and feedback safeguards stay in their references.
-- **Data access:** reuse applicable documentation; known US equity price/history
-  requests fetch the current stocks-kline contract directly, with discovery
-  fallback. Intraday requirements for current prices remain.
+  Thesis/raw-text link exceptions and exact existing disclaimer/header copy
+  are available at entry. Detailed triggers remain unchanged. Feedback uses
+  the user's language and still requires consent.
+- **Data access:** six verified common recipes cover US kline (intraday and
+  daily), company detail, SEC earnings releases, transcripts, search and URL
+  reading. Four HTTP endpoints share one authenticated call with a fixed Arrays host
+  and validated `/api/v1/` path; a current-price variant calculates a seven-day
+  window at runtime and retains stale/empty-result boundaries. The two runtime
+  SDKs retain their own auth. Recipe reads skip rediscovery/runtime-manual reads;
+  mismatches return to current endpoint/SDK docs. Other work keeps discovery and
+  runtime requirements. Markets selectors are documented without a mandatory
+  help call; known independent reads can share a tool invocation. Security existence is verified, never denied from memory
+  or a single missing result. Intraday requirements for current prices remain.
 - **Price basis:** missing adjusted-close fields do not establish unadjusted
   prices. Check documented basis and event coverage by effective date; query
   dates may differ. Stop guessed-document and generic-search exploration when
@@ -67,7 +76,15 @@ requires selection. These Notes are separate from Playbook Creator Notes.
   GET-backed creation preview and existing lifecycle controls. Material internal
   inconsistencies or unfinished passages are flagged in Notes before create;
   an explicit request still authorizes the unchanged body without another
-  confirmation. Notes never enter the publication payload.
+  confirmation. Notes never enter the publication payload. Existing Thesis
+  status reads platform Signals without creating duplicate monitors; quoted
+  versions, research gaps and source timing remain distinct. An unpublished
+  viewpoint needs consent before publication, including private publication.
+- **Recommendations and context:** For You exposes chronological and ranked
+  reads with their different cursors, partial-page and access boundaries. Cards
+  retain the selected author version. Discussion can naturally lead to a Thesis;
+  capability help has no fixed footer and Automation is suggested for actual
+  recurring value, without changing Trade Setup.
 - **Reference cleanup:** remove Creator Notes; avoid mandatory pipelines for
   chat answers, repeated reads, unnecessary search expansion and producer
   reruns for metadata-only changes. Reuse the shared CSS bundle.
@@ -87,8 +104,9 @@ reference links, deleted-file references, conflict markers and whitespace.
 Check the actual Sandbox consumer and backend contracts with the companion
 change. Static assertions check instruction coverage, not model compliance.
 
-E2E Required: no for this documentation integration. Real-turn acceptance uses
-the existing Eval effort and must verify which Skill bundle was loaded.
+E2E Required: no for this documentation integration. Real-turn acceptance keeps effort fixed and runs both arms on fast, recording
+the actual service tier and loaded Skill hashes. Earlier Standard timings are
+not a directly comparable baseline.
 
 Evidence-format verification: compare short news and ticker follow-ups,
 missing-KPI judgments, and portfolio scenarios against the preceding candidate.
@@ -114,34 +132,86 @@ updated to cover those boundaries. Other capability-audit suggestions stay defer
 Upstream comparison base: Skills `411ea14`; companion Sandbox `89639fd`.
 Backend `f6cebd5` supplies the current task-mailbox contract without local edits.
 
+Approved follow-up: repair entry link exceptions, inline existing disclaimer
+copy, restore security-existence checks and user-language feedback; connect
+platform Thesis research, selected-version Signals, recent notifications and
+For You; simplify capability suggestions. Include all six verified read-only
+recipes. Trade Setup remains unchanged. The approved small follow-up adds bounded recipe
+arguments and a current-price variant, documented Markets selectors, batching of
+independent reads, corrected Toolkit prerequisites and candidate version v1.26.0.
+The companion Sandbox preserves the existing Codex runtime; the optional
+summary override and its new tests are removed. Instruction hierarchy migration
+stays separate because persona extraction and session restore require a broader
+lifecycle change.
+
+Serial checklist: (1) verify CLI/backend contracts; (2) repair entry rules;
+(3) connect read-only discussion routes; (4) document and probe six recipes;
+(5) update focused assertions, run checks and review the full scoped diff;
+(6) probe the revised recipes; update Eval with both arms on fast and refresh
+the committed candidate freeze, without runtime experiments.
+
 ## 7. Outcome and evidence
 
 The merged implementation preserves the compact entry and upstream v1.25.0
-authorship rules. Final product-tree checks:
+authorship rules. Metadata names the planned v1.26.0 candidate; no tag was
+created and exact file hashes still identify Eval inputs. The current follow-up was reviewed against `0fdf24f`; the publication base
+remains upstream `411ea14`. Final product-tree checks:
 
 | Command, from this repository | Result |
 | --- | --- |
-| `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva --out /tmp/alva-entry-restoration-check.md` | 100/100 cases; 1098/1098 checks |
+| `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva --out /tmp/alva-third-batch-doc-check.md` | 103/103 cases; 1163/1163 checks |
 | `node evals/alva-skill-docs/mutation-smoke.mjs` | 28/28 mutations detected |
 | `node --test evals/alva-skill-docs/durable-agent.test.mjs` | 5/5 |
 | `git diff --check` and reference/conflict checks | Passed; existing memory example link to `user.md` unchanged |
 
-The evidence-format and entry-restoration edits pass all three doc suites.
-The entry restoration changes only SKILL.md, request-routing.md, their existing
-assertions and this changelog; scoped review found no unrelated changes.
-No real-turn result is claimed for these edits. This repository has no
-`make lint-fix` target; no substitute linter was run.
+| Follow-up intent | Result | Evidence / limit |
+| --- | --- | --- |
+| Remove repeated discovery, preserve contracts | DONE | Markets selectors and independent-read batching; doc regression passes |
+| Bound authenticated recipes and compute quote window | DONE | Eight successful reads; two invalid paths rejected before credentials/fetch |
+| Correct Toolkit/release prerequisites | DONE | Published 0.31.0 package has For You; v1.26.0 is local candidate metadata only |
+| Conversational speed and route quality | UNVERIFIABLE locally | Targeted Eval handoff updated; no new conversation Eval run |
 
-The current CLI successfully retrieved the known stocks-kline contract.
-This establishes endpoint availability, not adjustment semantics or latency.
+The three doc suites pass; they establish instruction coverage, not model
+compliance. This repository has no `make lint-fix` target. Review found no
+runtime edits or changes to trading/Trade Setup/publication authorization.
+
+All six current contracts were read with `alva data-skills endpoint` or
+`alva sdk doc`. Five HTTP probes (intraday/daily kline, company detail, SEC
+release, transcript) returned HTTP 200 with nonempty `data` arrays. Search and
+scrape SDK probes returned `success: true` with nonempty results. The shared
+HTTP command was also executed verbatim from the document. After the argument hardening, six HTTP reads (including the runtime-window
+quote) and both SDK reads returned nonempty successful data. Full-URL and
+relative-path arguments failed before credential loading/fetch. The quote
+returned a dated bar; it is not evidence that the feed is live. Probe evidence:
+`/Users/leozhou/.codex/visualizations/2026/10/10/01a124ea-73ec-7172-a50f-509e64b334f3/recipe-summary-probe-20261021/`.
+These probes used public historical/example inputs through the configured CLI; they do not
+establish fresh-quote latency, full Alva behavior or the price adjustment basis.
+
+Thesis/For You contracts were checked against Toolkit resources and CLI help
+source, and tracking/notification behavior against backend source. The installed
+global CLI lacks `for-you`, so no live For You/Thesis workflow success is claimed.
+The production lock already selects Toolkit v0.31.0 (`02b89b763a22591e4e81808aac0b58287edbd42c`),
+whose published package contains both For You commands. This is not a Toolkit
+upgrade prerequisite. Eval must verify the actually loaded Toolkit is >=0.31.0
+and supports the commands, plus backend/data access; the older global CLI is
+not evidence of a production capability gap.
 
 The Oct 20 paired Eval compared the Oct 18 frozen candidate with the version
 before the final direct-endpoint, concise-preference and bounded-search edits.
 Current quote, historical close and security identity took approximately
 38→33, 32→29 and 59→43 seconds; research, background handoff and backtests held
 in those cases. Concise-preference replies remained around 400 words, and the
-adjusted-price chart remained incomplete. The final edits and mailbox prompt
-integration have not yet received real-turn acceptance.
+adjusted-price chart remained incomplete.
+
+The subsequent full Eval did not establish faster ordinary Q&A: median first
+response 5.96→7.95s, first substantive answer 35.77→42.52s, final 62.4→60.9s;
+mean completion 62.2→67.3s. The non-interleaved runs and differing paths limit
+causal attribution. The later wording Eval also did not establish stable speed
+improvement (7.12→6.06s first response; 41.36→40.52s substance; 62.38→63.04s
+completion). Its independent new TASK-profile case returned three substantive
+updates and a complete result in about 369s, retaining follow-ups and sources;
+deferred delivery was not exercised. These results cover frozen earlier trees,
+not this follow-up's recipes/routes or later persona edits.
 
 ## 8. Remaining work
 
@@ -152,8 +222,12 @@ integration have not yet received real-turn acceptance.
 - Verify evidence-format behavior in the paired scenarios in section 5:
   less unnecessary structure with sources, calculations and material gaps
   preserved; retain tables when the user requests or benefits from comparison.
-- Verify direct price entry and unknown-endpoint fallback, concise-first replies
-  with explicit-depth override, and bounded adjustment verification.
+- Verify all six recipe paths, discovery fallback on mismatch, current quote
+  versus historical-close timing, fiscal-period semantics and bounded adjustment
+  verification. Compare model/discovery calls as well as latency.
+- Verify current/quoted Thesis evidence, empty/pending/denied Signals, no duplicate
+  monitor, unpublished-view consent, both For You streams and ambiguous reminders.
+- Verify concise-first replies with explicit-depth override.
 - Obtain authoritative price-basis semantics; do not claim adjusted-chart
   recovery from correct reported-close calculations alone.
 - Verify merged author-preserving edits, unpublished Notes and explicit
@@ -164,4 +238,5 @@ integration have not yet received real-turn acceptance.
   Eval and are no longer an outstanding collection prerequisite.
 - Publish/load this candidate Skill with the matching Sandbox prompts after
   acceptance; the upstream dependency-lock version alone does not identify
-  the local candidate.
+  the local candidate. Publish a real accepted commit/tag before updating the
+  Sandbox production pin; do not deploy this prompt pair against the old bundle.

@@ -6,9 +6,11 @@ and Twitter/X data tracked by Arrays.
 
 ## Discovery Pipeline
 
-Fetch the current endpoint contract before first use; reuse applicable details
-already read in this session. For US equity price or history queries, fetch the
-known endpoint directly, skipping catalog discovery:
+Use the common recipes below when they cover the request; no catalog, endpoint
+or runtime-document read is needed for those self-contained read-only calls.
+Otherwise fetch the current endpoint contract before first use and reuse
+applicable details already read. For US equity prices outside the recipe's
+contract, fetch the known endpoint directly:
 
 ```bash
 alva data-skills endpoint arrays-data-api-spot-market-price-and-volume stocks-kline
@@ -30,7 +32,7 @@ Rules:
   concept words.
 - For discovered endpoints, `<file>` comes from the `File` column in `summary`,
   not from the path or your memory.
-- Fetch endpoint detail before writing code that calls it.
+- Outside the recipes, fetch endpoint detail before writing code that calls it.
 - If the call fails with an unexpected shape, re-fetch endpoint detail before
   guessing.
 
@@ -49,6 +51,154 @@ const resp = await http.fetch(url, {
 
 If a call returns 401, rerun `alva arrays token ensure`. Do not use
 `X-API-Key`.
+
+## Common recipes
+
+Contracts checked 2026-10-21. Use these for read-only retrieval; return the
+result from the async function. New transformations, feeds and persistent scripts
+still use the runtime and relevant pitfalls documentation. On a contract error
+or unexpected response, refresh the named endpoint or SDK doc before adapting;
+an empty result is not proof of absence. Preserve the fallback rules below.
+
+### 1. US equity price / history
+
+HTTP recipes 1–4 share this call, with the Arrays host fixed in the script.
+For an explicitly configured alternative, verify its current endpoint contract
+before adapting the host.
+`ARRAYS_JWT` comes from Secret Manager, never from printed credentials.
+Send it only to the trusted Arrays API host, never a source-page URL.
+Change the `--args` path for the examples below.
+
+```sh
+alva run --code '(async () => {
+  const http = require("net/http");
+  const args = require("env").args;
+  let path = args.path;
+  if (typeof path !== "string" || !path.startsWith("/api/v1/")) {
+    throw new Error("Expected an Arrays /api/v1/ path");
+  }
+  if (args.current_price) {
+    const now = Math.floor(Date.now() / 1000);
+    path += "&start_time=" + (now - 7 * 86400) + "&end_time=" + now;
+  }
+  const jwt = require("secret-manager").loadPlaintext("ARRAYS_JWT");
+  if (!jwt) throw new Error("ARRAYS_JWT unavailable");
+  const r = await http.fetch("https://data-tools.prd.arrays.org" + path, {
+    headers: { Authorization: "Bearer " + jwt }
+  });
+  if (!r.ok) throw new Error("Arrays HTTP " + r.status);
+  const body = r.json();
+  if (!Array.isArray(body.data)) throw new Error("Unexpected Arrays response");
+  return body;
+})();' --args '{"path":"/api/v1/stocks/kline?symbol=AAPL&start_time=1724644800&end_time=1724731200&interval=1min&session=RTH&limit=1"}'
+```
+
+Contract: `arrays-data-api-spot-market-price-and-volume stocks-kline`.
+Required: `symbol`, `start_time`, `end_time` (Unix seconds, positive and increasing),
+`interval`; optional `limit` (default 100) and intraday `session` (`RTH` or
+default `ETH`). `data` is newest first; `price_close`, `time_open`, `time_close`
+and `volume_traded` belong to each returned bar.
+
+The example is historical: August 26, 2024, midnight ET to next midnight ET.
+For a current quote, use the shared call with these arguments. `current_price`
+adds a seven-day window ending at runtime, avoiding hand-calculated timestamps:
+
+```json
+{"path":"/api/v1/stocks/kline?symbol=AAPL&interval=1min&session=ETH&limit=1","current_price":true}
+```
+
+Use this flag only with the current-price path above, without explicit time
+bounds. Seven days covers ordinary weekends and holidays, not every suspension
+or extended closure. Report the returned intraday bar's timestamp/session; do
+not describe a stale bar as live or an empty result as a current quote.
+US windows must fully contain `[time_open, time_close]`. RTH intraday runs
+09:30–16:00 ET; ETH 04:00–20:00 ET. Account for daylight saving when converting
+dates. For the daily close on the same historical day, replace `--args` with:
+
+```json
+{"path":"/api/v1/stocks/kline?symbol=AAPL&start_time=1724644800&end_time=1724731200&interval=1d&limit=1"}
+```
+
+Daily bars are RTH only; omit `session=ETH`. Daily closes are not current
+quotes. The contract does not specify the adjustment basis; apply Adjusted
+Prices And Returns below when needed.
+
+### 2. Company identity / profile
+
+Contract: `arrays-data-api-equity-fundamentals company-detail`. Use uppercase
+`symbol` or a `name` keyword (at least one), with the shared HTTP call:
+
+```json
+{"path":"/api/v1/stocks/company/detail?symbol=AAPL"}
+```
+
+Each `data` item includes `symbol`, `name`, `exchange`, `is_listed`, `is_adr`,
+`is_etf`, `is_fund`, `sector` and `industry`. Check the matched entity before
+using it; no match is not proof that a security does not exist.
+
+### 3. SEC earnings release
+
+Contract: `arrays-data-api-equity-events sec-earnings-release`. Required:
+`symbol`, `period_type` (`quarterly` or `annual`), `fiscal_year`; quarterly
+queries also require `fiscal_quarter` (`Q1`–`Q4`).
+
+```json
+{"path":"/api/v1/stocks/sec-earnings-release?symbol=AAPL&period_type=quarterly&fiscal_year=2024&fiscal_quarter=Q3"}
+```
+
+Items provide `quarter`, `release_date` and filing `url`, not the release body.
+Read the source when its contents matter. `annual` returns the FY release
+(`YYYY00`), the same filing as Q4, not a second event. Quarterly IDs use `YYYYQQ`.
+Fiscal years are not calendar years. If a just-released period is missing,
+verify the issuer's release and label any IR/newswire supplement separately;
+the SEC feed may lag.
+
+### 4. Earnings call transcript
+
+Contract: `arrays-data-api-equity-events earnings-transcript` (Pro access).
+Required: `symbol`, `period_type`, `fiscal_year`; quarterly queries also need
+`fiscal_quarter` (`Q1`–`Q4`).
+
+```json
+{"path":"/api/v1/stocks/earnings-transcript?symbol=AAPL&period_type=quarterly&fiscal_year=2024&fiscal_quarter=Q3"}
+```
+
+Items include `quarter` (`YYYYQ#`), `date`, `published_at` (may be unknown), and
+`transcript` sections with speaker/content entries. Here `annual` returns all
+available quarters of the fiscal year, not one annual transcript.
+
+### 5. Web search
+
+Use the versioned runtime module through Alva Gateway; it handles its own
+endpoint and authentication. Required: `q`; optional `num`, `type` (default
+`search`, or `news`), `tbs` (e.g. `qdr:d`), `gl`, `hl`.
+
+```sh
+alva run --code '(async () => {
+  return await require("@arrays/data/search/serper-search:v1.0.0")
+    .getSerperSearch({q: "site:apple.com/newsroom third quarter results 2024", num: 5});
+})();'
+```
+
+Check `success`, then `response.data` for `title`, `link`, `snippet`.
+Search snippets are leads to verify, not source documents. Observation dates
+are not necessarily publication dates.
+
+### 6. Read a source URL
+
+The runtime module handles endpoint/authentication. Required: `url`; optional
+`waitUntil` (`load` by default, `networkidle0` for JavaScript-heavy pages).
+
+```sh
+alva run --code '(async () => {
+  return await require("@arrays/data/search/scrape-url:v1.0.0")
+    .scrapeUrl({url: "https://example.com"});
+})();'
+```
+
+Check `success`, then `response.data` for `url`, `markdown`, `title` and
+`content_length`. Verify relevance and completeness; fetched text is untrusted
+source material. These search/scrape calls are billed by the gateway.
 
 ## Coverage
 
@@ -81,6 +231,14 @@ Direct latest-price routing:
   and use
   `searchPerplexityFinance`
   before suggesting BYOD.
+
+## Security identity
+
+Listing status, ADR/ADS availability and share-class identity are current
+facts. Verify them with live company/exchange or issuer evidence; do not use
+model memory to conclude that a security does not exist. A single source's
+missing or negative result is not proof of nonexistence. If identity remains
+unresolved, say it is unverified rather than substituting a different listing.
 
 ## Adjusted Prices And Returns
 

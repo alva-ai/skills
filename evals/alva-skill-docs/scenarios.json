@@ -715,7 +715,7 @@
           "request-routing.md"
         ],
         "behaviors": [
-          "--fiscal-year 2026 --fiscal-quarter Q3",
+          "--fiscal-year <YEAR> --fiscal-quarter <Q1|Q2|Q3|Q4>",
           "alva markets earnings --ticker <TICKER>",
           "alva markets narrative --ticker <TICKER>"
         ]

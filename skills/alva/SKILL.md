@@ -7,7 +7,7 @@ description: >-
   explicit Thesis publication or maintenance, and requested Thesis rewriting.
 metadata:
   author: alva
-  version: v1.25.0
+  version: v1.26.0
 ---
 
 # Alva
@@ -31,10 +31,13 @@ Use the tools exposed by the current runtime. In a managed Sandbox:
   the relevant command help when its syntax or contract is uncertain; use
   top-level `--help` when the needed command family is not listed. Current help
   and documentation own commands, fields, and supported behavior.
+- Batch independent reads or calls with known contracts in one tool invocation;
+  keep dependent steps sequential.
 - Use workspace file tools for local files and `alva fs` for persistent ALFS
   files. Quote `~` paths so the gateway, not the local shell, resolves them.
 - Run cloud JavaScript with `alva run --local-file <path>` or `--code`, following
-  [jagent-runtime.md](references/jagent-runtime.md). Do not assume Node.js,
+  [jagent-runtime.md](references/jagent-runtime.md), unless using a self-contained
+  read-only [common recipe](references/data-skills.md#common-recipes). Do not assume Node.js,
   shell, local files, or environment variables exist inside cloud scripts.
 - When available, channel `SpawnTask` handles heavy background work and
   `CreateAutomation` handles the reviewed built-in setups according to the
@@ -60,6 +63,7 @@ operating requirements; this index is for navigation.
 | `skillhub` | Find and read methodology blueprints |
 | `markets` | Read company narrative and earnings context |
 | `thesis` | Create, read, and maintain published Theses |
+| `for-you` | Read personalized publications or ranked Thesis recommendations |
 | `automation` / `deploy` | Manage Automations / schedule and inspect producer scripts |
 | `schedule` | Schedule future or recurring Agent turns |
 | `alert` / `subscriptions` | Manage FEED alerts / Playbook follows |
@@ -106,8 +110,8 @@ verify facts when they are needed to advance the discussion or judgment.
    Explain stable concepts directly; distinguish sourced facts, calculations,
    and inference. Never substitute remembered values for missing live data.
 2. **Use the current contract.** Read the relevant reference when entering a
-   capability; fetch current endpoint documentation and Skillhub blueprints
-   before first use; reuse applicable documentation already read in this session.
+   capability; use a documented common recipe or fetch current endpoint documentation.
+   Fetch Skillhub blueprints before first use; reuse applicable documentation already read in this session.
    Do not guess fields or unsupported platform behavior.
 3. **Respect intent and ownership.** Act on clear requests without redundant
    confirmation. Ask only about unresolved material choices; follow the
@@ -129,9 +133,11 @@ verify facts when they are needed to advance the discussion or judgment.
    intake interview. Required authorization and trading confirmations still apply.
 8. **Use contextual investment framing.** Follow
    [user-facing-prose.md](references/user-facing-prose.md#investment-disclaimer).
-   Include the disclaimer once when its substantive-content trigger applies;
-   a ticker or price mention alone does not trigger it. Explicit financial or
-   analyst advice requests also require the exact advice-request header.
+   Include the disclaimer once at the end of the final substantive response or
+   artifact when its trigger applies: "This content is for informational purposes only and does not constitute investment advice."
+   A ticker or price mention alone does not trigger it. Explicit financial or
+   analyst advice requests also require the exact advice-request header at the start:
+   "I'll share an analysis, but keep in mind I'm not a licensed analyst or adviser, and this isn't personalized advice for you specifically."
 
 ## Routing
 
@@ -145,11 +151,13 @@ for "NVDA today" or "does the latest earnings report support this thesis?".
 | Price, security identity, or another simple factual lookup | [data-skills.md](references/data-skills.md): fetch the relevant fact with its source and as-of time |
 | Explanation requiring evidence, comparison, valuation, ranking, or complex research | [request-routing.md](references/request-routing.md): Ask evidence, matching Complex Ask Router gates, and useful follow-up only when justified |
 | Discuss or check a quoted Thesis | [Quoted Thesis context](references/thesis.md#quoted-thesis-context): preserve the selected author version; discussion does not authorize publication |
+| Check an existing Thesis, new evidence, or follow an investment viewpoint | [Thesis tracking](references/thesis.md#thesis-tracking): use platform research and Signals; publishing a new viewpoint requires consent |
+| What's worth reading in For You, or discuss a recommended card | [For You](references/request-routing.md#for-you): read the relevant stream, preserve the card's version, and discuss within the retrieved scope |
 | Explicit Thesis publication, guided drafting, update, close, deletion, or polishing | [thesis.md](references/thesis.md): preserve selected original text and author claims, put your assessment in Notes, draft only when needed, rewrite only when requested, resolve assets and directions, and after creation return the GET-backed `<thesis-preview>` |
 | Company analysis, earnings interpretation, move attribution, past-hour tracking, investor focus, or catalysts | Use the smallest sufficient source set; read [ticker-read.md](references/ticker-read.md) before source selection. Start with `alva/company-anomaly-read` for intraday/hourly tracking, not a simple latest-price lookup |
 | GEX, dealer gamma, gamma flip, call/put walls, vanna, or charm | Fetch the current `alva/gex` Skillhub blueprint and follow its methodology rather than hand-computing from raw chains |
 | FinTwit / KOL views, profiles, rankings, or track record | [fintwit.md](references/fintwit.md): structured Platform Data, snapshot date, read-only account and ticker queries |
-| Track, continuously evaluate, refresh, or alert | Read [alva-knowledge.md](references/alva-knowledge.md) when designing or changing automation reasoning, history, or notification logic, then [feed-lifecycle.md](references/feed-lifecycle.md) and [push-notifications.md](references/push-notifications.md). Apply the [Preferred Automation Setup Skills](references/request-routing.md#preferred-automation-setup-skills) when choosing a setup |
+| Track, continuously evaluate, refresh, or alert beyond platform Thesis tracking | Read [alva-knowledge.md](references/alva-knowledge.md) when designing or changing automation reasoning, history, or notification logic, then [feed-lifecycle.md](references/feed-lifecycle.md) and [push-notifications.md](references/push-notifications.md). Apply the [Preferred Automation Setup Skills](references/request-routing.md#preferred-automation-setup-skills) when choosing a setup |
 | Ask this Agent to return later or recur | [agent-schedules.md](references/agent-schedules.md): prefer the current Channel's `PutSchedule` / `ListSchedules` / `ManageSchedule` tools when exposed; the reference covers CLI/Inbox targets and authorization |
 | Create an Agent that keeps its coding Session across runs | [durable-agent.md](references/durable-agent.md): one cwd, one saved `agent.js` using `runAlvaAgent`, launch through `alva run --entry-path` |
 | Dashboard, screener app, hosted report, or other shareable investing app | [playbook-creation.md](references/playbook-creation.md): reuse before a new build, live feeds, design, draft, lint, release, and screenshot |
@@ -181,7 +189,8 @@ for "NVDA today" or "does the latest earnings report support this thesis?".
 Before first using runtime, ALFS, Feed, Automation, Playbook HTML, chart, or
 cron capabilities, read the corresponding section of
 [operational-pitfalls.md](references/operational-pitfalls.md) and reuse it for
-subsequent steps while applicable.
+subsequent steps while applicable. Self-contained read-only common recipes need
+no extra runtime or pitfalls read; transformations, feeds and persistent scripts do.
 
 ## Completion Criteria
 
@@ -191,6 +200,9 @@ or removal, verify that state change; do not run creation or release workflows.
 In replies, link the first high-confidence mention of each covered U.S.-listed
 company to `https://alva.ai/markets/{CANONICAL_TICKER}`, preserving its visible
 wording. Leave uncertain matches plain; do not fetch data solely to add a link.
+Do not insert company-page links into Thesis bodies or candidates, user originals
+or quotations, code, raw XML/payloads, or verbatim tool output. ETFs and other
+non-company assets stay plain. Preserve existing links and legitimate source citations.
 Exceptions are in [Company Page Links](references/user-facing-prose.md#company-page-links).
 
 - **Answer:** Relevant values have sources and timestamps. Facts, calculations,
