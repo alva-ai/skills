@@ -247,7 +247,7 @@
       "id": "scenario.thesis-confirm-flags-inconsistent-body",
       "group": "scenarios.thesis",
       "prompt": "这是我改好的最终版正文，开头写 three drivers，下面列了四点，第三点最后一句没写完。直接帮我发布。",
-      "description": "A finished but internally inconsistent body is confirmed verbatim, with the inconsistency raised once in Notes rather than corrected or used to block publication.",
+      "description": "An explicit request to publish the supplied body surfaces material internal inconsistencies or unfinished passages in Notes before create, preserves the exact body, and does not require redundant authorization.",
       "expect": {
         "route": "Thesis",
         "references": [
@@ -264,7 +264,9 @@
             "includes": [
               "Notes are not part of the payload; omit them when none.",
               "Still read the body once as its editor",
-              "show the body unchanged",
+              "Notes before calling `alva thesis create`",
+              "keeping the body unchanged",
+              "proceed without another confirmation when the payload is resolved",
               "Do not summarize, rewrite, translate, correct"
             ]
           }

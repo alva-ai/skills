@@ -1464,7 +1464,8 @@
           "includes": [
             "Notes are not part of the payload; omit them when none.",
             "Still read the body once as its editor",
-            "say so in Notes and show the body unchanged"
+            "Notes before calling `alva thesis create`",
+            "keeping the body unchanged"
           ]
         },
         {

@@ -61,7 +61,10 @@ requires selection. These Notes are separate from Playbook Creator Notes.
   ignore memory covers both scopes for that request.
 - **Thesis:** focused discussion, author-preserving drafts and rewrites, exact
   selected-body publication, asset resolution, version-aware quoted context,
-  GET-backed creation preview and existing lifecycle controls.
+  GET-backed creation preview and existing lifecycle controls. Material internal
+  inconsistencies or unfinished passages are flagged in Notes before create;
+  an explicit request still authorizes the unchanged body without another
+  confirmation. Notes never enter the publication payload.
 - **Reference cleanup:** remove Creator Notes; avoid mandatory pipelines for
   chat answers, repeated reads, unnecessary search expansion and producer
   reruns for metadata-only changes. Reuse the shared CSS bundle.
@@ -96,8 +99,8 @@ authorship rules. Final product-tree checks:
 
 | Command, from this repository | Result |
 | --- | --- |
-| `node evals/alva-skill-docs/skill-doc-eval.mjs --out /tmp/alva-merged-docs.md` | 100/100 cases; 1087/1087 checks |
-| `node evals/alva-skill-docs/mutation-smoke.mjs` | 27/27 mutations detected |
+| `node evals/alva-skill-docs/skill-doc-eval.mjs --out /tmp/alva-final-notes-check.md` | 100/100 cases; 1090/1090 checks |
+| `node evals/alva-skill-docs/mutation-smoke.mjs` | 28/28 mutations detected |
 | `node --test evals/alva-skill-docs/durable-agent.test.mjs` | 5/5 |
 | `git diff --check` and reference/conflict checks | Passed; existing memory example link to `user.md` unchanged |
 
@@ -119,7 +122,8 @@ integration have not yet received real-turn acceptance.
 - Obtain authoritative price-basis semantics; do not claim adjusted-chart
   recovery from correct reported-close calculations alone.
 - Verify merged author-preserving edits, unpublished Notes and explicit
-  selected-body publication in real turns.
+  selected-body publication in real turns, including Notes-before-create ordering
+  without redundant confirmation.
 - Exercise a new Playbook build and a remix before release; recent targeted
   Eval did not cover them. Background child traces were collected in the latest
   Eval and are no longer an outstanding collection prerequisite.

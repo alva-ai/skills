@@ -103,8 +103,9 @@ body contains no asset mention, leave entity IDs and directions empty.
 Preserve the selected body exactly, including wording, language, whitespace and
 line breaks. Do not summarize, rewrite, translate, correct, expand, generate a
 title, or add assets absent from that body or the user's request.
-Still read the body once as its editor: when it contradicts itself or looks
-unfinished, say so in Notes and show the body unchanged.
+Still read the body once as its editor: briefly flag material internal
+inconsistencies or unfinished passages in Notes before calling
+`alva thesis create`, keeping the body unchanged.
 Notes are not part of the payload; omit them when none.
 
 An explicit request to publish the supplied original, or the user's selection

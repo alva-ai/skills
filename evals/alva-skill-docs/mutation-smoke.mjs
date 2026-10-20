@@ -49,6 +49,15 @@ const MUTATIONS = [
     ],
   },
   {
+    id: "thesis-authorship-notes-before-create",
+    file: "references/thesis.md",
+    remove: " before calling\n`alva thesis create`",
+    expectFailedCases: [
+      "target.thesis-authorship",
+      "scenario.thesis-confirm-flags-inconsistent-body",
+    ],
+  },
+  {
     id: "thesis-authorship-editor-read",
     file: "references/thesis.md",
     remove: "Still read the body once as its editor",
