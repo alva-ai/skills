@@ -41,8 +41,9 @@
 
 ## Shared Styles
 
-> **Include this block in every playbook page.** Then add each widget type's CSS
-> block as needed.
+> The unified `design-system.css` bundle already includes these styles and
+> each widget type. Reuse its classes; add CSS only for custom differences.
+> Keep the blocks below as the bundle generation source and legacy reference.
 
 ```css
 /* ── Widget Card ── */

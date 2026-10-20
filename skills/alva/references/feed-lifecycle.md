@@ -68,8 +68,10 @@ Before `alva automation update`, verify:
 2. The requested flags describe only the fields the user intends to change.
 3. If changing the producer, the replacement cronjob exists, belongs to the
    same user, and its id is known.
-4. The resulting producer's exact script ran successfully via `alva run` in
-   this session and its output still matches the feed contract.
+4. If code, inputs, producer, or output contract changes, the resulting
+   producer's exact script ran successfully via `alva run` after the change
+   and its output still matches the feed contract. Metadata-only changes
+   require checking the saved fields, not rerunning the producer.
 
 If any evidence is missing, inspect or test first; do not fall back to
 delete-and-recreate.

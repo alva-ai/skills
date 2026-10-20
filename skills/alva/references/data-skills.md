@@ -6,7 +6,17 @@ and Twitter/X data tracked by Arrays.
 
 ## Discovery Pipeline
 
-Run the live discovery pipeline in order for every endpoint used in a session:
+Fetch the current endpoint contract before first use; reuse applicable details
+already read in this session. For US equity price or history queries, fetch the
+known endpoint directly, skipping catalog discovery:
+
+```bash
+alva data-skills endpoint arrays-data-api-spot-market-price-and-volume stocks-kline
+```
+
+If that endpoint is unavailable, or the needed endpoint is unknown, discover it
+below. Reuse applicable listings and summaries; refresh after an environment
+change or a contract mismatch:
 
 ```bash
 alva data-skills list
@@ -18,8 +28,8 @@ Rules:
 
 - Skill ids are namespaced `arrays-data-api-*` and are not predictable from
   concept words.
-- `<file>` comes from the `File` column in `summary`, not from the path or your
-  memory.
+- For discovered endpoints, `<file>` comes from the `File` column in `summary`,
+  not from the path or your memory.
 - Fetch endpoint detail before writing code that calls it.
 - If the call fails with an unexpected shape, re-fetch endpoint detail before
   guessing.
@@ -71,6 +81,23 @@ Direct latest-price routing:
   and use
   `searchPerplexityFinance`
   before suggesting BYOD.
+
+## Adjusted Prices And Returns
+
+When adjusted prices or returns are required, verify the source's adjustment
+basis using the endpoint contract and authoritative explanations it references.
+A missing adjusted-close field does not establish that prices are unadjusted.
+If those sources leave the basis unresolved, do not probe guessed documentation
+URLs or use generic web searches to infer it. Before declaring the task unsupported,
+check whether the available price conventions and dividend/split records can
+establish the requested basis.
+Match events by effective date and verify coverage: dividend query dates can
+differ from ex-dividend dates, and splits filter publication time. An empty
+same-window query does not establish that no events occurred. Claim return
+ratios are equivalent only when evidence supports a constant adjustment factor
+across the comparison interval. If the basis or coverage remains unresolved,
+state the limitation and provide a clearly labeled supported result; do not
+apply an assumed adjustment or label ordinary closes as adjusted.
 
 ## Thematic Ticker Curation
 

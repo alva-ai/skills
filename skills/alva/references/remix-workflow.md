@@ -187,7 +187,7 @@ didn't ask for the change, revert the structure and re-apply only the data swap.
 
 ## Step 5 — Deploy as New Playbook
 
-Follow the standard playbook creation flow (see SKILL.md), starting from the
+Follow the standard playbook creation flow (see [playbook-creation.md](playbook-creation.md)), starting from the
 sources you inspected in Steps 2–3. With ALFS-native edit tools, edit those ALFS
 files directly. In shell-only CLI sessions, edit the downloaded local files in
 place with the `Edit` tool. Swap data paths to your own namespace, adjust

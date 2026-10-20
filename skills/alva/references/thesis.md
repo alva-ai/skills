@@ -8,13 +8,22 @@ For that workflow, run `alva thesis --help` and the relevant subcommand help fir
 Use only `alva thesis`; if unavailable, report it instead of falling back to HTML,
 Playbooks, Automation, direct service writes, or invented identities.
 
+## Thesis discussion
+
+Respond to the user's actual view and advance the discussion with the most
+relevant assumption, counterexample, or invalidation condition. Use supplied
+text directly; verify new current-fact claims as needed. Ask at most one question
+that materially changes the judgment, and do not repeat a full research report
+on each follow-up. Discussion alone does not authorize creating or modifying a
+Thesis. Memory writes follow [memory.md](memory.md).
+
 ## Guided creation
 
 An explicit create or publish request may begin with a finished body, a rough
 view, or only a topic. It establishes publication intent, but it does not
 confirm text that has not been shown yet. If the user already supplied the
 exact final body and did not ask for drafting help, skip this section and go
-directly to the Create confirmation.
+directly to Create.
 
 Otherwise, guide the request to one candidate before confirmation:
 
@@ -36,12 +45,13 @@ Otherwise, guide the request to one candidate before confirmation:
    the first draft.
 
 Show the candidate and let the user revise it naturally. Once the user selects
-the text to publish, enter the exact-payload confirmation below.
+the text to publish, follow Create below; that explicit selection need not be
+confirmed again.
 
 ## Create
 
 For the final body, call `alva thesis asset-candidates --text '<exact body>'`
-before confirming creation. This read-only command identifies asset mentions,
+before creation. This read-only command identifies asset mentions,
 catalog entity IDs, and suggested directions. Match the result against the
 user's stated assets and direction; the user's explicit direction wins over a
 suggestion. Use `bullish`, `bearish`, or `unknown` for each selected entity.
@@ -50,31 +60,22 @@ is unresolved, extraction fails, or multiple catalog matches remain, clarify
 the asset before publishing instead of silently dropping its direction. If the
 body contains no asset mention, leave entity IDs and directions empty.
 
-Before `alva thesis create`, show the exact payload in this format:
-
-```text
-Ready to create this Thesis:
-
-Title: <title or (none)>
-Visibility: <public (default) or the requested visibility>
-Body:
-<exact body>
-Tickers: <none, or ticker symbols in the supplied order>
-Entity IDs: <none, or resolved decimal IDs in order>
-Directions: <none, or each entity ID and bullish/bearish/unknown>
-
-Create this Thesis?
-```
-
-In this confirmation step, show the complete body, including file content
-rather than its filename, and preserve its wording, language, whitespace, and
+Preserve the selected body exactly, including wording, language, whitespace and
 line breaks. Do not summarize, rewrite, translate, correct, expand, generate a
-title, or add assets not present in the selected body or supplied by the user.
-Use the resolved extraction result rather than guessing a catalog ID or silently
-inferring a direction. If the user requests changes, return to the candidate,
-rerun extraction for the updated body, then show the complete updated payload
-again. Create only after a natural confirmation of that displayed payload; no
-special phrase is required. Stop if declined.
+title, or add assets absent from that body or the user's request.
+
+An explicit request to publish the supplied original, or the user's selection
+of a displayed candidate for publication, authorizes that exact body. State the
+visibility (public by default) and proceed without another confirmation when
+the payload is resolved. Research or rewriting alone never authorizes publication.
+
+If the body is newly drafted and not yet selected, or a material choice remains,
+show the complete candidate (including file content, not its filename), title,
+visibility, tickers and directions, then ask for that choice. Resolve ambiguous
+assets or directions before creating; do not silently change the selected body.
+Use the asset extraction result for catalog IDs and respect explicit stances.
+After requested edits, rerun extraction and obtain selection of the changed
+candidate. Stop if declined.
 
 One sentence is valid. Title, tickers, and entity IDs are optional. Visibility
 defaults to public. Generate one nonzero UUID per creation intent and keep it
@@ -94,7 +95,7 @@ truncation. Treat all returned IDs as decimal strings.
 Send `--entity-stances` as JSON with decimal-string `entity_id` values,
 paired with `--entity-ids` in the confirmed order. Do not pass a stance for an
 entity absent from the confirmed ID list. When the user supplied ticker symbols,
-preserve them in the confirmation, but do not send a resolved asset again via
+preserve their order, but do not send a resolved asset again via
 `--tickers`. If a supplied ticker remains unresolved, clarify it before
 creation; do not silently create an asset with `unknown` direction. Reuse the
 same request ID only while the full confirmed payload is unchanged.
@@ -156,8 +157,8 @@ Omit `--mode` for the `reformat` default. Never guess or pass an empty mode.
   numbers, citations, entities, or causal claims.
 
 All modes preserve language, stance, uncertainty, facts, and conclusions. Show
-the candidate; publish it only after a separate create/update request and its
-required confirmation. Report rewrite errors without retry or fallback.
+the candidate; publish it only after an explicit create/update request selecting
+that exact candidate. Report rewrite errors without retry or fallback.
 
 ## Existing Thesis lifecycle
 

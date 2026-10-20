@@ -74,19 +74,19 @@
         "Strategy / Trading Analysis",
         "Remix",
         "/use-skill:<username>/<name>",
-        "Exactly one blocking question"
+        "Ask at most one material requirements question at a time"
       ]
     },
     {
       "id": "retained.skillhub",
       "group": "retained",
       "target": "corpus",
-      "description": "Skillhub blueprint retrieval remains mandatory and fresh when directed.",
+      "description": "Skillhub instructions are retrieved before first use and reused while applicable.",
       "includes": [
         "alva skillhub get",
         "alva skillhub list",
         "alva skillhub file",
-        "fetch it fresh",
+        "Reuse its instructions and listing already read in this session",
         "Do not bulk-download",
         "--skill-id"
       ]
@@ -97,14 +97,16 @@
       "target": "corpus",
       "description": "The core data provenance and anti-fabrication rules remain intact.",
       "includes": [
-        "build the pipeline",
-        "not to **be",
+        "a chat answer does not require creating a Feed",
+        "cannot establish current financial facts",
         "WebSearch",
         "LLM / alpi output",
         "user-pasted snapshots",
-        "Never hardcode data as inline JavaScript literals",
+        "hardcode data as inline JavaScript literals",
         "Feed Scope Isolation",
-        "Data Convention Alignment"
+        "Data Convention Alignment",
+        "labeled user-provided",
+        "never present them as independently verified or live data"
       ]
     },
     {
@@ -117,7 +119,9 @@
         "alva data-skills summary",
         "alva data-skills endpoint",
         "Authorization: Bearer <ARRAYS_JWT>",
-        "Do not use `X-API-Key`"
+        "Do not use `X-API-Key`",
+        "Reuse applicable listings",
+        "Refresh after an environment change or a contract mismatch"
       ]
     },
     {
@@ -139,7 +143,7 @@
       "target": "corpus",
       "description": "Jagent runtime constraints and heap override remain discoverable.",
       "includes": [
-        "sandboxed V8 isolate",
+        "JavaScript inside a V8 isolate",
         "no `process`",
         "no timer globals",
         "Top-level `await`",
@@ -304,10 +308,10 @@
       "target": "corpus",
       "description": "Backtesting and signal feeds still require Altra and preserve common guardrails.",
       "includes": [
-        "Always use Altra for backtesting",
+        "**Use Altra for trading.** Backtests",
         "FeedAltra",
         "look-ahead bias",
-        "Stock intraday window guardrail",
+        "Stock intraday data-window limit",
         "signal/targets"
       ]
     },
@@ -336,7 +340,7 @@
       "description": "alpi remains scheduled-pipeline reasoning, not a data source or one-off research wrapper.",
       "includes": [
         "@alva/pi",
-        "fixed LLM reasoning/tool loop",
+        "fixed LLM reasoning or tool loop",
         "Agent.ask()",
         "Do **not** use it for one-off research",
         "not use it to produce numbers"
@@ -365,11 +369,11 @@
       "section_includes": [
         {
           "file": "SKILL.md",
-          "heading": "Action Layer: Alerts",
-          "label": "rich alert summary",
+          "heading": "Routing",
+          "label": "Routing",
           "includes": [
-            "portable actions and card presentation",
-            "[push-notifications.md](references/push-notifications.md)"
+            "[push-notifications.md](references/push-notifications.md)",
+            "Track, continuously evaluate, refresh, or alert"
           ]
         },
         {
@@ -405,10 +409,10 @@
       "target": "corpus",
       "description": "Memory and secret-manager operating rules remain covered.",
       "includes": [
-        "Memory is a *claim*, not truth",
+        "Memory is a claim, not truth",
         "user-visible and editable",
         "Secret Manager",
-        "Do not ask the user to paste sensitive third-party secrets",
+        "Avoid asking the user to paste a sensitive third-party secret into chat",
         "loadPlaintext"
       ]
     },
@@ -465,12 +469,12 @@
       "target": "corpus",
       "description": "Snippet claims must not be merged into new agent-authored consensus, ranking, or recommendation output.",
       "includes": [
-        "Do not merge multiple snippet claims",
+        "Do not turn unverified snippets",
         "agent-authored consensus",
         "ranked list",
         "recommendation",
-        "source-labeled",
-        "synthetic takeaway",
+        "Attribute an unverified source claim explicitly",
+        "Synthesis of verified evidence is allowed",
         "source identity is missing",
         "ambiguous"
       ]
@@ -486,7 +490,7 @@
         "subscription",
         "custom data source URL",
         "callerUserId",
-        "allow_charges=false",
+        "--no-allow-charges",
         "20%",
         "~/library"
       ]
@@ -512,24 +516,22 @@
       "section_includes": [
         {
           "file": "SKILL.md",
-          "heading": "Data Access: Platform Data",
-          "label": "platform data section",
+          "heading": "Routing",
+          "label": "Routing",
           "includes": [
-            "Platform Data is Alva-maintained data and SDK surface",
-            "Fintwit Intelligence / KOL data",
-            "Read [fintwit.md](references/fintwit.md)",
-            "Fintwit Digest SDK",
-            "Read [fintwit-digest-sdk.md](references/fintwit-digest-sdk.md)",
-            "do not copy private runtime internals"
+            "FinTwit / KOL",
+            "[fintwit.md](references/fintwit.md)",
+            "snapshot date",
+            "read-only"
           ]
         },
         {
           "file": "SKILL.md",
-          "heading": "Request Routing",
-          "label": "request routing",
+          "heading": "Capabilities on Demand",
+          "label": "Capabilities on Demand",
           "includes": [
-            "Platform Data: Fintwit Intelligence",
-            "Platform Data: Fintwit Digest SDK"
+            "[fintwit-digest-sdk.md](references/fintwit-digest-sdk.md)",
+            "`@alva/fintwit-digest` contracts"
           ]
         }
       ]
@@ -538,7 +540,7 @@
       "id": "platform-data.ticker-read-sources",
       "group": "platform-data",
       "target": "corpus",
-      "description": "A single-ticker read routes through the five official Skillhub sources as a first-tier Platform Data lane with explicit read, build, freshness, and fallback boundaries.",
+      "description": "Company analysis routes through the five official Skillhub sources as a first-tier Platform Data lane with explicit read, build, freshness, and fallback boundaries.",
       "excludes": [
         "company-anomaly.md",
         "/alva/home/mia/feeds/<ticker-slug>-portfolio-watch-anomaly/v1",
@@ -547,22 +549,13 @@
       "section_includes": [
         {
           "file": "SKILL.md",
-          "heading": "Data Access: Platform Data",
-          "label": "platform data section",
+          "heading": "Routing",
+          "label": "Routing",
           "includes": [
-            "Ticker Read",
-            "Read [ticker-read.md](references/ticker-read.md)",
-            "first-tier sources",
-            "select the smallest sufficient combination"
-          ]
-        },
-        {
-          "file": "SKILL.md",
-          "heading": "Request Routing",
-          "label": "ticker read route",
-          "includes": [
-            "ticker read, analyze a named ticker",
-            "read [ticker-read.md](references/ticker-read.md) before source selection"
+            "Company analysis, earnings interpretation",
+            "Use the smallest sufficient source set",
+            "read [ticker-read.md](references/ticker-read.md) before source selection",
+            "intraday/hourly tracking"
           ]
         },
         {
@@ -619,10 +612,10 @@
       "section_includes": [
         {
           "file": "SKILL.md",
-          "heading": "Request Routing",
+          "heading": "Routing",
           "label": "markets intent and anti-drift route",
           "includes": [
-            "company narrative, earnings, earnings call",
+            "Company analysis, earnings interpretation",
             "Use the smallest sufficient source set",
             "read [ticker-read.md](references/ticker-read.md) before source selection"
           ]
@@ -632,8 +625,8 @@
           "heading": "Routes",
           "label": "named-ticker markets intent",
           "includes": [
-            "company narrative, earnings, or earnings call questions",
-            "first opens [ticker-read.md](ticker-read.md)"
+            "Company analysis, earnings interpretation, move attribution",
+            "use [ticker-read.md](ticker-read.md)"
           ]
         },
         {
@@ -663,12 +656,12 @@
       "description": "A named single-instrument ticker read can suggest Trade Setup automation after the normal answer, and accepting that suggestion routes through the official setup skill.",
       "section_includes": [
         {
-          "file": "SKILL.md",
+          "file": "references/request-routing.md",
           "heading": "Useful Next Step After Ask",
           "label": "post-answer pointer",
           "includes": [
             "Trade Setup follow-up rules",
-            "references/ticker-read.md#trade-setup-follow-up",
+            "ticker-read.md#trade-setup-follow-up",
             "Preferred Automation Setup Skills"
           ]
         },
@@ -771,7 +764,7 @@
           "includes": [
             "Financial Analysis / Ask Question",
             "fresh data/search/`alva run` evidence",
-            "Every answer must read [user-facing-prose.md](user-facing-prose.md)",
+            "For current-fact or evidence-dependent answers, apply the Ask Evidence Gate",
             "ask evidence gate"
           ]
         },
@@ -780,23 +773,22 @@
           "heading": "Guided Planning",
           "label": "answer gate",
           "includes": [
-            "decomposition",
-            "source path",
-            "coverage gaps",
-            "sourced-vs-inference boundary",
+            "Evidence Gate above",
             "Simple asks can satisfy the gate with one hop",
             "Only complex judgment asks also pass the Complex Ask Router"
           ]
         },
         {
-          "file": "SKILL.md",
-          "heading": "Financial Analysis / Ask Question Tree",
-          "label": "top-level route",
+          "file": "references/request-routing.md",
+          "heading": "Ask Evidence Gate",
+          "label": "Ask Evidence Gate",
           "includes": [
-            "It is not merely \"Data Query\"",
-            "data access and execution are steps inside an analysis answer",
-            "Simple latest-fact asks stop there after one sourced hop",
-            "Do not answer until you can name the decomposition"
+            "Simple latest-fact asks can finish after one sourced hop",
+            "Do not present a partial lookup as a completed comparison",
+            "applying the gates relevant to the conclusion being made",
+            "identify its source, timing",
+            "coverage gaps",
+            "whether it is fact, calculation, or inference"
           ]
         }
       ]
@@ -858,7 +850,7 @@
             "for private or paid playbooks",
             "authenticated SDK/PBSV read instead",
             "do not make the feed public solely to pass this gate",
-            "HTML fetches quantitative data from feeds, not inline literals",
+            "Live HTML fetches quantitative data from feeds",
             "Latest data from each referenced feed is fresh",
             "README exists, is current, and is passed via absolute `--readme-url`",
             "New feeds declare push-worthy outputs with",
@@ -980,8 +972,8 @@
       "id": "target.top-level-size",
       "group": "target",
       "target": "skill",
-      "description": "Top-level SKILL.md stays below the current guide ceiling without forcing a minimum size that would block future compression.",
-      "max_lines": 911
+      "description": "Keep the Slim-based entry compact; detailed procedures belong to references.",
+      "max_lines": 220
     },
     {
       "id": "target.playbook-task-offload",
@@ -990,7 +982,7 @@
       "description": "Playbook creation is a concrete task reference rather than the dominant top-level body.",
       "includes": [
         "playbook-creation.md",
-        "Playbook Creation Tree",
+        "Read [playbook-creation.md](playbook-creation.md) for the subroute tree and gates",
         "The playbook tree has subroutes",
         "hosted or shareable playbook surface",
         "ordinary financial-analysis questions should answer directly",
@@ -1008,34 +1000,33 @@
       "section_includes": [
         {
           "file": "SKILL.md",
-          "heading": "Publication Layer: Playbook Creation Tree",
-          "label": "playbook route",
+          "heading": "Core Model",
+          "label": "Core Model",
           "includes": [
-            "Enter this branch only when the user wants a hosted/shareable surface",
-            "Read [playbook-creation.md](references/playbook-creation.md)",
-            "owns the build order, Browser-safe feed reads, README, draft/release gates, screenshot verification, tier/visibility flow, and push-after-release handoff",
-            "feed-first and live-read",
-            "Keep procedure, release, screenshot, and tier details in the owning references",
-            "Do not let every financial question inherit playbook gates"
+            "hosted or shareable dashboard",
+            "Do not expand a one-off question into a Playbook"
           ]
         },
         {
           "file": "SKILL.md",
-          "heading": "Hosted Playbook Workflow",
-          "label": "common workflow",
+          "heading": "Routing",
+          "label": "Routing",
           "includes": [
-            "First choose the artifact shape",
-            "turn the request into a data contract before UI work",
-            "they own the procedure"
+            "Dashboard, screener app, hosted report, or other shareable investing app",
+            "[playbook-creation.md](references/playbook-creation.md)",
+            "live feeds, design, draft, lint, release, and screenshot"
           ]
         },
         {
-          "file": "SKILL.md",
-          "heading": "Final Sanity Checklist",
-          "label": "final checklist",
+          "file": "references/playbook-creation.md",
+          "heading": "Build Order",
+          "label": "Build Order",
           "includes": [
-            "Did playbook work read [playbook-creation.md](references/playbook-creation.md)",
-            "relevant hard gates"
+            "Build feeds through",
+            "HTML that reads feed outputs at runtime",
+            "Write HTML and README to ALFS",
+            "screenshot",
+            "draft/private"
           ]
         }
       ]
@@ -1046,23 +1037,13 @@
       "target": "corpus",
       "description": "Ask-question work is grouped as financial analysis instead of a low-level Data Query route.",
       "includes": [
-        "Shared Data And Execution Layer",
-        "Do not treat data access or `alva run` as playbook-only",
         "A direct answer may still need Alva Cloud execution",
-        "Execution: Jagent Runtime And `alva run`",
+        "Data access and execution are steps inside an analysis answer",
         "Financial Analysis / Ask Question",
-        "Financial Analysis / Ask Question Tree",
-        "It is not merely \"Data Query\"",
-        "data access and execution are steps inside an analysis answer",
-        "an `alva run` computation over live data",
-        "latest fact",
-        "comparison/valuation",
-        "Data Access: Data Sources",
-        "Data Access: Content Search And BYOD",
         "comparison baselines are financial facts",
         "historical average",
         "peer multiple",
-        "Do not let playbook creation become the default",
+        "Do not expand a one-off question into a Playbook",
         "Do not turn every Skillhub task into a playbook"
       ]
     },
@@ -1070,25 +1051,24 @@
       "id": "target.ask-evidence-gate",
       "group": "target",
       "target": "corpus",
-      "description": "Direct financial asks have compact evidence gates instead of a free-form memo contract.",
+      "description": "Evidence gates apply to each claim; supported findings can precede a complete analysis without overstating coverage.",
       "includes": [
-        "ask evidence gate",
-        "Do not answer until",
-        "decomposition",
-        "data/source path for each hop",
-        "fetched vs missing coverage",
-        "sourced facts, computed values, or inference",
-        "Simple latest-fact asks stop there after one sourced hop",
-        "Simple/latest-fact asks stop there",
-        "cap confidence when required evidence",
-        "KPI coverage",
-        "computation is missing"
+        "Ask Evidence Gate",
+        "identify its source, timing, coverage gaps",
+        "fact, calculation, or inference",
+        "Share supported findings while other research continues",
+        "correct earlier findings explicitly",
+        "Do not present a partial lookup as a completed comparison",
+        "missing required evidence limits the conclusion"
+      ],
+      "excludes": [
+        "Do not answer until you can name the decomposition"
       ]
     },
     {
       "id": "target.useful-next-step-actions",
       "group": "target",
-      "target": "skill",
+      "target": "corpus",
       "description": "Useful post-answer suggestions pair explanatory prose with the correct compact action when the tool is available.",
       "includes": [
         "If `PresentActions` is available",
@@ -1109,7 +1089,7 @@
         "Only complex judgment asks also pass the Complex Ask Router",
         "treat complex judgments as high-risk financial analysis",
         "Simple/latest-fact asks stop there",
-        "Complex Ask Router only for complex judgment asks",
+        "Only complex judgment asks also pass the Complex Ask Router",
         "thesis/fundamental",
         "earnings/catalyst",
         "event-study/backtest",
@@ -1147,15 +1127,13 @@
       "section_includes": [
         {
           "file": "SKILL.md",
-          "heading": "First Principles",
+          "heading": "Principles",
           "label": "top-level requirement",
           "includes": [
-            "Contextual investment framing",
-            "once in the final substantive response or artifact",
-            "a ticker or price mention alone",
-            "does not trigger it",
-            "financial advice",
-            "analyst advice",
+            "contextual investment framing",
+            "Include the disclaimer once",
+            "a ticker or price mention alone does not trigger it",
+            "Explicit financial or analyst advice requests",
             "exact advice-request header"
           ]
         },
@@ -1179,7 +1157,7 @@
           "heading": "Routes",
           "label": "Ask and strategy routing",
           "includes": [
-            "apply its Investment Disclaimer only when the output meets that section's trigger",
+            "[Investment Disclaimer](user-facing-prose.md#investment-disclaimer) when its trigger applies",
             "according to that reference"
           ]
         }
@@ -1189,31 +1167,33 @@
       "id": "target.financial-analysis-prose-gate",
       "group": "target",
       "target": "corpus",
-      "description": "Financial Analysis answers must read the merged user-facing prose reference before answering.",
+      "description": "Evidence-dependent claims apply the shared prose and evidence rules, including intermediate findings.",
       "includes": [
-        "Financial-analysis answer gate",
-        "before answering any Financial Analysis / Ask Question",
-        "read [user-facing-prose.md](references/user-facing-prose.md)",
-        "then satisfy the ask evidence gate",
-        "Every answer must read [user-facing-prose.md](user-facing-prose.md)",
+        "[Investment Disclaimer](user-facing-prose.md#investment-disclaimer) when its trigger applies",
+        "For current-fact or evidence-dependent answers, apply the Ask Evidence Gate",
         "user-facing prose reference read",
-        "Product vocabulary, voice rules, and alpi prose prompt block",
-        "Chat answers for Financial Analysis / Ask Question"
+        "Product language, conditional disclaimer, company links, and final replies",
+        "Chat answers for Financial Analysis / Ask Question",
+        "For each current-fact or evidence-dependent claim",
+        "Share supported findings while other research continues"
       ]
     },
     {
       "id": "target.pitfalls-stepwise-required",
       "group": "target",
       "target": "corpus",
-      "description": "Operational pitfalls are a mandatory stepwise gate, not an optional debugging appendix.",
+      "description": "Operational constraints apply before first use and remain reusable within the session.",
       "includes": [
-        "step by step",
-        "before each step",
-        "mandatory",
-        "runtime, feed, ALFS, playbook HTML, deploy, release, chart, or cron work",
+        "Before first using runtime, ALFS, Feed, Automation, Playbook HTML, chart, or cron capabilities",
+        "read the corresponding section",
         "Write or run jagent code",
         "Touch ALFS paths",
-        "Build or edit playbook HTML/charts"
+        "Build or edit playbook HTML/charts",
+        "Reuse sections already read in this session",
+        "Do not save these constraints for debugging"
+      ],
+      "excludes": [
+        "Before each execution step, read the matching section"
       ]
     },
     {
@@ -1245,7 +1225,9 @@
             "target numeric ID belongs to the intended owned automation",
             "replacement cronjob exists",
             "resulting producer's exact script ran successfully via `alva run`",
-            "do not fall back to delete-and-recreate"
+            "do not fall back to delete-and-recreate",
+            "If code, inputs, producer, or output contract changes",
+            "Metadata-only changes require checking the saved fields, not rerunning the producer"
           ]
         }
       ]
@@ -1269,7 +1251,8 @@
           "file": "SKILL.md",
           "label": "deploy command index",
           "includes": [
-            "Cronjob lifecycle for producer scripts: schedule, args, trigger, run-status, runs, logs."
+            "[deployment.md](references/deployment.md)",
+            "optional manual trigger"
           ]
         },
         {
@@ -1284,7 +1267,7 @@
     {
       "id": "communication.company-page-links",
       "group": "communication",
-      "target": "skill",
+      "target": "corpus",
       "description": "User-facing replies link high-confidence U.S.-listed company mentions to production Alva company pages without extra lookups or ambiguous company matches.",
       "excludes": [
         "https://alva.ai/company/",
@@ -1294,7 +1277,7 @@
       ],
       "section_includes": [
         {
-          "file": "SKILL.md",
+          "file": "references/user-facing-prose.md",
           "heading": "Company Page Links",
           "label": "company page link contract",
           "includes": [
@@ -1326,13 +1309,13 @@
       "description": "Post-deployment and multi-step updates report only new outcome evidence and unresolved issues instead of replaying the work.",
       "section_includes": [
         {
-          "file": "SKILL.md",
-          "heading": "User-Facing Communication",
+          "file": "references/user-facing-prose.md",
+          "heading": "Company Page Links",
           "label": "concise completion update",
           "includes": [
             "After a deployment or other multi-step build",
-            "keep the final update delta-only",
-            "do not recap earlier details"
+            "give a concise, self-contained result",
+            "without retelling the whole process"
           ]
         }
       ]
@@ -1357,7 +1340,7 @@
         "implementation internals",
         "Skillhub to users as a catalog of methodologies",
         "callerUserId",
-        "allow_charges=false",
+        "--no-allow-charges",
         "no-charge",
         "Browser request rule",
         "AlvaToolkit.AlvaClient",
@@ -1372,7 +1355,7 @@
       "id": "target.thesis-create-preview-card",
       "group": "target",
       "target": "corpus",
-      "description": "Thesis creation guides rough publication intent to one evidence-bounded candidate, lightly confirms the displayed final content, then uses the complete thesis GET response for one deterministic XML preview-card contract.",
+      "description": "Preserve exact selected Thesis text, require selection for new drafts, resolve assets, and emit a GET-backed preview without a redundant publication confirmation.",
       "file_includes": [
         {
           "file": "references/thesis.md",
@@ -1388,20 +1371,10 @@
             "open-ended create request permits drafting a candidate",
             "it does not permit publication",
             "Do not call `thesis rewrite` merely to make the first draft",
-            "Ready to create this Thesis:",
-            "Title: <title or (none)>",
-            "Visibility: <public (default)",
-            "Tickers: <none",
             "alva thesis asset-candidates --text",
-            "Entity IDs: <none",
-            "Directions: <none",
             "--entity-stances",
             "the user's explicit direction wins",
-            "including file content rather than its filename",
             "Do not summarize",
-            "rather than guessing a catalog ID",
-            "natural confirmation of that displayed payload",
-            "no special phrase is required",
             "After creation, `thesis get` is the sole source for the preview",
             "author_version_id",
             "response.author",
@@ -1426,16 +1399,23 @@
             "do not emit partial XML",
             "completion card, not another confirmation gate",
             "set-visibility --id <id> --visibility public",
-            "without publishing a new author version"
+            "without publishing a new author version",
+            "authorizes that exact body",
+            "without another confirmation when the payload is resolved",
+            "Research or rewriting alone never authorizes publication",
+            "show the complete candidate (including file content, not its filename), title, visibility, tickers and directions",
+            "Use the asset extraction result for catalog IDs",
+            "obtain selection of the changed candidate",
+            "Stop if declined"
           ]
         },
         {
           "file": "SKILL.md",
           "includes": [
-            "confirming the exact create payload",
+            "preserve selected original text",
             "<thesis-preview>",
-            "Rewrite only when requested",
-            "For Thesis work, follow"
+            "rewrite only when requested",
+            "[thesis.md](references/thesis.md)"
           ]
         }
       ]
@@ -1446,7 +1426,8 @@
       "target": "skill",
       "description": "Interactive orders keep the per-order confirmation rule: the exemption does not weaken it.",
       "includes": [
-        "explicit user confirmation before non-dry-run execution"
+        "Interactive live orders require a dry run and explicit per-order confirmation",
+        "never apply it to chat"
       ]
     },
     {
@@ -1500,8 +1481,7 @@
           "file": "SKILL.md",
           "includes": [
             "@alva/price-chart-sdk",
-            "[price-chart-sdk.md](references/price-chart-sdk.md)",
-            "Do not add charts by default or apply this route to one-off chat or Playbook charts"
+            "[price-chart-sdk.md](references/price-chart-sdk.md)"
           ]
         },
         {
@@ -1521,7 +1501,8 @@
             "previewUrl?: string",
             "publishedUrl: string",
             "already includes `interactive=1`",
-            "Do not call `@alva/automation-chart` directly"
+            "Do not call `@alva/automation-chart` directly",
+            "Do not add charts by default or apply this route to one-off chat or Playbook charts"
           ]
         }
       ]
@@ -1529,19 +1510,24 @@
     {
       "id": "target.auto-trade-consent-exemption",
       "group": "target",
-      "target": "skill",
+      "target": "corpus",
       "description": "A consent-referenced, record-verified Agent Schedule occurrence or legacy Channel Loop tick is exempt from per-order confirmation while staying dry-run/intent-id/risk bound.",
-      "includes": [
-        "auto-trade-consent:",
-        "~/memory/auto-trade-consent.md",
-        "one-read verification",
-        "place live orders without per-order user confirmation",
-        "missing or unreadable record",
-        "applies only to Agent Schedule occurrences",
-        "verified legacy Channel Loop ticks",
-        "verification checks only that the consent record exists",
-        "timestamp is provenance, not a match key",
-        "is not a mismatch"
+      "file_includes": [
+        {
+          "file": "references/agent-schedules.md",
+          "includes": [
+            "auto-trade-consent:",
+            "~/memory/auto-trade-consent.md",
+            "one-read verification",
+            "place live orders without per-order user confirmation",
+            "missing or unreadable record",
+            "applies only to Agent Schedule occurrences",
+            "verified legacy Channel Loop ticks",
+            "verification checks only that the consent record exists",
+            "timestamp is provenance, not a match key",
+            "is not a mismatch"
+          ]
+        }
       ]
     },
     {
@@ -1578,25 +1564,27 @@
       "group": "target",
       "target": "corpus",
       "description": "Session schedules self-target in embedded tools, explicitly target in CLI, and preserve failure/recovery boundaries.",
-      "file_includes": [{
-        "file": "references/agent-schedules.md",
-        "includes": [
-          "Existing Session Inbox",
-          "its own Inbox automatically",
-          "Without an Inbox, embedded schedule commands fail instead of falling back to a Channel",
-          "alva schedule put --inbox-path",
-          "alva schedule list --inbox-path",
-          "alva schedule pause --inbox-path",
-          "alva schedule resume --inbox-path",
-          "alva schedule delete --inbox-path",
-          "`--inbox-path` and `--channel-id` are mutually exclusive",
-          "same Session ID, cwd, and transcript",
-          "Agent execution failure ends this AutoRun without retry",
-          "may replay on ordinary Inbox recovery",
-          "already-acked occurrence does not call the model again",
-          "do not retract"
-        ]
-      }]
+      "file_includes": [
+        {
+          "file": "references/agent-schedules.md",
+          "includes": [
+            "Existing Session Inbox",
+            "its own Inbox automatically",
+            "Without an Inbox, embedded schedule commands fail instead of falling back to a Channel",
+            "alva schedule put --inbox-path",
+            "alva schedule list --inbox-path",
+            "alva schedule pause --inbox-path",
+            "alva schedule resume --inbox-path",
+            "alva schedule delete --inbox-path",
+            "`--inbox-path` and `--channel-id` are mutually exclusive",
+            "same Session ID, cwd, and transcript",
+            "Agent execution failure ends this AutoRun without retry",
+            "may replay on ordinary Inbox recovery",
+            "already-acked occurrence does not call the model again",
+            "do not retract"
+          ]
+        }
+      ]
     },
     {
       "id": "target.legacy-loop-compatibility",
@@ -1641,6 +1629,108 @@
             "[ALFS-native agent tool mode](preflight.md#alfs-native-agent-tool-mode)",
             "await alfs.writeFile(out, JSON.stringify(data));",
             "return { path: out, income: data.income.length };"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "target.chat-chart-publish-contract",
+      "group": "target",
+      "target": "corpus",
+      "description": "One-off chart rendering retains preview, repair, finalization and parent resize contracts in its on-demand owner.",
+      "section_includes": [
+        {
+          "file": "references/design.md",
+          "heading": "One-Off Chat Chart Artifacts",
+          "label": "One-Off Chat Chart Artifacts",
+          "includes": [
+            "Prefer TradingView Lightweight Charts",
+            "price series over time",
+            "annotates price levels",
+            "such as support, resistance, entry, target, or stop",
+            "Use ECharts for non-price",
+            "lightweight-charts.md",
+            "Inline the one-off resolved data directly in the HTML",
+            "local `.html` file in the session workspace",
+            "data-alva-chart-artifact=\"1\"",
+            "`finalize=false` (the default)",
+            "runtime errors and the attached preview image",
+            "repeat the `finalize=false` review",
+            "make at most three repair attempts",
+            "Missing errors or a missing preview must not block delivery",
+            "do not call with `finalize=true` and do not embed a chart",
+            "Only the finalized call returns the chart marker",
+            "recurring data source just to draw",
+            "Content Legitimacy constrains data sourcing, not artifact type",
+            "alva:chart-resize",
+            "chart.on('finished', reportAlvaChartHeight)",
+            "Do not call `UploadFile` again"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "target.slim-integration-route-boundaries",
+      "group": "target",
+      "target": "corpus",
+      "description": "Compact routing retains operational scope, current-channel targeting, and the distinction between explanation and evidence-dependent judgment.",
+      "section_includes": [
+        {
+          "file": "SKILL.md",
+          "heading": "Routing",
+          "includes": [
+            "explain P/E or restate a supplied Thesis directly",
+            "after creation return the GET-backed",
+            "existing-resource-management"
+          ]
+        },
+        {
+          "file": "SKILL.md",
+          "heading": "Completion Criteria",
+          "includes": [
+            "do not emit a creation preview",
+            "Saving a schedule does not prove a future run occurred"
+          ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "heading": "Routes",
+          "includes": [
+            "For current-fact or evidence-dependent answers, apply the Ask Evidence Gate",
+            "Stable explanations and discussion of supplied text need no evidence fetch"
+          ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "heading": "Complex Ask Router",
+          "includes": [
+            "not merely because they mention a domain term"
+          ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "heading": "Existing Resource Management",
+          "includes": [
+            "resolve the exact resource",
+            "muting delivery does not pause computation",
+            "does not require building, publishing, test-running"
+          ]
+        },
+        {
+          "file": "references/agent-schedules.md",
+          "heading": "Agent Schedules",
+          "includes": [
+            "do not replace them with the default-target CLI",
+            "may differ from the topic Channel"
+          ]
+        },
+        {
+          "file": "references/playbook-creation.md",
+          "heading": "Build Verification",
+          "includes": [
+            "never use `alva fs grant` to change feed visibility",
+            "preserve private access",
+            "explicit draft/private stopping point"
           ]
         }
       ]

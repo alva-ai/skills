@@ -1,12 +1,14 @@
 # Preflight
 
-Run this before the first Alva action in a session, and again after context
-loss or profile changes.
+For standalone use, run this before the first Alva action in a session, and
+again after context loss or profile changes. In a managed runtime, follow its
+startup rules and reuse supplied context instead of repeating setup. Identity
+and memory blocks are independent; missing one does not invalidate the others.
 
 ## Rule 0
 
-`alva <command> --help` is the source of truth. Every time you are about to call
-an `alva` CLI command you have not used in this session, run its help first.
+`alva <command> --help` is the source of truth. Read the relevant help before
+first use of a command family, or whenever the command contract is uncertain.
 The help text is authoritative for subcommands, flags, response fields, naming,
 and runnable examples. The `references/api/*.md` files record gotchas the help
 text misses; if this skill and help disagree, trust help and note the doc drift.
@@ -62,7 +64,8 @@ Third-party vendor secrets belong in Alva Secret Manager
 
 ## Auth And User Scope
 
-Run:
+Use `<session-prefill-whoami>` when the runtime supplies it. If required fields
+are missing or the task needs fresh identity, permissions, or delivery state, run:
 
 ```bash
 alva whoami
@@ -102,22 +105,25 @@ Arrays endpoints using `Authorization: Bearer <ARRAYS_JWT>`. Do not use
 
 ## Memory
 
-If you have not read the user's Alva memory index in this conversation, read it:
+Files supplied in `<session-prefill-memory>` are already read. If the global
+index is neither supplied nor already read, and the session permits global
+memory, read it:
 
 ```bash
 alva fs read --path '~/memory/MEMORY.md'
 ```
 
 If `~/memory/` is absent or empty, skip the global scope. `MEMORY.md` and
-`user.md` are default context when present; read `user.md` and topic files only
-when they exist or are named by the index/relevant to the task. Pack files are
+`user.md` are default context when present; reuse supplied files and read
+remaining relevant files when they exist or are named by the index. Pack files are
 read on demand. Read [memory.md](memory.md) before writing memory.
 
 **Channel sessions:** if the prefill includes a
 `<session-prefill-channel-memory root="...">` block, the channel has its own
-memory alongside `~/memory/`. Read that root's `MEMORY.md` when present too,
-even when `~/memory/` is empty — the index is separate. Channel roots do not
-have their own `user.md`. Write channel-specific facts there; keep user-global
+memory alongside `~/memory/`. Use the supplied index as already read; read that
+root's `MEMORY.md` unless supplied or explicitly reported empty, even when
+`~/memory/` is empty — the index is separate. Channel roots do not have their
+own `user.md`. Write channel-specific facts there; keep user-global
 facts in `~/memory/user.md`. Do not load full `journal/` history at startup; use
 the bounded Carry Forward prelude when supplied or read a relevant day on demand.
 For feature- or skill-specific facts, first resolve the scope root: use

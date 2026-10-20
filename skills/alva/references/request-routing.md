@@ -1,46 +1,117 @@
 # Request Routing
 
-Use this file when choosing the path for an Alva task. The goal is to select the
-smallest useful route, ask at most one blocking question, and then answer or
-build with evidence. Do not let playbook creation become the default: only enter
-that tree when the user wants a hosted/shareable surface, remix, release, or
-playbook edit.
-
-Decision order:
+Choose the capability in [SKILL.md](../SKILL.md#routing). This reference covers
+its evidence requirements and execution details. Ask at most one blocking
+question, then answer or build within the requested scope.
 
 For a question about an existing Thesis, including a
 `<reply_to context-type="thesis" thesis-id="…" author-version-id="…">` quote,
-first read [Quoted Thesis context](thesis.md#quoted-thesis-context). Resolve the selected version
-and its evidence before supplementing with broader market research. This does
+first read [Quoted Thesis context](thesis.md#quoted-thesis-context). When the question needs retrieval, resolve the selected version
+and its evidence before supplementing with broader market research. Paraphrasing
+the supplied quote alone needs no fetch. This does
 not enter the Thesis publication route; explicit changes still follow that route.
-
-0. Route every financial task through shared data and execution first: Data
-   Skills, search, BYOD, `alva run` / jagent, and provenance checks are common
-   to answers and artifacts.
-1. If the user wants an explanation, comparison, valuation, rank, or current
-   market fact in chat, route to Financial Analysis / Ask Question.
-2. If the user explicitly wants to shape a viewpoint for publication, create or
-   publish a Thesis, or maintain an existing Thesis, route to Thesis. Discussion
-   or research without publication intent remains Financial Analysis.
-3. If the user wants persistence, cadence, alerting, trading signals, or a
-   reusable dataset, route to the durable artifact that fits: Agent Schedule
-   for a future Agent turn, Automation for a feed/script pipeline, not
-   automatically to a playbook.
-4. If the user wants a hosted app, share URL, remix, annotation edit, release,
-   or playbook version update, enter the Playbook Creation tree.
 
 ## Routes
 
 | Request type | Objective |
 | --- | --- |
-| Financial Analysis / Ask Question | Answer market, asset, portfolio, valuation, comparison, single-ticker, and "why" questions with fresh data/search/`alva run` evidence. A named-ticker question — including company narrative, earnings, or earnings call questions — first opens [ticker-read.md](ticker-read.md). Comparison baselines are figures too: fetch or qualify them. Every answer must read [user-facing-prose.md](user-facing-prose.md), apply its Investment Disclaimer only when the output meets that section's trigger, then pass the ask evidence gate. |
+| Financial Analysis / Ask Question | Answer market, asset, portfolio, valuation, comparison, single-ticker, and "why" questions with fresh data/search/`alva run` evidence. Company analysis, earnings interpretation, move attribution, investor focus, and catalyst analysis use [ticker-read.md](ticker-read.md); a standalone price or security-identity lookup uses [data-skills.md](data-skills.md). Comparison baselines are figures too: fetch or qualify them. For current-fact or evidence-dependent answers, apply the Ask Evidence Gate and the [Investment Disclaimer](user-facing-prose.md#investment-disclaimer) when its trigger applies. Stable explanations and discussion of supplied text need no evidence fetch unless adding current market or account claims. |
 | Thesis | Guide an explicit publication request from rough intent or a finished body to one exact, user-confirmed Thesis payload. Read [thesis.md](thesis.md); research-dependent drafting first uses the Financial Analysis evidence route, while discussion without publication intent stays an answer. |
 | Playbook Creation | Build, remix, edit, release, or update a hosted/shareable playbook. Read [playbook-creation.md](playbook-creation.md) for the subroute tree and gates. |
 | Strategy / Trading Analysis | Use Altra for backtests, signals, portfolio simulation, rebalancing, or trading analysis; deliver an answer, feed, signal, or playbook as requested. Apply the [Investment Disclaimer](user-facing-prose.md#investment-disclaimer) according to that reference. |
-| Agent Schedule | Create or resume a named future Channel Agent turn. Read [agent-schedules.md](agent-schedules.md); use `schedule` for Agent instructions and `deploy` for scripts. |
+| Agent Schedule | Create or resume a named future Channel Agent turn. Read [agent-schedules.md](agent-schedules.md); prefer the current Channel schedule tools when exposed; otherwise use `schedule` for Agent instructions and `deploy` for scripts. |
 | Automation / Push | Read [alva-knowledge.md](alva-knowledge.md) before design, build or modify a feed that declares actionable outputs with `alertOutput(typeDoc)`, then verify publisher, subscription, and delivery paths. |
 | Debug / Edit | Inspect existing code, logs, playbook source, feed output, or annotations, then change the generator rather than rendered values. |
 | Capability Verification | Verify Data Skills, Skillhub, runtime, trading, or search coverage before saying Alva lacks a capability. |
+
+## Existing Resource Management
+
+Read current state and resolve the exact resource before changing it. If several
+resources match and context cannot distinguish them, ask which one. Follow the
+current command help; do not recreate a resource to change one setting.
+
+| User wants to change | Read and use |
+| --- | --- |
+| Automation code or metadata | [feed-lifecycle.md](feed-lifecycle.md#updating-an-existing-automation): `automation list/inspect/update` |
+| Automation cadence or producer run state | [deployment.md](deployment.md): inspect its producer, then update/pause/resume that cronjob |
+| Notifications or Playbook follows | [push-notifications.md](push-notifications.md#inventory-and-unsubscribe): these are independent; muting delivery does not pause computation |
+| Playbook content, release, or visibility | [playbook-creation.md](playbook-creation.md) and [api/release.md](api/release.md); inspect the existing Playbook and retain unchanged feeds/metadata |
+| A future Agent turn | [agent-schedules.md](agent-schedules.md): current Channel tools or the explicitly selected CLI/Inbox target |
+
+Verify the resulting requested state. A read or pause request does not require
+building, publishing, test-running a producer, or changing its data source.
+
+## Financial Evidence
+
+Read [content-legitimacy.md](content-legitimacy.md) before surfacing
+financial values. Comparison baselines are financial facts. A
+historical average, peer multiple, macro yardstick, or benchmark return that
+supports a judgment must be fetched or clearly labeled as unsourced. Do not put
+sourced current data next to memory-derived baselines.
+
+A direct answer may still need Alva Cloud execution for live fetches, joins,
+calculations, and comparisons. Data access and execution are steps inside an
+analysis answer; they do not require a Playbook.
+
+## Ask Evidence Gate
+
+For each current-fact or evidence-dependent claim, identify its source, timing,
+coverage gaps, and whether it is fact, calculation, or inference. Simple latest-fact
+asks can finish after one sourced hop. Use the Complex Ask Router for judgments
+that need it, applying the gates relevant to the conclusion being made.
+
+Prefer a complete final answer. Share supported findings while other research
+continues only when useful; state what remains
+unverified and correct earlier findings explicitly if later evidence changes
+them. Do not present a partial lookup as a completed comparison, valuation,
+ranking, or causal explanation. Stop when the user's question is adequately
+answered; missing required evidence limits the conclusion. The final answer
+should bring together the result and material limitations without requiring
+the user to reconstruct them from interim messages. Omit process recaps and
+repeated explanations that do not help the user understand the result.
+
+## Useful Next Step After Ask
+
+After fully answering a one-off Ask, choose one outcome:
+
+- **Automation** when changing inputs can be reevaluated by the same method and
+  cadence, a trigger, or notification creates ongoing value. Push ideas also
+  need a meaningful-change and quiet-run boundary.
+- **One-off follow-up** when one concrete question would materially deepen, test,
+  compare, apply, or naturally extend the answer. It need not lead to Automation.
+- **No suggestion** when neither option is specific, relevant, and clearly
+  useful. If uncertain, choose this and end the answer without a footer.
+
+Actively look for Automation, but hold both options to the same quality bar. If
+both pass, prefer Automation when recurring value justifies the setup; choose
+one-off only when it is clearly more useful now. Never recommend Automation
+merely because work is schedulable.
+
+Do not repeat an unaccepted suggestion unless the user revisits it or new
+information makes it materially more useful.
+
+When suggesting, use one short, low-pressure sentence in the user's language to
+explain the outcome. If `PresentActions` is available, follow it with one matching action:
+`send_prompt` when the Agent should continue, change state, or verify here; `open_url`
+when the user should go directly to an HTTPS product surface. Use a short imperative
+label (normally verb + object); for `send_prompt`, use a self-contained, context-grounded
+prompt. The sentence explains value while the button condenses the action. Required questions use `AskUserQuestion`.
+For named single-instrument ticker reads, apply the Trade Setup follow-up rules in [ticker-read.md](ticker-read.md#trade-setup-follow-up).
+If Automation clears this bar or is already requested, apply [Preferred Automation Setup Skills](request-routing.md#preferred-automation-setup-skills) before suggesting or building it.
+
+## Capability Help
+
+When the user asks who Alva is, what Alva can do, how to use Alva, or asks for
+starter prompts, answer from the capabilities in SKILL.md rather than implementation
+internals. Use user-facing groups such as Ask market questions, Set alerts,
+Build/remix Playbooks, Discover/manage Playbooks, and Connect accounts.
+
+Offer 3 concrete starter prompts when helpful. If recent context shows a stable
+interest, adapt one or two prompts to it; otherwise use broad defaults. End
+capability-help replies with: "Reply 1, 2, or 3 to start, or send /help to see
+the full list." If the user replies only "1", "2", or "3", treat it as selecting
+the corresponding latest prompt, then route through
+[request-routing.md](request-routing.md).
 
 ## Official Ticker Read Sources
 
@@ -78,7 +149,7 @@ assets broadly favors Portfolio Watch; one instrument tied to the user's own
 trade idea favors Trade Setup. If more than one seems plausible, follow the
 user's primary goal and never present them as competing CTAs.
 
-When one clearly fits, fetch its exact id and blueprint fresh, then follow the
+When one clearly fits, resolve its exact id and blueprint, then follow the
 Skillhub Blueprint rules below. If it does not fit or is unavailable, search the
 current catalog for one clear match; if none exists, build without a skill.
 Never claim an unavailable or ambiguous skill was used.
@@ -110,7 +181,9 @@ listing details internal unless the user is debugging blueprint retrieval.
    an id. Look leniently for semantic, case-insensitive, or
    separator-insensitive matches. Proceed only when exactly one match is
    obvious; otherwise ask the user to choose.
-4. Read the blueprint fresh with `alva skillhub file <username>/<name> <file>`.
+4. Read the blueprint with `alva skillhub file <username>/<name> <file>`.
+   Reuse its instructions and listing already read in this session when still
+   applicable; refresh on an environment change or contract mismatch.
    Use the blueprint file from the listing, conventionally `template.md`.
 5. Pull supporting files only on demand. Do not bulk-download.
 6. Treat the blueprint as authoritative for layout, fields, sections, cadence,
@@ -130,33 +203,39 @@ for one.
 
 ## Guided Planning
 
-For Financial Analysis / Ask Question, usually answer directly after fetching
-or computing evidence, but first read
-[user-facing-prose.md](user-facing-prose.md), then apply the answer gate from
-`SKILL.md`: decomposition, source path, coverage gaps, and
-sourced-vs-inference boundary. Simple asks can satisfy the gate with one hop.
+Stable concepts and paraphrasing supplied text bypass the evidence workflow.
+For current-fact or evidence-dependent Financial Analysis / Ask Question,
+answer directly after fetching or computing evidence and applying the Ask
+Evidence Gate above. Simple asks can satisfy the gate with one hop.
 Simple/latest-fact asks stop there. Only complex judgment asks also pass the
-Complex Ask Router below before the answer is written.
+Complex Ask Router below for the judgments being made; supported findings may
+be shared before the full analysis is complete.
 
 ### Complex Ask Router
 
-For asks involving thesis, valuation, ranking, backtest, portfolio, macro,
-news/social, or other complex judgment, classify the ask into one or more
-problem types and apply every matching gate. This is the quality boundary:
+Apply this router when the user asks for an evidence-dependent judgment, not
+merely because they mention a domain term. "What is a thesis?" needs an
+explanation; "does this thesis still hold after earnings?" needs evidence.
+Forming an idea or reasoning through a hypothetical stays a discussion; verify
+any factual claims it needs without treating the whole idea as a research task.
+Classify evidence-dependent judgments by the conclusion requested and apply
+only the relevant gates below. A
+follow-up about one assumption needs evidence for that assumption, not a fresh
+full report. This is the quality boundary:
 treat complex judgments as high-risk financial analysis rather than ordinary
 Q&A.
 
 | Problem type | Trigger | Minimum gate |
 | --- | --- | --- |
 | Ticker read | analyze a ticker or named company, past hour, why did it move, investor focus, recent catalysts | read `ticker-read.md`; resolve ticker and horizon; apply its source router; state freshness, coverage/gaps, and fact/computation/model-analysis boundaries; add live Data Skills facts |
-| Thesis/fundamental | thesis, moat, quality, fundamental | thesis driver, key KPI, metric source, peer/baseline, missing KPI impact |
+| Thesis/fundamental | assess whether evidence supports or challenges an investment thesis, moat, or business quality | thesis driver, key KPI, metric source, peer/baseline, missing KPI impact |
 | Earnings/catalyst | earnings, guide, catalyst, revision | event date, source, expected vs actual/consensus, forward catalyst, stale-data caveat |
 | Event-study/backtest | backtest, after/before, event window, forward returns, sample, bias-controlled | event definition, data source, sample count, date range, non-overlap rule, look-ahead control, benchmark, horizons, formula, friction/assumptions; missing sample count or event definition means incomplete and no strong trading conclusion |
 | Screener/ranking | screen, rank, top names, compare list | universe, filters, metric source, ranking formula, benchmark/sector ETF, missing-field handling; state actual fields screened vs proxies |
 | Macro/cross-asset | rates, dollar, gold, yields, Fed, cross-asset | synchronized as-of time, price move vs macro driver vs policy expectation vs positioning/narrative; recent occurrences or sample insufficient; Fed implied-probability source/proxy |
 | News/social sentiment | news, KOL, X, Reddit, sentiment | evidence table with source, timestamp, authority/relevance, stance, duplicate status, fact/opinion/inference |
 | Portfolio/scenario | portfolio, stress, shock, hedge, scenario | shocks, weights/exposure assumption, beta/correlation/proxy method, drawdown table, hedge candidates, confidence; otherwise qualitative scenario only |
-| Valuation/accounting | valuation, multiple, FCF, EPS, accounting | bridge current multiple/FCF/EPS, key operating KPI, scenario assumption, multiple/earnings sensitivity |
+| Valuation/accounting | estimate or assess a company's valuation, earnings, or cash flow using financial inputs | bridge current multiple/FCF/EPS, key operating KPI, scenario assumption, multiple/earnings sensitivity |
 
 Domain KPI checklist is not a schema. For domain-specific asks, list
 attempted/found/missing/impact for candidate KPIs. Examples: bank NIM,
@@ -173,20 +252,22 @@ requires confidence downgrade or a hard cap.
 For build routes, and for a Thesis request that does not yet contain the final
 body, present a plan once before building or drafting.
 
-Exactly one blocking question per session:
+Ask at most one material requirements question at a time; required authorization
+and trading confirmations still apply:
 
 1. If key parameters are missing and have no obvious default, ask one
    clarifying question. Prefer concrete choices.
 2. If real strategic alternatives exist, offer 2-3 approaches and lead with
    your recommendation.
 3. If the request is clear, or a `/use-skill:` directive pins the shape, give a
-   5-8 line plan naming the intended artifact. For analysis, name sources and
-   comparison baselines. For playbooks, name feeds, widgets, release path, and
+   brief plan naming the intended artifact, proportional to the task. For
+   analysis, name sources and comparison baselines. For playbooks, name feeds, widgets, release path, and
    defaults. For a Thesis, name the core claim, scope/tickers, horizon, evidence
    path, main risks or invalidation, and default visibility.
 
-If the user says "just do it", skip further clarifying questions for the rest
-of the session and proceed after the short plan.
+If the user says "just do it", proceed after the short plan with reasonable
+defaults. Ask again only if a new unresolved material choice or required
+authorization prevents completing the requested result.
 
 ## Capability Verification
 

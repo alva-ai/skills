@@ -35,11 +35,11 @@ below live in the `unified_search` partition.
 - **Signals**: `like_count`, `retweet_count`, `reply_count`, `quote_count`
 - **Fields**: `content`, `url`, `author_name`, `author_username`, `author_avatar`, `created_at` (ms — real publish time), `author_verified`, `author_followers_count`
 - **Batch queries**: GrokX is AI-powered, not keyword-matching — multiple related entities can be combined into one call (e.g. "Why are $AAPL $TSLA $NVDA moving? Explain each"). The `summary` will segment by entity automatically. Returned tweets are mixed (not per-entity); only do per-entity individual searches when the use case requires raw per-entity source content.
-- **Gotcha**: A single broad query returns mostly 0-engagement noise. Fix: (1) run 3-5 queries with different topical angles (e.g. "NVDA earnings", "NVDA AI chips", "NVDA stock price") plus entity aliases (`$NVDA`, `NVIDIA`); (2) filter results — tweets with `like_count == 0` AND `retweet_count == 0` are almost always noise; (3) `author_followers_count` and `author_verified` are strong quality signals for sorting survivors.
+- **Gotcha**: A broad query may miss relevant evidence. Add topical angles or entity aliases (`$NVDA`, `NVIDIA`) when needed. Judge authority, relevance, and recency; engagement is only a secondary ranking signal, not grounds to discard a new or specialist source.
 
 ### News
 
-- **Search**: `searchSerper` with `type:"news"` + `searchBrave` with `freshness` filter
+- **Search**: `searchSerper` with `type:"news"` or `searchBrave` with a `freshness` filter; add the other when coverage is insufficient
 - **Enrich**: Optional — `scrapeUrl` for full article text
 - **Signals**: Freshness (time-based), source authority (domain)
 - **Gotcha**: Serper `date` is index/observed time, NOT publish time — do not use as published_at. Brave `description` may contain `<strong>` HTML tags — strip before display. Brave `age` field (e.g. "18 hours ago") is more reliable for recency.
@@ -87,12 +87,14 @@ below live in the `unified_search` partition.
 
 ## Search Quality Patterns
 
-These apply across all sources:
+Start with the sources needed to answer the question. Expand when evidence is
+missing, contradictory, or broad coverage is requested; stop when the question
+is adequately supported. The wider-search patterns below apply when needed:
 
 - **Multiple queries > one broad query**: 3-5 queries with genuinely different angles (price action, fundamentals, sentiment, events, controversy) produce far better coverage than one keyword dump. Dedup results by URL across queries.
 - **Oversample then rank**: Search for ~15 items per source, rank by engagement/freshness/relevance, keep top N. Never trust raw search order as quality order.
-- **Entity alias expansion**: For tickers, always search both the symbol (`$NVDA`, `NVDA`) and the company name (`NVIDIA`). For crypto, include common aliases (`BTC`, `Bitcoin`, `#BTC`). Code should handle this expansion — don't rely on a single query string to cover all variants.
-- **Engagement as quality gate**: Every source has a native engagement signal (Twitter: likes/retweets, Reddit: score, YouTube: views). Items with zero engagement across all metrics are almost always noise — filter them out before presenting to the user.
+- **Entity alias expansion**: When coverage or identity is uncertain, search both the symbol (`$NVDA`, `NVDA`) and the company name (`NVIDIA`). For crypto, include common aliases (`BTC`, `Bitcoin`, `#BTC`). Code should handle this expansion — don't rely on a single query string to cover all variants.
+- **Engagement as a secondary signal**: Prioritize source authority, relevance, and recency. Where available, likes, scores, or views may help rank results; zero engagement alone does not disqualify evidence.
 
 ## Time Filters by Provider
 

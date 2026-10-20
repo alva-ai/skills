@@ -1,7 +1,8 @@
 # Operational Pitfalls
 
-This file is mandatory and stepwise. Do not save it for debugging. Before each
-execution step, read the matching section below, then do the step.
+Read the matching section before first use and apply it to subsequent steps.
+Reuse sections already read in this session; reread when context is missing or
+the runtime contract changes. Do not save these constraints for debugging.
 
 | Before you... | Read |
 | --- | --- |
@@ -85,6 +86,8 @@ alva fs remove --path '~/feeds/my-feed/v1/data' --recursive
 Do not use destructive resets in production.
 
 ## Chart And HTML
+
+**Playbook — ECharts inside tabs render with zero width.** Charts mounted in a hidden tab measure their container at `0×0` and stay collapsed even after the tab becomes visible. On every tab switch, find all ECharts instances inside the newly-shown tab panel and call `resize()` on each — e.g. iterate the panel's chart DOM nodes with `echarts.getInstanceByDom(el)?.resize()`. Do this in the tab's `onChange` / visibility handler, not on window `resize`, because the container's size changes without the window resizing.
 
 - Covered US equities and crypto latest/realtime price answers need intraday
   klines; daily-level bars and closes are not current-price sources.

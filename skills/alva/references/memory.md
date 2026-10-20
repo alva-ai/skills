@@ -18,13 +18,13 @@ as if the user will read them.
 
 ```
 ~/memory/
-├── MEMORY.md     # Concise index — read at the start of every conversation
+├── MEMORY.md     # Concise index — supplied in prefill or read via ALFS
 └── user.md       # Cross-channel identity, preferences, investment style, theses
 ```
 
-`MEMORY.md` is the entrypoint. Read it at the start of every conversation to
-discover what's stored. Keep it concise — under 200 lines. Each entry is one
-line linking to a topic file:
+`MEMORY.md` is the entrypoint. Use its prefilled content or read it as described
+in Reading rules below to discover what's stored. Keep it concise — under 200
+lines. Each entry is one line linking to a topic file:
 
 ```markdown
 - [user.md](user.md) — identity, investment style, interests, theses and preferences
@@ -48,8 +48,8 @@ prefill as a `<session-prefill-channel-memory root="...">` block:
 
 - User-global facts (identity, cross-channel preferences) → `~/memory/`.
 - Channel-specific facts (this channel's topic, decisions) → the prefill root.
-- Read both indexes at the start of a channel turn. No prefill block → no
-  channel scope; use `~/memory/` only.
+- Use both scopes according to Reading rules below. No channel-memory prefill
+  block → no channel scope; use only the global scope if the session permits it.
 - The default Alva channel uses the same layout at
   `~/channels/alva/memory/`; it is not an alias for global memory.
 
@@ -229,6 +229,11 @@ the interest. A single query does not create an Interest.
 An Investment Thesis is a user-stated or user-confirmed judgment that later
 evidence can support or disprove. Its title should state the conclusion.
 
+In `user.md`, this records the user's investment thinking for later conversation.
+Preserve the user's uncertainty and qualifications. Saving or revising this
+memory does not create, publish or modify a product Thesis; those operations
+require the user's corresponding request and the workflow in [thesis.md](thesis.md).
+
 - `Scope` — the asset, theme, sector, macro regime, or cross-asset relationship.
 - `Horizon` — the expected life of this judgment, not the user's general holding
   period.
@@ -315,12 +320,31 @@ feature memory, then link it from that scope's `MEMORY.md`.
 11. **Honor corrections and forget requests** — replace or remove obsolete
     durable entries and do not reintroduce forgotten content into later Journal.
 
+## Using context in conversation
+
+Start with the current request, quoted content and recent conversation; use
+relevant memory to fill in background. When that is enough, answer directly.
+Use known research interests, investment horizon and expertise to choose the
+focus and depth of the answer without asking for details already supplied or
+reciting the user's profile. For a user focused on long-term competitive
+advantage, explain how new earnings affect that thesis when relevant.
+
+Keep an author's view, the user's confirmed stance and a working hypothesis
+distinct. Reading, saving or following content can suggest relevance to this
+discussion; it does not establish agreement, holdings or a durable preference.
+Use the user's current statement over older memory. Ask about an unresolved
+conflict only when it materially changes the answer. Durable updates must meet
+the Writing rules above and be supported by the user's own statements.
+
 ## Reading rules
 
-- **Every conversation start**: Read `'~/memory/MEMORY.md'` via ALFS, then
-  `user.md` and any topic files relevant to the user's request when present. In
-  a channel session, also read the channel root's `MEMORY.md` and relevant topic
-  files when present. Channel roots do not have their own `user.md`.
+- **Every conversation start**: Files supplied in `<session-prefill-memory>`
+  and `<session-prefill-channel-memory>` are already read. Within the session's
+  permitted scope, read missing indexes, `user.md`, or topic files via ALFS only
+  when needed for the current request. The blocks are independent; reuse only
+  the files actually supplied. Fetch truncated content only when needed; do not
+  re-read files solely for startup. Missing memory does not block an answer that
+  does not need it. Channel roots do not have their own `user.md`.
 - **Journal**: Do not load complete Journal files at every turn. Use a supplied
   Carry Forward prelude, or read a bounded relevant daily file on explicit need.
 - **Pack relevance**: Read a pack's `MEMORY.md`, `state.md`, `rules.md`, or
@@ -328,11 +352,13 @@ feature memory, then link it from that scope's `MEMORY.md`.
   makes that pack relevant.
 - **Append ledgers**: Never load ledger streams by default. Read bounded latest
   records or a projection only when the task needs history, evidence, or audit.
-- **User references prior work**: "that strategy from last time" / "the rules
-  we discussed" → read the relevant memory file.
-- **User explicitly asks**: "do you remember" / "check my profile" → you
-  **must** read.
-- **User says to ignore memory**: Proceed as if `'~/memory/'` is empty.
+- **User references prior work or asks what you remember**: Use relevant
+  conversation and supplied memory first; read only what is missing, truncated,
+  or needs verification. An explicit request to check the currently stored
+  profile requires a fresh read of the relevant file.
+- **User says to ignore memory**: Honor the requested scope. If unspecified,
+  ignore both global and Channel memory, including supplied memory and Journal
+  carry-forward, for the request. Ignoring memory does not request deletion.
 
 ## Memory is a claim, not truth
 
@@ -348,4 +374,5 @@ a memory:
 - Memory records **user preferences** → apply directly (these are stable).
 
 If a memory conflicts with what the user just told you, **trust what the user
-says now** — and update the memory.
+says now**. Update durable memory when the statement meets the writing rules;
+a temporary scenario or hypothetical does not replace a confirmed preference.

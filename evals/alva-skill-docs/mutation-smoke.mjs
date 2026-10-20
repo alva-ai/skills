@@ -44,14 +44,15 @@ const MUTATIONS = [
   },
   {
     id: "simple-latest-one-hop",
-    file: "SKILL.md",
-    remove: "Simple latest-fact asks stop there after one\nsourced hop; ",
+    file: "references/request-routing.md",
+    remove: "Simple latest-fact\nasks can finish after one sourced hop. ",
     expectFailedCases: ["issue592.financial-ask-contract", "scenario.simple-latest-price"],
   },
   {
     id: "mandatory-investment-disclaimer",
     file: "SKILL.md",
-    remove: "10. **Contextual investment framing.** Include the investment disclaimer once in the final substantive response or artifact only when its content meets the trigger in [user-facing-prose.md](references/user-facing-prose.md#investment-disclaimer). Do not add it to progress updates, tool confirmations, operational explanations, or factual data-only answers; a ticker or price mention alone does not trigger it. If the user asks for any \"financial advice\" or \"analyst advice,\" the response MUST also begin with the exact advice-request header.\n",
+    remove:
+      "8. **Use contextual investment framing.** Follow\n   [user-facing-prose.md](references/user-facing-prose.md#investment-disclaimer).\n   Include the disclaimer once when its substantive-content trigger applies;\n   a ticker or price mention alone does not trigger it. Explicit financial or\n   analyst advice requests also require the exact advice-request header.\n",
     expectFailedCases: [
       "target.mandatory-investment-disclaimer",
       "scenario.explicit-analyst-advice-header",
@@ -137,19 +138,14 @@ const MUTATIONS = [
     id: "automation-knowledge-required-reading",
     file: "SKILL.md",
     remove:
-      "## Alva Knowledge (Required Reading)\n\n" +
-      "Before designing, modifying, or evaluating any automation, read\n" +
-      "[alva-knowledge.md](references/alva-knowledge.md). Every automation must decide\n" +
-      "whether bounded history improves its output; longitudinal or decision\n" +
-      "automations use that history, and push-capable automations also define semantic\n" +
-      "notification novelty.\n\n",
+      "| Track, continuously evaluate, refresh, or alert | Read [alva-knowledge.md](references/alva-knowledge.md) when designing or changing automation reasoning, history, or notification logic, then [feed-lifecycle.md](references/feed-lifecycle.md) and [push-notifications.md](references/push-notifications.md). Apply the [Preferred Automation Setup Skills](references/request-routing.md#preferred-automation-setup-skills) when choosing a setup |\n",
     expectFailedCases: ["scenario.alert-push-monitor"],
   },
   {
     id: "automation-knowledge-reference-index",
     file: "SKILL.md",
     remove:
-      "| [alva-knowledge.md](references/alva-knowledge.md)                                     | Required automation reasoning: bounded history, cross-run comparison, semantic notification novelty, quiet runs.                            |\n",
+      "| Automation reasoning, bounded history, novelty, and quiet runs | [alva-knowledge.md](references/alva-knowledge.md) |\n",
     expectFailedCases: ["scenario.alert-push-monitor"],
   },
   {

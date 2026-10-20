@@ -180,7 +180,7 @@ consumers.
 
 ## README And Release Additions
 
-Follow the normal README and release rules in `SKILL.md` and
+Follow the normal README and release rules in [playbook-creation.md](playbook-creation.md) and
 [api/release.md](api/release.md). ONNX only adds these checks:
 
 - README names the model artifact/version, training window, feature contract,

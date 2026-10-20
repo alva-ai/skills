@@ -9,11 +9,13 @@ const files = ["../../skills/alva/references/durable-agent.md"];
 test("top-level Skill routes durable Agents only through runAlvaAgent", () => {
   const text = readFileSync(new URL("../../skills/alva/SKILL.md", import.meta.url), "utf8");
   assert.doesNotMatch(text, /\brunAlpiAgent\b/u);
-  const routing = text.split("#### Reasoning Layer: alpi\n")[1]?.split("\n#### ")[0];
+  const routing = text.split("## Routing\n")[1]?.split("\n## ")[0];
   assert.ok(routing);
   assert.match(routing, /\[durable-agent\.md\]\(references\/durable-agent\.md\)/u);
   assert.match(routing, /`runAlvaAgent`/u);
-  assert.match(routing, /`Agent\.ask\(\)`/u);
+  const capabilities = text.split("## Capabilities on Demand\n")[1]?.split("\n## ")[0];
+  assert.ok(capabilities);
+  assert.match(capabilities, /`Agent\.ask\(\)`/u);
 });
 
 function sections(text) {

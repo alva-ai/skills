@@ -10,17 +10,41 @@ annotation/edit, release/version update, and push after release. Use this guide
 only after routing confirms the user wants a hosted or shareable playbook
 surface; ordinary financial-analysis questions should answer directly.
 
+## Reuse Before Build
+
+For a new Playbook request, walk this ladder. Existing edits and remixes go directly to their workflow. Recommend what you find at each rung; if a rung turns up nothing relevant, fall through to the next one without bothering the user.
+
+1. **Surface trending playbooks first.** Run `alva playbooks trending --keyword "<goal>" --limit 5`, substituting the user's goal. If any candidate looks like a strong fit, recommend it by pasting its link directly in chat and offer to use it as-is or remix it (see `remix-workflow.md`). If nothing fits, move on quietly.
+2. **Then check skillhub.** Run `alva skillhub list` and scan for a skill that closes the gap. If you find one, recommend it by pasting its link in chat and offer to run it for the user. Otherwise, move on quietly.
+3. **Build from scratch as a last resort.** If the user has not already requested or approved a build, confirm it before beginning the build workflow. Follow any workflow-specific planning gate.
+
+## Build Verification
+
+- Test before deploying. No exceptions.
+- Verify viewer access to every backing feed before building dashboards. For
+  public feeds, use `alva feed set-visibility` and verify an anonymous read;
+  never use `alva fs grant` to change feed visibility. For private Playbooks,
+  preserve private access and verify the viewer-scoped read path.
+- Use Altra for backtesting. Don't hand-roll a trading engine.
+- For an approved release, return the live URL only after writing local edits back to ALFS and cutting that release. Respect an explicit draft/private stopping point. A local `Edit` that never gets `alva fs write` + `alva release` is a dry run; the live playbook does not see it.
+- Read `playbook.json` for `latest_release.feeds` before re-releasing an existing playbook, and pass that exact array to `--feeds`. Never guess `feed_id` values.
+
+- Never ship past a critical-path blocker. If `alva fs grant` / `deploy` / `release` fails on the playbook's core data path, STOP and tell the user what is blocked. Anonymous visitors see the broken state — shipping a URL that fails to load is worse than shipping nothing.
+
 ## Build Order
 
-1. Complete [preflight.md](preflight.md) and route the request with
+1. Reuse managed-runtime startup context, or complete [preflight.md](preflight.md)
+   for standalone use, and route the request with
    [request-routing.md](request-routing.md).
 2. Verify data coverage with [data-skills.md](data-skills.md) or BYOD.
-3. Build feeds through [feed-lifecycle.md](feed-lifecycle.md).
+3. Build feeds through [feed-lifecycle.md](feed-lifecycle.md) when live or
+   recurring data is needed. A sourced, dated static snapshot needs no new feed.
 4. Read [design.md](design.md), then the relevant design companion:
    [design-widgets.md](design-widgets.md),
    [design-components.md](design-components.md), or
    [design-playbook-trading-strategy.md](design-playbook-trading-strategy.md).
-5. Build HTML that reads feed outputs at runtime.
+5. Build HTML that reads feed outputs at runtime, unless the user explicitly
+   requested a sourced, dated static snapshot.
 6. Write HTML and README to ALFS.
 7. Draft, lint, publish, then screenshot the deployed `published_url` unless the
    user explicitly asks to stop at draft/private.
@@ -78,7 +102,8 @@ hand-written auth headers for feed data. Load the browser SDK and use
 ```
 
 All quantitative data in charts, tables, and metric cards must be fetched from
-feed output paths at runtime, not embedded as inline literals.
+feed output paths at runtime. An explicitly requested static snapshot may
+inline sourced values with source/as-of labels; it must not claim live refresh.
 
 Browser request rule: generated playbook HTML uses `AlvaToolkit.AlvaClient` SDK
 resource methods or `_request(...)` for Alva API requests. Initialize the client
@@ -190,7 +215,8 @@ Before `alva release playbook`, verify:
    authenticated SDK/PBSV read instead and do not make the feed public solely
    to pass this gate.
 3. Cronjobs for referenced feeds are active.
-4. HTML fetches quantitative data from feeds, not inline literals.
+4. Live HTML fetches quantitative data from feeds. An explicitly requested
+   static snapshot labels its sourced values and as-of time without claiming refresh.
 5. If UDFs exist, [api/udf-runtime.md](api/udf-runtime.md) has been read, each
    function is registered with `alva functions`, HTML uses `window.alva.udf`,
    and the UDF result contract is verified: smoke invoke returned the declared
@@ -232,7 +258,9 @@ retry once without compression.
 
 A PNG or page shell is not enough. Pass screenshot verification only when the
 image or targeted capture shows real feed-backed chart marks, table rows, or KPI
-values. Blank frames, headers-only tables, loading/error fallbacks, and fetch
+values. For an explicitly requested static snapshot, verify the rendered values
+against its dated source data instead. Blank frames, headers-only tables,
+loading/error fallbacks, and fetch
 failures are data-rendering failures that must be fixed before claiming the
 playbook is done.
 

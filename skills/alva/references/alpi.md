@@ -9,6 +9,11 @@ inside a deterministic pipeline. The runtime module is `@alva/pi`; use
 > [user-facing-prose.md](user-facing-prose.md#voice-block) verbatim in
 > `systemPrompt`.
 
+Do **not** use it for one-off research the user asks interactively, and do not
+use it to produce numbers or events that should come from real data. Use the
+current conversation for interactive research and the channel background task
+for heavy work.
+
 ## Resume the current Session later
 
 Build durable Layer 2/3 Agents using the [agent.js entrypoint contract](durable-agent.md).
