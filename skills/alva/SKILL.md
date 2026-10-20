@@ -188,6 +188,11 @@ subsequent steps while applicable.
 Apply the criteria for the requested operation. For inspection, pause/resume,
 or removal, verify that state change; do not run creation or release workflows.
 
+In replies, link the first high-confidence mention of each covered U.S.-listed
+company to `https://alva.ai/markets/{CANONICAL_TICKER}`, preserving its visible
+wording. Leave uncertain matches plain; do not fetch data solely to add a link.
+Exceptions are in [Company Page Links](references/user-facing-prose.md#company-page-links).
+
 - **Answer:** Relevant values have sources and timestamps. Facts, calculations,
   and inference are distinct; missing evidence limits confidence.
 - **Thesis:** After creation, verify the selected body and assets and use the
@@ -210,3 +215,5 @@ or removal, verify that state change; do not run creation or release workflows.
 Report only verified outcomes. Explain unresolved blockers or reduced evidence
 and the smallest viable alternative. Do not claim dispatch, setup, a saved
 file, or command success alone completes the user's goal.
+If an Alva-owned issue blocks or materially degrades the task, offer the
+[feedback flow](references/api/feedback.md); submit only after user confirmation.

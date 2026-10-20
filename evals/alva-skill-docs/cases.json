@@ -788,7 +788,9 @@
             "applying the gates relevant to the conclusion being made",
             "identify its source, timing",
             "coverage gaps",
-            "whether it is fact, calculation, or inference"
+            "whether it is fact, calculation, or inference",
+            "sources for key facts, including qualitative claims",
+            "use a table when it helps the user compare"
           ]
         }
       ]
@@ -1104,17 +1106,17 @@
         "look-ahead control",
         "benchmark/sector ETF",
         "missing-field handling",
-        "evidence table with source",
+        "check evidence source",
         "authority/relevance",
         "duplicate status",
         "synchronized as-of time",
         "implied-probability source/proxy",
         "weights/exposure assumption",
         "beta/correlation/proxy method",
-        "drawdown table",
+        "estimated drawdowns",
         "current multiple/FCF/EPS",
         "multiple/earnings sensitivity",
-        "attempted/found/missing/impact",
+        "impact of missing evidence",
         "required calculation not done caps at B-/C",
         "hard cap"
       ]
@@ -1167,11 +1169,13 @@
       "id": "target.financial-analysis-prose-gate",
       "group": "target",
       "target": "corpus",
-      "description": "Evidence-dependent claims apply the shared prose and evidence rules, including intermediate findings.",
+      "description": "Evidence-dependent claims apply the shared prose and evidence rules without a mandatory whole-prose read, including intermediate findings.",
+      "excludes": [
+        "user-facing prose reference read"
+      ],
       "includes": [
         "[Investment Disclaimer](user-facing-prose.md#investment-disclaimer) when its trigger applies",
         "For current-fact or evidence-dependent answers, apply the Ask Evidence Gate",
-        "user-facing prose reference read",
         "Product language, conditional disclaimer, company links, and final replies",
         "Chat answers for Financial Analysis / Ask Question",
         "For each current-fact or evidence-dependent claim",
@@ -1277,6 +1281,16 @@
       ],
       "section_includes": [
         {
+          "file": "SKILL.md",
+          "heading": "Completion Criteria",
+          "label": "company page links remain visible at entry",
+          "includes": [
+            "link the first high-confidence mention of each covered U.S.-listed company",
+            "https://alva.ai/markets/{CANONICAL_TICKER}",
+            "do not fetch data solely to add a link"
+          ]
+        },
+        {
           "file": "references/user-facing-prose.md",
           "heading": "Company Page Links",
           "label": "company page link contract",
@@ -1325,6 +1339,18 @@
       "group": "target",
       "target": "corpus",
       "description": "Latest mainline Alva skill updates remain integrated after rebasing the refactor.",
+      "section_includes": [
+        {
+          "file": "SKILL.md",
+          "heading": "Completion Criteria",
+          "label": "platform failure feedback remains visible at entry",
+          "includes": [
+            "If an Alva-owned issue blocks or materially degrades the task",
+            "[feedback flow](references/api/feedback.md)",
+            "submit only after user confirmation"
+          ]
+        }
+      ],
       "includes": [
         "version: v1.25.0",
         "Capability Help",

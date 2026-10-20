@@ -56,7 +56,10 @@ analysis answer; they do not require a Playbook.
 ## Ask Evidence Gate
 
 For each current-fact or evidence-dependent claim, identify its source, timing,
-coverage gaps, and whether it is fact, calculation, or inference. Simple latest-fact
+coverage gaps, and whether it is fact, calculation, or inference. Cite supporting
+sources for key facts, including qualitative claims; explain timing, gaps, and
+uncertainty where they affect the judgment. Choose the presentation to fit the
+question; use a table when it helps the user compare. Simple latest-fact
 asks can finish after one sourced hop. Use the Complex Ask Router for judgments
 that need it, applying the gates relevant to the conclusion being made.
 
@@ -233,12 +236,12 @@ Q&A.
 | Event-study/backtest | backtest, after/before, event window, forward returns, sample, bias-controlled | event definition, data source, sample count, date range, non-overlap rule, look-ahead control, benchmark, horizons, formula, friction/assumptions; missing sample count or event definition means incomplete and no strong trading conclusion |
 | Screener/ranking | screen, rank, top names, compare list | universe, filters, metric source, ranking formula, benchmark/sector ETF, missing-field handling; state actual fields screened vs proxies |
 | Macro/cross-asset | rates, dollar, gold, yields, Fed, cross-asset | synchronized as-of time, price move vs macro driver vs policy expectation vs positioning/narrative; recent occurrences or sample insufficient; Fed implied-probability source/proxy |
-| News/social sentiment | news, KOL, X, Reddit, sentiment | evidence table with source, timestamp, authority/relevance, stance, duplicate status, fact/opinion/inference |
-| Portfolio/scenario | portfolio, stress, shock, hedge, scenario | shocks, weights/exposure assumption, beta/correlation/proxy method, drawdown table, hedge candidates, confidence; otherwise qualitative scenario only |
+| News/social sentiment | news, KOL, X, Reddit, sentiment | check evidence source, timestamp, authority/relevance, stance, duplicate status, fact/opinion/inference |
+| Portfolio/scenario | portfolio, stress, shock, hedge, scenario | shocks, weights/exposure assumption, beta/correlation/proxy method, estimated drawdowns, hedge candidates, confidence; otherwise qualitative scenario only |
 | Valuation/accounting | estimate or assess a company's valuation, earnings, or cash flow using financial inputs | bridge current multiple/FCF/EPS, key operating KPI, scenario assumption, multiple/earnings sensitivity |
 
-Domain KPI checklist is not a schema. For domain-specific asks, list
-attempted/found/missing/impact for candidate KPIs. Examples: bank NIM,
+For domain-specific asks, check relevant KPIs, their availability, and the
+impact of missing evidence; explain gaps that affect the conclusion. Examples: bank NIM,
 deposit beta, loan growth, credit loss, CRE, capital; GLP-1 product revenue,
 supply, payer, pipeline, gross margin; semis segment AI revenue, backlog,
 order, capex read-through, gross margin; energy upstream/downstream, WTI beta,
@@ -290,8 +293,8 @@ be honored while recording the disabled state or platform blocker.
 
 Before finishing, verify the delivered result matches the user's actual goal.
 For Financial Analysis, this means sourced figures, sourced or qualified
-comparison baselines, clear uncertainty when data is missing, user-facing prose
-reference read, and the answer gate for direct answers. When a shareable
+comparison baselines, clear uncertainty when data is missing, and the answer
+gate for direct answers. When a shareable
 playbook was part of the task, this normally means a released playbook and a
 canonical share URL:
 

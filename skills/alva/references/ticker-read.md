@@ -228,9 +228,11 @@ company coverage.
 
 ## Synthesis Gate
 
-Before answering, keep each layer and timestamp explicit:
+Verify the selected layers and their timestamps before using them. In the
+answer, cite supporting sources and explain timing, coverage, and uncertainty
+where they affect the conclusion.
 
-| Layer | Preferred evidence | State clearly |
+| Layer | Preferred evidence | What to check |
 | --- | --- | --- |
 | Performance now | Data Skills | Price/return basis, as-of time, fundamentals or valuation periods. |
 | Investor focus | Markets Narrative; WILF only as compatibility fallback | Narrative `asOf` / `generatedAtMs`; on WILF fallback, weekly `date` / `as_of` and `gaps`. |

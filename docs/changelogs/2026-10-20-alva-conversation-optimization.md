@@ -44,9 +44,12 @@ requires selection. These Notes are separate from Playbook Creator Notes.
 
 ## 4. Implementation
 
-- **Entry and routing:** 212-line SKILL.md, command index, simple price/identity
+- **Entry and routing:** compact SKILL.md, command index, simple price/identity
   path separate from company analysis, and judgment-based research triggers.
   Detailed build, chart and scheduled-trading procedures remain in references.
+  Company-page linking and user-confirmed feedback for Alva-owned blockers
+  remain explicit at entry. Completion no longer requires a whole-prose read;
+  detailed link exceptions and feedback safeguards stay in their references.
 - **Data access:** reuse applicable documentation; known US equity price/history
   requests fetch the current stocks-kline contract directly, with discovery
   fallback. Intraday requirements for current prices remain.
@@ -68,6 +71,11 @@ requires selection. These Notes are separate from Playbook Creator Notes.
 - **Reference cleanup:** remove Creator Notes; avoid mandatory pipelines for
   chat answers, repeated reads, unnecessary search expansion and producer
   reruns for metadata-only changes. Reuse the shared CSS bundle.
+- **Evidence presentation:** retain source, timing, methodology, KPI and
+  uncertainty checks while removing mandatory evidence/drawdown tables and
+  KPI status lists. Cite key quantitative and qualitative facts; surface
+  limitations that affect the judgment. Ticker synthesis checks selected
+  layers without requiring a separate visible section for each.
 - **Preserved capabilities:** Playbook reuse, feed reads, README, lint, release,
   screenshots and remix lineage; Altra/broker approvals; Trade Setup unchanged;
   conditional disclaimers; scope and provenance for memory writes.
@@ -82,12 +90,26 @@ change. Static assertions check instruction coverage, not model compliance.
 E2E Required: no for this documentation integration. Real-turn acceptance uses
 the existing Eval effort and must verify which Skill bundle was loaded.
 
+Evidence-format verification: compare short news and ticker follow-ups,
+missing-KPI judgments, and portfolio scenarios against the preceding candidate.
+Check retained sources and uncertainty alongside reduced unnecessary structure.
+An explicit request for a detailed comparison must still receive useful tables
+and calculation assumptions. Keep persona and runtime identical between sides.
+
 ## 6. Scope and approval
 
 User approved the minimal Skill/Sandbox optimization, removal of Creator Notes,
 upstream integration, local commits and one consolidated changelog per repository.
 Keep Trade Setup and trading/publication boundaries. Memory schema renaming is
 deferred. Work remains local for cross-review.
+
+The user approved a separate minimal evidence-format edit; persona stays for
+the next batch. Checklist: update the two evidence references, align existing
+doc assertions, run repository doc checks, and inspect the complete scoped diff.
+
+The user approved restoring only the company-link and platform-feedback entry
+triggers and removing the residual whole-prose read, with existing doc assertions
+updated to cover those boundaries. Other capability-audit suggestions stay deferred.
 
 Upstream comparison base: Skills `411ea14`; companion Sandbox `89639fd`.
 Backend `f6cebd5` supplies the current task-mailbox contract without local edits.
@@ -99,10 +121,16 @@ authorship rules. Final product-tree checks:
 
 | Command, from this repository | Result |
 | --- | --- |
-| `node evals/alva-skill-docs/skill-doc-eval.mjs --out /tmp/alva-final-notes-check.md` | 100/100 cases; 1090/1090 checks |
+| `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva --out /tmp/alva-entry-restoration-check.md` | 100/100 cases; 1098/1098 checks |
 | `node evals/alva-skill-docs/mutation-smoke.mjs` | 28/28 mutations detected |
 | `node --test evals/alva-skill-docs/durable-agent.test.mjs` | 5/5 |
 | `git diff --check` and reference/conflict checks | Passed; existing memory example link to `user.md` unchanged |
+
+The evidence-format and entry-restoration edits pass all three doc suites.
+The entry restoration changes only SKILL.md, request-routing.md, their existing
+assertions and this changelog; scoped review found no unrelated changes.
+No real-turn result is claimed for these edits. This repository has no
+`make lint-fix` target; no substitute linter was run.
 
 The current CLI successfully retrieved the known stocks-kline contract.
 This establishes endpoint availability, not adjustment semantics or latency.
@@ -117,6 +145,13 @@ integration have not yet received real-turn acceptance.
 
 ## 8. Remaining work
 
+- Verify GOOG/GOOGL company links (S02-C), uncertain/non-U.S. mentions staying
+  plain, and an Alva-owned blocker offering feedback without submitting before
+  consent. Check ordinary queries do not acquire a whole-prose read solely for
+  completion.
+- Verify evidence-format behavior in the paired scenarios in section 5:
+  less unnecessary structure with sources, calculations and material gaps
+  preserved; retain tables when the user requests or benefits from comparison.
 - Verify direct price entry and unknown-endpoint fallback, concise-first replies
   with explicit-depth override, and bounded adjustment verification.
 - Obtain authoritative price-basis semantics; do not claim adjusted-chart
