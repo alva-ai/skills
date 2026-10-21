@@ -169,7 +169,7 @@ available quarters of the fiscal year, not one annual transcript.
 
 ### 5. Web search
 
-For interactive research, prefer the exposed native search/page tools per
+For general web research, prefer the exposed native search/page tools per
 [Content Search](search.md); recipes 5–6 serve scripts and tool-unavailable fallbacks.
 Use the versioned runtime module through Alva Gateway; it handles its own
 endpoint and authentication. Required: `q`; optional `num`, `type` (default
@@ -211,10 +211,12 @@ prediction markets; news; and Twitter/X feeds.
 
 Twitter/X routing:
 
-- Use Data Skills for per-handle history, URL lookup, and full-text search over
-  the X accounts Arrays tracks.
-- For public X discussion beyond the tracked index, follow [Content Search](search.md):
-  native search first, or Serper/Brave with `site:x.com` when unavailable.
+- For tweet-content searches, use Arrays X Search first, including keyword
+  searches across tracked accounts or scoped to an author. Timeline and known-URL
+  lookups use the same Social Feeds Data Skill.
+- Follow [Content Search](search.md#twitterx) for the endpoint and general-search
+  fallback when access, coverage or freshness is insufficient. The index contains
+  already-ingested posts; an empty result does not prove absence of public discussion.
 
 Direct latest-price routing:
 
@@ -256,8 +258,8 @@ differ from ex-dividend dates, and splits filter publication time. An empty
 same-window query does not establish that no events occurred. Claim return
 ratios are equivalent only when evidence supports a constant adjustment factor
 across the comparison interval. If the basis or coverage remains unresolved,
-state the limitation and provide a clearly labeled supported result; do not
-apply an assumed adjustment or label ordinary closes as adjusted.
+state the limitation and follow [Failure And Fallback](#failure-and-fallback).
+Do not apply an assumed adjustment or label ordinary closes as adjusted.
 
 ## Thematic Ticker Curation
 
@@ -306,15 +308,20 @@ the user's claim that an official release has happened:
 5. Treat news, blogs, screenshots, memory, and LLM output only as hints to
    verify, not as fallback value sources.
 
-When an endpoint returns 403, 404, empty, or irrelevant data:
+When an endpoint returns 403, 404, empty or irrelevant data, or cannot establish
+the requested data convention:
 
 1. Re-check `summary` for a semantically equivalent endpoint in the same skill.
 2. If the skill id was guessed, rerun `list` and recover the correct id.
-3. If the error is Pro-gated or subscription-gated, say which module is
-   unavailable and give exactly two paths: the user upgrades or provides
-   access, or the user provides a custom data source URL / BYOD source for the
-   agent to wire.
-4. Report BYOD only after same-domain Alva endpoints cannot answer the task.
+3. If the error is Pro-gated or subscription-gated, explain the access limitation;
+   the user may provide access, or use an independently accessible source below.
+4. When same-domain Alva endpoints cannot answer the task, use a user-provided
+   custom data source URL / BYOD source or an agent-selected public source.
+   Fetch it through runtime code; verify source identity, requested conventions,
+   coverage and freshness, and cross-check overlapping data when available.
+   State the source and material limitations; preserve access boundaries.
+   If the requested source, currency or return basis remains unavailable, a
+   clearly labeled proxy may help, but does not complete that requirement.
 5. Never stop with zero useful output when a reduced-scope artifact can still
    be built from available endpoints.
 6. Never replace a missing data source with LLM-fabricated values.

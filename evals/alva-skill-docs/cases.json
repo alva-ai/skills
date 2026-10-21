@@ -128,7 +128,7 @@
       "id": "retained.search-routing",
       "group": "retained",
       "target": "corpus",
-      "description": "Native search leads unstructured research; optional Worldline evidence preserves source checks and specialized financial/Fintwit reads.",
+      "description": "Arrays leads tweet-content search with general search as fallback; source checks and specialized financial/Fintwit reads remain intact.",
       "includes": [
         "unified_search",
         "Twitter/X routing",
@@ -141,20 +141,20 @@
           "file": "references/search.md",
           "includes": [
             "Use the runtime's exposed web search tool first",
-            "run independent lookups in parallel where supported",
-            "do not query it for every question or delay an adequately supported answer",
-            "sdk.createWorldlineClient().recall",
-            "contentMode: \"generated\"",
-            "Multiple Contributions can come from one original",
-            "partial coverage",
-            "use Arrays Data Skills where covered"
+            "For X/Twitter post content, use Arrays X Search first:",
+            "alva data-skills endpoint arrays-data-api-social-feeds x-search",
+            "it does not fetch X on demand",
+            "If access, coverage or freshness is insufficient, use general search",
+            "An empty result does not establish that nobody discussed the topic",
+            "do not start paid handle tracking just to fill a search gap",
+            "inspect the original before citing its contents"
           ]
         },
         {
           "file": "references/fintwit.md",
           "includes": [
-            "native search first",
-            "optional parallel supplement",
+            "Arrays X Search first",
+            "general search as fallback",
             "source for curated account profiles, extracted views, rankings and backtested performance",
             "Do not infer a win rate or leaderboard position"
           ]
@@ -162,16 +162,17 @@
         {
           "file": "references/content-legitimacy.md",
           "includes": [
-            "inspected original reporting or Worldline source excerpts",
+            "inspected original reporting or retrieved original posts",
             "A reported claim is not independently established fact",
-            "generated Worldline text alone cannot establish financial facts",
+            "generated text alone cannot establish financial facts",
             "Do not substitute a news mention of a price for a current quote"
           ]
         }
       ],
       "excludes": [
         "Grok",
-        "search-grok-x"
+        "search-grok-x",
+        "Worldline"
       ]
     },
     {
@@ -861,7 +862,9 @@
           "label": "fallback behavior",
           "includes": [
             "same-domain Alva endpoints cannot answer the task",
-            "custom data source URL / BYOD source",
+            "custom data source URL / BYOD source or an agent-selected public source",
+            "verify source identity, requested conventions, coverage and freshness",
+            "a clearly labeled proxy may help, but does not complete that requirement",
             "Never stop with zero useful output",
             "Never replace a missing data source with LLM-fabricated values"
           ]

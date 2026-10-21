@@ -150,12 +150,13 @@ Serial checklist: (1) verify CLI/backend contracts; (2) repair entry rules;
 (6) probe the revised recipes; update Eval with both arms on fast and refresh
 the committed candidate freeze, without runtime experiments.
 
-Approved Search follow-up: use exposed native search for unstructured research;
-Worldline is an optional parallel supplement, never a required first step or a
-reason to delay an adequately supported answer. Remove GrokX guidance while
+Approved Search follow-up, revised after checking the live Social Feeds contract:
+use Arrays X Search first for tweet content and general search when access,
+coverage or freshness is insufficient. Other unstructured research uses exposed
+native search. Defer Worldline and remove its guidance. Remove GrokX guidance while
 preserving Arrays financial/history reads and Fintwit performance/ranking feeds.
 Align source rules narrowly for verified news and attributed source statements;
-search summaries and generated Worldline text are not independent factual proof.
+search summaries and generated text are not independent factual proof.
 
 Checklist: (1) update search/fintwit/durable routing and the search recipe note;
 (2) reconcile entry/source rules and the Sandbox source sentence;
@@ -176,6 +177,12 @@ doc cases and add a necessary-check removal mutation, run doc/mutation/durable c
 and review the complete scoped diff and its shared prompt consumers. No Sandbox,
 search, runtime, deployment, or frozen Eval changes are part of this follow-up.
 
+Approved follow-up: restore verified external-source fallback after Alva
+capability checks, keep exact requested conventions distinct from proxy results,
+and clarify product-language openings in the companion Sandbox. Only these
+rules change; investigate Arrays conventions and the successful Altra trace
+without adding an unverified data recipe or backtest example.
+
 ## 7. Outcome and evidence
 
 The review follow-up changes only three product references, aligns existing
@@ -189,15 +196,17 @@ Trade Setup, disclaimer text/triggers, company links and source/authorization
 boundaries are unchanged. No new real-turn Eval or speed claim is made.
 
 Search follow-up: removed GrokX instructions (including the legacy Grok pointer
-in Data Skills, guarded by a restoration mutation), made exposed native search the
-unstructured-research default and Worldline an optional parallel supplement.
-Fintwit keeps curated views, rankings and performance; recent public statements
-follow Content Search. Existing search/scrape recipes remain script/fallback
-paths. Entry and source rules now distinguish verified source reporting from
-snippets/generated text while preserving structured financial-data requirements.
-Review clarified that the structured-source requirement covers financial datasets
-and metrics; news and attributed statements use the verified-source branch.
-Worldline rereads now name Contribution versus Observation IDs explicitly.
+in Data Skills, guarded by a restoration mutation). The revised route uses Arrays
+X Search for tweet content and general search when access, coverage or freshness
+is insufficient. The live `arrays-data-api-social-feeds/x-search` contract confirms
+store-only keyword/author/time queries. Known URLs and account timelines retain
+their direct-read endpoints; empty results do not prove absence and lookup does
+not silently start paid tracking. Fintwit retains curated views, rankings and
+performance. Worldline guidance and examples are removed for now. Other
+unstructured research uses native search, with SDK fallback for scripts or absent
+tools. Original-source verification and structured financial-data requirements
+remain; a priority-reversal mutation protects the new X route.
+
 The companion Sandbox keeps platform/account reads on Alva CLI/API. Document assertions
 cover the route and provenance boundaries; real-turn behavior is not yet verified.
 The previously frozen `7bb2563` / `0ebcaf3` candidate remains unchanged.
@@ -210,8 +219,8 @@ remains upstream `411ea14`. Final product-tree checks:
 
 | Command, from this repository | Result |
 | --- | --- |
-| `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva --out /tmp/alva-three-item-doc-check.md` | 103/103 cases; 1187/1187 checks |
-| `node evals/alva-skill-docs/mutation-smoke.mjs` | 30/30 mutations detected |
+| `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva --out /tmp/alva-byod-doc-check.md` | 103/103 cases; 1190/1190 checks |
+| `node evals/alva-skill-docs/mutation-smoke.mjs` | 32/32 mutations detected |
 | `node --test evals/alva-skill-docs/durable-agent.test.mjs` | 5/5 |
 | `git diff --check` and reference/conflict checks | Passed; existing memory example link to `user.md` unchanged |
 
@@ -264,7 +273,32 @@ updates and a complete result in about 369s, retaining follow-ups and sources;
 deferred delivery was not exercised. These results cover frozen earlier trees,
 not this follow-up's recipes/routes or later persona edits.
 
+The external-source follow-up replaces user-only BYOD fallback with a verified
+user-provided or agent-selected public source. Adjustment uncertainty uses the
+same route; labeled proxies do not complete an unmet source/currency/return-basis
+requirement. Existing source, access and durable-output boundaries remain.
+Live Arrays endpoint documentation still does not state stock-close adjustment
+or estimates currency/scale. Baseline S19-D used a real FeedAltra engine with a
+custom provider, a raw entry event and close-triggered market exits, but synthetic
+UTC ordering and crypto performance settings make it unsuitable for verbatim
+reuse as a production US-stock example. No Altra product documentation changed.
+
 ## 8. Remaining work
+
+- Target external-source fallback with legacy 006/027/033/043: verify exact
+  requested conventions and provenance, equivalent Alva checks first, and honest
+  partial status when no suitable external source is available. Do not equate
+  successful fallback with bypassing source permissions or access restrictions.
+- Get authoritative Arrays adjustment and estimates unit/scale definitions before
+  adding a total-return recipe. S19-D needs a supported, market-time-correct
+  example and actual-engine replay before an Altra example enters the Skill.
+
+- Verify tweet-topic and author-scoped searches use Arrays X Search first;
+  insufficient/empty/stale or inaccessible results fall back to general search
+  without claiming no discussion exists or starting paid handle tracking.
+  Check known URLs/timelines, preserved Fintwit ranking reads, no Worldline calls,
+  original-post attribution, and general news retaining native search. Record
+  source coverage and latency; no real-turn search benefit is claimed yet.
 
 - Verify this three-reference follow-up against `43025ca`, with the same
   Sandbox/model/effort and fast tier: S10-E for contract/capex evidence and

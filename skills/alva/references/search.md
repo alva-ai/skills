@@ -1,7 +1,8 @@
 # Content Search
 
 Use the runtime's exposed web search tool first for unstructured research:
-news, public statements, source documents, and public X discussion. Inspect
+news, public statements and source documents. For X/Twitter post content, use
+Arrays X Search first as described below, with general search as fallback. Inspect
 relevant originals with its page-reading tools; follow the exposed tool schema.
 In ALPI, `web_search` accepts `search_query` and `open`/`click`/`find` using
 returned reference IDs. If native search is unavailable, or a plain Feed/Automation
@@ -13,56 +14,7 @@ their [Data Skills](data-skills.md) routes. News, YouTube, Reddit and podcast
 handle subscriptions remain in `feed_widgets`; search SDKs are in `unified_search`.
 Apply [content-legitimacy.md](content-legitimacy.md): finding a page is not
 verification of its contents, and a source's opinion remains an attributed claim.
-
-## Worldline supplement
-
-Worldline searches Alva's collected material. For company events, people or
-investment arguments, use it alongside primary search when likely to add useful
-evidence; run independent lookups in parallel where supported. It is optional:
-do not query it for every question or delay an adequately supported answer for
-it. Empty, failed or slow retrieval does not block the main search path. For an
-existing Thesis's progress, use [Signals](thesis.md#thesis-tracking) first.
-
-Use the existing authenticated Jagent SDK through `alva run`; no extra credential
-or Agent session is needed. This read-only example searches a seven-day indexing
-window; choose a window appropriate to the question:
-
-```sh
-alva run --code '(() => {
-  const sdk = require("@alva/worldline");
-  const since = Date.now() - 7 * 86400000;
-  return sdk.createWorldlineClient().recall({
-    query: "NVIDIA Blackwell data center demand",
-    indexedAfter: sdk.recallTimeFromMs(since),
-    publishedFromMs: since,
-    limit: 5
-  });
-})();'
-```
-
-`recall` defaults to semantic search; `mode: "keyword"` matches any query term,
-`"keyword_all"` requires all terms. For a company or author, resolve its ID with
-`searchEntities({query, entityTypes, limit})`, then use `entityIds` for mentions
-or `attribution: {partyIds: [...]}` for credited statements, not both. Without a
-query, these filters list newest first. Reuse returned IDs; do not guess them.
-
-Hits carry text, source metadata, author attributions and, when available,
-`sourceEvidence`. `contentMode: "generated"` is synthesized text, not a quotation;
-check the source excerpts for material claims. For more context, call
-`getContributions({ids: [hit.contributionId]})` or
-`getObservations({ids: [hit.observationId]})` and check each lookup outcome. Preserve
-fact/opinion/forecast/rumor distinctions and actual source links; library
-membership or similarity does not establish truth. Multiple Contributions can
-come from one original: group them rather than count independent corroboration.
-
-`indexedAfter` is indexing time; `publishedFromMs` still admits unknown publication
-times. `limitExceeded` means only top matches were returned; `budgetExceeded`
-means only part of the window was searched (continue older ranges with
-`indexedBefore: scannedFrom` when needed). Filter-only listings continue with
-`pageToken: nextPageToken` and the same conditions. Deduplicate by contributionId.
-Describe partial coverage honestly; absence is not proof that nothing happened.
-Older deployments may lack these options: on contract failure use primary search,
-without bypassing access through internal services.
+For an existing Thesis's progress, use [Signals](thesis.md#thesis-tracking) first.
 
 ## SDK Modules
 
@@ -88,12 +40,27 @@ repeating a search already completed with the exposed native tool.
 
 ### Twitter/X
 
-For recent public discussion, use native search (or Serper/Brave with `site:x.com`
-when unavailable), then inspect the original posts. Worldline may add collected
-statements in parallel. Neither route guarantees full X coverage or engagement
-counts. For an exact handle history, known post lookup or interaction metrics,
-use Arrays Data Skills where covered. Verify author and publication time; search
-snippets and a quoted or reposted view are not automatically the poster's own view.
+For X/Twitter post content, use Arrays X Search first:
+`GET /api/v1/social-feeds/x/search`. Read its current contract directly with
+`alva data-skills endpoint arrays-data-api-social-feeds x-search`, then call it
+through [Data Skills](data-skills.md#calling-arrays); reuse documentation already read.
+Use `q` for keywords, `handle` to scope an author, and `since`/`until` for the
+publication window (Unix seconds). Choose `sort=latest` for recency;
+`hottest` sorts by view count, not a representative measure of market sentiment.
+
+Search reads already-ingested posts from tracked accounts; it does not fetch X
+on demand. If access, coverage or freshness is insufficient, use general search:
+the exposed native search tool, or Serper/Brave with `site:x.com` when that tool
+is unavailable or running a plain script. An empty result does not establish
+that nobody discussed the topic; describe the coverage actually checked.
+
+For an account timeline or a known post URL, use the same Data Skill's
+`by-handle` or `by-url` endpoint. Keep these lookups read-only; do not start paid
+handle tracking just to fill a search gap. Results include post text, author,
+original URL, publication time and available engagement counts. Check freshness
+and distinguish missing counts from zero. Verify author and publication time;
+a quoted or reposted view is not automatically the poster's own view. General
+search snippets remain leads: inspect the original before citing its contents.
 
 ### News
 

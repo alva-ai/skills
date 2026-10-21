@@ -13,6 +13,19 @@ const DEFAULT_SKILL_DIR = resolve(REPO_ROOT, "skills/alva");
 
 const MUTATIONS = [
   {
+    id: "verified-external-source-fallback",
+    file: "references/data-skills.md",
+    remove: " or an agent-selected public source",
+    expectFailedCases: ["issue592.capability-verification-before-refusal"],
+  },
+  {
+    id: "arrays-x-search-priority",
+    file: "references/search.md",
+    remove: "For X/Twitter post content, use Arrays X Search first:",
+    replacement: "For X/Twitter post content, use general web search first:",
+    expectFailedCases: ["retained.search-routing"],
+  },
+  {
     id: "complex-ask-required-checks",
     file: "references/request-routing.md",
     remove:

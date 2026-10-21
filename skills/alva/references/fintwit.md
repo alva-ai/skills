@@ -11,14 +11,13 @@ user asks about top fintwit/KOL traders, a leaderboard ranking, whether an
 X/Twitter handle is tracked, the curated account views on a ticker or theme, or
 an account's track record — read it here and answer from real data.
 
-For "what has @X said recently?" or public discussion beyond this curated corpus,
-use [Content Search](search.md): native search first, with Worldline as an optional
-parallel supplement for recent public statements in its collected sources.
-Exact handle history, known-post lookup and engagement
-metrics use [Data Skills](data-skills.md) where covered. This Fintwit layer stays
-the source for curated account profiles, extracted views, rankings and backtested
-performance. Do not infer a win rate or leaderboard position from web mentions or
-Worldline statements.
+For "what has @X said recently?" or searches of tweet content, use
+[Content Search](search.md#twitterx): Arrays X Search first, with general search
+as fallback when access, coverage or freshness is insufficient. Account timelines,
+known-post lookup and engagement metrics use the same [Data Skills](data-skills.md).
+This Fintwit layer stays the source for curated account profiles, extracted views,
+rankings and backtested performance. Do not infer a win rate or leaderboard
+position from individual posts or web mentions.
 
 ## Access
 

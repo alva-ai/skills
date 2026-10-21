@@ -11,7 +11,7 @@ feed, or a validated BYOD HTTP/file source. Explain and reason over verified
 evidence directly; a chat answer does not require creating a Feed or running
 a pipeline. Use computation when the requested calculation needs it.
 For news, events and attributed statements, inspected original reporting or
-Worldline source excerpts may support the answer: verify source identity, date
+retrieved original posts may support the answer: verify source identity, date
 and the claim in context. A reported claim is not independently established fact;
 use primary evidence when the conclusion depends on its truth.
 
@@ -47,7 +47,7 @@ good unless you actually rendered or screenshotted it. Copy `published_url`,
 
 ## Prohibited Sources
 
-- WebSearch snippets, search-engine summaries and generated Worldline text
+- WebSearch snippets, search-engine summaries and generated text
   alone cannot establish financial facts or supply dataset values. Read the
   underlying source for news and attributed statements as above. Prices,
   financial metrics and time series retain the SDK/Data Skills, published Feed
@@ -61,9 +61,10 @@ good unless you actually rendered or screenshotted it. Copy `published_url`,
 - User-pasted examples and screenshots are user-provided inputs, not proof of
   current financial facts. Preserve that distinction in answers and charts.
 
-If a required SDK partition lacks coverage, reduce scope, use a user-provided
-BYOD source, or report the gap as a blocker. Do not fabricate point-in-time
-values or mark them `live: false`.
+If a required SDK partition lacks coverage, follow the verified external-source
+route in [Failure And Fallback](data-skills.md#failure-and-fallback), reduce scope,
+or report the remaining gap. Do not fabricate point-in-time values or mark them
+`live: false`.
 
 If more than 20% of requested symbols fail SDK/Data Skills lookup, treat it as
 a data-quality blocker. Report the failing ids and reduce scope or request a
