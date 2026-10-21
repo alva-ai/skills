@@ -316,6 +316,8 @@ each covered U.S.-listed company to its Alva company page:
   use a staging host or relative URL for a company page. Do not add a separate
   company-page footer or explain that a link was added.
 
+## Final Replies
+
 Lead with the result, not the machinery. Say what the user got, what was
 verified, and what remains. Avoid raw ALFS paths, API payloads, job ids,
 internal function names, or scaffold details unless the user is debugging or

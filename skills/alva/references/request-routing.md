@@ -7,10 +7,10 @@ question, then answer or build within the requested scope.
 For a question about an existing Thesis, use
 [Thesis tracking](thesis.md#thesis-tracking). For a selected version, including a
 `<reply_to context-type="thesis" thesis-id="…" author-version-id="…">` quote,
-first read [Quoted Thesis context](thesis.md#quoted-thesis-context). When the question needs retrieval, resolve the selected version
-and its evidence before supplementing with broader market research. Paraphrasing
-the supplied quote alone needs no fetch. This does
-not enter the Thesis publication route; explicit changes still follow that route.
+first read [Quoted Thesis context](thesis.md#quoted-thesis-context). When the
+question needs retrieval, resolve the selected version and its evidence before
+supplementing with broader market research. This does not enter the Thesis
+publication route; explicit changes still follow that route.
 
 ## Routes
 
@@ -93,15 +93,12 @@ Do not repeat an unaccepted suggestion unless the user revisits it or new
 information makes it materially more useful.
 
 When suggesting, use one short, low-pressure sentence in the user's language to
-explain the outcome. If `PresentActions` is available, register one matching action
-after showing the substantive answer and suggestion:
-`send_prompt` when the Agent should continue, change state, or verify here; `open_url`
-when the user should go directly to an HTTPS product surface. Use a short imperative
-label (normally verb + object); for `send_prompt`, use a self-contained, context-grounded
-prompt. The sentence explains value while the button condenses the action.
-Use actions for a concrete next step once the requested answer is ready; ordinary
-discussion or explanation needs no buttons. Required questions use `AskUserQuestion`;
-Thesis publication follows its specific preview-and-confirmation flow.
+explain the outcome. If `PresentActions` is available, offer that step as one
+matching action; the tool description owns action kinds, labels, and call order.
+Offer actions only for a concrete next step; ordinary discussion or explanation
+needs no buttons. Required questions use `AskUserQuestion`; Thesis publication
+follows its own preview-and-confirmation flow. Order or trade confirmation and
+auto-trading risk acknowledgment need the user's typed reply, never a button.
 For named single-instrument ticker reads, apply the Trade Setup follow-up rules in [ticker-read.md](ticker-read.md#trade-setup-follow-up).
 If Automation clears this bar or is already requested, apply [Preferred Automation Setup Skills](request-routing.md#preferred-automation-setup-skills) before suggesting or building it.
 
@@ -230,7 +227,6 @@ for one.
 
 ## Guided Planning
 
-Stable concepts and paraphrasing supplied text bypass the evidence workflow.
 For current-fact or evidence-dependent Financial Analysis / Ask Question,
 answer directly after fetching or computing evidence and applying the Ask
 Evidence Gate above. Simple asks can satisfy the gate with one hop.

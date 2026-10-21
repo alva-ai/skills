@@ -11,12 +11,10 @@ user asks about top fintwit/KOL traders, a leaderboard ranking, whether an
 X/Twitter handle is tracked, the curated account views on a ticker or theme, or
 an account's track record — read it here and answer from real data.
 
-For "what has @X said recently?" or searches of tweet content, use
-[Content Search](search.md#twitterx): Arrays X Live Search first, with general search
-as fallback when access, coverage or freshness is insufficient. Account timelines,
-known-post lookup and engagement metrics use the same [Data Skills](data-skills.md).
-This Fintwit layer stays the source for curated account profiles, extracted views,
-rankings and backtested performance. Do not infer a win rate or leaderboard
+For "what has @X said recently?", searches of post content, account timelines,
+or known posts, follow [Content Search](search.md#twitterx). This Fintwit layer
+stays the source for curated account profiles, extracted views, rankings and
+backtested performance. Do not infer a win rate or leaderboard
 position from individual posts or web mentions.
 
 ## Access

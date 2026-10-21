@@ -155,26 +155,21 @@ HTML focused on the chart.
 - **Omit** — app headers, hero sections, long descriptions, methodology blocks,
   footers, share/subscribe CTAs.
 
-Before writing chart HTML, follow the lightweight Ask chart path:
+Before writing chart HTML:
 
-1. Use this "One-Off Chat Chart Artifacts" variant.
-2. For the chart itself, read `design-widgets.md#chart-card`.
-3. If the chart shows a price series over time or annotates price levels, read
-   `lightweight-charts.md` when the skill bundle provides it. Whether
-   or not it does, that library's v5 series API differs from v4: use
-   `addSeries(CandlestickSeries, ...)`, never `addCandlestickSeries()`.
-4. Read `operational-pitfalls.md#chart-and-html` before writing the
+1. For the chart itself, read `design-widgets.md#chart-card`.
+2. If the chart shows a price series over time or annotates price levels, read
+   [lightweight-charts.md](lightweight-charts.md); its v5 series API differs
+   from v4: use `addSeries(CandlestickSeries, ...)`, never
+   `addCandlestickSeries()`.
+3. Read `operational-pitfalls.md#chart-and-html` before writing the
    final HTML.
-5. Read `design-components.md` only if the chart truly needs
-   controls, tabs, or menus. Read the strategy playbook spec only when the user
-   explicitly asks for a strategy/backtest playbook surface.
+4. Read `design-components.md` only if the chart truly needs
+   controls, tabs, or menus.
 
-`css/design-system.css` is the bundled stylesheet; use it, but read
-the `.md` references for rules. The chart should feel embedded in the answer,
-not like a miniature playbook: no hero/app header, long description,
-methodology, footer, or share/subscribe CTA. Prefer one compact
-Chart Card with a short title, readable axes, compact legend, source/as-of note,
-correct Alva watermark placement, and responsive sizing.
+Use the bundled `css/design-system.css` (rules live in the `.md` references).
+Within the Include/Omit shape above, keep readable axes, a compact legend, and
+responsive sizing.
 
 Prefer TradingView Lightweight Charts for any one-off chart whose main view is a
 price series over time — OHLC, candlestick, a single price line, price-volume,
@@ -249,12 +244,10 @@ review loop:
 6. Only the finalized call returns the chart marker. Embed that marker verbatim
    in your next reply. Do not call `UploadFile` again for the same chart.
 
-Content Legitimacy constrains data sourcing, not artifact type. It does not
-imply playbook creation, release, feed deployment, cron registration, or a share
-card. Use legitimate data you have already fetched, or ask for missing source
-context. When the user supplies the values directly, label them as
-user-provided and do not claim live, official, or automatically refreshed
-provenance.
+Content Legitimacy constrains data sourcing, not artifact type: follow its
+[chat-chart exception](content-legitimacy.md#data-sourcing). A chart never
+implies playbook creation, release, feed deployment, cron registration, or a
+share card.
 
 ## Playbook Container
 

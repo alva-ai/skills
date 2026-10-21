@@ -1,13 +1,11 @@
 # Content Search
 
 Use the runtime's exposed web search tool first for unstructured research:
-news, public statements and source documents. For X/Twitter post content, use
-Arrays X Live Search first as described below, with general search as fallback. Inspect
-relevant originals with its page-reading tools; follow the exposed tool schema.
-In ALPI, `web_search` accepts `search_query` and `open`/`click`/`find` using
-returned reference IDs. If native search is unavailable, or a plain Feed/Automation
-script needs search, use the SDKs below. Do not invent a tool or call the managed
-search transport directly.
+news, public statements and source documents. Inspect relevant originals with
+its page-reading tools, following the exposed tool schema. X/Twitter post
+content follows [Twitter/X](#twitterx). If native search is unavailable, or a
+plain Feed/Automation script needs search, use the SDKs below. Do not invent a
+tool or call the managed search transport directly.
 
 Prices, financial datasets, exact account history and engagement metrics retain
 their [Data Skills](data-skills.md) routes. News, YouTube, Reddit and podcast
@@ -40,35 +38,35 @@ repeating a search already completed with the exposed native tool.
 
 ### Twitter/X
 
-For X/Twitter post content, use Arrays X Live Search first:
-`GET /api/v1/social-feeds/x/live-search`. Read the current live-search contract
-from `arrays-data-api-social-feeds` through `alva data-skills`; use the File
-returned by its summary, then call through [Data Skills](data-skills.md#calling-arrays).
-Reuse documentation already read.
+Choose the X route from the current `arrays-data-api-social-feeds` Data Skill
+catalog (`alva data-skills summary`, then the endpoint doc for the File it
+lists), and call through [Data Skills](data-skills.md#calling-arrays). Reuse
+documentation already read; never call an endpoint the catalog does not list.
 
-`q` accepts X search syntax, including author filters. Use `sort=latest` or
-`sort=top`, and `since`/`until` for the publication window (Unix seconds).
-Retweets are excluded by default; add `include:nativeretweets` to `q` when the
-request needs them, including an account's reposts. Fetch one page (at most
-20 posts), then follow the returned `cursor` only when more evidence is needed.
-The response uses the same post format as `/x/search`; its request parameters
-and search coverage differ. `top` is not representative market sentiment.
+1. **Post-content or topic search:** when the catalog lists a live-search
+   endpoint, use it per its current contract. Fetch one page first; follow its
+   cursor only when more evidence is needed.
+2. **Known account or post:** use the catalog's `by-handle` timeline or
+   `by-url` lookup; stored history of tracked accounts or update polling uses
+   its indexed search. Keep these lookups read-only; do not start paid handle
+   tracking just to fill a search gap.
+3. **Otherwise, general search:** the exposed native search tool, or Serper/Brave
+   with `site:x.com OR site:twitter.com` when that tool is unavailable or in a
+   plain script. Say in the answer that this evidence came from general search,
+   not Arrays X data.
 
-The older `/api/v1/social-feeds/x/search` searches already-ingested posts from
-tracked accounts; retain it for indexed-history or update-polling requests.
-If live search or its contract is unavailable, or coverage or freshness is
-insufficient, use general search: the exposed native search tool, or Serper/Brave
-with `site:x.com` when that tool is unavailable or running a plain script.
+Failures follow [Failure And Fallback](data-skills.md#failure-and-fallback). On
+401, refresh the token as in [Calling Arrays](data-skills.md#calling-arrays); if
+it persists, report the credential block instead of switching to another source.
 An empty result does not establish that nobody discussed the topic; describe
 the coverage actually checked.
 
-For an account timeline or a known post URL, use the same Data Skill's
-`by-handle` or `by-url` endpoint. Keep these lookups read-only; do not start paid
-handle tracking just to fill a search gap. Results include post text, author,
-original URL, publication time and available engagement counts. Check freshness
-and distinguish missing counts from zero. Verify author and publication time;
-a quoted or reposted view is not automatically the poster's own view. General
-search snippets remain leads: inspect the original before citing its contents.
+Results include post text, author, original URL, publication time and available
+engagement counts. Check freshness and distinguish missing counts from zero.
+Verify author and publication time; a retweet or quoted post is not
+automatically the poster's own view. Top-ranked or most-engaged posts are not
+representative market sentiment. General search snippets remain leads: inspect
+the original before citing its contents.
 
 ### News
 

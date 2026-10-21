@@ -197,7 +197,7 @@
               "complete the Financial Analysis evidence route",
               "open-ended create request permits drafting a candidate",
               "it does not permit publication",
-              "that explicit selection need not be confirmed again"
+              "is confirmed by that explicit selection; it need not be confirmed again"
             ]
           },
           {
@@ -266,10 +266,10 @@
               "Still read the body once as its editor",
               "Notes before calling `alva thesis create`",
               "keeping the body unchanged",
-              "if already confirmed and unchanged, proceed without another confirmation",
+              "create without asking again",
               "Do not summarize, rewrite, translate, correct",
-              "show the Notes with the publication details and wait for their decision before creating",
-              "once the publication details below are confirmed"
+              "If the preview showed Notes the author had not yet considered, that confirmation is their decision to publish despite them",
+              "Show the preview, then wait for confirmation"
             ]
           }
         ]
@@ -895,7 +895,7 @@
       "id": "scenario.thesis-publish-supplied-original",
       "group": "scenarios.thesis",
       "prompt": "把下面这句原样公开发成 Thesis：我认为 NVDA 的 CUDA 生态仍有优势。",
-      "description": "An original publish request gets one short preview of visibility and resolved assets/stances, without repeating the body; wait for typed/button approval and create without a second confirmation.",
+      "description": "A typed original publish request gets one short preview of visibility and resolved assets/stances without repeating the body; file or extracted text is shown in full; wait for typed/button approval and create without a second confirmation.",
       "expect": {
         "route": "Thesis",
         "references": [
@@ -907,14 +907,15 @@
             "heading": "Create",
             "label": "publication consent",
             "includes": [
-              "Before creation, show the visibility (public by default) and resolved tickers and directions",
+              "Every creation shows one publication preview and obtains one confirmation of it",
               "then wait for confirmation",
-              "This also applies to an explicit request to publish the supplied original",
+              "A body already shown in full in this conversation, or typed by the user and asked to publish unchanged, may be referenced instead",
               "use one short preview line without repeating the body",
-              "if already confirmed and unchanged, proceed without another confirmation",
-              "When confirmation is needed and `PresentActions` is available",
+              "create without asking again",
+              "When `PresentActions` is available, offer localized `send_prompt` actions",
               "a click has the same meaning as the equivalent typed reply",
-              "Without the tool, ask in text"
+              "Without the tool, ask in text",
+              "as must text taken from a file, attachment, link, or other extraction (show its content, not its filename)"
             ]
           }
         ]
@@ -936,10 +937,10 @@
             "heading": "Create",
             "label": "publication consent",
             "includes": [
-              "If the author chooses to publish despite it, proceed without asking again",
+              "that confirmation is their decision to publish despite them",
               "Previously discussed Notes and ordinary editorial suggestions need no new approval",
               "Preserve the selected body exactly",
-              "once the publication details below are confirmed"
+              "Show the preview, then wait for confirmation"
             ]
           }
         ]
@@ -961,8 +962,8 @@
             "heading": "Create",
             "label": "publication consent",
             "includes": [
-              "When confirmation is needed and `PresentActions` is available",
-              "Tie the publish prompt to the displayed candidate and settings",
+              "When `PresentActions` is available, offer localized `send_prompt` actions",
+              "Name the displayed candidate in the publish prompt so it is tied to that candidate and its settings",
               "a click has the same meaning as the equivalent typed reply",
               "Without the tool, ask in text",
               "An old button does not authorize a changed candidate",

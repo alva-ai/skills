@@ -128,7 +128,7 @@
       "id": "retained.search-routing",
       "group": "retained",
       "target": "corpus",
-      "description": "Arrays leads tweet-content search with general search as fallback; source checks and specialized financial/Fintwit reads remain intact.",
+      "description": "Tweet-content search routes through the current social-feeds Data Skill catalog, discloses general-search fallback, keeps source checks, and never inlines unpublished X endpoints.",
       "includes": [
         "unified_search",
         "Twitter/X routing",
@@ -141,28 +141,26 @@
           "file": "references/search.md",
           "includes": [
             "Use the runtime's exposed web search tool first",
-            "For X/Twitter post content, use Arrays X Live Search first:",
-            "GET /api/v1/social-feeds/x/live-search",
-            "q` accepts X search syntax",
-            "sort=latest` or `sort=top",
-            "since`/`until",
-            "Unix seconds",
-            "Retweets are excluded by default",
-            "include:nativeretweets",
-            "Fetch one page (at most 20 posts)",
-            "returned `cursor` only when more evidence is needed",
-            "retain it for indexed-history or update-polling requests",
-            "If live search or its contract is unavailable",
+            "Choose the X route from the current `arrays-data-api-social-feeds` Data Skill catalog",
+            "never call an endpoint the catalog does not list",
+            "when the catalog lists a live-search endpoint, use it per its current contract",
+            "follow its cursor only when more evidence is needed",
+            "`by-handle` timeline or `by-url` lookup",
+            "stored history of tracked accounts or update polling uses its indexed search",
+            "`site:x.com OR site:twitter.com`",
+            "Say in the answer that this evidence came from general search",
+            "report the credential block instead of switching to another source",
             "An empty result does not establish that nobody discussed the topic",
             "do not start paid handle tracking just to fill a search gap",
+            "a retweet or quoted post is not automatically the poster's own view",
+            "Top-ranked or most-engaged posts are not representative market sentiment",
             "inspect the original before citing its contents"
           ]
         },
         {
           "file": "references/fintwit.md",
           "includes": [
-            "Arrays X Live Search first",
-            "general search as fallback",
+            "follow [Content Search](search.md#twitterx)",
             "source for curated account profiles, extracted views, rankings and backtested performance",
             "Do not infer a win rate or leaderboard position"
           ]
@@ -180,7 +178,9 @@
       "excludes": [
         "Grok",
         "search-grok-x",
-        "Worldline"
+        "Worldline",
+        "x/live-search",
+        "include:nativeretweets"
       ]
     },
     {
@@ -877,7 +877,9 @@
             "Never replace a missing data source with LLM-fabricated values",
             "Do not ask the user to find a source or approve public-source research before trying it yourself",
             "Return useful results with the source and material limitations",
-            "no routine source-approval question is needed"
+            "no routine source-approval question is needed",
+            "say which module is unavailable and offer two paths",
+            "Do not route around an access gate by fetching the gated dataset elsewhere"
           ]
         }
       ]
@@ -1128,16 +1130,20 @@
       "id": "target.useful-next-step-actions",
       "group": "target",
       "target": "corpus",
-      "description": "Useful post-answer suggestions pair explanatory prose with the correct compact action when the tool is available.",
+      "description": "Useful post-answer suggestions pair explanatory prose with one action when the tool is available; call order belongs to the tool description, and trade consent is never a button.",
       "includes": [
-        "If `PresentActions` is available",
-        "`send_prompt` when the Agent should continue",
-        "`open_url`",
-        "short imperative",
-        "button condenses the action",
-        "after showing the substantive answer and suggestion",
+        "If `PresentActions` is available, offer that step as one matching action",
+        "the tool description owns action kinds, labels, and call order",
         "ordinary discussion or explanation needs no buttons",
-        "Required questions use `AskUserQuestion`"
+        "Required questions use `AskUserQuestion`",
+        "need the user's typed reply, never a button"
+      ],
+      "excludes": [
+        "before the final reply",
+        "after the final reply",
+        "after showing the substantive answer",
+        "after showing the preview",
+        "after showing the completion card"
       ]
     },
     {
@@ -1394,7 +1400,7 @@
       "section_includes": [
         {
           "file": "references/user-facing-prose.md",
-          "heading": "Company Page Links",
+          "heading": "Final Replies",
           "label": "concise completion update",
           "includes": [
             "After a deployment or other multi-step build",
@@ -1517,27 +1523,27 @@
             "completion card, not another confirmation gate",
             "set-visibility --id <id> --visibility public",
             "without publishing a new author version",
-            "authorizes that exact body",
-            "if already confirmed and unchanged, proceed without another confirmation",
+            "authorizes exactly the displayed body and publication details",
+            "create without asking again",
             "Research or rewriting alone never authorizes publication",
-            "show the complete candidate (including file content, not its filename), title, visibility, tickers and directions",
-            "Use the asset extraction result for catalog IDs",
-            "obtain selection of the changed candidate",
+            "as must text taken from a file, attachment, link, or other extraction (show its content, not its filename)",
+            "using the asset extraction result for catalog IDs",
+            "rerun extraction for a changed body and show the new preview",
             "Stop if declined",
-            "Reuse an already displayed or user-supplied exact body by referring to it clearly",
+            "A body already shown in full in this conversation, or typed by the user and asked to publish unchanged, may be referenced instead",
             "New or changed candidates must be shown in full",
-            "A natural confirmation of the selected body and publication settings is sufficient",
-            "When confirmation is needed and `PresentActions` is available",
-            "after showing the preview and any Notes",
-            "action after showing the completion card and link",
+            "A natural confirmation, typed or by action click, authorizes exactly the displayed body and publication details",
+            "When `PresentActions` is available, offer localized `send_prompt` actions",
+            "\"Publish this version\" and \"Edit\" for the preview",
+            "also offer it as an `open_url` action",
             "a click has the same meaning as the equivalent typed reply",
             "Without the tool, ask in text",
             "An old button does not authorize a changed candidate",
             "repeated approval of an already completed creation must not create another Thesis",
-            "Present publication details in the user's language",
+            "Present the preview in the user's language",
             "Keep internal IDs and API field names out of the preview",
             "omit absent optional fields instead of listing blanks",
-            "Before creation, show the visibility (public by default) and resolved tickers and directions",
+            "Every creation shows one publication preview and obtains one confirmation of it",
             "then wait for confirmation",
             "use one short preview line without repeating the body"
           ]
@@ -1599,8 +1605,8 @@
             "Still read the body once as its editor",
             "Notes before calling `alva thesis create`",
             "keeping the body unchanged",
-            "show the Notes with the publication details and wait for their decision before creating",
-            "If the author chooses to publish despite it, proceed without asking again"
+            "If the preview showed Notes the author had not yet considered, that confirmation is their decision to publish despite them",
+            "that confirmation is their decision to publish despite them"
           ]
         },
         {

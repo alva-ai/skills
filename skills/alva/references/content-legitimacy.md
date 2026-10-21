@@ -26,20 +26,19 @@ summary, seeded RNG, or analytic memo when Alva can serve the original request.
 
 ## Data Sourcing
 
-Live Playbook charts, tables, and metric cards must read feed outputs at
-runtime. An explicitly requested static snapshot may freeze sourced values
-with a source/as-of label; do not describe it as live or automatically refreshed.
+Playbook charts, tables, and metric cards read feed outputs at runtime. Do not
+embed sandbox-only environment variables such as `$ALVA_ENDPOINT`, guess
+`https://api.alva.ai`, or hardcode data as inline JavaScript literals. Use the
+browser-safe public ALFS helper in
+[playbook-creation.md](playbook-creation.md#browser-safe-feed-reads). A release
+with `--feeds '[]'` must render zero quantitative values.
 
-For live Playbooks, HTML must fetch feed output paths at runtime. Do not embed
-sandbox-only environment variables such as `$ALVA_ENDPOINT`, guess `https://api.alva.ai`, or
-hardcode data as inline JavaScript literals. Use the browser-safe public ALFS
-helper in [playbook-creation.md](playbook-creation.md#browser-safe-feed-reads).
-
-Exception: one-off Ask chart artifacts published with `PublishChartHTML` may
-inline data already fetched or computed from legitimate sources in the current
-answer flow. Label the source/as-of time, mark user-supplied values as
-user-provided, and do not claim the artifact is live, official, or automatically
-refreshed.
+Two exceptions may inline values: an explicitly requested
+[static snapshot](playbook-creation.md#static-snapshot), and one-off Ask chart
+artifacts published with `PublishChartHTML` using data already fetched or
+computed from legitimate sources in the current answer flow. Both label the
+source/as-of time, mark user-supplied values as user-provided, and never claim
+to be live, official, or automatically refreshed.
 
 Verification claims must reflect real tool calls. Do not say a dashboard looks
 good unless you actually rendered or screenshotted it. Copy `published_url`,

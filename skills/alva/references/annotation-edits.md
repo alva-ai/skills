@@ -37,9 +37,10 @@ say so explicitly rather than letting it change silently.
 
 ---
 
-Never freeze rendered feed values into static text during a live Playbook edit.
-An explicitly requested static snapshot must use sourced, dated values. HTML edits re-enter
-`before-build-html` in [playbook-creation.md](playbook-creation.md).
+Never freeze rendered feed values into static text; converting a live Playbook
+to a [static snapshot](playbook-creation.md#static-snapshot) is a separate
+explicit request. HTML edits re-enter `before-build-html` in
+[playbook-creation.md](playbook-creation.md).
 
 ## Locate the Generator
 
@@ -58,7 +59,7 @@ so the target is one of two cases:
 ## Edit the Generator, Never Freeze the Output
 
 Do not copy the element's rendered DOM and paste it back as static HTML with
-the instruction applied during a live Playbook edit. That hardcodes the live feed value into a literal
+the instruction applied. That hardcodes the live feed value into a literal
 (breaking the [Content Legitimacy Rules](content-legitimacy.md)),
 so the element stops reflowing on the next feed update, and it usually drops
 design-system tokens.

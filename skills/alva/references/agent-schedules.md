@@ -134,22 +134,24 @@ See [alpi.md](alpi.md) for the distinction from application-level `Agent.ask()`.
 
 ## Auto-Trading Consent
 
-Backtests and signals use Altra. Actual
-orders require the trading surface, a dry run first, explicit user confirmation
-before non-dry-run execution, and [api/trading.md](api/trading.md).
-This per-order confirmation rule holds for any order placed in an ordinary
-conversation. *Exemption (scheduled occurrences only):* an Agent Schedule
-`--message` or verified legacy Channel Loop goal carrying
-`[auto-trade-consent: granted <ISO8601-UTC>
-record=~/memory/auto-trade-consent.md]` AND whose one-read verification finds
-the record MAY place live orders without per-order user confirmation, subject
-to dry-run validation, a fresh idempotent intent-id, and trex risk rules.
-Verification checks only that the consent record exists: the timestamp is
-provenance, not a match key, and a differing `granted_at` after re-grant is not
-a mismatch. A missing or unreadable record means NO live orders. This applies
-only to Agent Schedule occurrences and verified legacy Channel Loop ticks,
-never interactive; recurring schedules also require `--until` or
-`--max-occurrences`.
+Interactive orders, including any order placed in an ordinary conversation,
+require a dry run and explicit per-order confirmation per
+[api/trading.md](api/trading.md). The only exception: an Agent Schedule
+occurrence or verified legacy Channel Loop tick MAY place live orders without
+per-order user confirmation when all of these hold:
+
+1. The user explicitly granted it in their own typed reply (never an action
+   button), and the Schedule `--message` (or legacy Loop goal) carries
+   `[auto-trade-consent: granted <ISO8601-UTC> record=~/memory/auto-trade-consent.md]`.
+2. The occurrence's one-read verification finds that record. Verification
+   checks only that the consent record exists: the timestamp is provenance, not
+   a match key, and a differing `granted_at` after re-grant is not a mismatch.
+   A missing or unreadable record means NO live orders.
+3. A recurring Schedule is bounded by `--until` or `--max-occurrences`.
+4. Dry-run validation, a fresh idempotent intent-id, and trex risk rules pass.
+
+This applies only to Agent Schedule occurrences and verified legacy Channel
+Loop ticks, never interactive turns.
 
 Do not copy consent from an old Loop or another Schedule during migration. A
 new Schedule needs the user's explicit consent-bearing message.

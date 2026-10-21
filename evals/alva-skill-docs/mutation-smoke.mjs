@@ -13,24 +13,50 @@ const DEFAULT_SKILL_DIR = resolve(REPO_ROOT, "skills/alva");
 
 const MUTATIONS = [
   {
-    id: "x-live-search-retweet-default",
+    id: "x-catalog-gate",
     file: "references/search.md",
-    remove: "Retweets are excluded by default",
-    replacement: "Retweets are included by default",
+    remove: "never call an endpoint the catalog does not list.",
+    replacement: "call `/api/v1/social-feeds/x/live-search` directly.",
     expectFailedCases: ["retained.search-routing"],
   },
   {
-    id: "thesis-preview-before-actions",
+    id: "x-general-search-disclosure",
+    file: "references/search.md",
+    remove: " Say in the answer that this evidence came from general search,\n   not Arrays X data.",
+    expectFailedCases: ["retained.search-routing"],
+  },
+  {
+    id: "x-401-no-source-switch",
+    file: "references/search.md",
+    remove: "report the credential block instead of switching to another source.",
+    replacement: "switch to general search.",
+    expectFailedCases: ["retained.search-routing"],
+  },
+  {
+    id: "thesis-actions-scoped-to-preview",
     file: "references/thesis.md",
-    remove: "after showing\nthe preview and any Notes",
-    replacement: "before showing the preview and any Notes",
-    expectFailedCases: ["target.thesis-create-preview-card"],
+    remove: "\"Edit\" for the preview.",
+    replacement: "\"Edit\" before the final reply.",
+    expectFailedCases: ["target.thesis-create-preview-card", "target.useful-next-step-actions"],
+  },
+  {
+    id: "playbook-share-action-timing",
+    file: "references/playbook-creation.md",
+    remove: "also offer that link as an `open_url` action.",
+    replacement: "register that link as an `open_url` action before the final reply.",
+    expectFailedCases: ["target.useful-next-step-actions"],
+  },
+  {
+    id: "trade-consent-not-button",
+    file: "references/request-routing.md",
+    remove: "Order or trade confirmation and\nauto-trading risk acknowledgment need the user's typed reply, never a button.",
+    expectFailedCases: ["target.useful-next-step-actions"],
   },
   {
     id: "thesis-original-awaits-preview-confirmation",
     file: "references/thesis.md",
-    remove: "then wait\nfor confirmation",
-    replacement: "then create immediately",
+    remove: "Show the preview, then wait for confirmation.",
+    replacement: "Show the preview, then create immediately.",
     expectFailedCases: [
       "target.thesis-create-preview-card",
       "scenario.thesis-publish-supplied-original",
@@ -39,8 +65,8 @@ const MUTATIONS = [
   {
     id: "thesis-new-editorial-issue-awaits-author",
     file: "references/thesis.md",
-    remove: "show the Notes with the publication details and wait for their decision before creating",
-    replacement: "show the Notes and create immediately",
+    remove: "If the preview showed Notes the author had not yet\nconsidered, that confirmation is their decision to publish despite them.",
+    replacement: "Create immediately even when the preview shows new Notes.",
     expectFailedCases: [
       "target.thesis-authorship",
       "scenario.thesis-confirm-flags-inconsistent-body",
@@ -57,6 +83,21 @@ const MUTATIONS = [
     ],
   },
   {
+    id: "thesis-file-body-shown-in-full",
+    file: "references/thesis.md",
+    remove: ", as must text taken\n  from a file, attachment, link, or other extraction (show its content, not its\n  filename)",
+    expectFailedCases: [
+      "target.thesis-create-preview-card",
+      "scenario.thesis-publish-supplied-original",
+    ],
+  },
+  {
+    id: "pro-gate-not-bypassed",
+    file: "references/data-skills.md",
+    remove: " Do not route around an access gate\n   by fetching the gated dataset elsewhere unless the user asks for that.",
+    expectFailedCases: ["issue592.capability-verification-before-refusal"],
+  },
+  {
     id: "verified-external-source-fallback",
     file: "references/data-skills.md",
     remove: "actively search for\n   an accessible public source",
@@ -65,8 +106,8 @@ const MUTATIONS = [
   {
     id: "arrays-x-search-priority",
     file: "references/search.md",
-    remove: "For X/Twitter post content, use Arrays X Live Search first:",
-    replacement: "For X/Twitter post content, use general web search first:",
+    remove: "when the catalog lists a live-search\n   endpoint, use it per its current contract.",
+    replacement: "use general web search first.",
     expectFailedCases: ["retained.search-routing"],
   },
   {
@@ -124,7 +165,7 @@ const MUTATIONS = [
   {
     id: "thesis-authorship-notes-before-create",
     file: "references/thesis.md",
-    remove: " before calling\n`alva thesis create`",
+    remove: " before calling `alva thesis create`",
     expectFailedCases: [
       "target.thesis-authorship",
       "scenario.thesis-confirm-flags-inconsistent-body",
