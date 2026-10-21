@@ -1127,7 +1127,7 @@
         "`open_url`",
         "short imperative",
         "button condenses the action",
-        "as the last tool call immediately before writing the final reply",
+        "after showing the substantive answer and suggestion",
         "ordinary discussion or explanation needs no buttons",
         "Required questions use `AskUserQuestion`"
       ]
@@ -1520,6 +1520,8 @@
             "New or changed candidates must be shown in full",
             "A natural confirmation of the selected body and publication settings is sufficient",
             "When confirmation is needed and `PresentActions` is available",
+            "after showing the preview and any Notes",
+            "action after showing the completion card and link",
             "a click has the same meaning as the equivalent typed reply",
             "Without the tool, ask in text",
             "An old button does not authorize a changed candidate",

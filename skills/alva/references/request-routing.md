@@ -94,7 +94,7 @@ information makes it materially more useful.
 
 When suggesting, use one short, low-pressure sentence in the user's language to
 explain the outcome. If `PresentActions` is available, register one matching action
-as the last tool call immediately before writing the final reply:
+after showing the substantive answer and suggestion:
 `send_prompt` when the Agent should continue, change state, or verify here; `open_url`
 when the user should go directly to an HTTPS product surface. Use a short imperative
 label (normally verb + object); for `send_prompt`, use a self-contained, context-grounded

@@ -144,8 +144,8 @@ do not repeat the full text just to ask a remaining question. New or changed
 candidates must be shown in full. A natural confirmation of the selected body
 and publication settings is sufficient; do not ask for it again unless they change.
 When confirmation is needed and `PresentActions` is available, offer localized
-`send_prompt` actions such as "Publish this version" and "Edit": register them
-as the last tool call before the final reply containing the preview or Notes.
+`send_prompt` actions such as "Publish this version" and "Edit" after showing
+the preview and any Notes.
 Tie the publish prompt to the displayed candidate and settings; a click has the same meaning as the equivalent typed reply. Without the tool, ask in text.
 An old button does not authorize a changed candidate, and repeated approval of an
 already completed creation must not create another Thesis; verify its existing ID.
@@ -213,7 +213,7 @@ malformed field is failure. On incomplete GET data, report the created ID and
 only verified fields in plain text; do not emit partial XML. The preview is a
 completion card, not another confirmation gate. If an authoritative HTTPS Thesis
 URL is available and `PresentActions` is supported, offer it as an `open_url`
-action before the final reply and retain the link in the reply; otherwise use
+action after showing the completion card and link; otherwise use
 the existing preview card without inventing a URL.
 
 ## Rewrite

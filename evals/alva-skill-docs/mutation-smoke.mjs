@@ -13,6 +13,13 @@ const DEFAULT_SKILL_DIR = resolve(REPO_ROOT, "skills/alva");
 
 const MUTATIONS = [
   {
+    id: "thesis-preview-before-actions",
+    file: "references/thesis.md",
+    remove: "after showing\nthe preview and any Notes",
+    replacement: "before showing the preview and any Notes",
+    expectFailedCases: ["target.thesis-create-preview-card"],
+  },
+  {
     id: "thesis-original-awaits-preview-confirmation",
     file: "references/thesis.md",
     remove: "then wait\nfor confirmation",
