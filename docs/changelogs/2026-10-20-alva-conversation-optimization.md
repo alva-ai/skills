@@ -8,7 +8,7 @@ simple questions inherit setup, discovery and build requirements. The ALPI Slim
 entry offered a smaller structure but did not cover all Sandbox capabilities.
 
 This is the consolidated record for the batch. The companion
-[Sandbox changelog](../../../../backend/sandbox-agent-ts/docs/changelogs/2026-10-20-alva-conversation-optimization.md)
+[Sandbox changelog](https://github.com/alva-ai/sandbox-agent-ts/pull/386)
 covers communication, context use and background-task handoff.
 
 ## 2. Intended behavior
@@ -234,12 +234,11 @@ Live-search routing checks: 106/106 document cases (1247/1247 checks),
 is clean. These structural checks do not validate the live endpoint.
 
 Search follow-up: removed GrokX instructions (including the legacy Grok pointer
-in Data Skills, guarded by a restoration mutation). The revised route uses Arrays
-X Live Search for tweet content and general search when access, coverage or
-freshness is insufficient. The dev-provided live-search contract uses X query
-syntax, latest/top, Unix-second windows, pages of at most 20 posts and cursor
-pagination; retweets require explicit include:nativeretweets when wanted.
-The older x-search contract remains store-only and serves indexed history/polling.
+in Data Skills, guarded by a restoration mutation). The revised route picks
+the X endpoint from the current social-feeds Data Skill catalog: live search
+when the catalog lists it, otherwise `by-handle`/`by-url` (indexed search for
+stored history/polling), otherwise disclosed general search. The unpublished
+live-search path and parameters are not inlined in Skill text (see section 9).
 Known URLs and account timelines retain
 their direct-read endpoints; empty results do not prove absence and lookup does
 not silently start paid tracking. Fintwit retains curated views, rankings and
@@ -377,10 +376,9 @@ unverified; low invocation counts alone do not prove a unique cause.
 - Before rollout, Arrays must publish the live-search Data Skill contract and
   the separate billing task must be completed. The production catalog checked
   on 2026-10-21 still omitted it; the private Arrays PR could not be read. New
-  parameters follow the user-supplied dev contract; no paid live search was run.
-  Verify tweet-topic and author-scoped searches use Arrays X Live Search first;
-  check default retweet exclusion, explicit inclusion, latest/top, Unix-second
-  windows and bounded cursor paging;
+  Skill text is catalog-gated, so publication needs no Skill edit; no paid live
+  search was run. Once listed, verify tweet-topic and author-scoped searches use
+  live search per its catalog contract, with bounded cursor paging;
   insufficient/empty/stale or inaccessible results fall back to general search
   without claiming no discussion exists or starting paid handle tracking.
   Check known URLs/timelines, preserved Fintwit ranking reads, no Worldline calls,
@@ -421,3 +419,48 @@ unverified; low invocation counts alone do not prove a unique cause.
   acceptance; the upstream dependency-lock version alone does not identify
   the local candidate. Publish a real accepted commit/tag before updating the
   Sandbox production pin; do not deploy this prompt pair against the old bundle.
+
+## 9. Review follow-up (2026-10-21)
+
+Applied after review of head `2c197ef`; additive commits only.
+
+- **PresentActions timing:** Skill text no longer states when to call the tool.
+  `playbook-creation.md` still said "before the final reply", contradicting the
+  withdrawn order. Action kinds, labels and call order belong to the Sandbox tool
+  description. Skill text names which action to offer and states that order/trade
+  confirmation and auto-trading risk acknowledgment are typed replies, never buttons.
+  Corpus excludes guard against reintroduced timing.
+- **Thesis Create:** one publication preview (body, title, visibility, assets
+  with stances, Notes) and one confirmation, typed or by button, replace five
+  overlapping confirm-once statements. Asset extraction runs before the preview.
+  New or changed candidates, and text taken from files, attachments, links or
+  other extraction, are shown in full. A body already shown in full, or typed by
+  the user for unchanged publication, may be referenced by one short line. Any
+  change voids the confirmation.
+- **X search:** route through the current social-feeds catalog. Use live search
+  when listed, `by-handle`/`by-url` (indexed search for stored history or polling)
+  for known accounts/posts, otherwise general search
+  (`site:x.com OR site:twitter.com`), disclosed in the answer. A persistent 401
+  reports the credential block instead of switching source. Evidence rules (top
+  is not sentiment; a retweet is not the poster's own view) remain. Removed the
+  ALPI-specific `web_search` schema line.
+- **Access gates:** a Pro/subscription gate again offers upgrade/access or a
+  user-supplied source; it is not silently routed around. Autonomous public-source
+  recovery remains for coverage gaps.
+- **Static snapshot:** one definition in `playbook-creation.md#static-snapshot`
+  replaces per-gate exception clauses. Content Legitimacy lists it with the chat
+  chart as the two inline-value exceptions and restores the `--feeds '[]'`
+  zero-quantitative rule.
+- **Playbook reuse:** the mandatory trending + Skillhub ladder and build
+  confirmation become one optional trending check. Duplicates of existing gates
+  were removed from Build Verification.
+- **Scheduled trading consent:** restored the structured four-condition list
+  in `agent-schedules.md`. The broker reference now points there, not at SKILL.md.
+- **Cleanup:** restored the jagent `ReferenceError` rewrite rule. Deduplicated
+  the chat-chart section, the ECharts tab-resize pitfall, final-reply rules (own
+  heading) and repeated explain-versus-evidence sentences.
+
+Verification: `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva`
+106/106 cases; `node evals/alva-skill-docs/mutation-smoke.mjs` 43/43;
+`node --test evals/alva-skill-docs/durable-agent.test.mjs` 5/5;
+design.md CSS blocks unchanged. Real-turn Eval items in section 8 still apply.
