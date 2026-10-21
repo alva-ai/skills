@@ -170,9 +170,8 @@
         }
       ],
       "excludes": [
-        "searchGrokX",
-        "search-grok-x",
-        "GrokX"
+        "Grok",
+        "search-grok-x"
       ]
     },
     {

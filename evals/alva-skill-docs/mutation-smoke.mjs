@@ -13,6 +13,13 @@ const DEFAULT_SKILL_DIR = resolve(REPO_ROOT, "skills/alva");
 
 const MUTATIONS = [
   {
+    id: "search-legacy-grok-guidance",
+    file: "references/data-skills.md",
+    remove: "Twitter/X routing:",
+    replacement: "Twitter/X routing:\n\n- Use `unified_search` / Grok when you need global X search beyond the tracked index.",
+    expectFailedCases: ["retained.search-routing"],
+  },
+  {
     id: "thesis-quote-routing",
     file: "SKILL.md",
     remove: "[Quoted Thesis context](references/thesis.md#quoted-thesis-context)",
@@ -285,12 +292,12 @@ function runEval(skillDir) {
   };
 }
 
-function replaceOnce(filePath, needle) {
+function replaceOnce(filePath, needle, replacement = "") {
   const original = readFileSync(filePath, "utf8");
   if (!original.includes(needle)) {
     throw new Error(`Mutation target not found in ${filePath}: ${JSON.stringify(needle)}`);
   }
-  writeFileSync(filePath, original.replace(needle, ""), "utf8");
+  writeFileSync(filePath, original.replace(needle, replacement), "utf8");
 }
 
 function copySkill(sourceSkillDir, tempRoot, mutationId) {
@@ -309,11 +316,11 @@ function assertEvalGreen(sourceSkillDir) {
 
 function assertMutationFails(sourceSkillDir, tempRoot, mutation) {
   const mutatedSkillDir = copySkill(sourceSkillDir, tempRoot, mutation.id);
-  replaceOnce(resolve(mutatedSkillDir, mutation.file), mutation.remove);
+  replaceOnce(resolve(mutatedSkillDir, mutation.file), mutation.remove, mutation.replacement);
 
   const result = runEval(mutatedSkillDir);
   if (result.status === 0) {
-    throw new Error(`${mutation.id}: eval unexpectedly passed after removing ${mutation.file}`);
+    throw new Error(`${mutation.id}: eval unexpectedly passed after mutating ${mutation.file}`);
   }
 
   const missingExpectedCases = mutation.expectFailedCases.filter(

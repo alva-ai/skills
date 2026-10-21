@@ -166,7 +166,8 @@ previously frozen candidate; record this follow-up as a separate comparison.
 
 ## 7. Outcome and evidence
 
-Search follow-up: removed GrokX instructions, made exposed native search the
+Search follow-up: removed GrokX instructions (including the legacy Grok pointer
+in Data Skills, guarded by a restoration mutation), made exposed native search the
 unstructured-research default and Worldline an optional parallel supplement.
 Fintwit keeps curated views, rankings and performance; recent public statements
 follow Content Search. Existing search/scrape recipes remain script/fallback
@@ -187,8 +188,8 @@ remains upstream `411ea14`. Final product-tree checks:
 
 | Command, from this repository | Result |
 | --- | --- |
-| `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva --out /tmp/alva-search-doc-check.md` | 103/103 cases; 1182/1182 checks |
-| `node evals/alva-skill-docs/mutation-smoke.mjs` | 28/28 mutations detected |
+| `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva --out /tmp/alva-search-doc-check.md` | 103/103 cases; 1181/1181 checks |
+| `node evals/alva-skill-docs/mutation-smoke.mjs` | 29/29 mutations detected |
 | `node --test evals/alva-skill-docs/durable-agent.test.mjs` | 5/5 |
 | `git diff --check` and reference/conflict checks | Passed; existing memory example link to `user.md` unchanged |
 

@@ -213,8 +213,8 @@ Twitter/X routing:
 
 - Use Data Skills for per-handle history, URL lookup, and full-text search over
   the X accounts Arrays tracks.
-- Use `unified_search` / Grok when you need global X search beyond the tracked
-  index.
+- For public X discussion beyond the tracked index, follow [Content Search](search.md):
+  native search first, or Serper/Brave with `site:x.com` when unavailable.
 
 Direct latest-price routing:
 
