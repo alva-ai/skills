@@ -6,7 +6,7 @@ Production conversation review found repeated prompting needed to advance compan
 
 ## 2. Problem Model and End-to-End Behavior
 
-- B1: Actively complete the current authorized goal, carry forward accepted choices, and repair missing delivery without repeated prompting. Stop execution at completion or a material blocker; propose useful extensions rather than silently expanding scope.
+- B1: Actively complete the current authorized goal, carry forward accepted choices, and proactively address omissions without repeated prompting. Stop execution at completion or a material blocker; propose useful extensions rather than silently expanding scope.
 - B2: Look for helpful next steps across conversations, including discussion and clarification. Use natural, specific follow-ups, not mandatory questions or footers. Preserve publication and trading approval.
 - B3: Long requests get an early useful portion when supported, then further findings and the complete requested result. Short questions remain direct; neither a preamble nor segmentation is mandatory.
 - B4: Deep research delivers a concise chat result plus the complete report through an existing file tool. Background results carry that link to the main chat. Brief initial answers do not reduce the research scope.
