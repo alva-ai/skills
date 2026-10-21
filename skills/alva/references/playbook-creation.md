@@ -280,5 +280,6 @@ Free users:
 - Do not proactively upsell. Mention Pro only when the user hits a Pro-gated
   feature such as private/paid visibility or a resource limit.
 
-Always output the canonical share link to the user. Use `published_url` for
-verification steps such as screenshotting.
+Always output the canonical share link to the user. When `PresentActions` is
+available, also register that link as an `open_url` action before the final reply.
+Use `published_url` for verification steps such as screenshotting.

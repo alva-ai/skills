@@ -105,6 +105,15 @@ from Playbook Creator Notes.
   screenshots and remix lineage; Altra/broker approvals; Trade Setup unchanged;
   conditional disclaimers; scope and provenance for memory writes.
 
+PresentActions follow-up: register actions as the last tool call before the
+final reply; align both the tool description and its result instruction. Keep
+Thesis preview consent and ordinary AskUserQuestion clarification unchanged.
+Use existing next-step, optional chart-upgrade and verified artifact-link paths,
+without mandatory buttons on discussion turns. Thesis URLs must be authoritative;
+the existing preview card remains the fallback. Backend materialization accepts
+either call order, but Feed App renders action rows chronologically, so no
+automatic placement below the final text is claimed. No transport/UI changes.
+
 ## 5. Verification approach
 
 Run documentation regression, mutation smoke and durable-agent tests; inspect
@@ -324,7 +333,21 @@ The branch contains current upstream main `411ea14`; no upstream merge is
 pending. Latest publication and source-fallback behavior still needs real-turn
 Eval; these checks do not establish production readiness.
 
+PresentActions verification: `node evals/alva-skill-docs/skill-doc-eval.mjs
+--skill-dir skills/alva --out /tmp/alva-actions-doc.md` passed 106/106 cases
+and 1237/1237 checks; `node evals/alva-skill-docs/mutation-smoke.mjs` passed
+35/35; `node --test evals/alva-skill-docs/durable-agent.test.mjs` passed 5/5.
+`git diff --check` passed. Real-turn invocation and visual placement remain
+unverified; low invocation counts alone do not prove a unique cause.
+
 ## 8. Remaining work
+
+- PresentActions targeted Eval: reuse S03-A or S13-A for a concrete next step,
+  S17-B for a relevant optional chart upgrade, and supplied-original Thesis
+  publication for preview/approval/delivery. Include a pure discussion control.
+  Inspect actual tool calls, complete final text, button placement during and
+  after generation, click behavior, and retained authorization boundaries.
+  A successful registration alone does not prove rendering or user comprehension.
 
 - Reuse S11-C/E/F/G for original/new/edited candidates, public/private settings,
   unresolved assets, new editorial defects, informed insistence and refusal.

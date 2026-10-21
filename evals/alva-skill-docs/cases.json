@@ -1127,6 +1127,8 @@
         "`open_url`",
         "short imperative",
         "button condenses the action",
+        "as the last tool call immediately before writing the final reply",
+        "ordinary discussion or explanation needs no buttons",
         "Required questions use `AskUserQuestion`"
       ]
     },
