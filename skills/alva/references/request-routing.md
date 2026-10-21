@@ -4,7 +4,9 @@ Choose the capability in [SKILL.md](../SKILL.md#routing). This reference covers
 its evidence requirements and execution details. Ask at most one blocking
 question, then answer or build within the requested scope.
 
-For a question about an existing Thesis, use
+For published Thesis lists by author/asset or related viewpoints, use
+[Reading published Theses](thesis.md#reading-published-theses) directly.
+For new evidence about an existing Thesis, use
 [Thesis tracking](thesis.md#thesis-tracking). For a selected version, including a
 `<reply_to context-type="thesis" thesis-id="…" author-version-id="…">` quote,
 first read [Quoted Thesis context](thesis.md#quoted-thesis-context). When the question needs retrieval, resolve the selected version
