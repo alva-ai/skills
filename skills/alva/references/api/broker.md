@@ -42,7 +42,8 @@ collar ~12%, daily budget/velocity/open-order limits) and returns
 `admitted:true` + the deterministic `clientOrderId` **without placing**.
 Confirm, then re-run without `--dry-run`. (For a consented auto-trading
 Schedule occurrence or legacy Channel Loop tick, recorded consent per the
-SKILL.md rule stands in for this per-order confirmation.)
+[Agent Schedule rule](../agent-schedules.md#auto-trading-consent) stands in for
+this per-order confirmation.)
 
 ## Capabilities are per-venue — read them from describe
 

@@ -37,6 +37,11 @@ say so explicitly rather than letting it change silently.
 
 ---
 
+Never freeze rendered feed values into static text; converting a live Playbook
+to a [static snapshot](playbook-creation.md#static-snapshot) is a separate
+explicit request. HTML edits re-enter `before-build-html` in
+[playbook-creation.md](playbook-creation.md).
+
 ## Locate the Generator
 
 The `selector` describes the DOM **after** the playbook's JavaScript has run,

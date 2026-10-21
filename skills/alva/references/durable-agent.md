@@ -116,7 +116,7 @@ close; do not switch to a new Session inside its callback.
 | --- | --- |
 | System prompt and context | `resourceLoaderOptions.systemPrompt`, `appendSystemPrompt`, and context files in ALFS. Without an override, the Alva finance prompt and host runtime guidance apply. |
 | Custom tools | `customTools` with a schema and `execute` implementation; restore the implementation from code each launch. |
-| Tool selection | `tools` selects names; `excludeTools` removes optional tools; `noTools` disables optional defaults. `read` and `alva` remain required. `web_search` is available when the host supports it. |
+| Tool selection | `tools` selects names; `excludeTools` removes optional tools; `noTools` disables optional defaults. `read` and `alva` remain required. `web_search` is available when the host supports it; follow [Content Search](search.md) for routing and source checks. |
 | Model and reasoning | Omit `model` and `thinkingLevel` for managed defaults, unless saved settings explicitly select a model. Set them in code for a fixed policy. Transcript model history alone does not pin future runs. |
 | Skills and templates | `resourceLoaderOptions.additionalSkillPaths` and `additionalPromptTemplatePaths` add ALFS resources. The official Alva Skill remains enabled; shell extensions and themes are unavailable. |
 | Worker secrets | Omitted `secrets` grants none. Prefer a scoped name-to-value map resolved afresh; `"inherit"` delegates all available secrets. Never persist values. |

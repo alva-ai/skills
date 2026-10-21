@@ -10,19 +10,19 @@
       "description": "A simple latest-fact ask stays in Financial Analysis, uses fresh sourced evidence, and does not inherit playbook gates.",
       "expect": {
         "route": "Financial Analysis / Ask Question",
-        "top_level_route": "Simple latest-fact asks stop there after one sourced hop",
+        "top_level_route": "Simple latest-fact asks can finish after one sourced hop",
         "references": [
           "user-facing-prose.md",
           "content-legitimacy.md"
         ],
         "behaviors": [
-          "Direct latest/realtime price for covered US equities and crypto: intraday klines, not daily-level bars or closes",
-          "Do not answer until you can name the decomposition",
-          "Do not let playbook creation become the default",
+          "Covered US equities and crypto: latest/realtime price answers must use structured intraday kline data. Do not use daily-level bars or daily closes as current prices",
+          "Do not present a partial lookup as a completed comparison",
+          "Do not expand a one-off question into a Playbook",
           "A ticker or price mention alone does not trigger it"
         ],
         "forbidden_behaviors": [
-          "not automatically to a playbook"
+          "Scripts, feeds, and cronjobs are implementation primitives, not default user deliverables."
         ]
       }
     },
@@ -54,7 +54,7 @@
           "user-facing-prose.md"
         ],
         "behaviors": [
-          "If the user asks for any \"financial advice\" or \"analyst advice,\" the response MUST also begin with the exact advice-request header",
+          "Explicit financial or analyst advice requests also require the exact advice-request header",
           "I'll share an analysis, but keep in mind I'm not a licensed analyst or adviser, and this isn't personalized advice for you specifically.",
           "This advice-request header is additive",
           "This content is for informational purposes only and does not constitute investment advice."
@@ -79,10 +79,10 @@
           "comparison baselines are financial facts",
           "current multiple/FCF/EPS",
           "multiple/earnings sensitivity",
-          "cap confidence when required evidence"
+          "missing required evidence limits the conclusion"
         ],
         "forbidden_behaviors": [
-          "not automatically to a playbook"
+          "Scripts, feeds, and cronjobs are implementation primitives, not default user deliverables."
         ]
       }
     },
@@ -122,7 +122,7 @@
       "description": "A hosted dashboard enters the Playbook Creation route and preserves feed-first, live-read, README, lint, release, and screenshot gates.",
       "expect": {
         "route": "Playbook Creation",
-        "top_level_route": "Publication Layer: Playbook Creation Tree",
+        "top_level_route": "Dashboard, screener app, hosted report, or other shareable investing app",
         "references": [
           "playbook-creation.md",
           "feed-lifecycle.md",
@@ -131,8 +131,8 @@
           "AlvaToolkit.AlvaClient"
         ],
         "behaviors": [
-          "Build live feeds first",
-          "HTML fetches quantitative data from feeds, not inline literals"
+          "Build feeds through [feed-lifecycle.md](feed-lifecycle.md)",
+          "Live HTML fetches quantitative data from feeds"
         ],
         "sections": [
           {
@@ -197,7 +197,7 @@
               "complete the Financial Analysis evidence route",
               "open-ended create request permits drafting a candidate",
               "it does not permit publication",
-              "exact-payload confirmation"
+              "is confirmed by that explicit selection; it need not be confirmed again"
             ]
           },
           {
@@ -246,8 +246,8 @@
     {
       "id": "scenario.thesis-confirm-flags-inconsistent-body",
       "group": "scenarios.thesis",
-      "prompt": "这是我改好的最终版正文，开头写 three drivers，下面列了四点，第三点最后一句没写完。直接帮我发布。",
-      "description": "A finished but internally inconsistent body is confirmed verbatim, with the inconsistency raised once in Notes rather than corrected or used to block publication.",
+      "prompt": "请原样发布这段 Thesis：NVDA has three drivers. 1. CUDA keeps developers. 2. Inference demand expands. 3. Margins should improve because 4. Networking grows.",
+      "description": "An editor-detected inconsistency or unfinished passage is shown in unpublished Notes and awaits the author decision before creation; preserve the exact body.",
       "expect": {
         "route": "Thesis",
         "references": [
@@ -262,10 +262,14 @@
             "heading": "Create",
             "label": "editor read",
             "includes": [
-              "Notes: <omit when none; not part of the payload>",
+              "Notes are not part of the payload; omit them when none.",
               "Still read the body once as its editor",
-              "show the body unchanged",
-              "Do not summarize, rewrite, translate, correct"
+              "Notes before calling `alva thesis create`",
+              "keeping the body unchanged",
+              "create without asking again",
+              "Do not summarize, rewrite, translate, correct",
+              "If the preview showed Notes the author had not yet considered, that confirmation is their decision to publish despite them",
+              "Show the preview, then wait for confirmation"
             ]
           }
         ]
@@ -292,43 +296,44 @@
           "alva deploy update --id <ID> --push-notify",
           "alva alert enable --automation",
           "read `@last/1` of the declared output",
-          "A quiet V2 run does not append an alert record",
+          "In a new V2 feed, return without appending to the declared alert output when there is nothing worth sending",
           "`alva deploy trigger` is not a dry run",
           "do not claim push is set up"
         ],
         "sections": [
           {
             "file": "SKILL.md",
-            "heading": "Alva Knowledge (Required Reading)",
+            "heading": "Routing",
+            "label": "Routing",
             "includes": [
               "[alva-knowledge.md](references/alva-knowledge.md)",
-              "Every automation must decide"
+              "when designing or changing automation reasoning, history, or notification logic"
             ]
           },
           {
             "file": "SKILL.md",
-            "heading": "Reference Library",
+            "heading": "Capabilities on Demand",
+            "label": "Capabilities on Demand",
             "includes": [
               "[alva-knowledge.md](references/alva-knowledge.md)",
-              "Required automation reasoning"
+              "Automation reasoning, bounded history, novelty, and quiet runs"
             ]
           },
           {
-            "file": "SKILL.md",
-            "heading": "Push Monitor",
+            "file": "references/push-notifications.md",
+            "heading": "Identify Push-Worthy Feeds",
+            "label": "Identify Push-Worthy Feeds",
             "includes": [
-              "declared `alertOutput(typeDoc)`",
-              "quiet branch that does not append",
-              "`signal/targets` or `notify/message` only when maintaining an existing",
-              "recognized legacy producer"
+              "return without appending to the declared alert output"
             ]
           },
           {
-            "file": "SKILL.md",
-            "heading": "Action Layer: Alerts",
+            "file": "references/push-notifications.md",
+            "heading": "Legacy Compatibility",
+            "label": "Legacy Compatibility",
             "includes": [
-              "New feeds declare push-worthy outputs with `alertOutput(typeDoc)`",
-              "legacy `signal/targets` or `notify/message` producer"
+              "signal/targets",
+              "notify/message"
             ]
           },
           {
@@ -441,11 +446,11 @@
           "user-facing-prose.md"
         ],
         "behaviors": [
-          "Always use Altra for backtesting",
+          "**Use Altra for trading.** Backtests",
           "FeedAltra",
           "look-ahead bias",
           "drawdown",
-          "package results as a concise answer, feed, signal, or visual playbook depending on the request",
+          "choose the requested deliverable",
           "once, at the end of the final substantive response or artifact"
         ]
       }
@@ -552,7 +557,7 @@
         "sections": [
           {
             "file": "SKILL.md",
-            "heading": "Request Routing",
+            "heading": "Routing",
             "label": "ticker read route",
             "includes": [
               "read [ticker-read.md](references/ticker-read.md) before source selection"
@@ -575,7 +580,7 @@
         "behaviors": [
           "Use `alva/company-anomaly-read` as the first direct-read check for intraday and hourly-scale market tracking",
           "roughly every 15 minutes during US market hours",
-          "Fetch the selected method's current instructions from Skillhub before using it",
+          "Fetch the selected method's current instructions from Skillhub before first use",
           "do not bypass an unavailable Skillhub method",
           "A quiet state does not prove that price was flat",
           "Data Skills for the live price"
@@ -712,7 +717,7 @@
           "request-routing.md"
         ],
         "behaviors": [
-          "--fiscal-year 2026 --fiscal-quarter Q3",
+          "--fiscal-year <YEAR> --fiscal-quarter <Q1|Q2|Q3|Q4>",
           "alva markets earnings --ticker <TICKER>",
           "alva markets narrative --ticker <TICKER>"
         ]
@@ -760,15 +765,15 @@
       "description": "A remix reads source artifacts and preserves lineage instead of regenerating from memory.",
       "expect": {
         "route": "Debug / Edit",
-        "top_level_route": "Playbook Subroute: Remix",
+        "top_level_route": "Remix, annotation, or an existing Playbook change",
         "references": [
           "remix-workflow.md",
           "playbook-creation.md"
         ],
         "behaviors": [
-          "Extract source owner/name from the tag URL",
-          "read the source feed scripts, HTML, README, and playbook metadata",
-          "preserve them unless the user explicitly asks otherwise",
+          "Extract `owner` and `name` from the `url` attribute",
+          "Read Code Layer (Feed Scripts)",
+          "Copy inherited UDF entry scripts when present",
           "Do not regenerate from memory"
         ]
       }
@@ -780,13 +785,13 @@
       "description": "An annotation edit changes the generator behind the element and re-enters HTML gates.",
       "expect": {
         "route": "Debug / Edit",
-        "top_level_route": "Playbook Subroute: Annotation Edits",
+        "top_level_route": "Remix, annotation, or an existing Playbook change",
         "references": [
           "annotation-edits.md",
           "playbook-creation.md"
         ],
         "behaviors": [
-          "change the generator behind the selected element",
+          "Find the logic that *generates* that element and edit it there",
           "Never freeze rendered feed values into static text",
           "HTML edits re-enter `before-build-html`"
         ],
@@ -849,7 +854,7 @@
       "description": "A chart produced on every scheduled run uses the Automation-only price chart SDK, not the one-off chat publisher or Playbook renderer.",
       "expect": {
         "route": "Automation / Push",
-        "top_level_route": "Data Product Layer: Feed Lifecycle And Automation",
+        "top_level_route": "Feed modeling and Automation lifecycle",
         "references": [
           "price-chart-sdk.md",
           "feed-sdk.md"
@@ -883,6 +888,88 @@
           "Never hand-write bearer headers",
           "result contract",
           "smoke invoke returned the declared result shape"
+        ]
+      }
+    },
+    {
+      "id": "scenario.thesis-publish-supplied-original",
+      "group": "scenarios.thesis",
+      "prompt": "把下面这句原样公开发成 Thesis：我认为 NVDA 的 CUDA 生态仍有优势。",
+      "description": "A typed original publish request gets one short preview of visibility and resolved assets/stances without repeating the body; file or extracted text is shown in full; wait for typed/button approval and create without a second confirmation.",
+      "expect": {
+        "route": "Thesis",
+        "references": [
+          "thesis.md"
+        ],
+        "sections": [
+          {
+            "file": "references/thesis.md",
+            "heading": "Create",
+            "label": "publication consent",
+            "includes": [
+              "Every creation shows one publication preview and obtains one confirmation of it",
+              "then wait for confirmation",
+              "A body already shown in full in this conversation, or typed by the user and asked to publish unchanged, may be referenced instead",
+              "use one short preview line without repeating the body",
+              "create without asking again",
+              "When `PresentActions` is available, offer localized `send_prompt` actions",
+              "a click has the same meaning as the equivalent typed reply",
+              "Without the tool, ask in text",
+              "as must text taken from a file, attachment, link, or other extraction (show its content, not its filename)"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "scenario.thesis-publish-after-notes",
+      "group": "scenarios.thesis",
+      "prompt": "你刚展示的公开发布预览和 Notes 我看过了，第三点虽然没写完，还是按这版原样发。",
+      "description": "An informed decision to publish despite Notes authorizes the unchanged candidate without another approval.",
+      "expect": {
+        "route": "Thesis",
+        "references": [
+          "thesis.md"
+        ],
+        "sections": [
+          {
+            "file": "references/thesis.md",
+            "heading": "Create",
+            "label": "publication consent",
+            "includes": [
+              "that confirmation is their decision to publish despite them",
+              "Previously discussed Notes and ordinary editorial suggestions need no new approval",
+              "Preserve the selected body exactly",
+              "Show the preview, then wait for confirmation"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "scenario.thesis-publish-action-selection",
+      "group": "scenarios.thesis",
+      "prompt": "我看过当前候选和 Notes，点击“发布这版”。",
+      "description": "Actions carry the same authorization as text: preserve candidate scope, reject stale approval for changed text, and avoid duplicate creation.",
+      "expect": {
+        "route": "Thesis",
+        "references": [
+          "thesis.md"
+        ],
+        "sections": [
+          {
+            "file": "references/thesis.md",
+            "heading": "Create",
+            "label": "publication consent",
+            "includes": [
+              "When `PresentActions` is available, offer localized `send_prompt` actions",
+              "Name the displayed candidate in the publish prompt so it is tied to that candidate and its settings",
+              "a click has the same meaning as the equivalent typed reply",
+              "Without the tool, ask in text",
+              "An old button does not authorize a changed candidate",
+              "repeated approval of an already completed creation must not create another Thesis; verify its existing ID"
+            ]
+          }
         ]
       }
     }

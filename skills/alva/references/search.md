@@ -1,23 +1,32 @@
 # Content Search
 
-Search SDKs for discovering unstructured content across multiple sources.
-For handle-first access: Twitter/X handle history and rolling feeds are
-served by Arrays Data Skills — see [Data Skills](data-skills.md) and follow the
-discovery pipeline. News, YouTube, Reddit, and podcasts
-handle subscriptions live in the `feed_widgets` partition. The search SDKs
-below live in the `unified_search` partition.
+Use the runtime's exposed web search tool first for unstructured research:
+news, public statements and source documents. Inspect relevant originals with
+its page-reading tools, following the exposed tool schema. X/Twitter post
+content follows [Twitter/X](#twitterx). If native search is unavailable, or a
+plain Feed/Automation script needs search, use the SDKs below. Do not invent a
+tool or call the managed search transport directly.
+
+Prices, financial datasets, exact account history and engagement metrics retain
+their [Data Skills](data-skills.md) routes. News, YouTube, Reddit and podcast
+handle subscriptions remain in `feed_widgets`; search SDKs are in `unified_search`.
+Apply [content-legitimacy.md](content-legitimacy.md): finding a page is not
+verification of its contents, and a source's opinion remains an attributed claim.
+For an existing Thesis's progress, use [Signals](thesis.md#thesis-tracking) first.
 
 ## SDK Modules
 
 | SDK | Module | Best for |
 | --- | ------ | -------- |
-| `searchGrokX` | `@arrays/data/search/search-grok-x:v1.0.0` | Twitter/X — returns engagement directly |
 | `searchPerplexityFinance` | `@arrays/data/search/search-perplexity-finance:v1.0.0` | Non-US equities outside the curated Data Skills set (and market breadth); fallback for off-catalog asset classes and other structured-SDK gaps |
 | `searchSerper` | `@arrays/data/search/serper-search:v1.0.0` | Google index: News, YouTube, Reddit, Web |
 | `searchBrave` | `@arrays/data/search/search-brave:v1.0.0` | Independent index, good Reddit coverage |
 | `scrapeUrl` | `@arrays/data/search/scrape-url:v1.0.0` | Scrape any page to markdown for enrichment |
 
-## Sources
+## SDK source patterns
+
+These patterns serve scripts and native-search fallbacks; they do not require
+repeating a search already completed with the exposed native tool.
 
 ### Finance Search
 
@@ -29,17 +38,39 @@ below live in the `unified_search` partition.
 
 ### Twitter/X
 
-- **Data Skills first**: per-handle history, URL lookup, and full-text search over the X accounts Arrays tracks are served by Data Skills (see [data-skills.md](data-skills.md)). Use `searchGrokX` only for global X search beyond Arrays' tracked index.
-- **Search**: `searchGrokX` with `from_date`/`to_date` (YYYY-MM-DD format)
-- **Enrich**: Not needed — GrokX returns engagement natively
-- **Signals**: `like_count`, `retweet_count`, `reply_count`, `quote_count`
-- **Fields**: `content`, `url`, `author_name`, `author_username`, `author_avatar`, `created_at` (ms — real publish time), `author_verified`, `author_followers_count`
-- **Batch queries**: GrokX is AI-powered, not keyword-matching — multiple related entities can be combined into one call (e.g. "Why are $AAPL $TSLA $NVDA moving? Explain each"). The `summary` will segment by entity automatically. Returned tweets are mixed (not per-entity); only do per-entity individual searches when the use case requires raw per-entity source content.
-- **Gotcha**: A single broad query returns mostly 0-engagement noise. Fix: (1) run 3-5 queries with different topical angles (e.g. "NVDA earnings", "NVDA AI chips", "NVDA stock price") plus entity aliases (`$NVDA`, `NVIDIA`); (2) filter results — tweets with `like_count == 0` AND `retweet_count == 0` are almost always noise; (3) `author_followers_count` and `author_verified` are strong quality signals for sorting survivors.
+Choose the X route from the current `arrays-data-api-social-feeds` Data Skill
+catalog (`alva data-skills summary`, then the endpoint doc for the File it
+lists), and call through [Data Skills](data-skills.md#calling-arrays). Reuse
+documentation already read; never call an endpoint the catalog does not list.
+
+1. **Post-content or topic search:** when the catalog lists a live-search
+   endpoint, use it per its current contract. Fetch one page first; follow its
+   cursor only when more evidence is needed.
+2. **Known account or post:** use the catalog's `by-handle` timeline or
+   `by-url` lookup; stored history of tracked accounts or update polling uses
+   its indexed search. Keep these lookups read-only; do not start paid handle
+   tracking just to fill a search gap.
+3. **Otherwise, general search:** the exposed native search tool, or Serper/Brave
+   with `site:x.com OR site:twitter.com` when that tool is unavailable or in a
+   plain script. Say in the answer that this evidence came from general search,
+   not Arrays X data.
+
+Failures follow [Failure And Fallback](data-skills.md#failure-and-fallback). On
+401, refresh the token as in [Calling Arrays](data-skills.md#calling-arrays); if
+it persists, report the credential block instead of switching to another source.
+An empty result does not establish that nobody discussed the topic; describe
+the coverage actually checked.
+
+Results include post text, author, original URL, publication time and available
+engagement counts. Check freshness and distinguish missing counts from zero.
+Verify author and publication time; a retweet or quoted post is not
+automatically the poster's own view. Top-ranked or most-engaged posts are not
+representative market sentiment. General search snippets remain leads: inspect
+the original before citing its contents.
 
 ### News
 
-- **Search**: `searchSerper` with `type:"news"` + `searchBrave` with `freshness` filter
+- **Search**: `searchSerper` with `type:"news"` or `searchBrave` with a `freshness` filter; add the other when coverage is insufficient
 - **Enrich**: Optional — `scrapeUrl` for full article text
 - **Signals**: Freshness (time-based), source authority (domain)
 - **Gotcha**: Serper `date` is index/observed time, NOT publish time — do not use as published_at. Brave `description` may contain `<strong>` HTML tags — strip before display. Brave `age` field (e.g. "18 hours ago") is more reliable for recency.
@@ -87,17 +118,18 @@ below live in the `unified_search` partition.
 
 ## Search Quality Patterns
 
-These apply across all sources:
+Start with the sources needed to answer the question. Expand when evidence is
+missing, contradictory, or broad coverage is requested; stop when the question
+is adequately supported. The wider-search patterns below apply when needed:
 
 - **Multiple queries > one broad query**: 3-5 queries with genuinely different angles (price action, fundamentals, sentiment, events, controversy) produce far better coverage than one keyword dump. Dedup results by URL across queries.
 - **Oversample then rank**: Search for ~15 items per source, rank by engagement/freshness/relevance, keep top N. Never trust raw search order as quality order.
-- **Entity alias expansion**: For tickers, always search both the symbol (`$NVDA`, `NVDA`) and the company name (`NVIDIA`). For crypto, include common aliases (`BTC`, `Bitcoin`, `#BTC`). Code should handle this expansion — don't rely on a single query string to cover all variants.
-- **Engagement as quality gate**: Every source has a native engagement signal (Twitter: likes/retweets, Reddit: score, YouTube: views). Items with zero engagement across all metrics are almost always noise — filter them out before presenting to the user.
+- **Entity alias expansion**: When coverage or identity is uncertain, search both the symbol (`$NVDA`, `NVDA`) and the company name (`NVIDIA`). For crypto, include common aliases (`BTC`, `Bitcoin`, `#BTC`). Code should handle this expansion — don't rely on a single query string to cover all variants.
+- **Engagement as a secondary signal**: Prioritize source authority, relevance, and recency. Where available, likes, scores, or views may help rank results; zero engagement alone does not disqualify evidence.
 
 ## Time Filters by Provider
 
 | Provider | Parameter | 1 day | 1 week | 1 month |
 | -------- | --------- | ----- | ------ | ------- |
-| GrokX | `from_date` / `to_date` | YYYY-MM-DD (1 day ago) | YYYY-MM-DD (7 days ago) | YYYY-MM-DD (30 days ago) |
 | Serper | `tbs` | `qdr:d` | `qdr:w` | `qdr:m` |
 | Brave | `freshness` | `pd` | `pw` | `pm` |

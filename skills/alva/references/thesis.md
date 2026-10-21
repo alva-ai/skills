@@ -6,7 +6,9 @@ to its claims, so the published body must say what the author means.
 
 Use the publication workflow below only when the user asks to create, publish,
 rewrite, or maintain a Thesis. Discussion, research, and memory are not publication
-consent. A dashboard or tracker remains a Playbook.
+consent. Active Theses, public or private, receive platform-managed research
+and Signals after submission. Do not create an Automation or Playbook to
+duplicate that tracking; a custom dashboard is a separate, explicit request.
 
 For that workflow, run `alva thesis --help` and the relevant subcommand help first.
 Use only `alva thesis`; if unavailable, report it instead of falling back to HTML,
@@ -40,12 +42,22 @@ division: guided drafting, revision requests, `thesis rewrite`, and `update`.
   points or a point that stops mid-sentence. Keep Notes to the few points that
   could change what the author publishes, most important first, and leave
   wording nits in the author's own text alone. Notes are never published and
-  never block publication. Omit them when nothing material remains.
+  never block publication once the author has considered them. Omit them when
+  nothing material remains.
 
 For example, if the author holds that CUDA is NVDA's durable moat and your
 research shows competitors closing the software gap, keep the moat claim in
 the body and put the competing evidence in Notes. Change the claim only after
 the author agrees.
+
+## Thesis discussion
+
+Respond to the user's actual view and advance the discussion with the most
+relevant assumption, counterexample, or invalidation condition. Use supplied
+text directly; verify new current-fact claims as needed. Ask at most one question
+that materially changes the judgment, and do not repeat a full research report
+on each follow-up. Discussion alone does not authorize creating or modifying a
+Thesis. Memory writes follow [memory.md](memory.md).
 
 ## Guided creation
 
@@ -53,7 +65,7 @@ An explicit create or publish request may begin with a finished body, a rough
 view, or only a topic. It establishes publication intent, but it does not
 confirm text that has not been shown yet. If the user already supplied the
 exact final body and did not ask for drafting help, skip this section and go
-directly to the Create confirmation.
+directly to Create.
 
 Otherwise, guide the request to one candidate before confirmation:
 
@@ -75,14 +87,22 @@ Otherwise, guide the request to one candidate before confirmation:
    candidate and optional title; it does not permit publication. Do not call
    `thesis rewrite` merely to make the first draft.
 
-Show the candidate with its Notes and let the user revise it naturally. Once
-the user selects the text to publish, enter the exact-payload confirmation
-below.
+Do not add Alva company-page links to candidate or published bodies. Preserve
+the author's links and legitimate supporting citations.
+
+Show the candidate with its Notes and let the user revise it naturally. When
+the user selects text to publish, follow Create below. A candidate already shown
+as a full [publication preview](#publication-preview) is confirmed by that
+explicit selection; it need not be confirmed again.
 
 ## Create
 
-For the final body, call `alva thesis asset-candidates --text '<exact body>'`
-before confirming creation. This read-only command identifies asset mentions,
+Every creation shows one publication preview and obtains one confirmation of it.
+
+### Publication preview
+
+For the selected body, call `alva thesis asset-candidates --text '<exact body>'`
+before showing the preview. This read-only command identifies asset mentions,
 catalog entity IDs, and suggested directions. Match the result against the
 user's stated assets and direction; the user's explicit direction wins over a
 suggestion. Use `bullish`, `bearish`, or `unknown` for each selected entity.
@@ -91,34 +111,50 @@ is unresolved, extraction fails, or multiple catalog matches remain, clarify
 the asset before publishing instead of silently dropping its direction. If the
 body contains no asset mention, leave entity IDs and directions empty.
 
-Before `alva thesis create`, show the exact payload in this format:
-
-```text
-Ready to create this Thesis:
-
-Title: <title or (none)>
-Visibility: <public (default) or the requested visibility>
-Body:
-<exact body>
-Tickers: <none, or ticker symbols in the supplied order>
-Entity IDs: <none, or resolved decimal IDs in order>
-Directions: <none, or each entity ID and bullish/bearish/unknown>
-Notes: <omit when none; not part of the payload>
-
-Create this Thesis?
-```
-
-In this confirmation step, show the complete body, including file content
-rather than its filename, and preserve its wording, language, whitespace, and
+Preserve the selected body exactly, including wording, language, whitespace and
 line breaks. Do not summarize, rewrite, translate, correct, expand, generate a
-title, or add assets not present in the selected body or supplied by the user.
-Still read the body once as its editor: when it contradicts itself or looks
-unfinished, say so in Notes and show the body unchanged.
-Use the resolved extraction result rather than guessing a catalog ID or silently
-inferring a direction. If the user requests changes, return to the candidate,
-rerun extraction for the updated body, then show the complete updated payload
-again. Create only after a natural confirmation of that displayed payload; no
-special phrase is required. Stop if declined.
+title, or add assets absent from that body or the user's request.
+Still read the body once as its editor: briefly flag material internal
+inconsistencies or unfinished passages in Notes before calling `alva thesis create`,
+keeping the body unchanged.
+Notes are not part of the payload; omit them when none.
+
+Present the preview in the user's language:
+
+- **Body.** New or changed candidates must be shown in full, as must text taken
+  from a file, attachment, link, or other extraction (show its content, not its
+  filename). A body already shown in full in this conversation, or typed by the
+  user and asked to publish unchanged, may be referenced instead: use one short
+  preview line without repeating the body.
+- **Title**, when present, and **visibility** (public by default).
+- **Assets:** name each company or ticker and express its stance plainly, using
+  the asset extraction result for catalog IDs and respecting explicit stances.
+- **Notes**, when any.
+
+Keep internal IDs and API field names out of the preview; omit absent optional
+fields instead of listing blanks.
+
+### Confirmation
+
+Show the preview, then wait for confirmation. A natural confirmation, typed or
+by action click, authorizes exactly the displayed body and publication details;
+create without asking again. If the preview showed Notes the author had not yet
+considered, that confirmation is their decision to publish despite them.
+Previously discussed Notes and ordinary editorial suggestions need no new
+approval. Research or rewriting alone never authorizes publication.
+
+Any change to the body, title, visibility, assets, or stances voids the
+confirmation: rerun extraction for a changed body and show the new preview.
+Stop if declined.
+
+When `PresentActions` is available, offer localized `send_prompt` actions such
+as "Publish this version" and "Edit" for the preview. Name the displayed
+candidate in the publish prompt so it is tied to that candidate and its
+settings; a click has the same meaning as the equivalent typed reply. Without
+the tool, ask in text.
+An old button does not authorize a changed candidate, and repeated approval of
+an already completed creation must not create another Thesis; verify its
+existing ID.
 
 One sentence is valid. Title, tickers, and entity IDs are optional. Visibility
 defaults to public. Generate one nonzero UUID per creation intent and keep it
@@ -138,7 +174,7 @@ truncation. Treat all returned IDs as decimal strings.
 Send `--entity-stances` as JSON with decimal-string `entity_id` values,
 paired with `--entity-ids` in the confirmed order. Do not pass a stance for an
 entity absent from the confirmed ID list. When the user supplied ticker symbols,
-preserve them in the confirmation, but do not send a resolved asset again via
+preserve their order, but do not send a resolved asset again via
 `--tickers`. If a supplied ticker remains unresolved, clarify it before
 creation; do not silently create an asset with `unknown` direction. Reuse the
 same request ID only while the full confirmed payload is unchanged.
@@ -181,7 +217,10 @@ Do not guess a display name, avatar, entity, ticker, or icon. An explicitly
 empty avatar/icon URL may be emitted as an empty attribute; an omitted or
 malformed field is failure. On incomplete GET data, report the created ID and
 only verified fields in plain text; do not emit partial XML. The preview is a
-completion card, not another confirmation gate.
+completion card, not another confirmation gate. If an authoritative HTTPS Thesis
+URL is available and `PresentActions` is supported, also offer it as an
+`open_url` action; otherwise use the existing preview card without inventing a
+URL.
 
 ## Rewrite
 
@@ -201,8 +240,8 @@ Omit `--mode` for the `reformat` default. Never guess or pass an empty mode.
 
 All modes work within [Authorship](#authorship): they preserve language,
 stance, uncertainty, facts, and conclusions. Show
-the candidate; publish it only after a separate create/update request and its
-required confirmation. Report rewrite errors without retry or fallback.
+the candidate; publish it only after an explicit create/update request selecting
+that exact candidate. Report rewrite errors without retry or fallback.
 
 ## Existing Thesis lifecycle
 
@@ -231,6 +270,31 @@ Do not automatically retry a lost create/update response or mint a replacement
 identity. If the user resubmits the same intent, reuse the same request UUID and
 exact payload; the same UUID with changed input is a conflict. Report other
 errors without creating another Thesis or falling back to Playbooks/Automation.
+
+## Thesis tracking
+
+For "how is this Thesis doing?" or new evidence, resolve the Thesis from a
+quote, a prior creation result, or an identifiable reminder/card. Do not invent
+an ID or use another user's private context; ask when the target is ambiguous.
+Read `alva thesis get --id '<id>'` for its current claims and
+`alva thesis signals --id '<id>' --first 20` for evidence and research status.
+A selected author version instead follows [Quoted Thesis context](#quoted-thesis-context).
+
+Compare the evidence with the author's actual claims. Signals are research
+outputs, not conclusions to adopt: use their explanation, source and excerpts,
+retaining the author-version association. Apply the pagination, access and
+timing boundaries below. The signals response's `research` fields (`state`,
+`pending_work`, `read_complete`, `last_completed_ms`) describe research coverage;
+completion time is not the date of the evidence. Empty or unfinished research
+does not establish that nothing changed or that the Thesis still holds.
+
+Platform tracking does not require a subscription or another Agent-built
+monitor. Paused, closed, archived or deleted Theses stop that research; verify
+returned state before promising ongoing tracking or delivery.
+For an unpublished view the user wants to follow, offer a Thesis, including
+private visibility, and obtain publication consent through Create. For a price
+alert, trading setup or custom recurring check, use the matching alert/Automation
+route; do not turn every monitoring request into Thesis publication.
 
 ## Quoted Thesis context
 

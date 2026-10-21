@@ -13,6 +13,120 @@ const DEFAULT_SKILL_DIR = resolve(REPO_ROOT, "skills/alva");
 
 const MUTATIONS = [
   {
+    id: "x-catalog-gate",
+    file: "references/search.md",
+    remove: "never call an endpoint the catalog does not list.",
+    replacement: "call `/api/v1/social-feeds/x/live-search` directly.",
+    expectFailedCases: ["retained.search-routing"],
+  },
+  {
+    id: "x-general-search-disclosure",
+    file: "references/search.md",
+    remove: " Say in the answer that this evidence came from general search,\n   not Arrays X data.",
+    expectFailedCases: ["retained.search-routing"],
+  },
+  {
+    id: "x-401-no-source-switch",
+    file: "references/search.md",
+    remove: "report the credential block instead of switching to another source.",
+    replacement: "switch to general search.",
+    expectFailedCases: ["retained.search-routing"],
+  },
+  {
+    id: "thesis-actions-scoped-to-preview",
+    file: "references/thesis.md",
+    remove: "\"Edit\" for the preview.",
+    replacement: "\"Edit\" before the final reply.",
+    expectFailedCases: ["target.thesis-create-preview-card", "target.useful-next-step-actions"],
+  },
+  {
+    id: "playbook-share-action-timing",
+    file: "references/playbook-creation.md",
+    remove: "also offer that link as an `open_url` action.",
+    replacement: "register that link as an `open_url` action before the final reply.",
+    expectFailedCases: ["target.useful-next-step-actions"],
+  },
+  {
+    id: "trade-consent-not-button",
+    file: "references/request-routing.md",
+    remove: "Order or trade confirmation and\nauto-trading risk acknowledgment need the user's typed reply, never a button.",
+    expectFailedCases: ["target.useful-next-step-actions"],
+  },
+  {
+    id: "thesis-original-awaits-preview-confirmation",
+    file: "references/thesis.md",
+    remove: "Show the preview, then wait for confirmation.",
+    replacement: "Show the preview, then create immediately.",
+    expectFailedCases: [
+      "target.thesis-create-preview-card",
+      "scenario.thesis-publish-supplied-original",
+    ],
+  },
+  {
+    id: "thesis-new-editorial-issue-awaits-author",
+    file: "references/thesis.md",
+    remove: "If the preview showed Notes the author had not yet\nconsidered, that confirmation is their decision to publish despite them.",
+    replacement: "Create immediately even when the preview shows new Notes.",
+    expectFailedCases: [
+      "target.thesis-authorship",
+      "scenario.thesis-confirm-flags-inconsistent-body",
+    ],
+  },
+  {
+    id: "thesis-action-candidate-scope",
+    file: "references/thesis.md",
+    remove: "An old button does not authorize a changed candidate",
+    replacement: "An old button authorizes the latest candidate",
+    expectFailedCases: [
+      "target.thesis-create-preview-card",
+      "scenario.thesis-publish-action-selection",
+    ],
+  },
+  {
+    id: "thesis-file-body-shown-in-full",
+    file: "references/thesis.md",
+    remove: ", as must text taken\n  from a file, attachment, link, or other extraction (show its content, not its\n  filename)",
+    expectFailedCases: [
+      "target.thesis-create-preview-card",
+      "scenario.thesis-publish-supplied-original",
+    ],
+  },
+  {
+    id: "pro-gate-not-bypassed",
+    file: "references/data-skills.md",
+    remove: " Do not route around an access gate\n   by fetching the gated dataset elsewhere unless the user asks for that.",
+    expectFailedCases: ["issue592.capability-verification-before-refusal"],
+  },
+  {
+    id: "verified-external-source-fallback",
+    file: "references/data-skills.md",
+    remove: "actively search for\n   an accessible public source",
+    expectFailedCases: ["issue592.capability-verification-before-refusal"],
+  },
+  {
+    id: "arrays-x-search-priority",
+    file: "references/search.md",
+    remove: "when the catalog lists a live-search\n   endpoint, use it per its current contract.",
+    replacement: "use general web search first.",
+    expectFailedCases: ["retained.search-routing"],
+  },
+  {
+    id: "complex-ask-required-checks",
+    file: "references/request-routing.md",
+    remove:
+      "Complete the checks central to the requested judgment through available\n" +
+      "documented sources; report a gap when a necessary check cannot be completed,\n" +
+      "not simply because it has not been attempted.\n",
+    expectFailedCases: ["target.financial-ask-quality-gates"],
+  },
+  {
+    id: "search-legacy-grok-guidance",
+    file: "references/data-skills.md",
+    remove: "Twitter/X routing:",
+    replacement: "Twitter/X routing:\n\n- Use `unified_search` / Grok when you need global X search beyond the tracked index.",
+    expectFailedCases: ["retained.search-routing"],
+  },
+  {
     id: "thesis-quote-routing",
     file: "SKILL.md",
     remove: "[Quoted Thesis context](references/thesis.md#quoted-thesis-context)",
@@ -42,7 +156,16 @@ const MUTATIONS = [
   {
     id: "thesis-authorship-notes-line",
     file: "references/thesis.md",
-    remove: "Notes: <omit when none; not part of the payload>\n",
+    remove: "Notes are not part of the payload; omit them when none.\n",
+    expectFailedCases: [
+      "target.thesis-authorship",
+      "scenario.thesis-confirm-flags-inconsistent-body",
+    ],
+  },
+  {
+    id: "thesis-authorship-notes-before-create",
+    file: "references/thesis.md",
+    remove: " before calling `alva thesis create`",
     expectFailedCases: [
       "target.thesis-authorship",
       "scenario.thesis-confirm-flags-inconsistent-body",
@@ -71,14 +194,15 @@ const MUTATIONS = [
   },
   {
     id: "simple-latest-one-hop",
-    file: "SKILL.md",
-    remove: "Simple latest-fact asks stop there after one\nsourced hop; ",
+    file: "references/request-routing.md",
+    remove: "Simple latest-fact\nasks can finish after one sourced hop. ",
     expectFailedCases: ["issue592.financial-ask-contract", "scenario.simple-latest-price"],
   },
   {
     id: "mandatory-investment-disclaimer",
     file: "SKILL.md",
-    remove: "10. **Contextual investment framing.** Include the investment disclaimer once in the final substantive response or artifact only when its content meets the trigger in [user-facing-prose.md](references/user-facing-prose.md#investment-disclaimer). Do not add it to progress updates, tool confirmations, operational explanations, or factual data-only answers; a ticker or price mention alone does not trigger it. If the user asks for any \"financial advice\" or \"analyst advice,\" the response MUST also begin with the exact advice-request header.\n",
+    remove:
+      "8. **Use contextual investment framing.** Follow\n   [user-facing-prose.md](references/user-facing-prose.md#investment-disclaimer).\n   Include the disclaimer once at the end of the final substantive response or\n   artifact when its trigger applies: \"This content is for informational purposes only and does not constitute investment advice.\"\n   A ticker or price mention alone does not trigger it. Explicit financial or\n   analyst advice requests also require the exact advice-request header at the start:\n   \"I'll share an analysis, but keep in mind I'm not a licensed analyst or adviser, and this isn't personalized advice for you specifically.\"\n",
     expectFailedCases: [
       "target.mandatory-investment-disclaimer",
       "scenario.explicit-analyst-advice-header",
@@ -164,19 +288,14 @@ const MUTATIONS = [
     id: "automation-knowledge-required-reading",
     file: "SKILL.md",
     remove:
-      "## Alva Knowledge (Required Reading)\n\n" +
-      "Before designing, modifying, or evaluating any automation, read\n" +
-      "[alva-knowledge.md](references/alva-knowledge.md). Every automation must decide\n" +
-      "whether bounded history improves its output; longitudinal or decision\n" +
-      "automations use that history, and push-capable automations also define semantic\n" +
-      "notification novelty.\n\n",
+      "| Track, continuously evaluate, refresh, or alert beyond platform Thesis tracking | Read [alva-knowledge.md](references/alva-knowledge.md) when designing or changing automation reasoning, history, or notification logic, then [feed-lifecycle.md](references/feed-lifecycle.md) and [push-notifications.md](references/push-notifications.md). Apply the [Preferred Automation Setup Skills](references/request-routing.md#preferred-automation-setup-skills) when choosing a setup |\n",
     expectFailedCases: ["scenario.alert-push-monitor"],
   },
   {
     id: "automation-knowledge-reference-index",
     file: "SKILL.md",
     remove:
-      "| [alva-knowledge.md](references/alva-knowledge.md)                                     | Required automation reasoning: bounded history, cross-run comparison, semantic notification novelty, quiet runs.                            |\n",
+      "| Automation reasoning, bounded history, novelty, and quiet runs | [alva-knowledge.md](references/alva-knowledge.md) |\n",
     expectFailedCases: ["scenario.alert-push-monitor"],
   },
   {
@@ -280,12 +399,12 @@ function runEval(skillDir) {
   };
 }
 
-function replaceOnce(filePath, needle) {
+function replaceOnce(filePath, needle, replacement = "") {
   const original = readFileSync(filePath, "utf8");
   if (!original.includes(needle)) {
     throw new Error(`Mutation target not found in ${filePath}: ${JSON.stringify(needle)}`);
   }
-  writeFileSync(filePath, original.replace(needle, ""), "utf8");
+  writeFileSync(filePath, original.replace(needle, replacement), "utf8");
 }
 
 function copySkill(sourceSkillDir, tempRoot, mutationId) {
@@ -304,11 +423,11 @@ function assertEvalGreen(sourceSkillDir) {
 
 function assertMutationFails(sourceSkillDir, tempRoot, mutation) {
   const mutatedSkillDir = copySkill(sourceSkillDir, tempRoot, mutation.id);
-  replaceOnce(resolve(mutatedSkillDir, mutation.file), mutation.remove);
+  replaceOnce(resolve(mutatedSkillDir, mutation.file), mutation.remove, mutation.replacement);
 
   const result = runEval(mutatedSkillDir);
   if (result.status === 0) {
-    throw new Error(`${mutation.id}: eval unexpectedly passed after removing ${mutation.file}`);
+    throw new Error(`${mutation.id}: eval unexpectedly passed after mutating ${mutation.file}`);
   }
 
   const missingExpectedCases = mutation.expectFailedCases.filter(

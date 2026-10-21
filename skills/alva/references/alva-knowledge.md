@@ -1,7 +1,8 @@
 # Alva Knowledge
 
-Read this chapter before designing, modifying, or evaluating any automation. It
-owns the history decision for every automation, cross-run judgment for
+Read this chapter when designing or evaluating automation reasoning, or
+changing its history, decision, or notification logic. Metadata-only changes
+do not require repeating these checks. This chapter owns the history decision for every automation, cross-run judgment for
 longitudinal or decision automations, and notification novelty for push-capable
 automations. Feed construction and delivery mechanics remain in
 [feed-lifecycle.md](feed-lifecycle.md) and

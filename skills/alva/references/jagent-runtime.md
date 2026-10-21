@@ -309,7 +309,7 @@ To discover function signatures and response shapes, use the SDK doc API
 (`alva sdk doc --name "..."`).
 
 **Data APIs** (crypto, stock, macro, ETF) are now served by Arrays via HTTP
-endpoints — see the Data Skills section in SKILL.md. They are **not**
+endpoints — see [data-skills.md](data-skills.md). They are **not**
 loaded via `require()`.
 
 ---

@@ -1,5 +1,7 @@
 # Automation Price Chart SDK
 
+Do not add charts by default or apply this route to one-off chat or Playbook charts.
+
 Use `@alva/price-chart-sdk` only when a deployed Automation/Feed producer is
 explicitly designed to publish a standard time-based price chart on each run.
 Do not add charts to Automations by default.

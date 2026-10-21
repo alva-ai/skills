@@ -47,7 +47,7 @@ alva trading execute \
 
 - **Always dry-run first.** Show simulated orders and confirm before
   re-running without `--dry-run`. For a consented auto-trading Schedule
-  occurrence or legacy Channel Loop tick, recorded consent per the SKILL.md
+  occurrence or legacy Channel Loop tick, recorded consent per the [Agent Schedule](../agent-schedules.md#auto-trading-consent)
   rule stands in for this per-order confirmation.
 - **One active subscription per account.** `alva trading subscribe`
   fails until you `unsubscribe` the existing one.

@@ -18,7 +18,7 @@ local code you wrote.
 
 ## Required confirmation
 
-When you discover a likely Alva issue yourself, ask in English and in the
+When you discover a likely Alva issue yourself, ask in the user's language and in the
 Alva voice whether the user wants you to send feedback to Alva. Do not quote a
 fixed script; make the message brief, specific to the problem, and clear that
 the user controls whether anything is submitted.

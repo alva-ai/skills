@@ -12,6 +12,14 @@ select an arbitrary producer script. Use `alva deploy` when the occurrence must 
 deterministic producer script; use `alva schedule` when it must ask the Agent to
 resume reasoning or judgment in the selected Channel or Session.
 
+When the current Channel exposes `PutSchedule`, `ListSchedules`, and
+`ManageSchedule`, use those tools and the Channel profile's consent protocol.
+They bind to this Channel; do not replace them with the default-target CLI.
+The CLI examples below apply when those tools are not exposed, or when the
+user explicitly requests an existing ALPI Session Inbox target. For CLI work,
+verify the destination: omitting `--channel-id` targets the default Agent Channel,
+which may differ from the topic Channel the user is currently viewing.
+
 Run `alva schedule --help` before use. The active Toolkit contract is
 authoritative if these examples ever drift.
 
@@ -126,14 +134,24 @@ See [alpi.md](alpi.md) for the distinction from application-level `Agent.ask()`.
 
 ## Auto-Trading Consent
 
-Interactive orders still require explicit per-order confirmation. A scheduled
-auto-trading instruction may use the narrow exception in `SKILL.md` only when:
+Interactive orders, including any order placed in an ordinary conversation,
+require a dry run and explicit per-order confirmation per
+[api/trading.md](api/trading.md). The only exception: an Agent Schedule
+occurrence or verified legacy Channel Loop tick MAY place live orders without
+per-order user confirmation when all of these hold:
 
-1. the user explicitly grants it;
-2. the Schedule `--message` carries the canonical consent reference;
-3. each occurrence performs the required one-read record verification;
-4. the recurring Schedule is bounded by `--until` or `--max-occurrences`; and
-5. dry-run, fresh intent-id, and trex risk rules still pass.
+1. The user explicitly granted it in their own typed reply (never an action
+   button), and the Schedule `--message` (or legacy Loop goal) carries
+   `[auto-trade-consent: granted <ISO8601-UTC> record=~/memory/auto-trade-consent.md]`.
+2. The occurrence's one-read verification finds that record. Verification
+   checks only that the consent record exists: the timestamp is provenance, not
+   a match key, and a differing `granted_at` after re-grant is not a mismatch.
+   A missing or unreadable record means NO live orders.
+3. A recurring Schedule is bounded by `--until` or `--max-occurrences`.
+4. Dry-run validation, a fresh idempotent intent-id, and trex risk rules pass.
+
+This applies only to Agent Schedule occurrences and verified legacy Channel
+Loop ticks, never interactive turns.
 
 Do not copy consent from an old Loop or another Schedule during migration. A
 new Schedule needs the user's explicit consent-bearing message.

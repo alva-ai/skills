@@ -1,8 +1,9 @@
 # Ticker Read
 
-Use this reference for any single-ticker read: broad company analysis, current
-investor focus, an unusual move, a catalyst check, or a comparison of what
-changed. Treat these as first-tier ticker-read sources: check
+Use this reference for company analysis, earnings interpretation, investor
+focus, an unusual move, a catalyst check, or a comparison of what changed.
+Standalone price and security-identity lookups use [data-skills.md](data-skills.md).
+Treat these as first-tier ticker-read sources: check
 the matching official Platform Data method before generic search, then add Data
 Skills or primary-source verification where the method's contract requires it.
 
@@ -14,8 +15,9 @@ feed, Automation, or Playbook unless the user asks for a durable artifact.
 ## Source Router
 
 The five official methods form two lanes. Fetch the selected method's current
-instructions from Skillhub before using it; the contracts and public paths can
-change.
+instructions from Skillhub before first use; reuse applicable instructions
+already read in this session. Refresh on an environment change or contract
+mismatch, since contracts and public paths can change.
 
 Use `alva/company-anomaly-read` as the first direct-read check for intraday and hourly-scale market tracking.
 Its feed checks roughly every 15 minutes during US market hours, so it is the
@@ -47,7 +49,11 @@ Automation or Playbook.
 These source modules are official and known, but publication is profile-specific
 and may lag the source repository:
 
-1. Run `alva skillhub --help` if it has not been used in this session.
+Reuse applicable metadata and instructions already read in this session;
+otherwise follow these steps:
+
+1. Use the documented commands below; consult the relevant help if syntax is
+   uncertain or a call reports a contract mismatch.
 2. Run `alva skillhub get <official-id>` to verify that exact method and inspect
    its current file listing.
 3. If the exact id is unavailable, run
@@ -88,16 +94,18 @@ covered.
 
 ### Markets company context
 
-Run `alva markets --help` once before first use in a session.
+Use the signatures below; consult command help if syntax is uncertain or the
+call reports a contract mismatch.
 
 - Current Company Narrative, Narrative history, or change log:
   `alva markets narrative --ticker <TICKER>`
-- Latest completed earnings:
-  `alva markets earnings --ticker <TICKER>`
+- Latest completed earnings (default selector):
+  `alva markets earnings --ticker <TICKER> --event latest-completed`
 - Next confirmed earnings:
   `alva markets earnings --ticker <TICKER> --event next-confirmed`
-- Explicit period: pass both flags, e.g.
-  `--fiscal-year 2026 --fiscal-quarter Q3`.
+- Explicit period:
+  `alva markets earnings --ticker <TICKER> --fiscal-year <YEAR> --fiscal-quarter <Q1|Q2|Q3|Q4>`
+  Supply both fiscal flags; do not combine them with `--event`.
 
 Use Narrative as the default reader for current investor focus, debate,
 competitive context, what could move the stock, four-quarter focus, Street
@@ -123,7 +131,7 @@ GraphQL, ALFS paths, owners, or environment mappings.
 
 1. Use Data Skills for the live price, the move basis, and the requested
    one-hour or intraday window.
-2. Fresh-load and follow `alva/company-anomaly-read` first.
+2. Load and follow `alva/company-anomaly-read` first.
 3. Use its current-state or bounded-history workflow for the requested horizon,
    including its rules for keeping current and prior attributions distinct.
 4. Add Breaking News only when a current macro/sector event may explain the
@@ -137,9 +145,11 @@ crossed in that run; report the live move from Data Skills separately.
 For every broad ticker read, check the Direct-read lane before generic search:
 
 1. Resolve the canonical ticker and requested horizon.
-2. Check Company Anomaly exact-ticker coverage and current state first. When
-   covered, add the anomaly state and freshness; when uncovered, continue
-   without treating the missing feed as a company signal.
+2. For intraday tracking or an unusual move, check Company Anomaly exact-ticker
+   coverage and current state first. When covered, add the anomaly state and
+   freshness; when uncovered, continue without treating the missing feed as a
+   company signal. Long-term fundamental questions need no anomaly check unless
+   it bears on the requested judgment.
 3. Read Markets Narrative when the question needs current investor priorities,
    debate, competitive context, or recent changes. Report `asOf` and
    `generatedAtMs`.
@@ -181,7 +191,7 @@ confirms or breaks?"
 ### Why did it move?
 
 1. Establish the ticker, move, time window, and price basis with Data Skills.
-2. For a covered ticker, fresh-load and follow `alva/company-anomaly-read` for
+2. For a covered ticker, load and follow `alva/company-anomaly-read` for
    current state and attribution instead of reproducing its ALFS contract here.
 3. For an off-list, non-US, user-defined, or otherwise uncovered move, use
    `alva/company-data-aggregate`, confirm the supplied move is the one being
@@ -223,9 +233,11 @@ company coverage.
 
 ## Synthesis Gate
 
-Before answering, keep each layer and timestamp explicit:
+Verify the selected layers and their timestamps before using them. In the
+answer, cite supporting sources and explain timing, coverage, and uncertainty
+where they affect the conclusion.
 
-| Layer | Preferred evidence | State clearly |
+| Layer | Preferred evidence | What to check |
 | --- | --- | --- |
 | Performance now | Data Skills | Price/return basis, as-of time, fundamentals or valuation periods. |
 | Investor focus | Markets Narrative; WILF only as compatibility fallback | Narrative `asOf` / `generatedAtMs`; on WILF fallback, weekly `date` / `as_of` and `gaps`. |

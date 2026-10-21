@@ -737,8 +737,7 @@ const points = JSON.parse(data);
 Use `createAlvaClient().fs.read(...)` (the SDK), not a raw `fetch`: it carries
 the viewer's PBSV token, so the page reads its feed data whether the playbook is
 public or private. An unauthenticated `fetch` to `/api/v1/fs/read` is a
-public-only fallback that breaks when the playbook is set private. See SKILL.md
-§6.
+public-only fallback that breaks when the playbook is set private. See [Browser-Safe Feed Reads](playbook-creation.md#browser-safe-feed-reads).
 
 ---
 
