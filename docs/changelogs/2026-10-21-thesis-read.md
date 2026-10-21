@@ -24,3 +24,12 @@ authorization, routing and dependency review found no unresolved issue.
 Ship only after Toolkit commands are installed in Sandbox and ALPI Dispatch.
 Real Agent routing/conversation acceptance requires that deployed version; static
 Skill review does not prove runtime behavior. PR #650 is still an open dependency.
+
+## 9. Review follow-up
+Aligned with Toolkit #191 after its simplification: both reads continue with
+one `nextCursor`; `--person-id`/`--user-id` are gone and an author follow-up
+uses `publisher.__typename` with `slug` (`--person`) or `username` (`--user`).
+Owner author lists include private Theses, so those are omitted from any
+conversation that includes someone else. Dropped the misleading `thesisId`
+caveat (Gateway resolves it to `playbookId`). Doc eval: 106/106 cases; mutation
+smoke 35/35; durable-agent tests pass.
