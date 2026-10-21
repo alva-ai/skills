@@ -60,6 +60,8 @@ Verification on final content:
 - Sandbox `make lint-fix`: 39 files checked, no fixes.
 - Both repositories: `git diff --check` clean.
 
+PR #652 review follow-up clarifies the stop condition as requiring user input and makes the follow-up question explicitly specific. The existing no-routine-question boundary remains in place without duplication. No test files changed.
+
 These are structural/contract checks, not proof of model behavior. Rebased onto current main, preserving the prior merged prompt cleanup. Prepared for review; no deployment performed. Skills has no Makefile/lint-fix target; no substitute lint command was introduced.
 
 ## 8. Remaining Work
