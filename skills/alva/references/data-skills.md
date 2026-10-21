@@ -2,7 +2,7 @@
 
 Use this file for structured Arrays financial data: market history,
 fundamentals, estimates, ownership, macro, on-chain, prediction markets, news,
-and Twitter/X data tracked by Arrays.
+and Twitter/X data from Arrays.
 
 ## Discovery Pipeline
 
@@ -211,12 +211,11 @@ prediction markets; news; and Twitter/X feeds.
 
 Twitter/X routing:
 
-- For tweet-content searches, use Arrays X Search first, including keyword
-  searches across tracked accounts or scoped to an author. Timeline and known-URL
-  lookups use the same Social Feeds Data Skill.
-- Follow [Content Search](search.md#twitterx) for the endpoint and general-search
-  fallback when access, coverage or freshness is insufficient. The index contains
-  already-ingested posts; an empty result does not prove absence of public discussion.
+- For tweet-content searches, use Arrays X Live Search first, including topic
+  and author queries. Timeline and known-URL lookups retain the corresponding
+  Social Feeds endpoints; indexed search remains available for stored history.
+- Follow [Content Search](search.md#twitterx) for live-search parameters and the
+  general-search fallback. An empty result does not prove absence of public discussion.
 
 Direct latest-price routing:
 

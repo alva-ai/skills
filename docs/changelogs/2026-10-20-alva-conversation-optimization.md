@@ -168,8 +168,8 @@ Serial checklist: (1) verify CLI/backend contracts; (2) repair entry rules;
 (6) probe the revised recipes; update Eval with both arms on fast and refresh
 the committed candidate freeze, without runtime experiments.
 
-Approved Search follow-up, revised after checking the live Social Feeds contract:
-use Arrays X Search first for tweet content and general search when access,
+Approved Search follow-up: use Arrays X Live Search first for tweet content
+(`/api/v1/social-feeds/x/live-search`) and general search when access,
 coverage or freshness is insufficient. Other unstructured research uses exposed
 native search. Defer Worldline and remove its guidance. Remove GrokX guidance while
 preserving Arrays financial/history reads and Fintwit performance/ranking feeds.
@@ -229,11 +229,18 @@ the artifact Voice Block itself is unchanged. Full scoped review verified that
 Trade Setup, disclaimer text/triggers, company links and source/authorization
 boundaries are unchanged. No new real-turn Eval or speed claim is made.
 
+Live-search routing checks: 106/106 document cases (1247/1247 checks),
+37/37 mutation checks and 5/5 durable-agent tests passed; `git diff --check`
+is clean. These structural checks do not validate the live endpoint.
+
 Search follow-up: removed GrokX instructions (including the legacy Grok pointer
 in Data Skills, guarded by a restoration mutation). The revised route uses Arrays
-X Search for tweet content and general search when access, coverage or freshness
-is insufficient. The live `arrays-data-api-social-feeds/x-search` contract confirms
-store-only keyword/author/time queries. Known URLs and account timelines retain
+X Live Search for tweet content and general search when access, coverage or
+freshness is insufficient. The dev-provided live-search contract uses X query
+syntax, latest/top, Unix-second windows, pages of at most 20 posts and cursor
+pagination; retweets require explicit include:nativeretweets when wanted.
+The older x-search contract remains store-only and serves indexed history/polling.
+Known URLs and account timelines retain
 their direct-read endpoints; empty results do not prove absence and lookup does
 not silently start paid tracking. Fintwit retains curated views, rankings and
 performance. Worldline guidance and examples are removed for now. Other
@@ -367,7 +374,13 @@ unverified; low invocation counts alone do not prove a unique cause.
   adding a total-return recipe. S19-D needs a supported, market-time-correct
   example and actual-engine replay before an Altra example enters the Skill.
 
-- Verify tweet-topic and author-scoped searches use Arrays X Search first;
+- Before rollout, Arrays must publish the live-search Data Skill contract and
+  the separate billing task must be completed. The production catalog checked
+  on 2026-10-21 still omitted it; the private Arrays PR could not be read. New
+  parameters follow the user-supplied dev contract; no paid live search was run.
+  Verify tweet-topic and author-scoped searches use Arrays X Live Search first;
+  check default retweet exclusion, explicit inclusion, latest/top, Unix-second
+  windows and bounded cursor paging;
   insufficient/empty/stale or inaccessible results fall back to general search
   without claiming no discussion exists or starting paid handle tracking.
   Check known URLs/timelines, preserved Fintwit ranking reads, no Worldline calls,

@@ -2,7 +2,7 @@
 
 Use the runtime's exposed web search tool first for unstructured research:
 news, public statements and source documents. For X/Twitter post content, use
-Arrays X Search first as described below, with general search as fallback. Inspect
+Arrays X Live Search first as described below, with general search as fallback. Inspect
 relevant originals with its page-reading tools; follow the exposed tool schema.
 In ALPI, `web_search` accepts `search_query` and `open`/`click`/`find` using
 returned reference IDs. If native search is unavailable, or a plain Feed/Automation
@@ -40,19 +40,27 @@ repeating a search already completed with the exposed native tool.
 
 ### Twitter/X
 
-For X/Twitter post content, use Arrays X Search first:
-`GET /api/v1/social-feeds/x/search`. Read its current contract directly with
-`alva data-skills endpoint arrays-data-api-social-feeds x-search`, then call it
-through [Data Skills](data-skills.md#calling-arrays); reuse documentation already read.
-Use `q` for keywords, `handle` to scope an author, and `since`/`until` for the
-publication window (Unix seconds). Choose `sort=latest` for recency;
-`hottest` sorts by view count, not a representative measure of market sentiment.
+For X/Twitter post content, use Arrays X Live Search first:
+`GET /api/v1/social-feeds/x/live-search`. Read the current live-search contract
+from `arrays-data-api-social-feeds` through `alva data-skills`; use the File
+returned by its summary, then call through [Data Skills](data-skills.md#calling-arrays).
+Reuse documentation already read.
 
-Search reads already-ingested posts from tracked accounts; it does not fetch X
-on demand. If access, coverage or freshness is insufficient, use general search:
-the exposed native search tool, or Serper/Brave with `site:x.com` when that tool
-is unavailable or running a plain script. An empty result does not establish
-that nobody discussed the topic; describe the coverage actually checked.
+`q` accepts X search syntax, including author filters. Use `sort=latest` or
+`sort=top`, and `since`/`until` for the publication window (Unix seconds).
+Retweets are excluded by default; add `include:nativeretweets` to `q` when the
+request needs them, including an account's reposts. Fetch one page (at most
+20 posts), then follow the returned `cursor` only when more evidence is needed.
+The response uses the same post format as `/x/search`; its request parameters
+and search coverage differ. `top` is not representative market sentiment.
+
+The older `/api/v1/social-feeds/x/search` searches already-ingested posts from
+tracked accounts; retain it for indexed-history or update-polling requests.
+If live search or its contract is unavailable, or coverage or freshness is
+insufficient, use general search: the exposed native search tool, or Serper/Brave
+with `site:x.com` when that tool is unavailable or running a plain script.
+An empty result does not establish that nobody discussed the topic; describe
+the coverage actually checked.
 
 For an account timeline or a known post URL, use the same Data Skill's
 `by-handle` or `by-url` endpoint. Keep these lookups read-only; do not start paid

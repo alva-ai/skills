@@ -12,7 +12,7 @@ X/Twitter handle is tracked, the curated account views on a ticker or theme, or
 an account's track record — read it here and answer from real data.
 
 For "what has @X said recently?" or searches of tweet content, use
-[Content Search](search.md#twitterx): Arrays X Search first, with general search
+[Content Search](search.md#twitterx): Arrays X Live Search first, with general search
 as fallback when access, coverage or freshness is insufficient. Account timelines,
 known-post lookup and engagement metrics use the same [Data Skills](data-skills.md).
 This Fintwit layer stays the source for curated account profiles, extracted views,

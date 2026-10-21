@@ -13,6 +13,13 @@ const DEFAULT_SKILL_DIR = resolve(REPO_ROOT, "skills/alva");
 
 const MUTATIONS = [
   {
+    id: "x-live-search-retweet-default",
+    file: "references/search.md",
+    remove: "Retweets are excluded by default",
+    replacement: "Retweets are included by default",
+    expectFailedCases: ["retained.search-routing"],
+  },
+  {
     id: "thesis-preview-before-actions",
     file: "references/thesis.md",
     remove: "after showing\nthe preview and any Notes",
@@ -58,7 +65,7 @@ const MUTATIONS = [
   {
     id: "arrays-x-search-priority",
     file: "references/search.md",
-    remove: "For X/Twitter post content, use Arrays X Search first:",
+    remove: "For X/Twitter post content, use Arrays X Live Search first:",
     replacement: "For X/Twitter post content, use general web search first:",
     expectFailedCases: ["retained.search-routing"],
   },

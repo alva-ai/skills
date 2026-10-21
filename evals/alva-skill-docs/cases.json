@@ -141,10 +141,18 @@
           "file": "references/search.md",
           "includes": [
             "Use the runtime's exposed web search tool first",
-            "For X/Twitter post content, use Arrays X Search first:",
-            "alva data-skills endpoint arrays-data-api-social-feeds x-search",
-            "it does not fetch X on demand",
-            "If access, coverage or freshness is insufficient, use general search",
+            "For X/Twitter post content, use Arrays X Live Search first:",
+            "GET /api/v1/social-feeds/x/live-search",
+            "q` accepts X search syntax",
+            "sort=latest` or `sort=top",
+            "since`/`until",
+            "Unix seconds",
+            "Retweets are excluded by default",
+            "include:nativeretweets",
+            "Fetch one page (at most 20 posts)",
+            "returned `cursor` only when more evidence is needed",
+            "retain it for indexed-history or update-polling requests",
+            "If live search or its contract is unavailable",
             "An empty result does not establish that nobody discussed the topic",
             "do not start paid handle tracking just to fill a search gap",
             "inspect the original before citing its contents"
@@ -153,7 +161,7 @@
         {
           "file": "references/fintwit.md",
           "includes": [
-            "Arrays X Search first",
+            "Arrays X Live Search first",
             "general search as fallback",
             "source for curated account profiles, extracted views, rankings and backtested performance",
             "Do not infer a win rate or leaderboard position"
