@@ -2,7 +2,7 @@
 
 Use this file for structured Arrays financial data: market history,
 fundamentals, estimates, ownership, macro, on-chain, prediction markets, news,
-and Twitter/X data tracked by Arrays.
+and Twitter/X data from Arrays.
 
 ## Discovery Pipeline
 
@@ -211,12 +211,9 @@ prediction markets; news; and Twitter/X feeds.
 
 Twitter/X routing:
 
-- For tweet-content searches, use Arrays X Search first, including keyword
-  searches across tracked accounts or scoped to an author. Timeline and known-URL
-  lookups use the same Social Feeds Data Skill.
-- Follow [Content Search](search.md#twitterx) for the endpoint and general-search
-  fallback when access, coverage or freshness is insufficient. The index contains
-  already-ingested posts; an empty result does not prove absence of public discussion.
+- Post search, account timelines, and known-post lookups follow
+  [Content Search](search.md#twitterx), which selects the route from the
+  current social-feeds catalog.
 
 Direct latest-price routing:
 
@@ -313,9 +310,12 @@ the requested data convention:
 
 1. Re-check `summary` for a semantically equivalent endpoint in the same skill.
 2. If the skill id was guessed, rerun `list` and recover the correct id.
-3. If the error is Pro-gated or subscription-gated, explain the access limitation;
-   the user may provide access, or use an independently accessible source below.
-4. When same-domain Alva endpoints cannot answer the task, actively search for
+3. If the error is Pro-gated or subscription-gated, say which module is
+   unavailable and offer two paths: the user upgrades or provides access, or
+   supplies a data source for you to wire. Do not route around an access gate
+   by fetching the gated dataset elsewhere unless the user asks for that.
+4. When same-domain Alva endpoints cannot answer the task for lack of coverage
+   (not access), actively search for
    an accessible public source or use an available custom data source URL / BYOD
    source. Do not ask the user to find a source or approve public-source research
    before trying it yourself.

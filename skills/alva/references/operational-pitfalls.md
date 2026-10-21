@@ -17,6 +17,8 @@ the runtime contract changes. Do not save these constraints for debugging.
 
 - No `process`, Node.js builtins, timer globals, global `fetch`, or top-level
   `await` in jagent runtime. Use [jagent-runtime.md](jagent-runtime.md).
+- On `ReferenceError: <X> is not defined`, rewrite for the jagent runtime
+  instead of retrying the same code.
 - Use `require("net/http")` for HTTP.
 - Use `require("alfs")` with absolute `/alva/home/<username>/...` paths.
 - `FeedAltra.run()` is async; always `await` it.
@@ -87,8 +89,9 @@ Do not use destructive resets in production.
 
 ## Chart And HTML
 
-**Playbook — ECharts inside tabs render with zero width.** Charts mounted in a hidden tab measure their container at `0×0` and stay collapsed even after the tab becomes visible. On every tab switch, find all ECharts instances inside the newly-shown tab panel and call `resize()` on each — e.g. iterate the panel's chart DOM nodes with `echarts.getInstanceByDom(el)?.resize()`. Do this in the tab's `onChange` / visibility handler, not on window `resize`, because the container's size changes without the window resizing.
-
+- ECharts in a hidden tab measures `0×0`; resize every instance in the newly
+  shown panel on tab switch, per the canonical handler in
+  [design-components.md](design-components.md) (lint enforces it).
 - Covered US equities and crypto latest/realtime price answers need intraday
   klines; daily-level bars and closes are not current-price sources.
 - ECharts date axes should use `type: 'time'`, not raw epoch values as category

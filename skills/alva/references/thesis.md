@@ -147,15 +147,19 @@ Otherwise, guide the request to one candidate before confirmation:
 Do not add Alva company-page links to candidate or published bodies. Preserve
 the author's links and legitimate supporting citations.
 
-Show the candidate with its Notes and let the user revise it naturally. Once
-the user selects the text to publish, follow Create below. If the selection
-already covers the displayed final body and publication details, that explicit
-selection need not be confirmed again.
+Show the candidate with its Notes and let the user revise it naturally. When
+the user selects text to publish, follow Create below. A candidate already shown
+as a full [publication preview](#publication-preview) is confirmed by that
+explicit selection; it need not be confirmed again.
 
 ## Create
 
-For the final body, call `alva thesis asset-candidates --text '<exact body>'`
-before creation. This read-only command identifies asset mentions,
+Every creation shows one publication preview and obtains one confirmation of it.
+
+### Publication preview
+
+For the selected body, call `alva thesis asset-candidates --text '<exact body>'`
+before showing the preview. This read-only command identifies asset mentions,
 catalog entity IDs, and suggested directions. Match the result against the
 user's stated assets and direction; the user's explicit direction wins over a
 suggestion. Use `bullish`, `bearish`, or `unknown` for each selected entity.
@@ -168,44 +172,46 @@ Preserve the selected body exactly, including wording, language, whitespace and
 line breaks. Do not summarize, rewrite, translate, correct, expand, generate a
 title, or add assets absent from that body or the user's request.
 Still read the body once as its editor: briefly flag material internal
-inconsistencies or unfinished passages in Notes before calling
-`alva thesis create`, keeping the body unchanged.
+inconsistencies or unfinished passages in Notes before calling `alva thesis create`,
+keeping the body unchanged.
 Notes are not part of the payload; omit them when none.
-If this reveals a material inconsistency or unfinished passage the author has
-not yet considered, show the Notes with the publication details and wait for their decision before creating.
-If the author chooses to publish despite it, proceed without asking again
-once the publication details below are confirmed.
-Previously discussed Notes and ordinary editorial suggestions need no new approval.
 
-Before creation, show the visibility (public by default) and resolved tickers
-and directions alongside the selected body or a clear reference to it, then wait
-for confirmation. This also applies to an explicit request to publish the supplied
-original: use one short preview line without repeating the body. A confirmation
-of that preview authorizes that exact body and publication details; if already
-confirmed and unchanged, proceed without another confirmation.
-Research or rewriting alone never authorizes publication.
+Present the preview in the user's language:
 
-If the body is newly drafted and not yet selected, or a material choice remains,
-show the complete candidate (including file content, not its filename), title,
-visibility, tickers and directions, then ask for that choice. Resolve ambiguous
-assets or directions before creating; do not silently change the selected body.
-Present publication details in the user's language: name the company or ticker
-and express any stated stance plainly. Keep internal IDs and API field
-names out of the preview; omit absent optional fields instead of listing blanks.
-Use the asset extraction result for catalog IDs and respect explicit stances.
-After requested edits, rerun extraction and obtain selection of the changed
-candidate. Stop if declined.
+- **Body.** New or changed candidates must be shown in full, as must text taken
+  from a file, attachment, link, or other extraction (show its content, not its
+  filename). A body already shown in full in this conversation, or typed by the
+  user and asked to publish unchanged, may be referenced instead: use one short
+  preview line without repeating the body.
+- **Title**, when present, and **visibility** (public by default).
+- **Assets:** name each company or ticker and express its stance plainly, using
+  the asset extraction result for catalog IDs and respecting explicit stances.
+- **Notes**, when any.
 
-Reuse an already displayed or user-supplied exact body by referring to it clearly;
-do not repeat the full text just to ask a remaining question. New or changed
-candidates must be shown in full. A natural confirmation of the selected body
-and publication settings is sufficient; do not ask for it again unless they change.
-When confirmation is needed and `PresentActions` is available, offer localized
-`send_prompt` actions such as "Publish this version" and "Edit": register them
-as the last tool call before the final reply containing the preview or Notes.
-Tie the publish prompt to the displayed candidate and settings; a click has the same meaning as the equivalent typed reply. Without the tool, ask in text.
-An old button does not authorize a changed candidate, and repeated approval of an
-already completed creation must not create another Thesis; verify its existing ID.
+Keep internal IDs and API field names out of the preview; omit absent optional
+fields instead of listing blanks.
+
+### Confirmation
+
+Show the preview, then wait for confirmation. A natural confirmation, typed or
+by action click, authorizes exactly the displayed body and publication details;
+create without asking again. If the preview showed Notes the author had not yet
+considered, that confirmation is their decision to publish despite them.
+Previously discussed Notes and ordinary editorial suggestions need no new
+approval. Research or rewriting alone never authorizes publication.
+
+Any change to the body, title, visibility, assets, or stances voids the
+confirmation: rerun extraction for a changed body and show the new preview.
+Stop if declined.
+
+When `PresentActions` is available, offer localized `send_prompt` actions such
+as "Publish this version" and "Edit" for the preview. Name the displayed
+candidate in the publish prompt so it is tied to that candidate and its
+settings; a click has the same meaning as the equivalent typed reply. Without
+the tool, ask in text.
+An old button does not authorize a changed candidate, and repeated approval of
+an already completed creation must not create another Thesis; verify its
+existing ID.
 
 One sentence is valid. Title, tickers, and entity IDs are optional. Visibility
 defaults to public. Generate one nonzero UUID per creation intent and keep it
@@ -269,9 +275,9 @@ empty avatar/icon URL may be emitted as an empty attribute; an omitted or
 malformed field is failure. On incomplete GET data, report the created ID and
 only verified fields in plain text; do not emit partial XML. The preview is a
 completion card, not another confirmation gate. If an authoritative HTTPS Thesis
-URL is available and `PresentActions` is supported, offer it as an `open_url`
-action before the final reply and retain the link in the reply; otherwise use
-the existing preview card without inventing a URL.
+URL is available and `PresentActions` is supported, also offer it as an
+`open_url` action; otherwise use the existing preview card without inventing a
+URL.
 
 ## Rewrite
 

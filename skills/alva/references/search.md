@@ -1,13 +1,11 @@
 # Content Search
 
 Use the runtime's exposed web search tool first for unstructured research:
-news, public statements and source documents. For X/Twitter post content, use
-Arrays X Search first as described below, with general search as fallback. Inspect
-relevant originals with its page-reading tools; follow the exposed tool schema.
-In ALPI, `web_search` accepts `search_query` and `open`/`click`/`find` using
-returned reference IDs. If native search is unavailable, or a plain Feed/Automation
-script needs search, use the SDKs below. Do not invent a tool or call the managed
-search transport directly.
+news, public statements and source documents. Inspect relevant originals with
+its page-reading tools, following the exposed tool schema. X/Twitter post
+content follows [Twitter/X](#twitterx). If native search is unavailable, or a
+plain Feed/Automation script needs search, use the SDKs below. Do not invent a
+tool or call the managed search transport directly.
 
 Prices, financial datasets, exact account history and engagement metrics retain
 their [Data Skills](data-skills.md) routes. News, YouTube, Reddit and podcast
@@ -40,27 +38,35 @@ repeating a search already completed with the exposed native tool.
 
 ### Twitter/X
 
-For X/Twitter post content, use Arrays X Search first:
-`GET /api/v1/social-feeds/x/search`. Read its current contract directly with
-`alva data-skills endpoint arrays-data-api-social-feeds x-search`, then call it
-through [Data Skills](data-skills.md#calling-arrays); reuse documentation already read.
-Use `q` for keywords, `handle` to scope an author, and `since`/`until` for the
-publication window (Unix seconds). Choose `sort=latest` for recency;
-`hottest` sorts by view count, not a representative measure of market sentiment.
+Choose the X route from the current `arrays-data-api-social-feeds` Data Skill
+catalog (`alva data-skills summary`, then the endpoint doc for the File it
+lists), and call through [Data Skills](data-skills.md#calling-arrays). Reuse
+documentation already read; never call an endpoint the catalog does not list.
 
-Search reads already-ingested posts from tracked accounts; it does not fetch X
-on demand. If access, coverage or freshness is insufficient, use general search:
-the exposed native search tool, or Serper/Brave with `site:x.com` when that tool
-is unavailable or running a plain script. An empty result does not establish
-that nobody discussed the topic; describe the coverage actually checked.
+1. **Post-content or topic search:** when the catalog lists a live-search
+   endpoint, use it per its current contract. Fetch one page first; follow its
+   cursor only when more evidence is needed.
+2. **Known account or post:** use the catalog's `by-handle` timeline or
+   `by-url` lookup; stored history of tracked accounts or update polling uses
+   its indexed search. Keep these lookups read-only; do not start paid handle
+   tracking just to fill a search gap.
+3. **Otherwise, general search:** the exposed native search tool, or Serper/Brave
+   with `site:x.com OR site:twitter.com` when that tool is unavailable or in a
+   plain script. Say in the answer that this evidence came from general search,
+   not Arrays X data.
 
-For an account timeline or a known post URL, use the same Data Skill's
-`by-handle` or `by-url` endpoint. Keep these lookups read-only; do not start paid
-handle tracking just to fill a search gap. Results include post text, author,
-original URL, publication time and available engagement counts. Check freshness
-and distinguish missing counts from zero. Verify author and publication time;
-a quoted or reposted view is not automatically the poster's own view. General
-search snippets remain leads: inspect the original before citing its contents.
+Failures follow [Failure And Fallback](data-skills.md#failure-and-fallback). On
+401, refresh the token as in [Calling Arrays](data-skills.md#calling-arrays); if
+it persists, report the credential block instead of switching to another source.
+An empty result does not establish that nobody discussed the topic; describe
+the coverage actually checked.
+
+Results include post text, author, original URL, publication time and available
+engagement counts. Check freshness and distinguish missing counts from zero.
+Verify author and publication time; a retweet or quoted post is not
+automatically the poster's own view. Top-ranked or most-engaged posts are not
+representative market sentiment. General search snippets remain leads: inspect
+the original before citing its contents.
 
 ### News
 

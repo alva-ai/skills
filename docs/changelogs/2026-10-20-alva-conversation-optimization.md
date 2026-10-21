@@ -8,7 +8,7 @@ simple questions inherit setup, discovery and build requirements. The ALPI Slim
 entry offered a smaller structure but did not cover all Sandbox capabilities.
 
 This is the consolidated record for the batch. The companion
-[Sandbox changelog](../../../../backend/sandbox-agent-ts/docs/changelogs/2026-10-20-alva-conversation-optimization.md)
+[Sandbox changelog](https://github.com/alva-ai/sandbox-agent-ts/pull/386)
 covers communication, context use and background-task handoff.
 
 ## 2. Intended behavior
@@ -105,14 +105,15 @@ from Playbook Creator Notes.
   screenshots and remix lineage; Altra/broker approvals; Trade Setup unchanged;
   conditional disclaimers; scope and provenance for memory writes.
 
-PresentActions follow-up: register actions as the last tool call before the
-final reply; align both the tool description and its result instruction. Keep
-Thesis preview consent and ordinary AskUserQuestion clarification unchanged.
-Use existing next-step, optional chart-upgrade and verified artifact-link paths,
-without mandatory buttons on discussion turns. Thesis URLs must be authoritative;
-the existing preview card remains the fallback. Backend materialization accepts
-either call order, but Feed App renders action rows chronologically, so no
-automatic placement below the final text is claimed. No transport/UI changes.
+PresentActions: show the substantive answer, suggestion or publication preview
+and Notes before registering actions, then end the turn. Retain the existing
+answer-before-actions sequence: Feed App and Web render action rows in call order,
+so the proposed actions-before-final-reply timing has been withdrawn. Align the
+Skill, chart-upgrade instruction, tool description and tool-result instruction.
+Keep concise labels, typed/button consent equivalence, candidate scope and
+ordinary AskUserQuestion clarification unchanged. Use authoritative Thesis URLs
+with the existing completion-card fallback. No frontend or transport change is
+included; invocation frequency and delivery across clients still need live Eval.
 
 ## 5. Verification approach
 
@@ -167,8 +168,8 @@ Serial checklist: (1) verify CLI/backend contracts; (2) repair entry rules;
 (6) probe the revised recipes; update Eval with both arms on fast and refresh
 the committed candidate freeze, without runtime experiments.
 
-Approved Search follow-up, revised after checking the live Social Feeds contract:
-use Arrays X Search first for tweet content and general search when access,
+Approved Search follow-up: use Arrays X Live Search first for tweet content
+(`/api/v1/social-feeds/x/live-search`) and general search when access,
 coverage or freshness is insufficient. Other unstructured research uses exposed
 native search. Defer Worldline and remove its guidance. Remove GrokX guidance while
 preserving Arrays financial/history reads and Fintwit performance/ranking feeds.
@@ -228,11 +229,17 @@ the artifact Voice Block itself is unchanged. Full scoped review verified that
 Trade Setup, disclaimer text/triggers, company links and source/authorization
 boundaries are unchanged. No new real-turn Eval or speed claim is made.
 
+Live-search routing checks: 106/106 document cases (1247/1247 checks),
+37/37 mutation checks and 5/5 durable-agent tests passed; `git diff --check`
+is clean. These structural checks do not validate the live endpoint.
+
 Search follow-up: removed GrokX instructions (including the legacy Grok pointer
-in Data Skills, guarded by a restoration mutation). The revised route uses Arrays
-X Search for tweet content and general search when access, coverage or freshness
-is insufficient. The live `arrays-data-api-social-feeds/x-search` contract confirms
-store-only keyword/author/time queries. Known URLs and account timelines retain
+in Data Skills, guarded by a restoration mutation). The revised route picks
+the X endpoint from the current social-feeds Data Skill catalog: live search
+when the catalog lists it, otherwise `by-handle`/`by-url` (indexed search for
+stored history/polling), otherwise disclosed general search. The unpublished
+live-search path and parameters are not inlined in Skill text (see section 9).
+Known URLs and account timelines retain
 their direct-read endpoints; empty results do not prove absence and lookup does
 not silently start paid tracking. Fintwit retains curated views, rankings and
 performance. Worldline guidance and examples are removed for now. Other
@@ -335,8 +342,8 @@ Eval; these checks do not establish production readiness.
 
 PresentActions verification: `node evals/alva-skill-docs/skill-doc-eval.mjs
 --skill-dir skills/alva --out /tmp/alva-actions-doc.md` passed 106/106 cases
-and 1237/1237 checks; `node evals/alva-skill-docs/mutation-smoke.mjs` passed
-35/35; `node --test evals/alva-skill-docs/durable-agent.test.mjs` passed 5/5.
+and 1239/1239 checks; `node evals/alva-skill-docs/mutation-smoke.mjs` passed
+36/36; `node --test evals/alva-skill-docs/durable-agent.test.mjs` passed 5/5.
 `git diff --check` passed. Real-turn invocation and visual placement remain
 unverified; low invocation counts alone do not prove a unique cause.
 
@@ -345,8 +352,10 @@ unverified; low invocation counts alone do not prove a unique cause.
 - PresentActions targeted Eval: reuse S03-A or S13-A for a concrete next step,
   S17-B for a relevant optional chart upgrade, and supplied-original Thesis
   publication for preview/approval/delivery. Include a pure discussion control.
-  Inspect actual tool calls, complete final text, button placement during and
-  after generation, click behavior, and retained authorization boundaries.
+  Inspect actual tool calls and complete answer/preview delivery before buttons
+  in Feed App and Web, plus IM delivery with stream on and off. Check click
+  behavior and retained authorization boundaries. This rollback keeps the prior
+  call sequence; it does not establish improved invocation frequency.
   A successful registration alone does not prove rendering or user comprehension.
 
 - Reuse S11-C/E/F/G for original/new/edited candidates, public/private settings,
@@ -364,7 +373,12 @@ unverified; low invocation counts alone do not prove a unique cause.
   adding a total-return recipe. S19-D needs a supported, market-time-correct
   example and actual-engine replay before an Altra example enters the Skill.
 
-- Verify tweet-topic and author-scoped searches use Arrays X Search first;
+- Before rollout, Arrays must publish the live-search Data Skill contract and
+  the separate billing task must be completed. The production catalog checked
+  on 2026-10-21 still omitted it; the private Arrays PR could not be read. New
+  Skill text is catalog-gated, so publication needs no Skill edit; no paid live
+  search was run. Once listed, verify tweet-topic and author-scoped searches use
+  live search per its catalog contract, with bounded cursor paging;
   insufficient/empty/stale or inaccessible results fall back to general search
   without claiming no discussion exists or starting paid handle tracking.
   Check known URLs/timelines, preserved Fintwit ranking reads, no Worldline calls,
@@ -405,3 +419,48 @@ unverified; low invocation counts alone do not prove a unique cause.
   acceptance; the upstream dependency-lock version alone does not identify
   the local candidate. Publish a real accepted commit/tag before updating the
   Sandbox production pin; do not deploy this prompt pair against the old bundle.
+
+## 9. Review follow-up (2026-10-21)
+
+Applied after review of head `2c197ef`; additive commits only.
+
+- **PresentActions timing:** Skill text no longer states when to call the tool.
+  `playbook-creation.md` still said "before the final reply", contradicting the
+  withdrawn order. Action kinds, labels and call order belong to the Sandbox tool
+  description. Skill text names which action to offer and states that order/trade
+  confirmation and auto-trading risk acknowledgment are typed replies, never buttons.
+  Corpus excludes guard against reintroduced timing.
+- **Thesis Create:** one publication preview (body, title, visibility, assets
+  with stances, Notes) and one confirmation, typed or by button, replace five
+  overlapping confirm-once statements. Asset extraction runs before the preview.
+  New or changed candidates, and text taken from files, attachments, links or
+  other extraction, are shown in full. A body already shown in full, or typed by
+  the user for unchanged publication, may be referenced by one short line. Any
+  change voids the confirmation.
+- **X search:** route through the current social-feeds catalog. Use live search
+  when listed, `by-handle`/`by-url` (indexed search for stored history or polling)
+  for known accounts/posts, otherwise general search
+  (`site:x.com OR site:twitter.com`), disclosed in the answer. A persistent 401
+  reports the credential block instead of switching source. Evidence rules (top
+  is not sentiment; a retweet is not the poster's own view) remain. Removed the
+  ALPI-specific `web_search` schema line.
+- **Access gates:** a Pro/subscription gate again offers upgrade/access or a
+  user-supplied source; it is not silently routed around. Autonomous public-source
+  recovery remains for coverage gaps.
+- **Static snapshot:** one definition in `playbook-creation.md#static-snapshot`
+  replaces per-gate exception clauses. Content Legitimacy lists it with the chat
+  chart as the two inline-value exceptions and restores the `--feeds '[]'`
+  zero-quantitative rule.
+- **Playbook reuse:** the mandatory trending + Skillhub ladder and build
+  confirmation become one optional trending check. Duplicates of existing gates
+  were removed from Build Verification.
+- **Scheduled trading consent:** restored the structured four-condition list
+  in `agent-schedules.md`. The broker reference now points there, not at SKILL.md.
+- **Cleanup:** restored the jagent `ReferenceError` rewrite rule. Deduplicated
+  the chat-chart section, the ECharts tab-resize pitfall, final-reply rules (own
+  heading) and repeated explain-versus-evidence sentences.
+
+Verification: `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva`
+106/106 cases; `node evals/alva-skill-docs/mutation-smoke.mjs` 43/43;
+`node --test evals/alva-skill-docs/durable-agent.test.mjs` 5/5;
+design.md CSS blocks unchanged. Real-turn Eval items in section 8 still apply.
