@@ -8,15 +8,17 @@ axes: **by account**, **by ticker**, and **by ranking**.
 
 This is the data behind Alva's public fintwit/KOL leaderboard playbooks. When a
 user asks about top fintwit/KOL traders, a leaderboard ranking, whether an
-X/Twitter handle is tracked, what an account thinks about a ticker or theme, or an
-account's track record — read it here and answer from real data.
+X/Twitter handle is tracked, the curated account views on a ticker or theme, or
+an account's track record — read it here and answer from real data.
 
-**Not raw tweet search.** For "what is @X tweeting right now" with no
-curation/scoring, use Data Skills per-handle history / full-text over the X
-accounts Arrays tracks (see [data-skills.md](data-skills.md)); reach for Content
-Search (`searchGrokX`, see [search.md](search.md)) only for global X search
-beyond Arrays' tracked index. Fintwit Intelligence returns *processed* records:
-classified signals, extracted theses, backtested performance, computed rankings.
+For "what has @X said recently?" or public discussion beyond this curated corpus,
+use [Content Search](search.md): native search first, with Worldline as an optional
+parallel supplement for recent public statements in its collected sources.
+Exact handle history, known-post lookup and engagement
+metrics use [Data Skills](data-skills.md) where covered. This Fintwit layer stays
+the source for curated account profiles, extracted views, rankings and backtested
+performance. Do not infer a win rate or leaderboard position from web mentions or
+Worldline statements.
 
 ## Access
 

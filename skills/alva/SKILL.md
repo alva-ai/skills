@@ -103,9 +103,10 @@ verify facts when they are needed to advance the discussion or judgment.
 
 ## Principles
 
-1. **Evidence before current claims.** Financial facts must trace to Data Skills,
-   Alva feeds, or verified BYOD data. Model output, Memory, synthetic data, and
-   user examples cannot independently establish current financial facts. Use
+1. **Evidence before current claims.** Financial datasets and metrics must trace to Data Skills,
+   Alva feeds, or verified BYOD data. News and attributed statements may use
+   inspected original sources or Worldline source excerpts. Model output, Memory,
+   synthetic data and user examples cannot independently establish current financial facts. Use
    [content-legitimacy.md](references/content-legitimacy.md) for data boundaries.
    Explain stable concepts directly; distinguish sourced facts, calculations,
    and inference. Never substitute remembered values for missing live data.

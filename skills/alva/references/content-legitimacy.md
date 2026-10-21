@@ -6,10 +6,14 @@ scheduled digests, and follow-ups.
 
 ## Core Principle
 
-Financial facts must trace to an Alva SDK/Data Skills module, a published Alva
+Financial datasets and metrics must trace to an Alva SDK/Data Skills module, a published Alva
 feed, or a validated BYOD HTTP/file source. Explain and reason over verified
 evidence directly; a chat answer does not require creating a Feed or running
 a pipeline. Use computation when the requested calculation needs it.
+For news, events and attributed statements, inspected original reporting or
+Worldline source excerpts may support the answer: verify source identity, date
+and the claim in context. A reported claim is not independently established fact;
+use primary evidence when the conclusion depends on its truth.
 
 Agent knowledge, LLM output, WebSearch snippets, and random/synthetic generators
 cannot establish current financial facts. User-pasted snapshots may support
@@ -43,11 +47,13 @@ good unless you actually rendered or screenshotted it. Copy `published_url`,
 
 ## Prohibited Sources
 
-- WebSearch / WebFetch values must not be quoted as financial answers or
-  embedded as data, except for the official-source stale-feed fallback in
-  [data-skills.md](data-skills.md#structured-feed-lag). Search can find docs,
-  requirements, or BYOD endpoints, but discovered values must flow through a
-  legitimate data source.
+- WebSearch snippets, search-engine summaries and generated Worldline text
+  alone cannot establish financial facts or supply dataset values. Read the
+  underlying source for news and attributed statements as above. Prices,
+  financial metrics and time series retain the SDK/Data Skills, published Feed
+  or validated BYOD path, including the official-source stale-feed fallback in
+  [data-skills.md](data-skills.md#structured-feed-lag). Do not substitute a news
+  mention of a price for a current quote or a complete historical series.
 - LLM / alpi output must not be presented as factual sourced data. alpi can
   classify, summarize, and reason over real data; if it produces quantitative
   output, label it as AI-generated analysis.

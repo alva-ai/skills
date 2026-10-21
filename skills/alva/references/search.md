@@ -1,23 +1,82 @@
 # Content Search
 
-Search SDKs for discovering unstructured content across multiple sources.
-For handle-first access: Twitter/X handle history and rolling feeds are
-served by Arrays Data Skills — see [Data Skills](data-skills.md) and follow the
-discovery pipeline. News, YouTube, Reddit, and podcasts
-handle subscriptions live in the `feed_widgets` partition. The search SDKs
-below live in the `unified_search` partition.
+Use the runtime's exposed web search tool first for unstructured research:
+news, public statements, source documents, and public X discussion. Inspect
+relevant originals with its page-reading tools; follow the exposed tool schema.
+In ALPI, `web_search` accepts `search_query` and `open`/`click`/`find` using
+returned reference IDs. If native search is unavailable, or a plain Feed/Automation
+script needs search, use the SDKs below. Do not invent a tool or call the managed
+search transport directly.
+
+Prices, financial datasets, exact account history and engagement metrics retain
+their [Data Skills](data-skills.md) routes. News, YouTube, Reddit and podcast
+handle subscriptions remain in `feed_widgets`; search SDKs are in `unified_search`.
+Apply [content-legitimacy.md](content-legitimacy.md): finding a page is not
+verification of its contents, and a source's opinion remains an attributed claim.
+
+## Worldline supplement
+
+Worldline searches Alva's collected material. For company events, people or
+investment arguments, use it alongside primary search when likely to add useful
+evidence; run independent lookups in parallel where supported. It is optional:
+do not query it for every question or delay an adequately supported answer for
+it. Empty, failed or slow retrieval does not block the main search path. For an
+existing Thesis's progress, use [Signals](thesis.md#thesis-tracking) first.
+
+Use the existing authenticated Jagent SDK through `alva run`; no extra credential
+or Agent session is needed. This read-only example searches a seven-day indexing
+window; choose a window appropriate to the question:
+
+```sh
+alva run --code '(() => {
+  const sdk = require("@alva/worldline");
+  const since = Date.now() - 7 * 86400000;
+  return sdk.createWorldlineClient().recall({
+    query: "NVIDIA Blackwell data center demand",
+    indexedAfter: sdk.recallTimeFromMs(since),
+    publishedFromMs: since,
+    limit: 5
+  });
+})();'
+```
+
+`recall` defaults to semantic search; `mode: "keyword"` matches any query term,
+`"keyword_all"` requires all terms. For a company or author, resolve its ID with
+`searchEntities({query, entityTypes, limit})`, then use `entityIds` for mentions
+or `attribution: {partyIds: [...]}` for credited statements, not both. Without a
+query, these filters list newest first. Reuse returned IDs; do not guess them.
+
+Hits carry text, source metadata, author attributions and, when available,
+`sourceEvidence`. `contentMode: "generated"` is synthesized text, not a quotation;
+check the source excerpts for material claims. For more context, call
+`getContributions({ids: [hit.contributionId]})` or
+`getObservations({ids: [hit.observationId]})` and check each lookup outcome. Preserve
+fact/opinion/forecast/rumor distinctions and actual source links; library
+membership or similarity does not establish truth. Multiple Contributions can
+come from one original: group them rather than count independent corroboration.
+
+`indexedAfter` is indexing time; `publishedFromMs` still admits unknown publication
+times. `limitExceeded` means only top matches were returned; `budgetExceeded`
+means only part of the window was searched (continue older ranges with
+`indexedBefore: scannedFrom` when needed). Filter-only listings continue with
+`pageToken: nextPageToken` and the same conditions. Deduplicate by contributionId.
+Describe partial coverage honestly; absence is not proof that nothing happened.
+Older deployments may lack these options: on contract failure use primary search,
+without bypassing access through internal services.
 
 ## SDK Modules
 
 | SDK | Module | Best for |
 | --- | ------ | -------- |
-| `searchGrokX` | `@arrays/data/search/search-grok-x:v1.0.0` | Twitter/X — returns engagement directly |
 | `searchPerplexityFinance` | `@arrays/data/search/search-perplexity-finance:v1.0.0` | Non-US equities outside the curated Data Skills set (and market breadth); fallback for off-catalog asset classes and other structured-SDK gaps |
 | `searchSerper` | `@arrays/data/search/serper-search:v1.0.0` | Google index: News, YouTube, Reddit, Web |
 | `searchBrave` | `@arrays/data/search/search-brave:v1.0.0` | Independent index, good Reddit coverage |
 | `scrapeUrl` | `@arrays/data/search/scrape-url:v1.0.0` | Scrape any page to markdown for enrichment |
 
-## Sources
+## SDK source patterns
+
+These patterns serve scripts and native-search fallbacks; they do not require
+repeating a search already completed with the exposed native tool.
 
 ### Finance Search
 
@@ -29,13 +88,12 @@ below live in the `unified_search` partition.
 
 ### Twitter/X
 
-- **Data Skills first**: per-handle history, URL lookup, and full-text search over the X accounts Arrays tracks are served by Data Skills (see [data-skills.md](data-skills.md)). Use `searchGrokX` only for global X search beyond Arrays' tracked index.
-- **Search**: `searchGrokX` with `from_date`/`to_date` (YYYY-MM-DD format)
-- **Enrich**: Not needed — GrokX returns engagement natively
-- **Signals**: `like_count`, `retweet_count`, `reply_count`, `quote_count`
-- **Fields**: `content`, `url`, `author_name`, `author_username`, `author_avatar`, `created_at` (ms — real publish time), `author_verified`, `author_followers_count`
-- **Batch queries**: GrokX is AI-powered, not keyword-matching — multiple related entities can be combined into one call (e.g. "Why are $AAPL $TSLA $NVDA moving? Explain each"). The `summary` will segment by entity automatically. Returned tweets are mixed (not per-entity); only do per-entity individual searches when the use case requires raw per-entity source content.
-- **Gotcha**: A broad query may miss relevant evidence. Add topical angles or entity aliases (`$NVDA`, `NVIDIA`) when needed. Judge authority, relevance, and recency; engagement is only a secondary ranking signal, not grounds to discard a new or specialist source.
+For recent public discussion, use native search (or Serper/Brave with `site:x.com`
+when unavailable), then inspect the original posts. Worldline may add collected
+statements in parallel. Neither route guarantees full X coverage or engagement
+counts. For an exact handle history, known post lookup or interaction metrics,
+use Arrays Data Skills where covered. Verify author and publication time; search
+snippets and a quoted or reposted view are not automatically the poster's own view.
 
 ### News
 
@@ -100,6 +158,5 @@ is adequately supported. The wider-search patterns below apply when needed:
 
 | Provider | Parameter | 1 day | 1 week | 1 month |
 | -------- | --------- | ----- | ------ | ------- |
-| GrokX | `from_date` / `to_date` | YYYY-MM-DD (1 day ago) | YYYY-MM-DD (7 days ago) | YYYY-MM-DD (30 days ago) |
 | Serper | `tbs` | `qdr:d` | `qdr:w` | `qdr:m` |
 | Brave | `freshness` | `pd` | `pw` | `pm` |

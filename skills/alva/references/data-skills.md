@@ -169,6 +169,8 @@ available quarters of the fiscal year, not one annual transcript.
 
 ### 5. Web search
 
+For interactive research, prefer the exposed native search/page tools per
+[Content Search](search.md); recipes 5–6 serve scripts and tool-unavailable fallbacks.
 Use the versioned runtime module through Alva Gateway; it handles its own
 endpoint and authentication. Required: `q`; optional `num`, `type` (default
 `search`, or `news`), `tbs` (e.g. `qdr:d`), `gl`, `hl`.

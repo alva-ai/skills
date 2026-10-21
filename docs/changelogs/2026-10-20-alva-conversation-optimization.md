@@ -150,16 +150,44 @@ Serial checklist: (1) verify CLI/backend contracts; (2) repair entry rules;
 (6) probe the revised recipes; update Eval with both arms on fast and refresh
 the committed candidate freeze, without runtime experiments.
 
+Approved Search follow-up: use exposed native search for unstructured research;
+Worldline is an optional parallel supplement, never a required first step or a
+reason to delay an adequately supported answer. Remove GrokX guidance while
+preserving Arrays financial/history reads and Fintwit performance/ranking feeds.
+Align source rules narrowly for verified news and attributed source statements;
+search summaries and generated Worldline text are not independent factual proof.
+
+Checklist: (1) update search/fintwit/durable routing and the search recipe note;
+(2) reconcile entry/source rules and the Sandbox source sentence;
+(3) update existing document checks, run document/mutation/durable checks and the
+Sandbox prompt test, and review the diff. No runtime change or new E2E is needed;
+real-turn routing and optional parallel behavior remain Eval checks. Preserve the
+previously frozen candidate; record this follow-up as a separate comparison.
+
 ## 7. Outcome and evidence
+
+Search follow-up: removed GrokX instructions, made exposed native search the
+unstructured-research default and Worldline an optional parallel supplement.
+Fintwit keeps curated views, rankings and performance; recent public statements
+follow Content Search. Existing search/scrape recipes remain script/fallback
+paths. Entry and source rules now distinguish verified source reporting from
+snippets/generated text while preserving structured financial-data requirements.
+Review clarified that the structured-source requirement covers financial datasets
+and metrics; news and attributed statements use the verified-source branch.
+Worldline rereads now name Contribution versus Observation IDs explicitly.
+The companion Sandbox keeps platform/account reads on Alva CLI/API. Document assertions
+cover the route and provenance boundaries; real-turn behavior is not yet verified.
+The previously frozen `7bb2563` / `0ebcaf3` candidate remains unchanged.
+
 
 The merged implementation preserves the compact entry and upstream v1.25.0
 authorship rules. Metadata names the planned v1.26.0 candidate; no tag was
-created and exact file hashes still identify Eval inputs. The current follow-up was reviewed against `0fdf24f`; the publication base
+created and exact file hashes still identify Eval inputs. The Search follow-up was reviewed against `7bb2563`; the publication base
 remains upstream `411ea14`. Final product-tree checks:
 
 | Command, from this repository | Result |
 | --- | --- |
-| `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva --out /tmp/alva-third-batch-doc-check.md` | 103/103 cases; 1163/1163 checks |
+| `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva --out /tmp/alva-search-doc-check.md` | 103/103 cases; 1182/1182 checks |
 | `node evals/alva-skill-docs/mutation-smoke.mjs` | 28/28 mutations detected |
 | `node --test evals/alva-skill-docs/durable-agent.test.mjs` | 5/5 |
 | `git diff --check` and reference/conflict checks | Passed; existing memory example link to `user.md` unchanged |

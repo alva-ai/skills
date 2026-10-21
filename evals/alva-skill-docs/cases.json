@@ -128,13 +128,51 @@
       "id": "retained.search-routing",
       "group": "retained",
       "target": "corpus",
-      "description": "Search routing keeps structured data, Twitter/X, and non-US finance guidance.",
+      "description": "Native search leads unstructured research; optional Worldline evidence preserves source checks and specialized financial/Fintwit reads.",
       "includes": [
         "unified_search",
         "Twitter/X routing",
         "searchPerplexityFinance",
         "non-US equities",
         "structured Alva data"
+      ],
+      "file_includes": [
+        {
+          "file": "references/search.md",
+          "includes": [
+            "Use the runtime's exposed web search tool first",
+            "run independent lookups in parallel where supported",
+            "do not query it for every question or delay an adequately supported answer",
+            "sdk.createWorldlineClient().recall",
+            "contentMode: \"generated\"",
+            "Multiple Contributions can come from one original",
+            "partial coverage",
+            "use Arrays Data Skills where covered"
+          ]
+        },
+        {
+          "file": "references/fintwit.md",
+          "includes": [
+            "native search first",
+            "optional parallel supplement",
+            "source for curated account profiles, extracted views, rankings and backtested performance",
+            "Do not infer a win rate or leaderboard position"
+          ]
+        },
+        {
+          "file": "references/content-legitimacy.md",
+          "includes": [
+            "inspected original reporting or Worldline source excerpts",
+            "A reported claim is not independently established fact",
+            "generated Worldline text alone cannot establish financial facts",
+            "Do not substitute a news mention of a price for a current quote"
+          ]
+        }
+      ],
+      "excludes": [
+        "searchGrokX",
+        "search-grok-x",
+        "GrokX"
       ]
     },
     {
