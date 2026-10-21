@@ -64,15 +64,11 @@ question; use a table when it helps the user compare. Simple latest-fact
 asks can finish after one sourced hop. Use the Complex Ask Router for judgments
 that need it, applying the gates relevant to the conclusion being made.
 
-Prefer a complete final answer. Share supported findings while other research
-continues only when useful; state what remains
-unverified and correct earlier findings explicitly if later evidence changes
-them. Do not present a partial lookup as a completed comparison, valuation,
+Do not present a partial lookup as a completed comparison, valuation,
 ranking, or causal explanation. Stop when the user's question is adequately
-answered; missing required evidence limits the conclusion. The final answer
-should bring together the result and material limitations without requiring
-the user to reconstruct them from interim messages. Omit process recaps and
-repeated explanations that do not help the user understand the result.
+answered; missing required evidence limits the conclusion.
+For interim updates and final-answer presentation, follow the runtime's
+Communication Style when provided, otherwise [chat guidance](user-facing-prose.md#voice).
 
 ## Useful Next Step After Ask
 
@@ -251,10 +247,13 @@ follow-up about one assumption needs evidence for that assumption, not a fresh
 full report. This is the quality boundary:
 treat complex judgments as high-risk financial analysis rather than ordinary
 Q&A.
+Complete the checks central to the requested judgment through available
+documented sources; report a gap when a necessary check cannot be completed,
+not simply because it has not been attempted.
 
 | Problem type | Trigger | Minimum gate |
 | --- | --- | --- |
-| Ticker read | analyze a ticker or named company, past hour, why did it move, investor focus, recent catalysts | read `ticker-read.md`; resolve ticker and horizon; apply its source router; state freshness, coverage/gaps, and fact/computation/model-analysis boundaries; add live Data Skills facts |
+| Ticker read | analyze a ticker or named company, past hour, why did it move, investor focus, recent catalysts | read `ticker-read.md`; resolve ticker and horizon; apply its source router; state freshness, coverage/gaps, and fact/computation/model-analysis boundaries; add live Data Skills facts. For company-versus-sector attribution, check relevant sector/market benchmarks over the same window. |
 | Thesis/fundamental | assess whether evidence supports or challenges an investment thesis, moat, or business quality | thesis driver, key KPI, metric source, peer/baseline, missing KPI impact |
 | Earnings/catalyst | earnings, guide, catalyst, revision | event date, source, expected vs actual/consensus, forward catalyst, stale-data caveat |
 | Event-study/backtest | backtest, after/before, event window, forward returns, sample, bias-controlled | event definition, data source, sample count, date range, non-overlap rule, look-ahead control, benchmark, horizons, formula, friction/assumptions; missing sample count or event definition means incomplete and no strong trading conclusion |
@@ -262,7 +261,7 @@ Q&A.
 | Macro/cross-asset | rates, dollar, gold, yields, Fed, cross-asset | synchronized as-of time, price move vs macro driver vs policy expectation vs positioning/narrative; recent occurrences or sample insufficient; Fed implied-probability source/proxy |
 | News/social sentiment | news, KOL, X, Reddit, sentiment | check evidence source, timestamp, authority/relevance, stance, duplicate status, fact/opinion/inference |
 | Portfolio/scenario | portfolio, stress, shock, hedge, scenario | shocks, weights/exposure assumption, beta/correlation/proxy method, estimated drawdowns, hedge candidates, confidence; otherwise qualitative scenario only |
-| Valuation/accounting | estimate or assess a company's valuation, earnings, or cash flow using financial inputs | bridge current multiple/FCF/EPS, key operating KPI, scenario assumption, multiple/earnings sensitivity |
+| Valuation/accounting | estimate or assess a company's valuation, earnings, or cash flow using financial inputs | bridge current multiple/FCF/EPS, key operating KPI, scenario assumption, multiple/earnings sensitivity. For contract-driven cash-flow certainty, inspect commitments, return assumptions and capital-expenditure treatment. |
 
 For domain-specific asks, check relevant KPIs, their availability, and the
 impact of missing evidence; explain gaps that affect the conclusion. Examples: bank NIM,

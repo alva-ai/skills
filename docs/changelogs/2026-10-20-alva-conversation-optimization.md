@@ -164,7 +164,29 @@ Sandbox prompt test, and review the diff. No runtime change or new E2E is needed
 real-turn routing and optional parallel behavior remain Eval checks. Preserve the
 previously frozen candidate; record this follow-up as a separate comparison.
 
+Approved review follow-up: only (1) clarify necessary evidence checks within
+the Complex Ask Router, with same-window sector benchmarks and contract/capex
+examples in their corresponding rows; (2) remove mandatory Skillhub help for
+known commands and make broad-read anomaly checks depend on the question;
+(3) give runtime chat style precedence, preserve standalone chat guidance and
+limit the strict Voice Block to artifact/pipeline copy. Keep all methods,
+fallbacks, Trade Setup, source and authorization boundaries unchanged.
+Checklist: edit the three references, protect the six changed rules in existing
+doc cases and add a necessary-check removal mutation, run doc/mutation/durable checks,
+and review the complete scoped diff and its shared prompt consumers. No Sandbox,
+search, runtime, deployment, or frozen Eval changes are part of this follow-up.
+
 ## 7. Outcome and evidence
+
+The review follow-up changes only three product references, aligns existing
+document cases and adds six assertions for the new boundaries. A removal mutation
+verifies that deleting the necessary-check rule fails its quality-gate case. Necessary checks are scoped to complex judgments; simple asks
+retain their short path. Ticker reads retain all five methods, availability
+fallbacks and intraday priority without mandatory help or irrelevant anomaly
+reads. Chat follows supplied runtime style, with standalone guidance preserved;
+the artifact Voice Block itself is unchanged. Full scoped review verified that
+Trade Setup, disclaimer text/triggers, company links and source/authorization
+boundaries are unchanged. No new real-turn Eval or speed claim is made.
 
 Search follow-up: removed GrokX instructions (including the legacy Grok pointer
 in Data Skills, guarded by a restoration mutation), made exposed native search the
@@ -188,8 +210,8 @@ remains upstream `411ea14`. Final product-tree checks:
 
 | Command, from this repository | Result |
 | --- | --- |
-| `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva --out /tmp/alva-search-doc-check.md` | 103/103 cases; 1181/1181 checks |
-| `node evals/alva-skill-docs/mutation-smoke.mjs` | 29/29 mutations detected |
+| `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva --out /tmp/alva-three-item-doc-check.md` | 103/103 cases; 1187/1187 checks |
+| `node evals/alva-skill-docs/mutation-smoke.mjs` | 30/30 mutations detected |
 | `node --test evals/alva-skill-docs/durable-agent.test.mjs` | 5/5 |
 | `git diff --check` and reference/conflict checks | Passed; existing memory example link to `user.md` unchanged |
 
@@ -244,6 +266,15 @@ not this follow-up's recipes/routes or later persona edits.
 
 ## 8. Remaining work
 
+- Verify this three-reference follow-up against `43025ca`, with the same
+  Sandbox/model/effort and fast tier: S10-E for contract/capex evidence and
+  S13-A for same-window attribution benchmarks. Record completeness as well as
+  time; do not count a faster partial result as equivalent completion.
+- Contrast intraday/move questions with long-term fundamental questions to
+  check retained anomaly priority and avoided irrelevant preparation. Verify
+  chat style with and without a supplied runtime persona, and unchanged
+  Voice Block use for generated artifact/pipeline copy. Keep existing Eval
+  freezes intact; this follow-up has not been exercised in those runs.
 - Verify GOOG/GOOGL company links (S02-C), uncertain/non-U.S. mentions staying
   plain, and an Alva-owned blocker offering feedback without submitting before
   consent. Check ordinary queries do not acquire a whole-prose read solely for

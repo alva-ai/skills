@@ -13,6 +13,15 @@ const DEFAULT_SKILL_DIR = resolve(REPO_ROOT, "skills/alva");
 
 const MUTATIONS = [
   {
+    id: "complex-ask-required-checks",
+    file: "references/request-routing.md",
+    remove:
+      "Complete the checks central to the requested judgment through available\n" +
+      "documented sources; report a gap when a necessary check cannot be completed,\n" +
+      "not simply because it has not been attempted.\n",
+    expectFailedCases: ["target.financial-ask-quality-gates"],
+  },
+  {
     id: "search-legacy-grok-guidance",
     file: "references/data-skills.md",
     remove: "Twitter/X routing:",

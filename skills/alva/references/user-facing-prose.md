@@ -148,22 +148,23 @@ when the response also meets one of the triggers above.
 
 ## Voice
 
-User-facing prose in Alva should read like a sharp human analyst, not a
-research-report abstract or generic LLM prose. AI-tell tokens and shapes make
-readers disengage within two sentences and dilute the credibility of any data
-underneath. This section is the single source of truth for voice; it applies
-wherever the agent or alpi produces prose for end users.
+For chat voice and pacing, follow the runtime's persona and Communication Style
+when provided; otherwise use the chat guidance below. The Voice Block and
+artifact-writing rules that follow apply to Playbook/Automation copy and alpi
+narrative, not ordinary chat.
 
 In chat, respond naturally to the user's point. A short question or follow-up
 usually needs a few direct sentences; reserve report-like structure for requests
 that benefit from it. During longer work, a brief explanation of what you are
 checking or what has changed can keep the conversation moving while tools run.
+Share supported findings when useful; correct earlier findings explicitly when
+evidence changes. Keep the final result understandable on its own without
+replaying the process.
 
 ### When This Applies
 
-Any sentence that ends up in front of an end user must follow these rules:
+The artifact-writing rules apply to:
 
-- Chat answers for Financial Analysis / Ask Question.
 - Hand-written HTML copy: hero text, intro cards, methodology modal body,
   chart footnotes, rationale paragraphs, expandable card prose.
 - Playbook metadata: `description` and `display_name` passed to

@@ -578,6 +578,10 @@
       "group": "platform-data",
       "target": "corpus",
       "description": "Company analysis routes through the five official Skillhub sources as a first-tier Platform Data lane with explicit read, build, freshness, and fallback boundaries.",
+      "includes": [
+        "consult the relevant help if syntax is uncertain or a call reports a contract mismatch",
+        "Long-term fundamental questions need no anomaly check unless it bears on the requested judgment"
+      ],
       "excludes": [
         "company-anomaly.md",
         "/alva/home/mia/feeds/<ticker-slug>-portfolio-watch-anomaly/v1",
@@ -1097,7 +1101,7 @@
         "Ask Evidence Gate",
         "identify its source, timing, coverage gaps",
         "fact, calculation, or inference",
-        "Share supported findings while other research continues",
+        "Share supported findings when useful",
         "correct earlier findings explicitly",
         "Do not present a partial lookup as a completed comparison",
         "missing required evidence limits the conclusion"
@@ -1129,6 +1133,9 @@
         "Complex Ask Router",
         "Only complex judgment asks also pass the Complex Ask Router",
         "treat complex judgments as high-risk financial analysis",
+        "Complete the checks central to the requested judgment",
+        "For company-versus-sector attribution, check relevant sector/market benchmarks over the same window",
+        "For contract-driven cash-flow certainty, inspect commitments, return assumptions and capital-expenditure treatment",
         "Simple/latest-fact asks stop there",
         "Only complex judgment asks also pass the Complex Ask Router",
         "thesis/fundamental",
@@ -1219,9 +1226,10 @@
         "[Investment Disclaimer](user-facing-prose.md#investment-disclaimer) when its trigger applies",
         "For current-fact or evidence-dependent answers, apply the Ask Evidence Gate",
         "Product language, conditional disclaimer, company links, and final replies",
-        "Chat answers for Financial Analysis / Ask Question",
+        "For chat voice and pacing, follow the runtime's persona and Communication Style when provided; otherwise use the chat guidance below",
+        "artifact-writing rules that follow apply to Playbook/Automation copy and alpi narrative, not ordinary chat",
         "For each current-fact or evidence-dependent claim",
-        "Share supported findings while other research continues"
+        "Share supported findings when useful"
       ]
     },
     {

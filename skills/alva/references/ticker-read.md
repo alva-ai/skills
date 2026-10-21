@@ -52,7 +52,8 @@ and may lag the source repository:
 Reuse applicable metadata and instructions already read in this session;
 otherwise follow these steps:
 
-1. Run `alva skillhub --help` if it has not been used in this session.
+1. Use the documented commands below; consult the relevant help if syntax is
+   uncertain or a call reports a contract mismatch.
 2. Run `alva skillhub get <official-id>` to verify that exact method and inspect
    its current file listing.
 3. If the exact id is unavailable, run
@@ -144,9 +145,11 @@ crossed in that run; report the live move from Data Skills separately.
 For every broad ticker read, check the Direct-read lane before generic search:
 
 1. Resolve the canonical ticker and requested horizon.
-2. Check Company Anomaly exact-ticker coverage and current state first. When
-   covered, add the anomaly state and freshness; when uncovered, continue
-   without treating the missing feed as a company signal.
+2. For intraday tracking or an unusual move, check Company Anomaly exact-ticker
+   coverage and current state first. When covered, add the anomaly state and
+   freshness; when uncovered, continue without treating the missing feed as a
+   company signal. Long-term fundamental questions need no anomaly check unless
+   it bears on the requested judgment.
 3. Read Markets Narrative when the question needs current investor priorities,
    debate, competitive context, or recent changes. Report `asOf` and
    `generatedAtMs`.
