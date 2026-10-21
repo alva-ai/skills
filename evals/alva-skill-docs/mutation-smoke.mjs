@@ -13,9 +13,39 @@ const DEFAULT_SKILL_DIR = resolve(REPO_ROOT, "skills/alva");
 
 const MUTATIONS = [
   {
+    id: "thesis-original-awaits-preview-confirmation",
+    file: "references/thesis.md",
+    remove: "then wait\nfor confirmation",
+    replacement: "then create immediately",
+    expectFailedCases: [
+      "target.thesis-create-preview-card",
+      "scenario.thesis-publish-supplied-original",
+    ],
+  },
+  {
+    id: "thesis-new-editorial-issue-awaits-author",
+    file: "references/thesis.md",
+    remove: "show the Notes with the publication details and wait for their decision before creating",
+    replacement: "show the Notes and create immediately",
+    expectFailedCases: [
+      "target.thesis-authorship",
+      "scenario.thesis-confirm-flags-inconsistent-body",
+    ],
+  },
+  {
+    id: "thesis-action-candidate-scope",
+    file: "references/thesis.md",
+    remove: "An old button does not authorize a changed candidate",
+    replacement: "An old button authorizes the latest candidate",
+    expectFailedCases: [
+      "target.thesis-create-preview-card",
+      "scenario.thesis-publish-action-selection",
+    ],
+  },
+  {
     id: "verified-external-source-fallback",
     file: "references/data-skills.md",
-    remove: " or an agent-selected public source",
+    remove: "actively search for\n   an accessible public source",
     expectFailedCases: ["issue592.capability-verification-before-refusal"],
   },
   {

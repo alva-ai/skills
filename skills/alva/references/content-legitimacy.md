@@ -67,8 +67,8 @@ or report the remaining gap. Do not fabricate point-in-time values or mark them
 `live: false`.
 
 If more than 20% of requested symbols fail SDK/Data Skills lookup, treat it as
-a data-quality blocker. Report the failing ids and reduce scope or request a
-legitimate source instead of producing a table or chart with missing names,
+a data-quality blocker. Report the failing ids and try the verified external-source
+route above or reduce scope instead of producing a table or chart with missing names,
 fabricated values, or `live: false` placeholders.
 
 ## Chat-as-Artifact (`answer_only` / Query Mode)

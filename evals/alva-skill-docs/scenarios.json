@@ -246,8 +246,8 @@
     {
       "id": "scenario.thesis-confirm-flags-inconsistent-body",
       "group": "scenarios.thesis",
-      "prompt": "这是我改好的最终版正文，开头写 three drivers，下面列了四点，第三点最后一句没写完。直接帮我发布。",
-      "description": "An explicit request to publish the supplied body surfaces material internal inconsistencies or unfinished passages in Notes before create, preserves the exact body, and does not require redundant authorization.",
+      "prompt": "请原样发布这段 Thesis：NVDA has three drivers. 1. CUDA keeps developers. 2. Inference demand expands. 3. Margins should improve because 4. Networking grows.",
+      "description": "An editor-detected inconsistency or unfinished passage is shown in unpublished Notes and awaits the author decision before creation; preserve the exact body.",
       "expect": {
         "route": "Thesis",
         "references": [
@@ -266,8 +266,10 @@
               "Still read the body once as its editor",
               "Notes before calling `alva thesis create`",
               "keeping the body unchanged",
-              "proceed without another confirmation when the payload is resolved",
-              "Do not summarize, rewrite, translate, correct"
+              "if already confirmed and unchanged, proceed without another confirmation",
+              "Do not summarize, rewrite, translate, correct",
+              "show the Notes with the publication details and wait for their decision before creating",
+              "once the publication details below are confirmed"
             ]
           }
         ]
@@ -886,6 +888,87 @@
           "Never hand-write bearer headers",
           "result contract",
           "smoke invoke returned the declared result shape"
+        ]
+      }
+    },
+    {
+      "id": "scenario.thesis-publish-supplied-original",
+      "group": "scenarios.thesis",
+      "prompt": "把下面这句原样公开发成 Thesis：我认为 NVDA 的 CUDA 生态仍有优势。",
+      "description": "An original publish request gets one short preview of visibility and resolved assets/stances, without repeating the body; wait for typed/button approval and create without a second confirmation.",
+      "expect": {
+        "route": "Thesis",
+        "references": [
+          "thesis.md"
+        ],
+        "sections": [
+          {
+            "file": "references/thesis.md",
+            "heading": "Create",
+            "label": "publication consent",
+            "includes": [
+              "Before creation, show the visibility (public by default) and resolved tickers and directions",
+              "then wait for confirmation",
+              "This also applies to an explicit request to publish the supplied original",
+              "use one short preview line without repeating the body",
+              "if already confirmed and unchanged, proceed without another confirmation",
+              "When confirmation is needed and `PresentActions` is available",
+              "a click has the same meaning as the equivalent typed reply",
+              "Without the tool, ask in text"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "scenario.thesis-publish-after-notes",
+      "group": "scenarios.thesis",
+      "prompt": "你刚展示的公开发布预览和 Notes 我看过了，第三点虽然没写完，还是按这版原样发。",
+      "description": "An informed decision to publish despite Notes authorizes the unchanged candidate without another approval.",
+      "expect": {
+        "route": "Thesis",
+        "references": [
+          "thesis.md"
+        ],
+        "sections": [
+          {
+            "file": "references/thesis.md",
+            "heading": "Create",
+            "label": "publication consent",
+            "includes": [
+              "If the author chooses to publish despite it, proceed without asking again",
+              "Previously discussed Notes and ordinary editorial suggestions need no new approval",
+              "Preserve the selected body exactly",
+              "once the publication details below are confirmed"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "scenario.thesis-publish-action-selection",
+      "group": "scenarios.thesis",
+      "prompt": "我看过当前候选和 Notes，点击“发布这版”。",
+      "description": "Actions carry the same authorization as text: preserve candidate scope, reject stale approval for changed text, and avoid duplicate creation.",
+      "expect": {
+        "route": "Thesis",
+        "references": [
+          "thesis.md"
+        ],
+        "sections": [
+          {
+            "file": "references/thesis.md",
+            "heading": "Create",
+            "label": "publication consent",
+            "includes": [
+              "When confirmation is needed and `PresentActions` is available",
+              "Tie the publish prompt to the displayed candidate and settings",
+              "a click has the same meaning as the equivalent typed reply",
+              "Without the tool, ask in text",
+              "An old button does not authorize a changed candidate",
+              "repeated approval of an already completed creation must not create another Thesis; verify its existing ID"
+            ]
+          }
         ]
       }
     }

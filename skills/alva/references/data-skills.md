@@ -315,11 +315,16 @@ the requested data convention:
 2. If the skill id was guessed, rerun `list` and recover the correct id.
 3. If the error is Pro-gated or subscription-gated, explain the access limitation;
    the user may provide access, or use an independently accessible source below.
-4. When same-domain Alva endpoints cannot answer the task, use a user-provided
-   custom data source URL / BYOD source or an agent-selected public source.
+4. When same-domain Alva endpoints cannot answer the task, actively search for
+   an accessible public source or use an available custom data source URL / BYOD
+   source. Do not ask the user to find a source or approve public-source research
+   before trying it yourself.
    Fetch it through runtime code; verify source identity, requested conventions,
    coverage and freshness, and cross-check overlapping data when available.
-   State the source and material limitations; preserve access boundaries.
+   Return useful results with the source and material limitations so the user
+   can decide whether to use them; no routine source-approval question is needed.
+   Ask only when remaining gaps need the user's access, data or a material choice;
+   preserve access boundaries.
    If the requested source, currency or return basis remains unavailable, a
    clearly labeled proxy may help, but does not complete that requirement.
 5. Never stop with zero useful output when a reduced-scope artifact can still

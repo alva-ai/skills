@@ -862,11 +862,14 @@
           "label": "fallback behavior",
           "includes": [
             "same-domain Alva endpoints cannot answer the task",
-            "custom data source URL / BYOD source or an agent-selected public source",
+            "actively search for an accessible public source",
             "verify source identity, requested conventions, coverage and freshness",
             "a clearly labeled proxy may help, but does not complete that requirement",
             "Never stop with zero useful output",
-            "Never replace a missing data source with LLM-fabricated values"
+            "Never replace a missing data source with LLM-fabricated values",
+            "Do not ask the user to find a source or approve public-source research before trying it yourself",
+            "Return useful results with the source and material limitations",
+            "no routine source-approval question is needed"
           ]
         }
       ]
@@ -1505,12 +1508,26 @@
             "set-visibility --id <id> --visibility public",
             "without publishing a new author version",
             "authorizes that exact body",
-            "without another confirmation when the payload is resolved",
+            "if already confirmed and unchanged, proceed without another confirmation",
             "Research or rewriting alone never authorizes publication",
             "show the complete candidate (including file content, not its filename), title, visibility, tickers and directions",
             "Use the asset extraction result for catalog IDs",
             "obtain selection of the changed candidate",
-            "Stop if declined"
+            "Stop if declined",
+            "Reuse an already displayed or user-supplied exact body by referring to it clearly",
+            "New or changed candidates must be shown in full",
+            "A natural confirmation of the selected body and publication settings is sufficient",
+            "When confirmation is needed and `PresentActions` is available",
+            "a click has the same meaning as the equivalent typed reply",
+            "Without the tool, ask in text",
+            "An old button does not authorize a changed candidate",
+            "repeated approval of an already completed creation must not create another Thesis",
+            "Present publication details in the user's language",
+            "Keep internal IDs and API field names out of the preview",
+            "omit absent optional fields instead of listing blanks",
+            "Before creation, show the visibility (public by default) and resolved tickers and directions",
+            "then wait for confirmation",
+            "use one short preview line without repeating the body"
           ]
         },
         {
@@ -1569,7 +1586,9 @@
             "Notes are not part of the payload; omit them when none.",
             "Still read the body once as its editor",
             "Notes before calling `alva thesis create`",
-            "keeping the body unchanged"
+            "keeping the body unchanged",
+            "show the Notes with the publication details and wait for their decision before creating",
+            "If the author chooses to publish despite it, proceed without asking again"
           ]
         },
         {

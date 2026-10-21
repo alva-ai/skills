@@ -42,7 +42,8 @@ division: guided drafting, revision requests, `thesis rewrite`, and `update`.
   points or a point that stops mid-sentence. Keep Notes to the few points that
   could change what the author publishes, most important first, and leave
   wording nits in the author's own text alone. Notes are never published and
-  never block publication. Omit them when nothing material remains.
+  never block publication once the author has considered them. Omit them when
+  nothing material remains.
 
 For example, if the author holds that CUDA is NVDA's durable moat and your
 research shows competitors closing the software gap, keep the moat claim in
@@ -90,7 +91,8 @@ Do not add Alva company-page links to candidate or published bodies. Preserve
 the author's links and legitimate supporting citations.
 
 Show the candidate with its Notes and let the user revise it naturally. Once
-the user selects the text to publish, follow Create below; that explicit
+the user selects the text to publish, follow Create below. If the selection
+already covers the displayed final body and publication details, that explicit
 selection need not be confirmed again.
 
 ## Create
@@ -112,19 +114,41 @@ Still read the body once as its editor: briefly flag material internal
 inconsistencies or unfinished passages in Notes before calling
 `alva thesis create`, keeping the body unchanged.
 Notes are not part of the payload; omit them when none.
+If this reveals a material inconsistency or unfinished passage the author has
+not yet considered, show the Notes with the publication details and wait for their decision before creating.
+If the author chooses to publish despite it, proceed without asking again
+once the publication details below are confirmed.
+Previously discussed Notes and ordinary editorial suggestions need no new approval.
 
-An explicit request to publish the supplied original, or the user's selection
-of a displayed candidate for publication, authorizes that exact body. State the
-visibility (public by default) and proceed without another confirmation when
-the payload is resolved. Research or rewriting alone never authorizes publication.
+Before creation, show the visibility (public by default) and resolved tickers
+and directions alongside the selected body or a clear reference to it, then wait
+for confirmation. This also applies to an explicit request to publish the supplied
+original: use one short preview line without repeating the body. A confirmation
+of that preview authorizes that exact body and publication details; if already
+confirmed and unchanged, proceed without another confirmation.
+Research or rewriting alone never authorizes publication.
 
 If the body is newly drafted and not yet selected, or a material choice remains,
 show the complete candidate (including file content, not its filename), title,
 visibility, tickers and directions, then ask for that choice. Resolve ambiguous
 assets or directions before creating; do not silently change the selected body.
+Present publication details in the user's language: name the company or ticker
+and express any stated stance plainly. Keep internal IDs and API field
+names out of the preview; omit absent optional fields instead of listing blanks.
 Use the asset extraction result for catalog IDs and respect explicit stances.
 After requested edits, rerun extraction and obtain selection of the changed
 candidate. Stop if declined.
+
+Reuse an already displayed or user-supplied exact body by referring to it clearly;
+do not repeat the full text just to ask a remaining question. New or changed
+candidates must be shown in full. A natural confirmation of the selected body
+and publication settings is sufficient; do not ask for it again unless they change.
+When confirmation is needed and `PresentActions` is available, offer localized
+`send_prompt` actions such as "Publish this version" and "Edit" after the preview
+or Notes. Tie the publish prompt to the displayed candidate and settings; a click
+has the same meaning as the equivalent typed reply. Without the tool, ask in text.
+An old button does not authorize a changed candidate, and repeated approval of an
+already completed creation must not create another Thesis; verify its existing ID.
 
 One sentence is valid. Title, tickers, and entity IDs are optional. Visibility
 defaults to public. Generate one nonzero UUID per creation intent and keep it

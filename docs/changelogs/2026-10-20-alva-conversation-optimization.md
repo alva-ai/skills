@@ -38,9 +38,11 @@ The MUSE review informed shorter execution paths, selective follow-up suggestion
 and removal of repetitive process prose; final answers remain self-contained.
 
 Thesis authorship follows upstream #648: the user owns their claims, and the
-Agent's editorial assessment belongs in unpublished Notes. Explicit selection
-of the final body authorizes that payload; a newly drafted candidate still
-requires selection. These Notes are separate from Playbook Creator Notes.
+Agent's editorial assessment belongs in unpublished Notes. Show the final body
+or a clear reference to it, visibility and resolved assets/stances before
+creation. One confirmation of that preview authorizes the exact payload; an
+unchanged confirmed preview needs no second approval. These Notes are separate
+from Playbook Creator Notes.
 
 ## 4. Implementation
 
@@ -74,9 +76,15 @@ requires selection. These Notes are separate from Playbook Creator Notes.
 - **Thesis:** focused discussion, author-preserving drafts and rewrites, exact
   selected-body publication, asset resolution, version-aware quoted context,
   GET-backed creation preview and existing lifecycle controls. Material internal
-  inconsistencies or unfinished passages are flagged in Notes before create;
-  an explicit request still authorizes the unchanged body without another
-  confirmation. Notes never enter the publication payload. Existing Thesis
+  inconsistencies or unfinished passages not yet considered by the author are
+  shown in Notes and await their decision before create. An original-body request
+  also gets a short visibility/assets/stances preview and awaits one approval;
+  an unchanged confirmed preview needs no further confirmation. Notes
+  never enter the publication payload. Reuse selected text without repeating it;
+  show new/changed candidates in full. Keep internal IDs/API fields out of the
+  preview and omit absent optional fields. Optional confirmation buttons have
+  the same scope as a typed reply; old/repeated actions must not change the
+  selected version or create duplicates. Existing Thesis
   status reads platform Signals without creating duplicate monitors; quoted
   versions, research gaps and source timing remain distinct. An unpublished
   viewpoint needs consent before publication, including private publication.
@@ -183,6 +191,22 @@ and clarify product-language openings in the companion Sandbox. Only these
 rules change; investigate Arrays conventions and the successful Altra trace
 without adding an unverified data recipe or backtest example.
 
+Approved minimal publication/source follow-up: actively research public sources
+when Alva cannot meet the request, return attributed results before asking users
+to supply data, and retain convention/access checks. Preserve the production
+v1.25.0 publication workflow's author-visible candidate, natural consent, exact
+body, asset extraction, idempotency and GET verification. Original-body requests
+also receive a short publication-details preview and
+await one approval, as explicitly requested by the user. Avoid repeated
+body/consent, wait for decisions on newly found material editorial issues, and
+allow equivalent typed/button approval. Publication details use product language,
+not catalog IDs or API fields. Companion Sandbox changes only PresentActions'
+description, not its schema or handler. No routing/profile duplication or new UI.
+Checklist: amend the existing fallback/Create rules; reconcile source wording;
+align focused cases/scenarios and three mutation checks; run doc/mutation/durable,
+Sandbox agent/MCP tests, lint/typecheck; review both complete diffs. E2E remains
+Eval work; no live publication, config changes or deployment in this task.
+
 ## 7. Outcome and evidence
 
 The review follow-up changes only three product references, aligns existing
@@ -219,8 +243,8 @@ remains upstream `411ea14`. Final product-tree checks:
 
 | Command, from this repository | Result |
 | --- | --- |
-| `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva --out /tmp/alva-byod-doc-check.md` | 103/103 cases; 1190/1190 checks |
-| `node evals/alva-skill-docs/mutation-smoke.mjs` | 32/32 mutations detected |
+| `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva --out /tmp/alva-publish-doc-check.md` | 106/106 cases; 1235/1235 checks |
+| `node evals/alva-skill-docs/mutation-smoke.mjs` | 35/35 mutations detected |
 | `node --test evals/alva-skill-docs/durable-agent.test.mjs` | 5/5 |
 | `git diff --check` and reference/conflict checks | Passed; existing memory example link to `user.md` unchanged |
 
@@ -232,8 +256,8 @@ remains upstream `411ea14`. Final product-tree checks:
 | Conversational speed and route quality | UNVERIFIABLE locally | Targeted Eval handoff updated; no new conversation Eval run |
 
 The three doc suites pass; they establish instruction coverage, not model
-compliance. This repository has no `make lint-fix` target. Review found no
-runtime edits or changes to trading/Trade Setup/publication authorization.
+compliance. This repository has no `make lint-fix` target. Trading and Trade Setup
+remain unchanged; the publication consent refinement is documented below.
 
 All six current contracts were read with `alva data-skills endpoint` or
 `alva sdk doc`. Five HTTP probes (intraday/daily kline, company detail, SEC
@@ -283,12 +307,36 @@ custom provider, a raw entry event and close-triggered market exits, but synthet
 UTC ordering and crypto performance settings make it unsuitable for verbatim
 reuse as a production US-stock example. No Altra product documentation changed.
 
+Publication/source follow-up: the three product references and focused doc tests
+now retain the prior workflow with informed-author consent, optional button
+selection and readable previews, including a short confirmed preview for supplied
+originals. Public-source research was explicitly approved by the user, not an
+incidental publication-policy change. Comparing to production baseline `541aa13`
+confirms asset extraction, exact-body preservation, request-ID reuse, GET-backed
+preview and lifecycle commands remain. Source research stays verified and
+Alva-first. Static checks protect these instructions; they do not prove actual
+button rendering, stale-click handling or model compliance. No live publication
+was performed.
+
+Final pre-PR verification: documentation 106/106 cases and 1235/1235 checks;
+mutation smoke 35/35; durable-agent 5/5; `git diff --check` passed.
+The branch contains current upstream main `411ea14`; no upstream merge is
+pending. Latest publication and source-fallback behavior still needs real-turn
+Eval; these checks do not establish production readiness.
+
 ## 8. Remaining work
 
-- Target external-source fallback with legacy 006/027/033/043: verify exact
-  requested conventions and provenance, equivalent Alva checks first, and honest
-  partial status when no suitable external source is available. Do not equate
-  successful fallback with bypassing source permissions or access restrictions.
+- Reuse S11-C/E/F/G for original/new/edited candidates, public/private settings,
+  unresolved assets, new editorial defects, informed insistence and refusal.
+  Verify no redundant body/consent, no internal IDs/API labels in the preview,
+  exact GET body/stances and no creation before required choice. Exercise typed
+  and button approval, stale buttons after edits, repeated approval after success,
+  and tool-absent text fallback; static tests do not establish these behaviors.
+- Reuse S17-A and legacy 006/027/033/043 for proactive public-source recovery:
+  results before a routine source-permission question, transparent provenance
+  and conventions, no proxy falsely counted as the requested result, and honest
+  partial status when suitable sources remain unavailable. Preserve source
+  permissions and access boundaries.
 - Get authoritative Arrays adjustment and estimates unit/scale definitions before
   adding a total-return recipe. S19-D needs a supported, market-time-correct
   example and actual-engine replay before an Altra example enters the Skill.
@@ -325,8 +373,8 @@ reuse as a production US-stock example. No Altra product documentation changed.
 - Obtain authoritative price-basis semantics; do not claim adjusted-chart
   recovery from correct reported-close calculations alone.
 - Verify merged author-preserving edits, unpublished Notes and explicit
-  selected-body publication in real turns, including Notes-before-create ordering
-  without redundant confirmation.
+  selected-body publication in real turns, including author decisions on new
+  material Notes before create without redundant confirmation.
 - Exercise a new Playbook build and a remix before release; recent targeted
   Eval did not cover them. Background child traces were collected in the latest
   Eval and are no longer an outstanding collection prerequisite.
