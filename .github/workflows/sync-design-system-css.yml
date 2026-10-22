@@ -57,9 +57,8 @@ jobs:
         working-directory: tools/alva-design-system
         run: pnpm build-design-system-css
 
-      # Pushes made with the GITHUB_TOKEN identity do not run the PR checks on
-      # the new commit, so the push uses an App installation token instead. Only
-      # this step receives the token; the build steps above never see it.
+      # Use an App token so the pushed commit triggers PR checks; mint it after
+      # the build completes and pass it to the push step below.
       - name: Mint App token for the branch push
         id: app-token
         uses: actions/create-github-app-token@v3
