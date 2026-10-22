@@ -13,14 +13,18 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   sync:
     runs-on: ubuntu-latest
-    # Forks can't be pushed to via GITHUB_TOKEN. alva-ai PRs are internal;
-    # this guard prevents the job from failing silently on the rare fork PR.
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    # Forks can't be pushed to; alva-ai PRs are internal, so the guard keeps the
+    # job off fork PRs. Runs triggered by a bot are skipped because the App
+    # token's push to the PR branch re-triggers this workflow, and that second
+    # run would repeat the build without having anything new to push.
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.sender.type != 'Bot'
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
@@ -28,6 +32,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.1.0
@@ -52,14 +57,31 @@ jobs:
         working-directory: tools/alva-design-system
         run: pnpm build-design-system-css
 
+      # Pushes made with the GITHUB_TOKEN identity do not run the PR checks on
+      # the new commit, so the push uses an App installation token instead. Only
+      # this step receives the token; the build steps above never see it.
+      - name: Mint App token for the branch push
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-contents: write
+
       - name: Commit regenerated CSS if drift
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
           if [[ -n "$(git status --porcelain skills/alva/references/css/design-system.css)" ]]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add skills/alva/references/css/design-system.css
             git commit -m "build(alva): regenerate design-system.css"
-            if ! git push; then
+            if ! git -c credential.helper='!gh auth git-credential' \
+                push origin "HEAD:refs/heads/$HEAD_BRANCH"; then
               echo "::warning::Push failed — likely a race with a concurrent push. Will retry on next CI run."
               exit 0
             fi
