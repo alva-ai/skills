@@ -7,7 +7,7 @@ description: >-
   explicit Thesis publication or maintenance, and requested Thesis rewriting.
 metadata:
   author: alva
-  version: v1.26.4
+  version: v1.26.5
 ---
 
 # Alva
@@ -138,13 +138,6 @@ verify facts when they are needed to advance the discussion or judgment.
 7. **Keep questions focused.** Ask at most one requirements question at a time,
    only when the answer materially changes the result. Clear requests need no
    intake interview. Required authorization and trading confirmations still apply.
-8. **Use contextual investment framing.** Follow
-   [user-facing-prose.md](references/user-facing-prose.md#investment-disclaimer).
-   Include the disclaimer once at the end of the final substantive response or
-   artifact when its trigger applies: "This content is for informational purposes only and does not constitute investment advice."
-   A ticker or price mention alone does not trigger it. Explicit financial or
-   analyst advice requests also require the exact advice-request header at the start:
-   "I'll share an analysis, but keep in mind I'm not a licensed analyst or adviser, and this isn't personalized advice for you specifically."
 
 ## Routing
 
@@ -180,6 +173,7 @@ for "NVDA today" or "does the latest earnings report support this thesis?".
 
 | Capability | Reference |
 | --- | --- |
+| Curated X, interviews/podcasts, news and event context; actively consider for investment research and Thesis discussions, choosing reads and depth as needed | [Worldline](references/search.md#worldline) |
 | Structured data, fiscal/calendar periods, search, and external sources | [data-skills.md](references/data-skills.md), [fundamentals-periods.md](references/fundamentals-periods.md), [search.md](references/search.md), [secret-manager.md](references/secret-manager.md) |
 | Cloud JavaScript and ALFS | [jagent-runtime.md](references/jagent-runtime.md), [api/filesystem.md](references/api/filesystem.md) |
 | Feed modeling and Automation lifecycle | [feed-sdk.md](references/feed-sdk.md), [feed-lifecycle.md](references/feed-lifecycle.md), [deployment.md](references/deployment.md) for deploy, run-status, logs, and optional manual trigger |
@@ -192,7 +186,7 @@ for "NVDA today" or "does the latest earnings report support this thesis?".
 | Opt-in user-registered interactive functions | [api/udf-runtime.md](references/api/udf-runtime.md); ordinary filters and charts need no UDF |
 | Release metadata | [api/release.md](references/api/release.md) |
 | Credits, platform errors, and confirmed feedback | [api/credits.md](references/api/credits.md), [api/error-responses.md](references/api/error-responses.md), [api/feedback.md](references/api/feedback.md) |
-| Product language, conditional disclaimer, company links, and final replies | [user-facing-prose.md](references/user-facing-prose.md) |
+| Product language, company links, and final replies | [user-facing-prose.md](references/user-facing-prose.md) |
 
 Before first using runtime, ALFS, Feed, Automation, Playbook HTML, chart, or
 cron capabilities, read the corresponding section of

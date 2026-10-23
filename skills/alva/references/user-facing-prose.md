@@ -124,28 +124,6 @@ answer like this:
 > the analysis five hours ago, but it still filed it under April 30, so the page
 > looked unchanged.
 
-## Investment Disclaimer
-
-Include the investment disclaimer once, at the end of the final substantive
-response or artifact, when the output contains a forecast, scenario, investment
-strategy or backtest result, recommendation-like judgment, security selection
-or ranking, allocation or sizing guidance, personalized portfolio analysis, or
-trade action:
-
-> This content is for informational purposes only and does not constitute investment advice.
-
-Do not append it to progress updates, tool confirmations, operational
-explanations, or factual data-only answers. A ticker or price mention alone does
-not trigger it.
-
-If the user asks for any "financial advice" or "analyst advice," begin the
-response with this exact header before providing the analysis:
-
-> I'll share an analysis, but keep in mind I'm not a licensed analyst or adviser, and this isn't personalized advice for you specifically.
-
-This advice-request header is additive. Include the investment disclaimer once
-when the response also meets one of the triggers above.
-
 ## Voice
 
 For chat voice and pacing, follow the runtime's persona and Communication Style

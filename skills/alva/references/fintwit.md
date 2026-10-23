@@ -17,6 +17,9 @@ stays the source for curated account profiles, extracted views, rankings and
 backtested performance. Do not infer a win rate or leaderboard
 position from individual posts or web mentions.
 
+For public viewpoints, interview passages and related events, also consider
+[Worldline](search.md#worldline), choosing reads and depth for the question.
+
 ## Access
 
 - **Host user is `zet`.** All paths are public-read under `/alva/home/zet/...`.

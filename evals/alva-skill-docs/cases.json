@@ -31,7 +31,11 @@
             "do not fall back to direct HTTP, GraphQL",
             "Signals span",
             "entry's `author_version_id`",
-            "another user's private session"
+            "another user's private session",
+            "Choose the read for the follow-up",
+            "`author.kind=person` uses `author.slug`",
+            "list the author and filter",
+            "does not replace the quoted body"
           ]
         }
       ]
@@ -140,7 +144,7 @@
         {
           "file": "references/search.md",
           "includes": [
-            "Use the runtime's exposed web search tool first",
+            "Use the runtime's exposed web search tool for open-web research",
             "Choose the X route from the current `arrays-data-api-social-feeds` Data Skill catalog",
             "never call an endpoint the catalog does not list",
             "when the catalog lists a live-search endpoint, use it per its current contract",
@@ -154,7 +158,12 @@
             "do not start paid handle tracking just to fill a search gap",
             "a retweet or quoted post is not automatically the poster's own view",
             "Top-ranked or most-engaged posts are not representative market sentiment",
-            "inspect the original before citing its contents"
+            "inspect the original before citing its contents",
+            "Consider it early in investment research and Thesis discussions",
+            "createAsyncWorldlineClient",
+            "Promise.allSettled",
+            "Inspected `sourceEvidence` is captured original text",
+            "Worldline must not become a prerequisite for an otherwise supported answer"
           ]
         },
         {
@@ -178,7 +187,6 @@
       "excludes": [
         "Grok",
         "search-grok-x",
-        "Worldline",
         "x/live-search",
         "include:nativeretweets"
       ]
@@ -1190,50 +1198,19 @@
       ]
     },
     {
-      "id": "target.mandatory-investment-disclaimer",
+      "id": "target.no-generic-investment-disclaimer",
       "group": "target",
       "target": "corpus",
-      "description": "Final substantive decision-oriented outputs receive one investment disclaimer; factual and progress messages do not, while explicit advice requests still receive the required opening header.",
-      "section_includes": [
-        {
-          "file": "SKILL.md",
-          "heading": "Principles",
-          "label": "top-level requirement",
-          "includes": [
-            "contextual investment framing",
-            "Include the disclaimer once",
-            "A ticker or price mention alone does not trigger it",
-            "Explicit financial or analyst advice requests",
-            "exact advice-request header",
-            "at the end of the final substantive response or artifact",
-            "This content is for informational purposes only and does not constitute investment advice.",
-            "I'll share an analysis, but keep in mind I'm not a licensed analyst or adviser, and this isn't personalized advice for you specifically."
-          ]
-        },
-        {
-          "file": "references/user-facing-prose.md",
-          "heading": "Investment Disclaimer",
-          "label": "user-facing prose requirement",
-          "includes": [
-            "contains a forecast, scenario",
-            "recommendation-like judgment",
-            "Do not append it to progress updates",
-            "factual data-only answers",
-            "This content is for informational purposes only and does not constitute investment advice.",
-            "begin the response with this exact header",
-            "I'll share an analysis, but keep in mind I'm not a licensed analyst or adviser, and this isn't personalized advice for you specifically.",
-            "This advice-request header is additive"
-          ]
-        },
-        {
-          "file": "references/request-routing.md",
-          "heading": "Routes",
-          "label": "Ask and strategy routing",
-          "includes": [
-            "[Investment Disclaimer](user-facing-prose.md#investment-disclaimer) when its trigger applies",
-            "according to that reference"
-          ]
-        }
+      "description": "Generic investment disclaimers and fixed advice headers are removed; evidence and authorization requirements remain.",
+      "includes": [
+        "with assumptions and uncertainty stated",
+        "explicit per-order confirmation"
+      ],
+      "excludes": [
+        "This content is for informational purposes only and does not constitute investment advice.",
+        "I'll share an analysis, but keep in mind I'm not a licensed analyst or adviser, and this isn't personalized advice for you specifically.",
+        "#investment-disclaimer",
+        "**Legal disclaimer**"
       ]
     },
     {
@@ -1245,9 +1222,8 @@
         "user-facing prose reference read"
       ],
       "includes": [
-        "[Investment Disclaimer](user-facing-prose.md#investment-disclaimer) when its trigger applies",
         "For current-fact or evidence-dependent answers, apply the Ask Evidence Gate",
-        "Product language, conditional disclaimer, company links, and final replies",
+        "Product language, company links, and final replies",
         "For chat voice and pacing, follow the runtime's persona and Communication Style when provided; otherwise use the chat guidance below",
         "artifact-writing rules that follow apply to Playbook/Automation copy and alpi narrative, not ordinary chat",
         "For each current-fact or evidence-dependent claim",
@@ -1428,7 +1404,7 @@
         }
       ],
       "includes": [
-        "version: v1.26.4",
+        "version: v1.26.5",
         "Capability Help",
         "feedback",
         "api/feedback.md",
