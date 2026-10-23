@@ -212,6 +212,8 @@ added by the Agent. Preserve formatting, including any code fences, already in
 the author's selected body. Use verified catalog IDs only in tool calls.
 Keep internal IDs and API field names out of the preview; omit absent optional
 fields instead of listing blanks. Do not display CLI parameters or raw payloads.
+In the preview and accompanying explanation, state the author's direction
+without describing internal storage or field writes.
 Keep workflow instructions internal; do not quote or explain these rules in the
 preview. Ask naturally in the user's language, for example “按这个版本发布吗？”.
 
