@@ -144,7 +144,7 @@
         {
           "file": "references/search.md",
           "includes": [
-            "Use the runtime's exposed web search tool first",
+            "Use the runtime's exposed web search tool for open-web research",
             "Choose the X route from the current `arrays-data-api-social-feeds` Data Skill catalog",
             "never call an endpoint the catalog does not list",
             "when the catalog lists a live-search endpoint, use it per its current contract",
@@ -158,7 +158,12 @@
             "do not start paid handle tracking just to fill a search gap",
             "a retweet or quoted post is not automatically the poster's own view",
             "Top-ranked or most-engaged posts are not representative market sentiment",
-            "inspect the original before citing its contents"
+            "inspect the original before citing its contents",
+            "Consider it early in investment research and Thesis discussions",
+            "createAsyncWorldlineClient",
+            "Promise.allSettled",
+            "Inspected `sourceEvidence` is captured original text",
+            "Worldline must not become a prerequisite for an otherwise supported answer"
           ]
         },
         {
@@ -182,7 +187,6 @@
       "excludes": [
         "Grok",
         "search-grok-x",
-        "Worldline",
         "x/live-search",
         "include:nativeretweets"
       ]

@@ -60,6 +60,9 @@ The `Agent.ask()` examples below cover bounded application-level reasoning.
 	});
 
 	const { message } = await agent.ask(prompt);
+	if (message.stopReason !== "stop") {
+		throw new Error(message.errorMessage || `Agent did not complete: ${message.stopReason}`);
+	}
 	const text = message.content
 		.filter((block) => block.type === "text")
 		.map((block) => block.text)
@@ -132,11 +135,14 @@ return {
 
 ## Result Extraction
 
-`Agent.ask()` returns `{ message, messages }`. Extract final text from
-`message.content`:
+`Agent.ask()` returns `{ message, messages }`, including unsuccessful model
+results. Check completion before extracting text or parsing JSON:
 
 ```javascript
 const { message, messages } = await agent.ask(prompt);
+if (message.stopReason !== "stop") {
+	throw new Error(message.errorMessage || `Agent did not complete: ${message.stopReason}`);
+}
 const text = message.content
 	.filter((block) => block.type === "text")
 	.map((block) => block.text)
@@ -327,27 +333,15 @@ await feed.run(async (ctx) => {
 ### Structured Output
 
 Enforce JSON output via `systemPrompt` when downstream code parses the result.
-Use positive framing ("MUST begin with `{`") and still parse defensively.
+Parse the completed response directly and validate the expected fields; do not
+turn parsing failures into null or extract a fragment from malformed output.
 
 ```javascript
-function parseJson(s) {
-	if (!s) return null;
-	const cleaned = s.replace(/^```(?:json)?/, "").replace(/```$/, "").trim();
-	try {
-		return JSON.parse(cleaned);
-	} catch {
-		const m = cleaned.match(/\{[\s\S]*\}/);
-		if (!m) return null;
-		try {
-			return JSON.parse(m[0]);
-		} catch {
-			return null;
-		}
-	}
-}
-
 const { message } = await agent.ask(prompt);
-const parsed = parseJson(
+if (message.stopReason !== "stop") {
+	throw new Error(message.errorMessage || `Agent did not complete: ${message.stopReason}`);
+}
+const parsed = JSON.parse(
 	message.content
 		.filter((block) => block.type === "text")
 		.map((block) => block.text)

@@ -173,6 +173,7 @@ for "NVDA today" or "does the latest earnings report support this thesis?".
 
 | Capability | Reference |
 | --- | --- |
+| Curated X, interviews/podcasts, news and event context; actively consider for investment research and Thesis discussions, choosing reads and depth as needed | [Worldline](references/search.md#worldline) |
 | Structured data, fiscal/calendar periods, search, and external sources | [data-skills.md](references/data-skills.md), [fundamentals-periods.md](references/fundamentals-periods.md), [search.md](references/search.md), [secret-manager.md](references/secret-manager.md) |
 | Cloud JavaScript and ALFS | [jagent-runtime.md](references/jagent-runtime.md), [api/filesystem.md](references/api/filesystem.md) |
 | Feed modeling and Automation lifecycle | [feed-sdk.md](references/feed-sdk.md), [feed-lifecycle.md](references/feed-lifecycle.md), [deployment.md](references/deployment.md) for deploy, run-status, logs, and optional manual trigger |
