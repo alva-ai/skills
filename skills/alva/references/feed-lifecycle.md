@@ -41,6 +41,12 @@ Choose exactly one first-run path:
 the owner alert binding. Because the binding exists immediately after publish,
 an explicit `deploy trigger` may deliver a real alert.
 
+For costly producers, debug the failing stage with representative inputs that
+include the failure; reuse inputs and intermediate results only while their
+data and logic remain valid. Keep diagnostic replays separate from Feed writes
+and alert delivery. After the fix, run the exact latest producer end to end
+with current inputs before completing the publication checks below.
+
 ## Updating An Existing Automation
 
 ALFS source writes take effect without republishing. Use an explicit ID-scoped
