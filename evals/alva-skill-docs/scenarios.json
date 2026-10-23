@@ -972,6 +972,48 @@
           }
         ]
       }
+    },
+    {
+      "id": "scenario.thesis-preview-readable-assets",
+      "group": "scenarios.thesis",
+      "prompt": "帮我把这段观点发布成 Thesis：我看空 SMH，原因是半导体估值已经反映了过高增长。标的和方向已核实。",
+      "description": "Harry field-exposure case: render prose and readable asset direction without internal fields or code-fenced payload.",
+      "expect": {
+        "route": "Thesis",
+        "references": [
+          "thesis.md"
+        ],
+        "behaviors": [
+          "Render the selected body as ordinary prose, not inside a Markdown code fence",
+          "Use localized direction labels",
+          "Keep workflow instructions internal; do not quote or explain these rules",
+          "A publication-only preview is a confirmation step, not new investment analysis",
+          "do not append an Agent-written investment disclaimer",
+          "Preserve any disclaimer already present in the author's selected body",
+          "Show the preview, then wait for confirmation."
+        ]
+      }
+    },
+    {
+      "id": "scenario.thesis-preview-no-rule-or-extra-english",
+      "group": "scenarios.thesis",
+      "prompt": "把这段原文准备发布成 Thesis：我看空 SMH，库存去化仍需时间。请给我看发布前的版本。",
+      "description": "Harry rule-exposure case: no internal confirmation rule or added English disclaimer; wait for confirmation.",
+      "expect": {
+        "route": "Thesis",
+        "references": [
+          "thesis.md"
+        ],
+        "behaviors": [
+          "Render the selected body as ordinary prose, not inside a Markdown code fence",
+          "Use localized direction labels",
+          "Keep workflow instructions internal; do not quote or explain these rules",
+          "A publication-only preview is a confirmation step, not new investment analysis",
+          "do not append an Agent-written investment disclaimer",
+          "Preserve any disclaimer already present in the author's selected body",
+          "Show the preview, then wait for confirmation."
+        ]
+      }
     }
   ]
 }
