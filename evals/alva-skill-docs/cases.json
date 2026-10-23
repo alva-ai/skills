@@ -31,7 +31,11 @@
             "do not fall back to direct HTTP, GraphQL",
             "Signals span",
             "entry's `author_version_id`",
-            "another user's private session"
+            "another user's private session",
+            "Choose the read for the follow-up",
+            "`author.kind=person` uses `author.slug`",
+            "list the author and filter",
+            "does not replace the quoted body"
           ]
         }
       ]
