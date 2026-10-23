@@ -1404,7 +1404,7 @@
         }
       ],
       "includes": [
-        "version: v1.26.3",
+        "version: v1.26.4",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -2071,7 +2071,8 @@
             "A publication-only preview is a confirmation step, not new investment analysis",
             "do not append an Agent-written investment disclaimer",
             "Preserve any disclaimer already present in the author's selected body",
-            "Show the preview, then wait for confirmation."
+            "Show the preview, then wait for confirmation.",
+            "In the preview and accompanying explanation, state the author's direction without describing internal storage or field writes"
           ]
         }
       ]

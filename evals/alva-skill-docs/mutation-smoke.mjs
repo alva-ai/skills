@@ -13,6 +13,13 @@ const DEFAULT_SKILL_DIR = resolve(REPO_ROOT, "skills/alva");
 
 const MUTATIONS = [
   {
+    id: "thesis-preview-no-field-write-prose",
+    file: "references/thesis.md",
+    remove: "without describing internal storage or field writes.",
+    replacement: "by explaining which internal field will be written.",
+    expectFailedCases: ["target.thesis-readable-publication-preview"],
+  },
+  {
     id: "thesis-preview-prose",
     file: "references/thesis.md",
     remove: "Render the selected body as ordinary prose, not inside a Markdown code fence",
