@@ -65,3 +65,5 @@ PR preparation: synchronized current main and preserved its Thesis preview fixes
 SDK 1.13.0 follow-up: reviewed merged sdk-monorepo #398 and Gateway #1085 contracts. Added optional matchContributions guidance to Full/Slim EN/CN for attribution-scoped multi-angle reads, with required inputs, OR/AND meaning, output size, distinct pagination, separate match evidence and old-host fallback. Existing recall examples remain unchanged. Merge status does not establish production availability or latency; validate before relying on the new route.
 
 Combined-read guidance validation: Full docs 110/110, mutation 49/49, durable 5/5; Slim 61/61. Reviewed method/field names against SDK 1.13.0 source and README. No runtime call or speed claim for matchContributions; include attribution-scoped coverage, empty-page continuation, large-output selection and old-Gateway fallback in targeted Eval.
+
+PR review: the SDK 1.13.0 recall contract also permits entityIds AND attribution. Clarified both-filter usage and older-SDK verified intersection without dropping an author/entity constraint.

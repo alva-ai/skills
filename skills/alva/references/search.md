@@ -34,7 +34,7 @@ read interfaces; reuse this contract rather than rediscovering it each turn:
 | Find related arguments, events or counterevidence | `recall({query, indexedAfter, ...})`; `mode: "semantic"` is the default |
 | Match terms or a phrase | `mode: "keyword"` (OR) or `"keyword_all"` (AND); use the terms a relevant passage must contain |
 | Find material about a company/person | `searchEntities({query, entityTypes?, limit?})`, then `recall` with returned `entityIds` |
-| Find material credited to a person/publisher | `recall` with `attribution: {partyIds: [...]}`; choose this OR `entityIds`, not both |
+| Find material credited to a person/publisher | `recall` with `attribution: {partyIds: [...]}`; with SDK 1.13.0+, combine with `entityIds` (AND) when both constraints matter |
 | Follow a relevant hit | `getContributions({ids})` for evidence/media; `getObservations({ids})` for captured source; add `view: "full"` for structured transcript turns; `getClusters({refs: [{clusterId}]})` for current event context |
 
 Entity search returns `entities` with `entityId`, `canonicalName`, type and
@@ -161,7 +161,8 @@ semantic queries OR keywords). It requires `indexedAfter`, `attribution` with
 `partyIds` or `vip: true`, and at least one of `entityIds`, `queries` or
 `keywordQueries`. With `queries`, supply `minSimilarity` in (0, 1]; omitted
 `keywordQueries` leaves keyword matching off. Use resolved identities; choosing
-VIP coverage must fit the question. Ordinary discovery can keep using `recall`.
+VIP coverage must fit the question. Older SDKs require separate filtered reads
+and a verified intersection when both author and entity constraints are needed. Ordinary discovery can keep using `recall`.
 
 This method returns up to 1,024 whole-text hits per page, newest first, with no
 `limit` or `publishedFromMs` parameter. Select relevant evidence in the script

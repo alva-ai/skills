@@ -60,7 +60,7 @@ The `Agent.ask()` examples below cover bounded application-level reasoning.
 	});
 
 	const { message } = await agent.ask(prompt);
-	if (message.stopReason !== "stop") {
+	if (message.stopReason !== "stop" || message.errorMessage) {
 		throw new Error(message.errorMessage || `Agent did not complete: ${message.stopReason}`);
 	}
 	const text = message.content
@@ -140,7 +140,7 @@ results. Check completion before extracting text or parsing JSON:
 
 ```javascript
 const { message, messages } = await agent.ask(prompt);
-if (message.stopReason !== "stop") {
+if (message.stopReason !== "stop" || message.errorMessage) {
 	throw new Error(message.errorMessage || `Agent did not complete: ${message.stopReason}`);
 }
 const text = message.content
@@ -338,7 +338,7 @@ turn parsing failures into null or extract a fragment from malformed output.
 
 ```javascript
 const { message } = await agent.ask(prompt);
-if (message.stopReason !== "stop") {
+if (message.stopReason !== "stop" || message.errorMessage) {
 	throw new Error(message.errorMessage || `Agent did not complete: ${message.stopReason}`);
 }
 const parsed = JSON.parse(
