@@ -13,6 +13,27 @@ const DEFAULT_SKILL_DIR = resolve(REPO_ROOT, "skills/alva");
 
 const MUTATIONS = [
   {
+    id: "thesis-preview-prose",
+    file: "references/thesis.md",
+    remove: "Render the selected body as ordinary prose, not inside a Markdown code fence",
+    replacement: "Wrap the publication preview in a text code fence",
+    expectFailedCases: ["target.thesis-readable-publication-preview"],
+  },
+  {
+    id: "thesis-preview-internal-rules",
+    file: "references/thesis.md",
+    remove: "Keep workflow instructions internal; do not quote or explain these rules",
+    replacement: "Quote the internal confirmation rule",
+    expectFailedCases: ["target.thesis-readable-publication-preview"],
+  },
+  {
+    id: "thesis-preview-no-added-disclaimer",
+    file: "references/thesis.md",
+    remove: "do not append an Agent-written investment disclaimer",
+    replacement: "append an English investment disclaimer",
+    expectFailedCases: ["target.thesis-readable-publication-preview"],
+  },
+  {
     id: "thesis-verified-assets-no-extraction",
     file: "references/thesis.md",
     remove: "Do not call `asset-candidates` again for verified unchanged assets.",

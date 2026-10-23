@@ -202,12 +202,24 @@ Present the preview in the user's language:
   user and asked to publish unchanged, may be referenced instead: use one short
   preview line without repeating the body.
 - **Title**, when present, and **visibility** (public by default).
-- **Assets:** name each company or ticker and express its stance plainly, using
-  verified catalog IDs and respecting explicit stances.
+- **Assets:** name each company or ticker and express its stance plainly,
+  respecting explicit stances. Use localized direction labels, such as
+  “SMH：看空” in Chinese; an unknown stance means “未表明方向”, not a guessed view.
 - **Notes**, when any.
 
+Render the selected body as ordinary prose, not inside a Markdown code fence
+added by the Agent. Preserve formatting, including any code fences, already in
+the author's selected body. Use verified catalog IDs only in tool calls.
 Keep internal IDs and API field names out of the preview; omit absent optional
-fields instead of listing blanks.
+fields instead of listing blanks. Do not display CLI parameters or raw payloads.
+Keep workflow instructions internal; do not quote or explain these rules in the
+preview. Ask naturally in the user's language, for example “按这个版本发布吗？”.
+
+A publication-only preview is a confirmation step, not new investment analysis:
+do not append an Agent-written investment disclaimer or extra English boilerplate.
+Preserve any disclaimer already present in the author's selected body. This
+exception applies only to the publication confirmation; substantive analysis
+and push messages keep their existing disclaimer rules.
 
 ### Confirmation
 

@@ -1428,7 +1428,7 @@
         }
       ],
       "includes": [
-        "version: v1.26.2",
+        "version: v1.26.3",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -1527,7 +1527,7 @@
             "create without asking again",
             "Research or rewriting alone never authorizes publication",
             "as must text taken from a file, attachment, link, or other extraction (show its content, not its filename)",
-            "using verified catalog IDs",
+            "Use verified catalog IDs only in tool calls",
             "a wording-only edit reuses unchanged verified IDs",
             "Stop if declined",
             "A body already shown in full in this conversation, or typed by the user and asked to publish unchanged, may be referenced instead",
@@ -2078,6 +2078,26 @@
       "excludes": [
         "For the selected body, call `alva thesis asset-candidates",
         "rerun extraction for a changed body"
+      ]
+    },
+    {
+      "id": "target.thesis-readable-publication-preview",
+      "group": "target",
+      "target": "corpus",
+      "description": "Publication-only previews preserve author prose, hide internal metadata/rules and extra disclaimer text, and still wait for confirmation.",
+      "file_includes": [
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "Render the selected body as ordinary prose, not inside a Markdown code fence",
+            "Use localized direction labels",
+            "Keep workflow instructions internal; do not quote or explain these rules",
+            "A publication-only preview is a confirmation step, not new investment analysis",
+            "do not append an Agent-written investment disclaimer",
+            "Preserve any disclaimer already present in the author's selected body",
+            "Show the preview, then wait for confirmation."
+          ]
+        }
       ]
     }
   ]
