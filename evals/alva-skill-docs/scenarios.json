@@ -18,8 +18,7 @@
         "behaviors": [
           "Covered US equities and crypto: latest/realtime price answers must use structured intraday kline data. Do not use daily-level bars or daily closes as current prices",
           "Do not present a partial lookup as a completed comparison",
-          "Do not expand a one-off question into a Playbook",
-          "A ticker or price mention alone does not trigger it"
+          "Do not expand a one-off question into a Playbook"
         ],
         "forbidden_behaviors": [
           "Scripts, feeds, and cronjobs are implementation primitives, not default user deliverables."
@@ -27,37 +26,32 @@
       }
     },
     {
-      "id": "scenario.forecast-disclaimer-once",
+      "id": "scenario.forecast-without-boilerplate",
       "group": "scenarios.ask",
       "prompt": "Create an AAPL pre-earnings scenario chart and keep me updated while it runs.",
-      "description": "Progress messages omit the disclaimer while the final forecast artifact includes it once.",
+      "description": "Forecasts and advice requests retain sourced analysis; target.no-generic-investment-disclaimer checks boilerplate absence across the skill.",
       "expect": {
         "route": "Financial Analysis / Ask Question",
         "references": [
           "user-facing-prose.md"
         ],
         "behaviors": [
-          "once, at the end of the final substantive response or artifact",
-          "Do not append it to progress updates, tool confirmations, operational explanations, or factual data-only answers",
-          "This content is for informational purposes only and does not constitute investment advice."
+          "with assumptions and uncertainty stated"
         ]
       }
     },
     {
-      "id": "scenario.explicit-analyst-advice-header",
+      "id": "scenario.analyst-advice-without-boilerplate",
       "group": "scenarios.ask",
       "prompt": "Give me your analyst advice on whether I should buy NVDA.",
-      "description": "An explicit analyst-advice request begins with the required header and retains the investment disclaimer.",
+      "description": "Forecasts and advice requests retain sourced analysis; target.no-generic-investment-disclaimer checks boilerplate absence across the skill.",
       "expect": {
         "route": "Financial Analysis / Ask Question",
         "references": [
           "user-facing-prose.md"
         ],
         "behaviors": [
-          "Explicit financial or analyst advice requests also require the exact advice-request header",
-          "I'll share an analysis, but keep in mind I'm not a licensed analyst or adviser, and this isn't personalized advice for you specifically.",
-          "This advice-request header is additive",
-          "This content is for informational purposes only and does not constitute investment advice."
+          "with assumptions and uncertainty stated"
         ]
       }
     },
@@ -450,8 +444,7 @@
           "FeedAltra",
           "look-ahead bias",
           "drawdown",
-          "choose the requested deliverable",
-          "once, at the end of the final substantive response or artifact"
+          "choose the requested deliverable"
         ]
       }
     },

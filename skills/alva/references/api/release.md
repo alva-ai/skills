@@ -194,7 +194,6 @@ to playbook shape (screener / thesis / what-if), then optional sections.
 #### Optional
 
 - **Glossary** — domain-specific terms.
-- **Legal disclaimer** — at the bottom, where applicable.
 
 ### Voice
 

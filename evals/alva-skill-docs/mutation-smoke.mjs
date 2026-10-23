@@ -234,13 +234,12 @@ const MUTATIONS = [
     expectFailedCases: ["issue592.financial-ask-contract", "scenario.simple-latest-price"],
   },
   {
-    id: "mandatory-investment-disclaimer",
+    id: "reintroduced-investment-disclaimer",
     file: "SKILL.md",
-    remove:
-      "8. **Use contextual investment framing.** Follow\n   [user-facing-prose.md](references/user-facing-prose.md#investment-disclaimer).\n   Include the disclaimer once at the end of the final substantive response or\n   artifact when its trigger applies: \"This content is for informational purposes only and does not constitute investment advice.\"\n   A ticker or price mention alone does not trigger it. Explicit financial or\n   analyst advice requests also require the exact advice-request header at the start:\n   \"I'll share an analysis, but keep in mind I'm not a licensed analyst or adviser, and this isn't personalized advice for you specifically.\"\n",
+    remove: "## Principles\n",
+    replacement: "## Principles\n\nThis content is for informational purposes only and does not constitute investment advice.\n",
     expectFailedCases: [
-      "target.mandatory-investment-disclaimer",
-      "scenario.explicit-analyst-advice-header",
+      "target.no-generic-investment-disclaimer",
     ],
   },
   {
@@ -255,17 +254,12 @@ const MUTATIONS = [
     ],
   },
   {
-    id: "explicit-advice-request-header",
+    id: "reintroduced-advice-request-header",
     file: "references/user-facing-prose.md",
-    remove:
-      "If the user asks for any \"financial advice\" or \"analyst advice,\" begin the\n" +
-      "response with this exact header before providing the analysis:\n\n" +
-      "> I'll share an analysis, but keep in mind I'm not a licensed analyst or adviser, and this isn't personalized advice for you specifically.\n\n" +
-      "This advice-request header is additive. Include the investment disclaimer once\n" +
-      "when the response also meets one of the triggers above.\n",
+    remove: "# User-Facing Prose\n",
+    replacement: "# User-Facing Prose\n\nI'll share an analysis, but keep in mind I'm not a licensed analyst or adviser, and this isn't personalized advice for you specifically.\n",
     expectFailedCases: [
-      "target.mandatory-investment-disclaimer",
-      "scenario.explicit-analyst-advice-header",
+      "target.no-generic-investment-disclaimer",
     ],
   },
   {

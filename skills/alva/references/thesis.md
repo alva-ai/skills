@@ -217,9 +217,7 @@ preview. Ask naturally in the user's language, for example “按这个版本发
 
 A publication-only preview is a confirmation step, not new investment analysis:
 do not append an Agent-written investment disclaimer or extra English boilerplate.
-Preserve any disclaimer already present in the author's selected body. This
-exception applies only to the publication confirmation; substantive analysis
-and push messages keep their existing disclaimer rules.
+Preserve any disclaimer already present in the author's selected body.
 
 ### Confirmation
 
