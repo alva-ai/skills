@@ -13,6 +13,20 @@ const DEFAULT_SKILL_DIR = resolve(REPO_ROOT, "skills/alva");
 
 const MUTATIONS = [
   {
+    id: "thesis-verified-assets-no-extraction",
+    file: "references/thesis.md",
+    remove: "Do not call `asset-candidates` again for verified unchanged assets.",
+    replacement: "Always call asset-candidates again before publication.",
+    expectFailedCases: ["target.thesis-reuse-verified-assets"],
+  },
+  {
+    id: "thesis-wording-edit-no-extraction",
+    file: "references/thesis.md",
+    remove: "a wording-only edit reuses unchanged verified IDs",
+    replacement: "any wording edit requires fresh extraction",
+    expectFailedCases: ["target.thesis-reuse-verified-assets"],
+  },
+  {
     id: "x-catalog-gate",
     file: "references/search.md",
     remove: "never call an endpoint the catalog does not list.",

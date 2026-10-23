@@ -158,15 +158,33 @@ Every creation shows one publication preview and obtains one confirmation of it.
 
 ### Publication preview
 
-For the selected body, call `alva thesis asset-candidates --text '<exact body>'`
-before showing the preview. This read-only command identifies asset mentions,
-catalog entity IDs, and suggested directions. Match the result against the
-user's stated assets and direction; the user's explicit direction wins over a
-suggestion. Use `bullish`, `bearish`, or `unknown` for each selected entity.
-Never treat a suggestion as publication consent. If an explicitly named asset
-is unresolved, extraction fails, or multiple catalog matches remain, clarify
-the asset before publishing instead of silently dropping its direction. If the
-body contains no asset mention, leave entity IDs and directions empty.
+Identify the assets and the author's directions from the selected body and
+confirmed conversation context. The user's explicit direction wins. Reuse
+catalog entity IDs already verified by a tool when the asset identity has not
+changed, and pass them directly with `--entity-ids` and `--entity-stances`.
+Do not call `asset-candidates` again for verified unchanged assets. If there is
+no specific asset mention or requested binding, leave entity IDs and directions
+empty without calling extraction.
+
+For a concrete ticker or company name without a verified ID, use the read-only
+`alva thesis list --ticker '<ticker or name>' --first 1` identity lookup first.
+Use its `scope.id` only when `scope.__typename` is `Entity` and the returned
+name, ticker, kind and venue match the intended asset. Use only that scope for
+identity; other authors' Thesis entries do not establish this author's stance.
+Ask which candidate when the catalog reports ambiguity; do not start research
+or scan unrelated publications just to resolve an ID.
+
+Only call `alva thesis asset-candidates --text '<exact body>'` when an asset's
+catalog identity is still unresolved. It is a read-only fallback for missing
+IDs or ambiguous mentions, not a required publication step or a second opinion
+on an author's explicit stance. Check its candidates against the stated asset;
+never invent an entity ID. A broad description such as "semiconductor ETF"
+does not identify SMH uniquely: use confirmed context or ask which fund.
+If identity remains ambiguous, extraction fails without another verified ID,
+or the author's direction is unclear, clarify that point before publishing.
+Use `bullish`, `bearish`, or `unknown` for each selected entity and preserve
+explicit author direction over a model suggestion. Never treat a suggestion
+as publication consent.
 
 Preserve the selected body exactly, including wording, language, whitespace and
 line breaks. Do not summarize, rewrite, translate, correct, expand, generate a
@@ -185,7 +203,7 @@ Present the preview in the user's language:
   preview line without repeating the body.
 - **Title**, when present, and **visibility** (public by default).
 - **Assets:** name each company or ticker and express its stance plainly, using
-  the asset extraction result for catalog IDs and respecting explicit stances.
+  verified catalog IDs and respecting explicit stances.
 - **Notes**, when any.
 
 Keep internal IDs and API field names out of the preview; omit absent optional
@@ -201,7 +219,9 @@ Previously discussed Notes and ordinary editorial suggestions need no new
 approval. Research or rewriting alone never authorizes publication.
 
 Any change to the body, title, visibility, assets, or stances voids the
-confirmation: rerun extraction for a changed body and show the new preview.
+confirmation: show the new preview. Recheck asset identities and directions
+when they change; a wording-only edit reuses unchanged verified IDs and does
+not require extraction.
 Stop if declined.
 
 When `PresentActions` is available, offer localized `send_prompt` actions such
@@ -217,8 +237,9 @@ One sentence is valid. Title, tickers, and entity IDs are optional. Visibility
 defaults to public. Generate one nonzero UUID per creation intent and keep it
 with the exact payload as `--request-id`; a changed intent requires a new UUID.
 
+Use confirmed catalog IDs and directions directly:
+
 ```sh
-alva thesis asset-candidates --text '<exact body>'
 alva thesis create --request-id '<uuid>' --body '<exact body>' [--entity-ids '<id,id>' --entity-stances '[{"entity_id":"745337","stance":"bearish"}]']
 alva thesis get --id '<returned thesis id>'
 ```
@@ -308,7 +329,11 @@ that exact candidate. Report rewrite errors without retry or fallback.
 - `update`: publish the author's revised view under
   [Authorship](#authorship); retain unchanged fields and send `--id`, a new
   `--request-id`, `--expected-author-version-id`, `--body`, explicit
-  `--visibility`, plus retained optional fields. Omitting optional fields clears
+  `--visibility`, plus retained optional fields. For a body-only edit, carry
+  current `entity_stances` through `--entity-stances` with the retained entity
+  IDs. If the tool rejects that flag, stop and report the limitation; never drop
+  directions to make an update succeed. Verify returned directions.
+  Omitting optional fields clears
   them; never default an existing private Thesis to public.
 - `close`: require `--id` and `--expected-author-version-id`; `--note`
   is only a closing note.
