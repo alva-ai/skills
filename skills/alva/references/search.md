@@ -153,7 +153,28 @@ repeating a search already completed with the exposed native tool.
 - **Query scoping**: state the business question first, then the ticker, then a time window (`latest quarter`, `last 30 days`).
 - **Fields**: `summary`, `data`/`arrays` result blocks, `tickers`, `sources`, and provider `usage` when available.
 
-### Twitter/X
+#### Combined reads (SDK 1.13.0+)
+
+When attribution is part of the question and several retrieval angles are useful,
+`matchContributions` can combine them in one call: attribution AND (entities OR
+semantic queries OR keywords). It requires `indexedAfter`, `attribution` with
+`partyIds` or `vip: true`, and at least one of `entityIds`, `queries` or
+`keywordQueries`. With `queries`, supply `minSimilarity` in (0, 1]; omitted
+`keywordQueries` leaves keyword matching off. Use resolved identities; choosing
+VIP coverage must fit the question. Ordinary discovery can keep using `recall`.
+
+This method returns up to 1,024 whole-text hits per page, newest first, with no
+`limit` or `publishedFromMs` parameter. Select relevant evidence in the script
+before returning a large page to the model; filter publication dates from hits.
+For more coverage, repeat the unchanged request with `nextPageToken` as
+`pageToken`, even after an empty page; deduplicate by `contributionId`. Do not
+apply recall's `scannedFrom`/`budgetExceeded` paging. Entity/keyword hits can have
+zero `similarity`; `matchedKeywords` is a boolean, not a relevance score.
+Use this only when both SDK and Gateway relay support it; an unavailable method
+or unknown operation falls back to supported reads, without weakening the
+requested attribution or access boundaries.
+
+## Twitter/X
 
 Choose the X route from the current `arrays-data-api-social-feeds` Data Skill
 catalog (`alva data-skills summary`, then the endpoint doc for the File it
