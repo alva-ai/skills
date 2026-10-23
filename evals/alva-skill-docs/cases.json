@@ -1428,7 +1428,7 @@
         }
       ],
       "includes": [
-        "version: v1.26.1",
+        "version: v1.26.2",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -1527,8 +1527,8 @@
             "create without asking again",
             "Research or rewriting alone never authorizes publication",
             "as must text taken from a file, attachment, link, or other extraction (show its content, not its filename)",
-            "using the asset extraction result for catalog IDs",
-            "rerun extraction for a changed body and show the new preview",
+            "using verified catalog IDs",
+            "a wording-only edit reuses unchanged verified IDs",
             "Stop if declined",
             "A body already shown in full in this conversation, or typed by the user and asked to publish unchanged, may be referenced instead",
             "New or changed candidates must be shown in full",
@@ -2047,6 +2047,37 @@
       ],
       "excludes": [
         "X-API-Key:"
+      ]
+    },
+    {
+      "id": "target.thesis-reuse-verified-assets",
+      "group": "target",
+      "target": "corpus",
+      "description": "Publication reuses verified asset identity and author direction; extraction is conditional, with confirmation and ambiguity protection retained.",
+      "file_includes": [
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "Identify the assets and the author's directions",
+            "Reuse catalog entity IDs already verified by a tool",
+            "Do not call `asset-candidates` again for verified unchanged assets",
+            "empty without calling extraction",
+            "Only call `alva thesis asset-candidates",
+            "not a required publication step",
+            "does not identify SMH uniquely",
+            "a wording-only edit reuses unchanged verified IDs",
+            "Show the preview, then wait for confirmation.",
+            "never invent an entity ID",
+            "never drop directions to make an update succeed",
+            "identity lookup first",
+            "Use its `scope.id` only when",
+            "other authors' Thesis entries do not establish this author's stance"
+          ]
+        }
+      ],
+      "excludes": [
+        "For the selected body, call `alva thesis asset-candidates",
+        "rerun extraction for a changed body"
       ]
     }
   ]
