@@ -357,6 +357,12 @@ that exact candidate. Report rewrite errors without retry or fallback.
   is only a closing note.
 - `delete --id`: withdraw only on explicit request.
 
+## Thesis maintenance controls
+
+For explicit archive/restore, bookmark, or managed Signal research changes, use
+the corresponding Thesis CLI command and report its returned state. Read
+alva thesis --help for detailed concurrency, idempotency, and error rules.
+
 Report version conflicts instead of silently rereading and overwriting. Do not
 use `--editorial` to bypass a material or version conflict.
 
