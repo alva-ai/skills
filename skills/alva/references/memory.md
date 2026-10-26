@@ -226,15 +226,11 @@ the interest. A single query does not create an Interest.
 
 #### Investment Thoughts
 
-Remember investment ideas the user expresses that will help future conversations:
-observations, questions they want to pursue, tentative hypotheses, doubts, or
-settled views. They need not be mature, complete, directional, or actionable.
-Use concise bullets or short paragraphs; preserve the user's reasoning,
-uncertainty and qualifications. Include dates, assets, or conditions when useful,
-without required fields or asking questions just to complete a memory entry.
-A clear user statement is enough; no extra confirmation is needed to remember it.
-Distinguish the user's own thinking from quoted views and requests to analyze a
-position, which do not by themselves establish agreement.
+Remember important user-expressed investment ideas, including incomplete thoughts,
+open questions, doubts and settled views. Use brief prose or bullets, preserving
+reasoning, uncertainty and useful dates, assets or conditions. No fixed fields,
+trading direction or extra confirmation are required for a clear user statement.
+A quoted view or request to analyze it does not establish user agreement.
 
 ```markdown
 - The user suspects AI drug discovery may benefit lab tools and data providers,
@@ -243,22 +239,18 @@ position, which do not by themselves establish agreement.
   whether orders turn into cash after capital expenditure before taking a view.
 ```
 
-These memories do not create, publish or modify a product Thesis. Public and
-private product Theses are versioned objects: query them for the current body,
-assets, direction and status using [thesis.md](thesis.md). Memory may retain the
-user's reasons, open questions and a known Thesis reference without duplicating
-its full body. Further discussion alone does not request a product update.
+Memory does not create, publish or modify a product Thesis. For its current body
+and state, follow [thesis.md](thesis.md); memory may keep personal context and known
+Thesis references, not full copies. Discussion alone is not an update request.
 
-Legacy `Investment Thesis` sections mean Investment Thoughts, not product
-objects. When normal maintenance touches that section, use `Investment Thoughts`
-and merge overlapping entries if both headings exist, preserving distinct
-information. Replace obsolete template instructions in that section with this
-guidance, preserving user-authored content. Keep existing fields readable;
-simplify an entry only when working on it,
-preserving meaningful dates, conditions and unresolved doubts, including
-those expressed by an old status. Do not bulk-rewrite memory or turn an elapsed
-date alone into a confirmation request. Keep time-sensitive thoughts in their
-historical context and follow the user's later corrections.
+Treat legacy `Investment Thesis` sections as Investment Thoughts. During normal
+maintenance of that section, rename it or merge both headings under
+`Investment Thoughts`, preserving distinct user content and replacing obsolete
+template instructions. Keep old fields readable; simplify only entries being
+maintained, preserving meaningful dates, conditions and unresolved doubts,
+including those recorded in old status fields. Do not bulk-rewrite memory or
+request confirmation merely because a date has passed. Preserve historical
+context and follow later user corrections.
 
 #### Action Preferences
 
