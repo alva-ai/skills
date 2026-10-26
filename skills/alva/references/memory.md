@@ -19,7 +19,7 @@ as if the user will read them.
 ```
 ~/memory/
 ├── MEMORY.md     # Concise index — supplied in prefill or read via ALFS
-└── user.md       # Cross-channel identity, preferences, investment style, theses
+└── user.md       # Cross-channel identity, preferences, investment style, investment thoughts
 ```
 
 `MEMORY.md` is the entrypoint. Use its prefilled content or read it as described
@@ -27,11 +27,11 @@ in Reading rules below to discover what's stored. Keep it concise — under 200
 lines. Each entry is one line linking to a topic file:
 
 ```markdown
-- [user.md](user.md) — identity, investment style, interests, theses and preferences
+- [user.md](user.md) — identity, investment style, interests, investment thoughts and preferences
 ```
 
 Keep the default global model in `user.md`; investment style, watched areas,
-theses, and action preferences do not get a separate `investing.md`.
+investment thoughts, and action preferences do not get a separate `investing.md`.
 
 ### Channel-scoped memory
 
@@ -145,7 +145,7 @@ active custom contract.
 
 ## user.md — Who is this user
 
-Persistent facts about the user. Update when you learn something new.
+Persistent context about the user. Update when you learn something worth remembering.
 
 ```markdown
 # User Profile
@@ -181,19 +181,19 @@ Persistent facts about the user. Update when you learn something new.
 ## Interests
 
 <!-- Areas the user explicitly wants Alva to keep watching or connect to future
-research. Keep a flexible flat list. An Interest is not a confirmed Thesis or
-intent to trade. -->
+research. Keep a flexible flat list. An Interest does not establish an investment
+view or intent to trade. -->
 
-## Investment Thesis
+## Investment Thoughts
 
-<!-- User-explicit or user-confirmed, falsifiable investment judgments. Scope,
-Horizon, Thesis, and Last confirmed are the core fields. Optional fields belong
-only when supported and useful; never invent missing details. -->
+<!-- User-expressed investment ideas worth remembering, including tentative or
+incomplete thoughts and open questions. Use brief prose or bullets, preserve
+uncertainty, and include context when useful; no fixed fields. -->
 
 ## Action Preferences
 
 <!-- User-explicit or user-confirmed investment action defaults and safety
-boundaries across investment theses. Do not store current positions, orders, or
+boundaries across investments. Do not store current positions, orders, or
 general communication preferences here. -->
 ```
 
@@ -210,7 +210,7 @@ without supporting original user statements.
 #### Interests
 
 Interests are user-stated areas Alva should keep watching or connect to future
-research, alerts, or strategy discussions. They do not imply a confirmed Thesis
+research, alerts, or strategy discussions. They do not imply an investment view
 or intent to trade. Keep entries flat and include only useful fields:
 
 ```markdown
@@ -224,49 +224,38 @@ Types and fields are flexible. Topics, assets, people, news sites, X accounts,
 podcasts, newsletters, and company IR pages are all valid when the user states
 the interest. A single query does not create an Interest.
 
-#### Investment Thesis
+#### Investment Thoughts
 
-An Investment Thesis is a user-stated or user-confirmed judgment that later
-evidence can support or disprove. Its title should state the conclusion.
-
-In `user.md`, this records the user's investment thinking for later conversation.
-Preserve the user's uncertainty and qualifications. Saving or revising this
-memory does not create, publish or modify a product Thesis; those operations
-require the user's corresponding request and the workflow in [thesis.md](thesis.md).
-
-- `Scope` — the asset, theme, sector, macro regime, or cross-asset relationship.
-- `Horizon` — the expected life of this judgment, not the user's general holding
-  period.
-- `Thesis` — the concise, falsifiable judgment.
-- `Last confirmed` — the latest user-confirmed date and, when available, channel.
+Remember important user-expressed investment ideas, including incomplete thoughts,
+open questions, doubts and settled views. Use brief prose or bullets, preserving
+reasoning, uncertainty and useful dates, assets or conditions. No fixed fields,
+trading direction or extra confirmation are required for a clear user statement.
+A quoted view or request to analyze it does not establish user agreement.
 
 ```markdown
-### US rates · Higher for longer
-- Scope: US rates and long-duration growth equities
-- Horizon: 3-9 months
-- Thesis: Sticky services inflation can keep real yields elevated and limit valuation expansion.
-- Last confirmed: 2026-07-10 · Macro Channel
-- Key drivers: Services inflation; labor demand; term premium.
-- Invalidation: Inflation and labor data weaken enough to support sustained rate cuts.
-- Expression: Prefer quality and shorter-duration exposure; remain cautious on long duration.
+- The user suspects AI drug discovery may benefit lab tools and data providers,
+  but has not decided which companies would benefit most.
+- The user remains interested in the company's growth, but wants to understand
+  whether orders turn into cash after capital expenditure before taking a view.
 ```
 
-`Scope`, `Horizon`, `Thesis`, and `Last confirmed` are the core shape, not a
-validation gate. Update `Last confirmed` whenever the user confirms or revises
-the Thesis; omit the channel when unavailable. If the user did not give a
-Horizon, do not infer one or add a placeholder. Ask only when the missing
-Horizon materially affects the current action.
+Memory does not create, publish or modify a product Thesis. For its current body
+and state, follow [thesis.md](thesis.md); memory may keep personal context and known
+Thesis references, not full copies. Discussion alone is not an update request.
 
-`Stance`, `Key drivers`, `Catalysts`, `Invalidation`, and `Expression` are
-optional; include them only when supported and useful. Dream may append
-`Needs review` when the Thesis has a freshness risk. Keep one-off event
-judgments in Channel Memory or Journal, and concrete strategy parameters in the
-relevant Playbook or Automation domain state.
+Treat legacy `Investment Thesis` sections as Investment Thoughts. During normal
+maintenance of that section, rename it or merge both headings under
+`Investment Thoughts`, preserving distinct user content and replacing obsolete
+template instructions. Keep old fields readable; simplify only entries being
+maintained, preserving meaningful dates, conditions and unresolved doubts,
+including those recorded in old status fields. Do not bulk-rewrite memory or
+request confirmation merely because a date has passed. Preserve historical
+context and follow later user corrections.
 
 #### Action Preferences
 
 Action Preferences are user-stated or user-confirmed investment action defaults
-and safety boundaries that apply across investment theses. They are not current
+and safety boundaries that apply across investments. They are not current
 positions, orders, or general communication preferences:
 
 ```markdown
@@ -275,8 +264,8 @@ positions, orders, or general communication preferences:
 - Live execution: All assets · Confirm before placing, changing, or cancelling an order.
 ```
 
-`Expression` describes how one Thesis may be expressed. A rule that applies
-across investment theses belongs in Action Preferences.
+Action defaults that apply across investments belong in Action Preferences;
+a tentative idea about one investment can stay with that thought.
 
 ## Additional topic files
 
