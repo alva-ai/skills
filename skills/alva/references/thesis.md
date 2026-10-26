@@ -364,8 +364,10 @@ authorize publication, body rewriting, or unrelated visibility changes.
 
 ### Archive and restore
 
-    alva thesis archive --id '<thesis ID>' --request-id '<uuid>' [--note '<note>']
-    alva thesis restore --id '<thesis ID>' --request-id '<uuid>' [--note '<note>']
+```sh
+alva thesis archive --id '<thesis ID>' --request-id '<uuid>' [--note '<note>']
+alva thesis restore --id '<thesis ID>' --request-id '<uuid>' [--note '<note>']
+```
 
 The CLI reads the current Thesis first, then preserves its exact body, title,
 entity IDs, directions, and visibility while publishing the archive transition
@@ -379,8 +381,10 @@ unless the author had separately paused research.
 
 ### Bookmarks
 
-    alva thesis star --id '<thesis ID>'
-    alva thesis unstar --id '<thesis ID>'
+```sh
+alva thesis star --id '<thesis ID>'
+alva thesis unstar --id '<thesis ID>'
+```
 
 These calls change only the signed-in viewer's bookmark. Report the returned
 is_starred state and star_count; do not describe a bookmark as author
@@ -388,8 +392,10 @@ ownership, a Thesis update, or a Signal subscription.
 
 ### Signal research switch
 
-    alva thesis set-signal-enabled --id '<thesis ID>' --enabled true
-    alva thesis set-signal-enabled --id '<thesis ID>' --enabled false
+```sh
+alva thesis set-signal-enabled --id '<thesis ID>' --enabled true
+alva thesis set-signal-enabled --id '<thesis ID>' --enabled false
+```
 
 This toggles the platform-managed Signal research for the Thesis without
 deleting Signal history. Verify and report the returned enabled,
