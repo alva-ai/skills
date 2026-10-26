@@ -357,51 +357,11 @@ that exact candidate. Report rewrite errors without retry or fallback.
   is only a closing note.
 - `delete --id`: withdraw only on explicit request.
 
-## Archive, bookmarks, and Signal research
+## Thesis maintenance controls
 
-These are explicit maintenance actions on an existing Thesis. They do not
-authorize publication, body rewriting, or unrelated visibility changes.
-
-### Archive and restore
-
-```sh
-alva thesis archive --id '<thesis ID>' --request-id '<uuid>' [--note '<note>']
-alva thesis restore --id '<thesis ID>' --request-id '<uuid>' [--note '<note>']
-```
-
-The CLI reads the current Thesis first, then preserves its exact body, title,
-entity IDs, directions, and visibility while publishing the archive transition
-against the returned author_version_id. The request ID belongs to that exact
-payload. If the read and write encounter a version conflict, report it and ask
-the author to review the latest Thesis; never replace only the expected version
-ID and resend stale content. Archive and restore are state changes, so verify
-the returned archived value. Archive pauses platform Thesis research and
-removes the Thesis from active discovery; restore resumes platform tracking
-unless the author had separately paused research.
-
-### Bookmarks
-
-```sh
-alva thesis star --id '<thesis ID>'
-alva thesis unstar --id '<thesis ID>'
-```
-
-These calls change only the signed-in viewer's bookmark. Report the returned
-is_starred state and star_count; do not describe a bookmark as author
-ownership, a Thesis update, or a Signal subscription.
-
-### Signal research switch
-
-```sh
-alva thesis set-signal-enabled --id '<thesis ID>' --enabled true
-alva thesis set-signal-enabled --id '<thesis ID>' --enabled false
-```
-
-This toggles the platform-managed Signal research for the Thesis without
-deleting Signal history. Verify and report the returned enabled,
-research_paused, archived, and author_version_id values. Archived or
-closed Theses may remain paused or unavailable according to the server state;
-do not promise future research from the command alone.
+For explicit archive/restore, bookmark, or managed Signal research changes, use
+the corresponding Thesis CLI command and report its returned state. Read
+alva thesis --help for detailed concurrency, idempotency, and error rules.
 
 Report version conflicts instead of silently rereading and overwriting. Do not
 use `--editorial` to bypass a material or version conflict.
