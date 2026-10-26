@@ -2097,7 +2097,7 @@
             "Do not bulk-rewrite memory"
           ],
           "excludes": [
-            "## Investment Thesis\n",
+            "## Investment Thesis",
             "core fields",
             "core shape",
             "Dream may append"

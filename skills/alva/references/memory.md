@@ -253,8 +253,9 @@ Legacy `Investment Thesis` sections mean Investment Thoughts, not product
 objects. When normal maintenance touches that section, use `Investment Thoughts`
 and merge overlapping entries if both headings exist, preserving distinct
 information. Replace obsolete template instructions in that section with this
-guidance, preserving user-authored content. Keep existing fields readable; simplify an entry only when working
-on it, preserving meaningful dates, conditions and unresolved doubts, including
+guidance, preserving user-authored content. Keep existing fields readable;
+simplify an entry only when working on it,
+preserving meaningful dates, conditions and unresolved doubts, including
 those expressed by an old status. Do not bulk-rewrite memory or turn an elapsed
 date alone into a confirmation request. Keep time-sensitive thoughts in their
 historical context and follow the user's later corrections.
