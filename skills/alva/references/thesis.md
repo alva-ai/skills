@@ -348,8 +348,9 @@ that the update replaces the whole body of the selected Thesis. Wait for the
 author to select that version. If the author
 has already seen and selected that exact version, proceed without asking again;
 refer clearly to exact text supplied by the author instead of repeating it.
-For text edits, carry the current `medias` unchanged with `--medias` and verify
-media readback along with directions. If the tool lacks this flag, stop rather
+For text edits, pass `--medias` unchanged only when the current Thesis has media;
+otherwise omit the flag. Verify
+media readback along with directions. If media must be preserved and the tool lacks this flag, stop rather
 than dropping media. Adding or replacing uploaded images on an existing Thesis
 is outside this flow; explain the limitation instead of inserting image links
 into the body.
