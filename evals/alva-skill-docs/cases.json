@@ -2117,6 +2117,34 @@
         "For a Thesis, name the core claim",
         "Old references to the deleted Update become unavailable"
       ]
+    },
+    {
+      "id": "target.investment-thoughts-memory",
+      "group": "target",
+      "target": "corpus",
+      "description": "Investment thoughts stay flexible and separate from product Theses, with gradual, lossless legacy cleanup.",
+      "file_includes": [
+        {
+          "file": "references/memory.md",
+          "includes": [
+            "## Investment Thoughts",
+            "incomplete thoughts",
+            "No fixed fields",
+            "does not establish user agreement",
+            "does not create, publish or modify a product Thesis",
+            "legacy `Investment Thesis`",
+            "normal maintenance",
+            "dates, conditions and unresolved doubts",
+            "Do not bulk-rewrite memory"
+          ],
+          "excludes": [
+            "## Investment Thesis",
+            "core fields",
+            "core shape",
+            "Dream may append"
+          ]
+        }
+      ]
     }
   ]
 }
