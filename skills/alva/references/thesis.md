@@ -391,12 +391,9 @@ clear in ordinary language. An explicit request naming that scope is sufficient.
 
 - Whole Thesis: `alva thesis delete --id '<thesis-id>'` withdraws the resource
   and stops its research. Do not use it to remove one Update.
-- One Update: read the current Thesis, and use `alva thesis version list --id
-  '<thesis-id>' --first 10` when the selected Update is not already identified.
+- One Update: read the current Thesis, and use `alva thesis version list --id '<thesis-id>' --first 10` when the selected Update is not already identified.
   Follow `next_cursor` only as needed. This lists reader-visible Updates,
-  folding editorial revisions together. Run `alva thesis version delete --id
-  '<thesis-id>' --author-version-id '<selected-version>'
-  --expected-author-version-id '<current-version>'`.
+  folding editorial revisions together. Run `alva thesis version delete --id '<thesis-id>' --author-version-id '<selected-version>' --expected-author-version-id '<current-version>'`.
 
 Removing the latest Update restores the previous surviving version, including
 its images and asset directions; removing an older Update leaves current content
