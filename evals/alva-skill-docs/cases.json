@@ -1463,8 +1463,9 @@
             "a rough view, or only a topic",
             "Ask at most one blocking question",
             "Do not turn Thesis creation into a questionnaire",
-            "Present one short plan",
-            "core claim, scope/tickers, horizon",
+            "Let the candidate's length follow the substance of the author's view",
+            "A separate drafting plan is unnecessary unless the user asks for one",
+            "the body need not reproduce the research",
             "complete the Financial Analysis evidence route",
             "Never invent evidence, numbers, citations, entities, or causal claims",
             "open-ended create request permits drafting a candidate",
@@ -2075,6 +2076,46 @@
             "In the preview and accompanying explanation, state the author's direction without describing internal storage or field writes"
           ]
         }
+      ]
+    },
+    {
+      "id": "target.thesis-update-delete-media",
+      "group": "target",
+      "target": "corpus",
+      "description": "Agent-written updates are previewed, text updates keep media, deletion scopes stay distinct, retained Signals are described truthfully, and only non-Thesis routes plan first.",
+      "file_includes": [
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "Show newly drafted, translated, or rewritten updates before publishing",
+            "the update replaces the whole body of the selected Thesis",
+            "If the author has already seen and selected that exact version, proceed without asking again",
+            "carry the current `medias` unchanged with `--medias`",
+            "If the tool lacks this flag, stop rather than dropping media",
+            "explain the limitation instead of inserting image links into the body",
+            "Undoing a wording edit is not deletion of the whole Update",
+            "Do not use it to remove one Update",
+            "folding editorial revisions together",
+            "existing Signals still show that historical viewpoint",
+            "do not escalate to whole-Thesis deletion without that request",
+            "never a reason to substitute whole deletion or rewrite the body to imitate deletion",
+            "Private image publication is not supported by this path",
+            "keep the draft and resolve that failure before publishing rather than omitting it",
+            "compare `thesis.medias` with the submitted images"
+          ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "includes": [
+            "For Thesis drafting, follow [Guided creation](thesis.md#guided-creation)",
+            "For non-Thesis requests, if the request is clear or a `/use-skill:` directive pins the shape",
+            "For non-Thesis requests, if the user says \"just do it\", proceed after the short plan"
+          ]
+        }
+      ],
+      "excludes": [
+        "For a Thesis, name the core claim",
+        "Old references to the deleted Update become unavailable"
       ]
     }
   ]
