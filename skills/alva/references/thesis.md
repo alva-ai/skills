@@ -136,13 +136,15 @@ Otherwise, guide the request to one candidate before confirmation:
    changes the viewpoint: usually the core stance, scope/tickers, or horizon.
    Do not turn Thesis creation into a questionnaire. If the request already
    supplies enough direction, or the user says to just do it, do not ask.
-2. Present one short plan covering the core claim, scope/tickers, horizon,
-   supporting reasons or evidence, and main risks or invalidation. Use public
-   visibility as the stated default unless the user requested private.
+2. Let the candidate's length follow the substance of the author's view: one
+   sentence can be enough, and a detailed argument may need more. Center it on
+   the author's view and the reasons that carry it; add a horizon, risks, or
+   invalidation only when they matter to this view. A separate drafting plan
+   is unnecessary unless the user asks for one.
 3. When the candidate depends on current facts or the user requests a
    research-backed Thesis, complete the Financial Analysis evidence route in
-   [request-routing.md](request-routing.md) first. Bring verified support into
-   the body where it strengthens the author's case, and report contrary
+   [request-routing.md](request-routing.md) first. Use only the verified evidence
+   the view needs; the body need not reproduce the research. Report contrary
    evidence, unverified premises, and material missing evidence in Notes.
    Never invent evidence, numbers, citations, entities, or causal claims.
 4. Draft one candidate that carries the author's claims as described in
@@ -341,6 +343,18 @@ that exact candidate. Report rewrite errors without retry or fallback.
 
 ## Existing Thesis lifecycle
 
+Show newly drafted, translated, or rewritten updates before publishing, and say
+that the update replaces the whole body of the selected Thesis. Wait for the
+author to select that version. If the author
+has already seen and selected that exact version, proceed without asking again;
+refer clearly to exact text supplied by the author instead of repeating it.
+For text edits, pass `--medias` unchanged only when the current Thesis has media;
+otherwise omit the flag. Verify
+media readback along with directions. If media must be preserved and the tool lacks this flag, stop rather
+than dropping media. Adding or replacing uploaded images on an existing Thesis
+is outside this flow; explain the limitation instead of inserting image links
+into the body.
+
 - `get --id`: read the current document and version.
 - `set-visibility --id <id> --visibility public` (or `private`): change
   current access without publishing a new author version.
@@ -365,6 +379,33 @@ alva thesis --help for detailed concurrency, idempotency, and error rules.
 
 Report version conflicts instead of silently rereading and overwriting. Do not
 use `--editorial` to bypass a material or version conflict.
+
+## Deleting a Thesis or one Update
+
+Distinguish abandoning an unpublished draft, deleting the whole Thesis, and
+removing one published Update. Cancel a draft in conversation without a delete
+call. Undoing a wording edit is not deletion of the whole Update; clarify an
+ambiguous request and use the normal update preview for a restored draft.
+Resolve the target from the current conversation or quoted IDs; ask only
+when the target or scope is unclear. Before executing, make the selected scope
+clear in ordinary language. An explicit request naming that scope is sufficient.
+
+- Whole Thesis: `alva thesis delete --id '<thesis-id>'` withdraws the resource
+  and stops its research. Do not use it to remove one Update.
+- One Update: read the current Thesis, and use `alva thesis version list --id '<thesis-id>' --first 10` when the selected Update is not already identified.
+  Follow `next_cursor` only as needed. This lists reader-visible Updates,
+  folding editorial revisions together. Run `alva thesis version delete --id '<thesis-id>' --author-version-id '<selected-version>' --expected-author-version-id '<current-version>'`.
+
+Removing the latest Update restores the previous surviving version, including
+its images and asset directions; removing an older Update leaves current content
+unchanged. Its editorial revisions are withdrawn; historical Signals retain
+their original version links and the viewpoint snapshot they analyzed. Direct
+reads of the deleted Update are unavailable; existing Signals still show that
+historical viewpoint. The final remaining version cannot be
+deleted this way; do not escalate to whole-Thesis deletion without that request.
+Use the returned current Thesis to report what remains. A version conflict or
+unavailable command is a limitation to resolve, never a reason to substitute
+whole deletion or rewrite the body to imitate deletion.
 
 ## Evidence and retries
 
@@ -429,3 +470,37 @@ only when more evidence is needed. Partial pages, pending research and read erro
 do not prove evidence is absent; source publication time does not establish when
 the Signal was known. If access is denied or the CLI is unavailable, say so; do
 not fall back to direct HTTP, GraphQL, or another user's private session.
+
+## Images in a new public Thesis
+
+Keep the chat composer's existing attachment limit. The author may send images
+across several messages; collect the selected file references in their chosen
+order, up to 20 images per Thesis. Reuse those references rather than asking for
+another upload. Wait when the author says more images are coming; do not include
+unrelated conversation attachments. If more than 20 are selected, ask which to keep.
+
+Include the selected images and their order in the existing publication preview
+(clear references to images already shown are sufficient). The same confirmation
+covers the body and images; changed selections need a new preview. Before any
+public upload, check that the author confirmed public visibility. Private image
+publication is not supported by this path: do not upload private attachments to
+the public CDN or change visibility to make it work.
+
+Check `thesis create --help` supports `--images` before uploading.
+After confirmation, use the host's existing file-upload tool (Sandbox: UploadFile)
+to obtain durable HTTPS image URLs. If needed, copy the selected ALFS files into
+the session workspace first. Respect the upload tool's size and format limits;
+use available image preparation only when it preserves the meaningful content,
+otherwise explain which file needs adjustment. If the host lacks an upload tool,
+report that limitation. Never substitute local paths, temporary viewer links, or
+invented URLs. Reuse successful uploads on retry; if any selected image fails,
+keep the draft and resolve that failure before publishing rather than omitting it.
+
+Pass all selected URLs together, in order, with the existing create payload:
+`alva thesis create --request-id '<uuid>' --body '<confirmed body>' --visibility public --images '["https://.../first.png","https://.../second.png"]'`.
+The exact image list is part of the confirmed payload and request-ID identity.
+Read back with `thesis get` and compare `thesis.medias` with the submitted images
+before claiming that all images were published. If the field is absent or differs,
+report the created Thesis and the verification gap; do not create another one.
+The existing completion card contract is unchanged; images belong to the Thesis's
+media collection, not Markdown image tags inserted into the confirmed body.

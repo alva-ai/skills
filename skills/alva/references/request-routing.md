@@ -281,8 +281,8 @@ without structured data downgrades source/data coverage; social/KOL without
 denoising downgrades source quality; missing key KPIs with strong conclusion
 requires confidence downgrade or a hard cap.
 
-For build routes, and for a Thesis request that does not yet contain the final
-body, present a plan once before building or drafting.
+For Thesis drafting, follow [Guided creation](thesis.md#guided-creation).
+For build routes, present a plan once before building.
 
 Ask at most one material requirements question at a time; required authorization
 and trading confirmations still apply:
@@ -291,13 +291,12 @@ and trading confirmations still apply:
    clarifying question. Prefer concrete choices.
 2. If real strategic alternatives exist, offer 2-3 approaches and lead with
    your recommendation.
-3. If the request is clear, or a `/use-skill:` directive pins the shape, give a
+3. For non-Thesis requests, if the request is clear or a `/use-skill:` directive pins the shape, give a
    brief plan naming the intended artifact, proportional to the task. For
    analysis, name sources and comparison baselines. For playbooks, name feeds, widgets, release path, and
-   defaults. For a Thesis, name the core claim, scope/tickers, horizon, evidence
-   path, main risks or invalidation, and default visibility.
+   defaults.
 
-If the user says "just do it", proceed after the short plan with reasonable
+For non-Thesis requests, if the user says "just do it", proceed after the short plan with reasonable
 defaults. Ask again only if a new unresolved material choice or required
 authorization prevents completing the requested result.
 

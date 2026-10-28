@@ -187,7 +187,7 @@
             "label": "guided drafting",
             "includes": [
               "Ask at most one blocking question",
-              "Present one short plan",
+              "Let the candidate's length follow the substance of the author's view",
               "complete the Financial Analysis evidence route",
               "open-ended create request permits drafting a candidate",
               "it does not permit publication",
@@ -197,12 +197,9 @@
           {
             "file": "references/request-routing.md",
             "heading": "Guided Planning",
-            "label": "Thesis plan",
+            "label": "Thesis drafting route",
             "includes": [
-              "a Thesis request that does not yet contain the final body",
-              "core claim, scope/tickers, horizon",
-              "main risks or invalidation",
-              "default visibility"
+              "For Thesis drafting, follow [Guided creation](thesis.md#guided-creation)"
             ]
           }
         ]
