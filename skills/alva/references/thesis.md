@@ -475,6 +475,12 @@ an ID or use another user's private context; ask when the target is ambiguous.
 Read `alva thesis get --id '<id>'` for its current claims and
 `alva thesis signals --id '<id>' --first 20` for evidence and research status.
 A selected author version instead follows [Quoted Thesis context](#quoted-thesis-context).
+An active Thesis can collect dozens of Signals a day, so one page may cover
+only hours. For a status question, page with `--first 50` and `next_cursor`
+across the period it implies (since the last check or current version, else
+about a week), within a few pages. Weigh supporting, refuting and mixed
+Signals together, lead with what changed and the strongest evidence against the
+claims, and say how many Signals over what period you read.
 
 Compare the evidence with the author's actual claims. Signals are research
 outputs, not conclusions to adopt: use their explanation, source and excerpts,
