@@ -69,7 +69,7 @@ operating requirements; this index is for navigation.
 | `alert` / `subscriptions` | Manage FEED alerts / Playbook follows |
 | `playbooks` / `remix` / `release` | Discover, remix, and publish Playbooks |
 | `lint playbook` / `screenshot` | Validate and inspect Playbook delivery |
-| `portfolio` | Connected accounts, live holdings, balances, and account activity |
+| `portfolio` / `x` | Connected brokerage holdings and activity / the user's connected X following and posts ([Twitter/X](references/search.md#twitterx)) |
 | `trading` / `broker` | Portfolio and trading operations / venue order execution |
 | `functions` / `secrets` | Interactive UDFs / managed credentials |
 | `credits` / `feedback` | Credit usage / user-confirmed platform feedback |

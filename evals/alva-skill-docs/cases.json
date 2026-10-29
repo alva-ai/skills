@@ -2240,6 +2240,35 @@
       ]
     },
     {
+      "id": "target.connected-x-account-reads",
+      "group": "target",
+      "target": "corpus",
+      "description": "The user's connected X following and own posts are read through `alva x` with paging, and its limits (no profile, bookmarks or post type) are stated.",
+      "file_includes": [
+        {
+          "file": "SKILL.md",
+          "includes": [
+            "| `portfolio` / `x` |",
+            "the user's connected X following and posts"
+          ]
+        },
+        {
+          "file": "references/search.md",
+          "includes": [
+            "The user's own connected X account.",
+            "`alva x following` or `alva x posts`",
+            "continue with `--cursor <pageInfo.endCursor>`",
+            "do not call a list complete before paging",
+            "mixing the user's replies, reposts (`RT @…`) and",
+            "quotes without a type label",
+            "Neither returns their profile, bio, follower",
+            "ask the user to reconnect X in Alva",
+            "Keep these personal reads out of group channels"
+          ]
+        }
+      ]
+    },
+    {
       "id": "target.investment-thoughts-memory",
       "group": "target",
       "target": "corpus",

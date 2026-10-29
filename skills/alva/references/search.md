@@ -182,11 +182,24 @@ catalog (`alva data-skills summary`, then the endpoint doc for the File it
 lists), and call through [Data Skills](data-skills.md#calling-arrays). Reuse
 documentation already read; never call an endpoint the catalog does not list.
 
+**The user's own connected X account.** For who they follow or what they
+posted, use `alva x following` or `alva x posts`. Each call reads one live page
+(`--limit 5-100`, default 20); continue with `--cursor <pageInfo.endCursor>`
+while `hasNextPage` is true, and do not call a list complete before paging
+ends. Following returns `id`, `username` and `name`. Posts return `id`, `text`,
+`authorId` and `createdAt`, mixing the user's replies, reposts (`RT @…`) and
+quotes without a type label. Neither returns their profile, bio, follower
+count or bookmarks; for an account's stored profile, use the catalog's
+`entities/handle` lookup when the handle is known. If the read reports missing
+credentials or scope, ask the user to reconnect X in Alva. To see what the
+accounts they follow are saying, read those handles through the routes below.
+Keep these personal reads out of group channels.
+
 1. **Post-content or topic search:** when the catalog lists a live-search
    endpoint, use it per its current contract. Fetch one page first; follow its
    cursor only when more evidence is needed.
 2. **Known account or post:** use the catalog's `by-handle` timeline or
-   `by-url` lookup; stored history of tracked accounts or update polling uses
+   `by-url` lookup ([recipe 10](data-skills.md#10-x-post-by-url)); stored history of tracked accounts or update polling uses
    its indexed search. Keep these lookups read-only; do not start paid handle
    tracking just to fill a search gap.
 3. **Otherwise, general search:** the exposed native search tool, or Serper/Brave
