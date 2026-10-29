@@ -13,11 +13,11 @@ not execute every source by default, and do not turn a direct analysis into a
 feed, Automation, or Playbook unless the user asks for a durable artifact.
 
 For "today", "just now", or "the selloff", read the time in the user's own
-timezone (from memory or context) and pick the market session that just closed
-or is trading for the assets they follow; an investor in Asia asking in the
-afternoon likely means the local session, and the same question after the US
-close likely means Wall Street. When two readings fit, answer the likelier one
-and name it in half a sentence instead of answering one market and asking.
+timezone (from memory or context). For a named market or asset, use its
+session that is trading or last closed; otherwise infer the market from the
+assets they follow and their local time. When two readings fit, answer the
+likelier one and name it in half a sentence instead of answering one market
+and asking.
 
 ## Source Router
 
@@ -71,8 +71,8 @@ otherwise follow these steps:
    `alva/what-investors-are-looking-for`; verify that alias with `get` and do not
    infer other aliases.
 4. For an alias or a method without `SKILL.md`, read the listed instruction
-   file with `alva skillhub file <resolved-id> <file>`. Do not guess a stale local path or
-   bulk-download unrelated files. Pull bundled scripts only when the selected
+   file with `alva skillhub file <resolved-id> <file>`. Do not guess a stale
+   local path or bulk-download unrelated files. Pull bundled scripts only when the selected
    build method requires them.
 5. Follow the fresh method contract for paths, fields, coverage, and execution.
 

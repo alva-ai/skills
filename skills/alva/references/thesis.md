@@ -523,8 +523,8 @@ not fall back to direct HTTP, GraphQL, or another user's private session.
 ## Images in a new public Thesis
 
 The author may send images across several messages; collect the selected file
-references in their chosen order, up to 20 images per Thesis. Reuse those references rather than asking for
-another upload. Wait when the author says more images are coming; do not include
+references in their chosen order, up to 20 images per Thesis. Reuse those
+references rather than asking for another upload. Wait when the author says more images are coming; do not include
 unrelated conversation attachments. If more than 20 are selected, ask which to keep.
 
 Include the selected images and their order in the existing publication preview

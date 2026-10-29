@@ -199,8 +199,8 @@ Keep these personal reads out of group channels.
    endpoint, use it per its current contract. Fetch one page first; follow its
    cursor only when more evidence is needed.
 2. **Known account or post:** use the catalog's `by-handle` timeline or
-   `by-url` lookup ([recipe 10](data-skills.md#10-x-post-by-url)); stored history of tracked accounts or update polling uses
-   its indexed search. Keep these lookups read-only; do not start paid handle
+   `by-url` lookup ([recipe 10](data-skills.md#10-x-post-by-url)); stored
+   history of tracked accounts or update polling uses its indexed search. Keep these lookups read-only; do not start paid handle
    tracking just to fill a search gap.
 3. **Otherwise, general search:** the exposed native search tool, or Serper/Brave
    with `site:x.com OR site:twitter.com` when that tool is unavailable or in a

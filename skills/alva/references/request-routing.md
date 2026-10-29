@@ -64,8 +64,9 @@ sources for key facts, including qualitative claims; explain timing, gaps, and
 uncertainty where they affect the judgment. State each material limitation once,
 where it matters, rather than adding a caveat to every paragraph. Choose the
 presentation to fit the question; use a table when it helps the user compare.
-Simple latest-fact asks can finish after one sourced hop. Use the Complex Ask Router for judgments
-that need it, applying the gates relevant to the conclusion being made.
+Simple latest-fact asks can finish after one sourced hop. Use the Complex Ask
+Router for judgments that need it, applying the gates relevant to the
+conclusion being made.
 
 Do not present a partial lookup as a completed comparison, valuation,
 ranking, or causal explanation. Stop when the user's question is adequately

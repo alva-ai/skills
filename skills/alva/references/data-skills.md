@@ -54,8 +54,8 @@ If a call returns 401, rerun `alva arrays token ensure`. Do not use
 
 ## Common recipes
 
-Contracts checked 2026-10-21; recipes 7–10 on 2026-10-29. Use these for read-only retrieval; return the
-result from the async function. New transformations, feeds and persistent scripts
+Contracts checked 2026-10-21; recipes 7–10 on 2026-10-29. Use these for
+read-only retrieval; return the result from the async function. New transformations, feeds and persistent scripts
 still use the runtime and relevant pitfalls documentation. On a contract error
 or unexpected response, refresh the named endpoint or SDK doc before adapting;
 an empty result is not proof of absence. Preserve the fallback rules below.
@@ -110,10 +110,11 @@ adds a seven-day window ending at runtime, avoiding hand-calculated timestamps:
 ```
 
 Use this flag only with the current-price path above, without explicit time
-bounds. For other windowed endpoints, `"recent_days": N` adds the same kind of
-window ending at runtime; omit it when the path already sets times. Seven days covers ordinary weekends and holidays, not every suspension
+bounds. Seven days covers ordinary weekends and holidays, not every suspension
 or extended closure. Report the returned intraday bar's timestamp/session; do
-not describe a stale bar as live or an empty result as a current quote.
+not describe a stale bar as live or an empty result as a current quote. For
+other windowed endpoints, `"recent_days": N` adds the same kind of window
+ending at runtime; omit it when the path already sets times.
 US windows must fully contain `[time_open, time_close]`. RTH intraday runs
 09:30–16:00 ET; ETH 04:00–20:00 ET. Account for daylight saving when converting
 dates. For the daily close on the same historical day, replace `--args` with:
