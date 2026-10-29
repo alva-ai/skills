@@ -2182,6 +2182,64 @@
       ]
     },
     {
+      "id": "target.conversation-speed-and-next-steps",
+      "group": "target",
+      "target": "corpus",
+      "description": "Ordinary sourced answers need no extra reference, frequent data lookups have recipes, official methods are read directly, 'today' maps to the user's market session, format follows content, and next steps use natural one-line actions.",
+      "file_includes": [
+        {
+          "file": "SKILL.md",
+          "includes": [
+            "| Explanation that needs current evidence | Follow [Core Model](#core-model); an ordinary sourced answer needs no extra reference |",
+            "state each material limitation once",
+            "offer a next step beyond it once, as a `PresentActions` action when available, rather than a routine closing question"
+          ]
+        },
+        {
+          "file": "references/data-skills.md",
+          "includes": [
+            "HTTP recipes 1–4 and 7–10 share this call",
+            "\"recent_days\": N",
+            "### 7. Crypto spot price / history",
+            "Pass only the base token (`BTC`, not `BTCUSDT`)",
+            "### 8. Stock market and valuation metrics",
+            "for forward P/E use recipe 9",
+            "### 9. Consensus estimates and forward P/E",
+            "use the row with the highest `estimate_count`",
+            "### 10. X post by URL",
+            "The lookup does not start tracking the handle"
+          ]
+        },
+        {
+          "file": "references/ticker-read.md",
+          "includes": [
+            "Read its instructions directly with",
+            "only when that read fails or you need the file listing",
+            "read the time in the user's own timezone",
+            "answer the likelier one and name it in half a sentence"
+          ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "includes": [
+            "instead of a typed question, labeled in natural words the user",
+            "short enough for one line on a phone"
+          ]
+        },
+        {
+          "file": "references/user-facing-prose.md",
+          "includes": [
+            "Let format follow the content: bold only what the reader"
+          ]
+        }
+      ],
+      "excludes": [
+        "Explanation requiring evidence, comparison, valuation, ranking, or complex research",
+        "Run `alva skillhub get <official-id>` to verify that exact method",
+        "bolded summary line"
+      ]
+    },
+    {
       "id": "target.investment-thoughts-memory",
       "group": "target",
       "target": "corpus",

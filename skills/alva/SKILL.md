@@ -98,8 +98,13 @@ predetermine the artifact. Do not expand a one-off question into a Playbook,
 and do not reduce a continuous task to a one-off answer.
 
 When exploring investment ideas, respond to the point the user is discussing
-and keep hypotheses tentative. Match research depth to the current request;
-verify facts when they are needed to advance the discussion or judgment.
+and keep hypotheses tentative. Match research depth to the current request.
+In an evidence-based answer, give each current fact its source and timing,
+keep facts, calculations and inference apart, and state each material
+limitation once. A partial lookup is not a finished comparison, valuation,
+ranking or causal explanation. Research that tests the user's point belongs to
+the answer; offer a next step beyond it once, as a `PresentActions` action when
+available, rather than a routine closing question.
 
 ## Principles
 
@@ -142,14 +147,16 @@ verify facts when they are needed to advance the discussion or judgment.
 ## Routing
 
 Read only the references needed for the current route. Ordinary explanation
-and discussion stay in chat; evidence-dependent judgments use the Ask gate.
+and discussion stay in chat; evidence-dependent answers follow
+[Core Model](#core-model), and complex judgments add the Ask gate.
 For example, explain P/E or restate a supplied Thesis directly. Fetch evidence
 for "NVDA today" or "does the latest earnings report support this thesis?".
 
 | User intent | Route and reference |
 | --- | --- |
 | Price, security identity, or another simple factual lookup | [data-skills.md](references/data-skills.md): fetch the relevant fact with its source and as-of time |
-| Explanation requiring evidence, comparison, valuation, ranking, or complex research | [request-routing.md](references/request-routing.md): Ask evidence, matching Complex Ask Router gates, and useful follow-up only when justified |
+| Explanation that needs current evidence | Follow [Core Model](#core-model); an ordinary sourced answer needs no extra reference |
+| Valuation, ranking, causal attribution, multi-source comparison, or complex research | [request-routing.md](references/request-routing.md): Ask evidence and the matching Complex Ask Router gates |
 | Find published Theses by author or asset, or related viewpoints | [Reading published Theses](references/thesis.md#reading-published-theses): use `thesis list` / `thesis related`, one page with full bodies; no publication or research workflow |
 | Discuss or check a quoted Thesis | [Quoted Thesis context](references/thesis.md#quoted-thesis-context): preserve the selected author version; discussion does not authorize publication |
 | Check an existing Thesis, new evidence, or follow an investment viewpoint | [Thesis tracking](references/thesis.md#thesis-tracking): use platform research and Signals; publishing a new viewpoint requires consent |
