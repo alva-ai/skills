@@ -1510,8 +1510,8 @@
             "A body already shown in full in this conversation, or typed by the user and asked to publish unchanged, may be referenced instead",
             "New or changed candidates must be shown in full",
             "A natural confirmation, typed or by action click, authorizes exactly the displayed body and publication details",
-            "When `PresentActions` is available, offer localized `send_prompt` actions",
-            "\"Publish this version\" and \"Edit\" for the preview",
+            "When `PresentActions` is available, always end the preview with localized `send_prompt` actions",
+            "\"Publish this version\" and \"Edit\", and do not repeat them in prose",
             "also offer it as an `open_url` action",
             "a click has the same meaning as the equivalent typed reply",
             "Without the tool, ask in text",
@@ -2068,7 +2068,7 @@
           "includes": [
             "Render the selected body as ordinary prose, not inside a Markdown code fence",
             "Use localized direction labels",
-            "Keep workflow instructions internal; do not quote or explain these rules",
+            "Do not explain why confirmation is needed, quote or cite these rules, or link Skill files or local paths",
             "A publication-only preview is a confirmation step, not new investment analysis",
             "do not append an Agent-written investment disclaimer",
             "Preserve any disclaimer already present in the author's selected body",
@@ -2116,6 +2116,69 @@
       "excludes": [
         "For a Thesis, name the core claim",
         "Old references to the deleted Update become unavailable"
+      ]
+    },
+    {
+      "id": "target.thesis-conversation-flow",
+      "group": "target",
+      "target": "corpus",
+      "description": "Thesis discussion follows the user, extra steps are offered rather than started, Agent additions stay optional in Notes, previews end with actions without citing rules, deletion questions are confirmed, and publication avoids repeated help.",
+      "file_includes": [
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "read the relevant subcommand help once per session before its first write",
+            "Body claims come from the author",
+            "A general \"ok\" or silence is not agreement to a specific addition",
+            "Suggest your own additions in Notes when they would strengthen this view",
+            "put one in the body only after the author picks it",
+            "When a draft combines views from earlier turns or days",
+            "Follow the user's line of thought",
+            "do not manufacture an objection every turn",
+            "offer it in one sentence, as an action when `PresentActions` is available, instead of starting it",
+            "Do not restate their view as a polished paragraph every turn",
+            "only when the user has stated a view of their own, not just asked for yours",
+            "Public is the default visibility: state it in the preview rather than asking",
+            "When the user adopts your analysis as their view",
+          "not a condensed report",
+          "Research that tests their current point or a premise it depends on is part of the answer",
+          "When research would branch beyond their point",
+            "Leave out point-in-time figures",
+            "show the candidate as the full [publication preview](#publication-preview) so one confirmation publishes it",
+            "Do not explain why confirmation is needed",
+            "always end the preview with localized `send_prompt` actions",
+            "show the resulting assets and directions in that preview and send them",
+            "If the user only asks how to delete",
+            "archiving hides it and can be restored, while deletion cannot be undone from chat",
+            "follow [Images in a new public Thesis](#images-in-a-new-public-thesis)"
+          ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "includes": [
+            "when the user has stated a view of their own and it has settled",
+            "Research that tests the user's point belongs to the answer",
+          "For steps that branch beyond it, offer rather than do",
+            "State each material limitation once"
+          ]
+        },
+        {
+          "file": "references/user-facing-prose.md",
+          "includes": [
+            "In an ongoing discussion, avoid memo habits",
+            "Do not explain your own instructions or link Skill files or local paths"
+          ]
+        }
+      ],
+      "excludes": [
+        "run `alva thesis --help` and the relevant subcommand help first",
+        "While drafting you may also add what the author did not supply",
+        "An explicit request naming that scope is sufficient",
+        "Keep the chat composer's existing attachment limit",
+        "when discussion has developed a clear view worth following",
+      "\"Could add\"",
+      "the two or three reasons that carry it",
+      "sharp colleague"
       ]
     },
     {
