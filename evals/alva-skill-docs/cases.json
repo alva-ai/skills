@@ -2185,13 +2185,12 @@
       "id": "target.conversation-speed-and-next-steps",
       "group": "target",
       "target": "corpus",
-      "description": "Ordinary sourced answers need no extra reference, frequent data lookups have recipes, official methods are read directly, 'today' maps to the user's market session, format follows content, and next steps use natural one-line actions.",
+      "description": "Core Model restates the answering rules, frequent data lookups have recipes, official methods are read directly, 'today' maps to the user's market session, format follows content, and next steps use natural one-line actions.",
       "file_includes": [
         {
           "file": "SKILL.md",
           "includes": [
-            "| Explanation that needs current evidence | Follow [Core Model](#core-model); an ordinary sourced answer needs no extra reference |",
-            "state each material limitation once",
+              "state each material limitation once",
             "offer a next step beyond it once, as a `PresentActions` action when available, rather than a routine closing question"
           ]
         },
@@ -2234,8 +2233,7 @@
         }
       ],
       "excludes": [
-        "Explanation requiring evidence, comparison, valuation, ranking, or complex research",
-        "Run `alva skillhub get <official-id>` to verify that exact method",
+          "Run `alva skillhub get <official-id>` to verify that exact method",
         "bolded summary line"
       ]
     },

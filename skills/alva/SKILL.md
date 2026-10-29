@@ -147,16 +147,14 @@ available, rather than a routine closing question.
 ## Routing
 
 Read only the references needed for the current route. Ordinary explanation
-and discussion stay in chat; evidence-dependent answers follow
-[Core Model](#core-model), and complex judgments add the Ask gate.
+and discussion stay in chat; evidence-dependent judgments use the Ask gate.
 For example, explain P/E or restate a supplied Thesis directly. Fetch evidence
 for "NVDA today" or "does the latest earnings report support this thesis?".
 
 | User intent | Route and reference |
 | --- | --- |
 | Price, security identity, or another simple factual lookup | [data-skills.md](references/data-skills.md): fetch the relevant fact with its source and as-of time |
-| Explanation that needs current evidence | Follow [Core Model](#core-model); an ordinary sourced answer needs no extra reference |
-| Valuation, ranking, causal attribution, multi-source comparison, or complex research | [request-routing.md](references/request-routing.md): Ask evidence and the matching Complex Ask Router gates |
+| Explanation requiring evidence, comparison, valuation, ranking, or complex research | [request-routing.md](references/request-routing.md): Ask evidence, matching Complex Ask Router gates, and useful follow-up only when justified |
 | Find published Theses by author or asset, or related viewpoints | [Reading published Theses](references/thesis.md#reading-published-theses): use `thesis list` / `thesis related`, one page with full bodies; no publication or research workflow |
 | Discuss or check a quoted Thesis | [Quoted Thesis context](references/thesis.md#quoted-thesis-context): preserve the selected author version; discussion does not authorize publication |
 | Check an existing Thesis, new evidence, or follow an investment viewpoint | [Thesis tracking](references/thesis.md#thesis-tracking): use platform research and Signals; publishing a new viewpoint requires consent |
