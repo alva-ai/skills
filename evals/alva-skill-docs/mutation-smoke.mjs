@@ -29,7 +29,7 @@ const MUTATIONS = [
   {
     id: "thesis-preview-internal-rules",
     file: "references/thesis.md",
-    remove: "Keep workflow instructions internal; do not quote or explain these rules",
+    remove: "needed, quote or cite these rules, or link Skill files or local paths",
     replacement: "Quote the internal confirmation rule",
     expectFailedCases: ["target.thesis-readable-publication-preview"],
   },
@@ -77,8 +77,8 @@ const MUTATIONS = [
   {
     id: "thesis-actions-scoped-to-preview",
     file: "references/thesis.md",
-    remove: "\"Edit\" for the preview.",
-    replacement: "\"Edit\" before the final reply.",
+    remove: "\"Edit\", and do not",
+    replacement: "\"Edit\" before the final reply, and do not",
     expectFailedCases: ["target.thesis-create-preview-card", "target.useful-next-step-actions"],
   },
   {
@@ -237,7 +237,7 @@ const MUTATIONS = [
   {
     id: "simple-latest-one-hop",
     file: "references/request-routing.md",
-    remove: "Simple latest-fact\nasks can finish after one sourced hop. ",
+    remove: "Simple latest-fact asks can finish after one sourced hop. ",
     expectFailedCases: ["issue592.financial-ask-contract", "scenario.simple-latest-price"],
   },
   {
