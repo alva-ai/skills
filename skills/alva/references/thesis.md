@@ -10,7 +10,10 @@ consent. Active Theses, public or private, receive platform-managed research
 and Signals after submission. Do not create an Automation or Playbook to
 duplicate that tracking; a custom dashboard is a separate, explicit request.
 
-For that workflow, run `alva thesis --help` and the relevant subcommand help first.
+For that workflow, read the relevant subcommand help once per session before its
+first write, such as `alva thesis create --help`; reuse help already read and
+skip top-level help when the subcommand is known. Batch independent reads, such
+as identity lookups for several assets, in one tool invocation.
 Use only `alva thesis`; if unavailable, report it instead of falling back to HTML,
 Playbooks, Automation, direct service writes, or invented identities.
 
@@ -91,12 +94,21 @@ division: guided drafting, revision requests, `thesis rewrite`, and `update`.
   not a reason to edit the claim. A request to revise, polish, or tighten the
   text asks for editing, not for a different view.
 - Edit freely for expression: wording, order, structure, grammar, formatting,
-  and asset naming such as `1211 HK` to `BYD Company Limited (1211.HK)`. While
-  drafting you may also add what the author did not supply, such as a title, a
-  verified supporting fact, or an invalidation condition; label your own
-  inference as inference. When the author gave only a topic or a rough
-  direction, the claims you draft are proposals that become theirs when they
-  confirm.
+  and asset naming such as `1211 HK` to `BYD Company Limited (1211.HK)`. You
+  may propose a title.
+- Body claims come from the author: what they wrote, or what they explicitly
+  agreed to in this conversation. A general "ok" or silence is not agreement
+  to a specific addition. Suggest your own additions in Notes when they would
+  strengthen this view, such as an invalidation condition that would help
+  tracking, a horizon turned into a date, a qualifier, or a supporting fact;
+  put one in the body only after the author picks it, and label your own
+  inference as inference. Include supporting facts or source links in the
+  body when the author asks for them.
+  When the author gave only a topic or a rough direction, the claims you draft
+  are proposals that become theirs when they confirm.
+- When a draft combines views from earlier turns or days, say in one Notes line
+  what it brings in, such as "includes your Oct 25 view on an 18-month
+  shortage".
 - Tell the author the rest in Notes, directly after the body, whenever you
   show a candidate or a confirmation payload: evidence against a claim, an
   unverified premise a claim depends on, a substantive change you would
@@ -115,12 +127,26 @@ the author agrees.
 
 ## Thesis discussion
 
-Respond to the user's actual view and advance the discussion with the most
-relevant assumption, counterexample, or invalidation condition. Use supplied
-text directly; verify new current-fact claims as needed. Ask at most one question
-that materially changes the judgment, and do not repeat a full research report
-on each follow-up. Discussion alone does not authorize creating or modifying a
-Thesis. Memory writes follow [memory.md](memory.md).
+Follow the user's line of thought and respond to their specific point in a few
+conversational sentences. Step in when it matters: a premise that is factually
+wrong, or a missing condition that would change the conclusion. Otherwise build
+on their reasoning; do not manufacture an objection every turn or press one
+they have already answered. Research that tests their current point or a
+premise it depends on is part of the answer, in the foreground or as
+background work according to its size. When research would branch beyond
+their point, such as other tickers or an adjacent theme, offer it in one
+sentence, as an action when `PresentActions` is available, instead of
+starting it; if you are unsure whether they want it, ask. Use supplied text
+directly, ask at most one question that materially changes the judgment, and
+keep each follow-up from turning into a research report.
+
+Do not restate their view as a polished paragraph every turn. Show a version
+when they ask for one, or when the view has settled and they are heading toward
+publication. Offer to turn it into a Thesis only when the user has stated a
+view of their own, not just asked for yours, and it has settled: one
+low-pressure sentence with the version attached, once per view. Discussion
+alone does not authorize creating or modifying a Thesis. Memory writes follow
+[memory.md](memory.md).
 
 ## Guided creation
 
@@ -139,8 +165,14 @@ Otherwise, guide the request to one candidate before confirmation:
 2. Let the candidate's length follow the substance of the author's view: one
    sentence can be enough, and a detailed argument may need more. Center it on
    the author's view and the reasons that carry it; add a horizon, risks, or
-   invalidation only when they matter to this view. A separate drafting plan
-   is unnecessary unless the user asks for one.
+   invalidation only when the author supplied or picked them. A separate
+   drafting plan is unnecessary unless the user asks for one. Public is the
+   default visibility: state it in the preview rather than asking.
+   When the user adopts your analysis as their view, such as "publish this as
+   my view", write it as their viewpoint in their voice, not a condensed
+   report: what they believe and why, plus what they would watch when that
+   matters. Leave out point-in-time figures such as intraday moves or snapshot
+   levels unless the user asked for them or the view depends on them.
 3. When the candidate depends on current facts or the user requests a
    research-backed Thesis, complete the Financial Analysis evidence route in
    [request-routing.md](request-routing.md) first. Use only the verified evidence
@@ -156,9 +188,11 @@ Do not add Alva company-page links to candidate or published bodies. Preserve
 the author's links and legitimate supporting citations.
 
 Show the candidate with its Notes and let the user revise it naturally. When
-the user selects text to publish, follow Create below. A candidate already shown
-as a full [publication preview](#publication-preview) is confirmed by that
-explicit selection; it need not be confirmed again.
+the request already asks to publish, show the candidate as the full
+[publication preview](#publication-preview) so one confirmation publishes it.
+When the user selects text to publish, follow Create below. A candidate already
+shown as a full publication preview is confirmed by that explicit selection; it
+need not be confirmed again.
 
 ## Create
 
@@ -213,6 +247,8 @@ Present the preview in the user's language:
 - **Assets:** name each company or ticker and express its stance plainly,
   respecting explicit stances. Use localized direction labels, such as
   “SMH：看空” in Chinese; an unknown stance means “未表明方向”, not a guessed view.
+- **Images**, when selected: follow
+  [Images in a new public Thesis](#images-in-a-new-public-thesis).
 - **Notes**, when any.
 
 Render the selected body as ordinary prose, not inside a Markdown code fence
@@ -222,8 +258,10 @@ Keep internal IDs and API field names out of the preview; omit absent optional
 fields instead of listing blanks. Do not display CLI parameters or raw payloads.
 In the preview and accompanying explanation, state the author's direction
 without describing internal storage or field writes.
-Keep workflow instructions internal; do not quote or explain these rules in the
-preview. Ask naturally in the user's language, for example “按这个版本发布吗？”.
+Keep workflow instructions internal. Ask in one short sentence in the user's
+language, for example “按这个版本发布吗？”. Do not explain why confirmation is
+needed, quote or cite these rules, or link Skill files or local paths, even
+when the user already said to publish.
 
 A publication-only preview is a confirmation step, not new investment analysis:
 do not append an Agent-written investment disclaimer or extra English boilerplate.
@@ -244,8 +282,9 @@ when they change; a wording-only edit reuses unchanged verified IDs and does
 not require extraction.
 Stop if declined.
 
-When `PresentActions` is available, offer localized `send_prompt` actions such
-as "Publish this version" and "Edit" for the preview. Name the displayed
+When `PresentActions` is available, always end the preview with localized
+`send_prompt` actions such as "Publish this version" and "Edit", and do not
+repeat them in prose. Name the displayed
 candidate in the publish prompt so it is tied to that candidate and its
 settings; a click has the same meaning as the equivalent typed reply. Without
 the tool, ask in text.
@@ -344,8 +383,12 @@ that exact candidate. Report rewrite errors without retry or fallback.
 ## Existing Thesis lifecycle
 
 Show newly drafted, translated, or rewritten updates before publishing, and say
-that the update replaces the whole body of the selected Thesis. Wait for the
-author to select that version. If the author
+that the update replaces the whole body of the selected Thesis. When the revised
+view changes an asset's direction or adds or removes an asset, show the
+resulting assets and directions in that preview and send them; an edit that
+keeps the view carries the current directions. End the preview the same way as
+a creation preview, with actions when `PresentActions` is available. Wait for
+the author to select that version. If the author
 has already seen and selected that exact version, proceed without asking again;
 refer clearly to exact text supplied by the author instead of repeating it.
 For text edits, pass `--medias` unchanged only when the current Thesis has media;
@@ -369,7 +412,8 @@ into the body.
   them; never default an existing private Thesis to public.
 - `close`: require `--id` and `--expected-author-version-id`; `--note`
   is only a closing note.
-- `delete --id`: withdraw only on explicit request.
+- `delete --id`: withdraw only as described in
+  [Deleting a Thesis or one Update](#deleting-a-thesis-or-one-update).
 
 ## Thesis maintenance controls
 
@@ -388,7 +432,12 @@ call. Undoing a wording edit is not deletion of the whole Update; clarify an
 ambiguous request and use the normal update preview for a restored draft.
 Resolve the target from the current conversation or quoted IDs; ask only
 when the target or scope is unclear. Before executing, make the selected scope
-clear in ordinary language. An explicit request naming that scope is sufficient.
+clear in ordinary language. A direct instruction naming the target and scope,
+such as "delete that Thesis", is sufficient. If the user only asks how to
+delete, or the target is not the one just discussed, first confirm the target
+and scope in one sentence, as an action when `PresentActions` is available.
+For a whole Thesis, mention that archiving hides it and can be restored, while
+deletion cannot be undone from chat.
 
 - Whole Thesis: `alva thesis delete --id '<thesis-id>'` withdraws the resource
   and stops its research. Do not use it to remove one Update.
@@ -426,6 +475,12 @@ an ID or use another user's private context; ask when the target is ambiguous.
 Read `alva thesis get --id '<id>'` for its current claims and
 `alva thesis signals --id '<id>' --first 20` for evidence and research status.
 A selected author version instead follows [Quoted Thesis context](#quoted-thesis-context).
+An active Thesis can collect dozens of Signals a day, so one page may cover
+only hours. For a status question, page with `--first 50` and `next_cursor`
+across the period it implies (since the last check or current version, else
+about a week), within a few pages. Weigh supporting, refuting and mixed
+Signals together, lead with what changed and the strongest evidence against the
+claims, and say how many Signals over what period you read.
 
 Compare the evidence with the author's actual claims. Signals are research
 outputs, not conclusions to adopt: use their explanation, source and excerpts,
@@ -473,10 +528,9 @@ not fall back to direct HTTP, GraphQL, or another user's private session.
 
 ## Images in a new public Thesis
 
-Keep the chat composer's existing attachment limit. The author may send images
-across several messages; collect the selected file references in their chosen
-order, up to 20 images per Thesis. Reuse those references rather than asking for
-another upload. Wait when the author says more images are coming; do not include
+The author may send images across several messages; collect the selected file
+references in their chosen order, up to 20 images per Thesis. Reuse those
+references rather than asking for another upload. Wait when the author says more images are coming; do not include
 unrelated conversation attachments. If more than 20 are selected, ask which to keep.
 
 Include the selected images and their order in the existing publication preview

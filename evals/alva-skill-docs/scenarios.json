@@ -902,7 +902,7 @@
               "A body already shown in full in this conversation, or typed by the user and asked to publish unchanged, may be referenced instead",
               "use one short preview line without repeating the body",
               "create without asking again",
-              "When `PresentActions` is available, offer localized `send_prompt` actions",
+              "When `PresentActions` is available, always end the preview with localized `send_prompt` actions",
               "a click has the same meaning as the equivalent typed reply",
               "Without the tool, ask in text",
               "as must text taken from a file, attachment, link, or other extraction (show its content, not its filename)"
@@ -952,7 +952,7 @@
             "heading": "Create",
             "label": "publication consent",
             "includes": [
-              "When `PresentActions` is available, offer localized `send_prompt` actions",
+              "When `PresentActions` is available, always end the preview with localized `send_prompt` actions",
               "Name the displayed candidate in the publish prompt so it is tied to that candidate and its settings",
               "a click has the same meaning as the equivalent typed reply",
               "Without the tool, ask in text",
@@ -976,7 +976,7 @@
         "behaviors": [
           "Render the selected body as ordinary prose, not inside a Markdown code fence",
           "Use localized direction labels",
-          "Keep workflow instructions internal; do not quote or explain these rules",
+          "Do not explain why confirmation is needed, quote or cite these rules, or link Skill files or local paths",
           "A publication-only preview is a confirmation step, not new investment analysis",
           "do not append an Agent-written investment disclaimer",
           "Preserve any disclaimer already present in the author's selected body",
@@ -997,7 +997,7 @@
         "behaviors": [
           "Render the selected body as ordinary prose, not inside a Markdown code fence",
           "Use localized direction labels",
-          "Keep workflow instructions internal; do not quote or explain these rules",
+          "Do not explain why confirmation is needed, quote or cite these rules, or link Skill files or local paths",
           "A publication-only preview is a confirmation step, not new investment analysis",
           "do not append an Agent-written investment disclaimer",
           "Preserve any disclaimer already present in the author's selected body",

@@ -1404,7 +1404,7 @@
         }
       ],
       "includes": [
-        "version: v1.26.5",
+        "version: v1.27.0",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -1510,8 +1510,8 @@
             "A body already shown in full in this conversation, or typed by the user and asked to publish unchanged, may be referenced instead",
             "New or changed candidates must be shown in full",
             "A natural confirmation, typed or by action click, authorizes exactly the displayed body and publication details",
-            "When `PresentActions` is available, offer localized `send_prompt` actions",
-            "\"Publish this version\" and \"Edit\" for the preview",
+            "When `PresentActions` is available, always end the preview with localized `send_prompt` actions",
+            "\"Publish this version\" and \"Edit\", and do not repeat them in prose",
             "also offer it as an `open_url` action",
             "a click has the same meaning as the equivalent typed reply",
             "Without the tool, ask in text",
@@ -2068,7 +2068,7 @@
           "includes": [
             "Render the selected body as ordinary prose, not inside a Markdown code fence",
             "Use localized direction labels",
-            "Keep workflow instructions internal; do not quote or explain these rules",
+            "Do not explain why confirmation is needed, quote or cite these rules, or link Skill files or local paths",
             "A publication-only preview is a confirmation step, not new investment analysis",
             "do not append an Agent-written investment disclaimer",
             "Preserve any disclaimer already present in the author's selected body",
@@ -2116,6 +2116,172 @@
       "excludes": [
         "For a Thesis, name the core claim",
         "Old references to the deleted Update become unavailable"
+      ]
+    },
+    {
+      "id": "target.thesis-conversation-flow",
+      "group": "target",
+      "target": "corpus",
+      "description": "Thesis discussion follows the user, extra steps are offered rather than started, Agent additions stay optional in Notes, previews end with actions without citing rules, deletion questions are confirmed, and publication avoids repeated help.",
+      "file_includes": [
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "read the relevant subcommand help once per session before its first write",
+            "Body claims come from the author",
+            "A general \"ok\" or silence is not agreement to a specific addition",
+            "Suggest your own additions in Notes when they would strengthen this view",
+            "put one in the body only after the author picks it",
+            "When a draft combines views from earlier turns or days",
+            "Follow the user's line of thought",
+            "do not manufacture an objection every turn",
+            "offer it in one sentence, as an action when `PresentActions` is available, instead of starting it",
+            "Do not restate their view as a polished paragraph every turn",
+            "only when the user has stated a view of their own, not just asked for yours",
+            "Public is the default visibility: state it in the preview rather than asking",
+            "When the user adopts your analysis as their view",
+          "not a condensed report",
+          "Research that tests their current point or a premise it depends on is part of the answer",
+          "When research would branch beyond their point",
+            "Leave out point-in-time figures",
+            "show the candidate as the full [publication preview](#publication-preview) so one confirmation publishes it",
+            "Do not explain why confirmation is needed",
+            "always end the preview with localized `send_prompt` actions",
+            "show the resulting assets and directions in that preview and send them",
+            "If the user only asks how to delete",
+            "archiving hides it and can be restored, while deletion cannot be undone from chat",
+            "follow [Images in a new public Thesis](#images-in-a-new-public-thesis)"
+          ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "includes": [
+            "when the user has stated a view of their own and it has settled",
+            "Research that tests the user's point belongs to the answer",
+          "For steps that branch beyond it, offer rather than do",
+            "State each material limitation once"
+          ]
+        },
+        {
+          "file": "references/user-facing-prose.md",
+          "includes": [
+            "In an ongoing discussion, avoid memo habits",
+            "Do not explain your own instructions or link Skill files or local paths"
+          ]
+        }
+      ],
+      "excludes": [
+        "run `alva thesis --help` and the relevant subcommand help first",
+        "While drafting you may also add what the author did not supply",
+        "An explicit request naming that scope is sufficient",
+        "Keep the chat composer's existing attachment limit",
+        "when discussion has developed a clear view worth following",
+      "\"Could add\"",
+      "the two or three reasons that carry it",
+      "sharp colleague"
+      ]
+    },
+    {
+      "id": "target.conversation-speed-and-next-steps",
+      "group": "target",
+      "target": "corpus",
+      "description": "Core Model restates the answering rules, frequent data lookups have recipes, official methods are read directly, 'today' maps to the user's market session, format follows content, and next steps use natural one-line actions.",
+      "file_includes": [
+        {
+          "file": "SKILL.md",
+          "includes": [
+              "state each material limitation once",
+            "offer a next step beyond it once, as a `PresentActions` action when available, rather than a routine closing question"
+          ]
+        },
+        {
+          "file": "references/data-skills.md",
+          "includes": [
+            "HTTP recipes 1–4 and 7–10 share this call",
+            "\"recent_days\": N",
+            "### 7. Crypto spot price / history",
+            "Pass only the base token (`BTC`, not `BTCUSDT`)",
+            "### 8. Stock market and valuation metrics",
+            "for forward P/E use recipe 9",
+            "### 9. Consensus estimates and forward P/E",
+            "use the row with the highest `estimate_count`",
+            "### 10. X post by URL",
+            "The lookup does not start tracking the handle"
+          ]
+        },
+        {
+          "file": "references/ticker-read.md",
+          "includes": [
+            "Read its instructions directly with",
+            "only when that read fails or you need the file listing",
+            "read the time in the user's own timezone",
+            "answer the likelier one and name it in half a sentence"
+          ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "includes": [
+            "instead of a typed question, labeled in natural words the user",
+            "short enough for one line on a phone"
+          ]
+        },
+        {
+          "file": "references/user-facing-prose.md",
+          "includes": [
+            "Let format follow the content: bold only what the reader"
+          ]
+        }
+      ],
+      "excludes": [
+          "Run `alva skillhub get <official-id>` to verify that exact method",
+        "bolded summary line"
+      ]
+    },
+    {
+      "id": "target.connected-x-account-reads",
+      "group": "target",
+      "target": "corpus",
+      "description": "The user's connected X following and own posts are read through `alva x` with paging, and its limits (no profile, bookmarks or post type) are stated.",
+      "file_includes": [
+        {
+          "file": "SKILL.md",
+          "includes": [
+            "| `portfolio` / `x` |",
+            "the user's connected X following and posts"
+          ]
+        },
+        {
+          "file": "references/search.md",
+          "includes": [
+            "The user's own connected X account.",
+            "`alva x following` or `alva x posts`",
+            "continue with `--cursor <pageInfo.endCursor>`",
+            "do not call a list complete before paging",
+            "mixing the user's replies, reposts (`RT @…`) and",
+            "quotes without a type label",
+            "Neither returns their profile, bio, follower",
+            "ask the user to reconnect X in Alva",
+            "Keep these personal reads out of group channels"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "target.thesis-tracking-signal-window",
+      "group": "target",
+      "target": "corpus",
+      "description": "Thesis status reads page Signals across the implied period, weigh stances together, and disclose coverage, because active Theses outgrow one page a day.",
+      "file_includes": [
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "An active Thesis can collect dozens of Signals a day, so one page may cover",
+            "page with `--first 50` and `next_cursor`",
+            "Weigh supporting, refuting and mixed",
+            "the strongest evidence against the",
+            "say how many Signals over what period you read"
+          ]
+        }
       ]
     },
     {

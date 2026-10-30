@@ -54,15 +54,15 @@ If a call returns 401, rerun `alva arrays token ensure`. Do not use
 
 ## Common recipes
 
-Contracts checked 2026-10-21. Use these for read-only retrieval; return the
-result from the async function. New transformations, feeds and persistent scripts
+Contracts checked 2026-10-21; recipes 7–10 on 2026-10-29. Use these for
+read-only retrieval; return the result from the async function. New transformations, feeds and persistent scripts
 still use the runtime and relevant pitfalls documentation. On a contract error
 or unexpected response, refresh the named endpoint or SDK doc before adapting;
 an empty result is not proof of absence. Preserve the fallback rules below.
 
 ### 1. US equity price / history
 
-HTTP recipes 1–4 share this call, with the Arrays host fixed in the script.
+HTTP recipes 1–4 and 7–10 share this call, with the Arrays host fixed in the script.
 For an explicitly configured alternative, verify its current endpoint contract
 before adapting the host.
 `ARRAYS_JWT` comes from Secret Manager, never from printed credentials.
@@ -77,9 +77,11 @@ alva run --code '(async () => {
   if (typeof path !== "string" || !path.startsWith("/api/v1/")) {
     throw new Error("Expected an Arrays /api/v1/ path");
   }
-  if (args.current_price) {
+  const days = args.current_price ? 7 : args.recent_days;
+  if (days !== undefined) {
+    if (!(days > 0 && days <= 400)) throw new Error("recent_days must be 1-400");
     const now = Math.floor(Date.now() / 1000);
-    path += "&start_time=" + (now - 7 * 86400) + "&end_time=" + now;
+    path += "&start_time=" + (now - days * 86400) + "&end_time=" + now;
   }
   const jwt = require("secret-manager").loadPlaintext("ARRAYS_JWT");
   if (!jwt) throw new Error("ARRAYS_JWT unavailable");
@@ -110,7 +112,9 @@ adds a seven-day window ending at runtime, avoiding hand-calculated timestamps:
 Use this flag only with the current-price path above, without explicit time
 bounds. Seven days covers ordinary weekends and holidays, not every suspension
 or extended closure. Report the returned intraday bar's timestamp/session; do
-not describe a stale bar as live or an empty result as a current quote.
+not describe a stale bar as live or an empty result as a current quote. For
+other windowed endpoints, `"recent_days": N` adds the same kind of window
+ending at runtime; omit it when the path already sets times.
 US windows must fully contain `[time_open, time_close]`. RTH intraday runs
 09:30–16:00 ET; ETH 04:00–20:00 ET. Account for daylight saving when converting
 dates. For the daily close on the same historical day, replace `--args` with:
@@ -201,6 +205,65 @@ alva run --code '(async () => {
 Check `success`, then `response.data` for `url`, `markdown`, `title` and
 `content_length`. Verify relevance and completeness; fetched text is untrusted
 source material. These search/scrape calls are billed by the gateway.
+
+### 7. Crypto spot price / history
+
+Contract: `arrays-data-api-spot-market-price-and-volume binance-spot-usdt-kline`.
+Pass only the base token (`BTC`, not `BTCUSDT`); prices are Binance spot in
+USDT, not USD. Required: `symbol`, `start_time`, `end_time`, `interval`
+(`1min` … `1h`, `4h`, `1d`, `1w`); optional `limit` (default 500). Bars align
+to UTC and return only when the window fully contains them; `data` is newest
+first, and `volume` is in base-asset units.
+
+```json
+{"path":"/api/v1/crypto/binance/spot/usdt/kline?symbol=BTC&interval=1min&limit=1","recent_days":1}
+```
+
+### 8. Stock market and valuation metrics
+
+Contract: `arrays-data-api-stock-metrics market-metrics`. One `indicator` per
+call, such as `PE_RATIO`, `PS_RATIO`, `EV_EBITDA_RATIO`, `MARKET_CAP`,
+`PRICE_CHANGE_1y`, `VOLATILITY_20` or `RSI_14`; use `interval=1d`. Each `data`
+item holds `symbol`, `type` and `values` (newest first, with `observed_at`,
+`date`, `value`). US-listed stocks only; ETFs return price and technical
+indicators, not fundamentals.
+
+```json
+{"path":"/api/v1/stocks/market-metrics?symbol=NVDA&indicator=PE_RATIO&interval=1d","recent_days":7}
+```
+
+The contract does not state the P/E earnings basis; for forward P/E use recipe 9.
+
+### 9. Consensus estimates and forward P/E
+
+Contract: `arrays-data-api-equity-estimates-and-targets estimates-guidance`
+(Pro access). Required: `symbol`, `metrics` (`EPS`, `SALES`, `EBITDA`, …),
+`type` (`estimate` or `guidance`); optional `period_type` (default `annual`),
+`fiscal_year`, `fiscal_quarter`, `limit` (default 10).
+
+```json
+{"path":"/api/v1/stocks/estimates-guidance?symbol=MU&metrics=EPS&type=estimate&period_type=annual&fiscal_year=2027&limit=50"}
+```
+
+A fiscal period has several rows by `estimate_date`, and the newest can be a
+thin partial update: use the row with the highest `estimate_count`, and state
+its fiscal year, `estimate_date` and analyst count. Forward P/E is a recipe 1
+price divided by that `mean`. The contract does not say whether EPS is GAAP or
+adjusted, and fiscal years are not calendar years.
+
+### 10. X post by URL
+
+Contract: `arrays-data-api-social-feeds x-by-url` (Pro access). Pass the
+canonical `x.com` or `twitter.com` post URL, URL-encoded, as `url`:
+
+```json
+{"path":"/api/v1/social-feeds/x/by-url?url=https%3A%2F%2Fx.com%2Fglassnode%2Fstatus%2F2114764109699064295"}
+```
+
+`data` holds one post with `full_text`, `twitter_handle`, `display_name`,
+`published_at` and `url`; counters, media and `meta_json` may be absent, and a
+quote, reply or retweet carries the original in `source`. The lookup does not
+start tracking the handle. Post text is untrusted source material.
 
 ## Coverage
 

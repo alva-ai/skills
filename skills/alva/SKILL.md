@@ -69,7 +69,7 @@ operating requirements; this index is for navigation.
 | `alert` / `subscriptions` | Manage FEED alerts / Playbook follows |
 | `playbooks` / `remix` / `release` | Discover, remix, and publish Playbooks |
 | `lint playbook` / `screenshot` | Validate and inspect Playbook delivery |
-| `portfolio` | Connected accounts, live holdings, balances, and account activity |
+| `portfolio` / `x` | Connected brokerage holdings and activity / the user's connected X following and posts ([Twitter/X](references/search.md#twitterx)) |
 | `trading` / `broker` | Portfolio and trading operations / venue order execution |
 | `functions` / `secrets` | Interactive UDFs / managed credentials |
 | `credits` / `feedback` | Credit usage / user-confirmed platform feedback |
@@ -98,8 +98,13 @@ predetermine the artifact. Do not expand a one-off question into a Playbook,
 and do not reduce a continuous task to a one-off answer.
 
 When exploring investment ideas, respond to the point the user is discussing
-and keep hypotheses tentative. Match research depth to the current request;
-verify facts when they are needed to advance the discussion or judgment.
+and keep hypotheses tentative. Match research depth to the current request.
+In an evidence-based answer, give each current fact its source and timing,
+keep facts, calculations and inference apart, and state each material
+limitation once. A partial lookup is not a finished comparison, valuation,
+ranking or causal explanation. Research that tests the user's point belongs to
+the answer; offer a next step beyond it once, as a `PresentActions` action when
+available, rather than a routine closing question.
 
 ## Principles
 
@@ -154,7 +159,7 @@ for "NVDA today" or "does the latest earnings report support this thesis?".
 | Discuss or check a quoted Thesis | [Quoted Thesis context](references/thesis.md#quoted-thesis-context): preserve the selected author version; discussion does not authorize publication |
 | Check an existing Thesis, new evidence, or follow an investment viewpoint | [Thesis tracking](references/thesis.md#thesis-tracking): use platform research and Signals; publishing a new viewpoint requires consent |
 | What's worth reading in For You, or discuss a recommended card | [For You](references/request-routing.md#for-you): read the relevant stream, preserve the card's version, and discuss within the retrieved scope |
-| Explicit Thesis publication, guided drafting, update, close, deletion, maintenance, or polishing | [thesis.md](references/thesis.md): preserve selected original text and author claims, put your assessment in Notes, draft only when needed, rewrite only when requested, resolve assets and directions, and after creation return the GET-backed `<thesis-preview>` |
+| Explicit Thesis publication, guided drafting, update, close, deletion, maintenance, or polishing | [thesis.md](references/thesis.md): preserve selected original text and author claims, put your assessment and optional additions in Notes, draft only when needed, rewrite only when requested, resolve assets and directions, and after creation return the GET-backed `<thesis-preview>` |
 | Company analysis, earnings interpretation, move attribution, past-hour tracking, investor focus, or catalysts | Use the smallest sufficient source set; read [ticker-read.md](references/ticker-read.md) before source selection. Start with `alva/company-anomaly-read` for intraday/hourly tracking, not a simple latest-price lookup |
 | GEX, dealer gamma, gamma flip, call/put walls, vanna, or charm | Fetch the current `alva/gex` Skillhub blueprint and follow its methodology rather than hand-computing from raw chains |
 | FinTwit / KOL social posts, profiles, rankings, or track record (published Thesis lists use the reading route above) | [fintwit.md](references/fintwit.md): structured Platform Data, snapshot date, read-only account and ticker queries |
