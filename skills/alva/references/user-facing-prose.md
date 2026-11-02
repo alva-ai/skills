@@ -275,7 +275,7 @@ highest-frequency tokens only — not the full list above.
 ## Market Detail Links
 
 Use the same absolute production HTTPS URL for Markdown links and
-`PresentActions` `open_url` buttons on Web and App:
+`PresentActions` `open_url` buttons:
 `https://alva.ai/markets/entity/{ENTITY_ID}`. New links use the catalog's verified
 market `Entity.id`, including for U.S. stocks, non-U.S. listings, ETFs and crypto
 when the intended instrument exists in the market catalog. A content-search

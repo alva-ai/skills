@@ -1348,7 +1348,7 @@
           "label": "shared market entity link contract",
           "includes": [
             "same absolute production HTTPS URL",
-            "`PresentActions` `open_url` buttons on Web and App",
+            "`PresentActions` `open_url` buttons",
             "market `Entity.id`",
             "U.S. stocks, non-U.S. listings, ETFs and crypto",
             "A content-search entity ID, ticker, venue ID or Thesis ID is not a market entity ID",
@@ -1374,13 +1374,13 @@
           ]
         },
         {
-          "file": "references/request-routing.md",
-          "heading": "Routes",
+          "file": "SKILL.md",
+          "heading": "Routing",
           "label": "navigation does not enter research or publication",
           "includes": [
-            "Market Detail Navigation",
-            "user-facing-prose.md#market-detail-links",
-            "no financial research or Thesis publication workflow is needed"
+            "Open an asset detail page or a specific tab",
+            "references/user-facing-prose.md#market-detail-links",
+            "this is navigation, not research or Thesis publication"
           ]
         }
       ]

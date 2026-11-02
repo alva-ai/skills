@@ -18,7 +18,6 @@ publication route; explicit changes still follow that route.
 
 | Request type | Objective |
 | --- | --- |
-| Market Detail Navigation | Return the requested asset page or tab using [Market Detail Links](user-facing-prose.md#market-detail-links). Resolve only the missing catalog identity; no financial research or Thesis publication workflow is needed. |
 | Financial Analysis / Ask Question | Answer market, asset, portfolio, valuation, comparison, single-ticker, and "why" questions with fresh data/search/`alva run` evidence. Company analysis, earnings interpretation, move attribution, investor focus, and catalyst analysis use [ticker-read.md](ticker-read.md); a standalone price or security-identity lookup uses [data-skills.md](data-skills.md). Comparison baselines are figures too: fetch or qualify them. For current-fact or evidence-dependent answers, apply the Ask Evidence Gate. Stable explanations and discussion of supplied text need no evidence fetch unless adding current market or account claims. |
 | Thesis | Guide an explicit publication request from rough intent or a finished body to one exact, user-confirmed Thesis payload. The user stays the author of its claims and your own assessment goes in Notes. Read [thesis.md](thesis.md); research-dependent drafting first uses the Financial Analysis evidence route, while discussion without publication intent stays an answer. |
 | Playbook Creation | Build, remix, edit, release, or update a hosted/shareable playbook. Read [playbook-creation.md](playbook-creation.md) for the subroute tree and gates. |
