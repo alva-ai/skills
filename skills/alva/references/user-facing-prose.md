@@ -272,32 +272,66 @@ If observed output still reads AI-flavored despite this block being applied
 verbatim, the next step is a narrow post-generation check on the top 5-6
 highest-frequency tokens only — not the full list above.
 
-## Company Page Links
+## Market Detail Links
 
-In every user-facing Alva response, link the first high-confidence mention of
-each covered U.S.-listed company to its Alva company page:
-`[visible wording](https://alva.ai/markets/{CANONICAL_TICKER})`.
+Use the same absolute production HTTPS URL for Markdown links and
+`PresentActions` `open_url` buttons on Web and App:
+`https://alva.ai/markets/entity/{ENTITY_ID}`. New links use the catalog's verified
+market `Entity.id`, including for U.S. stocks, non-U.S. listings, ETFs and crypto
+when the intended instrument exists in the market catalog. A content-search
+entity ID, ticker, venue ID or Thesis ID is not a market entity ID.
 
-- Recognize explicit tickers such as `AAPL` or `$AAPL` and semantically clear
-  company names, common names, or localized aliases. Treat `Apple` as `AAPL`
-  when context refers to Apple Inc. Use semantic context, not token shape alone:
-  do not link `apple` when it means fruit, `Meta` as a general term, or `AI` as
-  a theme rather than a company.
-- Only link U.S.-listed companies. Leave non-U.S. listings such as `3986.HK`
-  plain even when the company is clear; never strip or rewrite an exchange
-  suffix to force a company-page match.
-- Preserve the visible wording and use the canonical uppercase ticker only in
-  the URL. Prefer a company/ticker mapping and U.S. listing status already
-  resolved by Alva data or clearly established in the conversation. If the
-  mapping, listing market, share class, or page coverage is uncertain, leave it
-  plain; do not call a tool just to add a link.
-- Link each company at most once per reply. Do not link non-company assets such
-  as ETFs, indices, crypto, FX, or commodities; code; raw URLs; existing links;
-  Thesis bodies or candidates; user originals or quoted passages; raw XML/payloads;
-  or verbatim tool output. Preserve legitimate source citations.
-- Always use an absolute production URL under `https://alva.ai/markets/`. Never
-  use a staging host or relative URL for a company page. Do not add a separate
-  company-page footer or explain that a link was added.
+### Explicit navigation requests
+
+For an asset page or tab request, reuse a tool-verified market entity ID from
+the current context when its instrument and market still match. Otherwise use
+the existing read-only identity lookup:
+
+```sh
+alva thesis list --ticker '<ticker or name>' --first 1
+```
+
+Use `scope.id` only when `scope.__typename` is `Entity` and its name, ticker,
+kind, assetClass and venue match the intended instrument. An empty Thesis list
+does not invalidate a resolved `scope`; do not read or page publications just
+to resolve a link. This lookup does not authorize Thesis creation or research.
+
+For ambiguous results, use the user's stated market, venue and instrument type
+to identify one exact candidate, then verify it with
+`alva thesis list --entity-id '<candidate ID>' --first 1`. If the intent does
+not distinguish the candidates, ask which market or instrument. Never choose
+the first match or guess an ID. Preserve ticker case, share class and exchange
+suffixes; never strip or rewrite an exchange suffix to force a U.S. match.
+If the lookup is unavailable, fails or finds no matching entity, explain the
+gap without fabricating a working link or trying undocumented service calls.
+
+Append `?tab=<tab>` only when a particular tab is requested. The shared tab
+values are `overview` (default), `about`, `theses`, `anomalies`, `smartMoney`
+and `earnings`; use these exact spellings. For example, a verified Tesla entity
+ID produces `https://alva.ai/markets/entity/{ENTITY_ID}?tab=about` for About.
+The page owns availability: `anomalies`, `smartMoney` and `earnings` are U.S.
+stock company tabs. For other markets, offer the base page or an available tab
+instead of promising an unsupported tab. A correct URL alone does not prove
+that the user opened the page or that a tab has data.
+
+Do not generate legacy `/markets/{ticker}` or `/ticker/{symbol}` URLs, native
+schemes, staging hosts or relative URLs. Existing symbol links are compatibility
+inputs scoped to U.S. stocks; they cannot select other markets reliably. Keep
+the HTTPS domain in both prose and button URLs.
+
+### Links in ordinary replies
+
+Link the first high-confidence mention of an asset only when its market entity
+ID is already verified in context: `[visible wording](https://alva.ai/markets/entity/{ENTITY_ID})`.
+Preserve the visible wording and link each asset at most once per reply. Use
+semantic context, not token shape alone: `Apple` may name the company or fruit,
+and a bare ticker does not establish its market. Leave unresolved mentions
+plain; do not call a tool just to add a link.
+
+Do not insert market links into Thesis bodies or candidates, user originals or
+quotations, code, raw XML/payloads, or verbatim tool output. Preserve existing
+links and legitimate source citations. Do not add a separate link footer or
+explain that a link was added.
 
 ## Final Replies
 

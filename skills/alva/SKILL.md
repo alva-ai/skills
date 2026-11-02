@@ -153,6 +153,7 @@ for "NVDA today" or "does the latest earnings report support this thesis?".
 
 | User intent | Route and reference |
 | --- | --- |
+| Open an asset detail page or a specific tab | [Market Detail Links](references/user-facing-prose.md#market-detail-links): resolve the market entity, then return its absolute HTTPS entity URL; this is navigation, not research or Thesis publication |
 | Price, security identity, or another simple factual lookup | [data-skills.md](references/data-skills.md): fetch the relevant fact with its source and as-of time |
 | Explanation requiring evidence, comparison, valuation, ranking, or complex research | [request-routing.md](references/request-routing.md): Ask evidence, matching Complex Ask Router gates, and useful follow-up only when justified |
 | Find published Theses by author or asset, or related viewpoints | [Reading published Theses](references/thesis.md#reading-published-theses): use `thesis list` / `thesis related`, one page with full bodies; no publication or research workflow |
@@ -204,13 +205,14 @@ no extra runtime or pitfalls read; transformations, feeds and persistent scripts
 Apply the criteria for the requested operation. For inspection, pause/resume,
 or removal, verify that state change; do not run creation or release workflows.
 
-In replies, link the first high-confidence mention of each covered U.S.-listed
-company to `https://alva.ai/markets/{CANONICAL_TICKER}`, preserving its visible
-wording. Leave uncertain matches plain; do not fetch data solely to add a link.
-Do not insert company-page links into Thesis bodies or candidates, user originals
-or quotations, code, raw XML/payloads, or verbatim tool output. ETFs and other
-non-company assets stay plain. Preserve existing links and legitimate source citations.
-Exceptions are in [Company Page Links](references/user-facing-prose.md#company-page-links).
+Use `https://alva.ai/markets/entity/{ENTITY_ID}` for new asset detail links,
+including `?tab=<tab>` when requested. Reuse verified market entity IDs; an
+explicit navigation request may resolve a missing ID. In ordinary prose, leave
+unresolved mentions plain; do not fetch data solely to add a link. Preserve the
+visible wording, existing links and legitimate source citations. Do not insert
+market links into Thesis bodies or candidates, user originals or quotations,
+code, raw XML/payloads, or verbatim tool output. Follow
+[Market Detail Links](references/user-facing-prose.md#market-detail-links).
 
 - **Answer:** Relevant values have sources and timestamps. Facts, calculations,
   and inference are distinct; missing evidence limits confidence.

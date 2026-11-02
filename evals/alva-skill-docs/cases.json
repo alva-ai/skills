@@ -1320,7 +1320,7 @@
       "id": "communication.company-page-links",
       "group": "communication",
       "target": "corpus",
-      "description": "User-facing replies link high-confidence U.S.-listed company mentions to production Alva company pages without extra lookups or ambiguous company matches.",
+      "description": "Market navigation resolves verified catalog identities and preserves tabs in shared HTTPS entity URLs; ordinary mentions reuse known IDs without decorative lookups.",
       "excludes": [
         "https://alva.ai/company/",
         "https://stg.alva.ai/markets/",
@@ -1331,39 +1331,56 @@
         {
           "file": "SKILL.md",
           "heading": "Completion Criteria",
-          "label": "company page links remain visible at entry",
+          "label": "canonical market links remain visible at entry",
           "includes": [
-            "link the first high-confidence mention of each covered U.S.-listed company",
-            "https://alva.ai/markets/{CANONICAL_TICKER}",
+            "https://alva.ai/markets/entity/{ENTITY_ID}",
+            "including `?tab=<tab>` when requested",
+            "explicit navigation request may resolve a missing ID",
             "do not fetch data solely to add a link",
-            "Do not insert company-page links into Thesis bodies or candidates",
+            "Do not insert market links into Thesis bodies or candidates",
             "user originals or quotations, code, raw XML/payloads, or verbatim tool output",
-            "ETFs and other non-company assets stay plain",
-            "Preserve existing links and legitimate source citations"
+            "existing links and legitimate source citations"
           ]
         },
         {
           "file": "references/user-facing-prose.md",
-          "heading": "Company Page Links",
-          "label": "company page link contract",
+          "heading": "Market Detail Links",
+          "label": "shared market entity link contract",
           "includes": [
-            "In every user-facing Alva response",
-            "each covered U.S.-listed company to its Alva company page",
-            "[visible wording](https://alva.ai/markets/{CANONICAL_TICKER})",
-            "semantically clear company names",
-            "common names, or localized aliases",
-            "Apple",
-            "Use semantic context, not token shape alone",
-            "Only link U.S.-listed companies",
-            "non-U.S. listings such as `3986.HK`",
+            "same absolute production HTTPS URL",
+            "`PresentActions` `open_url` buttons on Web and App",
+            "market `Entity.id`",
+            "U.S. stocks, non-U.S. listings, ETFs and crypto",
+            "A content-search entity ID, ticker, venue ID or Thesis ID is not a market entity ID",
+            "alva thesis list --ticker '<ticker or name>' --first 1",
+            "`scope.__typename` is `Entity`",
+            "An empty Thesis list does not invalidate a resolved `scope`",
+            "alva thesis list --entity-id '<candidate ID>' --first 1",
+            "ask which market or instrument",
+            "Never choose the first match or guess an ID",
             "never strip or rewrite an exchange suffix",
-            "company/ticker mapping and U.S. listing status already resolved by Alva data",
-            "mapping, listing market, share class, or page coverage",
+            "without fabricating a working link or trying undocumented service calls",
+            "https://alva.ai/markets/entity/{ENTITY_ID}?tab=about",
+            "`overview` (default), `about`, `theses`, `anomalies`, `smartMoney` and `earnings`",
+            "instead of promising an unsupported tab",
+            "Do not generate legacy `/markets/{ticker}` or `/ticker/{symbol}` URLs",
+            "Keep the HTTPS domain in both prose and button URLs",
+            "market entity ID is already verified in context",
+            "Use semantic context, not token shape alone",
             "do not call a tool just to add a link",
-            "Link each company at most once per reply",
-            "non-company assets",
-            "Never use a staging host or relative URL for a company page",
-            "Do not add a separate company-page footer"
+            "link each asset at most once per reply",
+            "Preserve existing links and legitimate source citations",
+            "Do not add a separate link footer"
+          ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "heading": "Routes",
+          "label": "navigation does not enter research or publication",
+          "includes": [
+            "Market Detail Navigation",
+            "user-facing-prose.md#market-detail-links",
+            "no financial research or Thesis publication workflow is needed"
           ]
         }
       ]
