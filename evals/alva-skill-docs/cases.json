@@ -162,7 +162,7 @@
             "Consider it early in investment research and Thesis discussions",
             "createAsyncWorldlineClient",
             "Promise.allSettled",
-            "Inspected `sourceEvidence` is captured original text",
+            "`item.sourceContent` is captured original text",
             "Worldline must not become a prerequisite for an otherwise supported answer"
           ]
         },
@@ -1404,7 +1404,7 @@
         }
       ],
       "includes": [
-        "version: v1.28.0",
+        "version: v1.28.2",
         "Capability Help",
         "feedback",
         "api/feedback.md",
