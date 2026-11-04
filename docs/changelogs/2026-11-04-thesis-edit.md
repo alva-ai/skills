@@ -48,8 +48,8 @@ See the primary record.
 
 ## 7. Outcome and Evidence
 
-Pending.
+- "Editing the current version" section (no note edits), routing row, v1.28.0; doc eval and mutation smoke pass.
 
 ## 8. Remaining Work
 
-Pending.
+See the primary record section 8.
