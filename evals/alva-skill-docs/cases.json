@@ -2344,6 +2344,35 @@
           ]
         }
       ]
+    },
+    {
+      "id": "target.watchlist-and-people-follows",
+      "group": "target",
+      "target": "corpus",
+      "description": "The Agent adds tickers to the watchlist and follows people on request through the CLI and reports each result group instead of claiming it lacks permission.",
+      "file_includes": [
+        {
+          "file": "SKILL.md",
+          "includes": [
+            "Playbook and people follows, ticker watchlist",
+            "[Watchlist and people follows](references/request-routing.md#watchlist-and-people-follows)"
+          ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "includes": [
+            "## Watchlist and People Follows",
+            "Tickers are added to the watchlist, people are followed, and a Thesis is",
+            "alva subscriptions watchlist-add --tickers A,B",
+            "alva subscriptions search-profiles",
+            "Follow only an exact",
+            "(`unchanged`)",
+            "(`unresolved`)",
+            "never substitute a similar",
+            "do not claim a ticker was added"
+          ]
+        }
+      ]
     }
   ]
 }

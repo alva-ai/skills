@@ -38,11 +38,37 @@ current command help; do not recreate a resource to change one setting.
 | Automation code or metadata | [feed-lifecycle.md](feed-lifecycle.md#updating-an-existing-automation): `automation list/inspect/update` |
 | Automation cadence or producer run state | [deployment.md](deployment.md): inspect its producer, then update/pause/resume that cronjob |
 | Notifications or Playbook follows | [push-notifications.md](push-notifications.md#inventory-and-unsubscribe): these are independent; muting delivery does not pause computation |
+| Watchlist tickers or followed people | [Watchlist and people follows](#watchlist-and-people-follows) |
 | Playbook content, release, or visibility | [playbook-creation.md](playbook-creation.md) and [api/release.md](api/release.md); inspect the existing Playbook and retain unchanged feeds/metadata |
 | A future Agent turn | [agent-schedules.md](agent-schedules.md): current Channel tools or the explicitly selected CLI/Inbox target |
 
 Verify the resulting requested state. A read or pause request does not require
 building, publishing, test-running a producer, or changing its data source.
+
+## Watchlist and People Follows
+
+Tickers are added to the watchlist, people are followed, and a Thesis is
+bookmarked (see [Thesis](thesis.md)). These commands change the same watchlist
+and Following list the user sees in the Alva App. Change them only when the
+user asks.
+
+- **Tickers:** pass every requested symbol in one
+  `alva subscriptions watchlist-add --tickers A,B` (1-50; `watchlist-remove`
+  removes). Take symbols from the conversation; for "my holdings", read them
+  with `alva portfolio` first. `alva subscriptions watchlist` lists the current
+  watchlist.
+- **People:** find the profile with
+  `alva subscriptions search-profiles --query <name or username>` (prefix match).
+  `USER` is an Alva user; `PERSON` is a curated person. Follow only an exact
+  match with `follow-profile --kind <user|person> --id <id>`; when several
+  profiles match, ask which one. `alva subscriptions profiles` lists follows.
+
+Report every result group: added or removed (or followed), already in that
+state (`unchanged`), and not recognized (`unresolved`). For an ambiguous ticker
+(`FAILED_PRECONDITION`), ask or retry with `--kind`; never substitute a similar
+symbol. Nothing is written when no ticker resolves. The command result is the
+record of what changed; do not claim a ticker was added or a person was
+followed unless it appears in that result.
 
 ## Financial Evidence
 

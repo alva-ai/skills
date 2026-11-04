@@ -65,7 +65,7 @@ operating requirements; this index is for navigation.
 | `for-you` | Read personalized publications or ranked Thesis recommendations |
 | `automation` / `deploy` | Manage Automations / schedule and inspect producer scripts |
 | `schedule` | Schedule future or recurring Agent turns |
-| `alert` / `subscriptions` | Manage FEED alerts / Playbook follows |
+| `alert` / `subscriptions` | Manage FEED alerts / Playbook and people follows, ticker watchlist |
 | `playbooks` / `remix` / `release` | Discover, remix, and publish Playbooks |
 | `lint playbook` / `screenshot` | Validate and inspect Playbook delivery |
 | `portfolio` / `x` | Connected brokerage holdings and activity / the user's connected X following and posts ([Twitter/X](references/search.md#twitterx)) |
@@ -166,6 +166,7 @@ for "NVDA today" or "does the latest earnings report support this thesis?".
 | Ask this Agent to return later or recur | [agent-schedules.md](references/agent-schedules.md): prefer the current Channel's `PutSchedule` / `ListSchedules` / `ManageSchedule` tools when exposed; the reference covers CLI/Inbox targets and authorization |
 | Create an Agent that keeps its coding Session across runs | [durable-agent.md](references/durable-agent.md): one cwd, one saved `agent.js` using `runAlvaAgent`, launch through `alva run --entry-path` |
 | Dashboard, screener app, hosted report, or other shareable investing app | [playbook-creation.md](references/playbook-creation.md): reuse before a new build, live feeds, design, draft, lint, release, and screenshot |
+| Add tickers to or remove them from the watchlist, or follow or unfollow people | [Watchlist and people follows](references/request-routing.md#watchlist-and-people-follows): act only on the user's request, write every requested ticker in one call, and report changed, unchanged, and unresolved items |
 | Manage an existing Automation, Playbook, alert, or subscription | [request-routing.md](references/request-routing.md#existing-resource-management): identify the existing resource, change only the requested state, and verify it |
 | Backtest, portfolio simulation, signal, rebalance, or execute an order | [altra-trading.md](references/altra-trading.md); also [api/trading.md](references/api/trading.md) or [api/broker.md](references/api/broker.md) for execution |
 | `/use-skill:<username>/<name>`, a named method, or template-like research | [request-routing.md](references/request-routing.md#skillhub-blueprint): read or reuse the current blueprint, choose the requested deliverable, and set `--skill-id` for a resulting Playbook |
