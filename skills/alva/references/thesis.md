@@ -421,7 +421,9 @@ into the body.
 
 An edit corrects the version readers see now without publishing a new
 Update. Use it when the author asks to edit, fix, reword, correct, or adjust
-the current Thesis, including its title, assets, directions, or note. Use the
+the current Thesis, including its title, assets, or directions. `update` has
+no note flag, so a note cannot be changed this way; say so instead of
+reporting it as saved. Use the
 `update` flow when the author asks for an update or states a new or changed
 view. If the intent is unclear, ask once with both choices, as actions when
 `PresentActions` is available.

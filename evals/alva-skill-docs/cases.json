@@ -2137,6 +2137,7 @@
             "### Editing the current version",
             "An edit corrects the version readers see now without publishing a new\nUpdate.",
             "edit, fix, reword, correct, or adjust",
+            "`update` has\nno note flag, so a note cannot be changed this way",
             "states a new or changed\nview",
             "ask once with both choices",
             "readers will see it marked \"Edited\" with the edit time",
