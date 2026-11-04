@@ -188,8 +188,7 @@ answered into a Trade Setup automation.
 Use this only when the answer naturally identifies something worth monitoring
 over time: a thesis, entry/exit area, confirmation condition, breakdown risk,
 catalyst watch, or user-facing decision condition. Do not suggest it for simple
-fact lookups, broad multi-ticker discovery, portfolio monitoring, or when Alpha
-Radar / Portfolio Watch is the better durable route.
+fact lookups, broad multi-ticker discovery, or portfolio monitoring.
 
 Ask after the normal answer, in the user's language, and keep it low-pressure.
 For a setup-like ask, the answer is incomplete without this final invitation.

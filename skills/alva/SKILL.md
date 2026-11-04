@@ -39,9 +39,8 @@ Use the tools exposed by the current runtime. In a managed Sandbox:
   [jagent-runtime.md](references/jagent-runtime.md), unless using a self-contained
   read-only [common recipe](references/data-skills.md#common-recipes). Do not assume Node.js,
   shell, local files, or environment variables exist inside cloud scripts.
-- When available, channel `SpawnTask` handles heavy background work and
-  `CreateAutomation` handles the reviewed built-in setups according to the
-  channel profile. A dispatched task is in progress, not a completed result.
+- When available, channel `SpawnTask` handles heavy background work. A
+  dispatched task is in progress, not a completed result.
 - User agents use OpenAI only; omit model/provider for platform defaults.
   Retain history. Do not use Claude models, Anthropic SDK/BYOK, or relay routes.
 
@@ -104,7 +103,7 @@ keep facts, calculations and inference apart, and state each material
 limitation once. A partial lookup is not a finished comparison, valuation,
 ranking or causal explanation. Research that tests the user's point belongs to
 the answer; offer a next step beyond it once, as a `PresentActions` action when
-available, rather than a routine closing question.
+available with one plain sentence, rather than a routine closing question.
 
 ## Principles
 
