@@ -436,7 +436,7 @@ view. If the intent is unclear, ask once with both choices, as actions when
 3. Run `alva thesis update` with `--editorial`, `--id`, a new
    `--request-id`, `--expected-author-version-id` set to the current version,
    `--body`, explicit `--visibility`, and the retained fields exactly as the
-   `update` rules above require (directions, title, media).
+   `update` rules above require (directions, title, medias).
 4. Verify the returned version and report that it was saved as an edit.
 
 Only the current version can be edited. An older Update is removed or
