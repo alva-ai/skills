@@ -402,7 +402,9 @@ into the body.
 - `set-visibility --id <id> --visibility public` (or `private`): change
   current access without publishing a new author version.
 - `update`: publish the author's revised view under
-  [Authorship](#authorship); retain unchanged fields and send `--id`, a new
+  [Authorship](#authorship) as a new Update; to correct the current version
+  instead, see [Editing the current version](#editing-the-current-version).
+  Retain unchanged fields and send `--id`, a new
   `--request-id`, `--expected-author-version-id`, `--body`, explicit
   `--visibility`, plus retained optional fields. For a body-only edit, carry
   current `entity_stances` through `--entity-stances` with the retained entity
@@ -415,14 +417,38 @@ into the body.
 - `delete --id`: withdraw only as described in
   [Deleting a Thesis or one Update](#deleting-a-thesis-or-one-update).
 
+### Editing the current version
+
+An edit corrects the version readers see now without publishing a new
+Update. Use it when the author asks to edit, fix, reword, correct, or adjust
+the current Thesis, including its title, assets, directions, or note. Use the
+`update` flow when the author asks for an update or states a new or changed
+view. If the intent is unclear, ask once with both choices, as actions when
+`PresentActions` is available.
+
+1. Read the current version with `alva thesis get --id '<thesis-id>'`.
+2. Preview the full edited version, plus any changed assets or directions,
+   and say that it replaces the current version without a new Update and that
+   readers will see it marked "Edited" with the edit time. Wait for the author
+   to select it.
+3. Run `alva thesis update` with `--editorial`, `--id`, a new
+   `--request-id`, `--expected-author-version-id` set to the current version,
+   `--body`, explicit `--visibility`, and the retained fields exactly as the
+   `update` rules above require (directions, title, media).
+4. Verify the returned version and report that it was saved as an edit.
+
+Only the current version can be edited. An older Update is removed or
+superseded by a new Update, never edited. A closed Thesis cannot be edited.
+
 ## Thesis maintenance controls
 
 For explicit archive/restore, bookmark, or managed Signal research changes, use
 the corresponding Thesis CLI command and report its returned state. Read
 alva thesis --help for detailed concurrency, idempotency, and error rules.
 
-Report version conflicts instead of silently rereading and overwriting. Do not
-use `--editorial` to bypass a material or version conflict.
+Report version conflicts instead of silently rereading and overwriting. Use
+`--editorial` only for [Editing the current version](#editing-the-current-version);
+never use it to bypass a material or version conflict.
 
 ## Deleting a Thesis or one Update
 

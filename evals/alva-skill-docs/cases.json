@@ -1404,7 +1404,7 @@
         }
       ],
       "includes": [
-        "version: v1.27.0",
+        "version: v1.28.0",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -2116,6 +2116,38 @@
       "excludes": [
         "For a Thesis, name the core claim",
         "Old references to the deleted Update become unavailable"
+      ]
+    },
+    {
+      "id": "target.thesis-edit-current-version",
+      "group": "target",
+      "target": "corpus",
+      "description": "Chat corrections of the current Thesis are previewed and saved as editorial edits marked Edited, explicit updates and new views stay on the Update flow, unclear intent asks once, and only the current version can be edited.",
+      "file_includes": [
+        {
+          "file": "SKILL.md",
+          "includes": [
+            "update, edit, close, deletion",
+            "[Editing](references/thesis.md#editing-the-current-version)"
+          ]
+        },
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "### Editing the current version",
+            "An edit corrects the version readers see now without publishing a new\nUpdate.",
+            "edit, fix, reword, correct, or adjust",
+            "states a new or changed\nview",
+            "ask once with both choices",
+            "readers will see it marked \"Edited\" with the edit time",
+            "Run `alva thesis update` with `--editorial`",
+            "Only the current version can be edited.",
+            "Use\n`--editorial` only for [Editing the current version](#editing-the-current-version);\nnever use it to bypass a material or version conflict."
+          ]
+        }
+      ],
+      "excludes": [
+        "Do not\nuse `--editorial` to bypass a material or version conflict."
       ]
     },
     {
