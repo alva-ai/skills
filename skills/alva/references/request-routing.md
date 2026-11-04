@@ -105,12 +105,15 @@ do; when you are unsure whether the user wants one, offer it or ask briefly
 instead of starting it or silently skipping it.
 
 When suggesting, use one short, low-pressure sentence in the user's language to
-explain the outcome. If `PresentActions` is available, offer that step as one
-matching action instead of a typed question, labeled in natural words the user
-might say and short enough for one line on a phone; the tool description owns
-action kinds, labels, and call order.
-Offer actions only for a concrete next step; ordinary discussion or explanation
-needs no buttons. Required questions use `AskUserQuestion`; Thesis publication
+explain the outcome; it need not be a question. If `PresentActions` is
+available, offer that step as one matching action, labeled in natural words the
+user might say and short enough for one line on a phone; the tool description
+owns action kinds, labels, and call order.
+Offer actions only when the user's next message is predictable: a concrete next
+step, or a needed choice with two to four discrete answers. Free-form answers
+and questions that ask for the user's own reasoning stay plain text, with no
+buttons. A question needed before any substantive reply uses
+`AskUserQuestion`; Thesis publication
 follows its own preview-and-confirmation flow. Order or trade confirmation and
 auto-trading risk acknowledgment need the user's typed reply, never a button.
 For named single-instrument ticker reads, apply the Trade Setup follow-up rules in [ticker-read.md](ticker-read.md#trade-setup-follow-up).
@@ -164,30 +167,19 @@ freshness, and fallback for these official methods:
 
 ## Preferred Automation Setup Skills
 
-Before broader Skillhub search or custom work, check these official fast paths:
+Before broader Skillhub search or custom work, check this official fast path:
+`alva/trade-setup-automation` for watching **one instrument against the
+user's own free-form trade thesis or strategy** (entry/exit conditions,
+judgment-based alerts) via `@alva/trade-setup-sdk`. Trigger phrasings, in
+any language: "trade setup", "trading strategy", "investment strategy",
+watching/monitoring a ticker against the user's own trade idea, "alert me
+when my setup confirms or breaks", editing/diagnosing an existing trade
+setup, or accepting a post-answer Trade Setup suggestion after a named
+single-instrument ticker read. In the post-answer path, reuse the answered
+ticker, thesis, key levels, catalysts, risk, and invalidation conditions as
+setup context, then fetch the blueprint fresh before building.
 
-1. `alva/alpha-radar-setup` for discovering new candidates from user-selected
-   FinTwit/KOL handles, news, and technical signals. Do not choose handles for
-   the user.
-2. `alva/portfolio-watch-setup` for monitoring known tickers, manual holdings,
-   or connected Portfolio Accounts for material changes.
-3. `alva/trade-setup-automation` for watching **one instrument against the
-   user's own free-form trade thesis or strategy** (entry/exit conditions,
-   judgment-based alerts) via `@alva/trade-setup-sdk`. Trigger phrasings, in
-   any language: "trade setup", "trading strategy", "investment strategy",
-   watching/monitoring a ticker against the user's own trade idea, "alert me
-   when my setup confirms or breaks", editing/diagnosing an existing trade
-   setup, or accepting a post-answer Trade Setup suggestion after a named
-   single-instrument ticker read. In the post-answer path, reuse the answered
-   ticker, thesis, key levels, catalysts, risk, and invalidation conditions as
-   setup context, then fetch the blueprint fresh before building.
-
-Choose by outcome: discovery favors Alpha Radar; monitoring owned or followed
-assets broadly favors Portfolio Watch; one instrument tied to the user's own
-trade idea favors Trade Setup. If more than one seems plausible, follow the
-user's primary goal and never present them as competing CTAs.
-
-When one clearly fits, resolve its exact id and blueprint, then follow the
+When it clearly fits, resolve its exact id and blueprint, then follow the
 Skillhub Blueprint rules below. If it does not fit or is unavailable, search the
 current catalog for one clear match; if none exists, build without a skill.
 Never claim an unavailable or ambiguous skill was used.
@@ -197,8 +189,7 @@ complete an Automation. Finish the normal Automation / Push lifecycle, including
 schedule or trigger, publish, novelty and quiet-run behavior, alert binding, and
 delivery-path verification.
 
-In the suggestion, lead with the durable user outcome. Name Alpha Radar or
-Portfolio Watch only when the product name makes that outcome clearer.
+In the suggestion, lead with the durable user outcome.
 
 ## Skillhub Blueprint
 

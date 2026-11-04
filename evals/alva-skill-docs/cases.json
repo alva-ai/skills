@@ -742,7 +742,7 @@
             "After answering a named single-instrument ticker read",
             "after the normal answer",
             "simple fact lookups",
-            "Alpha Radar / Portfolio Watch"
+            "portfolio monitoring"
           ]
         },
         {
@@ -1138,12 +1138,12 @@
       "id": "target.useful-next-step-actions",
       "group": "target",
       "target": "corpus",
-      "description": "Useful post-answer suggestions pair explanatory prose with one action when the tool is available; call order belongs to the tool description, and trade consent is never a button.",
+      "description": "Useful post-answer suggestions pair one short sentence with an action when the next message is predictable and the tool is available; call order belongs to the tool description, and trade consent is never a button.",
       "includes": [
         "If `PresentActions` is available, offer that step as one matching action",
         "the tool description owns action kinds, labels, and call order",
-        "ordinary discussion or explanation needs no buttons",
-        "Required questions use `AskUserQuestion`",
+        "Offer actions only when the user's next message is predictable",
+        "A question needed before any substantive reply uses `AskUserQuestion`",
         "need the user's typed reply, never a button"
       ],
       "excludes": [
@@ -2191,7 +2191,7 @@
           "file": "SKILL.md",
           "includes": [
               "state each material limitation once",
-            "offer a next step beyond it once, as a `PresentActions` action when available, rather than a routine closing question"
+            "offer a next step beyond it once, as a `PresentActions` action when available with one plain sentence, rather than a routine closing question"
           ]
         },
         {
@@ -2221,7 +2221,7 @@
         {
           "file": "references/request-routing.md",
           "includes": [
-            "instead of a typed question, labeled in natural words the user",
+            "offer that step as one matching action, labeled in natural words",
             "short enough for one line on a phone"
           ]
         },
