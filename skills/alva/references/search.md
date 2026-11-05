@@ -134,18 +134,18 @@ playback time; if no time is available, keep the original link without
 guessing. An earnings call transcript has no link: name the company, fiscal
 quarter, call date and speaker instead.
 
-Worldline podcast `source.url` is an Apple Podcasts episode link or the episode
-audio file (since 2026-10-15); `source.title` is the show name. Transcript turns
-carry their time as `Speaker @ h:mm:ss` and `offset`; YouTube evidence carries
-`[mm:ss]`. When one clip lets the user hear the cited moment, put it after the
-conclusion as a link alone in its own paragraph, with a blank line before it
-(Alva apps play such a line in place; a link on the next line of the same
-paragraph, or inside a sentence, stays a text link), at most one per reply:
+A podcast item's `item.uri` is an Apple Podcasts episode link or the episode
+audio file, and its `sourceContent.title` is the show name. When one clip lets
+the user hear the cited moment, put it after the conclusion as a link alone in
+its own paragraph, with a blank line before it (Alva apps play such a line in
+place; a link on the next line of the same paragraph, or inside a sentence,
+stays a text link), at most one per reply, starting at the cited turn's
+`offsetSeconds`:
 
 - YouTube: `[what to watch (mm:ss 起)](https://www.youtube.com/watch?v=<id>&t=<seconds>s)`
-- Podcast: `[what to listen for (mm:ss 起)](<source.url>#t=<seconds>&o=<observationId> "<show name>")`,
-  with the cited hit's `observationId` so Alva apps can show its transcript
-  as captions
+- Podcast: `[what to listen for (mm:ss 起)](<item.uri>#t=<seconds>&i=<item.name> "<show name>")`,
+  with the cited item's `name` so Alva apps can show its transcript as
+  captions
 - X post: the post URL alone on its own line.
 
 When several sources qualify, feature the evidence itself (the quoted clip,

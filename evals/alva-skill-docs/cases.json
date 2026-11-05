@@ -200,11 +200,11 @@
         {
           "file": "references/search.md",
           "includes": [
-            "Worldline podcast `source.url` is an Apple Podcasts episode link or the episode",
+            "A podcast item's `item.uri` is an Apple Podcasts episode link or the episode",
             "as a link alone in its own paragraph, with a blank line before it",
             "keep the other citations",
             "at most one per reply",
-            "- Podcast: `[what to listen for (mm:ss 起)](<source.url>#t=<seconds>&o=<observationId> \"<show name>\")`",
+            "- Podcast: `[what to listen for (mm:ss 起)](<item.uri>#t=<seconds>&i=<item.name> \"<show name>\")`",
             "- YouTube: `[what to watch (mm:ss 起)](https://www.youtube.com/watch?v=<id>&t=<seconds>s)`"
           ]
         }
