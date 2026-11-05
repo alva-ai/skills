@@ -51,3 +51,16 @@ same Markdown paragraph, and the apps only turn a paragraph that is nothing
 but the link into a player. `search.md` now asks for the link in its own
 paragraph with a blank line before it; the `target.worldline-media-line` eval
 checks that wording and the "keep the other citations inline" rule.
+
+## Worldline v2 fields (2026-11-05)
+
+Rebased on main v1.28.2 (search.md moved to v2 `searchItems`); this
+branch's four commits were squashed into one first, then rebased without
+conflicts. The media-line paragraph now uses v2 fields: a podcast item's
+`item.uri` (Apple Podcasts episode or audio file, checked on PRD),
+`sourceContent.title` as the show name, the cited turn's `offsetSeconds`, and
+`i=<item.name>` in the fragment for captions (was `o=<observationId>`). The
+eval case and mutation follow the new strings.
+
+Checks: `skill-doc-eval.mjs` no failed cases (the stale
+`target.mainline-updates` passes on the new base); `mutation-smoke.mjs` 51/51.

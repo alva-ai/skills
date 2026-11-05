@@ -77,8 +77,8 @@ const MUTATIONS = [
   {
     id: "worldline-podcast-media-line",
     file: "references/search.md",
-    remove: "](<source.url>#t=<seconds>&o=<observationId> \"<show name>\")`",
-    replacement: "](<source.url>)`",
+    remove: "](<item.uri>#t=<seconds>&i=<item.name> \"<show name>\")`",
+    replacement: "](<item.uri>)`",
     expectFailedCases: ["target.worldline-media-line"],
   },
   {
