@@ -38,11 +38,42 @@ current command help; do not recreate a resource to change one setting.
 | Automation code or metadata | [feed-lifecycle.md](feed-lifecycle.md#updating-an-existing-automation): `automation list/inspect/update` |
 | Automation cadence or producer run state | [deployment.md](deployment.md): inspect its producer, then update/pause/resume that cronjob |
 | Notifications or Playbook follows | [push-notifications.md](push-notifications.md#inventory-and-unsubscribe): these are independent; muting delivery does not pause computation |
+| Watchlist tickers or followed people | [Watchlist and people follows](#watchlist-and-people-follows) |
 | Playbook content, release, or visibility | [playbook-creation.md](playbook-creation.md) and [api/release.md](api/release.md); inspect the existing Playbook and retain unchanged feeds/metadata |
 | A future Agent turn | [agent-schedules.md](agent-schedules.md): current Channel tools or the explicitly selected CLI/Inbox target |
 
 Verify the resulting requested state. A read or pause request does not require
 building, publishing, test-running a producer, or changing its data source.
+
+## Watchlist and People Follows
+
+Tickers are added to the watchlist, people are followed, and a Thesis is
+bookmarked (see [Thesis](thesis.md)). These commands change the same watchlist
+and Following list the user sees in the Alva App.
+
+- **Tickers:** add only the symbols the user named, all in one
+  `alva markets watchlist add --tickers A,B`; remove with
+  `alva markets watchlist remove --tickers A,B`. Mixed kinds stay in one call
+  with a kind suffix (`NVDA,BTC:crypto`).
+- **"My holdings":** read every account (`alva portfolio accounts`, then
+  `alva portfolio summary --account-id <id>` for each), compare with
+  `alva markets watchlist list`, and add the missing holdings in one call.
+  Adding also restores a ticker the user removed from the watchlist earlier,
+  so tell the user which tickers were added.
+- **People:** find the profile with
+  `alva people search --query <name or username>` (prefix match). `USER` is
+  an Alva user; `PERSON` is a curated person. Follow only an exact match:
+  exactly one result whose name or username is what the user gave, with
+  `alva people follows follow --kind <user|person> --id <id>` (unfollow with
+  `alva people follows unfollow` and the same flags). When several match, ask
+  which one; when none match, say so.
+
+Report every result group: added or removed (or followed), already in that
+state (`unchanged`), and not recognized (`unresolved`). An ambiguous ticker
+(`FAILED_PRECONDITION` in `unresolved`) is not written while the others are;
+retry only that symbol with a kind suffix, or ask. Never substitute a similar
+symbol. The command result is the record of what changed; do not claim a
+ticker was added or a person was followed unless it appears in that result.
 
 ## Financial Evidence
 
