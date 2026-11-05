@@ -53,15 +53,17 @@ and Following list the user sees in the Alva App. Change them only when the
 user asks.
 
 - **Tickers:** pass every requested symbol in one
-  `alva subscriptions watchlist-add --tickers A,B` (1-50; `watchlist-remove`
-  removes). Take symbols from the conversation; for "my holdings", read them
-  with `alva portfolio` first. `alva subscriptions watchlist` lists the current
-  watchlist.
+  `alva subscriptions watchlist-add --tickers A,B` (1-50); remove with
+  `alva subscriptions watchlist-remove --tickers A,B`. Take symbols from the
+  conversation; for "my holdings", read them with `alva portfolio` first.
+  `alva subscriptions watchlist` lists the current watchlist.
 - **People:** find the profile with
   `alva subscriptions search-profiles --query <name or username>` (prefix match).
   `USER` is an Alva user; `PERSON` is a curated person. Follow only an exact
-  match with `follow-profile --kind <user|person> --id <id>`; when several
-  profiles match, ask which one. `alva subscriptions profiles` lists follows.
+  match with `alva subscriptions follow-profile --kind <user|person> --id <id>`
+  (unfollow with `alva subscriptions unfollow-profile` and the same flags); when
+  several profiles match, ask which one. `alva subscriptions profiles` lists
+  follows.
 
 Report every result group: added or removed (or followed), already in that
 state (`unchanged`), and not recognized (`unresolved`). For an ambiguous ticker
