@@ -2354,7 +2354,7 @@
         {
           "file": "SKILL.md",
           "includes": [
-            "Playbook and people follows, ticker watchlist",
+            "manage the ticker watchlist / search and follow people",
             "[Watchlist and people follows](references/request-routing.md#watchlist-and-people-follows)"
           ]
         },
@@ -2363,8 +2363,8 @@
           "includes": [
             "## Watchlist and People Follows",
             "Tickers are added to the watchlist, people are followed, and a Thesis is",
-            "alva subscriptions watchlist-add --tickers A,B",
-            "alva subscriptions search-profiles",
+            "alva markets watchlist add --tickers A,B",
+            "alva people search",
             "Follow only an exact",
             "(`unchanged`)",
             "(`unresolved`)",

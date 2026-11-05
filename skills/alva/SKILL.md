@@ -60,12 +60,12 @@ operating requirements; this index is for navigation.
 | `sdk` | Discover runtime libraries, including search |
 | `run` / `fs` | Execute cloud JavaScript / access persistent ALFS files |
 | `skillhub` | Find and read methodology blueprints |
-| `markets` | Read company narrative and earnings context |
+| `markets` / `people` | Read company narrative and earnings context, manage the ticker watchlist / search and follow people |
 | `thesis` | Create, read, and maintain published Theses |
 | `for-you` | Read personalized publications or ranked Thesis recommendations |
 | `automation` / `deploy` | Manage Automations / schedule and inspect producer scripts |
 | `schedule` | Schedule future or recurring Agent turns |
-| `alert` / `subscriptions` | Manage FEED alerts / Playbook and people follows, ticker watchlist |
+| `alert` / `subscriptions` | Manage FEED alerts / Playbook follows |
 | `playbooks` / `remix` / `release` | Discover, remix, and publish Playbooks |
 | `lint playbook` / `screenshot` | Validate and inspect Playbook delivery |
 | `portfolio` / `x` | Connected brokerage holdings and activity / the user's connected X following and posts ([Twitter/X](references/search.md#twitterx)) |

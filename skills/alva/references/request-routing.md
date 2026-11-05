@@ -53,24 +53,24 @@ and Following list the user sees in the Alva App. Change them only when the
 user asks.
 
 - **Tickers:** pass every requested symbol in one
-  `alva subscriptions watchlist-add --tickers A,B` (1-50); remove with
-  `alva subscriptions watchlist-remove --tickers A,B`. Take symbols from the
+  `alva markets watchlist add --tickers A,B` (1-50); remove with
+  `alva markets watchlist remove --tickers A,B`. Take symbols from the
   conversation; for "my holdings", read them with `alva portfolio` first.
-  `alva subscriptions watchlist` lists the current watchlist.
+  `alva markets watchlist list` lists the current watchlist.
 - **People:** find the profile with
-  `alva subscriptions search-profiles --query <name or username>` (prefix match).
-  `USER` is an Alva user; `PERSON` is a curated person. Follow only an exact
-  match with `alva subscriptions follow-profile --kind <user|person> --id <id>`
-  (unfollow with `alva subscriptions unfollow-profile` and the same flags); when
-  several profiles match, ask which one. `alva subscriptions profiles` lists
-  follows.
+  `alva people search --query <name or username>` (prefix match). `USER` is an
+  Alva user; `PERSON` is a curated person. Follow only an exact match with
+  `alva people follows follow --kind <user|person> --id <id>` (unfollow with
+  `alva people follows unfollow` and the same flags); when several profiles
+  match, ask which one. `alva people follows list` lists follows.
 
 Report every result group: added or removed (or followed), already in that
 state (`unchanged`), and not recognized (`unresolved`). For an ambiguous ticker
-(`FAILED_PRECONDITION`), ask or retry with `--kind`; never substitute a similar
-symbol. Nothing is written when no ticker resolves. The command result is the
-record of what changed; do not claim a ticker was added or a person was
-followed unless it appears in that result.
+(`FAILED_PRECONDITION`), ask or retry that symbol with a kind suffix such as
+`BTC:crypto`; never substitute a similar symbol. Nothing is written when no
+ticker resolves. The command result is the record of what changed;
+do not claim a ticker was added or a person was followed unless it appears in
+that result.
 
 ## Financial Evidence
 
