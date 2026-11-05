@@ -2354,7 +2354,7 @@
         {
           "file": "SKILL.md",
           "includes": [
-            "manage the ticker watchlist / search and follow people",
+            "| `markets` / `people` | Company narrative, earnings, watchlist / find and follow people |",
             "[Watchlist and people follows](references/request-routing.md#watchlist-and-people-follows)"
           ]
         },
@@ -2364,7 +2364,12 @@
             "## Watchlist and People Follows",
             "Tickers are added to the watchlist, people are followed, and a Thesis is",
             "alva markets watchlist add --tickers A,B",
-            "alva people search",
+            "`NVDA,BTC:crypto`",
+            "alva portfolio summary --account-id <id>",
+            "Adding also restores a ticker the user removed",
+            "retry only that symbol with a kind suffix",
+            "alva people search --query",
+            "alva people follows follow --kind <user|person> --id <id>",
             "Follow only an exact",
             "(`unchanged`)",
             "(`unresolved`)",
@@ -2372,6 +2377,12 @@
             "do not claim a ticker was added"
           ]
         }
+      ],
+      "excludes": [
+        "subscriptions watchlist",
+        "search-profiles",
+        "follow-profile",
+        "subscriptions profiles"
       ]
     }
   ]

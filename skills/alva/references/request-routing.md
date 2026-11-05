@@ -49,28 +49,31 @@ building, publishing, test-running a producer, or changing its data source.
 
 Tickers are added to the watchlist, people are followed, and a Thesis is
 bookmarked (see [Thesis](thesis.md)). These commands change the same watchlist
-and Following list the user sees in the Alva App. Change them only when the
-user asks.
+and Following list the user sees in the Alva App.
 
-- **Tickers:** pass every requested symbol in one
-  `alva markets watchlist add --tickers A,B` (1-50); remove with
-  `alva markets watchlist remove --tickers A,B`. Take symbols from the
-  conversation; for "my holdings", read them with `alva portfolio` first.
-  `alva markets watchlist list` lists the current watchlist.
+- **Tickers:** add only the symbols the user named, all in one
+  `alva markets watchlist add --tickers A,B`; remove with
+  `alva markets watchlist remove --tickers A,B`. Mixed kinds stay in one call
+  with a kind suffix (`NVDA,BTC:crypto`).
+- **"My holdings":** read every account (`alva portfolio accounts`, then
+  `alva portfolio summary --account-id <id>` for each), compare with
+  `alva markets watchlist list`, and add the missing holdings in one call.
+  Adding also restores a ticker the user removed from the watchlist earlier,
+  so tell the user which tickers were added.
 - **People:** find the profile with
-  `alva people search --query <name or username>` (prefix match). `USER` is an
-  Alva user; `PERSON` is a curated person. Follow only an exact match with
+  `alva people search --query <name or username>` (prefix match). `USER` is
+  an Alva user; `PERSON` is a curated person. Follow only an exact match:
+  exactly one result whose name or username is what the user gave, with
   `alva people follows follow --kind <user|person> --id <id>` (unfollow with
-  `alva people follows unfollow` and the same flags); when several profiles
-  match, ask which one. `alva people follows list` lists follows.
+  `alva people follows unfollow` and the same flags). When several match, ask
+  which one; when none match, say so.
 
 Report every result group: added or removed (or followed), already in that
-state (`unchanged`), and not recognized (`unresolved`). For an ambiguous ticker
-(`FAILED_PRECONDITION`), ask or retry that symbol with a kind suffix such as
-`BTC:crypto`; never substitute a similar symbol. Nothing is written when no
-ticker resolves. The command result is the record of what changed;
-do not claim a ticker was added or a person was followed unless it appears in
-that result.
+state (`unchanged`), and not recognized (`unresolved`). An ambiguous ticker
+(`FAILED_PRECONDITION` in `unresolved`) is not written while the others are;
+retry only that symbol with a kind suffix, or ask. Never substitute a similar
+symbol. The command result is the record of what changed; do not claim a
+ticker was added or a person was followed unless it appears in that result.
 
 ## Financial Evidence
 
