@@ -269,7 +269,7 @@ the original before citing its contents.
 - **Signals**: `releaseDate`, podcast popularity (no direct metric)
 - **Fields**: `trackName` (episode title), `collectionName` (podcast name), `description`, `releaseDate` (ISO 8601), `episodeUrl` (audio), `artworkUrl600`, `trackViewUrl` (Apple Podcasts link), `trackTimeMillis` (duration)
 - **Note**: Limited source — best as supplementary, not primary. No engagement metrics.
-- **Playable link**: prefer `trackViewUrl` (Apple episode) or `episodeUrl`, in the podcast format under [Worldline](#worldline).
+- **Playable link**: in the podcast format under [Worldline](#worldline), with `trackViewUrl` (Apple episode) or `episodeUrl` as `<item.uri>` and `collectionName` as `<show name>`. Omit `&i=<item.name>`: these episodes have no Worldline transcript.
 
 ### General Web
 
