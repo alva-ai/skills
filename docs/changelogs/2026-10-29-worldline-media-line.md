@@ -19,7 +19,10 @@ Local record. Primary design: mono-meta
   of it, the other citations stay inline, and the sentence before it says
   what to listen or watch for without repeating the card.
 - Podcasts section: playable link from `trackViewUrl` (Apple episode) or
-  `episodeUrl`, in the same format.
+  `episodeUrl`, with `collectionName` as the show name, in the same format
+  without `&i=` (these episodes have no Worldline transcript).
+- Eval: `target.mainline-updates` expects v1.29.0, the version main bumped
+  to in #671 without updating the case.
 - Eval: `target.worldline-media-line` checks the format, the blank line and
   the keep-others-inline rule; mutation `worldline-podcast-media-line` drops
   the `#t=` start and the show-name title.
