@@ -134,27 +134,11 @@ playback time; if no time is available, keep the original link without
 guessing. An earnings call transcript has no link: name the company, fiscal
 quarter, call date and speaker instead.
 
-A podcast item's `item.uri` is an Apple Podcasts episode link or the episode
-audio file, and its `sourceContent.title` is the show name. When one clip lets
-the user hear the cited moment, put it after the conclusion as a link alone in
-its own paragraph, with a blank line before it (Alva apps play such a line in
-place; a link on the next line of the same paragraph, or inside a sentence,
-stays a text link), at most one per reply, starting at the cited turn's
-`offsetSeconds`:
-
-- YouTube: `[what to watch (from mm:ss)](https://www.youtube.com/watch?v=<id>&t=<seconds>s)`
-- Podcast: `[what to listen for (from mm:ss)](<item.uri>#t=<seconds>&i=<item.name> "<show name>")`,
-  with the cited item's `name` so Alva apps can show its transcript as
-  captions
-- X post: the post URL alone on its own line.
-
-Write the link text in the reply's language and keep the start time in
-parentheses at its end, e.g. `(from 0:56)` or `(0:56 起)`.
-
-When several sources qualify, feature the evidence itself (the quoted clip,
-the original post) rather than coverage of it, and keep the other citations
-inline. The sentence before the line says what to listen or watch for, without
-repeating what the card shows.
+When `mcp__alva__FeatureMedia` is available and the user would want to play a
+cited audio or video passage, feature the item by `item.name` as
+`worldline_item`, with the cited turn's `offsetSeconds` as `start_seconds`:
+Alva apps play it from that moment and show its transcript as captions. Keep
+the inline citation.
 
 Worldline is selectively indexed, not live full-web/X coverage. Keep the
 Twitter/X route for current posts and account history. Independent lookups may
@@ -272,7 +256,6 @@ the original before citing its contents.
 - **Signals**: `releaseDate`, podcast popularity (no direct metric)
 - **Fields**: `trackName` (episode title), `collectionName` (podcast name), `description`, `releaseDate` (ISO 8601), `episodeUrl` (audio), `artworkUrl600`, `trackViewUrl` (Apple Podcasts link), `trackTimeMillis` (duration)
 - **Note**: Limited source — best as supplementary, not primary. No engagement metrics.
-- **Playable link**: in the podcast format under [Worldline](#worldline), with `trackViewUrl` (Apple episode) or `episodeUrl` as `<item.uri>` and `collectionName` as `<show name>`. Omit `&i=<item.name>`: these episodes have no Worldline transcript.
 
 ### General Web
 

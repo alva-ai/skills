@@ -192,21 +192,17 @@
       ]
     },
     {
-      "id": "target.worldline-media-line",
+      "id": "target.worldline-feature-media",
       "group": "target",
       "target": "corpus",
-      "description": "Worldline audio/video citations can add one playable clip as a standalone line that starts at the cited moment, with the podcast show name as the link title.",
+      "description": "A cited Worldline audio or video passage is featured through FeatureMedia by item name, starting at the cited turn, and keeps its inline citation.",
       "file_includes": [
         {
           "file": "references/search.md",
           "includes": [
-            "A podcast item's `item.uri` is an Apple Podcasts episode link or the episode",
-            "as a link alone in its own paragraph, with a blank line before it",
-            "keep the other citations",
-            "at most one per reply",
-            "- Podcast: `[what to listen for (from mm:ss)](<item.uri>#t=<seconds>&i=<item.name> \"<show name>\")`",
-            "- YouTube: `[what to watch (from mm:ss)](https://www.youtube.com/watch?v=<id>&t=<seconds>s)`",
-            "Write the link text in the reply's language and keep the start time in"
+            "feature the item by `item.name` as `worldline_item`",
+            "the cited turn's `offsetSeconds` as `start_seconds`",
+            "Keep the inline citation."
           ]
         }
       ]

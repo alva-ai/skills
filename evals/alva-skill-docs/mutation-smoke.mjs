@@ -82,11 +82,11 @@ const MUTATIONS = [
     expectFailedCases: ["retained.search-routing"],
   },
   {
-    id: "worldline-podcast-media-line",
+    id: "worldline-feature-media-by-item",
     file: "references/search.md",
-    remove: "](<item.uri>#t=<seconds>&i=<item.name> \"<show name>\")`",
-    replacement: "](<item.uri>)`",
-    expectFailedCases: ["target.worldline-media-line"],
+    remove: "feature the item by `item.name` as\n`worldline_item`",
+    replacement: "feature its `item.uri` as `url`",
+    expectFailedCases: ["target.worldline-feature-media"],
   },
   {
     id: "thesis-actions-scoped-to-preview",
