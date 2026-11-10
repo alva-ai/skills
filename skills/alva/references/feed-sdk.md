@@ -736,19 +736,32 @@ await feed.run(async (ctx) => {
   read, but only finds records their author indexed.
 - **Cost.** Embedding is billed to the run's credits like managed LLM calls: 22
   credits per million tokens. `index()` pays only for new or changed records;
-  `search()` pays for the query. With too few credits the call throws before any
-  request is sent.
+  `search()` pays for the query. Each embedding request is checked against the
+  remaining credits before it is sent, not the whole call: when credits run out
+  partway through `index()`, it throws, but the requests already sent stay
+  charged and the vectors already written stay. Rerunning embeds only the rest.
 
 To skip near-duplicates before publishing, search with text built exactly the
-way `index()` builds it:
+way `index()` builds it, including the 8,000-byte cut (a longer query is
+rejected):
 
 ```javascript
 const FIELDS = ["title", "explanation"];
 const DUPLICATE = 0.9; // a starting point: calibrate on your own records
-const text = (r) =>
-  FIELDS.map((f) => r[f])
+const text = (r) => {
+  const joined = FIELDS.map((f) => r[f])
     .filter((v) => typeof v === "string" && v.trim())
     .join("\n\n");
+  let out = ""; // cut at 8,000 UTF-8 bytes without splitting a character
+  let bytes = 0;
+  for (const ch of joined) {
+    const c = ch.codePointAt(0);
+    bytes += c < 0x80 ? 1 : c < 0x800 ? 2 : c < 0x10000 ? 3 : 4;
+    if (bytes > 8000) break;
+    out += ch;
+  }
+  return out;
+};
 
 const { hits } = await cards.search(text(card), {
   from: card.date - 30 * 86400e3,
