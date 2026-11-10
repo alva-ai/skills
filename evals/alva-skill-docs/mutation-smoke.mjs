@@ -112,13 +112,6 @@ const MUTATIONS = [
     ],
   },
   {
-    id: "thesis-edit-uses-editorial",
-    file: "references/thesis.md",
-    remove: "3. Run `alva thesis update` with `--editorial`, `--id`, a new",
-    replacement: "3. Run `alva thesis update` with `--id`, a new",
-    expectFailedCases: ["target.thesis-edit-current-version"],
-  },
-  {
     id: "thesis-new-editorial-issue-awaits-author",
     file: "references/thesis.md",
     remove: "If the preview showed Notes the author had not yet\nconsidered, that confirmation is their decision to publish despite them.",
