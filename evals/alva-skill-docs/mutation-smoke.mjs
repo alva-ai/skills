@@ -22,9 +22,16 @@ const MUTATIONS = [
   {
     id: "thesis-preview-prose",
     file: "references/thesis.md",
-    remove: "Render the selected body as ordinary prose, not inside a Markdown code fence",
+    remove: "Render the selected body as Markdown with its paragraphs and lists intact, not",
     replacement: "Wrap the publication preview in a text code fence",
     expectFailedCases: ["target.thesis-readable-publication-preview"],
+  },
+  {
+    id: "thesis-body-shape-notes",
+    file: "references/thesis.md",
+    remove: "tests, risks, data or framing, goes in Notes as a suggestion.",
+    replacement: "tests, risks, data or framing, goes in the body.",
+    expectFailedCases: ["target.thesis-body-shape"],
   },
   {
     id: "thesis-preview-internal-rules",

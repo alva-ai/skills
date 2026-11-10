@@ -974,7 +974,7 @@
           "thesis.md"
         ],
         "behaviors": [
-          "Render the selected body as ordinary prose, not inside a Markdown code fence",
+          "Render the selected body as Markdown with its paragraphs and lists intact, not inside a Markdown code fence",
           "Use localized direction labels",
           "Do not explain why confirmation is needed, quote or cite these rules, or link Skill files or local paths",
           "A publication-only preview is a confirmation step, not new investment analysis",
@@ -995,7 +995,7 @@
           "thesis.md"
         ],
         "behaviors": [
-          "Render the selected body as ordinary prose, not inside a Markdown code fence",
+          "Render the selected body as Markdown with its paragraphs and lists intact, not inside a Markdown code fence",
           "Use localized direction labels",
           "Do not explain why confirmation is needed, quote or cite these rules, or link Skill files or local paths",
           "A publication-only preview is a confirmation step, not new investment analysis",
