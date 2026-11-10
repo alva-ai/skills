@@ -142,7 +142,9 @@ first line and can scan the rest, the way a well-edited post reads:
 
 Shape follows substance: a one-sentence view stays one sentence, and shaping
 never adds, drops or softens a claim. Text the author wrote and asked to publish
-as is keeps its own form.
+as is keeps its own form. A targeted change to an existing body, such as fixing
+a figure or a typo, touches only what the author asked to change, and a length
+or format the author asked for wins over the defaults here.
 
 Shaping moves and trims words, never meaning:
 
@@ -203,9 +205,10 @@ Otherwise, guide the request to one candidate before confirmation:
    default visibility: state it in the preview rather than asking.
    When the user adopts your analysis as their view, such as "publish this as
    my view", write it as their viewpoint in their voice, not a condensed
-   report: what they believe and why, plus what they would watch when that
-   matters. Leave out point-in-time figures such as intraday moves or snapshot
-   levels unless the user asked for them or the view depends on them.
+   report: what they believe and why, plus the watch items that analysis
+   already names, when they matter. Leave out point-in-time figures such as
+   intraday moves or snapshot levels unless the user asked for them or the
+   view depends on them.
 3. When the candidate depends on current facts or the user requests a
    research-backed Thesis, complete the Financial Analysis evidence route in
    [request-routing.md](request-routing.md) first. Use only the verified evidence
