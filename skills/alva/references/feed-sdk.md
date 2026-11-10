@@ -651,19 +651,21 @@ await feed.run(async (ctx) => {
 
 ### TimeSeries (read-only, from upstreams)
 
-| Method   | Signature                       | Description                                                   |
-| -------- | ------------------------------- | ------------------------------------------------------------- |
-| last     | `last(n?, before?) → records[]` | Last N records (chronological), optionally before a timestamp |
-| first    | `first(n?, after?) → records[]` | First N records, optionally after a timestamp                 |
-| range    | `range(from, to?) → records[]`  | Records in time range                                         |
-| lastDate | `lastDate() → number \| null`   | Timestamp of the most recent record                           |
-| count    | `count(from?, to?) → number`    | Number of records (optionally in range)                       |
+| Method   | Signature                                                 | Description                                                                                             |
+| -------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| last     | `last(n?, before?) → records[]`                           | Last N records (chronological), optionally before a timestamp                                           |
+| first    | `first(n?, after?) → records[]`                           | First N records, optionally after a timestamp                                                           |
+| range    | `range(from, to?) → records[]`                            | Records in time range                                                                                   |
+| lastDate | `lastDate() → number \| null`                             | Timestamp of the most recent record                                                                     |
+| count    | `count(from?, to?) → number`                              | Number of records (optionally in range)                                                                 |
+| search   | `search(query, { from, to, limit? }) → { hits, limited }` | Records whose indexed text is nearest to `query` ([Semantic Search](#semantic-search-index-and-search)) |
 
 ### WritableTimeSeries (extends TimeSeries, from ctx.self)
 
-| Method | Signature           | Description                                           |
-| ------ | ------------------- | ----------------------------------------------------- |
-| append | `append(records[])` | Append records; auto-sorts and deduplicates by `date` |
+| Method | Signature                                                   | Description                                                                               |
+| ------ | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| append | `append(records[])`                                         | Append records; auto-sorts and deduplicates by `date`                                     |
+| index  | `index({ fields, from, to })` or `index({ fields, dates })` | Embed records' text for `search()` ([Semantic Search](#semantic-search-index-and-search)) |
 
 All TimeSeries read methods and `append` are async.
 
@@ -680,6 +682,87 @@ await ctx.self.ts("metrics", "prices").append([
 Records are automatically sorted by `date` ascending. Records sharing the same
 `date` are transparently grouped and stored as `{date, items: [{...}, {...}]}`;
 on read, they are auto-flattened back into individual flat records.
+
+### Semantic Search (`index()` and `search()`)
+
+Requires `@alva/feed` 1.0.14 or later. `index()` embeds chosen text fields of
+each record with OpenAI `text-embedding-3-small` and stores the vector with the
+output; `search()` embeds a query and returns the records in a time range whose
+text is most similar. Nothing is indexed automatically: `search()` only finds
+records an `index()` call covered, so call `index()` after `append()` (or from
+another task).
+
+```javascript
+await feed.run(async (ctx) => {
+  const cards = ctx.self.ts("news", "cards");
+  await cards.append(stories);
+  // Embed only the records just written; unchanged records cost nothing.
+  await cards.index({
+    fields: ["headline", "summary"],
+    dates: stories.map((s) => s.date),
+  });
+
+  const now = Date.now();
+  const { hits, limited } = await cards.search("chip export restrictions", {
+    from: now - 7 * 86400e3,
+    to: now,
+    limit: 5,
+  });
+  for (const hit of hits)
+    console.log(hit.score.toFixed(3), hit.record.headline);
+});
+```
+
+- **What is embedded.** For each record, the non-empty string values of `fields`
+  (1-8 top-level names), in order, joined by a blank line and cut at 8,000
+  bytes. A record has one vector; same-date grouped records each get their own.
+  `search()` compares the query with that combined text, not with each field. To
+  search headlines only, index only `["headline"]`.
+- **One index per output.** Use the same `fields` for every `index()` call on an
+  output. Indexing a scope with other fields re-embeds it and replaces its
+  vectors; indexing different time ranges with different fields silently mixes
+  them in search results.
+- **Scope.** `{ from, to }` (inclusive, ms) or `{ dates: [...] }`; large scopes
+  are split automatically. Re-running is cheap: unchanged records are skipped,
+  changed records are re-embedded, and vectors of deleted or emptied records are
+  removed. `index()` resolves once the vectors are committed and searchable.
+- **Results.** `from` and `to` are required; `limit` is 1-50 (default 10).
+  `hits` is `[{ score, date, record }]`, nearest first, where `score` is cosine
+  similarity (at most 1). Up to `limit` hits come back **even when none are
+  related**, so filter hits by a score threshold you calibrated on your own
+  records. Only the newest 10,000 indexed records in the range are compared;
+  `limited: true` means older ones were skipped, so narrow the range.
+- **Upstreams.** `search()` also works on `ctx.upstream` time series you can
+  read, but only finds records their author indexed.
+- **Cost.** Embedding is billed to the run's credits like managed LLM calls: 22
+  credits per million tokens. `index()` pays only for new or changed records;
+  `search()` pays for the query. With too few credits the call throws before any
+  request is sent.
+
+To skip near-duplicates before publishing, search with text built exactly the
+way `index()` builds it:
+
+```javascript
+const FIELDS = ["title", "explanation"];
+const DUPLICATE = 0.9; // a starting point: calibrate on your own records
+const text = (r) =>
+  FIELDS.map((f) => r[f])
+    .filter((v) => typeof v === "string" && v.trim())
+    .join("\n\n");
+
+const { hits } = await cards.search(text(card), {
+  from: card.date - 30 * 86400e3,
+  to: card.date,
+  limit: 1,
+});
+if (hits.length === 0 || hits[0].score < DUPLICATE) {
+  await cards.append([card]);
+  await cards.index({ fields: FIELDS, dates: [card.date] });
+}
+```
+
+To embed text outside a Feed, use
+`require("@alva/openai-embeddings").embed(texts, { model: "text-embedding-3-small" })`.
 
 ---
 
@@ -916,6 +999,9 @@ alva fs read --path '/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last
   `(async () => { ... })();`.
 - **`@last` returns chronological (oldest-first) order**, consistent with
   `first()` and `range()`. No manual sorting needed.
+- **`search()` needs `index()`**. Appending does not index anything, and
+  `search()` returns up to `limit` hits even when none are related; filter by
+  score.
 
 ---
 

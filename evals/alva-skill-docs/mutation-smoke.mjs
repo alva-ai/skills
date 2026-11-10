@@ -89,6 +89,13 @@ const MUTATIONS = [
     expectFailedCases: ["target.worldline-feature-media"],
   },
   {
+    id: "feed-search-mixed-fields",
+    file: "references/feed-sdk.md",
+    remove: "Use the same `fields` for every `index()` call on an\n  output.",
+    replacement: "Each `index()` call may pick different `fields`.",
+    expectFailedCases: ["target.feed-semantic-search"],
+  },
+  {
     id: "thesis-actions-scoped-to-preview",
     file: "references/thesis.md",
     remove: "\"Edit\", and do not",
