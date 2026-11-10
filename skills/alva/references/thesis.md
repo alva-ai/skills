@@ -125,6 +125,41 @@ research shows competitors closing the software gap, keep the moat claim in
 the body and put the competing evidence in Notes. Change the claim only after
 the author agrees.
 
+### Body shape
+
+Any body you draft or revise is read in a scrolling feed, where a card shows
+about seven lines before "more". Shape it so a reader gets the call from the
+first line and can scan the rest, the way a well-edited post reads:
+
+- Open with the call in one short line: the asset, the direction and the one
+  reason that carries it.
+- Then give one idea per paragraph, one or two short sentences each, with a
+  blank line between paragraphs. Put parallel reasons, a cause-and-effect
+  chain, or the conditions to watch in a short list rather than one long
+  sentence.
+- Cut words that carry no claim: "I believe", "I expect that", a restatement
+  of the stance, a closing line that only summarizes.
+
+Shape follows substance: a one-sentence view stays one sentence, and shaping
+never adds, drops or softens a claim. Text the author wrote and asked to publish
+as is keeps its own form. A targeted change to an existing body, such as fixing
+a figure or a typo, touches only what the author asked to change, and a length
+or format the author asked for wins over the defaults here.
+
+Shaping moves and trims words, never meaning:
+
+- The first line always names the asset or theme and the author's direction.
+- Keep the author's core claim and every reason, condition and figure they
+  gave, at the certainty they gave it ("may" stays "may"; "unless A and B"
+  stays "unless A and B"). Compress the wording, not the content.
+- Anything the author asked to include, or adopted from your analysis, counts
+  as theirs and stays. Everything else you contribute, such as watch items,
+  tests, risks, data or framing, goes in Notes as a suggestion.
+
+Keep it short: about 50 words (about 100 Chinese characters) when the
+author gave one or two reasons. With more reasons, give each one short line
+in a list. Go over only to keep an author's claim, never to add your own.
+
 ## Thesis discussion
 
 Follow the user's line of thought and respond to their specific point in a few
@@ -170,9 +205,10 @@ Otherwise, guide the request to one candidate before confirmation:
    default visibility: state it in the preview rather than asking.
    When the user adopts your analysis as their view, such as "publish this as
    my view", write it as their viewpoint in their voice, not a condensed
-   report: what they believe and why, plus what they would watch when that
-   matters. Leave out point-in-time figures such as intraday moves or snapshot
-   levels unless the user asked for them or the view depends on them.
+   report: what they believe and why, plus the watch items that analysis
+   already names, when they matter. Leave out point-in-time figures such as
+   intraday moves or snapshot levels unless the user asked for them or the
+   view depends on them.
 3. When the candidate depends on current facts or the user requests a
    research-backed Thesis, complete the Financial Analysis evidence route in
    [request-routing.md](request-routing.md) first. Use only the verified evidence
@@ -187,7 +223,9 @@ Otherwise, guide the request to one candidate before confirmation:
 Do not add Alva company-page links to candidate or published bodies. Preserve
 the author's links and legitimate supporting citations.
 
-Show the candidate with its Notes and let the user revise it naturally. When
+Show the candidate with its Notes and let the user revise it naturally. Lead
+into it with at most one short line; do not restate the view in prose before
+showing the body, and do not repeat the body's points in Notes. When
 the request already asks to publish, show the candidate as the full
 [publication preview](#publication-preview) so one confirmation publishes it.
 When the user selects text to publish, follow Create below. A candidate already
@@ -251,9 +289,9 @@ Present the preview in the user's language:
   [Images in a new public Thesis](#images-in-a-new-public-thesis).
 - **Notes**, when any.
 
-Render the selected body as ordinary prose, not inside a Markdown code fence
-added by the Agent. Preserve formatting, including any code fences, already in
-the author's selected body. Use verified catalog IDs only in tool calls.
+Render the selected body as Markdown with its paragraphs and lists intact, not
+inside a Markdown code fence added by the Agent. Preserve formatting, including
+any code fences, already in the author's selected body. Use verified catalog IDs only in tool calls.
 Keep internal IDs and API field names out of the preview; omit absent optional
 fields instead of listing blanks. Do not display CLI parameters or raw payloads.
 In the preview and accompanying explanation, state the author's direction

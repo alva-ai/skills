@@ -1404,7 +1404,7 @@
         }
       ],
       "includes": [
-        "version: v1.28.2",
+        "version: v1.29.1",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -2066,7 +2066,7 @@
         {
           "file": "references/thesis.md",
           "includes": [
-            "Render the selected body as ordinary prose, not inside a Markdown code fence",
+            "Render the selected body as Markdown with its paragraphs and lists intact, not inside a Markdown code fence",
             "Use localized direction labels",
             "Do not explain why confirmation is needed, quote or cite these rules, or link Skill files or local paths",
             "A publication-only preview is a confirmation step, not new investment analysis",
@@ -2074,6 +2074,28 @@
             "Preserve any disclaimer already present in the author's selected body",
             "Show the preview, then wait for confirmation.",
             "In the preview and accompanying explanation, state the author's direction without describing internal storage or field writes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "target.thesis-body-shape",
+      "group": "target",
+      "target": "corpus",
+      "description": "Drafted Thesis bodies read like an edited post: the call first, one idea per paragraph, about 50 words, author claims kept, the Agent's own additions in Notes, and a one-line lead-in.",
+      "file_includes": [
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "### Body shape",
+            "Open with the call in one short line: the asset, the direction and the one reason that carries it.",
+            "with a blank line between paragraphs",
+            "touches only what the author asked to change",
+            "a length or format the author asked for wins over the defaults here",
+            "The first line always names the asset or theme and the author's direction.",
+            "tests, risks, data or framing, goes in Notes as a suggestion.",
+            "Keep it short: about 50 words (about 100 Chinese characters)",
+            "Lead into it with at most one short line"
           ]
         }
       ]
@@ -2173,9 +2195,10 @@
             "only when the user has stated a view of their own, not just asked for yours",
             "Public is the default visibility: state it in the preview rather than asking",
             "When the user adopts your analysis as their view",
-          "not a condensed report",
-          "Research that tests their current point or a premise it depends on is part of the answer",
-          "When research would branch beyond their point",
+            "not a condensed report",
+            "plus the watch items that analysis already names, when they matter",
+            "Research that tests their current point or a premise it depends on is part of the answer",
+            "When research would branch beyond their point",
             "Leave out point-in-time figures",
             "show the candidate as the full [publication preview](#publication-preview) so one confirmation publishes it",
             "Do not explain why confirmation is needed",
@@ -2191,7 +2214,7 @@
           "includes": [
             "when the user has stated a view of their own and it has settled",
             "Research that tests the user's point belongs to the answer",
-          "For steps that branch beyond it, offer rather than do",
+            "For steps that branch beyond it, offer rather than do",
             "State each material limitation once"
           ]
         },
@@ -2209,9 +2232,9 @@
         "An explicit request naming that scope is sufficient",
         "Keep the chat composer's existing attachment limit",
         "when discussion has developed a clear view worth following",
-      "\"Could add\"",
-      "the two or three reasons that carry it",
-      "sharp colleague"
+        "\"Could add\"",
+        "the two or three reasons that carry it",
+        "sharp colleague"
       ]
     },
     {
@@ -2223,7 +2246,7 @@
         {
           "file": "SKILL.md",
           "includes": [
-              "state each material limitation once",
+            "state each material limitation once",
             "offer a next step beyond it once, as a `PresentActions` action when available with one plain sentence, rather than a routine closing question"
           ]
         },
@@ -2266,7 +2289,7 @@
         }
       ],
       "excludes": [
-          "Run `alva skillhub get <official-id>` to verify that exact method",
+        "Run `alva skillhub get <official-id>` to verify that exact method",
         "bolded summary line"
       ]
     },
