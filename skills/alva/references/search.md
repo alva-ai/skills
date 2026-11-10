@@ -134,6 +134,12 @@ playback time; if no time is available, keep the original link without
 guessing. An earnings call transcript has no link: name the company, fiscal
 quarter, call date and speaker instead.
 
+When `mcp__alva__FeatureMedia` is available and the user would want to play a
+cited audio or video passage, feature the item by `item.name` as
+`worldline_item`, with the cited turn's `offsetSeconds` as `start_seconds`:
+Alva apps play it from that moment and show its transcript as captions. Keep
+the inline citation.
+
 Worldline is selectively indexed, not live full-web/X coverage. Keep the
 Twitter/X route for current posts and account history. Independent lookups may
 share a tool round where supported, but parallel calls still await completion;
