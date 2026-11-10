@@ -14,7 +14,9 @@ Local record. Primary design: mono-meta
   paragraph stays a text link), at most one per reply, starting at the cited
   turn's `offsetSeconds`. Formats for YouTube, podcast
   (`<item.uri>#t=<seconds>&i=<item.name> "<show name>"`; the item name lets
-  Alva apps show its transcript as captions) and X posts. When several
+  Alva apps show its transcript as captions) and X posts. The link text is in
+  the reply's language, with the start time in parentheses at its end
+  (`(from 0:56)`, `(0:56 起)`). When several
   sources qualify, the line goes to the evidence itself rather than coverage
   of it, the other citations stay inline, and the sentence before it says
   what to listen or watch for without repeating the card.
@@ -23,8 +25,8 @@ Local record. Primary design: mono-meta
   without `&i=` (these episodes have no Worldline transcript).
 - Eval: `target.mainline-updates` expects v1.29.0, the version main bumped
   to in #671 without updating the case.
-- Eval: `target.worldline-media-line` checks the format, the blank line and
-  the keep-others-inline rule; mutation `worldline-podcast-media-line` drops
+- Eval: `target.worldline-media-line` checks the format, the reply-language
+  rule, the blank line and the keep-others-inline rule; mutation `worldline-podcast-media-line` drops
   the `#t=` start and the show-name title.
 
 ## Verification

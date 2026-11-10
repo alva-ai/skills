@@ -142,11 +142,14 @@ place; a link on the next line of the same paragraph, or inside a sentence,
 stays a text link), at most one per reply, starting at the cited turn's
 `offsetSeconds`:
 
-- YouTube: `[what to watch (mm:ss 起)](https://www.youtube.com/watch?v=<id>&t=<seconds>s)`
-- Podcast: `[what to listen for (mm:ss 起)](<item.uri>#t=<seconds>&i=<item.name> "<show name>")`,
+- YouTube: `[what to watch (from mm:ss)](https://www.youtube.com/watch?v=<id>&t=<seconds>s)`
+- Podcast: `[what to listen for (from mm:ss)](<item.uri>#t=<seconds>&i=<item.name> "<show name>")`,
   with the cited item's `name` so Alva apps can show its transcript as
   captions
 - X post: the post URL alone on its own line.
+
+Write the link text in the reply's language and keep the start time in
+parentheses at its end, e.g. `(from 0:56)` or `(0:56 起)`.
 
 When several sources qualify, feature the evidence itself (the quoted clip,
 the original post) rather than coverage of it, and keep the other citations

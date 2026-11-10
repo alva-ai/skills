@@ -204,8 +204,9 @@
             "as a link alone in its own paragraph, with a blank line before it",
             "keep the other citations",
             "at most one per reply",
-            "- Podcast: `[what to listen for (mm:ss 起)](<item.uri>#t=<seconds>&i=<item.name> \"<show name>\")`",
-            "- YouTube: `[what to watch (mm:ss 起)](https://www.youtube.com/watch?v=<id>&t=<seconds>s)`"
+            "- Podcast: `[what to listen for (from mm:ss)](<item.uri>#t=<seconds>&i=<item.name> \"<show name>\")`",
+            "- YouTube: `[what to watch (from mm:ss)](https://www.youtube.com/watch?v=<id>&t=<seconds>s)`",
+            "Write the link text in the reply's language and keep the start time in"
           ]
         }
       ]
