@@ -96,6 +96,13 @@ const MUTATIONS = [
     expectFailedCases: ["target.feed-semantic-search"],
   },
   {
+    id: "feed-search-concurrent-indexers",
+    file: "references/feed-sdk.md",
+    remove: "Index an output from one task at a time,",
+    replacement: "Any number of tasks may index an output at once,",
+    expectFailedCases: ["target.feed-semantic-search"],
+  },
+  {
     id: "feed-search-whole-call-credit-check",
     file: "references/feed-sdk.md",
     remove:
