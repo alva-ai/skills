@@ -389,9 +389,12 @@ const strategy = defineStrategy({ name: "spy-tlt-trend", revision: "1" /* ... */
   from `start`. Never delete the Feed's `data/` to force a replay.
 - **Events:** pass the whole event history from `start` on every call, not only new events: a
   rebuild replays with only what that call passed.
-- **Alerts.** Every decision with commands appends a v1-compatible row to `signal/targets`, a
-  legacy alert output: `--push-notify` works, and do not wrap it in `alertOutput()`. A rebuild
-  never re-announces rows at or before the previous frontier.
+- **Alerts.** A decision with at least one well-formed command appends a v1-compatible row to
+  `signal/targets`, a legacy alert output: `--push-notify` works, and do not wrap it in
+  `alertOutput()`. Structurally invalid commands (`bad_amount`, `unknown_instrument`, ...) are
+  left out of the row; operational rejections (funds, lots) still appear. Native `decisions`
+  and their `outcomes` are authoritative for every rejection. A rebuild never re-announces rows
+  at or before the previous frontier.
 
 ### Reading a Live Feed
 
