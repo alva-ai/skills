@@ -208,6 +208,27 @@
       ]
     },
     {
+      "id": "target.feed-semantic-search",
+      "group": "target",
+      "target": "corpus",
+      "description": "Feed semantic search is explicit: index() embeds chosen fields with one index per output, and search() always returns up to limit hits that must be filtered by score.",
+      "file_includes": [
+        {
+          "file": "references/feed-sdk.md",
+          "includes": [
+            "Nothing is indexed automatically",
+            "Use the same `fields` for every `index()` call on an output.",
+            "Up to `limit` hits come back **even when none are related**",
+            "filter hits by a score threshold you calibrated on your own records",
+            "22 credits per million tokens",
+            "Each embedding request is checked against the remaining credits before it is sent, not the whole call",
+            "the requests already sent stay charged and the vectors already written stay",
+            "including the 8,000-byte cut"
+          ]
+        }
+      ]
+    },
+    {
       "id": "retained.runtime",
       "group": "retained",
       "target": "corpus",

@@ -89,6 +89,21 @@ const MUTATIONS = [
     expectFailedCases: ["target.worldline-feature-media"],
   },
   {
+    id: "feed-search-mixed-fields",
+    file: "references/feed-sdk.md",
+    remove: "Use the same `fields` for every `index()` call on an\n  output.",
+    replacement: "Each `index()` call may pick different `fields`.",
+    expectFailedCases: ["target.feed-semantic-search"],
+  },
+  {
+    id: "feed-search-whole-call-credit-check",
+    file: "references/feed-sdk.md",
+    remove:
+      "Each embedding request is checked against the\n  remaining credits before it is sent, not the whole call",
+    replacement: "With too few credits the call throws before any request is sent",
+    expectFailedCases: ["target.feed-semantic-search"],
+  },
+  {
     id: "thesis-actions-scoped-to-preview",
     file: "references/thesis.md",
     remove: "\"Edit\", and do not",
