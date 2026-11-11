@@ -218,6 +218,7 @@
           "includes": [
             "Nothing is indexed automatically",
             "Use the same `fields` for every `index()` call on an output.",
+     "Index an output from one task at a time",
             "Up to `limit` hits come back **even when none are related**",
             "filter hits by a score threshold you calibrated on your own records",
             "22 credits per million tokens",
