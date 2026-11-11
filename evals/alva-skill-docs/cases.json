@@ -218,7 +218,7 @@
           "includes": [
             "Nothing is indexed automatically",
             "Use the same `fields` for every `index()` call on an output.",
-     "Index an output from one task at a time",
+            "Index an output from one task at a time",
             "Up to `limit` hits come back **even when none are related**",
             "filter hits by a score threshold you calibrated on your own records",
             "22 credits per million tokens",
@@ -401,6 +401,7 @@
       "description": "Backtesting and signal feeds still require Altra and preserve common guardrails.",
       "includes": [
         "**Use Altra for trading.** Backtests",
+        "@alva/altra2",
         "FeedAltra",
         "look-ahead bias",
         "Stock intraday data-window limit",
@@ -421,6 +422,77 @@
             "alva trading-pairs --help",
             "bounded smoke window",
             "at least one real OHLCV bar"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "target.altra2-default",
+      "group": "target",
+      "target": "corpus",
+      "description": "New strategies use altra2: the entry routes to it, the reference teaches the v2 API, and every user function may be async.",
+      "file_includes": [
+        {
+          "file": "SKILL.md",
+          "includes": [
+            "Altra (`@alva/altra2`)",
+            "v1 `FeedAltra` is deprecated",
+            "[altra-v1-legacy.md](references/altra-v1-legacy.md) only to maintain an existing v1"
+          ]
+        },
+        {
+          "file": "references/altra-trading.md",
+          "includes": [
+            "require(\"@alva/altra2\")",
+            "defineStrategy",
+            "Decide at a close, fill at the next open",
+            "`fn` may be `async`",
+            "feedStore(feedPath(",
+            "instrument_no_data",
+            "[Coming from v1](#coming-from-v1)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "target.altra-canonical-lookup",
+      "group": "target",
+      "target": "corpus",
+      "description": "The Agent looks up canonical trading pairs by venue symbol, never by company name, and handles ambiguous or unsupported pairs.",
+      "section_includes": [
+        {
+          "file": "references/altra-trading.md",
+          "heading": "Resolve Trading Pairs Before Backtesting",
+          "includes": [
+            "`0700` (4 digits; not `700`)",
+            "not a company name",
+            "Multiple candidates are normal",
+            "Copy the returned `tradingPair` unchanged",
+            "instrument_unsupported",
+            "instrument_not_canonical"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "target.altra-v1-legacy",
+      "group": "target",
+      "target": "corpus",
+      "description": "v1 FeedAltra documentation is kept for existing scripts and clearly marked deprecated.",
+      "file_includes": [
+        {
+          "file": "references/altra-v1-legacy.md",
+          "includes": [
+            "# Altra v1 (Legacy, Deprecated)",
+            "Do not use it for new strategies",
+            "existing v1 script"
+          ]
+        },
+        {
+          "file": "references/altra-trading.md",
+          "includes": [
+            "**v1 is deprecated.**",
+            "[altra-v1-legacy.md](altra-v1-legacy.md)"
           ]
         }
       ]
@@ -1442,7 +1514,7 @@
         }
       ],
       "includes": [
-        "version: v1.29.2",
+        "version: v1.30.0",
         "Capability Help",
         "feedback",
         "api/feedback.md",

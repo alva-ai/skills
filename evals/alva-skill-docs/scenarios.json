@@ -438,7 +438,7 @@
         ],
         "behaviors": [
           "**Use Altra for trading.** Backtests",
-          "FeedAltra",
+          "@alva/altra2",
           "look-ahead bias",
           "drawdown",
           "choose the requested deliverable"

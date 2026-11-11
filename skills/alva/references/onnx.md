@@ -29,8 +29,9 @@ Before writing inference code, freeze this handoff:
   and retraining or re-upload cadence
 
 If the output is a strategy, rebalance rule, allocation model, or
-portfolio-following signal, route the exported model through FeedAltra. Use a
-plain Feed SDK pipeline only for prediction-only inspection.
+portfolio-following signal, route the exported model through Altra
+(`@alva/altra2`). Use a plain Feed SDK pipeline only for prediction-only
+inspection.
 
 ## Runtime Inference
 
@@ -123,36 +124,70 @@ share the model. Public playbooks expose feed outputs, not the `.onnx` file.
 If input shape, feature order, normalization, or output meaning is missing, ask
 the user before writing inference code.
 
-## FeedAltra Inference
+## Altra Inference
 
-Use FeedAltra when ONNX output drives a backtest, rebalance, simulation, trading
-signal, or strategy metric. Follow [altra-trading.md](altra-trading.md) for the
-general feature/strategy shape; ONNX adds these constraints:
+Use Altra (`@alva/altra2`) when ONNX output drives a backtest, rebalance,
+simulation, trading signal, or strategy metric. Follow
+[altra-trading.md](altra-trading.md) for the strategy shape. Run the model inside
+an async feature function: the engine awaits it and keeps it point-in-time.
 
-- Create the session once per run, not once per bar.
+- Create the session once per run, before `run`, and release it in `finally`.
 - Reproduce training exactly: identifiers, intervals, bar-close timestamps,
   lookback, missing-data policy, feature order, scaling, target horizon, labels.
-- The feature timestamp is the time input evidence is available, not the
-  prediction horizon. Never use future bars to build the tensor for time `T`.
-- Scalers and normalizers must be fitted on training data or rolling history
-  available at or before `T`, never on the full backtest or live window.
+- Build each row's tensor only from inputs up to that row. Never use later rows,
+  and never fit a scaler or normalizer on the whole backtest or live window.
 - Do not read labels, future returns, future ranks, future volatility/drawdown,
   or other target-derived fields while building the inference tensor.
-- `inputConfig` must request every evidence window needed by the model.
-
-Inside an async feature function, keep the ONNX call explicit:
+- Set the feature's `lookback` to the first row with a complete input window.
+- Non-bar model inputs enter as events, or the model runs in a separate Automation
+  whose predictions are passed in as events.
 
 ```javascript
-const result = await session.run({
-  [inputName]: new Tensor(TensorDataType.Float32, row.features, dims),
-});
-return { date: row.date, prediction: result[outputName].data[0] };
+const alfs = require("alfs");
+const { InferenceSession, Tensor, TensorDataType } = require("@alva/onnx");
+const { defineStrategy, allocate, run } = require("@alva/altra2");
+
+(async () => {
+  const session = await InferenceSession.createFromAlfs({ alfs, path: modelPath });
+  try {
+    const strategy = defineStrategy({
+      name: "onnx-signal",
+      universe: [SYMBOL], // a canonical trading pair
+      features: {
+        score: {
+          from: "close",
+          lookback: WINDOW,
+          fn: async (c) => {
+            const out = new Float64Array(c.length).fill(NaN);
+            for (let i = WINDOW; i < c.length; i++) {
+              const x = new Float32Array(WINDOW);
+              for (let k = 0; k < WINDOW; k++) x[k] = c[i - WINDOW + 1 + k] / c[i - WINDOW + k] - 1;
+              const res = await session.run({ [inputName]: new Tensor(TensorDataType.Float32, x, dims) });
+              out[i] = res[outputName].data[0];
+            }
+            return out;
+          },
+        },
+      },
+      trigger: { kind: "bar", instrument: SYMBOL },
+      decide: (ctx) => {
+        const s = ctx.features(SYMBOL).score.last();
+        if (s === undefined) return { kind: "decided", commands: [] };
+        return { kind: "decided", commands: [allocate({ [SYMBOL]: s > THRESHOLD ? 1 : 0 })], reason: `score ${s}` };
+      },
+    });
+    return await run({ strategy, range });
+  } finally {
+    await session.release();
+  }
+})();
 ```
 
-The input name, output name, dims, feature builder, and normalization must come
-from `model_meta.json` or the user's training recipe. Raw model outputs are
-predictions, not trading instructions; thresholds, no-trade bands, and position
-sizing must also come from the model metadata or research recipe.
+The input name, output name, dims, window, feature builder, normalization,
+`THRESHOLD`, and sizing must come from `model_meta.json` or the user's training
+recipe. Raw model outputs are predictions, not trading instructions. A model with
+a dynamic batch dimension may score all rows in one call. Check causality with
+`await testing.assertCausal(fn, sampleCloses)` from `@alva/altra2`.
 
 ## Feed Outputs
 
@@ -168,9 +203,9 @@ Recommended output groups, when the playbook needs them:
 | `model/summary` | Latest verdict, freshness, model version, compact chart arrays, diagnostics |
 | `signal/targets` | Actionable target, if the model emits a trading signal |
 
-If using FeedAltra, its normal `signal`, `sim`, and `perf` outputs are covered by
-[altra-trading.md](altra-trading.md); do not duplicate them unless the playbook
-needs a custom ONNX-specific view.
+If using Altra, its decisions, order events, equity and `signal/targets` outputs
+are covered by [altra-trading.md](altra-trading.md); do not duplicate them unless
+the playbook needs a custom ONNX-specific view.
 
 If released HTML displays ONNX predictions or metrics, it must read released
 feed data at runtime. Preview fixtures must not become the authoritative source

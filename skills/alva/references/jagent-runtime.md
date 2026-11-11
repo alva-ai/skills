@@ -225,7 +225,7 @@ const { InferenceSession, Tensor, TensorDataType } = require("@alva/onnx");
 })();
 ```
 
-See [onnx.md](onnx.md) for the model-playbook contract, FeedAltra session
+See [onnx.md](onnx.md) for the model-playbook contract, Altra session
 lifecycle, output convention, and release checks.
 
 ### @test/suite -- Testing
