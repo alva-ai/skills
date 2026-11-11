@@ -89,6 +89,13 @@ const MUTATIONS = [
     expectFailedCases: ["target.worldline-feature-media"],
   },
   {
+    id: "feature-media-by-link",
+    file: "references/search.md",
+    remove: "Feature a match by `item.name` as `worldline_item`",
+    replacement: "Feature the episode's Apple Podcasts link as `url`",
+    expectFailedCases: ["target.feature-media-worldline-first"],
+  },
+  {
     id: "feed-search-mixed-fields",
     file: "references/feed-sdk.md",
     remove: "Use the same `fields` for every `index()` call on an\n  output.",

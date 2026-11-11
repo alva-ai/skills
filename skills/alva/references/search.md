@@ -36,7 +36,7 @@ each turn:
 | Match terms or a phrase | `searchItems({keywordQuery, ...})`: any of the words; quote a phrase that must appear as written |
 | Find material about a company/person | `searchEntities({query, entityTypes?, limit?})`, then `searchItems` with `entities: ["entities/" + entityId]` |
 | Find material credited to a person/publisher | `searchItems` with `attribution: {parties: ["entities/" + entityId]}` |
-| Restrict the kind of source | `sourceCategories`: `x`, `news`, `podcast`, `earnings_call`, `price_target_news`, `person_commentary`, `company_narrative`, `market_narrative`, `pre_earnings_analysis`, `post_earnings_analysis`, `memory_prices` |
+| Restrict the kind of source | `sourceCategories`: `x`, `news`, `podcast`, `video` (YouTube), `earnings_call`, `price_target_news`, `person_commentary`, `company_narrative`, `market_narrative`, `pre_earnings_analysis`, `post_earnings_analysis`, `memory_prices` |
 | Re-read a result | `batchGetItems({names})` with `item.name`, or `item.revision` for the exact version cited |
 
 Filters combine with AND; `entities`, `parties` and `sourceCategories` each
@@ -140,6 +140,19 @@ cited audio or video passage, feature the item by `item.name` as
 Alva apps play it from that moment and show its transcript as captions. Keep
 the inline citation.
 
+Captions and cited moments come from a Worldline item. Before featuring a
+podcast episode or YouTube video found elsewhere (Apple Podcasts Search, web
+search, a show page), look it up: `searchItems` with `sourceCategories:
+["podcast"]` or `["video"]`, a `publishTime` window of a day or two around its
+release, and as `keywordQuery` the show name for an episode (a podcast item's
+`sourceContent.title` is the show, not the episode) or the video's title. The
+match is the item whose `item.uri` carries the same id: the episode's Apple id
+(`i=`, Apple Search's `trackId`) or the YouTube video id (`v=`); otherwise the
+same show and publication time.
+Feature a match by `item.name` as `worldline_item`, with a cited turn's
+`offsetSeconds` as `start_seconds` when a passage is the point; pass the link as
+`url` only when Worldline has no match.
+
 Worldline is selectively indexed, not live full-web/X coverage. Keep the
 Twitter/X route for current posts and account history. Independent lookups may
 share a tool round where supported, but parallel calls still await completion;
@@ -238,6 +251,7 @@ the original before citing its contents.
 - **Enrich**: `scrapeUrl` the watch page → regex extract views/likes. Thumbnails: `https://img.youtube.com/vi/{VIDEO_ID}/mqdefault.jpg`
 - **Signals**: `views`, `likes`
 - **URL filter**: Only accept `/watch?v=`, `/shorts/`, `youtu.be/{id}`. Drop channel pages, playlists.
+- **Worldline**: look the video up in [Worldline](#worldline) first; its item carries the timed transcript, so no `yt-dlp` is needed, and featuring it by its item starts at the cited turn.
 - **Video ID extraction**: `url.match(/(?:v=|shorts\/)([\w-]{11})/)`
 - **Transcript / "what's this video about"**: to read a video's spoken content, use the bundled `yt-dlp` CLI from **Bash** (a local sandbox binary, not a Cloud SDK module). It fetches captions without downloading the video:
 
@@ -256,6 +270,7 @@ the original before citing its contents.
 - **Signals**: `releaseDate`, podcast popularity (no direct metric)
 - **Fields**: `trackName` (episode title), `collectionName` (podcast name), `description`, `releaseDate` (ISO 8601), `episodeUrl` (audio), `artworkUrl600`, `trackViewUrl` (Apple Podcasts link), `trackTimeMillis` (duration)
 - **Note**: Limited source — best as supplementary, not primary. No engagement metrics.
+- **Feature**: look the episode up in [Worldline](#worldline) first; featured by its item, it plays with its transcript.
 
 ### General Web
 

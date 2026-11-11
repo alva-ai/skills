@@ -208,6 +208,25 @@
       ]
     },
     {
+      "id": "target.feature-media-worldline-first",
+      "group": "target",
+      "target": "corpus",
+      "description": "A podcast episode or YouTube video found outside Worldline is looked up in Worldline before it is featured, matched by its Apple episode id or YouTube video id, and featured by its item; its link is featured only without a match.",
+      "file_includes": [
+        {
+          "file": "references/search.md",
+          "includes": [
+            "Captions and cited moments come from a Worldline item.",
+            "(`i=`, Apple Search's `trackId`) or the YouTube video id (`v=`)",
+            "Feature a match by `item.name` as `worldline_item`",
+            "`video` (YouTube)",
+            "look the episode up in [Worldline](#worldline) first",
+            "look the video up in [Worldline](#worldline) first"
+          ]
+        }
+      ]
+    },
+    {
       "id": "target.feed-semantic-search",
       "group": "target",
       "target": "corpus",
