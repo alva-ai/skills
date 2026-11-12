@@ -309,6 +309,14 @@ feature memory, then link it from that scope's `MEMORY.md`.
 11. **Honor corrections and forget requests** — replace or remove obsolete
     durable entries and do not reintroduce forgotten content into later Journal.
 
+### Writing from an external agent
+
+An agent outside a managed runtime (connected through `BOOTSTRAP.md`) follows the
+same rules and writes `'~/memory/user.md'` with `alva fs`. Read the file, merge,
+then read it once more right before writing: if it changed, merge into the new
+text instead of overwriting it. Only content the user saw and approved, or said
+themselves, becomes durable memory.
+
 ## Using context in conversation
 
 Start with the current request, quoted content and recent conversation; use

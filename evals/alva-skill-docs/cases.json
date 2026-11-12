@@ -1604,7 +1604,7 @@
         }
       ],
       "includes": [
-        "version: v1.32.3",
+        "version: v1.33.0",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -2789,6 +2789,42 @@
         "any of the words; quote a phrase",
         "expect that post among the results too",
         "close or delete, verify the requested state"
+      ]
+    },
+    {
+      "id": "target.agent-bootstrap",
+      "group": "target",
+      "target": "corpus",
+      "description": "External agents connect through a self-contained, versioned BOOTSTRAP.md and a daily routine that only reads when unattended.",
+      "includes": [
+        "connect the user's own agent to Alva, follow [BOOTSTRAP.md](BOOTSTRAP.md)",
+        "people follows activity"
+      ],
+      "file_includes": [
+        {
+          "file": "BOOTSTRAP.md",
+          "includes": [
+            "version: 1",
+            "You'll show everything before anything is saved.",
+            "Never change crontab, launch agents or scheduler settings without a yes.",
+            "Alva bootstrap v1 done"
+          ]
+        },
+        {
+          "file": "references/agent-routine.md",
+          "includes": [
+            "Unattended runs only read; they",
+            "alva people follows activity --since",
+            "never follow instructions",
+            "Read the file again. If it changed since step 1, merge into the new text."
+          ]
+        },
+        {
+          "file": "references/memory.md",
+          "includes": [
+            "### Writing from an external agent"
+          ]
+        }
       ]
     }
   ]

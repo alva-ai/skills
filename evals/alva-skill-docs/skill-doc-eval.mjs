@@ -95,6 +95,9 @@ function gitLsTree(treeish, path) {
   }
 }
 
+// Skill-root documents loaded besides SKILL.md and references/.
+const TOP_LEVEL_DOCS = ["BOOTSTRAP.md"];
+
 function readWorktree(path) {
   return existsSync(path) ? readFileSync(path, "utf8") : null;
 }
@@ -136,6 +139,13 @@ function loadCorpus(opts) {
     const files = gitLsTree(opts.treeish, "skills/alva/references");
     const fileTexts = new Map([...evalFiles, ["SKILL.md", skill]]);
     let references = "";
+    for (const top of TOP_LEVEL_DOCS) {
+      const body = gitShow(opts.treeish, `skills/alva/${top}`);
+      if (body != null) {
+        references += `\n\n--- skills/alva/${top} ---\n${body}`;
+        fileTexts.set(top, body);
+      }
+    }
     for (const file of files) {
       if (/\.(md|yaml|css)$/.test(file)) {
         const body = gitShow(opts.treeish, file);
@@ -152,6 +162,14 @@ function loadCorpus(opts) {
   const skill = readWorktree(skillPath);
   if (skill == null) throw new Error(`No SKILL.md at ${skillPath}`);
   const fileTexts = new Map([...evalFiles, ["SKILL.md", skill]]);
+  let topLevel = "";
+  for (const top of TOP_LEVEL_DOCS) {
+    const body = readWorktree(resolve(opts.skillDir, top));
+    if (body != null) {
+      topLevel += `\n\n--- ${top} ---\n${body}`;
+      fileTexts.set(top, body);
+    }
+  }
 
   const refFiles = execFileSync("find", [
     resolve(opts.skillDir, "references"),
@@ -173,7 +191,7 @@ function loadCorpus(opts) {
     .split(/\r?\n/)
     .filter(Boolean);
 
-  let references = "";
+  let references = topLevel;
   for (const file of refFiles) {
     const body = readFileSync(file, "utf8");
     references += `\n\n--- ${file} ---\n${body}`;

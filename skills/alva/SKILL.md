@@ -7,7 +7,7 @@ description: >-
   explicit Thesis publication or maintenance, and requested Thesis rewriting.
 metadata:
   author: alva
-  version: v1.32.3
+  version: v1.33.0
 ---
 
 # Alva
@@ -44,7 +44,8 @@ Use the tools exposed by the current runtime. In a managed Sandbox:
 - User agents use OpenAI only; omit model/provider for platform defaults.
   Retain history. Do not use Claude models, Anthropic SDK/BYOK, or relay routes.
 
-Outside a managed runtime, follow [preflight.md](references/preflight.md).
+Outside a managed runtime, follow [preflight.md](references/preflight.md). To
+connect the user's own agent to Alva, follow [BOOTSTRAP.md](BOOTSTRAP.md).
 Durable ALPI Agents have their own tool and launch contract in
 [durable-agent.md](references/durable-agent.md); do not assume their native
 `alva`, ALFS, or `javascript` tools exist in a Sandbox session.
