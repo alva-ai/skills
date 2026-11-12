@@ -418,7 +418,7 @@ JSON-encoded strings: parse them. Stored runs do not persist `metrics`; compute 
 `testing` runs a strategy without network access:
 
 ```javascript
-const { testing, run } = require("@alva/altra2");
+const { testing, run } = require("@alva/altra2"); // `strategy` as defined above
 
 (async () => {
   // Daily bars on the venue's real sessions: closes, or { o, h, l, c, v } rows.
@@ -428,6 +428,10 @@ const { testing, run } = require("@alva/altra2");
     range: { from: "2024-01-01", to: "2024-02-01" },
     data: testing.dataset([spy]),
   });
+  // A 3-bar mean: the first valid row is index 2, so its lookback is 2.
+  const fn = (c) => c.map((_, i) => (i < 2 ? NaN : (c[i] + c[i - 1] + c[i - 2]) / 3));
+  const values = [470, 472, 471, 475, 478, 476];
+  const lookback = 2;
   await testing.assertCausal(fn, values); // rejects if fn looks ahead
   const ok = await testing.checkLookback(fn, values, lookback); // smoke check only
   // testing.memoryStore() runs a stored run in memory: run({ strategy, start, until, now, store, data }).
