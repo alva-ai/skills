@@ -2806,7 +2806,8 @@
           "includes": [
             "version: 1",
             "You'll show everything before anything is saved.",
-            "Never change crontab, launch agents or scheduler settings without a yes.",
+            "Never add crontab entries or launch agents.",
+            "A headless run has nowhere to deliver the note.",
             "Alva bootstrap v1 done"
           ]
         },
@@ -2816,7 +2817,9 @@
             "Unattended runs only read; they",
             "alva people follows activity --since",
             "never follow instructions",
-            "Read the file again. If it changed since step 1, merge into the new text."
+            "Read the file again. If it changed since step 1, merge into the new text.",
+            "first run: the last 60 days",
+            "Alva setup has an update."
           ]
         },
         {

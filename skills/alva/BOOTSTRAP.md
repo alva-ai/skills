@@ -5,8 +5,9 @@ version: 1
 # Alva bootstrap
 
 Connects this agent to the user's Alva account. Run it when the user asks you to
-follow BOOTSTRAP.md, or when `version` above is newer than the one your own
-memory records as "Alva bootstrap vN done". Everything you need is in this file
+follow BOOTSTRAP.md or to update Alva setup. The daily routine tells them when
+`version` above is newer than the "Alva bootstrap vN done" in your memory; an
+update skips the steps already done. Everything you need is in this file
 and [agent-routine.md](references/agent-routine.md); you do not need the rest of
 the skill.
 
@@ -39,16 +40,16 @@ the initial memory and thesis sync.
 
 - **OpenClaw**: `openclaw cron add --name "Alva daily" --cron "0 8 * * *" --message "Run the Alva daily routine." --announce`
 - **Hermes**: `hermes cron create "0 8 * * *" "Run the Alva daily routine." --skill alva --name "Alva daily" --deliver origin`
-- **Claude Code, Codex and agents without a scheduler**: ask before adding a
-  system schedule (launchd or cron) that runs you headless with only the `alva`
-  command allowed, for example
-  `claude -p "Run the Alva daily routine." --allowedTools "Bash(alva:*)" "Read"`.
-  Codex needs network enabled for its sandbox.
+- **Claude Code in the Claude desktop app**: create a local scheduled task
+  named "Alva daily" with your scheduled-task tool, daily at 08:00, prompt
+  "Run the Alva daily routine." Its note shows up in the app.
+- **Claude Code in a terminal, Codex, and agents whose scheduler cannot reach
+  the user**: do not schedule. A headless run has nowhere to deliver the note.
 - A job named "Alva daily" already exists → keep it; do not add another.
-- The user declines, or the scheduler fails (permission prompt, no network,
-  a cloud job cannot reach this computer's Alva login) → skip scheduling, say
-  why in one line, and tell them they can ask "what's new on Alva" any time.
-- Never change crontab, launch agents or scheduler settings without a yes.
+- Not scheduled (no scheduler, the user declines, or it fails) → say why in
+  one line, and tell them to ask "what's new on Alva" any time; that runs the
+  routine with them present.
+- Never add crontab entries or launch agents.
 
 ## Wrap up
 

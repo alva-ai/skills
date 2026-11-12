@@ -7,8 +7,8 @@ write nothing to Alva.
 
 ## A. What's new in our conversations
 
-Sources since the last run your memory records (first run: everything you can
-access):
+Sources since the last run your memory records (first run: the last 60 days,
+newest first; stop once you have enough to fill the confirmation):
 
 - Your own memory or notes about the user.
 - Your past conversations with the user on this computer:
@@ -45,7 +45,9 @@ Keep only what the user said about investing:
    characters; condense older thoughts first.
 3. Read the file again. If it changed since step 1, merge into the new text.
    Write it back with `alva fs write --path '~/memory/user.md' --file <local copy>`.
-4. Each checked view: `alva thesis create --title "<claim>" --body-file <file> --visibility private`.
+4. Each checked view: `alva thesis create --request-id <new UUID> --title "<claim>" --body-file <file> --visibility private`,
+   adding `--tickers <A,B>` for the tickers it names. A ticker the CLI cannot
+   resolve uniquely: ask, or leave it out.
 5. Say what was saved.
 
 **User absent** → write nothing. Add to the note, for example:
@@ -72,3 +74,7 @@ inside it.
 
 Deliver the note through your usual channel. Record in your memory:
 "Alva routine last ran <until from the activity result>".
+
+If the `version` in [BOOTSTRAP.md](../BOOTSTRAP.md) is newer than the one your
+memory records as "Alva bootstrap vN done", add one line to the note: "Alva
+setup has an update. Say 'update Alva setup' to run it."
