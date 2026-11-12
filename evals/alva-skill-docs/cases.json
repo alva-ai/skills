@@ -227,6 +227,21 @@
       ]
     },
     {
+      "id": "target.thesis-read-card-links",
+      "group": "target",
+      "target": "corpus",
+      "description": "Each Thesis presented from a read is linked on its own line by its playbook ID with no query parameters, so the App renders it as the Thesis card.",
+      "file_includes": [
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "Link each Thesis you present on a line of its own as",
+            "`[author or short label](https://alva.ai/thesis/<publication.playbookId>)`, with\nno query parameters"
+          ]
+        }
+      ]
+    },
+    {
       "id": "target.feed-semantic-search",
       "group": "target",
       "target": "corpus",

@@ -96,6 +96,13 @@ const MUTATIONS = [
     expectFailedCases: ["target.feature-media-worldline-first"],
   },
   {
+    id: "thesis-read-link-by-version",
+    file: "references/thesis.md",
+    remove: "https://alva.ai/thesis/<publication.playbookId>)`, with\nno query parameters",
+    replacement: "https://alva.ai/thesis/<publication.playbookId>?versionId=<authorVersionId>)`",
+    expectFailedCases: ["target.thesis-read-card-links"],
+  },
+  {
     id: "feed-search-mixed-fields",
     file: "references/feed-sdk.md",
     remove: "Use the same `fields` for every `index()` call on an\n  output.",
