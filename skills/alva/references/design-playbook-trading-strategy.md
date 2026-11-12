@@ -623,6 +623,23 @@ from Altra outputs plus any required enrichments (for example benchmark history
 or traded-symbol OHLCV). Do not pass raw ALFS directory trees directly to the
 page.
 
+**From an altra2 Feed** (see [altra-trading.md](altra-trading.md#reading-a-live-feed)):
+
+- Read `@kv/altra2.manifest` first; use only rows of its `generation` with
+  `date <= frontierAt`. Resolve the generation on every load: a rebuild switches it.
+- `equity` rows give the equity curve, drawdown and daily P&L; the last row's
+  `positions` (a JSON string) gives Current Positions. Stored runs do not persist
+  metrics: compute total return, annualized return, volatility, Sharpe, Sortino
+  and max drawdown from `equity`.
+- `order_events` rows with `kind` `filled_at_open` or `filled_intrabar` give
+  `tradeLog[]` (`instrument`, `side`, `price`, `qty`, time `date`).
+- `decisions` give the Feed tab's signal cards; `reason` is the explanation.
+- A one-off backtest result (`run` without a store) has `records` and `metrics`
+  directly; persist the projection if the page needs it.
+
+A legacy v1 Feed (`sim/*`, `perf/*`) is described in
+[altra-v1-legacy.md](altra-v1-legacy.md).
+
 ```jsonc
 {
   // === Shared ===

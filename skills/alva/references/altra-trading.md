@@ -1,1041 +1,499 @@
 # Altra Trading Engine
 
-Altra is an **event-driven backtesting engine** for quantitative trading
-strategies. Strategies are triggered by data events (e.g. when a new OHLCV bar
-closes) and execute with stateful context including portfolio, features, and
-custom state.
+Altra is Alva's backtest and live-strategy engine. Use `@alva/altra2` for every new
+backtest, portfolio simulation, signal, rebalance or order-logic strategy. One strategy
+definition runs both as a backtest and as a live strategy that persists its decisions, orders
+and equity to a Feed. Do not hand-roll trading loops: they easily introduce look-ahead bias.
 
-A trading strategy IS a feed: all output data (targets, portfolio, orders,
-equity, metrics) lives under a single feed's ALFS path.
+altra2 covers US, Hong Kong, Shanghai/Shenzhen and Korea equities and crypto spot and
+perpetuals on Binance and Hyperliquid.
 
-**Key principle: All decisions are made at bar CLOSE, not bar OPEN.**
+> **v1 is deprecated.** `FeedAltra` (`require("@alva/feed").FeedAltraModule`, or `@alva/altra`)
+> is legacy. Do not use it for new strategies. Read
+> [altra-v1-legacy.md](altra-v1-legacy.md) only to read, maintain or debug an existing v1
+> script or Feed. Existing v1 Automations keep running and need no migration; migrate one only
+> when the user asks, using [Coming from v1](#coming-from-v1).
 
----
+Altra simulates; it never places real orders. For live account queries and orders, also read
+[api/trading.md](api/trading.md) or [api/broker.md](api/broker.md).
 
-## Architecture
+## Fix the Research Contract First
 
-Altra consists of four processing stages:
+Before writing code, define:
 
-1. **DataGraph** -- Registers OHLCV data, raw external data, and computed
-   features (indicators)
-2. **SignalEngine** -- Runs your strategy function on each trigger event,
-   producing targets (buy/sell signals)
-3. **SimEngine** -- Simulates order execution, portfolio management, and
-   position tracking
-4. **PerfEngine** -- Computes performance metrics (returns, Sharpe, drawdown,
-   etc.)
+- The research question, evaluation metrics, exact signal definition, asset universe and its
+  membership rules, canonical instruments, venues, currencies, sessions and time zones.
+- Fixed start and end dates, train/validation/out-of-sample splits, rebalance events, and
+  bar intervals.
+- Benchmark and return definition, initial capital, long-only or signed exposure, leverage,
+  per-asset limits.
+- Fees, slippage, trading rules (`market` or `ideal`), and policies for missing data and halts.
+- Source, coverage and availability time of every non-bar input. Obtain data according to
+  [data-skills.md](data-skills.md).
 
-All output is persisted under the feed's ALFS path via the Feed SDK context.
+Do not change the sample, benchmark or cost assumptions after seeing interim results. If
+searching parameters, define the search space and selection rule in advance and keep every
+trial; do not report only the best one. Give each trial its own Feed path.
 
----
+## Resolve Trading Pairs Before Backtesting
 
-## Getting Started: Complete Example
-
-A strategy is organized into modular files:
-
-```
-constants.js       # Shared constants (symbol, interval, tick)
-raw_data.js        # Raw data sources (optional)
-features.js        # Feature definitions (indicators)
-strategy.js        # Strategy function (trading logic)
-main.js            # Entry point (assembles everything)
-```
-
-### constants.js
-
-```javascript
-const { FeedAltraModule } = require("@alva/feed");
-const { TIME } = FeedAltraModule;
-
-const SYMBOL = "BINANCE_SPOT_BTC_USDT";
-const STRATEGY_INTERVAL = "1d";
-const TICK = TIME.DAY;
-
-module.exports = { SYMBOL, STRATEGY_INTERVAL, TICK, TIME };
-```
-
-### features.js
-
-```javascript
-const {
-  macd,
-} = require("@alva/technical-indicators/moving-average-convergence-divergence-macd:v1.0.0");
-const { FeedAltraModule, num } = require("@alva/feed");
-const { SYMBOL, STRATEGY_INTERVAL, TICK } = require("./constants.js");
-
-function inRange(t, fromExclusive, toInclusive) {
-  return t > fromExclusive && t <= toInclusive;
-}
-
-function createMACDFeature() {
-  const slowPeriod = 26;
-
-  return {
-    name: "macd",
-    description: "MACD(12,26,9) on daily closes",
-    inputConfig: {
-      ohlcvs: [
-        {
-          id: { pair: SYMBOL, interval: STRATEGY_INTERVAL },
-          lookback: { count: slowPeriod - 1 },
-        },
-      ],
-    },
-    fields: [num("macd_line", "MACD line"), num("signal_line", "Signal line")],
-    fn: (data, { fromExclusive, toInclusive }) => {
-      const bars = data.ohlcvs[SYMBOL]?.[STRATEGY_INTERVAL] || [];
-      if (bars.length < slowPeriod) return [];
-
-      const closes = bars.map((b) => b.close);
-      const m = macd(closes, { fast: 12, slow: 26, signal: 9 });
-
-      const out = [];
-      for (let i = 0; i < bars.length; i++) {
-        const t = bars[i].endTime ?? bars[i].date + TICK;
-        if (!inRange(t, fromExclusive, toInclusive)) continue;
-        out.push({
-          date: t,
-          macd_line: m.macdLine[i],
-          signal_line: m.signalLine[i],
-        });
-      }
-      return out;
-    },
-  };
-}
-
-module.exports = { createMACDFeature, inRange };
-```
-
-### strategy.js
-
-```javascript
-const { SYMBOL, STRATEGY_INTERVAL } = require("./constants.js");
-
-const initialState = { lastSignal: null };
-
-function strategyFn(ctx) {
-  const { tick, data, portfolio, state } = ctx;
-
-  const bars = data.ohlcvs[SYMBOL]?.[STRATEGY_INTERVAL] || [];
-  if (!bars) throw new Error("OHLCV not found for " + SYMBOL);
-
-  const macdData = data.features["macd"];
-  if (!macdData) throw new Error('Feature "macd" not found');
-
-  if (bars.length === 0 || macdData.length < 2) {
-    return { target: null, state, logs: "warmup" };
-  }
-
-  const currMACD = macdData[macdData.length - 1];
-  const prevMACD = macdData[macdData.length - 2];
-
-  const pos = portfolio.positions.find((p) => p.symbol === SYMBOL);
-  const hasPosition = pos && pos.qty > 0;
-
-  const bullishCross =
-    prevMACD.macd_line <= prevMACD.signal_line &&
-    currMACD.macd_line > currMACD.signal_line;
-  const bearishCross =
-    prevMACD.macd_line >= prevMACD.signal_line &&
-    currMACD.macd_line < currMACD.signal_line;
-
-  if (bullishCross && !hasPosition) {
-    return {
-      target: {
-        date: tick,
-        instruction: {
-          type: "allocate",
-          weights: [{ symbol: SYMBOL, weight: 1.0 }],
-        },
-        meta: { reason: "MACD bullish crossover" },
-      },
-      state: { ...state, lastSignal: "buy" },
-    };
-  }
-
-  if (bearishCross && hasPosition) {
-    return {
-      target: {
-        date: tick,
-        instruction: {
-          type: "allocate",
-          weights: [{ symbol: SYMBOL, weight: 0.0 }],
-        },
-        meta: { reason: "MACD bearish crossover" },
-      },
-      state: { ...state, lastSignal: "sell" },
-    };
-  }
-
-  return { target: null, state };
-}
-
-module.exports = { strategyFn, initialState };
-```
-
-### main.js
-
-```javascript
-const { FeedAltraModule, createArraysOhlcvProvider } = require("@alva/feed");
-const { FeedAltra, e } = FeedAltraModule;
-const secret = require("secret-manager");
-
-const { SYMBOL, STRATEGY_INTERVAL } = require("./constants.js");
-const { createMACDFeature } = require("./features.js");
-const { strategyFn, initialState } = require("./strategy.js");
-
-const START_DATE = Date.parse("2025-01-01T00:00:00.000Z");
-const END_DATE = Date.now();
-
-const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
-const ohlcvProvider = createArraysOhlcvProvider({ jwt: ARRAYS_JWT });
-
-const altra = new FeedAltra(
-  {
-    path: "~/feeds/macd-strategy/v1",
-    startDate: START_DATE,
-    portfolioOptions: { initialCash: 1_000_000, currency: "USDT" },
-    simOptions: { simTick: "1min", feeRate: 0.001 },
-    perfOptions: { timezone: "UTC", marketType: "crypto" },
-  },
-  ohlcvProvider,
-);
-
-const dataGraph = altra.getDataGraph();
-dataGraph.registerOhlcv(SYMBOL, STRATEGY_INTERVAL);
-dataGraph.registerFeature(createMACDFeature());
-
-altra.setStrategy(strategyFn, {
-  trigger: { type: "events", expr: e.ohlcv(SYMBOL, STRATEGY_INTERVAL) },
-  inputConfig: {
-    ohlcvs: [{ id: { pair: SYMBOL, interval: STRATEGY_INTERVAL } }],
-    features: [{ id: "macd", lookback: { count: 1 } }],
-  },
-  initialState,
-});
-
-(async () => {
-  const result = await altra.run(END_DATE);
-})();
-```
-
----
-
-## Imports
-
-Altra is accessed through the `FeedAltraModule` export from `@alva/feed`. Field
-type helpers (`num`, `str`, etc.) and `createArraysOhlcvProvider` are at the
-`@alva/feed` top level:
-
-```javascript
-const {
-  FeedAltraModule,
-  num,
-  str,
-  bool,
-  obj,
-  arr,
-  fld,
-  makeDoc,
-  createArraysOhlcvProvider,
-} = require("@alva/feed");
-const { FeedAltra, e, Amount, TIME, allocate, order, orders } = FeedAltraModule;
-```
-
-| Export                                    | Source                   | Description                                      |
-| ----------------------------------------- | ------------------------ | ------------------------------------------------ |
-| `FeedAltra`                               | `FeedAltraModule`        | Main backtesting engine class                    |
-| `e`                                       | `FeedAltraModule`        | Event trigger expression builder                 |
-| `Amount`                                  | `FeedAltraModule`        | Order amount constructors                        |
-| `TIME`                                    | `FeedAltraModule`        | Time constants (SECOND, MINUTE, HOUR, DAY, WEEK) |
-| `allocate`                                | `FeedAltraModule`        | Helper to create allocate target                 |
-| `order` / `orders`                        | `FeedAltraModule`        | Helper to create order targets                   |
-| `num`, `str`, `bool`, `obj`, `arr`, `fld` | `@alva/feed` (top level) | Field type helpers (same as Feed SDK)            |
-| `makeDoc`                                 | `@alva/feed` (top level) | Type document helper                             |
-| `createArraysOhlcvProvider`               | `@alva/feed` (top level) | Builds the OHLCV provider used by Altra          |
-
----
-
-## OHLCV Provider
-
-Use an OHLCV provider such as `createArraysOhlcvProvider()`. Never fabricate
-price data. The provider is exported from `@alva/feed`.
-
-```javascript
-const { createArraysOhlcvProvider } = require("@alva/feed");
-const secret = require("secret-manager");
-
-const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
-const ohlcvProvider = createArraysOhlcvProvider({ jwt: ARRAYS_JWT });
-
-const altra = new FeedAltra(config, ohlcvProvider);
-```
-
-### Resolve Trading Pairs Before Backtesting
+altra2 accepts only Alva's canonical trading pairs (`VENUE_CONTRACT_BASE_QUOTE`): the
+exact `tradingPair` the CLI returns. Never construct one from a ticker, a company name or an
+exchange alias.
 
 Use the `alva trading-pairs` CLI to resolve trading pairs before writing a
 strategy. Run `alva trading-pairs --help` for its search and resolve commands.
 
-The lookup proves naming and catalog membership, not OHLCV availability. Before
-the full-range backtest, run Altra with the selected symbol over a bounded smoke
-window that covers the maximum feature lookback. Require at least one real OHLCV
-bar and no provider error before expanding to the requested range.
+```bash
+alva trading-pairs search --symbol NVDA --market US --instrument-type spot --json
+alva trading-pairs resolve --symbol 0700 --market HK --instrument-type spot --quote HKD --json
+alva trading-pairs resolve --symbol BTC --market BINANCE --instrument-type perp --json
+```
 
-**Supported OHLCV intervals**:
+| Market            | Example code                                                  | Symbol to search             | Session (local)              |
+| ----------------- | ------------------------------------------------------------- | ---------------------------- | ---------------------------- |
+| US equities, ETFs | `US_SPOT_NVDA_USD`                                            | `NVDA`                       | 09:30–16:00 America/New_York |
+| Hong Kong         | `HK_SPOT_0700_HKD`                                            | `0700` (4 digits; not `700`) | 09:30–16:00 Asia/Hong_Kong   |
+| Shanghai/Shenzhen | `SS_SPOT_600519_CNY`, `SZ_SPOT_000001_CNY`                    | `600519`, `000001`           | 09:30–15:00 Asia/Shanghai    |
+| Korea             | `KS_SPOT_005930_KRW` (KOSPI), `KQ_SPOT_293490_KRW` (KOSDAQ)   | `005930`                     | 09:00–15:30 Asia/Seoul       |
+| Crypto            | `BINANCE_SPOT_BTC_USDT`, `BINANCE_PERP_BTC_USDT`, `HYPERLIQUID_PERP_BTC_USDC` | `BTC` | 24/7; daily bars close 00:00 UTC |
 
-- US stocks: `"1min"`, `"2min"`, `"3min"`, `"5min"`, `"10min"`, `"15min"`,
-  `"30min"`, `"1h"`, `"2h"`, `"4h"`, `"1d"`, `"1w"`, `"1m"`.
-- Crypto spot/perp: `"1min"`, `"2min"`, `"3min"`, `"5min"`, `"10min"`,
-  `"15min"`, `"30min"`, `"45min"`, `"1h"`, `"2h"`, `"4h"`, `"1d"`, `"1w"`,
-  `"1m"`, plus locally aggregated minute/hour/day multiples that divide cleanly
-  into a supported base interval (for example `"6h"`, `"8h"`, `"12h"`, `"3d"`).
-- Do not use stock `"45min"`; the provider rejects it. Do not assume arbitrary
-  strings between `"1min"` and `"1w"` are valid for stocks.
+- Search takes the venue's own symbol, not a company name. Map a name to its ticker first
+  (for example with [data-skills.md](data-skills.md)), then search.
+- Multiple candidates are normal: `BTC` matches a US ETF, Binance spot and perp, Hyperliquid
+  and more. Filter by `--market`, `--instrument-type` and `--quote`; `resolve` requires exactly
+  one. Zero or several matches after filtering is a blocking ambiguity, not permission to take
+  the first.
+- Copy the returned `tradingPair` unchanged into `universe`, commands and inputs. Existing
+  holdings keep their stored pair.
+- A pair on another venue (`NZ_...`) or an option is a real trading pair that altra2 does not
+  trade: the run returns `instrument_unsupported`.
+- If a run returns `instrument_not_canonical`, its message contains guesses built from the
+  text. They are hints, not lookups; search again and use what the CLI returns.
 
-**Stock intraday data-window limit**: For US stocks, long intraday windows must
-be chunked. A single full-window request for `"1min"`/`"5min"`/`"15min"`/
-`"30min"`/hourly data can fail when the range is large; the underlying
-Arrays/data-tools endpoint rejects very large intraday windows (for example
-`"1min"` over more than about 366 days).
+The lookup proves naming and catalog membership, not OHLCV availability. Before the full-range
+backtest, run Altra with the selected symbol over a bounded smoke window that covers the
+maximum feature lookback. Require at least one real OHLCV bar and no provider error (the run
+is `complete` and `gaps` is empty) before expanding to the requested range.
 
-When a user asks for a multi-year intraday stock backtest, do not blindly set a
-2-year `startDate` with `"1min"`/`"5min"` bars. First narrow the window, switch
-to daily/weekly bars if that still answers the question, or use a provider path
-that explicitly chunks the request. Retrying the same full-window request across
-regions usually does not fix this class of request.
+## How a Run Works
 
----
+The engine walks one timeline of instants (bar opens and closes, schedule ticks, external
+events, valuation times). At each instant it confirms resting orders, runs `decide` if a
+trigger fired, admits the returned commands, matches orders at bars that open now, and records
+equity at the valuation time.
 
-## Altra Configuration
+- **Decide at a close, fill at the next open.** An order decided at `t` fills at its
+  instrument's first bar opening at or after `t`. A US daily decision fills at the next
+  session's 09:30 open. Legs on different venues fill at their own opens.
+- **No look-ahead.** `decide` sees only bars with `closeAt <= now`. An open bar is invisible,
+  including its open price.
+- **One `decide` call per instant**, even when several triggers fire; `ctx.triggers` lists them.
+- **Reproducible when your functions are.** With deterministic `decide` and feature functions,
+  the same strategy, data and options always produce the same records.
+
+## A Complete Backtest
+
+Run it as cloud JavaScript with `alva run --local-file <path>`
+([jagent-runtime.md](jagent-runtime.md)). Bars come from Alva's data relay; nothing needs to be
+wired up.
 
 ```javascript
-const altra = new FeedAltra(
-  {
-    path: "~/feeds/my-strategy/v1",
-    startDate: Date.parse("2025-01-01T00:00:00Z"),
-    portfolioOptions: {
-      initialCash: 1_000_000,
-      currency: "USDT",
-    },
-    simOptions: {
-      simTick: "1min",
-      feeRate: 0.001, // 0.1% per trade
-      slippage: 0.0005, // 0.05% slippage
-    },
-    perfOptions: {
-      timezone: "UTC",
-      marketType: "crypto", // "crypto", "us_stock", or "mix"
-    },
+const { defineStrategy, allocate, run } = require("@alva/altra2");
+const { indicators } = require("@alva/algorithm");
+
+const SPY = "US_SPOT_SPY_USD"; // from alva trading-pairs
+const TLT = "US_SPOT_TLT_USD";
+
+const strategy = defineStrategy({
+  name: "spy-tlt-trend",
+  revision: "1",
+  universe: [SPY, TLT],
+  features: {
+    sma200: { from: "close", lookback: 199, fn: (c) => indicators.sma(c, { period: 200 }) },
   },
-  ohlcvProvider,
-);
-```
-
-| Field                          | Description                                                                                                                              |
-| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `path`                         | ALFS feed path (e.g. `'~/feeds/my-strategy/v1'`). All output data stored here.                                                           |
-| `startDate`                    | Backtest start timestamp (ms UTC). Use the exact date, never adjust for warmup, but still respect provider data-window limits.           |
-| `portfolioOptions.initialCash` | Starting cash (default: 100,000)                                                                                                         |
-| `portfolioOptions.currency`    | Quote currency (default: "USD")                                                                                                          |
-| `simOptions.simTick`           | Simulation resolution. Prefer valid tick strings like `"1min"`, `"15min"`, or `"1d"`; numeric ms values must map to a valid tick string. |
-| `simOptions.feeRate`           | Fee per trade as fraction (e.g. 0.001 = 0.1%)                                                                                            |
-| `simOptions.slippage`          | Slippage as fraction                                                                                                                     |
-| `perfOptions.timezone`         | `"UTC"` for crypto/mix, `"America/New_York"` for us_stock                                                                                |
-| `perfOptions.marketType`       | `"crypto"`, `"us_stock"`, or `"mix"` (multi-asset)                                                                                       |
-
-### TIME Constants
-
-```javascript
-const { TIME } = FeedAltraModule;
-
-TIME.SECOND; // 1,000 ms
-TIME.MINUTE; // 60,000 ms
-TIME.HOUR; // 3,600,000 ms
-TIME.DAY; // 86,400,000 ms
-TIME.WEEK; // 604,800,000 ms
-```
-
-### Multi-Asset Strategies
-
-When trading both crypto and stocks, use a single FeedAltra instance with
-`marketType: "mix"`:
-
-```javascript
-const ohlcvProvider = createArraysOhlcvProvider({ jwt: ARRAYS_JWT });
-const altra = new FeedAltra(
-  {
-    path: "~/feeds/multi-asset/v1",
-    perfOptions: { timezone: "UTC", marketType: "mix" },
-    // ...
-  },
-  ohlcvProvider,
-);
-
-dg.registerOhlcv("BINANCE_SPOT_BTC_USDT", "1d");
-dg.registerOhlcv("US_SPOT_AAPL_USD", "1d");
-await altra.run(endDate);
-```
-
----
-
-## DataGraph
-
-The DataGraph manages all data sources: OHLCV price data, raw external data, and
-computed features.
-
-```javascript
-const dataGraph = altra.getDataGraph();
-```
-
-### Register OHLCV
-
-```javascript
-dataGraph.registerOhlcv("BINANCE_SPOT_BTC_USDT", "1d");
-dataGraph.registerOhlcv("BINANCE_SPOT_ETH_USDT", "1h");
-```
-
-Register each symbol/interval pair your features and strategy need.
-
-### Register Features
-
-A **feature** is a computed indicator or derived data point that transforms raw
-data into signals. Features are the middle layer between raw data and trading
-decisions.
-
-```javascript
-dataGraph.registerFeature({
-  name: "rsi",
-  description: "14-period RSI",
-  inputConfig: {
-    ohlcvs: [{ id: { pair: SYMBOL, interval: "1d" }, lookback: { count: 13 } }],
-  },
-  fields: [num("value", "RSI value")],
-  fn: (data, { fromExclusive, toInclusive }) => {
-    const bars = data.ohlcvs[SYMBOL]?.["1d"] || [];
-    if (bars.length < 14) return [];
-
-    const closes = bars.map((b) => b.close);
-    const rsiValues = indicators.rsi(closes, 14);
-
-    const out = [];
-    for (let i = 0; i < bars.length; i++) {
-      const t = bars[i].endTime ?? bars[i].date + TICK;
-      if (t <= fromExclusive || t > toInclusive) continue;
-      out.push({ date: t, value: rsiValues[i] });
-    }
-    return out;
-  },
-});
-```
-
-**Feature function requirements**:
-
-1. **Lookback**: Use `{ count: period - 1 }` for count-based (RSI 14 needs
-   `{ count: 13 }`) or `{ duration: N * TICK }` for duration-based
-2. **Time filtering**: Return ONLY records in `(fromExclusive, toInclusive]`
-3. **Data ordering**: Chronological (oldest first)
-4. **Access pattern**: Use bracket notation --
-   `data.ohlcvs["PAIR"]?.["interval"]`, `data.features["name"]`,
-   `data.raws["name"]`
-5. **PIT compliance**: Feature at time T must use only data from before or at T.
-   Use `bar.endTime` (not `bar.date`) as the output timestamp
-
-**Feature depending on another feature**:
-
-```javascript
-dataGraph.registerFeature({
-  name: "price_ma_ratio",
-  inputConfig: {
-    ohlcvs: [{ id: { pair: SYMBOL, interval: "1d" } }],
-    features: [{ id: "sma_20" }],
-  },
-  fields: [num("ratio")],
-  fn: (data) => {
-    const bars = data.ohlcvs[SYMBOL]?.["1d"] || [];
-    const sma = data.features["sma_20"] || [];
-    return sma.map((s, i) => ({
-      date: s.date,
-      ratio: bars[i].close / s.value,
-    }));
-  },
-});
-```
-
-**Multi-pair features**: Create separate features per symbol:
-
-```javascript
-const symbols = ["BINANCE_SPOT_BTC_USDT", "BINANCE_SPOT_ETH_USDT"];
-for (const symbol of symbols) {
-  const ticker = symbol.split("_")[2];
-  dataGraph.registerFeature({
-    name: `rsi_${ticker}`,
-    inputConfig: {
-      ohlcvs: [
-        { id: { pair: symbol, interval: "1d" }, lookback: { count: 13 } },
-      ],
-    },
-    fields: [num("rsi")],
-    fn: (data) => {
-      /* compute RSI for this symbol */
-    },
-  });
-}
-```
-
-**Event-based features** (earnings, disclosures): Must output for EVERY bar, not
-just event days. Otherwise strategy with lookback sees stale data.
-
-```javascript
-const out = [];
-for (const bar of bars) {
-  const t = bar.endTime ?? bar.date + TICK;
-  if (!inRange(t, fromExclusive, toInclusive)) continue;
-  out.push({
-    date: t,
-    is_event: eventSet.has(t),
-    value: eventMap.get(t) ?? null,
-  });
-}
-```
-
-### Register Raw Data
-
-Raw data sources provide external data beyond OHLCV (funding rates, open
-interest, on-chain metrics, sentiment).
-
-```javascript
-const http = require("net/http");
-const secret = require("secret-manager");
-const ARRAYS_JWT = secret.loadPlaintext("ARRAYS_JWT");
-const ARRAYS_BASE = "https://data-tools.prd.space.id";
-
-dataGraph.registerRawData({
-  name: "btc_open_interest",
-  description: "BTC perpetual futures open interest",
-  fields: [num("sumOpenInterest"), num("sumOpenInterestValue")],
-  fn: (fromExclusive, toInclusive) => {
-    const resp = http.syncFetch(
-      `${ARRAYS_BASE}/api/v1/crypto/open-interest?symbol=BTCUSDT&start_time=${fromExclusive}&end_time=${toInclusive}&interval=1d`,
-      { headers: { Authorization: "Bearer " + ARRAYS_JWT } },
-    );
-    const result = JSON.parse(resp.text());
-
-    if (!result.success) {
-      throw new Error("getOpenInterest failed: " + JSON.stringify(result));
-    }
-
+  trigger: { kind: "schedule", every: "month-start", at: { timeZone: "America/New_York", hour: 17 } },
+  decide: (ctx) => {
+    const close = ctx.bars(SPY).last()?.close;
+    const sma = ctx.features(SPY).sma200.last();
+    if (close === undefined || sma === undefined)
+      return { kind: "decided", commands: [], reason: "warm-up" };
+    const risk = close > sma;
     return {
-      data: result.data.map((d) => ({
-        date: d.observedAt, // MUST use observedAt for PIT safety
-        sumOpenInterest: d.sum_open_interest,
-        sumOpenInterestValue: d.sum_open_interest_value,
-      })),
+      kind: "decided",
+      commands: [allocate(risk ? { [SPY]: 0.6, [TLT]: 0.4 } : { [TLT]: 1 })],
+      reason: `SPY ${close.toFixed(2)} vs SMA200 ${sma.toFixed(2)}`,
     };
   },
 });
-```
 
-**Raw data PIT rule**: Always use `observedAt` as the `date` field. This is the
-only PIT-safe timestamp -- it represents when the data became available, not
-when the event occurred.
-
----
-
-## Strategy
-
-### setStrategy(fn, config)
-
-```javascript
-altra.setStrategy(strategyFn, {
-  trigger: { type: "events", expr: e.ohlcv(SYMBOL, "1d") },
-  inputConfig: {
-    ohlcvs: [{ id: { pair: SYMBOL, interval: "1d" } }],
-    features: [{ id: "rsi" }, { id: "macd", lookback: { count: 1 } }],
-    raws: [{ id: "btc_open_interest", lookback: { count: 5 } }],
-  },
-  initialState: { lastSignal: null },
-});
-```
-
-### Event Triggers
-
-Triggers fire at bar CLOSE (when the bar is complete).
-
-```javascript
-const { e } = FeedAltraModule;
-
-e.ohlcv("BINANCE_SPOT_BTC_USDT", "1d"); // Daily bar close
-e.raw("sentiment_score"); // Raw data update
-e.feature("rsi"); // Feature computed
-
-e.all(
-  e.ohlcv("US_SPOT_AAPL_USD", "1d"),
-  e.ohlcv("BINANCE_SPOT_BTC_USDT", "1d"),
-); // AND
-e.any(e.ohlcv("BINANCE_SPOT_BTC_USDT", "1h"), e.raw("funding")); // OR
-```
-
-### Strategy Config
-
-```javascript
-{
-  trigger: {
-    type: "events",
-    expr: EventExpr,   // e.ohlcv(), e.raw(), e.all(), e.any()
-    delay: number,     // optional ms delay after event
-  },
-  inputConfig: {
-    ohlcvs: [{ id: { pair, interval }, lookback?: LookbackOptions }],
-    features: [{ id: string, lookback?: LookbackOptions }],
-    raws: [{ id: string, lookback?: LookbackOptions }],
-  },
-  initialState: TState,
-}
-```
-
-**LookbackOptions**: `{ count?: number, duration?: number }`; set one or both.
-`duration` is in ms.
-
-### Strategy Function
-
-```javascript
-function strategyFn(ctx) {
-  const { tick, data, portfolio, state } = ctx;
-
-  // Access data with bracket notation
-  const bars = data.ohlcvs["BINANCE_SPOT_BTC_USDT"]?.["1d"] || [];
-  const rsiData = data.features["rsi"] || [];
-  const oiData = data.raws["btc_open_interest"] || [];
-
-  // Portfolio snapshot
-  const cash = portfolio.cash;
-  const positions = portfolio.positions; // [{symbol, qty}, ...]
-
-  // Return: target (or null) + updated state
-  return {
-    target: null, // or a Target object
-    state: newState, // must always return updated state
-    logs: "optional debug string",
-  };
-}
-```
-
-**Defensive programming**:
-
-- Throw errors for unexpected conditions (missing data sources, invalid formats)
-- Return `{ target: null, state }` for expected no-signal conditions (warmup, no
-  trigger)
-
-```javascript
-const bars = data.ohlcvs[SYMBOL]?.["1d"];
-if (!bars)
-  throw new Error("OHLCV not found -- check registerOhlcv and inputConfig");
-if (bars.length === 0) return { target: null, state }; // warmup
-```
-
-### Understanding Lookback
-
-**Feature lookback** and **strategy lookback** are set in different scopes:
-
-| Type              | Where Set                | Controls                                                                |
-| ----------------- | ------------------------ | ----------------------------------------------------------------------- |
-| Feature lookback  | Feature's `inputConfig`  | How many OHLCV, raw, or feature dependency records the feature receives |
-| Strategy lookback | Strategy's `inputConfig` | How many OHLCV, raw, or feature records the strategy sees               |
-
-Strategy lookback can also extend upstream raw/feature computation ranges so the
-requested records are available to the strategy.
-
-**Quick reference**:
-
-- RSI(14): Feature lookback `{ count: 13 }`
-- SMA(20): Feature lookback `{ count: 19 }`
-- MACD(12,26,9): Feature lookback `{ count: 25 }`
-- Crossover detection: Strategy lookback `{ count: 1 }` (see 2 values: current +
-  previous)
-- Current activation data only: Omit lookback (record count depends on trigger
-  and data frequency)
-
-**Never adjust `startDate` for warmup**: Use `lookback` in feature/strategy
-`inputConfig` instead.
-
----
-
-## Target / Signal Structure
-
-Targets tell the SimEngine what to do. One signal per tick maximum.
-
-### Weight-Based Allocation
-
-Set target portfolio weights. SimEngine calculates and executes the needed
-trades.
-
-```javascript
-{
-  date: tick,
-  instruction: {
-    type: "allocate",
-    weights: [
-      { symbol: "BINANCE_SPOT_BTC_USDT", weight: 0.6 },
-      { symbol: "BINANCE_SPOT_ETH_USDT", weight: 0.4 },
-    ],
-  },
-  meta: { reason: "Rebalance: BTC 60%, ETH 40%" },
-}
-```
-
-**Weight values**:
-
-| Weight | Meaning                                    |
-| ------ | ------------------------------------------ |
-| `0`    | Close entire position (exit)               |
-| `0.5`  | 50% of equity in this asset                |
-| `1.0`  | 100% long (fully invested)                 |
-| `-1.0` | 100% short                                 |
-| `2.0`  | 200% long target, subject to margin limits |
-
-- Existing positions omitted from `weights` are also targeted to `0` and closed
-- If weights sum to < 1.0, remainder stays as cash
-- Repeating the same target weights rebalances to those weights
-
-### Order-Based Execution
-
-Execute specific buy/sell orders with precise amounts.
-
-```javascript
-{
-  date: tick,
-  instruction: {
-    type: "orders",
-    orders: [
-      { symbol: "BINANCE_SPOT_BTC_USDT", side: "buy", amount: Amount.quote(100) },
-    ],
-  },
-  meta: { reason: "DCA: buying $100 of BTC" },
-}
-```
-
-### Amount Types
-
-```javascript
-const { Amount } = FeedAltraModule;
-
-Amount.base(0.5); // 0.5 units of base asset (e.g. 0.5 BTC)
-Amount.quote(100); // $100 worth
-Amount.ofCash(0.5); // 50% of available cash (buy orders only)
-Amount.ofPosition(0.5); // 50% of current position size
-Amount.ofEquity(0.05); // 5% of portfolio equity
-```
-
-Use either an `allocate` instruction or an `orders` instruction in a target. Do
-not put `orders` inside an `allocate` instruction; current execution only uses
-the `weights` for `allocate` targets.
-
----
-
-## Running the Backtest
-
-`run()` is async and returns a `Promise<RunResult>`:
-
-```javascript
 (async () => {
-  const result = await altra.run(END_DATE);
+  const r = await run({
+    strategy,
+    range: { from: "2018-01-01", to: "2025-12-31" }, // (from, to]
+    sim: { initialCash: 100_000, feeBps: 2, slippageBps: 5 },
+  });
+  if (r.status !== "complete") return r; // invalid / not_ready / failed: read issues, reason, error
+  const fills = r.records.orderEvents.filter((e) => e.kind.startsWith("filled"));
+  return {
+    metrics: r.metrics,
+    decisions: r.records.decisions.length,
+    fills: fills.length,
+    rejected: r.records.decisions.flatMap((d) => d.outcomes).filter((o) => o.status === "rejected"),
+    gaps: r.gaps.slice(0, 20),
+    lastDecisions: r.records.decisions.slice(-5),
+  };
 })();
 ```
 
-The `RunResult` contains:
+- **Return a summary, not `records`.** Records and features of a long run are large.
+- **History before `from`** for features and inputs is fetched automatically. Never move
+  `startDate`/`from` earlier for warm-up.
+- **Execution limits.** One call has a time and memory limit. For large universes over long
+  histories, build a stored run over several calls with increasing `until`.
 
-- `numTicks` -- Number of strategy activations
-- `targets` -- All generated targets (buy/sell signals)
-- `orders` -- All executed orders with fill details
-- `perf` -- Performance metrics (total return, Sharpe ratio, max drawdown, etc.)
+## Defining a Strategy
 
-All output data is also persisted under the feed's ALFS path (quote in CLI, e.g.
-`'~/feeds/my-strategy/v1/data/'`):
+`defineStrategy(spec)` returns the spec unchanged.
 
-```
-~/feeds/my-strategy/v1/data/
-├── signal/targets          -- Target records
-├── sim/portfolio           -- Portfolio snapshots
-├── sim/orders              -- Order/fill records
-├── perf/equity             -- Equity curve
-└── perf/metrics            -- Performance report
-```
+| Field       | Required     | Meaning |
+| ----------- | ------------ | ------- |
+| `name`      | yes          | A label. |
+| `revision`  | with a store | Version of the logic. Bump it whenever code, captured parameters or the meaning of `state` change. |
+| `universe`  | yes          | Every instrument the strategy may trade or read: canonical codes, a static list. For index membership or ranking, list the candidates and filter in `decide`. |
+| `execution` | no           | Matching interval per instrument, e.g. `{ US_SPOT_NVDA_USD: "1h" }`. Default `"1d"`. Intervals: `1m`, `5m`, `15m`, `30m`, `1h`, `4h`, `1d`. |
+| `inputs`    | no           | Observation-only bars: `[{ instrument, interval, lookback }]`; `lookback` closed bars must exist at the first activation. |
+| `features`  | no           | Declarative per-instrument series. See [Features](#features). |
+| `trigger`   | yes          | When `decide` runs. See [Triggers](#triggers). |
+| `state`     | no           | `{ initial }`, a JSON value. `decide` may return a new `state`; omitting it keeps the old one. |
+| `decide`    | yes          | `(ctx) => outcome`, or `async (ctx) => outcome`. |
 
-`signal/targets` makes the feed push-capable, but delivery still requires the
-cronjob to be created or updated with `--push-notify` and
-`alva automation publish` to bind the feed to that cronjob. Initial publish
-creates the owner's alert binding and starts the producer once by default;
-other viewers or destinations require an explicit alert binding mutation. A
-playbook follow does not enable alerts for its feeds. See
-`references/deployment.md` for the deploy/publish flow.
+`decide` returns `{ kind: "decided", commands: [...], state?, reason? }` or
+`{ kind: "not_ready", reason }`.
 
----
+- `reason` is recorded with the decision; write why, it is the first thing to read when
+  debugging.
+- Nothing to do is `commands: []`. `not_ready` aborts the whole run with nothing committed; use
+  it only when the run must not proceed.
 
-## Point-In-Time (PIT) Compliance
+Spec problems return `{ status: "invalid", issues: [{ code, message, path? }] }`, all at once,
+before anything runs: for example `instrument_not_canonical`, `instrument_unsupported`,
+`trigger_feature`, `feature_cycle`, `feature_bad_lookback`, `schedule_time_zone`,
+`bad_sim_option`, `revision_required`, `bad_range`.
 
-PIT means: a feature at time T must use ONLY data available at or before T.
+## The Decide Context
 
-**OHLCV bars** have two timestamps:
+| Member                    | Meaning |
+| ------------------------- | ------- |
+| `ctx.now`                 | The current instant (epoch ms). Use it instead of `Date.now()`. |
+| `ctx.triggers`            | Why this activation happened: `[{ kind, instrument?, feature?, source? }]`. |
+| `ctx.state`               | The strategy state (frozen). |
+| `ctx.account`             | `{ cash, equity, positions, openOrders }`. A position has `instrument`, `qty` (negative when short), `avgPrice`, `sellableQty` (T+1 on A-shares), `realizedPnl`, `mark`, `value`. An open order has `id`, `tag?`, `instrument`, `side`, `type`, `qty`, `price?`. |
+| `ctx.bars(id, interval?)` | Closed bars: `last()`, `row(i)`, `closes(n)`, `length`, and columns `openAt`, `closeAt`, `open`, `high`, `low`, `close`, `volume`. Only the declared window is visible: an input's `lookback` or what the instrument's features need. |
+| `ctx.features(id).name`   | Point-in-time feature: `last()`, `back(k)`, `values(n)`. A missing row is `undefined` (`NaN` in `values`). |
+| `ctx.orderEvents`         | Order events confirmed since the previous activation. |
+| `ctx.events`              | External events that became visible since the previous activation. |
 
-- `bar.date` = bar START (open time)
-- `bar.endTime` = bar CLOSE (when the bar is complete)
+Every call takes the canonical code exactly as in `universe`.
 
-An indicator computed from `bar.close` is NOT available at `bar.date`. It
-becomes available at `bar.endTime`.
-
-```javascript
-// WRONG -- look-ahead bias
-return bars.map((bar, i) => ({ date: bar.date, value: indicator[i] }));
-
-// CORRECT -- PIT compliant
-return bars.map((bar, i) => ({
-  date: bar.endTime ?? bar.date + TICK,
-  value: indicator[i],
-}));
-```
-
-**Raw data**: Use `observedAt` (when data became available), not `eventTime` or
-calculated timestamps.
-
----
-
-## Common Patterns
-
-### State Counters
-
-Track strategy state for multi-bar logic:
+## Commands and Orders
 
 ```javascript
-const initialState = { signal: 0, entry_time: null, entry_price: null };
+const { allocate, market, limit, stop, cancel, qty, notional, gtc, gtd, ioc } = require("@alva/altra2");
 
-function strategyFn(ctx) {
-  const { tick, data, state } = ctx;
-  let next = { ...state };
-  let target = null;
-
-  const inPos = state.signal !== 0;
-
-  if (!inPos && enterCondition) {
-    next.signal = 1;
-    next.entry_time = tick;
-    next.entry_price = currentClose;
-    target = {
-      date: tick,
-      instruction: {
-        type: "allocate",
-        weights: [{ symbol: SYMBOL, weight: 1.0 }],
-      },
-    };
-  }
-
-  if (inPos) {
-    const timeExit =
-      state.entry_time != null && tick - state.entry_time >= 60 * TIME.MINUTE;
-    if (timeExit) {
-      next = { signal: 0, entry_time: null, entry_price: null };
-      target = {
-        date: tick,
-        instruction: {
-          type: "allocate",
-          weights: [{ symbol: SYMBOL, weight: 0 }],
-        },
-      };
-    }
-  }
-
-  return { target, state: next };
-}
+allocate({ US_SPOT_SPY_USD: 0.6, US_SPOT_TLT_USD: 0.4 }); // target weights of equity
+market("US_SPOT_NVDA_USD", "buy", qty(10)); // 10 shares at the next open
+market("US_SPOT_NVDA_USD", "sell", notional(5000), { tag: "trim" });
+limit("BINANCE_SPOT_BTC_USDT", "buy", qty(0.1), 60000, gtc(), { tag: "L60000" });
+stop("US_SPOT_NVDA_USD", "sell", qty(10), 800, gtd(Date.parse("2026-03-31")));
+cancel("L60000"); // by tag
 ```
 
-### Fixed-Duration Exits
+- `decide` may return any number of commands.
+- **`allocate`**: held instruments not listed target 0; `allocate({})` liquidates. A new
+  `allocate` replaces the unfinished legs of the previous one. Negative weights are shorts
+  (rejected `short_forbidden` where the venue forbids them). The sum of absolute weights may
+  not exceed `sim.maxGrossLeverage` (default 1).
+- Under `market` rules, sells fill before buys at the open and buys are scaled down together if
+  cash cannot cover them. **`canceled · unfunded` after a fill is a normal partial fill.**
+- **`market`** fills at the next open with slippage. **`limit`** rests until filled (at the open
+  if the bar gaps through, otherwise at the limit price), canceled or expired. **`stop`**
+  triggers at `stopPrice` and fills like a market order.
+- Time in force: `gtc()` (default), `gtd(until)`, `ioc()` (next open only). `tag` must be unique
+  among live orders.
+- Quantities follow venue lots under `market` rules, including notional orders.
 
-Store `entry_time` and check `tick - entry_time >= duration`:
+Every command gets an outcome in the decision record:
+`{ index, kind, status: "accepted" | "partial" | "rejected", orderIds, issues }`. Codes include
+`unknown_instrument`, `short_forbidden`, `below_lot`, `bad_amount`, `bad_price`, `bad_tif`,
+`bad_side`, `bad_weight`, `duplicate_tag`, `leverage`, `no_price`.
+
+Order events carry `kind`: `placed`, `filled_at_open`, `filled_intrabar` (with `qty`, `price`,
+`fee`), `pending_funds`, `blocked` (`price_band`, `sellability`, `insufficient_funds`, ...; the
+order stays live), `canceled` (`replaced`, `ioc`, `unfunded`, `nothing_to_sell`, `below_lot`,
+...), `expired`.
+
+## Triggers
+
+| Trigger | Fires |
+| ------- | ----- |
+| `{ kind: "bar", instrument, interval? }` | At every close of that instrument's bars. |
+| `{ kind: "schedule", every, at: { timeZone, hour, minute? } }` | At a wall-clock time. `every`: `day`, `weekday`, `week-start`, `month-start`, `month-end`. |
+| `{ kind: "cross", feature, instrument?, level?, direction? }` | When a feature crosses `level` (default 0) at a close; `direction` `up`, `down` or `both`. |
+| `{ kind: "event", source }` | When an external event of that source becomes available. |
+| `{ kind: "any", of: [...] }` | When any listed trigger fires. |
+
+A schedule fires even when no market is open: choose a time after the closes you need, for
+example 17:00 New York for US daily bars.
+
+## Features
+
+Features are declared, computed once over each instrument's series, and read point-in-time:
+a row becomes visible when its source bar closes.
 
 ```javascript
-if (state.entry_time != null && tick - state.entry_time >= 7 * TIME.DAY) {
-  // Exit after 7 days
-}
+features: {
+  sma20: { from: "close", lookback: 19, fn: (c) => indicators.sma(c, { period: 20 }) },
+  sma50: { from: "close", lookback: 49, fn: (c) => indicators.sma(c, { period: 50 }) },
+  spread: { deps: ["sma20", "sma50"], history: 2, fn: (d) => d.sma20.map((x, i) => x - d.sma50[i]) },
+  rsi14: { from: "close", lookback: 14, mode: "recursive", warmup: 100, fn: (c) => indicators.rsi(c, { period: 14 }) },
+},
 ```
 
-### Initial State
+- `fn` receives a `Float64Array` of the `from` field (`open`, `high`, `low`, `close`, `volume`),
+  or `{ name: Float64Array }` with `deps`, and returns an array of the same length.
+- **`fn` may be `async`** (model inference, a service call); the engine awaits it. Prefer one
+  pass over the whole array to one call per row when the service allows it.
+- **`lookback`** is the index of the first valid output: SMA(p) → `p − 1`, ROC(p) → `p`,
+  RSI(p) → `p`. `@alva/algorithm` fills warm-up rows with partial values, so the lookback must
+  be right. Lookbacks add up along `deps`.
+- **`history`** (default 1) is how many rows `decide` may read: `back(k)` needs `k + 1`,
+  `values(n)` needs `n`.
+- **Recursive indicators** (EMA, RSI, MACD) declare `mode: "recursive"` and a `warmup` of several
+  times the period.
+- **Causality is your obligation**: no centered windows, no normalization over the whole array,
+  no reading the array's end. Check with `await testing.assertCausal(fn, values)`.
+- A non-finite output marks a row missing. A throw or rejected promise fails the run.
 
-Only track strategy decision logic. Altra manages portfolio, trades, and metrics
-automatically.
+## External Events
+
+Non-bar data (earnings, fundamentals, sentiment scores, another Automation's signals) enters as
+events. Load it in the script, convert each record, and pass `events` to `run`:
 
 ```javascript
-// CORRECT
-const initialState = { lastSignal: null, entry_time: null };
-
-// WRONG -- Altra manages these
-const initialState = { capital: 1_000_000, trades: [], totalPnL: 0 };
+events: [
+  { source: "earnings", id: "NVDA-2024Q4", revision: 1,
+    availableAt: Date.parse("2024-02-21T21:20:00Z"), payload: { surprisePct: 12 } },
+],
+// trigger: { kind: "event", source: "earnings" }; in decide: ctx.events
 ```
 
----
+- `availableAt` is when the information could be known: the engine schedules by it. Use the
+  provider's publication/observation time, never the event time or a crawl/backfill time.
+- `(source, id)` identifies an event; a higher `revision` supersedes earlier ones. `payload` is
+  JSON (`null` when empty).
+- Events at or before the run start are not delivered (`records.lateEvents`).
 
-## Data Access Patterns
+## LLMs and Models
 
-All data in strategy context uses bracket notation (plain objects):
+Every function you write may be async: `decide` and feature `fn` can call an LLM through
+[alpi.md](alpi.md), an ONNX model through [onnx.md](onnx.md), or another service.
+
+- **Nothing is recorded.** Every replay (a backtest, or a stored run's rebuild) calls them again:
+  it costs again and a model may answer differently.
+- **Backtests call the model for every activation**, and a model asked about past dates may
+  already know what happened next.
+- **A failed call fails the run** and nothing is committed; catch inside the function to fall
+  back instead.
+- **Recommended:** keep `decide` deterministic. Run the LLM analysis as its own Automation that
+  writes answers to a Feed, then pass those rows in as events. A fixed ONNX model inside an async
+  feature is deterministic and fine.
+
+## Trading Rules and Options
+
+`sim.rules`:
+
+- **`"market"`** (default): integer shares, A-share lots of 100 (STAR at least 200) and T+1,
+  daily price bands (A-share ±10%, STAR/ChiNext ±20%, Korea ±30%), no shorting where the venue
+  forbids it, strict cash.
+- **`"ideal"`**: no lots, bands, short limits or cash limit; fractional quantities. Use it to
+  study a signal without frictions, or a margin strategy such as a perp grid.
+
+Other options: `initialCash` (default 100,000), `feeBps` (default 0), `slippageBps` (default 0),
+`maxGrossLeverage` (default 1), `valuation: { timeZone, hour, minute? }` (default 20:00 New
+York).
+
+## Reading a Backtest Result
+
+| `status`    | Meaning |
+| ----------- | ------- |
+| `complete`  | `records`, `metrics`, `features`, `gaps`. |
+| `invalid`   | The spec or options are wrong; `issues` lists every problem. Nothing ran. |
+| `not_ready` | `decide` returned `not_ready`, or an input lacked its `lookback` bars (`reason`). |
+| `failed`    | `error` says why (a fetch failed, a feature threw). Run again or fix. |
+
+- `records.decisions`: `{ at, triggers, commands, outcomes, reason }`; `records.orderEvents`;
+  `records.samples` (equity at each valuation); `records.approximations`.
+- `metrics`: `totalReturn`, `cagr`, `volatility`, `sharpe`, `sortino`, `maxDrawdown`, `calmar`,
+  each `{ value }` or `{ unavailable }`. Risk-free rate 0; observed days only.
+- **`instrument_no_data`** (`invalid`): an instrument has no bar in the range at an interval the
+  strategy uses: the code does not exist, it did not trade then (no delisted history), or that
+  interval's history is shorter (intraday). Fix the code, move the range or change the interval.
+- **`gaps`** lists windows the provider could not deliver. Check it before trusting a result.
+- To understand one fill, rerun a short range with `trace: true` and read the steps at that
+  time.
+
+## A Live Strategy as an Automation
+
+A live strategy is a Feed whose producer calls `run` with a store. Each call continues from
+the last committed point and appends decisions, order events, equity and features. Put the
+source at `~/feeds/<name>/v1/src/index.js` and use the same Feed path for the store:
 
 ```javascript
-// OHLCV
-const bars = data.ohlcvs["BINANCE_SPOT_BTC_USDT"]?.["1d"] || [];
-const latestBar = bars[bars.length - 1];
+const { feedPath } = require("@alva/feed");
+const { defineStrategy, allocate, run, feedStore } = require("@alva/altra2");
 
-// Features
-const rsiData = data.features["rsi"] || [];
-const latest = rsiData[rsiData.length - 1];
+const strategy = defineStrategy({ name: "spy-tlt-trend", revision: "1" /* ... */ });
 
-// Raw data
-const fundingData = data.raws["funding_rate"] || [];
-const latestFunding = fundingData[fundingData.length - 1];
-
-// Portfolio
-const cash = portfolio.cash;
-const btcPos = portfolio.positions.find((p) => p.symbol === SYMBOL);
-const btcQty = btcPos ? btcPos.qty : 0;
-```
-
-**Data availability**: With event-driven triggers, the strategy only runs when
-data arrives. Holidays/weekends are naturally skipped (no bar = no trigger).
-
----
-
-## Testing Strategies
-
-Use `@test/suite` for unit testing strategy components.
-
-### Testing Features
-
-```javascript
-const { describe, it, expect, runTests } = require("@test/suite:v1.0.0");
-const { SYMBOL, STRATEGY_INTERVAL, TICK } = require("./constants.js");
-const { discountFeatureFn } = require("./features.js");
-
-function createMockBars(count, basePrice, startTime) {
-  return Array.from({ length: count }, (_, i) => ({
-    date: startTime + i * TICK,
-    endTime: startTime + (i + 1) * TICK,
-    open: basePrice,
-    high: basePrice + 500,
-    low: basePrice - 500,
-    close: basePrice - i * 1000,
-    volume: 1000,
-  }));
-}
-
-describe("Feature: discount_30d", () => {
-  it("returns empty when insufficient bars", () => {
-    const mockData = {
-      ohlcvs: {
-        [SYMBOL]: {
-          [STRATEGY_INTERVAL]: createMockBars(29, 100000, 1733011200000),
-        },
-      },
-    };
-    const result = discountFeatureFn(mockData, {
-      fromExclusive: 0,
-      toInclusive: Infinity,
-    });
-    expect(result.length).toBe(0);
+(async () => {
+  const r = await run({
+    strategy,
+    start: "2026-01-02", // the persisted history begins after this
+    store: feedStore(feedPath("spy-tlt-trend", "v1")),
   });
-});
-
-runTests({ verbose: true });
+  // complete, rebuilt and up_to_date are healthy; anything else must fail the run so the
+  // platform shows it and the next scheduled run retries from the same point.
+  if (!["complete", "rebuilt", "up_to_date"].includes(r.status))
+    throw new Error(`altra2 ${r.status}: ${JSON.stringify(r).slice(0, 800)}`);
+  return { status: r.status, frontierAt: r.frontierAt, written: r.written };
+})();
 ```
 
-### Testing Strategy Logic
+| `status`     | Meaning | What to do |
+| ------------ | ------- | ---------- |
+| `complete`   | Advanced to `frontierAt`. | — |
+| `rebuilt`    | Replayed from `start` (`revision` or a setting changed, a re-adjusted price, an invalid checkpoint). | Expected after a `revision` bump. |
+| `up_to_date` | Nothing new has closed (with `coverage`: a market is still open). | Run later. |
+| `failed` / `not_ready` / `busy` | Nothing committed. | Retry later or fix the cause. |
+| `invalid`    | As for backtests, plus `revision_required`. | Fix the spec. |
+
+- **Verify before creating.** Run the source once with `alva run --entry-path`. The first call
+  replays from `start` to now; if it is too long for one call, pick a later `start` or build the
+  history with several calls passing increasing `until` before creating the Automation.
+- Then create the Automation per [feed-lifecycle.md](feed-lifecycle.md) and
+  [deployment.md](deployment.md). **Cron times are UTC**: for US daily bars `30 21 * * 1-5` is
+  after the close in winter and summer; for crypto daily bars, a few minutes after 00:00 UTC.
+- **One Automation per Feed path.** Never point a second Automation, a manual run or a trial at
+  a live strategy's path; give every experiment its own path.
+- **Change the strategy** by editing the source and bumping `revision`; the next run rebuilds
+  from `start`. Never delete the Feed's `data/` to force a replay.
+- **Events:** pass the whole event history from `start` on every call, not only new events: a
+  rebuild replays with only what that call passed.
+- **Alerts.** A decision with at least one well-formed command appends a v1-compatible row to
+  `signal/targets`, a legacy alert output: `--push-notify` works, and do not wrap it in
+  `alertOutput()`. Structurally invalid commands (`bad_amount`, `unknown_instrument`, ...) are
+  left out of the row; operational rejections (funds, lots) still appear. Native `decisions`
+  and their `outcomes` are authoritative for every rejection. A rebuild never re-announces rows
+  at or before the previous frontier.
+
+### Reading a Live Feed
+
+Resolve the generation from the manifest on every read and drop rows after `frontierAt`:
+
+```text
+~/feeds/<name>/v1/data/@kv/altra2.manifest                → generation, frontierAt
+~/feeds/<name>/v1/data/altra2-<generation>/decisions/@last/20
+~/feeds/<name>/v1/data/altra2-<generation>/equity/@range/<from>..<frontierAt>
+~/feeds/<name>/v1/data/altra2-<generation>/order_events/@last/50
+~/feeds/<name>/v1/data/altra2-<generation>-features/<feature>.y2026/@last/20
+~/feeds/<name>/v1/data/signal/targets/@last/5
+```
+
+`triggers`, `commands` and `outcomes` in `decisions`, and `positions` in `equity`, are
+JSON-encoded strings: parse them. Stored runs do not persist `metrics`; compute them from
+`equity`. Playbooks: see [design-playbook-trading-strategy.md](design-playbook-trading-strategy.md).
+
+## Testing
+
+`testing` runs a strategy without network access:
 
 ```javascript
-const { describe, it, expect, runTests } = require("@test/suite:v1.0.0");
-const { SYMBOL, STRATEGY_INTERVAL, TICK } = require("./constants.js");
-const { strategyFn, initialState } = require("./strategy.js");
+const { testing, run, defineStrategy, allocate } = require("@alva/altra2");
 
-function createMockCtx(overrides) {
-  return {
-    tick: 1733097600000,
-    data: {
-      ohlcvs: {
-        [SYMBOL]: {
-          [STRATEGY_INTERVAL]: [
-            { date: 1733011200000, endTime: 1733097600000, close: 90000 },
-          ],
-        },
-      },
-      features: {
-        macd: [
-          { date: 1733011200000, macd_line: 3, signal_line: 4 },
-          { date: 1733097600000, macd_line: 5, signal_line: 4 },
-        ],
-      },
-      raws: {},
-    },
-    portfolio: { positions: [], cash: 1000000 },
-    state: { ...initialState },
-    ...overrides,
-  };
-}
+// A 3-bar mean: the first valid row is index 2, so its lookback is 2.
+const fn = (c) => c.map((_, i) => (i < 2 ? NaN : (c[i] + c[i - 1] + c[i - 2]) / 3));
+const SPY = "US_SPOT_SPY_USD";
+const strategy = defineStrategy({
+  name: "spy-mean-test",
+  universe: [SPY],
+  features: { mean3: { from: "close", lookback: 2, fn } },
+  trigger: { kind: "bar", instrument: SPY },
+  decide: (ctx) => {
+    const close = ctx.bars(SPY).last().close;
+    const m = ctx.features(SPY).mean3.last();
+    if (m === undefined) return { kind: "decided", commands: [], reason: "warm-up" };
+    return { kind: "decided", commands: [allocate({ [SPY]: close > m ? 1 : 0 })] };
+  },
+});
 
-describe("Strategy Logic", () => {
-  it("enters on bullish MACD crossover", () => {
-    const ctx = createMockCtx();
-    const result = strategyFn(ctx);
-    expect(result.target).not.toBe(null);
-    expect(result.target.instruction.weights[0].weight).toBe(1.0);
+(async () => {
+  // Daily bars on the venue's real sessions: closes, or { o, h, l, c, v } rows.
+  const spy = testing.daily(SPY, "2024-01-02", [470, 472, 471, 475, 478, 476, 480, 474]);
+  const r = await run({
+    strategy,
+    range: { from: "2024-01-01", to: "2024-01-31" },
+    data: testing.dataset([spy]),
   });
-});
-
-runTests({ verbose: true });
+  if (r.status !== "complete") throw new Error(JSON.stringify(r));
+  const values = [470, 472, 471, 475, 478, 476];
+  await testing.assertCausal(fn, values); // rejects if fn looks ahead
+  const ok = await testing.checkLookback(fn, values, 2); // smoke check only
+  // testing.memoryStore() runs a stored run in memory: run({ strategy, start, until, now, store, data }).
+  return { decisions: r.records.decisions.length, ok };
+})();
 ```
 
-### Testing Raw Data
+With in-memory data, include enough history before `from` for features and inputs.
 
-Use factory functions with injectable fetchers:
+## Result Validity
 
-```javascript
-function createFundingRateRawData(options) {
-  const { fetcher = getFundingRate } = options;
-  return {
-    name: "funding_rate",
-    fn: (fromExclusive, toInclusive) => {
-      const res = fetcher({/* params */});
-      // ...
-    },
-  };
-}
+Report with every result:
 
-// In test:
-const mockFetcher = () => ({ success: true, response: { data: mockData } });
-const rawDataConfig = createFundingRateRawData({ fetcher: mockFetcher });
-```
+- Coverage and `gaps`, survivorship (no delisted history), corporate actions (prices are
+  split-adjusted without dividends), and which conclusions they affect.
+- Out-of-sample or walk-forward results, and the number of parameter trials and how the winner
+  was chosen.
+- Benchmark, return, volatility, maximum drawdown, trade count, turnover, fees and slippage.
+  Benchmark prices are not in the outputs; fetch them separately.
+- The fixed end date, rules mode and any rejected commands, `blocked` or `unfunded` events.
 
-### Test Execution
+A high Sharpe ratio alone does not validate a strategy. Results are simulations under the
+stated data and execution assumptions.
 
-```javascript
-runTests({
-  verbose: true,
-  timeout: 60000, // ms, default 30000
-});
-```
+## Limitations
 
----
+- No FX conversion: a portfolio mixing USD, HKD, KRW and CNY has equity and weights in mixed
+  units. Keep one quote currency per strategy when the totals matter.
+- Crypto bars come from the relay's default exchange, whatever venue the code names.
+- No history for delisted tickers; A-share history starts in 2017. HK board lots are
+  approximated as 1 share.
+- Recursive features in stored runs are approximate (recomputed from `warmup`).
+- Calls inside async functions are not recorded; replays make them again.
 
-## Debug Guide
+## Coming from v1
 
-### Common Errors
+| v1 (`FeedAltra`, legacy) | altra2 |
+| ------------------------ | ------ |
+| `new FeedAltra(config, provider)` + `altra.run(end)` | `run({ strategy, range })`, or `run({ strategy, start, store })` live |
+| `createArraysOhlcvProvider`, `registerOhlcv` | `universe`, `execution`, `inputs`; bars are fetched for you |
+| `registerFeature({ inputConfig, fn })` | `features: { name: { from, lookback, history?, fn } }` |
+| `registerRawData` with `observedAt` | `events` with `availableAt` |
+| `trigger: { type: "events", expr: e.ohlcv(...) }` | `trigger: { kind: "bar", instrument }`, `schedule`, `cross`, `event`, `any` |
+| `return { target, state }`, `target: null` | `return { kind: "decided", commands, state? }`, `commands: []` |
+| one `allocate` or `orders` target per tick | any number of `allocate`, `market`, `limit`, `stop`, `cancel` |
+| `Amount.quote(x)` / `Amount.base(n)` | `notional(x)` / `qty(n)` |
+| `ctx.portfolio`, `ctx.data`, `ctx.tick` | `ctx.account`, `ctx.bars()` / `ctx.features()`, `ctx.now` |
+| `setAgentStrategy` | an async `decide`, or model answers passed in as events |
+| `signal/targets`, `sim/*`, `perf/*` | `signal/targets` (same shape) plus generation-scoped `decisions`, `order_events`, `equity` |
 
-| Error                      | Cause                                | Fix                                                       |
-| -------------------------- | ------------------------------------ | --------------------------------------------------------- |
-| OHLCV empty in strategy    | Not in `inputConfig.ohlcvs`          | Add to strategy's `inputConfig.ohlcvs`                    |
-| OHLCV empty in feature fn  | Insufficient lookback                | Increase feature's `inputConfig.ohlcvs[].lookback`        |
-| Feature not found          | Not registered or not in inputConfig | Add `registerFeature()` and add to `inputConfig.features` |
-| Feature empty array        | Strategy can't see outputs           | Increase strategy's `inputConfig.features[].lookback`     |
-| Duplicate dates in feature | Same timestamp pushed twice          | Ensure one output per unique date                         |
-| State not updating         | Missing state return                 | Always return `{ target, state: newState }`               |
-
-### PIT Compliance Checklist
-
-- Feature output uses `bar.endTime` (NOT `bar.date`)
-- Indicator computed from `closes[i]` is available at bar CLOSE, not bar START
-- Strategy triggers fire when bar CLOSES
-- Raw data uses `observedAt` as date field
+Trading pairs are the same canonical codes in both versions.

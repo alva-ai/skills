@@ -21,7 +21,8 @@ the runtime contract changes. Do not save these constraints for debugging.
   instead of retrying the same code.
 - Use `require("net/http")` for HTTP.
 - Use `require("alfs")` with absolute `/alva/home/<username>/...` paths.
-- `FeedAltra.run()` is async; always `await` it.
+- altra2 `run()` is async; always `await` it and check `status` before reading results.
+  Legacy `FeedAltra.run()` is async too.
 - V8 heap is 256 MB by default. For memory-heavy `alva run`, use
   `--max-heap-size-mb <mb>` up to 2048.
 
