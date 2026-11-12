@@ -418,24 +418,38 @@ JSON-encoded strings: parse them. Stored runs do not persist `metrics`; compute 
 `testing` runs a strategy without network access:
 
 ```javascript
-const { testing, run } = require("@alva/altra2"); // `strategy` as defined above
+const { testing, run, defineStrategy, allocate } = require("@alva/altra2");
+
+// A 3-bar mean: the first valid row is index 2, so its lookback is 2.
+const fn = (c) => c.map((_, i) => (i < 2 ? NaN : (c[i] + c[i - 1] + c[i - 2]) / 3));
+const SPY = "US_SPOT_SPY_USD";
+const strategy = defineStrategy({
+  name: "spy-mean-test",
+  universe: [SPY],
+  features: { mean3: { from: "close", lookback: 2, fn } },
+  trigger: { kind: "bar", instrument: SPY },
+  decide: (ctx) => {
+    const close = ctx.bars(SPY).last().close;
+    const m = ctx.features(SPY).mean3.last();
+    if (m === undefined) return { kind: "decided", commands: [], reason: "warm-up" };
+    return { kind: "decided", commands: [allocate({ [SPY]: close > m ? 1 : 0 })] };
+  },
+});
 
 (async () => {
   // Daily bars on the venue's real sessions: closes, or { o, h, l, c, v } rows.
-  const spy = testing.daily("US_SPOT_SPY_USD", "2024-01-02", [470, 472, 471, 475]);
+  const spy = testing.daily(SPY, "2024-01-02", [470, 472, 471, 475, 478, 476, 480, 474]);
   const r = await run({
     strategy,
-    range: { from: "2024-01-01", to: "2024-02-01" },
+    range: { from: "2024-01-01", to: "2024-01-31" },
     data: testing.dataset([spy]),
   });
-  // A 3-bar mean: the first valid row is index 2, so its lookback is 2.
-  const fn = (c) => c.map((_, i) => (i < 2 ? NaN : (c[i] + c[i - 1] + c[i - 2]) / 3));
+  if (r.status !== "complete") throw new Error(JSON.stringify(r));
   const values = [470, 472, 471, 475, 478, 476];
-  const lookback = 2;
   await testing.assertCausal(fn, values); // rejects if fn looks ahead
-  const ok = await testing.checkLookback(fn, values, lookback); // smoke check only
+  const ok = await testing.checkLookback(fn, values, 2); // smoke check only
   // testing.memoryStore() runs a stored run in memory: run({ strategy, start, until, now, store, data }).
-  return { status: r.status, ok };
+  return { decisions: r.records.decisions.length, ok };
 })();
 ```
 
