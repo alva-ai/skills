@@ -131,7 +131,7 @@ Build persistent data pipelines that store time series data. Schedule them as cr
 
 ### Backtest — Altra Trading Engine
 
-Event-driven backtesting with historical data and live paper trading. Define strategies, register features, simulate portfolios, and analyze performance.
+Backtest and run strategies with Altra (`@alva/altra2`) across US, Hong Kong, China A-share and Korea equities and crypto. Define a strategy once with features and triggers; run it as a point-in-time backtest with venue trading rules, or live as an Automation that records every decision, order and equity sample to a Feed.
 
 ### Deploy & Share — Playbook Web Apps
 

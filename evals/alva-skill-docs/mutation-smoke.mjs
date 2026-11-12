@@ -110,6 +110,13 @@ const MUTATIONS = [
     expectFailedCases: ["target.feed-semantic-search"],
   },
   {
+    id: "feed-search-concurrent-indexers",
+    file: "references/feed-sdk.md",
+    remove: "Index an output from one task at a time,",
+    replacement: "Any number of tasks may index an output at once,",
+    expectFailedCases: ["target.feed-semantic-search"],
+  },
+  {
     id: "feed-search-whole-call-credit-check",
     file: "references/feed-sdk.md",
     remove:
@@ -291,6 +298,27 @@ const MUTATIONS = [
     expectFailedCases: [
       "target.no-generic-investment-disclaimer",
     ],
+  },
+  {
+    id: "altra-v1-not-marked-deprecated",
+    file: "references/altra-v1-legacy.md",
+    remove: "# Altra v1 (Legacy, Deprecated)\n",
+    replacement: "# Altra Trading Engine\n",
+    expectFailedCases: ["target.altra-v1-legacy"],
+  },
+  {
+    id: "altra-company-name-lookup",
+    file: "references/altra-trading.md",
+    remove:
+      "- Search takes the venue's own symbol, not a company name. Map a name to its ticker first\n",
+    expectFailedCases: ["target.altra-canonical-lookup"],
+  },
+  {
+    id: "altra-routes-to-v1",
+    file: "SKILL.md",
+    remove: "Altra (`@alva/altra2`)",
+    replacement: "Altra (`FeedAltra`)",
+    expectFailedCases: ["target.altra2-default"],
   },
   {
     id: "altra-symbol-resolution",

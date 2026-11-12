@@ -722,6 +722,10 @@ await feed.run(async (ctx) => {
   output. Indexing a scope with other fields re-embeds it and replaces its
   vectors; indexing different time ranges with different fields silently mixes
   them in search results.
+- **One indexing task per output.** Index an output from one task at a time,
+  usually the feed's own run right after `append()`. Two `index()` calls that
+  cover the same new records at the same moment both embed them and both pay;
+  the stored vectors stay correct (one per record), only the cost doubles.
 - **Scope.** `{ from, to }` (inclusive, ms) or `{ dates: [...] }`; large scopes
   are split automatically. Re-running is cheap: unchanged records are skipped,
   changed records are re-embedded, and vectors of deleted or emptied records are
