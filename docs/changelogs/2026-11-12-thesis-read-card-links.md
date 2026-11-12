@@ -12,7 +12,8 @@ of `/thesis/` links.
 
 ## Change
 
-- `references/thesis.md`, Reading published Theses: link each presented
+- `references/thesis.md`, Reading published Theses (and the For You section of
+  `references/request-routing.md`, which points to it): link each presented
   Thesis on its own line as `[author or short label](https://alva.ai/thesis/<publication.playbookId>)`
   with no query parameters, and summarize the view instead of repeating its
   full body.

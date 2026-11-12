@@ -238,6 +238,12 @@
             "Link each Thesis you present on a line of its own as",
             "`[author or short label](https://alva.ai/thesis/<publication.playbookId>)`, with\nno query parameters"
           ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "includes": [
+            "Link each recommended Thesis by its `publication.playbookId` as in\n[Reading published Theses](thesis.md#reading-published-theses)."
+          ]
         }
       ]
     },
