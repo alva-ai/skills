@@ -89,6 +89,20 @@ const MUTATIONS = [
     expectFailedCases: ["target.worldline-feature-media"],
   },
   {
+    id: "feature-media-by-link",
+    file: "references/search.md",
+    remove: "Feature a match by `item.name` as `worldline_item`",
+    replacement: "Feature the episode's Apple Podcasts link as `url`",
+    expectFailedCases: ["target.feature-media-worldline-first"],
+  },
+  {
+    id: "thesis-read-link-by-version",
+    file: "references/thesis.md",
+    remove: "https://alva.ai/thesis/<publication.playbookId>)`, with\nno query parameters",
+    replacement: "https://alva.ai/thesis/<publication.playbookId>?versionId=<authorVersionId>)`",
+    expectFailedCases: ["target.thesis-read-card-links"],
+  },
+  {
     id: "feed-search-mixed-fields",
     file: "references/feed-sdk.md",
     remove: "Use the same `fields` for every `index()` call on an\n  output.",

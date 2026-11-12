@@ -208,6 +208,46 @@
       ]
     },
     {
+      "id": "target.feature-media-worldline-first",
+      "group": "target",
+      "target": "corpus",
+      "description": "A podcast episode or YouTube video found outside Worldline is looked up in Worldline before it is featured, matched by its Apple episode id or YouTube video id, and featured by its item; its link is featured only without a match.",
+      "file_includes": [
+        {
+          "file": "references/search.md",
+          "includes": [
+            "Captions and cited moments come from a Worldline item.",
+            "(`i=`, Apple Search's `trackId`) or the YouTube video id (`v=`)",
+            "Feature a match by `item.name` as `worldline_item`",
+            "`video` (YouTube)",
+            "look the episode up in [Worldline](#worldline) first",
+            "look the video up in [Worldline](#worldline) first"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "target.thesis-read-card-links",
+      "group": "target",
+      "target": "corpus",
+      "description": "Each Thesis presented from a read is linked on its own line by its playbook ID with no query parameters, so the App renders it as the Thesis card.",
+      "file_includes": [
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "Link each Thesis you present on a line of its own as",
+            "`[author or short label](https://alva.ai/thesis/<publication.playbookId>)`, with\nno query parameters"
+          ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "includes": [
+            "Link each recommended Thesis by its `publication.playbookId` as in\n[Reading published Theses](thesis.md#reading-published-theses)."
+          ]
+        }
+      ]
+    },
+    {
       "id": "target.feed-semantic-search",
       "group": "target",
       "target": "corpus",
