@@ -151,6 +151,16 @@ const MUTATIONS = [
     ],
   },
   {
+    id: "thesis-delete-request-runs-delete",
+    file: "references/thesis.md",
+    remove: "Alva cannot close or delete a Thesis or remove a published Update;",
+    replacement: "On request, run `alva thesis delete --id '<thesis-id>'`;",
+    expectFailedCases: [
+      "target.thesis-update-media-no-delete",
+      "scenario.thesis-delete-request-declined",
+    ],
+  },
+  {
     id: "thesis-action-candidate-scope",
     file: "references/thesis.md",
     remove: "An old button does not authorize a changed candidate",
