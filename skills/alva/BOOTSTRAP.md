@@ -20,7 +20,8 @@ memory here.
 
 ## Say first
 
-In your own words, in the user's language, briefly:
+Before step 1 and before any command, reply with only this, in your own words
+and the user's language, briefly. Then stop and wait for their go-ahead:
 
 - You'll connect them to Alva. It takes about 3 minutes.
 - You'll read your memory and your past conversations with them on this
@@ -29,6 +30,7 @@ In your own words, in the user's language, briefly:
 - You'll show everything before anything is saved.
 - Holdings, balances and account details stay on this computer.
 - They can say stop at any time.
+- Ask whether to start.
 
 ## 1. Get ready
 

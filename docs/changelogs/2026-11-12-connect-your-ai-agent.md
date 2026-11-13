@@ -7,3 +7,4 @@
 - 每天的 routine 发现 BOOTSTRAP 版本比记忆里新时，在提醒里加一句可更新；`SKILL.md` 连接时指向 BOOTSTRAP；`references/memory.md` 补外部 agent 写前重读。
 - 验证：先实测各家 agent 定时任务的权限与网络；在 Claude Code 中以新用户、老用户各实跑一遍并重跑，记录到主记录第 7 节。
 - 评审后（11-13）：Alva 端内（sandbox-agent-ts）每个会话复制整个 skill 目录、运行的是 Claude Code。BOOTSTRAP 开头加「If you are Alva itself」守卫：托管 Sandbox 里不执行安装、定时、routine 和记忆记录，只回一句「这段提示词是给你自己的 agent 用的，到 Me › Connect your AI 复制」。SKILL.md 那句改为「连接 agent 走 BOOTSTRAP；Sandbox 只给守卫里的回复」，仍为 240 行。评测加三条守卫文字检查，0 失败，mutation smoke 59/59，durable-agent 5/5。
+- 实跑（11-13，Claude Code 2.1.322 headless，本地栈 alice）：三次新用户运行中 agent 都没先发开场话，而是读完对话后一次性汇报；改词两次无效。经哥确认，开场改为发完即停、等用户同意再开始，复跑验证生效。

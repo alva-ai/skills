@@ -2809,6 +2809,7 @@
             "do not run any of this: no setup, schedule, routine or",
             "Connect your AI in the Alva app and send it there",
             "You'll show everything before anything is saved.",
+            "Then stop and wait for their go-ahead:",
             "Never add crontab entries or launch agents.",
             "A headless run has nowhere to deliver the note.",
             "Alva bootstrap v1 done"
