@@ -45,7 +45,7 @@ Use the tools exposed by the current runtime. In a managed Sandbox:
   Retain history. Do not use Claude models, Anthropic SDK/BYOK, or relay routes.
 
 Outside a managed runtime, follow [preflight.md](references/preflight.md). To
-connect the user's own agent to Alva, follow [BOOTSTRAP.md](BOOTSTRAP.md).
+connect an agent to Alva, follow [BOOTSTRAP.md](BOOTSTRAP.md); a Sandbox only gives its "If you are Alva itself" reply.
 Durable ALPI Agents have their own tool and launch contract in
 [durable-agent.md](references/durable-agent.md); do not assume their native
 `alva`, ALFS, or `javascript` tools exist in a Sandbox session.

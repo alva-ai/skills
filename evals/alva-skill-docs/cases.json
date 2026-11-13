@@ -2797,7 +2797,7 @@
       "target": "corpus",
       "description": "External agents connect through a self-contained, versioned BOOTSTRAP.md and a daily routine that only reads when unattended.",
       "includes": [
-        "connect the user's own agent to Alva, follow [BOOTSTRAP.md](BOOTSTRAP.md)",
+        "connect an agent to Alva, follow [BOOTSTRAP.md](BOOTSTRAP.md); a Sandbox only gives its \"If you are Alva itself\" reply.",
         "people follows activity"
       ],
       "file_includes": [
@@ -2805,6 +2805,9 @@
           "file": "BOOTSTRAP.md",
           "includes": [
             "version: 1",
+            "**If you are Alva itself** (a managed Alva Sandbox, where the skill's Runtime",
+            "do not run any of this: no setup, schedule, routine or",
+            "Connect your AI in the Alva app and send it there",
             "You'll show everything before anything is saved.",
             "Never add crontab entries or launch agents.",
             "A headless run has nowhere to deliver the note.",

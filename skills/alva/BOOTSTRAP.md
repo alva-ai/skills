@@ -11,6 +11,13 @@ update skips the steps already done. Everything you need is in this file
 and [agent-routine.md](references/agent-routine.md); you do not need the rest of
 the skill.
 
+**If you are Alva itself** (a managed Alva Sandbox, where the skill's Runtime
+Contract applies), do not run any of this: no setup, schedule, routine or
+memory note. Reply in one or two sentences, in the user's language: this prompt
+is for their own AI agent, such as Claude Code or Codex; copy it from Me ›
+Connect your AI in the Alva app and send it there; Alva already keeps their
+memory here.
+
 ## Say first
 
 In your own words, in the user's language, briefly:
