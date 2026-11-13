@@ -598,6 +598,27 @@ const MUTATIONS = [
     remove: "Read the released HTML from `releases[0].layout_html`",
     replacement: "Read the HTML from `/playbooks/{name}/index.html`",
     expectFailedCases: ["target.playbook-publication-alignment"],
+    },
+    {
+    id: "bootstrap-sandbox-guard",
+    file: "BOOTSTRAP.md",
+    remove: "**If you are Alva itself** (a managed Alva Sandbox, where the skill's Runtime",
+    replacement: "**If you are another agent** (a managed Alva Sandbox, where the skill's Runtime",
+    expectFailedCases: ["target.agent-bootstrap"],
+  },
+  {
+    id: "bootstrap-opening-no-pause",
+    file: "BOOTSTRAP.md",
+    remove: "Then stop and wait for their go-ahead:",
+    replacement: "Then continue without waiting:",
+    expectFailedCases: ["target.agent-bootstrap"],
+  },
+  {
+    id: "skill-sandbox-runs-bootstrap",
+    file: "SKILL.md",
+    remove: "; a Sandbox only gives its \"If you are Alva itself\" reply.",
+    replacement: ".",
+    expectFailedCases: ["target.agent-bootstrap"],
   },
 ];
 
