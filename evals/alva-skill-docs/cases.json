@@ -1554,7 +1554,7 @@
         }
       ],
       "includes": [
-        "version: v1.30.0",
+        "version: v1.30.1",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -2251,10 +2251,10 @@
       ]
     },
     {
-      "id": "target.thesis-update-delete-media",
+      "id": "target.thesis-update-media-no-delete",
       "group": "target",
       "target": "corpus",
-      "description": "Agent-written updates are previewed, text updates keep media, deletion scopes stay distinct, retained Signals are described truthfully, and only non-Thesis routes plan first.",
+      "description": "Agent-written updates are previewed, text updates keep media, close and delete requests are declined with archive or a new Update offered instead, and only non-Thesis routes plan first.",
       "file_includes": [
         {
           "file": "references/thesis.md",
@@ -2265,12 +2265,12 @@
             "pass `--medias` unchanged only when the current Thesis has media",
             "If media must be preserved and the tool lacks this flag, stop rather than dropping media",
             "explain the limitation instead of inserting image links into the body",
-            "Undoing a wording edit is not deletion of the whole Update",
-            "Do not use it to remove one Update",
-            "folding editorial revisions together",
-            "existing Signals still show that historical viewpoint",
-            "do not escalate to whole-Thesis deletion without that request",
-            "never a reason to substitute whole deletion or rewrite the body to imitate deletion",
+            "Alva cannot close or delete a Thesis or remove a published Update",
+            "say so plainly in one or two sentences",
+            "archiving hides the Thesis and can be restored, or a new Update can\nstate the changed view",
+            "Do not run close or delete commands, even where an\nolder CLI still lists them",
+            "Abandoning an unpublished draft needs no call",
+            "Never imitate closing or deletion by rewriting the body",
             "Private image publication is not supported by this path",
             "keep the draft and resolve that failure before publishing rather than omitting it",
             "compare `thesis.medias` with the submitted images"
@@ -2287,14 +2287,18 @@
       ],
       "excludes": [
         "For a Thesis, name the core claim",
-        "Old references to the deleted Update become unavailable"
+        "Old references to the deleted Update become unavailable",
+        "alva thesis delete",
+        "alva thesis version delete",
+        "alva thesis close",
+        "`close`: require `--id`"
       ]
     },
     {
       "id": "target.thesis-conversation-flow",
       "group": "target",
       "target": "corpus",
-      "description": "Thesis discussion follows the user, extra steps are offered rather than started, Agent additions stay optional in Notes, previews end with actions without citing rules, deletion questions are confirmed, and publication avoids repeated help.",
+      "description": "Thesis discussion follows the user, extra steps are offered rather than started, Agent additions stay optional in Notes, previews end with actions without citing rules, close or delete requests are declined, and publication avoids repeated help.",
       "file_includes": [
         {
           "file": "references/thesis.md",
@@ -2321,8 +2325,7 @@
             "Do not explain why confirmation is needed",
             "always end the preview with localized `send_prompt` actions",
             "show the resulting assets and directions in that preview and send them",
-            "If the user only asks how to delete",
-            "archiving hides it and can be restored, while deletion cannot be undone from chat",
+            "When asked, say so plainly in one or two sentences, then offer what\nremains",
             "follow [Images in a new public Thesis](#images-in-a-new-public-thesis)"
           ]
         },

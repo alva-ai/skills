@@ -1004,6 +1004,36 @@
           "Show the preview, then wait for confirmation."
         ]
       }
+    },
+    {
+      "id": "scenario.thesis-delete-request-declined",
+      "group": "scenarios.thesis",
+      "prompt": "我那个 NVDA AI capex 的 Thesis 观点不成立了，帮我删掉，或者至少把最新那条 Update 删了。",
+      "description": "A request to delete a Thesis or one Update is declined in one or two plain sentences, archive or a new Update is offered, and no close or delete command runs.",
+      "expect": {
+        "route": "Thesis",
+        "references": [
+          "thesis.md"
+        ],
+        "behaviors": [
+          "decline per [Closing or deleting](references/thesis.md#closing-or-deleting-a-thesis)"
+        ],
+        "sections": [
+          {
+            "file": "references/thesis.md",
+            "heading": "Closing or deleting a Thesis",
+            "label": "decline close and delete",
+            "includes": [
+              "Alva cannot close or delete a Thesis or remove a published Update",
+              "say so plainly in one or two sentences",
+              "archiving hides the Thesis and can be restored",
+              "a new Update can state the changed view",
+              "Do not run close or delete commands",
+              "Never imitate closing or deletion by rewriting the body"
+            ]
+          }
+        ]
+      }
     }
   ]
 }

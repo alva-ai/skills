@@ -453,10 +453,6 @@ into the body.
   directions to make an update succeed. Verify returned directions.
   Omitting optional fields clears
   them; never default an existing private Thesis to public.
-- `close`: require `--id` and `--expected-author-version-id`; `--note`
-  is only a closing note.
-- `delete --id`: withdraw only as described in
-  [Deleting a Thesis or one Update](#deleting-a-thesis-or-one-update).
 
 ## Thesis maintenance controls
 
@@ -465,40 +461,19 @@ the corresponding Thesis CLI command and report its returned state. Read
 alva thesis --help for detailed concurrency, idempotency, and error rules.
 
 Report version conflicts instead of silently rereading and overwriting. Never
-pass `--editorial`: editing the current version is not offered, so publish
-every change, including a typo fix, through `update` as a new Update.
+pass `--editorial`, even where an older CLI still accepts it: editing the
+current version is not offered, so publish every change, including a typo fix,
+through `update` as a new Update.
 
-## Deleting a Thesis or one Update
+## Closing or deleting a Thesis
 
-Distinguish abandoning an unpublished draft, deleting the whole Thesis, and
-removing one published Update. Cancel a draft in conversation without a delete
-call. Undoing a wording edit is not deletion of the whole Update; clarify an
-ambiguous request and use the normal update preview for a restored draft.
-Resolve the target from the current conversation or quoted IDs; ask only
-when the target or scope is unclear. Before executing, make the selected scope
-clear in ordinary language. A direct instruction naming the target and scope,
-such as "delete that Thesis", is sufficient. If the user only asks how to
-delete, or the target is not the one just discussed, first confirm the target
-and scope in one sentence, as an action when `PresentActions` is available.
-For a whole Thesis, mention that archiving hides it and can be restored, while
-deletion cannot be undone from chat.
-
-- Whole Thesis: `alva thesis delete --id '<thesis-id>'` withdraws the resource
-  and stops its research. Do not use it to remove one Update.
-- One Update: read the current Thesis, and use `alva thesis version list --id '<thesis-id>' --first 10` when the selected Update is not already identified.
-  Follow `next_cursor` only as needed. This lists reader-visible Updates,
-  folding editorial revisions together. Run `alva thesis version delete --id '<thesis-id>' --author-version-id '<selected-version>' --expected-author-version-id '<current-version>'`.
-
-Removing the latest Update restores the previous surviving version, including
-its images and asset directions; removing an older Update leaves current content
-unchanged. Its editorial revisions are withdrawn; historical Signals retain
-their original version links and the viewpoint snapshot they analyzed. Direct
-reads of the deleted Update are unavailable; existing Signals still show that
-historical viewpoint. The final remaining version cannot be
-deleted this way; do not escalate to whole-Thesis deletion without that request.
-Use the returned current Thesis to report what remains. A version conflict or
-unavailable command is a limitation to resolve, never a reason to substitute
-whole deletion or rewrite the body to imitate deletion.
+Alva cannot close or delete a Thesis or remove a published Update; every
+published Update stays on the record. When asked, say so plainly in one or two sentences, then offer what
+remains: archiving hides the Thesis and can be restored, or a new Update can
+state the changed view. Do not run close or delete commands, even where an
+older CLI still lists them. Abandoning an unpublished draft needs no call.
+Never imitate closing or deletion by rewriting the body or dropping assets or
+directions.
 
 ## Evidence and retries
 
