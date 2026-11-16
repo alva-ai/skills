@@ -9,3 +9,4 @@
 - 评审后（11-13）：Alva 端内（sandbox-agent-ts）每个会话复制整个 skill 目录、运行的是 Claude Code。BOOTSTRAP 开头加「If you are Alva itself」守卫：托管 Sandbox 里不执行安装、定时、routine 和记忆记录，只回一句「这段提示词是给你自己的 agent 用的，到 Me › Connect your AI 复制」。SKILL.md 那句改为「连接 agent 走 BOOTSTRAP；Sandbox 只给守卫里的回复」，仍为 240 行。评测加三条守卫文字检查，0 失败，mutation smoke 59/59，durable-agent 5/5。
 - 实跑（11-13，Claude Code 2.1.322 headless，本地栈 alice）：三次新用户运行中 agent 都没先发开场话，而是读完对话后一次性汇报；改词两次无效。经哥确认，开场改为发完即停、等用户同意再开始，复跑验证生效。
 - 评审后：补三条 mutation smoke（去掉 Sandbox 守卫、开场不停、SKILL.md 去掉 Sandbox 限定），63/63 均被评测抓到；rebase 到 main（v1.30.1 之后），版本保持 v1.31.0。
+- 奥卡姆复核后（11-16）：routine 的动态列表改为发布、更新、收藏 Thesis，点赞 Signal，加自选（去掉修改和 Thesis 点赞），Signal 文本同样只摘要；routine 补「Undo」：记忆条目按读、合并、写回删掉，Thesis 用 `alva thesis archive` 撤下。doc eval 无失败，mutation smoke 63/63。
