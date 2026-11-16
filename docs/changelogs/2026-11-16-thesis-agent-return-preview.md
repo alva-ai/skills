@@ -51,3 +51,13 @@ See the primary record section 5 for this repository's tests. E2E Required: no.
 ## 6. Human Decisions and Interaction
 
 See the primary record section 6.
+
+## 7. Outcome and Evidence
+
+See the primary record section 7 for this repository's verification results
+and the publication links.
+
+## 8. Remaining Work
+
+See the primary record section 8 (STG release chain, public skill coupling,
+PRD order).
