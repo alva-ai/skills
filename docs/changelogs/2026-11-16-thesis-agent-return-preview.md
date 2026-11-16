@@ -57,6 +57,12 @@ See the primary record section 6.
 See the primary record section 7 for this repository's verification results
 and the publication links.
 
+Review feedback: English typed fallback and exact `THESIS_RETURN_LAST_LEG`
+wording added to `references/thesis.md` (the latter asserted in
+`target.thesis-return-preview`); a redundant prefix include removed from
+`cases.json`. `node evals/alva-skill-docs/skill-doc-eval.mjs` 127 pass / 0
+fail; mutation smoke 62/62; `durable-agent.test.mjs` 5/5.
+
 ## 8. Remaining Work
 
 See the primary record section 8 (STG release chain, public skill coupling,

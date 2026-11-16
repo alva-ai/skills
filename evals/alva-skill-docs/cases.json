@@ -2186,7 +2186,6 @@
           "file": "references/thesis.md",
           "includes": [
             "Identify the assets from the selected body and confirmed conversation context",
-            "Reuse catalog entity IDs already verified by a tool",
             "Reuse catalog entity IDs already verified by a tool when the asset identity has not changed",
             "leave entity IDs empty",
             "Only call `alva thesis asset-candidates",
@@ -2549,6 +2548,7 @@
             "lastLegRemoved",
             "THESIS_RETURN_SWITCH_FINAL",
             "THESIS_RETURN_LAST_LEG",
+            "至少要保留一个看多或看空的标的",
             "## Thesis return",
             "alva thesis return --id '<thesis id>' [--detail]",
             "the total cannot be added up from Update returns",

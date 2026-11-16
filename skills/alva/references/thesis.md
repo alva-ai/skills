@@ -359,14 +359,18 @@ plus “关闭收益并发布” / "Turn off return and publish" only when `askS
 true. Do not repeat them in prose. Name the displayed candidate in the publish
 prompt so it is tied to that candidate and its settings, including the
 turn-off choice; a click has the same meaning as the equivalent typed reply. Without the tool, ask in text, for
-example “回复「发布」、「关闭收益并发布」或「修改」。”. Turning the return off
-publishes with `--track-return false`; that choice is part of the confirmed
-payload, so a changed choice needs a new preview and request ID.
+example “回复「发布」、「关闭收益并发布」或「修改」。” / "Reply “Publish”, “Turn
+off return and publish” or “Edit”.", leaving out the turn-off reply when
+`askSwitch` is false. Turning the return off publishes with
+`--track-return false`; that choice is part of the confirmed payload, so a
+changed choice needs a new preview and request ID.
 
 If publishing fails with reason `THESIS_RETURN_SWITCH_FINAL`, say “这条 thesis
 的收益开关已经确定，不能再改。” / "This thesis's return setting is final and
-can't be changed."; with `THESIS_RETURN_LAST_LEG`, say that it must keep at
-least one long or short ticker. Then preview again; never retry unchanged.
+can't be changed."; with `THESIS_RETURN_LAST_LEG`, say
+“这条 thesis 正在计收益，至少要保留一个看多或看空的标的。” / "This thesis tracks a
+return, so it must keep at least one long or short ticker.". Then preview
+again; never retry unchanged.
 An old button does not authorize a changed candidate, and repeated approval of
 an already completed creation must not create another Thesis; verify its
 existing ID.
