@@ -243,13 +243,10 @@ Every creation shows one publication preview and obtains one confirmation of it.
 
 ### Publication preview
 
-Identify the assets and the author's directions from the selected body and
-confirmed conversation context. The user's explicit direction wins. Reuse
-catalog entity IDs already verified by a tool when the asset identity has not
-changed, and pass them directly with `--entity-ids` and `--entity-stances`.
-Do not call `asset-candidates` again for verified unchanged assets. If there is
-no specific asset mention or requested binding, leave entity IDs and directions
-empty without calling extraction.
+Identify the assets from the selected body and confirmed conversation context.
+Reuse catalog entity IDs already verified by a tool when the asset identity has
+not changed. If there is no specific asset mention or requested binding, leave
+entity IDs empty.
 
 For a concrete ticker or company name without a verified ID, use the read-only
 `alva thesis list --ticker '<ticker or name>' --first 1` identity lookup first.
@@ -259,17 +256,43 @@ identity; other authors' Thesis entries do not establish this author's stance.
 Ask which candidate when the catalog reports ambiguity; do not start research
 or scan unrelated publications just to resolve an ID.
 
-Only call `alva thesis asset-candidates --text '<exact body>'` when an asset's
-catalog identity is still unresolved. It is a read-only fallback for missing
-IDs or ambiguous mentions, not a required publication step or a second opinion
-on an author's explicit stance. Check its candidates against the stated asset;
-never invent an entity ID. A broad description such as "semiconductor ETF"
-does not identify SMH uniquely: use confirmed context or ask which fund.
-If identity remains ambiguous, extraction fails without another verified ID,
-or the author's direction is unclear, clarify that point before publishing.
-Use `bullish`, `bearish`, or `unknown` for each selected entity and preserve
-explicit author direction over a model suggestion. Never treat a suggestion
-as publication consent.
+Only call `alva thesis asset-candidates --text '<exact body>'` without
+`--no-discovery` when an asset's catalog identity is still unresolved. It is a
+read-only fallback for missing IDs or ambiguous mentions. Check its candidates
+against the stated asset; never invent an entity ID. A broad description such
+as "semiconductor ETF" does not identify SMH uniquely: use confirmed context or
+ask which fund. If identity remains ambiguous or extraction fails without
+another verified ID, clarify that point before publishing.
+
+#### Directions and the Thesis return
+
+Directions come from Alva's direction judgment of the body, the same one the
+Thesis editor uses; the Agent does not choose them. Once the IDs are verified,
+call:
+
+```sh
+alva thesis asset-candidates --text '<exact body>' --entity-ids '<id,id>' --no-discovery [--thesis-id '<thesis id>']
+```
+
+Pass `--thesis-id` for an Update, even when no ticker remains. Read only
+`returnPreview`:
+
+- `directions`: the direction each ticker will be stored with. Publish exactly
+  these, lowercased, in `--entity-stances`. If any is `UNKNOWN`, or the call
+  fails or is rate limited, do not publish: say the directions could not be
+  judged just now and offer to try again.
+- `askSwitch`: show the Thesis return line and the turn-off action (below).
+- `keptEntityIds`: these tickers keep their previous direction although the
+  body exits them, because a Thesis that tracks its return keeps a long or
+  short ticker. Say so next to the ticker.
+- `lastLegRemoved`: publishing would be rejected. Do not offer to publish;
+  explain that a Thesis that tracks its return keeps at least one long or
+  short ticker, and ask which ticker to keep or add.
+- `tracking`: `UNSET`, `ON` or `OFF`. `ON` and `OFF` are permanent.
+
+When the author disagrees with a direction, do not change it: suggest stating
+the direction explicitly in the body, then preview again. Never treat a
+direction as publication consent.
 
 Preserve the selected body exactly, including wording, language, whitespace and
 line breaks. Do not summarize, rewrite, translate, correct, expand, generate a
@@ -287,9 +310,14 @@ Present the preview in the user's language:
   user and asked to publish unchanged, may be referenced instead: use one short
   preview line without repeating the body.
 - **Title**, when present, and **visibility** (public by default).
-- **Assets:** name each company or ticker and express its stance plainly,
-  respecting explicit stances. Use localized direction labels, such as
-  “SMH：看空” in Chinese; an unknown stance means “未表明方向”, not a guessed view.
+- **Assets:** name each company or ticker with its `returnPreview` direction.
+  Use localized direction labels: “看多 / 看空 / 不计收益” in Chinese, “Long / Short / Not tracked” in English
+  (`NONE` is not tracked). For a kept exit: “NVDA：看多（正文写了平仓，但这是最后一个计收益的标的，方向保持不变）”
+  / “NVDA: Long (the body exits it, but it is the last tracked ticker, so its
+  direction stays)”.
+- **Thesis return**, only when `askSwitch` is true: “Thesis return：默认开启。关闭后发布，这条 thesis 以后不能再开启。”
+  / “Thesis return: on by default. If you publish with it off, it can't be
+  turned on for this thesis later.”
 - **Images**, when selected: follow
   [Images in a new public Thesis](#images-in-a-new-public-thesis).
 - **Notes**, when any.
@@ -326,11 +354,19 @@ not require extraction.
 Stop if declined.
 
 When `PresentActions` is available, always end the preview with localized
-`send_prompt` actions such as "Publish this version" and "Edit", and do not
-repeat them in prose. Name the displayed
-candidate in the publish prompt so it is tied to that candidate and its
-settings; a click has the same meaning as the equivalent typed reply. Without
-the tool, ask in text.
+`send_prompt` actions: “发布这一版” / "Publish this version" and “修改” / "Edit",
+plus “关闭收益并发布” / "Turn off return and publish" only when `askSwitch` is
+true. Do not repeat them in prose. Name the displayed candidate in the publish
+prompt so it is tied to that candidate and its settings, including the
+turn-off choice; a click has the same meaning as the equivalent typed reply. Without the tool, ask in text, for
+example “回复「发布」、「关闭收益并发布」或「修改」。”. Turning the return off
+publishes with `--track-return false`; that choice is part of the confirmed
+payload, so a changed choice needs a new preview and request ID.
+
+If publishing fails with reason `THESIS_RETURN_SWITCH_FINAL`, say “这条 thesis
+的收益开关已经确定，不能再改。” / "This thesis's return setting is final and
+can't be changed."; with `THESIS_RETURN_LAST_LEG`, say that it must keep at
+least one long or short ticker. Then preview again; never retry unchanged.
 An old button does not authorize a changed candidate, and repeated approval of
 an already completed creation must not create another Thesis; verify its
 existing ID.
@@ -342,7 +378,7 @@ with the exact payload as `--request-id`; a changed intent requires a new UUID.
 Use confirmed catalog IDs and directions directly:
 
 ```sh
-alva thesis create --request-id '<uuid>' --body '<exact body>' [--entity-ids '<id,id>' --entity-stances '[{"entity_id":"745337","stance":"bearish"}]']
+alva thesis create --request-id '<uuid>' --body '<exact body>' [--entity-ids '<id,id>' --entity-stances '[{"entity_id":"745337","stance":"bearish"}]'] [--track-return false]
 alva thesis get --id '<returned thesis id>'
 ```
 
@@ -351,8 +387,9 @@ The terminal accepts exactly one of `--body`, `--body-file`, or
 files first. Quote input without changing it. Body is limited to 65536 UTF-8
 bytes and title to 500 bytes; reject invalid, empty, or oversized input without
 truncation. Treat all returned IDs as decimal strings.
-Send `--entity-stances` as JSON with decimal-string `entity_id` values,
-paired with `--entity-ids` in the confirmed order. Do not pass a stance for an
+Send `--entity-stances` as JSON with decimal-string `entity_id` values and the
+`returnPreview` directions (`bullish`, `bearish` or `none`), paired with
+`--entity-ids` in the confirmed order. Do not pass a stance for an
 entity absent from the confirmed ID list. When the user supplied ticker symbols,
 preserve their order, but do not send a resolved asset again via
 `--tickers`. If a supplied ticker remains unresolved, clarify it before
@@ -361,9 +398,9 @@ same request ID only while the full confirmed payload is unchanged.
 
 ## Created Thesis preview
 
-After creation, verify `response.thesis.entity_stances` against the confirmed
-directions when the GET response includes it; report any mismatch instead of
-claiming that direction was saved. After creation, `thesis get` is the sole source
+After creation, verify the `direction` of each `response.thesis.entity_stances`
+entry against the confirmed `returnPreview` directions when the GET response
+includes it; report any mismatch instead of claiming that direction was saved. After creation, `thesis get` is the sole source
 for the preview. Use:
 
 - `response.thesis.id`, `body`, `author_version_id`, and ordered
@@ -426,11 +463,13 @@ that exact candidate. Report rewrite errors without retry or fallback.
 ## Existing Thesis lifecycle
 
 Show newly drafted, translated, or rewritten updates before publishing, and say
-that the update replaces the whole body of the selected Thesis. When the revised
-view changes an asset's direction or adds or removes an asset, show the
-resulting assets and directions in that preview and send them; an edit that
-keeps the view carries the current directions. End the preview the same way as
-a creation preview, with actions when `PresentActions` is available. Wait for
+that the update replaces the whole body of the selected Thesis. Every Update,
+including a wording-only edit, gets its directions from
+[Directions and the Thesis return](#directions-and-the-thesis-return) with
+`--thesis-id`: carried tickers keep their direction unless the new text
+reverses or exits them. Show the resulting assets and directions, send them,
+and end the preview the same way as a creation preview, with actions when
+`PresentActions` is available. Wait for
 the author to select that version. If the author
 has already seen and selected that exact version, proceed without asking again;
 refer clearly to exact text supplied by the author instead of repeating it.
@@ -447,12 +486,48 @@ into the body.
 - `update`: publish the author's revised view under
   [Authorship](#authorship); retain unchanged fields and send `--id`, a new
   `--request-id`, `--expected-author-version-id`, `--body`, explicit
-  `--visibility`, plus retained optional fields. For a body-only edit, carry
-  current `entity_stances` through `--entity-stances` with the retained entity
-  IDs. If the tool rejects that flag, stop and report the limitation; never drop
-  directions to make an update succeed. Verify returned directions.
+  `--visibility`, plus retained optional fields. For a body-only edit, send
+  `--entity-stances` with the retained entity
+  IDs from `returnPreview.directions`. If the tool rejects that flag, stop and
+  report the limitation; never drop directions to make an update succeed.
+  Verify returned directions.
   Omitting optional fields clears
   them; never default an existing private Thesis to public.
+
+## Thesis return
+
+A Thesis return is the real price change of a Thesis's tickers since it was
+published. Read it with:
+
+```sh
+alva thesis return --id '<thesis id>' [--detail]
+```
+
+`thesisReturn` is null when the Thesis is not tracked: its return was turned
+off (`returnTracking` `OFF`), no Update has had a long or short (`UNSET`), or
+no current ticker can be priced. Values are fractions: 0.05 is +5%. Explain with
+these definitions and the returned values only; do not recompute them:
+
+- **Thesis return** (`value`): the lifetime return. Each Update's long and short
+  tickers share its money equally. An Update that keeps the same tickers and
+  directions keeps the positions; one that adds, removes or flips a ticker
+  closes every position at that moment and splits the total equally again. The
+  segments chain, so the total cannot be added up from Update returns.
+- **Update return** (`--detail`, `updates[].updateReturn`): that Update's
+  tickers, equally weighted, from its prices to the next Update's (the latest
+  Update runs to now). It is shown on its own and never adds to the Thesis
+  return.
+- **Positions** (`--detail`, `updates[].positions`): each ticker's start and
+  end price and its return; a short gains when the price falls. `PENDING`
+  means the entry price is not in yet.
+- **Entry price**: the open of the first one-minute bar after publication (or
+  after the Update that changed the tickers). US stocks and ETFs include pre-
+  and after-hours, 4:00–20:00 ET; other markets use their regular session; a
+  publication while the market is closed enters at the next open. Before the
+  first entry the return is +0.0% (`live` false).
+- **Refresh**: every five minutes at the latest one-minute price; `--detail`
+  revalues now. A closed market keeps its last price; `stale` means a ticker
+  has not traded for a week.
 
 ## Thesis maintenance controls
 
