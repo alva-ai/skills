@@ -27,16 +27,17 @@ Common ALFS layout:
 | ---------------------------------- | ----------------------------------------------------- | ------------------------------------------------ |
 | `@last/{n}`                        | Last N points (chronological)                         | `.../prices/@last/100`                           |
 | `@count`                           | Data point count                                      | `.../prices/@count`                              |
-| `@range/{start_ms}..{end_ms}`      | Between two timestamps (from..to only)                | `.../prices/@range/1735689600000..1740787200000` |
+| `@count/{start_ms}..{end_ms}`      | Data point count in `(start, end]`                    | `.../prices/@count/1735689600000..1740787200000` |
+| `@range/{start_ms}..{end_ms}`      | Points in `(start, end]`: start exclusive, end inclusive | `.../prices/@range/1735689600000..1740787200000` |
 | `@before/{timestamp_ms}/{limit}`   | Up to `limit` points strictly before the timestamp    | `.../prices/@before/1737988200000/10`            |
 | `@after/{timestamp_ms}/{limit}`    | Up to `limit` points strictly after the timestamp     | `.../prices/@after/1737988200000/10`             |
 
 **Timestamp format**: Unix milliseconds only (`1737988200000`). RFC 3339
 and Unix-second timestamps are not supported by feed synth mounts.
 
-For grouped records (multiple events appended at the same timestamp), the
-response is `{date, items: [...]}`. The Feed SDK auto-flattens, CLI
-consumers don't.
+Grouped records (multiple records appended at the same timestamp in one
+`append()`) are flattened on read: CLI, REST, and the Feed SDK all return one
+flat record per item, each carrying the shared `date`.
 
 ### Time-series writes
 

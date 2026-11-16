@@ -48,13 +48,16 @@ this per-order confirmation.)
 ## Capabilities are per-venue — read them from describe
 
 `describe` → `venues[]` gives `createOrder / options / testnet / noCoidLookup /
-markets` per venue. Do not assume; check. Notably:
+markets` per venue. Read the venue list and capabilities from `alva broker
+describe` each time; do not assume from this table. Venues currently wired:
 
 | Venue | Assets | Paper (`testnet`) | Idempotency | Notes |
 | ----- | ------ | ----------------- | ----------- | ----- |
 | `alpaca` | US equities + crypto + options | yes | coid wired | |
 | `robinhood` | US equities (long only) | **no** | **`noCoidLookup`** | a paper-provisioned account is rejected; a lost order id can't be reconciled — treat writes conservatively |
 | `binance` `okx` `bybit` `gate` `bitget` `coinbase` `hyperliquid` | crypto | per venue testnet | coid wired | ccxt-served |
+| `webull` | US equities | yes | coid wired | |
+| `ibkr_mcp` | IBKR (incl. options) | yes | — | `createOrder: false`: reads only; an order becomes an instruction the user submits in IBKR |
 
 ## Symbols, account, paper
 

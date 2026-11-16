@@ -26,8 +26,9 @@ Run the skill updater:
 bash "<this skill's directory>/scripts/version_check.sh"
 ```
 
-No output means up to date. Any output should be shown to the user, applied,
-and then rechecked.
+No output means up to date, or the check was skipped: it runs at most once
+every 8 hours and stays silent when offline. It reports only a newer published
+release. Any output should be shown to the user and applied.
 
 The Alva CLI (`@alva-ai/toolkit`) is the only supported platform interface for
 this skill. If `alva --help` is unavailable, install it. If it is present,

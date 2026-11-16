@@ -543,6 +543,34 @@ const MUTATIONS = [
       "scenario.ticker-read-hourly-tracking",
     ],
   },
+  {
+    id: "trading-signal-date-seconds",
+    file: "references/api/trading.md",
+    remove: "`date` is **Unix milliseconds**",
+    replacement: "`date` is **epoch seconds**",
+    expectFailedCases: ["target.runtime-contract-alignment"],
+  },
+  {
+    id: "jagent-no-top-level-await",
+    file: "references/jagent-runtime.md",
+    remove: "**Top-level `await` is supported**",
+    replacement: "**No top-level `await`**",
+    expectFailedCases: ["target.runtime-contract-alignment"],
+  },
+  {
+    id: "playbook-release-public-first",
+    file: "references/playbook-creation.md",
+    remove: "read it back, then release. Never release publicly first",
+    replacement: "release publicly first, then set visibility",
+    expectFailedCases: ["target.playbook-publication-alignment"],
+  },
+  {
+    id: "remix-reads-root-index-html",
+    file: "references/remix-workflow.md",
+    remove: "Read the released HTML from `releases[0].layout_html`",
+    replacement: "Read the HTML from `/playbooks/{name}/index.html`",
+    expectFailedCases: ["target.playbook-publication-alignment"],
+  },
 ];
 
 function parseArgs(argv) {

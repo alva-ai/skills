@@ -66,15 +66,18 @@ Returns JSON with structure:
   "releases": [
     {
       "version": "v1.0.0",
+      "layout_html": "https://alice.playbook.alva.ai/btc-momentum/v1.0.0/index.html",
       "feeds": [{ "feed_id": 100, "feed_name": "btc-ema", "feed_major": 1 }]
     }
   ]
 }
 ```
 
-`releases` is ordered newest-first, so `releases[0]` is the latest release. From
+`releases` is ordered newest-first, so `releases[0]` is the latest release. Pin
+to it: record its `version`, `layout_html`, and feed refs. From
 `releases[0].feeds`, collect the feed refs you need to inspect — each entry
-carries both `feed_name` (for ALFS paths) and `feed_id` (for API calls).
+carries `feed_name` and `feed_major` (for ALFS paths) and `feed_id` (for API
+calls).
 
 If the source playbook has registered UDFs, collect each function's
 `function_name`, `entry_script_path`, and `params_schema` before editing. Read
@@ -92,14 +95,19 @@ If ALFS-native read/write/edit tools are available, inspect and edit the ALFS
 source directly. Do not force a local download/upload loop in PI/jagent agent
 tool mode.
 
+Read the released HTML from `releases[0].layout_html` (a URL), not the source
+Playbook's root `/playbooks/{name}/index.html`: that file may be an unreleased
+draft in progress. If the release HTML is unreadable or no release exists,
+explain the blocker instead of copying the draft.
+
 In a shell-only CLI session, download to a local file; do not regenerate from
-memory. Redirect `alva fs read` output into a local file so you can edit it in
+memory. Save the HTML into a local file so you can edit it in
 place (e.g. with the `Edit` tool). Reconstructing the HTML from what you
 remember of the read output drops layout details, comments, and working code
 that the user expects to inherit.
 
 ```bash
-alva fs read --path '/alva/home/{owner}/playbooks/{name}/index.html' > ./index.html
+curl -fsSL '<releases[0].layout_html>' > ./index.html
 ```
 
 This is the full HTML source of the playbook dashboard — the ECharts charts,
@@ -110,11 +118,12 @@ metric cards, layout, and data-fetching logic. Edit this source directly in Step
 
 ## Step 3 — Read Code Layer (Feed Scripts)
 
-Each entry in `releases[0].feeds` carries `feed_name` — inspect each feed's
-script source the same way. In shell-only CLI sessions, download each source:
+Each entry in `releases[0].feeds` carries `feed_name` and `feed_major` —
+inspect each feed's script source the same way. In shell-only CLI sessions,
+download each source:
 
 ```bash
-alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v1/src/index.js' > ./{feed_name}.js
+alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v{feed_major}/src/index.js' > ./{feed_name}.js
 ```
 
 This contains the strategy logic, data fetching, and indicator computations. As
@@ -136,7 +145,7 @@ Optionally, read sample feed output to understand the data schema (this one
 stays in stdout — it's reference, not a file you'll edit):
 
 ```bash
-alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v1/data/{group}/{output}/@last/5'
+alva fs read --path '/alva/home/{owner}/feeds/{feed_name}/v{feed_major}/data/{group}/{output}/@last/5'
 ```
 
 ---
@@ -203,10 +212,14 @@ request). Do not write fresh files from scratch.
    `alva deploy create --name {new-name} --path '~/feeds/{new-name}/v1/src/index.js' --cron "..."`
 4. **Publish automation** and record the returned `feed_id`:
    `alva automation publish --name {new-name} --version 1.0.0 --cronjob-id ID --description "..."`
-5. **Publish feed visibility** when the remixed playbook needs public reads:
+5. **Feed visibility**: a released Playbook delivers its bundled Feeds to its
+   audience while they stay private; release a public or paid remix with
+   `--confirm-bundled-feed-exposure` after telling the user
+   ([bundled Feeds](playbook-creation.md#visibility-and-bundled-feeds)). Make
+   the feed public only when direct public reads are needed:
    `alva feed set-visibility --id <feed_id> --visibility public`
-6. **Verify public data** with an unauthenticated absolute-path read before the
-   HTML depends on it.
+6. **Verify data** before the HTML depends on it: an authenticated SDK read,
+   plus an unauthenticated absolute-path read for a public feed.
 7. **Write the edited HTML** to ALFS after updating data paths to point to your
    own feed. Use the ALFS write/edit tool in agent tool mode; shell-only
    fallback:
@@ -270,8 +283,8 @@ save them to local files:
 # 1. Metadata — releases[0].feeds carries feed_name + feed_id per ref
 alva fs read --path '/alva/home/alice/playbooks/btc-momentum/playbook.json'
 
-# 2. HTML source — save locally only in shell-only CLI sessions
-alva fs read --path '/alva/home/alice/playbooks/btc-momentum/index.html' > ./index.html
+# 2. Released HTML from releases[0].layout_html — save locally only in shell-only CLI sessions
+curl -fsSL 'https://alice.playbook.alva.ai/btc-momentum/v1.0.0/index.html' > ./index.html
 
 # 3. Feed source code (use feed_name from playbook.json) — same shell-only fallback
 alva fs read --path '/alva/home/alice/feeds/btc-momentum/v1/src/index.js' > ./btc-momentum.js

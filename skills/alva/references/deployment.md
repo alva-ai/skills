@@ -163,7 +163,7 @@ alva deploy run-logs --id 42 --run-id 123
 
 ## Automation / Playbook Lifecycle — Extras Not In CLI Help
 
-Run `alva automation --help` and `alva playbook --help` for subcommands, flags,
+Run `alva automation --help` and `alva playbooks --help` for subcommands, flags,
 and response shapes. This section only covers the conceptual boundaries and the
 deletion gotcha — the help text is authoritative on flags.
 
@@ -174,7 +174,7 @@ deletion gotcha — the help text is authoritative on flags.
 - `alva automation` — the product-facing lifecycle CLI for the same underlying
   feed object; ids are feed ids, and `stop` / `resume` delegate to the feed's
   producer cronjob. Feed publication state lives in `feeds` / `feed_majors`.
-- `alva playbook` — the **published playbook** (rendered HTML + display_name +
+- `alva playbooks` / `alva release playbook` — the **published playbook** (rendered HTML + display_name +
   visibility + ACL). Lives in `playbooks` and is surfaced at
   `https://alva.ai/u/<username>/playbooks/<name>`.
 
@@ -197,9 +197,10 @@ stays alive. The platform still:
 - fires push fanout for the (now empty) feed
 
 The cap-gate symptom is "the platform still has a playbook record for me even
-after I cleaned the ALFS files". The fix is `alva playbook delete --name <X>`
-(or `alva automation delete --id <X>`), which soft-deletes the DB row and frees
-the quota / ACL immediately.
+after I cleaned the ALFS files". There is no CLI Playbook delete: tell the user
+to delete the Playbook from its page in Alva, which soft-deletes the DB row and
+frees the quota / ACL immediately. For the feed, `alva automation delete --id
+<X>` soft-deletes its row.
 
 ---
 

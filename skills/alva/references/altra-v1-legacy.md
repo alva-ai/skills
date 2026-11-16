@@ -424,7 +424,7 @@ dataGraph.registerFeature({
     if (bars.length < 14) return [];
 
     const closes = bars.map((b) => b.close);
-    const rsiValues = indicators.rsi(closes, 14);
+    const rsiValues = indicators.rsi(closes, { period: 14 });
 
     const out = [];
     for (let i = 0; i < bars.length; i++) {

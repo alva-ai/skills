@@ -7,7 +7,7 @@ description: >-
   explicit Thesis publication or maintenance, and requested Thesis rewriting.
 metadata:
   author: alva
-  version: v1.32.0
+  version: v1.32.1
 ---
 
 # Alva
@@ -217,8 +217,8 @@ Exceptions are in [Company Page Links](references/user-facing-prose.md#company-p
 - **Answer:** Relevant values have sources and timestamps. Facts, calculations,
   and inference are distinct; missing evidence limits confidence.
 - **Thesis:** After creation, verify the selected body and assets and use the
-  authoritative GET result for the preview. For updates, visibility changes,
-  close or delete, verify the requested state; do not emit a creation preview.
+  authoritative GET result for the preview. For updates, visibility changes, or
+  archiving, verify the requested state; do not emit a creation preview.
   A rewrite candidate alone is not a published Thesis.
 - **Agent Schedule:** Verify the intended Channel/Inbox, saved rule, and next
   run or lifecycle state. Saving a schedule does not prove a future run occurred.
@@ -229,7 +229,7 @@ Exceptions are in [Company Page Links](references/user-facing-prose.md#company-p
 - **Playbook:** Live browser data reads declared feeds; an explicitly requested
   static snapshot uses sourced, dated values. README, lint, release, and
   screenshot verification are complete. Return the canonical share URL, or
-  stop at draft/private when explicitly requested.
+  stop at draft when explicitly requested.
 - **Strategy and trading:** Altra results pass bias checks. Live execution
   requires dry-run validation, the applicable consent, and final-state checks.
 

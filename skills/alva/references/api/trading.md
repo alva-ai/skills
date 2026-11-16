@@ -26,22 +26,26 @@ with `alva trading-pairs resolve --pair <tradingPair> --json`. Use the returned
 ## `--signal` JSON schema for `alva trading execute`
 
 The CLI help example shows `{symbol, side, qty}` — that is **not** the
-accepted schema. `--signal` takes an array of signal objects with one of
-two `instruction.type` values:
+accepted schema. `--signal` takes one signal object. An array is accepted,
+but only its **last** element executes. `instruction.type` is one of:
 
 - **`allocate`** — target portfolio weights. `weight: 0` closes the
   position; `weight: 0.5` sets it to 50% of equity.
+- **`order`** / **`orders`** — explicit market orders: `orders[]` of
+  `{symbol, side: "buy"|"sell", amount: {type, value}}`.
 - **`predict`** — prediction market orders (Polymarket only).
 
 ```bash
 # Allocate 10% to BTC perp on a binance account (dry run)
 alva trading execute \
   --account-id <id> \
-  --signal '[{"date":1735689600,"instruction":{"type":"allocate","weights":[{"symbol":"BINANCE_PERP_BTC_USDT","weight":0.1}]}}]' \
+  --signal '{"date":1735689600000,"instruction":{"type":"allocate","weights":[{"symbol":"BINANCE_PERP_BTC_USDT","weight":0.1}]}}' \
   --dry-run
 ```
 
-`date` is **epoch seconds**, not milliseconds.
+`date` is **Unix milliseconds**, the same unit Feed records use. A live
+signal whose `date` is not newer than the account's last processed signal is
+skipped silently, so a seconds value after a milliseconds one never executes.
 
 ## Operational rules
 
@@ -52,4 +56,10 @@ alva trading execute \
 - **One active subscription per account.** `alva trading subscribe`
   fails until you `unsubscribe` the existing one.
 - `--execute-latest` on subscribe fires the playbook's last signal
-  immediately — only works if the feed has a stored `lastSignal`.
+  immediately — only works if the feed has a stored `lastSignal`. It
+  executes **live, without a dry run**, and an execution error is only
+  logged, not returned. Before using it, dry-run that signal with
+  `alva trading execute --dry-run` and get the per-order confirmation.
+- **Subscribing a live account bypasses per-order confirmation** — every
+  later signal trades automatically. Default to a paper account; subscribe a
+  live account only with the user's explicit consent to auto-trade it.

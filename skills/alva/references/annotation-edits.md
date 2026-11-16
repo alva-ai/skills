@@ -1,23 +1,30 @@
 # Annotation-Driven Edits
 
-An annotation points at one element of a playbook the user is iterating on and
-asks for a change to it. The request arrives as one or more `<annotation>`
-tags. Find the logic that *generates* that element and edit it there.
+An annotation points at one element of a playbook's rendered DOM. It may carry
+a question about that element or a request to change it; the request arrives
+as one or more `<annotation>` tags. Determine intent first: do not write,
+draft, or release merely because a tag is present. For a change, find the
+logic that *generates* that element and edit it there.
 
 ---
 
 ## Tag Format
 
 ```
-<annotation index="1" selector="div.playbook-container > div.tab-panel > div.hero-card" tag-name="div" instruction="Highlight this card"></annotation>
+<annotation index="1" selector="div.playbook-container > div.hero-card > h2" tag-name="h2" new-text="BTC trend" instruction="Shorten the title">Bitcoin price trend overview</annotation>
 ```
 
-| Attribute     | Description                                                     |
+| Field         | Description                                                     |
 | ------------- | --------------------------------------------------------------- |
-| `index`       | Sequence number; a message may carry several annotations        |
-| `selector`    | CSS path to the target element in the **rendered** playbook DOM |
+| `index`       | Order within this message only, not a persistent element id     |
+| `selector`    | CSS path to the target element in the **rendered** playbook DOM; a location hint for the current render |
 | `tag-name`    | The target element's tag                                        |
-| `instruction` | What the user wants done to that element                        |
+| `new-text`    | Replacement text the user previewed in the iframe (optional)    |
+| `instruction` | The user's instruction or question (optional)                   |
+| tag body      | `originalText`: the element's text when annotated               |
+
+A `new-text` already visible in the iframe does not mean the source changed;
+write it back to the generator and verify it through a rerender.
 
 The tag carries no playbook identity — an annotation applies to the playbook
 already in session context (just built, remixed, or read). If none is in
@@ -27,8 +34,23 @@ context, ask which playbook, then read its HTML locally before editing:
 alva fs read --path '/alva/home/{owner}/playbooks/{name}/index.html' > ./index.html
 ```
 
-Process each `index` as a separate, targeted edit — change only what the
-`instruction` asks of the annotated element, nothing around it.
+## Question or Change
+
+- A question about an element's content, source, or meaning: read the
+  Playbook and its data and answer directly. Do not edit a file, create a
+  draft, or release.
+- A change: confirm the target and ownership first (`alva whoami` against the
+  owner). A non-owner's page cannot be edited in place; use
+  [remix-workflow.md](remix-workflow.md) only when the user explicitly wants
+  their own version, never as a silent copy.
+- Preserve the Playbook's name, visibility, Feed refs, UDFs, Skillhub binding,
+  and all unmentioned behavior.
+
+Process the annotations in `index` order as targeted edits combined into one
+minimal patch — change only what each `instruction` (or `new-text`) asks of the
+annotated element, nothing around it. Stop and confirm if they conflict. When
+the selector has no unique match, cross-reference its leaf class, `tag-name`,
+`originalText`, and `new-text`; ask the user if ambiguity remains.
 
 When the instruction is a bug fix, fix the named defect only — do not change
 what displayed data *means* (its period basis, units, or source) as a side
@@ -76,6 +98,9 @@ Editing playbook HTML re-enters the `before-build-html` gate: read
 
 ## Re-release
 
-After applying every annotation, write the HTML back to ALFS and re-release.
-A change to an already-released playbook is a version bump: `alva release
-playbook-draft` then `alva release playbook` with the new version (Step 7).
+An annotation is not permission to publish or re-release. Annotating a session
+preview or an unreleased draft keeps that state, and a draft-only request
+still stops at draft. For a released playbook the user asked to change, write
+the HTML back to ALFS and re-release: a version bump through `alva release
+playbook-draft` then `alva release playbook` with the new version (Step 7),
+keeping its visibility and Feed refs. Report only the state actually reached.

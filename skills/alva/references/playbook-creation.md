@@ -21,12 +21,15 @@ A clear Playbook request needs no separate build confirmation.
 
 ## Build Verification
 
-- Verify viewer access to every backing feed before building dashboards. For
-  public feeds, use `alva feed set-visibility` and verify an anonymous read;
-  never use `alva fs grant` to change feed visibility. For private Playbooks,
-  preserve private access and verify the viewer-scoped read path.
+- Verify viewer access to every backing feed before building dashboards. A
+  released Playbook delivers its bundled Feeds to its audience even while a
+  Feed stays private ([Visibility and bundled Feeds](#visibility-and-bundled-feeds)).
+  Make a Feed public with `alva feed set-visibility` and verify an anonymous
+  read only when direct public reads are needed; never use `alva fs grant` to
+  change feed visibility. For private Playbooks, preserve private access and
+  verify the viewer-scoped read path.
 - Return the live URL only after writing local edits back to ALFS and cutting
-  that release; respect an explicit draft/private stopping point. A local edit
+  that release; respect an explicit draft-only stopping point. A local edit
   without `alva fs write` + `alva release` is not live.
 - Before re-releasing an existing playbook, read `playbook.json` for
   `latest_release.feeds` and pass that exact array to `--feeds`. Never guess
@@ -49,7 +52,8 @@ A clear Playbook request needs no separate build confirmation.
 5. Build HTML that reads feed outputs at runtime.
 6. Write HTML and README to ALFS.
 7. Draft, lint, publish, then screenshot the deployed `published_url` unless the
-   user explicitly asks to stop at draft/private.
+   user explicitly asks to stop at draft. A private or paid Playbook gets its
+   visibility after the draft and before release.
 8. Evaluate push setup with [push-notifications.md](push-notifications.md).
 
 ### Static Snapshot
@@ -177,10 +181,12 @@ Before `alva release playbook-draft`, verify:
 - Target name and owner namespace match `alva whoami`.
 - Every feed in `--feeds` has passed `before-automation-publish`.
 - Every feed the HTML reads appears in `--feeds` and passes the check for the
-  planned playbook visibility: for public playbooks, set public visibility with
-  `alva feed set-visibility` and verify an unauthenticated read; for private or
-  paid playbooks, verify an authenticated SDK/PBSV read instead and do not make
-  the feed public solely to pass this gate.
+  planned playbook visibility: for public playbooks, either the feed is public
+  (`alva feed set-visibility`, verified with an unauthenticated read) or it
+  stays private as a [bundled Feed](#visibility-and-bundled-feeds) and passes an
+  authenticated SDK/PBSV read; for private or paid playbooks, verify an
+  authenticated SDK/PBSV read instead and do not make the feed public solely to
+  pass this gate.
 - Draft metadata matches the approved plan.
 - `--tags` includes required asset overlap plus material related people:
   investors, company figures, officials/policymakers, Twitter/X KOLs.
@@ -204,14 +210,47 @@ Resolve `<username>` once via `alva whoami`.
 
 After `playbook-draft` succeeds and `before-playbook-release` passes, call
 `alva release playbook` without asking whether to stop at the draft version,
-unless the user explicitly requested draft-only/private. Draft is a separate
-version state; visibility (`public` / `private` / `paid`) applies after
-publication. The default published visibility is public.
+unless the user explicitly requested draft-only. Draft is a separate version
+state. Visibility (`public` / `private` / `paid`) belongs to the Playbook, not
+the release: the default is public, and a release keeps the current
+visibility.
 
 ```bash
 alva release playbook ... \
   --readme-url '/alva/home/<username>/playbooks/{name}/README.md'
 ```
+
+### Visibility and bundled Feeds
+
+For a private or paid Playbook, set the visibility after the draft and before
+the release, read it back, then release. Never release publicly first:
+
+```bash
+alva playbooks set-visibility --name {name} --visibility private   # or paid
+alva playbooks mine --json   # the row's visibility must match
+```
+
+Private and paid are Pro-gated, and `paid` also needs a price on the Playbook.
+If `set-visibility` fails or the read-back differs, stay at the draft and
+report it instead of releasing.
+
+Your non-public Feeds bundled in a public or paid Playbook are delivered to the
+Playbook's audience, so release asks for confirmation (a FailedPrecondition
+error) the first time such a Feed is added. Tell the user that viewers of the
+Playbook will receive that Feed's data, then release with
+`--confirm-bundled-feed-exposure`:
+
+```bash
+alva release playbook ... --confirm-bundled-feed-exposure
+```
+
+A private Playbook and a re-release with the same Feeds need no confirmation.
+Make the Feed itself public only when direct public reads outside the Playbook
+are needed. Widening a released Playbook with `alva playbooks set-visibility`
+(private to paid or public) does not ask: it confirms the exposure
+automatically, so bundled non-public Feeds reach the new audience at once.
+Before widening a Playbook that bundles your non-public Feeds, tell the user
+which Feeds become readable to the wider audience and get their consent first.
 
 <HARD-GATE id="before-playbook-release">
 Before `alva release playbook`, verify:
@@ -219,10 +258,13 @@ Before `alva release playbook`, verify:
 1. Every backing feed passed `before-automation-publish`.
 2. Every feed the HTML reads at runtime has a successful deploy, appears in
    `--feeds`, and passes the check for the release visibility: for public
-   playbooks, set public visibility with `alva feed set-visibility` and verify
-   an unauthenticated read; for private or paid playbooks, verify an
-   authenticated SDK/PBSV read instead and do not make the feed public solely
-   to pass this gate.
+   playbooks, either the feed is public (`alva feed set-visibility`, verified
+   with an unauthenticated read) or it stays private as a
+   [bundled Feed](#visibility-and-bundled-feeds) the user agreed to expose and
+   passes an authenticated SDK/PBSV read; for private or paid playbooks, verify
+   an authenticated SDK/PBSV read instead and do not make the feed public
+   solely to pass this gate. A private or paid Playbook already reads back
+   that visibility.
 3. Cronjobs for referenced feeds are active.
 4. Live HTML fetches quantitative data from feeds; a
    [static snapshot](#static-snapshot) meets that section instead.
@@ -277,10 +319,12 @@ playbook is done.
 Pro users:
 
 - Publish publicly by default after gates pass.
-- To change a published playbook later, use `alva playbooks set-visibility`
-  after `alva playbooks --help`. Private/paid are Pro-gated.
-- If the user wants draft-only/private before publishing, stop at draft and say
-  how to publish later.
+- For a private or paid Playbook, set visibility after the draft and before
+  release ([Visibility and bundled Feeds](#visibility-and-bundled-feeds)). To
+  change a published playbook later, use `alva playbooks set-visibility` after
+  `alva playbooks --help`. Private/paid are Pro-gated.
+- If the user wants draft-only before publishing, stop at draft and say how to
+  publish later.
 
 Free users:
 
