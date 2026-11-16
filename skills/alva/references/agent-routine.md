@@ -55,6 +55,9 @@ Keep only what the user said about investing:
 "New view: '<claim>'. Reply 'publish' to make it a private thesis."
 When they reply, do steps 1-5 for those items.
 
+**Undo** → remove those entries from `user.md` the same way (steps 1-3), and
+take a thesis down with `alva thesis archive --id <id> --request-id <new UUID>`.
+
 ## B. People they follow
 
 ```bash

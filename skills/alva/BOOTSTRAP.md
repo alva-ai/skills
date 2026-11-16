@@ -63,8 +63,8 @@ the initial memory and thesis sync.
 ## Wrap up
 
 Tell the user what was saved (how many memory items, which theses, all
-private), that they can see it in the Alva app under Me, that "undo" removes
-anything, and when the next daily note arrives (or that none is scheduled).
+private), that they can see it in the Alva app under Me, that saying "undo"
+removes any of it (see Undo in agent-routine.md), and when the next daily note arrives (or that none is scheduled).
 
 Then record in your own memory:
 "Alva bootstrap v1 done <date>; Alva routine last ran <until from step 2>".
