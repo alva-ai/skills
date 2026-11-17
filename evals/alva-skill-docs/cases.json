@@ -2810,6 +2810,8 @@
             "Connect your AI in the Alva app and send it there",
             "You'll show everything before anything is saved.",
             "Then stop and wait for their go-ahead:",
+            "**If you cannot run shell commands here** (a chat app, or an agent on a phone),",
+            "this setup needs an AI agent on their computer that can run commands, such as",
             "Never add crontab entries or launch agents.",
             "A headless run has nowhere to deliver the note.",
             "Run the Alva daily routine: follow references/agent-routine.md in the Alva skill.",

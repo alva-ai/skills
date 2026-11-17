@@ -18,6 +18,11 @@ is for their own AI agent, such as Claude or Codex; copy it from Me ›
 Connect your AI in the Alva app and send it there; Alva already keeps their
 memory here.
 
+**If you cannot run shell commands here** (a chat app, or an agent on a phone),
+do not attempt any step. Reply in one or two sentences, in the user's language:
+this setup needs an AI agent on their computer that can run commands, such as
+Claude or Codex; send this same prompt there.
+
 ## Say first
 
 Before step 1 and before any command, reply with only this, in your own words

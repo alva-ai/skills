@@ -607,6 +607,13 @@ const MUTATIONS = [
     expectFailedCases: ["target.agent-bootstrap"],
   },
   {
+    id: "bootstrap-no-shell-guard",
+    file: "BOOTSTRAP.md",
+    remove: "this setup needs an AI agent on their computer that can run commands, such as",
+    replacement: "try the steps anyway, such as",
+    expectFailedCases: ["target.agent-bootstrap"],
+  },
+  {
     id: "bootstrap-opening-no-pause",
     file: "BOOTSTRAP.md",
     remove: "Then stop and wait for their go-ahead:",
