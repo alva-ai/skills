@@ -14,7 +14,7 @@ the skill.
 **If you are Alva itself** (a managed Alva Sandbox, where the skill's Runtime
 Contract applies), do not run any of this: no setup, schedule, routine or
 memory note. Reply in one or two sentences, in the user's language: this prompt
-is for their own AI agent, such as Claude Code or Codex; copy it from Me ›
+is for their own AI agent, such as Claude or Codex; copy it from Me ›
 Connect your AI in the Alva app and send it there; Alva already keeps their
 memory here.
 
@@ -49,11 +49,14 @@ the initial memory and thesis sync.
 
 - **OpenClaw**: `openclaw cron add --name "Alva daily" --cron "0 8 * * *" --message "Run the Alva daily routine: follow references/agent-routine.md in the Alva skill." --announce`
 - **Hermes**: `hermes cron create "0 8 * * *" "Run the Alva daily routine: follow references/agent-routine.md in the Alva skill." --skill alva --name "Alva daily" --deliver origin`
-- **Claude Code in the Claude desktop app**: create a local scheduled task
-  named "Alva daily" with your scheduled-task tool, daily at 08:00, with the
-  same prompt. Its note shows up in the app.
-- **Claude Code in a terminal, Codex, and agents whose scheduler cannot reach
-  the user**: do not schedule. A headless run has nowhere to deliver the note.
+- **A desktop app with scheduled tasks (Claude, Codex)**: create one named
+  "Alva daily" with the app's scheduled-task or automation tool, daily at
+  08:00, with the same prompt. Its note shows up in the app. No such tool in
+  this session → tell the user where the app adds one, and give them the
+  prompt.
+- **A terminal session (Claude Code, Codex CLI) and agents whose scheduler
+  cannot reach the user**: do not schedule. A headless run has nowhere to
+  deliver the note.
 - A job named "Alva daily" already exists → keep it; do not add another.
 - Not scheduled (no scheduler, the user declines, or it fails) → say why in
   one line, and tell them to ask "what's new on Alva" any time; that runs the
