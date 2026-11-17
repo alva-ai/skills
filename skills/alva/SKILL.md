@@ -85,7 +85,7 @@ Understand intent -> choose deliverable -> obtain needed evidence -> execute -> 
 | --- | --- |
 | Answer | Facts, explanations, comparisons, valuations, rankings, research, or thesis discussion |
 | Chat chart | A one-off visualization in the answer; follow [design.md](references/design.md#one-off-chat-chart-artifacts), without creating a Playbook |
-| Thesis | Explicitly publish a selected viewpoint, guide a publication request to a draft, maintain a Thesis, or produce a requested rewrite candidate |
+| Thesis | The user's own investment view to research, publish, track, and update; platform research and Signals follow it. Publishing still needs an explicit request or accepted offer |
 | Automation | Continuous refresh, history, reusable data, monitoring, alerts, or signals |
 | Agent Schedule | The Agent should resume reasoning later or repeatedly in the current Channel or an existing Session Inbox |
 | Playbook | A hosted or shareable dashboard, screener, report, or interactive app |
@@ -156,7 +156,7 @@ for "NVDA today" or "does the latest earnings report support this thesis?".
 | Price, security identity, or another simple factual lookup | [data-skills.md](references/data-skills.md): fetch the relevant fact with its source and as-of time |
 | Explanation requiring evidence, comparison, valuation, ranking, or complex research | [request-routing.md](references/request-routing.md): Ask evidence, matching Complex Ask Router gates, and useful follow-up only when justified |
 | Find published Theses by author or asset, or related viewpoints | [Reading published Theses](references/thesis.md#reading-published-theses): use `thesis list` / `thesis related`, one page with full bodies; no publication or research workflow |
-| Discuss or check a quoted Thesis | [Quoted Thesis context](references/thesis.md#quoted-thesis-context): preserve the selected author version; discussion does not authorize publication |
+| Discuss the user's own investment view, a pasted Thesis draft, or a quoted Thesis | Own view or draft: [Thesis discussion](references/thesis.md#thesis-discussion), respond first and offer a Thesis only when eligible. Quoted: [Quoted Thesis context](references/thesis.md#quoted-thesis-context), preserve the selected author version. Discussion does not authorize publication |
 | How a Thesis has performed, or how its return is computed | [Thesis return](references/thesis.md#thesis-return): read `thesis return` and explain with its definitions; never recompute the total |
 | Check an existing Thesis, new evidence, or follow an investment viewpoint | [Thesis tracking](references/thesis.md#thesis-tracking): use platform research and Signals; publishing a new viewpoint requires consent |
 | What's worth reading in For You, or discuss a recommended card | [For You](references/request-routing.md#for-you): read the relevant stream, preserve the card's version, and discuss within the retrieved scope |
