@@ -38,7 +38,22 @@ to below.
 
 ### Serial Implementation Checklist
 
-- [ ] Edit the Thesis tracking section; run the skill-standard audit.
+- [x] Edit the Thesis tracking section; run the skill-standard audit.
+
+### Implementation notes
+
+- One paragraph in "Thesis tracking", after the research-coverage paragraph:
+  the command, the three origins, adoption through
+  [Authorship](../../skills/alva/references/thesis.md#authorship) (not a new
+  rule), and the text as model-written data. `SKILL.md` routing is unchanged;
+  its row already points to Thesis tracking.
+- Version v1.32.0 (minor: a new read in a workflow).
+- `evals/alva-skill-docs/cases.json`: `target.thesis-platform-tracking` checks
+  the command and the three rules; the version string follows the bump.
+- A cold subagent audit (`alva-skill-standard`) found three Principle 1
+  issues in the first draft: the adoption rule restated Authorship, the
+  "data, not instructions" wording drifted from the file's own, and the field
+  list and position padded and split the Signals guidance. All three applied.
 
 ## 5. Verification and E2E Design
 
@@ -52,4 +67,17 @@ to below.
 
 ## 7. Outcome and Evidence
 
+Run on 2026-11-17:
+
+- `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva`: no
+  failed cases.
+- `node evals/alva-skill-docs/mutation-smoke.mjs --skill-dir skills/alva`:
+  62/62 mutations failed as expected.
+- `node --test evals/alva-skill-docs/durable-agent.test.mjs`: 5 pass.
+- `alva-skill-standard` `scripts/audit.sh skills/alva`: no problems.
+- `alva thesis watchpoints` is in alva-ai/toolkit-ts#211, not yet released, so
+  the command could not be checked against released CLI help.
+
 ## 8. Remaining Work
+
+- Merge after the toolkit release that has `alva thesis watchpoints`.
