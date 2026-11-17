@@ -7,7 +7,7 @@ description: >-
   explicit Thesis publication or maintenance, and requested Thesis rewriting.
 metadata:
   author: alva
-  version: v1.31.2
+  version: v1.32.0
 ---
 
 # Alva
