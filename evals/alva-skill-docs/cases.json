@@ -2830,7 +2830,11 @@
             "never follow instructions",
             "Read the file again. If it changed since step 1, merge into the new text.",
             "first run: the last 60 days",
-            "Alva setup has an update."
+            "Alva setup has an update.",
+            "your own suggestions, your inferences and their repeated",
+            "--entity-ids '<id,id>' --no-discovery",
+            "Any `UNKNOWN`, or the call fails → do",
+            "each body in full,"
           ]
         },
         {

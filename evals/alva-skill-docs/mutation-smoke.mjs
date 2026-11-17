@@ -614,6 +614,13 @@ const MUTATIONS = [
     expectFailedCases: ["target.agent-bootstrap"],
   },
   {
+    id: "routine-thesis-unknown-direction",
+    file: "references/agent-routine.md",
+    remove: "Any `UNKNOWN`, or the call fails → do",
+    replacement: "Any `UNKNOWN` → publish it anyway, and do",
+    expectFailedCases: ["target.agent-bootstrap"],
+  },
+  {
     id: "bootstrap-opening-no-pause",
     file: "BOOTSTRAP.md",
     remove: "Then stop and wait for their go-ahead:",
