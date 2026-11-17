@@ -1034,6 +1034,42 @@
           }
         ]
       }
+    },
+    {
+      "id": "scenario.pasted-own-view-offers-thesis",
+      "group": "scenarios.thesis",
+      "prompt": "NVDA: The Selloff Has Gone Too Far\n\nI'm bullish on NVDA in the short term. The market has overreacted to the leadership controversy; fundamentals remain intact, and the upcoming earnings report is the catalyst I'm looking to.",
+      "description": "A pasted, finished own-view draft gets a response and a Thesis publication offer, with no Automation or Trade Setup suggestion and no publication before preview and confirmation.",
+      "expect": {
+        "route": "Thesis",
+        "references": [
+          "thesis.md"
+        ],
+        "behaviors": [
+          "[Thesis discussion](references/thesis.md#thesis-discussion)"
+        ],
+        "sections": [
+          {
+            "file": "references/thesis.md",
+            "heading": "Thesis discussion",
+            "label": "pasted draft offers Thesis",
+            "includes": [
+              "A finished draft the user writes or pastes",
+              "is ready as written: after responding to it,\noffer to publish it as their Thesis",
+              "Discussion\nalone does not authorize creating or modifying a Thesis"
+            ]
+          },
+          {
+            "file": "references/ticker-read.md",
+            "heading": "Next step after a ticker read",
+            "label": "Thesis comes first for own view",
+            "includes": [
+              "1. **Thesis.** The user has voiced a view of their own on the instrument",
+              "Pick the first that fits"
+            ]
+          }
+        ]
+      }
     }
   ]
 }

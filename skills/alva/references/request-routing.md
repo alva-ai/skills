@@ -113,15 +113,22 @@ within its agreed scope, do the necessary work rather than offering to do it.
 Once it is complete, offer a useful extension or ask a specific question that
 moves the discussion forward, leaving the choice to the user. Choose what fits:
 
+- **Thesis** when the user has voiced a view of their own; a direction with a
+  reason in their words is enough. Offer once to organize it into a Thesis,
+  optionally private, for platform research; the offer does not authorize
+  publication or a separate monitoring Automation. When they already have a
+  Thesis on the topic, offer to check it against the new evidence or draft an
+  Update. See [Thesis discussion](thesis.md#thesis-discussion) and
+  [Thesis tracking](thesis.md#thesis-tracking). Helping the user research,
+  create, and update their own Thesis is usually the most valuable next step;
+  prefer it over an Automation or Trade Setup suggestion they did not ask for.
+  An explicit request for levels, entries, exits, stops, alerts, or a
+  recurring check follows its own route.
+- **One-off follow-up** when one concrete question would materially deepen, test,
+  compare, apply, or naturally extend the answer. It need not lead to Automation.
 - **Automation** when changing inputs can be reevaluated by the same method and
   cadence, a trigger, or notification creates ongoing value. Push ideas also
   need a meaningful-change and quiet-run boundary.
-- **One-off follow-up** when one concrete question would materially deepen, test,
-  compare, apply, or naturally extend the answer. It need not lead to Automation.
-- **Thesis** when the user has stated a view of their own and it has settled.
-  Offer once to organize it into a Thesis, optionally private, for platform
-  research; the offer does not authorize publication or a separate monitoring
-  Automation. See [Thesis discussion](thesis.md#thesis-discussion).
 - **No suggestion** when there is no useful next step or the user is closing
   the conversation. End naturally rather than adding a routine question.
 
@@ -147,7 +154,7 @@ buttons. A question needed before any substantive reply uses
 `AskUserQuestion`; Thesis publication
 follows its own preview-and-confirmation flow. Order or trade confirmation and
 auto-trading risk acknowledgment need the user's typed reply, never a button.
-For named single-instrument ticker reads, apply the Trade Setup follow-up rules in [ticker-read.md](ticker-read.md#trade-setup-follow-up).
+For named single-instrument ticker reads, always offer one next step in the order set by [Next step after a ticker read](ticker-read.md#next-step-after-a-ticker-read).
 If Automation clears this bar or is already requested, apply [Preferred Automation Setup Skills](request-routing.md#preferred-automation-setup-skills) before suggesting or building it.
 
 ## Capability Help
@@ -203,15 +210,17 @@ freshness, and fallback for these official methods:
 
 Before broader Skillhub search or custom work, check this official fast path:
 `alva/trade-setup-automation` for watching **one instrument against the
-user's own free-form trade thesis or strategy** (entry/exit conditions,
+user's explicit execution conditions** (price levels, entry/exit, stops,
 judgment-based alerts) via `@alva/trade-setup-sdk`. Trigger phrasings, in
-any language: "trade setup", "trading strategy", "investment strategy",
-watching/monitoring a ticker against the user's own trade idea, "alert me
-when my setup confirms or breaks", editing/diagnosing an existing trade
-setup, or accepting a post-answer Trade Setup suggestion after a named
-single-instrument ticker read. In the post-answer path, reuse the answered
-ticker, thesis, key levels, catalysts, risk, and invalidation conditions as
-setup context, then fetch the blueprint fresh before building.
+any language: "trade setup", "trading strategy", watching a ticker against
+the user's levels, entries, exits, or stops, "alert me when my setup confirms
+or breaks", editing/diagnosing an existing trade setup, or accepting a
+post-answer Trade Setup suggestion after a named single-instrument ticker read.
+Following the user's investment view itself for new evidence is
+[Thesis tracking](thesis.md#thesis-tracking), not a Trade Setup. In the
+post-answer path, reuse the answered ticker, thesis, key levels, catalysts,
+risk, and invalidation conditions as setup context, then fetch the blueprint
+fresh before building.
 
 When it clearly fits, resolve its exact id and blueprint, then follow the
 Skillhub Blueprint rules below. If it does not fit or is unavailable, search the
