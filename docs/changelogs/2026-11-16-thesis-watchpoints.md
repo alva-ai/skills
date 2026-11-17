@@ -18,8 +18,7 @@ to below.
 ## 2. Problem Model and End-to-End Behavior
 
 - Carries B14 of the primary record. When tracking a Thesis the agent also
-  reads `alva thesis watchpoints --id`, can group Signals by their
-  watchpoint, and tells the author which entries are their own (`stated`) and
+  reads `alva thesis watchpoints --id` and tells the author which entries are their own (`stated`) and
   which are Alva's reading (`inferred`, `agent`).
 - An inferred entry becomes the author's only through an Update the author
   asks for, under the existing publication consent rules. The agent does not
