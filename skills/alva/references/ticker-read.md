@@ -171,30 +171,33 @@ Data Skills remain the source for live price, fundamentals, valuation, and
 other ordinary financial facts. Platform Data contributes processed company
 context; it does not replace the financial evidence needed by the answer.
 
-### Trade Setup follow-up
+### Next step after a ticker read
 
-After answering a named single-instrument ticker read, end with one short Trade
-Setup automation follow-up when the answer identifies a trade thesis, entry or
-exit area, confirmation condition, catalyst watch, risk, or invalidation
-condition. This is mandatory for setup-like asks such as "can I go long/short",
-"key levels", "catalysts", "stop/invalidated if", "breakout/breakdown", or
-"what would confirm this trade". Do not omit it merely because the normal
-answer already contains the levels, risk, or conclusion.
+After answering a named single-instrument ticker read that identifies a view,
+entry or exit area, confirmation condition, catalyst, risk, or invalidation
+condition, always offer one next step after the normal answer. Skip it for
+simple fact lookups, broad multi-ticker discovery, portfolio monitoring, or a
+user closing the conversation. Pick the first that fits:
 
-The follow-up must be the final sentence or final short paragraph of the answer.
-It should ask whether the user wants to turn the specific conditions just
-answered into a Trade Setup automation.
+1. **Thesis.** The user has voiced a view of their own on the instrument or
+   already has a Thesis on it, and did not ask a setup-like question. Offer to
+   turn the view into a Thesis, or to check or update the existing one, per
+   [Thesis discussion](thesis.md#thesis-discussion). Researching, creating,
+   and updating the user's own Thesis is usually the most valuable step for
+   them, so prefer it whenever it fits.
+2. **Trade Setup.** The user asked a setup-like question, such as "can I go
+   long/short", "key levels", "stop/invalidated if", "breakout/breakdown", or
+   "what would confirm this trade", or the answer gives concrete price levels
+   or entry/exit conditions. Offer to turn those conditions into a Trade Setup
+   automation. For a setup-like ask, the answer is incomplete without this
+   offer.
+3. **Follow-up question.** Otherwise, ask one specific question that moves the
+   discussion forward: a concrete check, such as how the stock moved after its
+   last four earnings reports, or the user's own judgment, such as which risk
+   worries them more.
 
-Use this only when the answer naturally identifies something worth monitoring
-over time: a thesis, entry/exit area, confirmation condition, breakdown risk,
-catalyst watch, or user-facing decision condition. Do not suggest it for simple
-fact lookups, broad multi-ticker discovery, or portfolio monitoring.
-
-Ask after the normal answer, in the user's language, and keep it low-pressure.
-For a setup-like ask, the answer is incomplete without this final invitation.
-Example: "Want me to turn these key levels, catalysts, and invalidation
-conditions into a Trade Setup automation so you can be notified if the setup
-confirms or breaks?"
+Offer it in the form set by [Useful Next Step After Ask](request-routing.md#useful-next-step-after-ask).
+If the user declined that kind of offer earlier, pick the next that fits.
 
 ### Why did it move?
 

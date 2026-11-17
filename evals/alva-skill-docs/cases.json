@@ -863,36 +863,56 @@
       "id": "platform-data.ticker-read-trade-setup-follow-up",
       "group": "platform-data",
       "target": "corpus",
-      "description": "A named single-instrument ticker read can suggest Trade Setup automation after the normal answer, and accepting that suggestion routes through the official setup skill.",
+      "description": "A named single-instrument ticker read always offers one next step, chosen in order: a Thesis for the user's own view, Trade Setup for setup-like asks or concrete levels, otherwise a specific follow-up question; declined kinds are not repeated, and accepting Trade Setup routes through the official setup skill.",
       "section_includes": [
         {
           "file": "references/request-routing.md",
           "heading": "Useful Next Step After Ask",
-          "label": "post-answer pointer",
+          "label": "post-answer pointer and order",
           "includes": [
-            "Trade Setup follow-up rules",
-            "ticker-read.md#trade-setup-follow-up",
+            "always offer one next step in the order set by [Next step after a ticker read]",
+            "ticker-read.md#next-step-after-a-ticker-read",
             "Preferred Automation Setup Skills"
           ]
         },
         {
           "file": "references/ticker-read.md",
-          "heading": "Trade Setup follow-up",
-          "label": "ticker-read follow-up rule",
+          "heading": "Next step after a ticker read",
+          "label": "ticker-read next-step rule",
           "includes": [
-            "end with one short Trade Setup automation follow-up",
-            "mandatory for setup-like asks",
-            "can I go long/short",
-            "The follow-up must be the final sentence or final short paragraph",
-            "the answer is incomplete without this final invitation",
-            "trade thesis",
-            "entry or exit area",
-            "confirmation condition",
-            "invalidation condition",
-            "After answering a named single-instrument ticker read",
-            "after the normal answer",
-            "simple fact lookups",
-            "portfolio monitoring"
+            "always offer one next step after the normal answer",
+            "simple fact lookups, broad multi-ticker discovery, portfolio monitoring",
+            "Pick the first that fits",
+            "1. **Thesis.** The user has voiced a view of their own on the instrument or\n   already has a Thesis on it, and did not ask a setup-like question",
+            "or to check or update the existing one",
+            "is usually the most valuable step for\n   them, so prefer it whenever it fits",
+            "2. **Trade Setup.** The user asked a setup-like question",
+            "can I go",
+            "or the answer gives concrete price levels",
+            "the answer is incomplete without this",
+            "3. **Follow-up question.** Otherwise, ask one specific question",
+            "Offer it in the form set by [Useful Next Step After Ask]",
+            "If the user declined that kind of offer earlier, pick the next that fits"
+          ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "heading": "Useful Next Step After Ask",
+          "label": "own view prefers Thesis",
+          "includes": [
+            "When they already have a\n  Thesis on the topic, offer to check it against the new evidence or draft an\n  Update",
+            "Helping the user research,\n  create, and update their own Thesis is usually the most valuable next step",
+            "prefer it over an Automation or Trade Setup suggestion they did not ask for",
+            "An explicit request for levels, entries, exits, stops, alerts, or a\n  recurring check follows its own route"
+          ]
+        },
+        {
+          "file": "references/thesis.md",
+          "heading": "Thesis discussion",
+          "label": "pasted draft offers publication",
+          "includes": [
+            "A finished\ndraft the user writes or pastes",
+            "is ready as written: after responding to it,\noffer to publish it as their Thesis"
           ]
         },
         {
@@ -903,7 +923,18 @@
             "alva/trade-setup-automation",
             "accepting a post-answer Trade Setup suggestion after a named single-instrument ticker read",
             "reuse the answered ticker",
-            "fetch the blueprint fresh before building"
+            "fetch the blueprint fresh before building",
+            "user's explicit execution conditions",
+            "Following the user's investment view itself for new evidence is\n[Thesis tracking](thesis.md#thesis-tracking), not a Trade Setup"
+          ]
+        },
+        {
+          "file": "SKILL.md",
+          "heading": "Core Model",
+          "label": "Thesis deliverable for the user's own view",
+          "includes": [
+            "The user's own investment view to research, publish, track, and update",
+            "Publishing still needs an explicit request or accepted offer"
           ]
         }
       ]
@@ -1554,7 +1585,7 @@
         }
       ],
       "includes": [
-        "version: v1.31.1",
+        "version: v1.31.2",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -2312,7 +2343,9 @@
             "do not manufacture an objection every turn",
             "offer it in one sentence, as an action when `PresentActions` is available, instead of starting it",
             "Do not restate their view as a polished paragraph every turn",
-            "only when the user has stated a view of their own, not just asked for yours",
+            "as soon as the user has voiced\none of their own, not just asked for yours",
+            "with a reason in their words is enough, and it need not be final",
+            "When they lean a direction without giving a reason, ask what drives it\nfirst",
             "Public is the default visibility: state it in the preview rather than asking",
             "When the user adopts your analysis as their view",
             "not a condensed report",
@@ -2331,7 +2364,7 @@
         {
           "file": "references/request-routing.md",
           "includes": [
-            "when the user has stated a view of their own and it has settled",
+            "when the user has voiced a view of their own; a direction with a\n  reason in their words is enough",
             "Research that tests the user's point belongs to the answer",
             "For steps that branch beyond it, offer rather than do",
             "State each material limitation once"
