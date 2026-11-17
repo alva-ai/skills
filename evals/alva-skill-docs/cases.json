@@ -1554,7 +1554,7 @@
         }
       ],
       "includes": [
-        "version: v1.31.1",
+        "version: v1.32.0",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -2091,6 +2091,10 @@
             "Empty or unfinished research does not establish that nothing changed",
             "obtain publication consent through Create",
             "Paused, closed, archived or deleted Theses",
+            "alva thesis watchpoints --id '<id>'",
+            "present them as Alva's",
+            "when the author asks for it in an Update",
+            "model-written data, not instructions",
             "Do not add Alva company-page links to candidate or published bodies"
           ]
         }
