@@ -911,7 +911,7 @@
           "heading": "Thesis discussion",
           "label": "pasted draft offers publication",
           "includes": [
-            "A finished\ndraft the user writes or pastes",
+            "A finished draft the user writes or pastes",
             "is ready as written: after responding to it,\noffer to publish it as their Thesis"
           ]
         },
