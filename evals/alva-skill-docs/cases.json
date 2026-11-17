@@ -1554,7 +1554,7 @@
         }
       ],
       "includes": [
-        "version: v1.30.1",
+        "version: v1.31.0",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -1623,7 +1623,7 @@
             "Do not call `thesis rewrite` merely to make the first draft",
             "alva thesis asset-candidates --text",
             "--entity-stances",
-            "the user's explicit direction wins",
+            "When the author disagrees with a direction, do not change it",
             "Do not summarize",
             "After creation, `thesis get` is the sole source for the preview",
             "author_version_id",
@@ -1661,7 +1661,7 @@
             "New or changed candidates must be shown in full",
             "A natural confirmation, typed or by action click, authorizes exactly the displayed body and publication details",
             "When `PresentActions` is available, always end the preview with localized `send_prompt` actions",
-            "\"Publish this version\" and \"Edit\", and do not repeat them in prose",
+            "Do not repeat them in prose",
             "also offer it as an `open_url` action",
             "a click has the same meaning as the equivalent typed reply",
             "Without the tool, ask in text",
@@ -2185,12 +2185,11 @@
         {
           "file": "references/thesis.md",
           "includes": [
-            "Identify the assets and the author's directions",
-            "Reuse catalog entity IDs already verified by a tool",
-            "Do not call `asset-candidates` again for verified unchanged assets",
-            "empty without calling extraction",
+            "Identify the assets from the selected body and confirmed conversation context",
+            "Reuse catalog entity IDs already verified by a tool when the asset identity has not changed",
+            "leave entity IDs empty",
             "Only call `alva thesis asset-candidates",
-            "not a required publication step",
+            "read-only fallback for missing IDs or ambiguous mentions",
             "does not identify SMH uniquely",
             "a wording-only edit reuses unchanged verified IDs",
             "Show the preview, then wait for confirmation.",
@@ -2324,7 +2323,7 @@
             "show the candidate as the full [publication preview](#publication-preview) so one confirmation publishes it",
             "Do not explain why confirmation is needed",
             "always end the preview with localized `send_prompt` actions",
-            "show the resulting assets and directions in that preview and send them",
+            "Show the resulting assets and directions, send them",
             "When asked, say so plainly in one or two sentences, then offer what\nremains",
             "follow [Images in a new public Thesis](#images-in-a-new-public-thesis)"
           ]
@@ -2526,6 +2525,50 @@
         "search-profiles",
         "follow-profile",
         "subscriptions profiles"
+      ]
+    },
+    {
+      "id": "target.thesis-return-preview",
+      "group": "target",
+      "target": "corpus",
+      "description": "Publication previews take directions and the return switch from Alva's direction judgment, offer the turn-off action only when asked, publish exactly the previewed directions, and explain returns from thesis return.",
+      "file_includes": [
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "#### Directions and the Thesis return",
+            "--no-discovery",
+            "Pass `--thesis-id` for an Update, even when no ticker remains.",
+            "Publish exactly\n  these, lowercased, in `--entity-stances`.",
+            "If any is `UNKNOWN`",
+            "do not publish",
+            "only when `askSwitch` is\ntrue",
+            "--track-return false",
+            "When the author disagrees with a direction, do not change it",
+            "lastLegRemoved",
+            "THESIS_RETURN_SWITCH_FINAL",
+            "THESIS_RETURN_LAST_LEG",
+            "至少要保留一个看多或看空的标的",
+            "## Thesis return",
+            "alva thesis return --id '<thesis id>' [--detail]",
+            "the total cannot be added up from Update returns",
+            "关闭后发布，这条 thesis 以后不能再开启",
+            "Answer only\nwhat the user asks about; do not volunteer how returns are measured."
+          ],
+          "excludes": [
+            "preserve\nexplicit author direction over a model suggestion",
+            "The user's explicit direction wins",
+            "an edit that\nkeeps the view carries the current directions",
+            "**Entry price**:",
+            "**Refresh**:"
+          ]
+        },
+        {
+          "file": "SKILL.md",
+          "includes": [
+            "[Thesis return](references/thesis.md#thesis-return)"
+          ]
+        }
       ]
     }
   ]
