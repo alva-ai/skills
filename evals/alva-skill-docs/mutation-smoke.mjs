@@ -50,9 +50,23 @@ const MUTATIONS = [
   {
     id: "thesis-verified-assets-no-extraction",
     file: "references/thesis.md",
-    remove: "Do not call `asset-candidates` again for verified unchanged assets.",
-    replacement: "Always call asset-candidates again before publication.",
+    remove: "Reuse catalog entity IDs already verified by a tool when the asset identity has\nnot changed.",
+    replacement: "Always call asset-candidates with discovery again before publication.",
     expectFailedCases: ["target.thesis-reuse-verified-assets"],
+  },
+  {
+    id: "thesis-return-preview-publishes-unjudged",
+    file: "references/thesis.md",
+    remove: "If any is `UNKNOWN`, or the call\n  fails or is rate limited, do not publish",
+    replacement: "If any is unknown, publish anyway",
+    expectFailedCases: ["target.thesis-return-preview"],
+  },
+  {
+    id: "thesis-return-preview-overrides-direction",
+    file: "references/thesis.md",
+    remove: "When the author disagrees with a direction, do not change it",
+    replacement: "When the author disagrees with a direction, use the author's direction",
+    expectFailedCases: ["target.thesis-return-preview", "target.thesis-create-preview-card"],
   },
   {
     id: "thesis-wording-edit-no-extraction",
@@ -127,8 +141,8 @@ const MUTATIONS = [
   {
     id: "thesis-actions-scoped-to-preview",
     file: "references/thesis.md",
-    remove: "\"Edit\", and do not",
-    replacement: "\"Edit\" before the final reply, and do not",
+    remove: "always end the preview with localized\n`send_prompt` actions:",
+    replacement: "send localized `send_prompt` actions before the final reply:",
     expectFailedCases: ["target.thesis-create-preview-card", "target.useful-next-step-actions"],
   },
   {
