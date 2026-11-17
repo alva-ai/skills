@@ -509,8 +509,9 @@ alva thesis return --id '<thesis id>' [--detail]
 
 `thesisReturn` is null when the Thesis is not tracked: its return was turned
 off (`returnTracking` `OFF`), no Update has had a long or short (`UNSET`), or
-no current ticker can be priced. Values are fractions: 0.05 is +5%. Explain with
-these definitions and the returned values only; do not recompute them:
+no current ticker can be priced. Values are fractions: 0.05 is +5%. Answer only
+what the user asks about; do not volunteer how returns are measured. Explain
+with these definitions and the returned values only; do not recompute them:
 
 - **Thesis return** (`value`): the lifetime return. Each Update's long and short
   tickers share its money equally. An Update that keeps the same tickers and
@@ -524,14 +525,6 @@ these definitions and the returned values only; do not recompute them:
 - **Positions** (`--detail`, `updates[].positions`): each ticker's start and
   end price and its return; a short gains when the price falls. `PENDING`
   means the entry price is not in yet.
-- **Entry price**: the open of the first one-minute bar after publication (or
-  after the Update that changed the tickers). US stocks and ETFs include pre-
-  and after-hours, 4:00–20:00 ET; other markets use their regular session; a
-  publication while the market is closed enters at the next open. Before the
-  first entry the return is +0.0% (`live` false).
-- **Refresh**: every five minutes at the latest one-minute price; `--detail`
-  revalues now. A closed market keeps its last price; `stale` means a ticker
-  has not traded for a week.
 
 ## Thesis maintenance controls
 

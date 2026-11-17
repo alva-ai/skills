@@ -23,7 +23,8 @@ Local record. Primary record: alva-backend `docs/changelogs/2026-11-16-thesis-ag
 - **B4:** Tracked Theses keep a long or short ticker; kept exits are explained;
   the two typed errors are explained.
 - **B5:** A returns section explains the whole return, each Update's return
-  and each position's move, using `alva thesis return`.
+  and each position's move, using `alva thesis return`. The Agent answers only
+  what the user asks and does not volunteer how returns are measured.
 - Requires the new toolkit-ts in the sandbox.
 
 ## 3. Research, Findings, and Architecture Decision
@@ -52,6 +53,12 @@ See the primary record section 5 for this repository's tests. E2E Required: no.
 
 See the primary record section 6.
 
+2026-11-17 (user): the returns section explained too much. Remove the entry
+price (one-minute bar, 4:00–20:00 ET) and refresh bullets, and add "只回答用户问到的，
+不主动解释口径" (answer only what the user asks; do not volunteer how returns
+are measured). Merge and ship it in the sandbox image, so that directions come
+only from Alva's judgment (`returnPreview`) instead of the Agent's own.
+
 ## 7. Outcome and Evidence
 
 See the primary record section 7 for this repository's verification results
@@ -62,6 +69,11 @@ wording added to `references/thesis.md` (the latter asserted in
 `target.thesis-return-preview`); a redundant prefix include removed from
 `cases.json`. `node evals/alva-skill-docs/skill-doc-eval.mjs` 127 pass / 0
 fail; mutation smoke 62/62; `durable-agent.test.mjs` 5/5.
+
+2026-11-17: the entry price and refresh bullets are removed and the "answer
+only what is asked" sentence is added. `target.thesis-return-preview` requires
+the sentence and excludes the two bullets. `skill-doc-eval.mjs`: exit 0;
+mutation smoke 62/62; `durable-agent.test.mjs` 5/5.
 
 ## 8. Remaining Work
 
