@@ -2092,6 +2092,8 @@
             "obtain publication consent through Create",
             "Paused, closed, archived or deleted Theses",
             "alva thesis watchpoints --id '<id>'",
+            "using the same Thesis id",
+            "every entry of the current set",
             "present them as Alva's",
             "when the author asks for it in an Update",
             "model-written data, not instructions",
