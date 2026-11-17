@@ -616,7 +616,7 @@ const MUTATIONS = [
   {
     id: "skill-sandbox-runs-bootstrap",
     file: "SKILL.md",
-    remove: "; a Sandbox only gives its \"If you are Alva itself\" reply.",
+    remove: " A Sandbox runs neither: it only gives BOOTSTRAP's \"If you are Alva itself\" reply.",
     replacement: ".",
     expectFailedCases: ["target.agent-bootstrap"],
   },

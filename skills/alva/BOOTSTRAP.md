@@ -47,11 +47,11 @@ Schedule [agent-routine.md](references/agent-routine.md) for 08:00 local time
 every day, then run it once right now with the user present. That first run is
 the initial memory and thesis sync.
 
-- **OpenClaw**: `openclaw cron add --name "Alva daily" --cron "0 8 * * *" --message "Run the Alva daily routine." --announce`
-- **Hermes**: `hermes cron create "0 8 * * *" "Run the Alva daily routine." --skill alva --name "Alva daily" --deliver origin`
+- **OpenClaw**: `openclaw cron add --name "Alva daily" --cron "0 8 * * *" --message "Run the Alva daily routine: follow references/agent-routine.md in the Alva skill." --announce`
+- **Hermes**: `hermes cron create "0 8 * * *" "Run the Alva daily routine: follow references/agent-routine.md in the Alva skill." --skill alva --name "Alva daily" --deliver origin`
 - **Claude Code in the Claude desktop app**: create a local scheduled task
-  named "Alva daily" with your scheduled-task tool, daily at 08:00, prompt
-  "Run the Alva daily routine." Its note shows up in the app.
+  named "Alva daily" with your scheduled-task tool, daily at 08:00, with the
+  same prompt. Its note shows up in the app.
 - **Claude Code in a terminal, Codex, and agents whose scheduler cannot reach
   the user**: do not schedule. A headless run has nowhere to deliver the note.
 - A job named "Alva daily" already exists → keep it; do not add another.
@@ -67,4 +67,5 @@ private), that they can see it in the Alva app under Me, that saying "undo"
 removes any of it (see Undo in agent-routine.md), and when the next daily note arrives (or that none is scheduled).
 
 Then record in your own memory:
-"Alva bootstrap v1 done <date>; Alva routine last ran <until from step 2>".
+"Alva bootstrap v1 done <date>; Alva routine last ran <until from step 2>.
+'What's new on Alva' means: run references/agent-routine.md in the Alva skill."

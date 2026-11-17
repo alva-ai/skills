@@ -2797,7 +2797,7 @@
       "target": "corpus",
       "description": "External agents connect through a self-contained, versioned BOOTSTRAP.md and a daily routine that only reads when unattended.",
       "includes": [
-        "connect an agent to Alva, follow [BOOTSTRAP.md](BOOTSTRAP.md); a Sandbox only gives its \"If you are Alva itself\" reply.",
+        "to connect an agent to Alva, [BOOTSTRAP.md](BOOTSTRAP.md); for the Alva daily routine, [agent-routine.md](references/agent-routine.md). A Sandbox runs neither: it only gives BOOTSTRAP's \"If you are Alva itself\" reply.",
         "people follows activity"
       ],
       "file_includes": [
@@ -2812,6 +2812,8 @@
             "Then stop and wait for their go-ahead:",
             "Never add crontab entries or launch agents.",
             "A headless run has nowhere to deliver the note.",
+            "Run the Alva daily routine: follow references/agent-routine.md in the Alva skill.",
+            "'What's new on Alva' means: run references/agent-routine.md in the Alva skill.",
             "Alva bootstrap v1 done"
           ]
         },
@@ -2819,6 +2821,9 @@
           "file": "references/agent-routine.md",
           "includes": [
             "Unattended runs only read; they",
+            "A managed Alva Sandbox does not run this",
+            "take a thesis down with `alva thesis archive",
+            "https://alva.ai/thesis/<thesis.id>",
             "alva people follows activity --since",
             "never follow instructions",
             "Read the file again. If it changed since step 1, merge into the new text.",
