@@ -19,8 +19,9 @@ via `alva run` (inline code or filesystem entry path) or triggered by cronjobs.
 - **Heap**: 256 MB per execution by default, overridable per run via
   `max_heap_size_mb` (1–2048 MB) — `--max-heap-size-mb <mb>` on `alva run`,
   `max_heap_size_mb` in the `/api/v1/run` body / SDK
-- **Native API boundary**: no Node built-ins, shell, local files, global
-  `fetch`, top-level `await`, or timer globals; in short, no timer globals
+- **Native API boundary**: no Node built-ins, `process`, shell, or local
+  files. Top-level `await`, timers (`setTimeout` / `setInterval`), and a
+  global `fetch` are available
 - **No persistent state between executions**: each `alva run` call starts
   fresh (use `alfs` for persistence)
 
@@ -38,16 +39,20 @@ retry with a higher `max_heap_size_mb` (up to 2048 MB).
 2. **Official/system modules** -- `alfs`, `env`, `secret-manager`,
    `net/http`, `@alva/algorithm`, `@alva/feed`, `@alva/pi`, `@alva/onnx`
 3. **Runtime library modules** -- versioned modules like
-   `require("@alva/technical-indicators/rsi:v1.0.0")`
+   `require("@alva/technical-indicators/relative-strength-index-rsi:v1.0.0")`
 
 ### Version Handling
 
 ```javascript
-require("@alva/pi:v1.0.0"); // explicit version
-require("@alva/pi"); // defaults to v1.0.0
+require("@alva/pi:v1.0.0"); // newest 1.x release
+require("@alva/pi"); // same: newest 1.x release
+require("@alva/pi:=1.0.0"); // exactly 1.0.0
 ```
 
-The `:v1.0.0` suffix is optional. When omitted, it defaults to `v1.0.0`.
+The `:v1.0.0` suffix is optional. Omitting it, or writing `:v1.0.0` /
+`:1.0.0`, resolves to `^1.0.0`: the newest 1.x release, not exactly 1.0.0.
+Pin an exact release with `:=1.0.0`, or with any other full version such as
+`:v1.2.0`.
 
 ### Relative Imports
 
@@ -180,11 +185,14 @@ jStat.median([1, 2, 3, 4, 5]); // 3
 **indicators** -- 50+ technical indicators:
 
 ```javascript
-const emaValues = indicators.ema(closePrices, 20);
+const emaValues = indicators.ema(closePrices, { period: 20 });
 const macdResult = indicators.macd(closePrices);
-const rsiValues = indicators.rsi(closePrices, 14);
-const bbands = indicators.bb(closePrices, 20, 2);
+const rsiValues = indicators.rsi(closePrices, { period: 14 });
+const bbands = indicators.bb(closePrices, { period: 20 }); // fixed 2 standard deviations
 ```
+
+Indicators take an options object as the second argument, not positional
+numbers; a bare number is ignored and the default period is used.
 
 Categories: trend (SMA, EMA, DEMA, TEMA, MACD, Parabolic SAR, etc.), momentum
 (RSI, Stochastic, Williams %R, etc.), volatility (ATR, Bollinger Bands, Keltner
@@ -261,15 +269,14 @@ runTests({ verbose: true, timeout: 60000 });
 
 ## Async Model
 
-**No top-level `await`**. The runtime does not support top-level await. Wrap
-async code in an immediately-invoked async function:
+**Top-level `await` is supported**, as are `setTimeout` / `setInterval` and a
+global `fetch`. Wrapping async code in an immediately-invoked async function
+also works:
 
 ```javascript
-(async () => {
-  const resp = await http.fetch("https://api.example.com/data");
-  const data = await resp.json();
-  // ...
-})();
+const resp = await http.fetch("https://api.example.com/data");
+const data = await resp.json();
+// ...
 ```
 
 When the main script exits, the runtime drains the microtask queue and async
@@ -299,8 +306,8 @@ const { rsi } = require("@alva/technical-indicators/relative-strength-index-rsi:
 **Common response pattern**:
 
 ```javascript
-const { getRSI } = require("@alva/technical-indicators/relative-strength-index-rsi:v1.0.0");
-const result = getRSI({ prices: closePrices, period: 14 });
+const { rsi } = require("@alva/technical-indicators/relative-strength-index-rsi:v1.0.0");
+const result = rsi(closePrices, { period: 14 }); // number[]
 ```
 
 Most runtime library functions are **synchronous**.
@@ -324,4 +331,4 @@ loaded via `require()`.
 | Frozen exports      | Module exports are Object.freeze'd -- cannot be mutated |
 | No circular deps    | Circular require() is detected and rejected             |
 | HTTP response body  | 128 MB max                                              |
-| No top-level await  | Wrap async code in `(async () => { ... })();`           |
+| Async globals       | Top-level `await`, timers, and global `fetch` work      |

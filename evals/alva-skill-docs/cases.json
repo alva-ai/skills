@@ -292,12 +292,12 @@
       "id": "retained.runtime",
       "group": "retained",
       "target": "corpus",
-      "description": "Jagent runtime constraints and heap override remain discoverable.",
+      "description": "Jagent runtime constraints, supported async globals, and heap override remain discoverable.",
       "includes": [
         "JavaScript inside a V8 isolate",
-        "no `process`",
-        "no timer globals",
-        "Top-level `await`",
+        "no Node built-ins, `process`, shell, or local",
+        "Top-level `await` is supported",
+        "global `fetch`",
         "--max-heap-size-mb",
         "256 MB"
       ]
@@ -1295,7 +1295,7 @@
             "HTML that reads feed outputs at runtime",
             "Write HTML and README to ALFS",
             "screenshot",
-            "draft/private"
+            "stop at draft"
           ]
         }
       ]
@@ -2114,7 +2114,7 @@
           "includes": [
             "never use `alva fs grant` to change feed visibility",
             "preserve private access",
-            "explicit draft/private stopping point"
+            "explicit draft-only stopping point"
           ]
         }
       ]
@@ -2627,6 +2627,167 @@
             "[Thesis return](references/thesis.md#thesis-return)"
           ]
         }
+      ]
+    },
+    {
+      "id": "target.runtime-contract-alignment",
+      "group": "target",
+      "target": "corpus",
+      "description": "Runtime-facing references match the jagent, Feed SDK, ALFS, trex and sdkhub contracts: options-object indicators, real module names, ^1.0.0 module defaults, top-level await, grouped-record semantics, flattened reads, millisecond signal dates and current broker venues.",
+      "file_includes": [
+        {
+          "file": "references/jagent-runtime.md",
+          "includes": [
+            "indicators.ema(closePrices, { period: 20 })",
+            "indicators.rsi(closePrices, { period: 14 })",
+            "indicators.bb(closePrices, { period: 20 })",
+            "Indicators take an options object as the second argument",
+            "const { rsi } = require(\"@alva/technical-indicators/relative-strength-index-rsi:v1.0.0\");",
+            "resolves to `^1.0.0`: the newest 1.x release, not exactly 1.0.0",
+            "Pin an exact release with `:=1.0.0`",
+            "**Top-level `await` is supported**"
+          ]
+        },
+        {
+          "file": "references/altra-v1-legacy.md",
+          "includes": [
+            "indicators.rsi(closes, { period: 14 })"
+          ]
+        },
+        {
+          "file": "references/feed-sdk.md",
+          "includes": [
+            "const data = await alfs.readFile(",
+            "**No cross-run accumulation**",
+            "replaces the whole stored\nrow (last writer wins)",
+            "reads flatten grouped rows everywhere"
+          ]
+        },
+        {
+          "file": "references/api/filesystem.md",
+          "includes": [
+            "`@count/{start_ms}..{end_ms}`",
+            "start exclusive, end inclusive",
+            "are flattened on read: CLI, REST, and the Feed SDK"
+          ]
+        },
+        {
+          "file": "references/api/trading.md",
+          "includes": [
+            "`--signal` takes one signal object",
+            "only its **last** element executes",
+            "**`order`** / **`orders`**",
+            "\"date\":1735689600000",
+            "`date` is **Unix milliseconds**",
+            "executes **live, without a dry run**",
+            "dry-run that signal with\n  `alva trading execute --dry-run`",
+            "Default to a paper account"
+          ]
+        },
+        {
+          "file": "references/api/broker.md",
+          "includes": [
+            "Read the venue list and capabilities from `alva broker\ndescribe`",
+            "`webull`",
+            "`ibkr_mcp`"
+          ]
+        }
+      ],
+      "excludes": [
+        "indicators.ema(closePrices, 20)",
+        "indicators.bb(closePrices, 20, 2)",
+        "getRSI(",
+        "@alva/technical-indicators/rsi:v1.0.0",
+        "When omitted, it defaults to `v1.0.0`",
+        "**No top-level `await`**",
+        "Top-level `await` is not supported",
+        "Cross-run accumulation pattern",
+        "consumers don't",
+        "`date` is **epoch seconds**",
+        "takes an array of signal objects"
+      ]
+    },
+    {
+      "id": "target.playbook-publication-alignment",
+      "group": "target",
+      "target": "corpus",
+      "description": "Playbook visibility is set before release, bundled private Feeds are confirmed rather than made public, remix reads the pinned release, and stale CLI commands are gone.",
+      "file_includes": [
+        {
+          "file": "references/playbook-creation.md",
+          "includes": [
+            "### Visibility and bundled Feeds",
+            "set the visibility after the draft and before\nthe release, read it back, then release. Never release publicly first",
+            "alva playbooks set-visibility --name {name} --visibility private",
+            "Tell the user that viewers of the\nPlaybook will receive that Feed's data",
+            "--confirm-bundled-feed-exposure",
+            "Make the Feed itself public only when direct public reads outside the Playbook\nare needed"
+          ]
+        },
+        {
+          "file": "references/feed-lifecycle.md",
+          "includes": [
+            "delivers it to the Playbook's audience while\n   it stays private"
+          ]
+        },
+        {
+          "file": "references/remix-workflow.md",
+          "includes": [
+            "Read the released HTML from `releases[0].layout_html`",
+            "may be an unreleased\ndraft in progress",
+            "/v{feed_major}/src/index.js",
+            "--confirm-bundled-feed-exposure"
+          ]
+        },
+        {
+          "file": "references/deployment.md",
+          "includes": [
+            "`alva playbooks --help`",
+            "There is no CLI Playbook delete"
+          ]
+        },
+        {
+          "file": "references/annotation-edits.md",
+          "includes": [
+            "`new-text`",
+            "`originalText`",
+            "do not write,\ndraft, or release merely because a tag is present",
+            "An annotation is not permission to publish or re-release"
+          ]
+        },
+        {
+          "file": "references/fintwit.md",
+          "includes": [
+            "`createAlvaClient().fs.read({ path: absPath })`"
+          ]
+        },
+        {
+          "file": "references/preflight.md",
+          "includes": [
+            "or the check was skipped",
+            "It reports only a newer published\nrelease"
+          ]
+        },
+        {
+          "file": "references/search.md",
+          "includes": [
+            "at least two thirds of the words (all of one or two)",
+            "`getSerperSearch`"
+          ]
+        }
+      ],
+      "excludes": [
+        "visibility (`public` / `private` / `paid`) applies after\npublication",
+        "alva playbook delete",
+        "alva playbook --help",
+        "alva fs read --path '/alva/home/alice/playbooks/btc-momentum/index.html'",
+        "/feeds/{feed_name}/v1/src/index.js",
+        "fetch(\"$ALVA_ENDPOINT/api/v1/fs/read",
+        "`searchSerper`",
+        "person_commentary",
+        "any of the words; quote a phrase",
+        "expect that post among the results too",
+        "close or delete, verify the requested state"
       ]
     }
   ]

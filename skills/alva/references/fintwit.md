@@ -25,8 +25,10 @@ For public viewpoints, interview passages and related events, also consider
 - **Host user is `zet`.** All paths are public-read under `/alva/home/zet/...`.
   Use **absolute paths** — never `~/` (that resolves to the querying user's home).
 - Read in chat with `alva fs read --path '/alva/home/zet/...'` (no auth needed —
-  data is granted `special:user:*`); from playbook HTML use
-  `fetch("$ALVA_ENDPOINT/api/v1/fs/read?path=" + encodeURIComponent(absPath))`.
+  data is granted `special:user:*`); from playbook HTML use the Alva client,
+  `createAlvaClient().fs.read({ path: absPath })`, per
+  [Browser-Safe Feed Reads](playbook-creation.md#browser-safe-feed-reads) — not
+  a raw `fetch` to `$ALVA_ENDPOINT`.
 - Reads return a JSON array of flat records. Tabular outputs share one timestamp,
   so `@last/1` returns the whole current batch (the search index returns every
   tracked account; a leaderboard board returns its full ranked set).

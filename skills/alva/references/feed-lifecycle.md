@@ -22,7 +22,9 @@ Every feed follows the same path:
 5. Publish the automation with `alva automation publish` using the cronjob id
    from deploy, and record the returned `feed_id`. Publish creates an ACTIVE
    owner alert binding and, by default, starts the producer once.
-6. When a playbook or public user needs the feed, publish its visibility with
+6. A Playbook that bundles the feed delivers it to the Playbook's audience while
+   it stays private ([bundled Feeds](playbook-creation.md#visibility-and-bundled-feeds)).
+   When direct public reads are needed, publish its visibility with
    `alva feed set-visibility --id <feed_id> --visibility public`.
 7. Verify an unauthenticated read of a public feed path returns HTTP 200.
 

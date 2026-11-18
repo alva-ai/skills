@@ -15,8 +15,9 @@ the runtime contract changes. Do not save these constraints for debugging.
 
 ## Runtime
 
-- No `process`, Node.js builtins, timer globals, global `fetch`, or top-level
-  `await` in jagent runtime. Use [jagent-runtime.md](jagent-runtime.md).
+- No `process`, Node.js builtins, shell, or local files in jagent runtime.
+  Top-level `await`, timers, and global `fetch` are available. Use
+  [jagent-runtime.md](jagent-runtime.md).
 - On `ReferenceError: <X> is not defined`, rewrite for the jagent runtime
   instead of retrying the same code.
 - Use `require("net/http")` for HTTP.

@@ -33,10 +33,10 @@ each turn:
 | Intent | Read |
 | --- | --- |
 | Find related arguments, events or counterevidence | `searchItems({query, publishTime: {startTime}, limit})` |
-| Match terms or a phrase | `searchItems({keywordQuery, ...})`: any of the words; quote a phrase that must appear as written |
+| Match terms or a phrase | `searchItems({keywordQuery, ...})`: at least two thirds of the words (all of one or two); quoted phrases must all appear, and the other words only rank |
 | Find material about a company/person | `searchEntities({query, entityTypes?, limit?})`, then `searchItems` with `entities: ["entities/" + entityId]` |
 | Find material credited to a person/publisher | `searchItems` with `attribution: {parties: ["entities/" + entityId]}` |
-| Restrict the kind of source | `sourceCategories`: `x`, `news`, `podcast`, `video` (YouTube), `earnings_call`, `price_target_news`, `person_commentary`, `company_narrative`, `market_narrative`, `pre_earnings_analysis`, `post_earnings_analysis`, `memory_prices` |
+| Restrict the kind of source | `sourceCategories`: `x`, `news`, `podcast`, `video` (YouTube), `earnings_call`, `price_target_news`, `company_narrative`, `market_narrative`, `pre_earnings_analysis`, `post_earnings_analysis`, `memory_prices` |
 | Re-read a result | `batchGetItems({names})` with `item.name`, or `item.revision` for the exact version cited |
 
 Filters combine with AND; `entities`, `parties` and `sourceCategories` each
@@ -91,10 +91,11 @@ registry name and bio of the credited parties. `evidence[0].passage` is the
 best-matching passage; read it with `resolvePassageText(item, passage)`.
 `similarity` is the cosine of a semantic query, with no floor: a low score is a
 weak match, judged by reading the passage. A keyword result sets
-`matchedKeywords`. Copies and pure reposts arrive as one result. A passage of
-`kind: "reference"` is from a post the item quotes, replies to or reposts
-(`contextReferences`), not the item's own words: attribute it to that post's
-author, and expect that post among the results too. Use the
+`matchedKeywords`. Copies arrive as one result, and so do the items whose best
+passage is the text of one post they quote, reply to or repost, with that post.
+A passage of `kind: "reference"` is from a post the item quotes, replies to or
+reposts (`contextReferences`), not the item's own words: attribute it to that
+post's author. Use the
 current conversation model to select and reason over relevant passages; read
 more when it would affect the answer. A transcript can exceed 100 KB: select in
 the script before returning it, keeping the passage, enough surrounding turns
@@ -166,7 +167,7 @@ do not use Worldline to bypass the existing permission or credential boundaries.
 | SDK | Module | Best for |
 | --- | ------ | -------- |
 | `searchPerplexityFinance` | `@arrays/data/search/search-perplexity-finance:v1.0.0` | Non-US equities outside the curated Data Skills set (and market breadth); fallback for off-catalog asset classes and other structured-SDK gaps |
-| `searchSerper` | `@arrays/data/search/serper-search:v1.0.0` | Google index: News, YouTube, Reddit, Web |
+| `getSerperSearch` | `@arrays/data/search/serper-search:v1.0.0` | Google index: News, YouTube, Reddit, Web |
 | `searchBrave` | `@arrays/data/search/search-brave:v1.0.0` | Independent index, good Reddit coverage |
 | `scrapeUrl` | `@arrays/data/search/scrape-url:v1.0.0` | Scrape any page to markdown for enrichment |
 
@@ -230,7 +231,7 @@ the original before citing its contents.
 
 ### News
 
-- **Search**: `searchSerper` with `type:"news"` or `searchBrave` with a `freshness` filter; add the other when coverage is insufficient
+- **Search**: `getSerperSearch` with `type:"news"` or `searchBrave` with a `freshness` filter; add the other when coverage is insufficient
 - **Enrich**: Optional — `scrapeUrl` for full article text
 - **Signals**: Freshness (time-based), source authority (domain)
 - **Gotcha**: Serper `date` is index/observed time, NOT publish time — do not use as published_at. Brave `description` may contain `<strong>` HTML tags — strip before display. Brave `age` field (e.g. "18 hours ago") is more reliable for recency.
@@ -239,7 +240,7 @@ the original before citing its contents.
 
 ### Reddit
 
-- **Search**: `searchSerper` or `searchBrave` with `site:reddit.com`
+- **Search**: `getSerperSearch` or `searchBrave` with `site:reddit.com`
 - **Enrich**: Append `.json` to post URL → `scrapeUrl` → regex extract `score`, `num_comments`, `created_utc`
 - **Signals**: `score`, `num_comments`, `created_utc` (real publish time, seconds → ×1000 for ms)
 - **URL filter**: Only accept `/r/{sub}/comments/` URLs (detail pages). Drop subreddit homepages, user profiles.
@@ -247,7 +248,7 @@ the original before citing its contents.
 
 ### YouTube
 
-- **Search**: `searchSerper` or `searchBrave` with `site:youtube.com`
+- **Search**: `getSerperSearch` or `searchBrave` with `site:youtube.com`
 - **Enrich**: `scrapeUrl` the watch page → regex extract views/likes. Thumbnails: `https://img.youtube.com/vi/{VIDEO_ID}/mqdefault.jpg`
 - **Signals**: `views`, `likes`
 - **URL filter**: Only accept `/watch?v=`, `/shorts/`, `youtu.be/{id}`. Drop channel pages, playlists.
@@ -274,7 +275,7 @@ the original before citing its contents.
 
 ### General Web
 
-- **Search**: `searchSerper` or `searchBrave` (no site filter)
+- **Search**: `getSerperSearch` or `searchBrave` (no site filter)
 - **Enrich**: `scrapeUrl` for content extraction
 - **Signals**: Search rank position, freshness
 

@@ -802,7 +802,7 @@ const alfs = require("alfs");
 const env = require("env");
 const home = "/alva/home/" + env.username;
 
-const data = alfs.readFile(
+const data = await alfs.readFile(
   home + "/feeds/btc-ema/v1/data/metrics/prices/@last/100",
 );
 const points = JSON.parse(data);
@@ -843,26 +843,30 @@ public-only fallback that breaks when the playbook is set private. See [Browser-
 
 ## Grouped Records (Multi-Record Per Date)
 
-`append()` transparently groups same-date records. If you pass records with the
-same `date`, they are automatically stored as `{date, items: [{...}, {...}]}`.
-On read, the SDK auto-flattens these back into individual flat records.
+`append()` transparently groups same-date records **within one call**. If you
+pass records with the same `date` in one `append()`, they are stored as one
+grouped row. On read, they are flattened back into individual flat records.
 
-**Cross-run accumulation pattern**: A common use case is an hourly cronjob that
-aggregates highlights by day. Each run appends one record per day; multiple runs
-produce multiple records for the same date. They are grouped in storage and
-flattened when read:
+**No cross-run accumulation**: grouping happens only inside a single
+`append()`. A later `append()` at the same `date` replaces the whole stored
+row (last writer wins), so an hourly run appending one highlight per day keeps
+only the latest highlight. To accumulate, read the existing records for that
+date, merge, and append the full set in one call:
 
 ```javascript
-// Hourly cronjob: append one highlight per run
-await ctx.self
-  .ts("metrics", "highlights")
-  .append([{ date: startOfDay(today), highlight: "Price spike at 14:00 UTC" }]);
-// Next run adds another record for the same date; both are grouped and auto-flattened on read.
+// Hourly cronjob: keep every highlight of the day
+const ts = ctx.self.ts("metrics", "highlights");
+const day = startOfDay(today);
+const existing = (await ts.range(day - 1, day)).filter((r) => r.date === day);
+await ts.append([
+  ...existing,
+  { date: day, highlight: "Price spike at 14:00 UTC" },
+]);
 ```
 
-**CLI / REST vs SDK**: The CLI (and REST API) returns raw values—for grouped
-rows, `{date, items: [...]}`. The SDK auto-flattens grouped records into
-individual flat records when using `last()`, `first()`, `range()`, etc.
+**CLI / REST vs SDK**: reads flatten grouped rows everywhere. The CLI, REST
+API, and SDK (`last()`, `first()`, `range()`, etc.) all return individual flat
+records.
 
 **Limit behavior**: The `limit` parameter in `last()`, `first()`, etc. applies
 to unique timestamps (DB rows), not individual records after auto-flatten. A
@@ -1000,8 +1004,8 @@ alva fs read --path '/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last
   like `"metrics"`, `"signals"`, `"market"`.
 - **Records must be in ascending date order**. `append()` auto-sorts, but
   providing pre-sorted data is more efficient.
-- **Same-date records are grouped**. If you `append()` records sharing the same
-  `date`, they are transparently stored as a grouped record. On read, they are
+- **Same-date records are grouped**. If one `append()` call passes records
+  sharing the same `date`, they are transparently stored as a grouped record. On read, they are
   auto-flattened back into individual records.
 - **Limit applies to timestamps, not records**. `last(5)` fetches 5 unique
   timestamps. Grouped timestamps expand to multiple records after auto-flatten,
@@ -1012,8 +1016,8 @@ alva fs read --path '/alva/home/alice/feeds/btc-ema/v1/data/metrics/prices/@last
 - **`feedPath()` requires `env.username`**. It reads from
   `require("env").username` internally, which is available in the jagent
   runtime.
-- **Top-level `await` is not supported**. Wrap feed logic in
-  `(async () => { ... })();`.
+- **Top-level `await` is supported**. Wrapping feed logic in
+  `(async () => { ... })();` also works.
 - **`@last` returns chronological (oldest-first) order**, consistent with
   `first()` and `range()`. No manual sorting needed.
 - **`search()` needs `index()`**. Appending does not index anything, and
