@@ -248,6 +248,23 @@
       ]
     },
     {
+      "id": "target.thesis-write-card-preview",
+      "group": "target",
+      "target": "corpus",
+      "description": "Every created or updated Thesis, including one from a background task, is reported with the thesis-preview block on lines of its own, falling back to a standalone link without query parameters, and never only as a link inside a sentence.",
+      "file_includes": [
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "A published Update ends the same way: after `update` succeeds, read it with\n`thesis get` and emit this block for the new `author_version_id`.",
+            "In a background task, the task's final result must contain the block for\n  every Thesis the task created or updated",
+            "Put each block on lines of its own after the sentence that reports the\n  result",
+            "Never report a created or updated Thesis only as a link inside a sentence"
+          ]
+        }
+      ]
+    },
+    {
       "id": "target.feed-semantic-search",
       "group": "target",
       "target": "corpus",
@@ -1585,7 +1602,7 @@
         }
       ],
       "includes": [
-        "version: v1.32.0",
+        "version: v1.32.1",
         "Capability Help",
         "feedback",
         "api/feedback.md",

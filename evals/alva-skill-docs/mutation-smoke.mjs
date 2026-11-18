@@ -117,6 +117,20 @@ const MUTATIONS = [
     expectFailedCases: ["target.thesis-read-card-links"],
   },
   {
+    id: "thesis-update-without-preview",
+    file: "references/thesis.md",
+    remove: "A published Update ends the same way: after `update` succeeds, read it with\n`thesis get` and emit this block for the new `author_version_id`.",
+    replacement: "After an Update, confirm it in a sentence with a link to the Thesis.",
+    expectFailedCases: ["target.thesis-write-card-preview"],
+  },
+  {
+    id: "thesis-task-result-without-preview",
+    file: "references/thesis.md",
+    remove: "In a background task, the task's final result must contain the block for\n  every Thesis the task created or updated",
+    replacement: "In a background task, the task's final result may summarize each Thesis\n  the task created or updated",
+    expectFailedCases: ["target.thesis-write-card-preview"],
+  },
+  {
     id: "feed-search-mixed-fields",
     file: "references/feed-sdk.md",
     remove: "Use the same `fields` for every `index()` call on an\n  output.",

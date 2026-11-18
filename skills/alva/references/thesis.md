@@ -465,6 +465,24 @@ URL is available and `PresentActions` is supported, also offer it as an
 `open_url` action; otherwise use the existing preview card without inventing a
 URL.
 
+A published Update ends the same way: after `update` succeeds, read it with
+`thesis get` and emit this block for the new `author_version_id`.
+
+The block is how the Alva App shows the Thesis card, so every created or
+updated Thesis must be reported with it:
+
+- Put each block on lines of its own after the sentence that reports the
+  result, one block per Thesis, never inside a sentence, list item, quote, or
+  code fence.
+- In a background task, the task's final result must contain the block for
+  every Thesis the task created or updated, in addition to the summary of
+  what it did. The main chat relays that block as written.
+- Only when the block cannot be emitted (incomplete GET data), put
+  `[short label](https://alva.ai/thesis/<response.thesis.id>)` on a line of
+  its own instead, with no query parameters.
+- Never report a created or updated Thesis only as a link inside a sentence:
+  the App leaves such a link as text and shows no card.
+
 ## Rewrite
 
 Rewrite only when explicitly requested. It returns a candidate and never
@@ -518,7 +536,9 @@ into the body.
   report the limitation; never drop directions to make an update succeed.
   Verify returned directions.
   Omitting optional fields clears
-  them; never default an existing private Thesis to public.
+  them; never default an existing private Thesis to public. Report a
+  published Update with the preview block from
+  [Created Thesis preview](#created-thesis-preview).
 
 ## Thesis return
 
