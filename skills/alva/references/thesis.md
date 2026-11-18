@@ -337,9 +337,9 @@ Present the preview in the user's language:
 - **Title**, when present, and **visibility** (public by default).
 - **Assets:** name each company or ticker with its `returnPreview` direction.
   Use localized direction labels: “看多 / 看空 / 不计收益” in Chinese, “Long / Short / Not tracked” in English
-  (`NONE` is not tracked). For a kept exit: “NVDA：看多（正文没有明确改方向，方向保持不变；要变成无方向，请去掉这个标的）”
-  / “NVDA: Long (the body does not clearly change it, so its direction stays;
-  remove the ticker to have no direction)”.
+  (`NONE` is not tracked). For a kept exit: “NVDA：看多（正文没有明确改方向，方向保持不变）”
+  / “NVDA: Long (the body does not clearly change it, so its direction
+  stays)”.
 - **Thesis return**, only when `askSwitch` is true: “Thesis return：默认开启。关闭后发布，这条 thesis 以后不能再开启。”
   / “Thesis return: on by default. If you publish with it off, it can't be
   turned on for this thesis later.”
