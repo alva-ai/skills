@@ -579,8 +579,8 @@ with these definitions and the returned values only; do not recompute them:
   closes every position at that moment and splits the total equally again. The
   segments chain, so the total cannot be added up from Update returns. An
   Update with no long or short, or archiving the Thesis, holds the return at
-  its value; a later Update with a long or short, also the one that unarchives
-  the Thesis, starts it moving again.
+  its value; a later Update with a long or short, including the one that
+  unarchives the Thesis, starts it moving again.
 - **Update return** (`--detail`, `updates[].updateReturn`): that Update's
   tickers, equally weighted, from its prices to the next Update's (the latest
   Update runs to now). It is shown on its own and never adds to the Thesis
