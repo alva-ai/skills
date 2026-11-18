@@ -117,6 +117,20 @@ const MUTATIONS = [
     expectFailedCases: ["target.thesis-read-card-links"],
   },
   {
+    id: "thesis-read-link-without-paragraph",
+    file: "references/thesis.md",
+    remove: "Put a blank line before and after each link, including between successive\nlinks, so every link is its own Markdown paragraph.",
+    replacement: "A single newline is enough before each link.",
+    expectFailedCases: ["target.thesis-read-card-links"],
+  },
+  {
+    id: "thesis-fallback-link-without-paragraph",
+    file: "references/thesis.md",
+    remove: "Keep each link in its own Markdown paragraph, with a blank line before\n  and after each link, including between successive links.",
+    replacement: "A single newline is enough before each fallback link.",
+    expectFailedCases: ["target.thesis-write-card-preview"],
+  },
+  {
     id: "thesis-update-without-preview",
     file: "references/thesis.md",
     remove: "A published Update ends the same way: after `update` succeeds, read it with\n`thesis get` and emit this block for the new `author_version_id`.",
