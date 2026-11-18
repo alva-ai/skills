@@ -394,8 +394,10 @@ If publishing fails with reason `THESIS_RETURN_SWITCH_FINAL`, say “这条 thes
 的收益开关已经确定，不能再改。” / "This thesis's return setting is final and
 can't be changed."; with `THESIS_RETURN_LAST_LEG`, say
 “这条 thesis 正在计收益，至少要保留一个看多或看空的标的。” / "This thesis tracks a
-return, so it must keep at least one long or short ticker.". Then preview
-again; never retry unchanged.
+return, so it must keep at least one long or short ticker."; with
+`THESIS_ARCHIVED`, say “这条 thesis 已归档，发布这条 Update 会同时取消归档。” /
+"This thesis is archived; publishing this Update also unarchives it." and
+preview it with `--archived false`. Then preview again; never retry unchanged.
 An old button does not authorize a changed candidate, and repeated approval of
 an already completed creation must not create another Thesis; verify its
 existing ID.
@@ -577,7 +579,8 @@ with these definitions and the returned values only; do not recompute them:
   closes every position at that moment and splits the total equally again. The
   segments chain, so the total cannot be added up from Update returns. An
   Update with no long or short, or archiving the Thesis, holds the return at
-  its value; a later long or short, or restoring it, starts moving again.
+  its value; a later Update with a long or short, also the one that unarchives
+  the Thesis, starts it moving again.
 - **Update return** (`--detail`, `updates[].updateReturn`): that Update's
   tickers, equally weighted, from its prices to the next Update's (the latest
   Update runs to now). It is shown on its own and never adds to the Thesis
@@ -588,9 +591,14 @@ with these definitions and the returned values only; do not recompute them:
 
 ## Thesis maintenance controls
 
-For explicit archive/restore, bookmark, or managed Signal research changes, use
-the corresponding Thesis CLI command and report its returned state. Read
+For explicit archive, bookmark, or managed Signal research changes, use the
+corresponding Thesis CLI command and report its returned state. Read
 alva thesis --help for detailed concurrency, idempotency, and error rules.
+
+Unarchiving is publishing an Update; an archived Thesis takes no other Update.
+To restore one, publish an Update with `--archived false` through the normal
+Update preview; it may keep the current text, tickers and directions. Never run
+`thesis restore`, even where an older CLI still lists it.
 
 Report version conflicts instead of silently rereading and overwriting. Never
 pass `--editorial`, even where an older CLI still accepts it: editing the
@@ -601,8 +609,8 @@ through `update` as a new Update.
 
 Alva cannot close or delete a Thesis or remove a published Update; every
 published Update stays on the record. When asked, say so plainly in one or two sentences, then offer what
-remains: archiving hides the Thesis and can be restored, or a new Update can
-state the changed view. Do not run close or delete commands, even where an
+remains: archiving hides the Thesis until an Update restores it, or a new Update
+can state the changed view. Do not run close or delete commands, even where an
 older CLI still lists them. Abandoning an unpublished draft needs no call.
 Never imitate closing or deletion by rewriting the body or dropping assets or
 directions.

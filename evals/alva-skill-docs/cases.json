@@ -1604,7 +1604,7 @@
         }
       ],
       "includes": [
-        "version: v1.32.2",
+        "version: v1.32.3",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -2322,7 +2322,9 @@
             "explain the limitation instead of inserting image links into the body",
             "Alva cannot close or delete a Thesis or remove a published Update",
             "say so plainly in one or two sentences",
-            "archiving hides the Thesis and can be restored, or a new Update can\nstate the changed view",
+            "archiving hides the Thesis until an Update restores it, or a new Update\ncan state the changed view",
+            "Unarchiving is publishing an Update; an archived Thesis takes no other Update.",
+            "`--archived false`",
             "Do not run close or delete commands, even where an\nolder CLI still lists them",
             "Abandoning an unpublished draft needs no call",
             "Never imitate closing or deletion by rewriting the body",
@@ -2607,6 +2609,8 @@
             "THESIS_RETURN_SWITCH_FINAL",
             "THESIS_RETURN_LAST_LEG",
             "至少要保留一个看多或看空的标的",
+            "THESIS_ARCHIVED",
+            "发布这条 Update 会同时取消归档",
             "publishes like any other Update",
             "## Thesis return",
             "alva thesis return --id '<thesis id>' [--detail]",

@@ -1026,7 +1026,7 @@
             "includes": [
               "Alva cannot close or delete a Thesis or remove a published Update",
               "say so plainly in one or two sentences",
-              "archiving hides the Thesis and can be restored",
+              "archiving hides the Thesis until an Update restores it",
               "a new Update can state the changed view",
               "Do not run close or delete commands",
               "Never imitate closing or deletion by rewriting the body"
