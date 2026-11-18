@@ -2607,7 +2607,7 @@
             "THESIS_RETURN_SWITCH_FINAL",
             "THESIS_RETURN_LAST_LEG",
             "至少要保留一个看多或看空的标的",
-            "这次更新后没有看多或看空的标的",
+            "publishes like any other Update",
             "## Thesis return",
             "alva thesis return --id '<thesis id>' [--detail]",
             "the total cannot be added up from Update returns",

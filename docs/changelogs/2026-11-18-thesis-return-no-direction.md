@@ -12,8 +12,9 @@ Product decision (2026-11-18): having no direction is a view. alva-ai/alva-backe
 publishes an Update that leaves no long or short ticker, and holds the return
 at its value until a later Update adds one; archiving does the same.
 
-- B1: `lastLegRemoved` true → the preview shows a "No direction" line and the
-  author may confirm; no wording about positions, closing or selling.
+- B1: `lastLegRemoved` true → the Update publishes like any other: no
+  separate confirmation, no explanation unless asked (Zet: removing a ticker is
+  already the author's explicit choice).
 - B2: a kept exit (`keptEntityIds`) explains that only removing the ticker
   leaves no direction.
 - B3: the Thesis return definitions say an Update with no direction or an
@@ -23,12 +24,13 @@ at its value until a later Update adds one; archiving does the same.
 
 ## 3. Research, Findings, and Architecture Decision
 
-The editors confirm in the same words (alva-ai/frontend-monorepo#5571).
+The editors likewise publish it without a confirmation
+(alva-ai/frontend-monorepo#5571).
 
 ## 4. Implementation Design
 
 `references/thesis.md` (Directions and the Thesis return, preview, Thesis
-return); `SKILL.md` version v1.32.2; the eval case pins the new line.
+return); `SKILL.md` version v1.32.2; the eval case pins the new rule.
 
 ## 5. Verification and E2E Design
 
@@ -37,7 +39,7 @@ claimed.
 
 ## 6. Human Decisions and Interaction
 
-Zet: say "no direction" to users, never positions.
+Zet: no confirmation step; say "no direction" to users, never positions.
 
 ## 7. Outcome and Evidence
 

@@ -310,9 +310,9 @@ Pass `--thesis-id` for an Update, even when no ticker remains. Read only
   body exits them: a direction judged from the text never takes away the last
   long or short; only removing the ticker does. Say so next to the ticker.
 - `lastLegRemoved`: after this Update the Thesis has no long or short ticker,
-  so its return stops moving and holds at its current value until a later
-  Update adds one. It can be published: show the No direction line below and
-  let the author confirm, or keep or add a ticker instead.
+  so its return holds at its current value until a later Update adds one. It
+  publishes like any other Update; do not ask for a separate confirmation or
+  explain it unless asked.
 - `tracking`: `UNSET`, `ON` or `OFF`. `ON` and `OFF` are permanent.
 
 When the author disagrees with a direction, do not change it: suggest stating
@@ -340,10 +340,6 @@ Present the preview in the user's language:
   (`NONE` is not tracked). For a kept exit: “NVDA：看多（正文没有明确改方向，方向保持不变；要变成无方向，请去掉这个标的）”
   / “NVDA: Long (the body does not clearly change it, so its direction stays;
   remove the ticker to have no direction)”.
-- **No direction**, only when `lastLegRemoved` is true: “这次更新后没有看多或看空的标的，Thesis return 会停在现在的数字，之后加回方向会继续计算。”
-  / “This update has no long or short ticker, so the Thesis return stays at
-  its current value until a later update adds one.” Never describe it as
-  closing or selling a position.
 - **Thesis return**, only when `askSwitch` is true: “Thesis return：默认开启。关闭后发布，这条 thesis 以后不能再开启。”
   / “Thesis return: on by default. If you publish with it off, it can't be
   turned on for this thesis later.”
