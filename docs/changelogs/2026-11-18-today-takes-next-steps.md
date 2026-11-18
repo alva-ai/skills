@@ -94,7 +94,7 @@ idempotent text. B6: enum roundtrip, eligibility and idempotent Markets
 dispatch. B3: existing client test/type checks and focused rendered verification
 where tooling exists; report missing native/web prerequisites distinctly.
 
-Commands: Node --test steward_today_run.test.mjs and adjacent Brief suites;
+Commands: node --test steward_today_run.test.mjs and adjacent Brief suites;
 ENV=test TZ=UTC GOMAXPROCS=4 GOFLAGS=-p=2 go test affected packages; make repos;
 make -C api proto; pinned make lint-fix (inspect unrelated churn). SDK package
 and manifest tests/build-artifact; public Skills checks; Gateway make gql-gen,
@@ -122,9 +122,13 @@ explicitly retained. Public Skill advances to v1.32.3.
 regression validation of existing durable-agent guidance, not behavioral proof
 of a live Thesis write. The changed Thesis workflow and adjacent authorship,
 publication, update and preview rules were manually reviewed for consistency.
+Full offline doc regression `node evals/alva-skill-docs/skill-doc-eval.mjs
+--skill-dir skills/alva`: 131 cases, 1591 checks PASS; mutation smoke: 78/78 PASS.
+The version fixture was updated to v1.32.3 together with the manifest; its stale
+v1.32.2 assertion caused the first CI failure. No behavioral assertion was removed.
 `git diff --check`: PASS.
 
-Main agent completed six serial passes over the final net diff: behavior/scope,
+Main agent restarted and completed six serial passes after the version-fixture fix over the final net diff: behavior/scope,
 ownership and retry boundaries, test quality, source/authentication and mixed
 version safety, rollout/rollback, then documentation. No unresolved in-scope
 finding remains. This is deterministic/doc validation, not a model-quality or
