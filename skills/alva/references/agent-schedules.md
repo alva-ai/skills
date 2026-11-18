@@ -143,6 +143,9 @@ per-order user confirmation when all of these hold:
 1. The user explicitly granted it in their own typed reply (never an action
    button), and the Schedule `--message` (or legacy Loop goal) carries
    `[auto-trade-consent: granted <ISO8601-UTC> record=~/memory/auto-trade-consent.md]`.
+   Before creating the Schedule, write that record to
+   `~/memory/auto-trade-consent.md`: `granted_at`, the Schedule name, the
+   account, and the scope in the user's own words.
 2. The occurrence's one-read verification finds that record. Verification
    checks only that the consent record exists: the timestamp is provenance, not
    a match key, and a differing `granted_at` after re-grant is not a mismatch.

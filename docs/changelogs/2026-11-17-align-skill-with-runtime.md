@@ -87,6 +87,10 @@
 - `references/preflight.md`, `scripts/version_check.sh`: `sort -V` comparison
   (newer only), record `last_check` after fetch and compare, documented silent
   cases.
+- `references/agent-schedules.md`: tell the Agent to write
+  `~/memory/auto-trade-consent.md` before creating a consent-bearing Schedule;
+  occurrences already required that record, but nothing created it, so
+  consented auto-trading always failed closed.
 - `SKILL.md`: drop "close or delete" from the Thesis verify sentence and
   "draft/private" stopping; version v1.32.1.
 - `evals/alva-skill-docs`: new `target.runtime-contract-alignment` and
