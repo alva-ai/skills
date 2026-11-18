@@ -14,3 +14,12 @@
 - 11-17（哥定：Claude 和 Codex 都有桌面 App）：定时规则按能力写：有定时任务的桌面 App（Claude、Codex）用 App 自带的定时任务或 automation 工具建「Alva daily」，会话里没有这个工具就告诉用户在 App 哪里加并给出提示词；终端会话（Claude Code、Codex CLI）不建。Sandbox 守卫回复里的「Claude Code or Codex」改为「Claude or Codex」。Codex 桌面 App 的建法未实测（本机没有 Codex App）。doc eval 无失败，mutation smoke 73/73。
 - 11-17：App 里复制提示词都发生在手机上，用户可能直接粘给手机上的聊天 AI。BOOTSTRAP 在 Sandbox 守卫后加一条：跑不了命令（聊天 App、手机上的 agent）就什么都不做，一两句话告诉用户要发给电脑上能跑命令的 agent（如 Claude、Codex）。App 提示词同步加一句（手机 AI 拿不到 skill，只能靠提示词本身）。doc eval 无失败，mutation smoke 74/74（新增 `bootstrap-no-shell-guard`）。
 - 11-17：外部 agent 按 BOOTSTRAP「不需要 skill 其他部分」只读 routine，`memory.md` 的外部 agent 规则和 `thesis.md` 的发布规则都够不到。routine 补齐要点：记忆只认用户自己说的（推断、重复行为不算）、补「Action preferences」、旧 `Investment Thesis` 分区并入 Investment Thoughts、记忆里只留观点短句加 Thesis 链接；Thesis 候选按作者/编辑分工写正文（首行标的+方向+理由、约 50 词、不加己见，己见放 Notes），标的用 `thesis list --ticker` 核 ID，方向用 `asset-candidates --no-discovery` 判，`UNKNOWN` 或失败就这次不提；确认时展示全文、每个标的方向和 Notes；发布改用 `--entity-ids` + `--entity-stances`（去掉 `--tickers` 和 `--title`），发后 `thesis get` 核对方向。`memory.md` 外部 agent 一节改为指向 routine。doc eval 无失败，mutation smoke 75/75（新增 `routine-thesis-unknown-direction`），durable-agent 5/5。
+- 11-18（哥要求查证 Grok bot 后改）：Grok bot（xAI，2026-08）和 Muse（Meta，2026-09）都跑在自己的云端电脑上，用户在手机上就能把提示词发给它们，原文案「电脑上的 agent」对它们不成立。BOOTSTRAP 改动：
+  - 跑不了命令的守卫改为「没有自己电脑的聊天 App」，回复改为「需要能跑命令的 agent，比如电脑上的 Claude、Codex，或 Grok bot」。
+  - 新增一段：有云端电脑的 agent 在那台电脑上做全部步骤，没有本地历史对话，用自己的记忆。
+  - 开场：「读这台电脑上的对话」改为「读你有的历史对话」；「持仓留在这台电脑」改为「持仓、余额、账户信息不会发给 Alva」。
+  - 登录：用户看不到这台电脑屏幕时（云端电脑、远程机器）用 `alva auth login --no-browser`，把链接发给用户，用户在自己设备登录后把页面上的 code 发回，命令保持运行时输入。
+  - 定时：新增 Grok bot 用 Routine 建「Alva daily」，结果出现在对话里。
+  - Sandbox 守卫回复改为「从 Alva App 的 Me 复制」（新旧 App 都成立），示例 agent 加 Grok bot、Muse。
+  - routine 来源列表补「云端 agent 没有这些文件，用自己的记忆」。
+  - eval：`retained.search-routing` 原先排除整个「Grok」字样，用来防止 X 搜索走 Grok；现在 agent 名字里合法出现 Grok bot，排除项改为原来的搜索写法（`X/Grok`、`/ Grok`、`searchGrokX`、`search-grok-x`）。新增 mutation `bootstrap-cloud-login`。doc eval 无失败，mutation smoke 76/76，durable-agent 5/5。Muse 是否能跑命令、`npx skills add` 能否装进 Grok bot 和 Muse 都没实测。

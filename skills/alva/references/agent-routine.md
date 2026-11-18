@@ -18,6 +18,8 @@ newest first; stop once you have enough to fill the confirmation):
   - Hermes: `~/.hermes/state.db`, `~/.hermes/memories/USER.md` and `MEMORY.md`
   - OpenClaw: the workspace `MEMORY.md` and `memory/*.md`,
     `~/.openclaw/memory/main.sqlite`
+- An agent on its own cloud computer (Grok bot, for example) has none of these
+  files: use your own memory of the user.
 - Reading is refused or nothing is found → use your memory and the current
   conversation. On a first run with little to go on, ask three questions: which
   markets, how long they usually hold, what they believe right now.

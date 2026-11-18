@@ -609,7 +609,7 @@ const MUTATIONS = [
   {
     id: "bootstrap-no-shell-guard",
     file: "BOOTSTRAP.md",
-    remove: "this setup needs an AI agent on their computer that can run commands, such as",
+    remove: "this setup needs an AI agent that can run commands, such as Claude or Codex on",
     replacement: "try the steps anyway, such as",
     expectFailedCases: ["target.agent-bootstrap"],
   },
@@ -618,6 +618,13 @@ const MUTATIONS = [
     file: "references/agent-routine.md",
     remove: "Any `UNKNOWN`, or the call fails → do",
     replacement: "Any `UNKNOWN` → publish it anyway, and do",
+    expectFailedCases: ["target.agent-bootstrap"],
+  },
+  {
+    id: "bootstrap-cloud-login",
+    file: "BOOTSTRAP.md",
+    remove: "use `alva auth login --no-browser` instead: send them the",
+    replacement: "open a browser on this computer anyway and send them the",
     expectFailedCases: ["target.agent-bootstrap"],
   },
   {

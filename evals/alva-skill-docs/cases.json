@@ -185,7 +185,9 @@
         }
       ],
       "excludes": [
-        "Grok",
+        "X/Grok",
+        "/ Grok",
+        "searchGrokX",
         "search-grok-x",
         "x/live-search",
         "include:nativeretweets"
@@ -2807,11 +2809,13 @@
             "version: 1",
             "**If you are Alva itself** (a managed Alva Sandbox, where the skill's Runtime",
             "do not run any of this: no setup, schedule, routine or",
-            "Connect your AI in the Alva app and send it there",
+            "Me in the Alva app and send it there; Alva already keeps their memory here.",
             "You'll show everything before anything is saved.",
             "Then stop and wait for their go-ahead:",
-            "**If you cannot run shell commands here** (a chat app, or an agent on a phone),",
-            "this setup needs an AI agent on their computer that can run commands, such as",
+            "**If you cannot run shell commands** (a chat app with no computer of its own),",
+            "this setup needs an AI agent that can run commands, such as Claude or Codex on",
+            "use `alva auth login --no-browser` instead: send them the",
+            "- **Grok bot**: create a Routine named \"Alva daily\", every day at 08:00, with",
             "Never add crontab entries or launch agents.",
             "A headless run has nowhere to deliver the note.",
             "Run the Alva daily routine: follow references/agent-routine.md in the Alva skill.",
