@@ -307,11 +307,12 @@ Pass `--thesis-id` for an Update, even when no ticker remains. Read only
   judged just now and offer to try again.
 - `askSwitch`: show the Thesis return line and the turn-off action (below).
 - `keptEntityIds`: these tickers keep their previous direction although the
-  body exits them, because a Thesis that tracks its return keeps a long or
-  short ticker. Say so next to the ticker.
-- `lastLegRemoved`: publishing would be rejected. Do not offer to publish;
-  explain that a Thesis that tracks its return keeps at least one long or
-  short ticker, and ask which ticker to keep or add.
+  body exits them: a direction judged from the text never takes away the last
+  long or short; only removing the ticker does. Say so next to the ticker.
+- `lastLegRemoved`: after this Update the Thesis has no long or short ticker,
+  so its return holds at its current value until a later Update adds one. It
+  publishes like any other Update; do not ask for a separate confirmation or
+  explain it unless asked.
 - `tracking`: `UNSET`, `ON` or `OFF`. `ON` and `OFF` are permanent.
 
 When the author disagrees with a direction, do not change it: suggest stating
@@ -336,9 +337,9 @@ Present the preview in the user's language:
 - **Title**, when present, and **visibility** (public by default).
 - **Assets:** name each company or ticker with its `returnPreview` direction.
   Use localized direction labels: “看多 / 看空 / 不计收益” in Chinese, “Long / Short / Not tracked” in English
-  (`NONE` is not tracked). For a kept exit: “NVDA：看多（正文写了平仓，但这是最后一个计收益的标的，方向保持不变）”
-  / “NVDA: Long (the body exits it, but it is the last tracked ticker, so its
-  direction stays)”.
+  (`NONE` is not tracked). For a kept exit: “NVDA：看多（正文没有明确改方向，方向保持不变）”
+  / “NVDA: Long (the body does not clearly change it, so its direction
+  stays)”.
 - **Thesis return**, only when `askSwitch` is true: “Thesis return：默认开启。关闭后发布，这条 thesis 以后不能再开启。”
   / “Thesis return: on by default. If you publish with it off, it can't be
   turned on for this thesis later.”
@@ -566,7 +567,7 @@ alva thesis return --id '<thesis id>' [--detail]
 
 `thesisReturn` is null when the Thesis is not tracked: its return was turned
 off (`returnTracking` `OFF`), no Update has had a long or short (`UNSET`), or
-no current ticker can be priced. Values are fractions: 0.05 is +5%. Answer only
+no ticker it ever held can be priced. Values are fractions: 0.05 is +5%. Answer only
 what the user asks about; do not volunteer how returns are measured. Explain
 with these definitions and the returned values only; do not recompute them:
 
@@ -574,7 +575,9 @@ with these definitions and the returned values only; do not recompute them:
   tickers share its money equally. An Update that keeps the same tickers and
   directions keeps the positions; one that adds, removes or flips a ticker
   closes every position at that moment and splits the total equally again. The
-  segments chain, so the total cannot be added up from Update returns.
+  segments chain, so the total cannot be added up from Update returns. An
+  Update with no long or short, or archiving the Thesis, holds the return at
+  its value; a later long or short, or restoring it, starts moving again.
 - **Update return** (`--detail`, `updates[].updateReturn`): that Update's
   tickers, equally weighted, from its prices to the next Update's (the latest
   Update runs to now). It is shown on its own and never adds to the Thesis
