@@ -16,13 +16,147 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   eval:
-    runs-on: ubuntu-latest
+    runs-on: ${{ ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) || github.event_name == 'pull_request' && github.event.pull_request.head.repo.id == github.event.repository.id && github.base_ref == github.event.repository.default_branch) && 'alva-ci-stateless' || 'ubuntu-latest' }}
     steps:
+      # Public own-repository adapter: no private action download or catalog.
+      # Requires platform approval for this exact workflow target; no cold
+      # fallback is allowed after an authenticated-path denial.
+      - name: Seed authenticated current-repository Git bundle
+        if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) || github.event_name == 'pull_request' && github.event.pull_request.head.repo.id == github.event.repository.id && github.base_ref == github.event.repository.default_branch }}
+        shell: bash
+        env:
+          CHECKOUT_TOKEN: ${{ github.token }}
+          CI_GIT_CACHE_CA_PEM: ${{ vars.CI_CACHE_SHARED_CA_PEM }}
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/public-arc-cache.py" <<'PY'
+          """Current-repository Git/npm cache adapter for a public Actions workflow."""
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import ssl
+          import subprocess
+          import sys
+          import tarfile
+          import tempfile
+          import time
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+
+          LIMIT = 2 * 1024**3
+          BASE = 'https://ci-git-cache.ci-cache.svc.cluster.local:8443'
+          REPOSITORY = 'alva-ai/skills'
+
+
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, *args):
+                  return None
+
+
+          def identity():
+              url = os.environ['ACTIONS_ID_TOKEN_REQUEST_URL']
+              url += ('&' if '?' in url else '?') + 'audience=alva-ci-repository-cache'
+              request = urllib.request.Request(url, headers={'Authorization': 'Bearer '+os.environ['ACTIONS_ID_TOKEN_REQUEST_TOKEN']})
+              with urllib.request.build_opener(NoRedirect).open(request, timeout=20) as response:
+                  body = response.read(65537)
+              if len(body) > 65536:
+                  raise ValueError('Identity response exceeds bound')
+              return json.loads(body)['value']
+
+
+          def request(path, method='GET', data=None):
+              if os.environ['GITHUB_REPOSITORY'] != REPOSITORY or os.environ['GITHUB_REPOSITORY_ID'] != '1179578081':
+                  raise ValueError('Unexpected repository')
+              context = ssl.create_default_context(cadata=os.environ['CI_GIT_CACHE_CA_PEM'])
+              context.minimum_version = ssl.TLSVersion.TLSv1_2
+              opener = urllib.request.build_opener(NoRedirect, urllib.request.HTTPSHandler(context=context))
+              for attempt in range(5):
+                  headers = {'Authorization': 'Bearer '+os.environ['CHECKOUT_TOKEN'], 'X-GitHub-OIDC': identity()}
+                  if data is not None:
+                      data.seek(0)
+                      headers['Content-Length'] = str(os.fstat(data.fileno()).st_size)
+                  try:
+                      return opener.open(urllib.request.Request(BASE+path, headers=headers, method=method, data=data), timeout=600)
+                  except urllib.error.HTTPError as error:
+                      if error.code != 503 or attempt == 4:
+                          raise
+                      error.close()
+                      time.sleep(min(16, 2**attempt))
+
+
+          def download(response, destination):
+              length = int(response.headers['Content-Length'])
+              if not 0 < length <= LIMIT:
+                  raise ValueError('Cache object exceeds bound')
+              with destination.open('wb') as output:
+                  remaining = length
+                  while remaining:
+                      chunk = response.read(min(1024**2, remaining))
+                      if not chunk:
+                          raise ValueError('Truncated cache object')
+                      output.write(chunk)
+                      remaining -= len(chunk)
+                  if response.read(1):
+                      raise ValueError('Oversized cache response')
+
+
+          def git(*args, capture=False):
+              env = dict(os.environ, GIT_CONFIG_NOSYSTEM='1', GIT_CONFIG_GLOBAL='/dev/null',
+                         GIT_CONFIG_COUNT='0', GIT_TRACE='0', GIT_TRACE_CURL='0', GIT_CURL_VERBOSE='0')
+              result = subprocess.run(['git','-c','core.hooksPath=/dev/null',*map(str,args)],env=env,
+                                      input=b'',stdout=subprocess.PIPE if capture else subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+              if result.returncode:
+                  raise ValueError('Repository bundle verification/import failed')
+              return result.stdout.decode().strip() if capture else None
+
+
+          def seed():
+              workspace = Path(os.environ['GITHUB_WORKSPACE'])
+              with tempfile.TemporaryDirectory(dir=os.environ['RUNNER_TEMP']) as directory:
+                  bundle = Path(directory)/'repository.bundle'
+                  with request('/bundles/'+REPOSITORY+'.bundle') as response:
+                      download(response, bundle)
+                  git('init', workspace)
+                  git('-C',workspace,'remote','add','origin','https://github.com/'+REPOSITORY)
+                  git('-C',workspace,'bundle','verify',bundle)
+                  git('-C',workspace,'fetch','--no-tags',bundle,
+                      '+refs/heads/*:refs/cache-seed/heads/*','+refs/tags/*:refs/cache-seed/tags/*')
+                  tree=git('-C',workspace,'mktree',capture=True)
+                  placeholder=git('-C',workspace,'-c','user.name=ARC cache preparation','-c','user.email=ci-cache@example.invalid','-c','commit.gpgsign=false','commit-tree',tree,'-m','Empty preparation placeholder; GitHub selects source',capture=True)
+                  git('-C',workspace,'update-ref','--no-deref','HEAD',placeholder)
+                  (workspace/'.git/cache-seed.receipt').write_text('approved-own-repository-bundle\n')
+              print('Shared repository bundle loaded; GitHub checkout selects the exact event SHA')
+
+
+          if __name__ == '__main__':
+              try:
+                  seed()
+              except Exception:
+                  raise SystemExit('Authenticated ARC cache operation failed; no trusted-path fallback') from None
+          PY
+          python3 "$RUNNER_TEMP/public-arc-cache.py" seed
+
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Verify retained Git bundle and authoritative commit
+        if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) || github.event_name == 'pull_request' && github.event.pull_request.head.repo.id == github.event.repository.id && github.base_ref == github.event.repository.default_branch }}
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          test -f .git/cache-seed.receipt
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          git for-each-ref --format='delete %(refname)' refs/cache-seed/ | git update-ref --stdin
 
       - name: Setup Node
         uses: actions/setup-node@v4

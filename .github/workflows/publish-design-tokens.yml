@@ -15,15 +15,279 @@ permissions:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    runs-on: ${{ ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) || github.event_name == 'pull_request' && github.event.pull_request.head.repo.id == github.event.repository.id && github.base_ref == github.event.repository.default_branch) && 'alva-ci-stateless' || 'ubuntu-latest' }}
     steps:
+      # Public own-repository adapter: no private action download or catalog.
+      # Requires platform approval for this exact workflow target; no cold
+      # fallback is allowed after an authenticated-path denial.
+      - name: Seed authenticated current-repository Git bundle
+        if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) || github.event_name == 'pull_request' && github.event.pull_request.head.repo.id == github.event.repository.id && github.base_ref == github.event.repository.default_branch }}
+        shell: bash
+        env:
+          CHECKOUT_TOKEN: ${{ github.token }}
+          CI_GIT_CACHE_CA_PEM: ${{ vars.CI_CACHE_SHARED_CA_PEM }}
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/public-arc-cache.py" <<'PY'
+          """Current-repository Git/npm cache adapter for a public Actions workflow."""
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import ssl
+          import subprocess
+          import sys
+          import tarfile
+          import tempfile
+          import time
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+
+          LIMIT = 2 * 1024**3
+          BASE = 'https://ci-git-cache.ci-cache.svc.cluster.local:8443'
+          REPOSITORY = 'alva-ai/skills'
+
+
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, *args):
+                  return None
+
+
+          def identity():
+              url = os.environ['ACTIONS_ID_TOKEN_REQUEST_URL']
+              url += ('&' if '?' in url else '?') + 'audience=alva-ci-repository-cache'
+              request = urllib.request.Request(url, headers={'Authorization': 'Bearer '+os.environ['ACTIONS_ID_TOKEN_REQUEST_TOKEN']})
+              with urllib.request.build_opener(NoRedirect).open(request, timeout=20) as response:
+                  body = response.read(65537)
+              if len(body) > 65536:
+                  raise ValueError('Identity response exceeds bound')
+              return json.loads(body)['value']
+
+
+          def request(path, method='GET', data=None):
+              if os.environ['GITHUB_REPOSITORY'] != REPOSITORY or os.environ['GITHUB_REPOSITORY_ID'] != '1179578081':
+                  raise ValueError('Unexpected repository')
+              context = ssl.create_default_context(cadata=os.environ['CI_GIT_CACHE_CA_PEM'])
+              context.minimum_version = ssl.TLSVersion.TLSv1_2
+              opener = urllib.request.build_opener(NoRedirect, urllib.request.HTTPSHandler(context=context))
+              for attempt in range(5):
+                  headers = {'Authorization': 'Bearer '+os.environ['CHECKOUT_TOKEN'], 'X-GitHub-OIDC': identity()}
+                  if data is not None:
+                      data.seek(0)
+                      headers['Content-Length'] = str(os.fstat(data.fileno()).st_size)
+                  try:
+                      return opener.open(urllib.request.Request(BASE+path, headers=headers, method=method, data=data), timeout=600)
+                  except urllib.error.HTTPError as error:
+                      if error.code != 503 or attempt == 4:
+                          raise
+                      error.close()
+                      time.sleep(min(16, 2**attempt))
+
+
+          def download(response, destination):
+              length = int(response.headers['Content-Length'])
+              if not 0 < length <= LIMIT:
+                  raise ValueError('Cache object exceeds bound')
+              with destination.open('wb') as output:
+                  remaining = length
+                  while remaining:
+                      chunk = response.read(min(1024**2, remaining))
+                      if not chunk:
+                          raise ValueError('Truncated cache object')
+                      output.write(chunk)
+                      remaining -= len(chunk)
+                  if response.read(1):
+                      raise ValueError('Oversized cache response')
+
+
+          def git(*args, capture=False):
+              env = dict(os.environ, GIT_CONFIG_NOSYSTEM='1', GIT_CONFIG_GLOBAL='/dev/null',
+                         GIT_CONFIG_COUNT='0', GIT_TRACE='0', GIT_TRACE_CURL='0', GIT_CURL_VERBOSE='0')
+              result = subprocess.run(['git','-c','core.hooksPath=/dev/null',*map(str,args)],env=env,
+                                      input=b'',stdout=subprocess.PIPE if capture else subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+              if result.returncode:
+                  raise ValueError('Repository bundle verification/import failed')
+              return result.stdout.decode().strip() if capture else None
+
+
+          def seed():
+              workspace = Path(os.environ['GITHUB_WORKSPACE'])
+              with tempfile.TemporaryDirectory(dir=os.environ['RUNNER_TEMP']) as directory:
+                  bundle = Path(directory)/'repository.bundle'
+                  with request('/bundles/'+REPOSITORY+'.bundle') as response:
+                      download(response, bundle)
+                  git('init', workspace)
+                  git('-C',workspace,'remote','add','origin','https://github.com/'+REPOSITORY)
+                  git('-C',workspace,'bundle','verify',bundle)
+                  git('-C',workspace,'fetch','--no-tags',bundle,
+                      '+refs/heads/*:refs/cache-seed/heads/*','+refs/tags/*:refs/cache-seed/tags/*')
+                  tree=git('-C',workspace,'mktree',capture=True)
+                  placeholder=git('-C',workspace,'-c','user.name=ARC cache preparation','-c','user.email=ci-cache@example.invalid','-c','commit.gpgsign=false','commit-tree',tree,'-m','Empty preparation placeholder; GitHub selects source',capture=True)
+                  git('-C',workspace,'update-ref','--no-deref','HEAD',placeholder)
+                  (workspace/'.git/cache-seed.receipt').write_text('approved-own-repository-bundle\n')
+              print('Shared repository bundle loaded; GitHub checkout selects the exact event SHA')
+
+
+          import shutil
+          MAXIMUM = 5*1024**3
+          NAMES = {'pnpm'}
+          CREDENTIAL_FILES = {'.gitconfig','.netrc','.npmrc','.yarnrc','.yarnrc.yml','bunfig.toml','.git-credentials','.pypirc','credentials','credentials.toml','credentials.json','id_rsa','id_ed25519','private-key.pem'}
+
+          def forbidden(path):
+              if bool({'vcs','.git','.ssh','secrets'} & set(path.parts)) or path.name in CREDENTIAL_FILES or ('cargo' in path.parts and path.name in {'config','config.toml'}):
+                  return True
+              # Expanded modules are directory-atomic: selecting individual files leaves
+              # a seemingly installed module that Go will not repair. Cache only verified
+              # download objects; Go expands each selected zip itself on the next job.
+              if path.parts and path.parts[0] == 'yarn' and '.tmp' in path.parts:
+                  return True
+              if path.parts and path.parts[0] == 'go-mod':
+                  return path.parts[1:3] != ('cache','download') or path.suffix not in ('.zip','.ziphash','.mod','.info')
+              return False
+
+          def unpack(archive, root, names=NAMES):
+              # No extractall, links, devices, path escapes or credential config files.
+              size = 0
+              with tarfile.open(archive,'r:gz') as stream:
+                  for member in stream:
+                      path = Path(member.name)
+                      if path.is_absolute() or '..' in path.parts or not path.parts or path.parts[0] not in names or not (member.isfile() or member.isdir()):
+                          raise ValueError('Unsafe build-cache archive entry')
+                      if forbidden(path):
+                          raise ValueError('Credential-capable configuration is forbidden in the cache')
+                      size += member.size
+                      if size > MAXIMUM:
+                          raise ValueError('Expanded build cache exceeds bound')
+                      target = root/path
+                      for parent in [target,*target.parents]:
+                          if parent == root:
+                              break
+                          if parent.is_symlink():
+                              raise ValueError('Build-cache path is a symlink')
+                      if member.isdir():
+                          target.mkdir(parents=True,exist_ok=True)
+                      else:
+                          target.parent.mkdir(parents=True,exist_ok=True)
+                          with stream.extractfile(member) as source, target.open('wb') as output:
+                              shutil.copyfileobj(source,output)
+                          target.chmod(0o700 if member.mode & 0o111 else 0o600)
+                          import math
+                          if not math.isfinite(member.mtime) or member.mtime < 0:
+                              raise ValueError('Invalid cache file timestamp')
+                          os.utime(target,(member.mtime,member.mtime))
+
+          def pack(root, archive, names=NAMES, maximum=1024**3):
+              size = 0
+              candidates = {}
+              skipped = 0
+              for name in sorted(names):
+                  directory = root/name
+                  if directory.is_symlink() or not directory.exists():
+                      continue
+                  for path in directory.rglob('*'):
+                      relative = path.relative_to(root)
+                      if path.is_symlink() or not path.is_file() or forbidden(relative):
+                          continue
+                      # uv considers an unpacked archive installed as a unit. Never
+                      # truncate one package to meet the byte budget (e.g. torch stubs).
+                      # Other uv metadata buckets are also retained or omitted whole.
+                      if name == 'bun' and len(relative.parts) >= 2:
+                          # Bun expanded package directories must be complete units.
+                          unit = tuple(relative.parts[:3] if relative.parts[1].startswith('@') and len(relative.parts) >= 3 else relative.parts[:2])
+                      elif name == 'yarn' and len(relative.parts) >= 3 and relative.parts[1].startswith('v'):
+                          unit = tuple(relative.parts[:3])
+                      elif name == 'uv' and len(relative.parts) >= 3:
+                          depth = 3 if relative.parts[1].startswith('archive-v') else 2
+                          unit = tuple(relative.parts[:depth])
+                      else:
+                          unit = tuple(relative.parts)
+                      candidates.setdefault(unit, []).append(path)
+              with tarfile.open(archive,'w:gz',dereference=True) as stream:
+                  for paths in sorted(candidates.values(), key=lambda paths: max(p.stat().st_mtime for p in paths), reverse=True):
+                      length = sum(path.stat().st_size for path in paths)
+                      if size + length > maximum:
+                          skipped += len(paths)
+                          continue
+                      size += length
+                      for path in paths:
+                          stream.add(path,arcname=str(path.relative_to(root)),recursive=False)
+              print(json.dumps({'build_cache_selected_bytes':size,'files_outside_cache_budget':skipped}))
+
+          def packages(operation):
+              fingerprint = '\0'.join(['download-objects-v3', os.environ['BUILD_CACHE_TOOLCHAIN'],
+                                        os.environ['RUNNER_OS'], os.environ['RUNNER_ARCH'], 'pnpm'])
+              key = hashlib.sha256(fingerprint.encode()).hexdigest()
+              root = Path(os.environ['RUNNER_TEMP'])/'service-build-cache'/key
+              if root != root.resolve():
+                  raise ValueError('Invalid cache root')
+              root.mkdir(parents=True, exist_ok=True)
+              path = '/build-cache/'+REPOSITORY+'/'+key
+              with tempfile.TemporaryDirectory(dir=os.environ['RUNNER_TEMP']) as directory:
+                  archive = Path(directory)/'pnpm.tar.gz'
+                  if operation == 'restore':
+                      hit = False
+                      try:
+                          with request(path) as response:
+                              download(response, archive)
+                          unpack(archive, root, {'pnpm'})
+                          hit = True
+                      except urllib.error.HTTPError as error:
+                          if error.code != 404 or error.headers.get('X-Build-Cache') != 'authenticated-miss':
+                              raise ValueError('Cache authorization/service failed') from None
+                      (root/'pnpm').mkdir(exist_ok=True)
+                      with open(os.environ['GITHUB_ENV'], 'a') as output:
+                          output.write('npm_config_store_dir='+str(root/'pnpm')+'\n')
+                      print(json.dumps({'build_cache_restore':'hit' if hit else 'cold','key':key}))
+                  elif operation == 'save':
+                      if (root/'pnpm').is_symlink():
+                          raise ValueError('Symlink cache roots are forbidden')
+                      pack(root, archive, {'pnpm'})
+                      with archive.open('rb') as source, request(path, method='PUT', data=source) as response:
+                          if response.status != 204:
+                              raise ValueError('Cache upload rejected')
+                      print(json.dumps({'build_cache_save':'success','archive_bytes':archive.stat().st_size,'key':key}))
+                  else:
+                      raise ValueError('Invalid operation')
+
+          if __name__ == '__main__':
+              try:
+                  seed() if sys.argv[1] == 'seed' else packages(sys.argv[1])
+              except Exception:
+                  raise SystemExit('Authenticated ARC cache operation failed; no trusted-path fallback') from None
+          PY
+          python3 "$RUNNER_TEMP/public-arc-cache.py" seed
+
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Verify retained Git bundle and authoritative commit
+        if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) || github.event_name == 'pull_request' && github.event.pull_request.head.repo.id == github.event.repository.id && github.base_ref == github.event.repository.default_branch }}
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          test -f .git/cache-seed.receipt
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          git for-each-ref --format='delete %(refname)' refs/cache-seed/ | git update-ref --stdin
 
       # Guard against publishing a drifted bundle. The sync workflow
       # commits-back regen on PRs, but PRs can slip through (squash
       # race, admin merge) and leave main stale. Fail here rather
       # than serve drift from the CDN — fix via PR.
+
+      - name: Restore authenticated PVC pnpm download cache
+        if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) || github.event_name == 'pull_request' && github.event.pull_request.head.repo.id == github.event.repository.id && github.base_ref == github.event.repository.default_branch }}
+        shell: bash
+        env:
+          CHECKOUT_TOKEN: ${{ github.token }}
+          CI_GIT_CACHE_CA_PEM: ${{ vars.CI_CACHE_SHARED_CA_PEM }}
+          BUILD_CACHE_TOOLCHAIN: node20-pnpm10-${{ hashFiles('tools/alva-design-system/pnpm-lock.yaml') }}
+        run: python3 "$RUNNER_TEMP/public-arc-cache.py" restore
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.1.0
         with:
@@ -33,8 +297,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm
-          cache-dependency-path: tools/alva-design-system/pnpm-lock.yaml
 
       - name: Install design-system tool deps
         working-directory: tools/alva-design-system
@@ -43,6 +305,16 @@ jobs:
       - name: Verify design-system.css is in sync with design docs
         working-directory: tools/alva-design-system
         run: pnpm design-contract-sync
+
+
+      - name: Save authenticated PVC pnpm download cache
+        if: ${{ success() && ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) || github.event_name == 'pull_request' && github.event.pull_request.head.repo.id == github.event.repository.id && github.base_ref == github.event.repository.default_branch) }}
+        shell: bash
+        env:
+          CHECKOUT_TOKEN: ${{ github.token }}
+          CI_GIT_CACHE_CA_PEM: ${{ vars.CI_CACHE_SHARED_CA_PEM }}
+          BUILD_CACHE_TOOLCHAIN: node20-pnpm10-${{ hashFiles('tools/alva-design-system/pnpm-lock.yaml') }}
+        run: python3 "$RUNNER_TEMP/public-arc-cache.py" save
 
       - name: GCP Auth
         id: auth
