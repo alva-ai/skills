@@ -236,13 +236,32 @@
           "file": "references/thesis.md",
           "includes": [
             "Link each Thesis you present on a line of its own as",
-            "`[author or short label](https://alva.ai/thesis/<publication.playbookId>)`, with\nno query parameters"
+            "`[author or short label](https://alva.ai/thesis/<publication.playbookId>)`, with\nno query parameters",
+            "Put a blank line before and after each link, including between successive\nlinks, so every link is its own Markdown paragraph."
           ]
         },
         {
           "file": "references/request-routing.md",
           "includes": [
             "Link each recommended Thesis by its `publication.playbookId` as in\n[Reading published Theses](thesis.md#reading-published-theses)."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "target.thesis-write-card-preview",
+      "group": "target",
+      "target": "corpus",
+      "description": "Every created or updated Thesis, including one from a background task, is reported with the thesis-preview block on lines of its own, falling back to a standalone link without query parameters, and never only as a link inside a sentence.",
+      "file_includes": [
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "A published Update ends the same way: after `update` succeeds, read it with\n`thesis get` and emit this block for the new `author_version_id`.",
+            "In a background task, the task's final result must contain the block for\n  every Thesis the task created or updated",
+            "Put each block on lines of its own after the sentence that reports the\n  result",
+            "Never report a created or updated Thesis only as a link inside a sentence",
+            "Keep each link in its own Markdown paragraph, with a blank line before\n  and after each link, including between successive links."
           ]
         }
       ]
@@ -1585,7 +1604,7 @@
         }
       ],
       "includes": [
-        "version: v1.32.0",
+        "version: v1.32.1",
         "Capability Help",
         "feedback",
         "api/feedback.md",
