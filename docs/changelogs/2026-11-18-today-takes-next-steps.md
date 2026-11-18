@@ -52,8 +52,7 @@ regenerates GraphQL from schema, using the new Backend API module. Feed/Web
 choose taskTitle for TASK and render the new ACTION completion. Public Skills
 owns Thesis consent.
 
-The two existing publication selections add watchpoints { id label text origin
-}. Complete card-material groups count toward the existing material budget; an over-budget record is
+The two existing publication selections add watchpoints { id, label, text, origin }. Complete card-material groups count toward the existing material budget; an over-budget record is
 omitted with incomplete state, never clipped into an apparently complete group.
 
 TASK.thesisId must appear in the frozen authored manifest; storage accepts only
