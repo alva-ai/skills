@@ -355,9 +355,10 @@ Present the preview in the user's language:
   user and asked to publish unchanged, may be referenced instead: use one short
   preview line without repeating the body.
 - **Title**, when present, and **visibility** (public by default).
-- **Assets:** name each company or ticker with its `returnPreview` direction.
-  Use localized direction labels: “看多 / 看空 / 不计收益” in Chinese, “Long / Short / Not tracked” in English
-  (`NONE` is not tracked).
+- **Assets:** name each company or ticker with its confirmed direction.
+  Use localized direction labels: “看多 / 看空 / 无方向” in Chinese, “Bullish / Bearish / No direction” in English
+  (`NONE` is no direction). Use the same labels everywhere you name a
+  direction, never long/short or 看涨/看跌.
 - **Thesis return**, only when `askSwitch` is true: “Thesis return：默认开启。关闭后发布，这条 thesis 以后不能再开启。”
   / “Thesis return: on by default. If you publish with it off, it can't be
   turned on for this thesis later.”
@@ -409,8 +410,8 @@ off return and publish” or “Edit”.", leaving out the turn-off reply when
 changed choice needs a new preview and request ID.
 
 If publishing fails with reason `THESIS_RETURN_SWITCH_FINAL`, say “这条 thesis
-的收益开关已经确定，不能再改。” / "This thesis's return setting is final and
-can't be changed."; with `THESIS_ARCHIVED`, say “这条 thesis 已归档，发布这条 Update 会同时取消归档。” /
+的收益设置已经确定，不能再更改。” / "Thesis return has already been set for this
+thesis and can't be changed."; with `THESIS_ARCHIVED`, say “这条 thesis 已归档，发布这条 Update 会同时取消归档。” /
 "This thesis is archived; publishing this Update also unarchives it." and
 preview it with `--archived false`. Then preview again; never retry unchanged.
 An old button does not authorize a changed candidate, and repeated approval of

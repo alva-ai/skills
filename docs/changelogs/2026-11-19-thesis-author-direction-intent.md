@@ -49,9 +49,16 @@ explaining positions.
   accepts. It leads with an Update instead when the view changed or the Thesis
   should stay visible. An explicit archive request runs directly.
 
+- B7: direction labels are “看多 / 看空 / 无方向” / "Bullish / Bearish / No
+  direction" everywhere the Agent names a direction, never long/short or
+  看涨/看跌. The `THESIS_RETURN_SWITCH_FINAL` message uses the editor's copy.
+
 ## 3. Research, Findings, and Architecture Decision
 
-The Backend already stores every direction as sent (alva-ai/alva-backend#3794
+The App and web editors already let the author pick Bullish or Bearish per
+ticker (`ticker-direction-toggle.tsx`), so B1 matches the editors; the Agent
+also offers no direction, which the editors do not yet. The Backend already
+stores every direction as sent (alva-ai/alva-backend#3794
 D6), so B1 changes only the skill. A correction affects only the return from
 the moment of publishing onward. It cannot change any return already earned,
 which is why the return-integrity reason behind #3743 B6 does not apply.
@@ -90,6 +97,8 @@ disambiguation question.
 - Zet, 2026-11-19: "按意图重写". The subsection lists goals, not trading
   vocabulary as triggers, so body text such as "我会在 100 止盈" is not read as
   an exit request.
+- Zet, 2026-11-19: unify direction labels as 看多 / 看空 / 无方向; pausing
+  Signals stays an Agent-only control.
 - Zet, 2026-11-19: a weight request is told that the Thesis return splits
   equally and weights cannot be set.
 
@@ -102,7 +111,11 @@ Docs only. 2026-11-19: `node evals/alva-skill-docs/skill-doc-eval.mjs
 ## 8. Remaining Work
 
 - Merges into #688 and follows its merge order.
-- The App editor still does not let authors edit directions; whether it should
-  is a separate decision.
+- Frontend follow-up (frontend-monorepo):
+  - labels to 看多 / 看空 / 无方向 (now 看涨 / 看跌, and no label for no
+    direction);
+  - a 无方向 choice in the direction toggle (now Bullish / Bearish only);
+  - feed-app Updates start from the stored directions, as web and the Agent
+    do (now reset to Unknown and judged again without `thesisId`).
 - The ALPI Slim skill (sdk-monorepo `skills/alpi-slim-skill`) still says an
   explicit `unknown` clears a direction; it needs its own change.
