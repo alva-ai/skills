@@ -37,12 +37,22 @@ entry from a stated one, and may quote it back as the user's view or edit it.
 - `skills/alva/references/memory.md`: the pointer and the subsection.
 - `skills/alva/SKILL.md`, `evals/alva-skill-docs/cases.json`: version v1.32.4.
 
-Release this with or after the backend change; before it, no entry carries the
-mark and the text is inert.
+Release this before the backend starts writing observed entries, that is,
+before `MEMORY_CONNECTED_CONTEXT_ENABLED` is turned on for alva-backend#3822.
+Until then no entry carries the mark and the text is inert, so releasing early
+is safe.
 
 ## 5. Verification and E2E Design
 
 `E2E Required: no`. Documentation for an agent. Checks: the skill doc evals.
+
+## 6. Human Decisions and Interaction
+
+- 2026-11-19: the requester asked for the conversation agent's guidance on
+  observed entries as a separate skills PR rather than inside the backend
+  change.
+- 2026-11-19: dev review (Jaxon) aligned the release timing with the backend
+  switch: this ships before the switch is turned on.
 
 ## 7. Outcome and Evidence
 
