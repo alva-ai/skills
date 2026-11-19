@@ -82,6 +82,43 @@ delegated for the night and are recorded in section 3 and in section 8.
 
 Docs and evals only.
 
+M20 client review (2026-11-19), against toolkit 1.0 (`agent-api-v2`
+`d1e3582`) and the gateway snapshot (`b34005a9`):
+
+- R1 (fixed, `3417cdf`): Thesis reads and links broke under toolkit 1.0.
+  `publication.playbookId` is the Playbook ID there, and
+  `thesis related --id <publication.playbookId>` sends it where
+  `/api/v2/theses/{thesisId}` takes only a Thesis ID (400). The App's Thesis
+  card and the `alva.ai/thesis/<id>` page take the Thesis number (feed-app
+  `thesis-link.ts` accepts only digits; the detail read is
+  `playbook:<number>`), which 0.x returned as the ID. Reads now use
+  `publication.thesisId`; read links use `publication.thesisNumber`, the
+  write fallback link `response.thesis.number`, and the preview card's
+  `thesis-id`/`version-id` `number`/`author_version_number` (toolkit
+  `d1e3582` returns them). A CLI older than 1.0 keeps `playbookId`, `id` and
+  `author_version_id`, which were those numbers. This replaces the D16 IDs
+  this change had put in the preview example; the ticker `entity-id` stays
+  the Asset ID (there is no asset number).
+- R2 (fixed, `3417cdf`): For You told the agent to keep a `--newer-than`
+  bound, a flag toolkit 1.0 refuses; the alert inventory compared `items`
+  with `total_count`, which 1.0 no longer returns (pages end when
+  `next_cursor` is empty).
+- R3 (fixed, `ed948ca`): `api/error-responses.md` listed only the 0.x error
+  JSON. It now names `requiredPermission`, `invalidParams`, `retryAfter`,
+  `INSUFFICIENT_PERMISSION`, `CONFLICT` and `UNAVAILABLE`, and says a
+  missing permission is reported, not retried (an agent key never holds
+  `trading_limits:write`).
+- Evals: `target.thesis-read-card-links`, `target.thesis-create-preview-card`
+  and `target.for-you-context` assert the new text; new case
+  `target.platform-errors`; five new mutations (links and related by
+  Playbook ID, preview from opaque IDs, `--newer-than`, retrying a missing
+  permission).
+- Verification: `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir
+  skills/alva` 132/132 cases (1602 checks); `mutation-smoke.mjs` 85/85;
+  `node --test evals/alva-skill-docs/durable-agent.test.mjs` 5/5; each
+  commit's tree passes the eval and the mutation smoke on its own;
+  `git diff --check` clean.
+
 ## 8. Remaining Work
 
 - Release with toolkit 1.0.0 in the M20 window (primary record 4.6 step 7):
@@ -94,8 +131,9 @@ Docs and evals only.
     Thesis reads fail until the App writes D16 IDs or toolkit resolves the
     number (`GET /api/v2/theses/by-number/{number}`; there is no version
     lookup by number).
-  - The agent's `<thesis-preview>` will carry D16 IDs from toolkit 1.0; the
-    App card must open a Thesis by them.
+  - The preview card's ticker `entity-id` is a D16 Asset ID (toolkit 1.0
+    has no asset number); the App's share sheet reads it as an entity ID.
+    The Thesis and version attributes are numbers again (section 7, R1).
   - `playbook.json` carries numeric `feed_id` values, and the re-release and
     remix flows pass them to `alva release ... --feeds`; toolkit 1.0 sends
     Automation IDs, so those flows need D16 IDs in the dbview or a toolkit
