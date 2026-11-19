@@ -145,6 +145,13 @@ const MUTATIONS = [
     expectFailedCases: ["target.for-you-context"],
   },
   {
+    id: "platform-error-retry-permission",
+    file: "references/api/error-responses.md",
+    remove: "Report it\ninstead of retrying.",
+    replacement: "Retry it.",
+    expectFailedCases: ["target.platform-errors"],
+  },
+  {
     id: "thesis-read-link-without-paragraph",
     file: "references/thesis.md",
     remove: "Put a blank line before and after each link, including between successive\nlinks, so every link is its own Markdown paragraph.",

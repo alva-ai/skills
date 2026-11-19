@@ -2162,6 +2162,23 @@
       ]
     },
     {
+      "id": "target.platform-errors",
+      "group": "target",
+      "target": "corpus",
+      "description": "A missing permission is reported with the permission it names, never retried; risk limits are raised by the user.",
+      "file_includes": [
+        {
+          "file": "references/api/error-responses.md",
+          "includes": [
+            "| 403         | INSUFFICIENT_PERMISSION | The credential lacks `requiredPermission`",
+            "`INSUFFICIENT_PERMISSION` does not change on retry",
+            "never holds `trading_limits:write`",
+            "Report it\ninstead of retrying."
+          ]
+        }
+      ]
+    },
+    {
       "id": "target.for-you-context",
       "group": "target",
       "target": "corpus",
