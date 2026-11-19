@@ -3,7 +3,12 @@
 ## 1. Background and Current State
 
 The skill told the Agent to restore an archived Thesis with the Thesis CLI
-restore command, a state change without an Update.
+restore command, a state change without an Update. It also said a direction
+judged from the text never takes away the last long or short
+(`keptEntityIds`), and mapped `THESIS_RETURN_LAST_LEG`. An Agent asked to keep
+two tickers with no direction sent them as unknown, which keeps a carried
+direction; the update changed nothing and looked saved
+(alva-ai/alva-backend#3809).
 
 ## 2. Problem Model and End-to-End Behavior
 
@@ -20,11 +25,19 @@ no other Update (`THESIS_ARCHIVED`).
 - B3: the Thesis return definition says the unarchiving Update starts the
   return moving again; declining close or delete offers archiving, which an
   Update later restores.
+- B4 (#3809): to keep a ticker with no direction, the body says so and the
+  previewed `none` is published, also for the last long or short; the Agent
+  never sends `unknown` to clear a direction. The `keptEntityIds` and
+  `THESIS_RETURN_LAST_LEG` guidance is removed (the Backend no longer keeps
+  exits or refuses).
+- B5 (#3809): when `thesis update` returns `unchanged: true`, the Agent says
+  the Update changed nothing, never that it was published.
 
 ## 3. Research, Findings, and Architecture Decision
 
-`alva thesis update --archived false` ships in alva-ai/toolkit-ts#213, which
-also removes `thesis restore`.
+`alva thesis update --archived false` and `unchanged` ship in
+alva-ai/toolkit-ts#213, which also removes `thesis restore`. Storing `none` as
+sent for the last long or short is alva-ai/alva-backend#3794 (D6).
 
 ## 4. Implementation Design
 
@@ -38,13 +51,16 @@ the version.
 
 ## 6. Human Decisions and Interaction
 
-Jaxon, 2026-11-18: "skills：写明取消归档就是发一条 Update".
+- Jaxon, 2026-11-18: "skills：写明取消归档就是发一条 Update".
+- Jaxon, 2026-11-19 (alva-ai/alva-backend#3809): an author's none is stored as
+  sent; the CLI and the skill say when an Update changed nothing.
 
 ## 7. Outcome and Evidence
 
-Docs only.
+Docs only. 2026-11-19: `node evals/alva-skill-docs/skill-doc-eval.mjs
+--skill-dir skills/alva` exit 0; mutation smoke 78/78; durable agent 5/5.
 
 ## 8. Remaining Work
 
-Ship after alva-ai/skills#687, once the Toolkit release with
-alva-ai/toolkit-ts#213 is the pinned CLI.
+Ship once alva-ai/alva-backend#3794 is on PRD and the Toolkit release with
+alva-ai/toolkit-ts#213 is the pinned CLI (alva-ai/skills#687 is merged).

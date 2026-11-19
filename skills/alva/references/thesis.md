@@ -306,9 +306,6 @@ Pass `--thesis-id` for an Update, even when no ticker remains. Read only
   fails or is rate limited, do not publish: say the directions could not be
   judged just now and offer to try again.
 - `askSwitch`: show the Thesis return line and the turn-off action (below).
-- `keptEntityIds`: these tickers keep their previous direction although the
-  body exits them: a direction judged from the text never takes away the last
-  long or short; only removing the ticker does. Say so next to the ticker.
 - `lastLegRemoved`: after this Update the Thesis has no long or short ticker,
   so its return holds at its current value until a later Update adds one. It
   publishes like any other Update; do not ask for a separate confirmation or
@@ -316,8 +313,11 @@ Pass `--thesis-id` for an Update, even when no ticker remains. Read only
 - `tracking`: `UNSET`, `ON` or `OFF`. `ON` and `OFF` are permanent.
 
 When the author disagrees with a direction, do not change it: suggest stating
-the direction explicitly in the body, then preview again. Never treat a
-direction as publication consent.
+the direction explicitly in the body, then preview again. To keep a ticker
+with no direction, the body says so (for example that there is no current
+call on it); the preview then gives `none`, which publishes as an exit, also
+for the last long or short. Never send `unknown` to clear a direction: it
+keeps the previous one. Never treat a direction as publication consent.
 
 Preserve the selected body exactly, including wording, language, whitespace and
 line breaks. Do not summarize, rewrite, translate, correct, expand, generate a
@@ -337,9 +337,7 @@ Present the preview in the user's language:
 - **Title**, when present, and **visibility** (public by default).
 - **Assets:** name each company or ticker with its `returnPreview` direction.
   Use localized direction labels: “看多 / 看空 / 不计收益” in Chinese, “Long / Short / Not tracked” in English
-  (`NONE` is not tracked). For a kept exit: “NVDA：看多（正文没有明确改方向，方向保持不变）”
-  / “NVDA: Long (the body does not clearly change it, so its direction
-  stays)”.
+  (`NONE` is not tracked).
 - **Thesis return**, only when `askSwitch` is true: “Thesis return：默认开启。关闭后发布，这条 thesis 以后不能再开启。”
   / “Thesis return: on by default. If you publish with it off, it can't be
   turned on for this thesis later.”
@@ -392,10 +390,7 @@ changed choice needs a new preview and request ID.
 
 If publishing fails with reason `THESIS_RETURN_SWITCH_FINAL`, say “这条 thesis
 的收益开关已经确定，不能再改。” / "This thesis's return setting is final and
-can't be changed."; with `THESIS_RETURN_LAST_LEG`, say
-“这条 thesis 正在计收益，至少要保留一个看多或看空的标的。” / "This thesis tracks a
-return, so it must keep at least one long or short ticker."; with
-`THESIS_ARCHIVED`, say “这条 thesis 已归档，发布这条 Update 会同时取消归档。” /
+can't be changed."; with `THESIS_ARCHIVED`, say “这条 thesis 已归档，发布这条 Update 会同时取消归档。” /
 "This thesis is archived; publishing this Update also unarchives it." and
 preview it with `--archived false`. Then preview again; never retry unchanged.
 An old button does not authorize a changed candidate, and repeated approval of
@@ -531,7 +526,9 @@ including a wording-only edit, gets its directions from
 `--thesis-id`: carried tickers keep their direction unless the new text
 reverses or exits them. Show the resulting assets and directions, send them,
 and end the preview the same way as a creation preview, with actions when
-`PresentActions` is available. Wait for
+`PresentActions` is available. When `thesis update` returns `unchanged: true`,
+nothing was stored: say the Update changed nothing, never that it was
+published. Wait for
 the author to select that version. If the author
 has already seen and selected that exact version, proceed without asking again;
 refer clearly to exact text supplied by the author instead of repeating it.
