@@ -115,7 +115,8 @@ Docs only. 2026-11-19: `node evals/alva-skill-docs/skill-doc-eval.mjs
   - labels to 看多 / 看空 / 无方向 (now 看涨 / 看跌, and no label for no
     direction);
   - a 无方向 choice in the direction toggle (now Bullish / Bearish only);
-  - feed-app Updates start from the stored directions, as web and the Agent
-    do (now reset to Unknown and judged again without `thesisId`).
+  - feed-app Updates start from the stored directions and send `thesisId`,
+    as web and the Agent do: alva-ai/frontend-monorepo#5536 (approved, not
+    merged; main still resets them to Unknown and judges again).
 - The ALPI Slim skill (sdk-monorepo `skills/alpi-slim-skill`) still says an
   explicit `unknown` clears a direction; it needs its own change.
