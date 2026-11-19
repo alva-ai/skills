@@ -173,10 +173,11 @@ execution carries the current declarations and writes.
 ## Inventory And Unsubscribe
 
 - `alva alert list --first 200` — rows carry `kind`, `target_status`, feed
-  identity, `feed_status`, and `last_pushed_at_ms` when available. If `items` <
-  `total_count`, keep paginating; never report a truncated page as the full
-  inventory. Alert enablement is an active `FEED_ALERT`. Social playbook follows
-  are separate and must not be used as delivery state.
+  identity, `feed_status`, and `last_pushed_at_ms` when available. While
+  `next_cursor` is non-empty, keep paginating with `--cursor`; never report a
+  truncated page as the full inventory. Alert enablement is an active
+  `FEED_ALERT`. Social playbook follows are separate and must not be used as
+  delivery state.
 - `alva alert follows --limit 100` — the playbook follow list. Keep paginating
   with `--cursor` when `has_next` is true.
 - Disable by name (`alva alert disable --automation owner/name`) for live

@@ -231,20 +231,22 @@
       "id": "target.thesis-read-card-links",
       "group": "target",
       "target": "corpus",
-      "description": "Each Thesis presented from a read is linked on its own line by its playbook ID with no query parameters, so the App renders it as the Thesis card.",
+      "description": "Each Thesis presented from a read is linked on its own line by its Thesis number with no query parameters, so the App renders it as the Thesis card; reads take the Thesis ID, not the Playbook ID.",
       "file_includes": [
         {
           "file": "references/thesis.md",
           "includes": [
+            "alva thesis related --id '<publication.thesisId>' --first 10",
+            "Use `publication.thesisId` for get/version/signals/related",
             "Link each Thesis you present on a line of its own as",
-            "`[author or short label](https://alva.ai/thesis/<publication.playbookId>)`, with\nno query parameters",
+            "`[author or short label](https://alva.ai/thesis/<publication.thesisNumber>)`, with\nno query parameters",
             "Put a blank line before and after each link, including between successive\nlinks, so every link is its own Markdown paragraph."
           ]
         },
         {
           "file": "references/request-routing.md",
           "includes": [
-            "Link each recommended Thesis by its `publication.playbookId` as in\n[Reading published Theses](thesis.md#reading-published-theses)."
+            "Link each recommended Thesis by its `publication.thesisNumber` as in\n[Reading published Theses](thesis.md#reading-published-theses)."
           ]
         }
       ]
@@ -1690,7 +1692,9 @@
             "extra, or out-of-order author/entity data",
             "Never substitute",
             "Emit exactly one raw XML block",
-            "<thesis-preview schema-version=\"1\" thesis-id=",
+            "`response.thesis.number`, `author_version_number`",
+            "<thesis-preview schema-version=\"1\" thesis-id=\"123\" version-id=\"456\"",
+            "Map `thesis-id` and `version-id` from `number` and\n  `author_version_number`, never from the opaque IDs.",
             "<body>",
             "<tickers>",
             "<ticker entity-id=\"asset_002agc\" symbol=\"NVDA\" icon-url=",
@@ -2175,6 +2179,7 @@
           "includes": [
             "alva for-you theses --limit 10",
             "alva for-you list --limit 20",
+            "`list` continues with `--cursor '<pageInfo.endCursor>'`. `--feed-id` narrows",
             "pageInfo.endCursor",
             "nextCursor",
             "Only `exhausted`",
