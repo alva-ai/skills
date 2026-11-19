@@ -1692,7 +1692,7 @@
             "extra, or out-of-order author/entity data",
             "Never substitute",
             "Emit exactly one raw XML block",
-            "`response.thesis.number`, `author_version_number`",
+            "`response.thesis`: `number`, `author_version_number`",
             "<thesis-preview schema-version=\"1\" thesis-id=\"123\" version-id=\"456\"",
             "Map `thesis-id` and `version-id` from `number` and\n  `author_version_number`, never from the opaque IDs.",
             "<body>",

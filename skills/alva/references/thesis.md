@@ -447,7 +447,7 @@ entry against the confirmed `returnPreview` directions when the GET response
 includes it; report any mismatch instead of claiming that direction was saved. After creation, `thesis get` is the sole source
 for the preview. Use:
 
-- `response.thesis.number`, `author_version_number`, `body`, and ordered
+- `response.thesis`: `number`, `author_version_number`, `body`, and ordered
   `entity_ids` (a CLI older than 1.0 has no numbers: use `id` and
   `author_version_id`);
 - `response.author`: `id`, `kind`, `display_name`, `avatar_url`,
