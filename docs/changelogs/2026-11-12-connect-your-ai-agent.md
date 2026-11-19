@@ -23,3 +23,4 @@
   - Sandbox 守卫回复改为「从 Alva App 的 Me 复制」（新旧 App 都成立），示例 agent 加 Grok bot、Muse。
   - routine 来源列表补「云端 agent 没有这些文件，用自己的记忆」。
   - eval：`retained.search-routing` 原先排除整个「Grok」字样，用来防止 X 搜索走 Grok；现在 agent 名字里合法出现 Grok bot，排除项改为原来的搜索写法（`X/Grok`、`/ Grok`、`searchGrokX`、`search-grok-x`）。新增 mutation `bootstrap-cloud-login`。doc eval 无失败，mutation smoke 76/76，durable-agent 5/5。Muse 是否能跑命令、`npx skills add` 能否装进 Grok bot 和 Muse 都没实测。
+- 11-19（哥定：频率由用户选，默认每天）：开场多一句「之后每天 08:00 来看一次，除非你说别的时间或频率」，用户说「开始」时一并回答；定时按用户选择建，任务改名「Alva routine」，已有任务只改时间不重建；routine 在距上次运行超过 31 天时说明只覆盖最近 31 天（后端窗口同步改为 31 天）。新增 mutation `bootstrap-fixed-daily-schedule`。rebase 到 main（v1.32.3 之后），版本 v1.33.0。验证：doc eval 无失败，mutation smoke 85/85，durable-agent 5/5。
