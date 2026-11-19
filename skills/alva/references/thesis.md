@@ -512,9 +512,9 @@ Fallback layout (the fence illustrates spacing; do not emit the fence):
 ```markdown
 Updated the Theses.
 
-[Author — NVDA](https://alva.ai/thesis/<id>)
+[Author — NVDA](https://alva.ai/thesis/<number>)
 
-[Author — QQQ](https://alva.ai/thesis/<other-id>)
+[Author — QQQ](https://alva.ai/thesis/<other-number>)
 ```
 
 ## Rewrite
