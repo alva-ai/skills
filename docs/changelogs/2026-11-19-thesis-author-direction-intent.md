@@ -38,8 +38,9 @@ explaining positions.
   by the author's goal, however it is worded, and never by words inside a
   body being published. The goals are: stop the Thesis (archive), keep it
   running with a changed call (an Update with changed tickers and directions,
-  including no direction), change a ticker's weight (one question in
-  direction terms; never published as a direction), hide or show it
+  including no direction), change a ticker's weight (say the return splits
+  equally and weights cannot be set, then one question in direction terms;
+  never published as a direction), hide or show it
   (`set-visibility`), stop research and Signals (`set-signal-enabled`), not
   have a return (only while `UNSET`), and bring it back (an Update with
   `--archived false`). Results are described in view terms, never positions.
@@ -73,7 +74,7 @@ disambiguation question.
   - The two excludes that encoded "explicit direction wins" as forbidden are
     removed.
   - New case `target.thesis-author-intent`.
-- Mutations: the old override mutation is replaced with five mutations that
+- Mutations: the old override mutation is replaced with six mutations that
   guard the new rules.
 
 ## 5. Verification and E2E Design
@@ -89,11 +90,13 @@ disambiguation question.
 - Zet, 2026-11-19: "按意图重写". The subsection lists goals, not trading
   vocabulary as triggers, so body text such as "我会在 100 止盈" is not read as
   an exit request.
+- Zet, 2026-11-19: a weight request is told that the Thesis return splits
+  equally and weights cannot be set.
 
 ## 7. Outcome and Evidence
 
 Docs only. 2026-11-19: `node evals/alva-skill-docs/skill-doc-eval.mjs
---skill-dir skills/alva` exit 0 (132/132); mutation smoke 82/82; durable agent
+--skill-dir skills/alva` exit 0 (132/132); mutation smoke 83/83; durable agent
 5/5.
 
 ## 8. Remaining Work

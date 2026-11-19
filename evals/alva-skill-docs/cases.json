@@ -2645,7 +2645,7 @@
       "id": "target.thesis-author-intent",
       "group": "target",
       "target": "corpus",
-      "description": "Requests about an existing Thesis are routed by the author's goal, not by wording or body text, to archive, an Update with changed tickers and directions, a direction question for size, set-visibility, set-signal-enabled or unarchiving, described in view terms rather than positions; stopping a Thesis leads with one archive confirmation.",
+      "description": "Requests about an existing Thesis are routed by the author's goal, not by wording or body text, to archive, an Update with changed tickers and directions, an equal-split explanation and a direction question for weight, set-visibility, set-signal-enabled or unarchiving, described in view terms rather than positions; stopping a Thesis leads with one archive confirmation.",
       "file_includes": [
         {
           "file": "references/thesis.md",
@@ -2653,12 +2653,10 @@
             "### What the author asks for",
             "An author publishes views, not positions.",
             "Route each request about an existing Thesis by what the author wants to\nachieve, however they word it, and never by words inside a body being\npublished.",
-            "never\npositions, weights or rebalancing, unless the author asks how the return is\nmeasured.",
             "**Keep it running with a changed call**",
             "keeping a ticker with no direction, for some or all tickers",
             "do not ask whether to archive instead",
             "a Thesis records direction,\n  not size",
-            "never publish a size change as a\n  direction",
             "**Hide it from others, or show it again**: `set-visibility`; no Update.",
             "set-signal-enabled --id <id> --enabled\n  false",
             "The return is unaffected.",
@@ -2666,7 +2664,11 @@
             "**Bring back an archived Thesis**: an Update with `--archived false`",
             "Lead with archiving",
             "archive only after the author accepts",
-            "An explicit archive request needs no extra confirmation."
+            "An explicit archive request needs no extra confirmation.",
+            "never\npositions, weights or rebalancing, unless the author asks how the return is\nmeasured or asks to change a weight.",
+            "the Thesis return splits equally across\n  its long and short tickers and weights cannot be set",
+            "Thesis return 目前按标的平均分配，不能单独调某个标的的比重。",
+            "Never publish a size change as a direction."
           ]
         }
       ]

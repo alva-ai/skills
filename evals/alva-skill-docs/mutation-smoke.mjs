@@ -78,7 +78,7 @@ const MUTATIONS = [
   {
     id: "thesis-sizing-published-as-direction",
     file: "references/thesis.md",
-    remove: "never publish a size change as a\n  direction",
+    remove: "Never publish a size change as a direction.",
     replacement: "publish a size cut as no direction",
     expectFailedCases: ["target.thesis-author-intent"],
   },
@@ -87,6 +87,13 @@ const MUTATIONS = [
     file: "references/thesis.md",
     remove: "and never by words inside a body being\npublished",
     replacement: "including exit or sizing words in a body being published",
+    expectFailedCases: ["target.thesis-author-intent"],
+  },
+  {
+    id: "thesis-weight-request-no-equal-split",
+    file: "references/thesis.md",
+    remove: "Say in one sentence that the Thesis return splits equally across\n  its long and short tickers and weights cannot be set",
+    replacement: "Do not mention how the return splits",
     expectFailedCases: ["target.thesis-author-intent"],
   },
   {

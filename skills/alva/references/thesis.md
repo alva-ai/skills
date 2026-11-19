@@ -584,7 +584,7 @@ them. Route each request about an existing Thesis by what the author wants to
 achieve, however they word it, and never by words inside a body being
 published. Describe the result in terms of views and directions, never
 positions, weights or rebalancing, unless the author asks how the return is
-measured.
+measured or asks to change a weight.
 
 - **Stop the Thesis** (they no longer want it): follow
   [Closing or deleting a Thesis](#closing-or-deleting-a-thesis). When the
@@ -596,9 +596,12 @@ measured.
   when they no longer hold a call on it. The Update preview is the one
   confirmation; do not ask whether to archive instead.
 - **Change how much weight a ticker carries**: a Thesis records direction,
-  not size. Ask one question in direction terms, such as “NVDA 还看多吗？”; do
-  not explain weighting unless asked, and never publish a size change as a
-  direction.
+  not size. Say in one sentence that the Thesis return splits equally across
+  its long and short tickers and weights cannot be set, for example
+  “Thesis return 目前按标的平均分配，不能单独调某个标的的比重。” / "The Thesis
+  return splits equally across its tickers; one ticker's weight can't be set."
+  Then ask whether the call on that ticker changes, such as “NVDA 还看多吗？”.
+  Never publish a size change as a direction.
 - **Hide it from others, or show it again**: `set-visibility`; no Update.
 - **Stop new research and Signals**: `set-signal-enabled --id <id> --enabled
   false`; `true` resumes them. The return is unaffected.
