@@ -67,6 +67,11 @@ durable user memory only from traceable original user statements; never promote
 assistant output, automation output, third-party claims, or inference into
 `user.md` as if the user stated it.
 
+Dream also reads the accounts the user connected (X, broker) and what they keep
+on Alva (watchlist, people followed), and may add what that shows to Investment
+Style, Interests and Investment Thoughts. Such an entry ends with
+`(observed, <source>, <date>)`; see [Observed entries](#observed-entries).
+
 ### Scope root resolution
 
 `<scope-root>` is not a literal path. Resolve it before reading or writing pack
@@ -251,6 +256,29 @@ maintained, preserving meaningful dates, conditions and unresolved doubts,
 including those recorded in old status fields. Do not bulk-rewrite memory or
 request confirmation merely because a date has passed. Preserve historical
 context and follow later user corrections.
+
+#### Observed entries
+
+An entry ending with `(observed, <source>, <date>)` was written by background
+maintenance from the user's connected accounts, not from anything the user said.
+It records attention or habit: an area their follows gather around, a symbol
+they keep trading, how long they tend to hold.
+
+```markdown
+- Topic: semiconductors (observed, X follows, 2026-11-17)
+- Holding period: mostly weeks to a few months (observed, broker, 2026-11)
+```
+
+Use it to choose what to bring up and what to connect, including ideas worth
+developing into a Thesis with the user. Do not present it as their view, their
+intent or something they told you; following an account or holding a symbol is
+not agreement or conviction. Where it differs from what the user stated, the
+user's statement stands.
+
+Background maintenance owns these entries and removes ones that go stale. In
+conversation, do not write an entry with this mark. When the user confirms or
+corrects one, record what they said as their own entry under the Writing rules
+and remove the observed one it replaces.
 
 #### Action Preferences
 
