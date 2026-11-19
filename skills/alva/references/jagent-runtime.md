@@ -18,7 +18,8 @@ via `alva run` (inline code or filesystem entry path) or triggered by cronjobs.
   isolate
 - **Heap**: 256 MB per execution by default, overridable per run via
   `max_heap_size_mb` (1–2048 MB) — `--max-heap-size-mb <mb>` on `alva run`,
-  `max_heap_size_mb` in the `/api/v1/run` body / SDK
+  `max_heap_size_mb` in the SDK, `maxHeapSizeMb` in the `POST /api/v2/runs`
+  body
 - **Native API boundary**: no Node built-ins, `process`, shell, or local
   files. Top-level `await`, timers (`setTimeout` / `setInterval`), and a
   global `fetch` are available

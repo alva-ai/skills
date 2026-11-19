@@ -84,7 +84,7 @@ the cronjob.
 
 ```json
 {
-  "id": 42,
+  "id": "cronjob_000n0",
   "name": "btc-ema-update",
   "path": "/feeds/btc-ema/v1/src/index.js",
   "cron_expression": "0 */4 * * *",
@@ -110,7 +110,7 @@ alva deploy list [--limit 10] [--cursor CURSOR]
 ### Get Cronjob
 
 ```bash
-alva deploy get --id 42
+alva deploy get --id cronjob_000n0
 ```
 
 ### Update Cronjob
@@ -118,7 +118,7 @@ alva deploy get --id 42
 Partial update -- only include flags you want to change.
 
 ```bash
-alva deploy update --id 42 --cron "0 */2 * * *" --args '{"symbol":"ETH"}'
+alva deploy update --id cronjob_000n0 --cron "0 */2 * * *" --args '{"symbol":"ETH"}'
 ```
 
 Updatable fields: `--name`, `--cron`, `--args`, `--push-notify` /
@@ -127,14 +127,14 @@ Updatable fields: `--name`, `--cron`, `--args`, `--push-notify` /
 ### Delete Cronjob
 
 ```bash
-alva deploy delete --id 42
+alva deploy delete --id cronjob_000n0
 ```
 
 ### Pause / Resume
 
 ```bash
-alva deploy pause --id 42
-alva deploy resume --id 42
+alva deploy pause --id cronjob_000n0
+alva deploy resume --id cronjob_000n0
 ```
 
 Both return the updated cronjob object.
@@ -148,15 +148,15 @@ diagnose the problem.
 message. The response also includes aggregate stats (total/success/fail counts).
 
 ```bash
-alva deploy runs --id 42                # recent runs
-alva deploy runs --id 42 --first 10     # paginate
+alva deploy runs --id cronjob_000n0                # recent runs
+alva deploy runs --id cronjob_000n0 --first 10     # paginate
 ```
 
 **Get logs for a specific run** — returns the full stdout/stderr from that
 execution, useful for tracing errors or verifying output.
 
 ```bash
-alva deploy run-logs --id 42 --run-id 123
+alva deploy run-logs --id cronjob_000n0 --run-id cronjob_run_000n00yr
 ```
 
 ---

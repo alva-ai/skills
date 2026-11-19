@@ -347,8 +347,22 @@ const MUTATIONS = [
   {
     id: "thesis-quote-version-cli",
     file: "references/thesis.md",
-    remove: "alva thesis version get --id '123' --author-version-id '456'",
+    remove: "alva thesis version get --id 'thesis_001xg' --author-version-id 'thesis_version_001xg1j03'",
     expectFailedCases: ["target.thesis-quote-context"],
+  },
+  {
+    id: "thesis-quote-opaque-ids",
+    file: "references/thesis.md",
+    remove: "Pass both IDs exactly as given (opaque strings)",
+    replacement: "Keep both IDs as positive int64 decimal strings",
+    expectFailedCases: ["target.thesis-quote-context"],
+  },
+  {
+    id: "thesis-returned-ids-opaque",
+    file: "references/thesis.md",
+    remove: "Treat every returned ID as an opaque string",
+    replacement: "Treat all returned IDs as decimal strings",
+    expectFailedCases: ["target.thesis-create-preview-card"],
   },
   {
     id: "thesis-authorship-keep-claims",

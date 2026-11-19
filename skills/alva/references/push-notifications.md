@@ -40,7 +40,7 @@ alva automation delivery update --id <automation_id> --email-enabled
 alva automation delivery update --id <automation_id> --no-email-enabled
 
 # Replace only Alva destinations. 0 is the default Agent destination.
-alva automation delivery update --id <automation_id> --alva-channel-ids 0,123
+alva automation delivery update --id <automation_id> --alva-channel-ids 0,channel_001xg
 
 # Clear only Alva destinations.
 alva automation delivery update --id <automation_id> --alva-channel-ids=

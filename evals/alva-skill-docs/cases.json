@@ -25,9 +25,10 @@
           "file": "references/thesis.md",
           "includes": [
             "use the IDs as read-only question context",
-            "alva thesis version get --id '123' --author-version-id '456'",
+            "Pass both IDs exactly as given (opaque strings)",
+            "alva thesis version get --id 'thesis_001xg' --author-version-id 'thesis_version_001xg1j03'",
             "never the latest `alva thesis get --id`",
-            "alva thesis signals --id '123' --first 20",
+            "alva thesis signals --id 'thesis_001xg' --first 20",
             "do not fall back to direct HTTP, GraphQL",
             "Signals span",
             "entry's `author_version_id`",
@@ -1474,7 +1475,7 @@
           "id": "before-automation-update",
           "label": "automation update gate",
           "includes": [
-            "target numeric ID belongs to the intended owned automation",
+            "target automation ID belongs to the intended owned automation",
             "replacement cronjob exists",
             "resulting producer's exact script ran successfully via `alva run`",
             "do not fall back to delete-and-recreate",
@@ -1604,7 +1605,7 @@
         }
       ],
       "includes": [
-        "version: v1.32.3",
+        "version: v1.33.0",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -1673,6 +1674,7 @@
             "Do not call `thesis rewrite` merely to make the first draft",
             "alva thesis asset-candidates --text",
             "--entity-stances",
+            "Treat every returned ID as an opaque string",
             "When the author disagrees with a direction, do not change it",
             "Do not summarize",
             "After creation, `thesis get` is the sole source for the preview",
@@ -1691,7 +1693,7 @@
             "<thesis-preview schema-version=\"1\" thesis-id=",
             "<body>",
             "<tickers>",
-            "<ticker entity-id=\"789\" symbol=\"NVDA\" icon-url=",
+            "<ticker entity-id=\"asset_002agc\" symbol=\"NVDA\" icon-url=",
             "from entity `id`,",
             "use self-closing ticker elements in GET order",
             "After one XML decode",

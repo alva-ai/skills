@@ -72,7 +72,7 @@ before updating.
 <HARD-GATE id="before-automation-update">
 Before `alva automation update`, verify:
 
-1. The target numeric ID belongs to the intended owned automation.
+1. The target automation ID belongs to the intended owned automation.
 2. The requested flags describe only the fields the user intends to change.
 3. If changing the producer, the replacement cronjob exists, belongs to the
    same user, and its id is known.
