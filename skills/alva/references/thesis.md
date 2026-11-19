@@ -580,30 +580,31 @@ into the body.
 
 An author publishes views, not positions. The directions in the preview are
 the only position-like thing they confirm, and the Thesis return follows from
-them. Map the author's words to a direction change, an added or removed
-ticker, archiving, unarchiving, or one of the controls below. Do not describe
-these with positions, weights or rebalancing unless the author asks how the
-return is measured.
+them. Route each request about an existing Thesis by what the author wants to
+achieve, however they word it, and never by words inside a body being
+published. Describe the result in terms of views and directions, never
+positions, weights or rebalancing, unless the author asks how the return is
+measured.
 
-- “关闭 / 关掉 / 删掉 / 不要了”: follow
+- **Stop the Thesis** (they no longer want it): follow
   [Closing or deleting a Thesis](#closing-or-deleting-a-thesis). When the
-  context shows they mean notifications, such as a reply to a Signal, offer
-  pausing research instead.
-- “离场 / 止盈 / 止损 / 平仓 / 观望 / 没观点了”, for some or all tickers: an
-  Update giving those tickers no direction. Its preview is the one
+  context shows they only want fewer notifications, such as a reply to a
+  Signal, offer pausing research instead.
+- **Keep it running with a changed call**: an Update with the changed tickers
+  and directions. That covers reversing a direction, adding or removing a
+  ticker, and keeping a ticker with no direction, for some or all tickers,
+  when they no longer hold a call on it. The Update preview is the one
   confirmation; do not ask whether to archive instead.
-- “翻空 / 转多 / 方向不对”: an Update with the author's corrected direction.
-- “加上 / 去掉 <ticker>”: an Update adding or removing it.
-- “加仓 / 减仓 / 减一半 / 仓位比例”: a Thesis records direction, not size. Ask
-  one question in direction terms, such as “NVDA 还看多吗？”; do not explain
-  weighting unless asked, and never publish a size change as a direction.
-- “别人别看到 / 设成私密 / 公开”: `set-visibility`; no Update.
-- “别再推了 / 暂停研究”: `set-signal-enabled --id <id> --enabled false`,
-  which pauses research and new Signals; `true` resumes them. The return is
-  unaffected.
-- “不想算收益”: possible only while `tracking` is `UNSET`, through the
-  turn-off action in a preview; otherwise say the setting is permanent.
-- “恢复 / 取消归档”: an Update with `--archived false`, per
+- **Change how much weight a ticker carries**: a Thesis records direction,
+  not size. Ask one question in direction terms, such as “NVDA 还看多吗？”; do
+  not explain weighting unless asked, and never publish a size change as a
+  direction.
+- **Hide it from others, or show it again**: `set-visibility`; no Update.
+- **Stop new research and Signals**: `set-signal-enabled --id <id> --enabled
+  false`; `true` resumes them. The return is unaffected.
+- **Not have a return**: possible only while `tracking` is `UNSET`, through
+  the turn-off action in a preview; otherwise say the setting is permanent.
+- **Bring back an archived Thesis**: an Update with `--archived false`, per
   [Thesis maintenance controls](#thesis-maintenance-controls).
 
 ## Thesis return

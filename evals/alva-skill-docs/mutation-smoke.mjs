@@ -78,8 +78,15 @@ const MUTATIONS = [
   {
     id: "thesis-sizing-published-as-direction",
     file: "references/thesis.md",
-    remove: "never publish a size change as a direction",
+    remove: "never publish a size change as a\n  direction",
     replacement: "publish a size cut as no direction",
+    expectFailedCases: ["target.thesis-author-intent"],
+  },
+  {
+    id: "thesis-intent-from-body-words",
+    file: "references/thesis.md",
+    remove: "and never by words inside a body being\npublished",
+    replacement: "including exit or sizing words in a body being published",
     expectFailedCases: ["target.thesis-author-intent"],
   },
   {

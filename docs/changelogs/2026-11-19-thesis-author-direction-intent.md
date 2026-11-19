@@ -34,10 +34,15 @@ explaining positions.
   author did not ask for is named in the preview.
 - B4: Notes flag a relative call, which counts as one long and one short, and a
   conditional or "avoid" call, which has no direction and no return.
-- B5: "What the author asks for" maps the author's words to a direction change,
-  a ticker change, archive, unarchive, `set-visibility` or
-  `set-signal-enabled`. Size requests (加仓 / 减仓) get one question in
-  direction terms and are never published as a direction.
+- B5: "What the author asks for" routes each request about an existing Thesis
+  by the author's goal, however it is worded, and never by words inside a
+  body being published. The goals are: stop the Thesis (archive), keep it
+  running with a changed call (an Update with changed tickers and directions,
+  including no direction), change a ticker's weight (one question in
+  direction terms; never published as a direction), hide or show it
+  (`set-visibility`), stop research and Signals (`set-signal-enabled`), not
+  have a return (only while `UNSET`), and bring it back (an Update with
+  `--archived false`). Results are described in view terms, never positions.
 - B6: a close or delete request leads with one archive action, saying the
   record stays and the return holds. The Agent archives only after the author
   accepts. It leads with an Update instead when the view changed or the Thesis
@@ -68,7 +73,7 @@ disambiguation question.
   - The two excludes that encoded "explicit direction wins" as forbidden are
     removed.
   - New case `target.thesis-author-intent`.
-- Mutations: the old override mutation is replaced with four mutations that
+- Mutations: the old override mutation is replaced with five mutations that
   guard the new rules.
 
 ## 5. Verification and E2E Design
@@ -81,11 +86,14 @@ disambiguation question.
 - Zet, 2026-11-19: the author should not need to think about positions when
   publishing, and the return algorithm should feel fair in hindsight. A close
   request still goes to archive with one confirmation.
+- Zet, 2026-11-19: "按意图重写". The subsection lists goals, not trading
+  vocabulary as triggers, so body text such as "我会在 100 止盈" is not read as
+  an exit request.
 
 ## 7. Outcome and Evidence
 
 Docs only. 2026-11-19: `node evals/alva-skill-docs/skill-doc-eval.mjs
---skill-dir skills/alva` exit 0 (132/132); mutation smoke 81/81; durable agent
+--skill-dir skills/alva` exit 0 (132/132); mutation smoke 82/82; durable agent
 5/5.
 
 ## 8. Remaining Work
