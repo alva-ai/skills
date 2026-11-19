@@ -1,4 +1,4 @@
-# Alva daily routine
+# Alva routine
 
 For agents connected through [BOOTSTRAP.md](../BOOTSTRAP.md). It runs on a
 schedule with nobody watching, or right away while the user is present (the
@@ -94,7 +94,9 @@ take a thesis down with `alva thesis archive --id <id> --request-id <new UUID>`.
 alva people follows activity --since <last run from your memory>
 ```
 
-Omit `--since` when your memory has no last run. Summarize newest first: who
+Omit `--since` when your memory has no last run. Activity reaches back at most
+31 days: when the last run is older, say the note covers only the last 31 days.
+Summarize newest first: who
 did what (published or updated a thesis; bookmarked a thesis; liked a Signal,
 the piece of evidence under a thesis; added tickers to their Watchlist), one
 line on each thesis or Signal, and why it matters when it touches the user's

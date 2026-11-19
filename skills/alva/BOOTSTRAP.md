@@ -5,7 +5,7 @@ version: 1
 # Alva bootstrap
 
 Connects this agent to the user's Alva account. Run it when the user asks you to
-follow BOOTSTRAP.md or to update Alva setup. The daily routine tells them when
+follow BOOTSTRAP.md or to update Alva setup. The routine tells them when
 `version` above is newer than the "Alva bootstrap vN done" in your memory; an
 update skips the steps already done. Everything you need is in this file
 and [agent-routine.md](references/agent-routine.md); you do not need the rest of
@@ -37,6 +37,8 @@ and the user's language, briefly. Then stop and wait for their go-ahead:
   allow reading those files.
 - You'll show everything before anything is saved.
 - Holdings, balances and account details are never sent to Alva.
+- Afterwards you'll check Alva for them every day at 08:00, unless they name
+  another time or how often (weekdays, weekly, …) in their reply.
 - They can say stop at any time.
 - Ask whether to start.
 
@@ -53,25 +55,29 @@ and the user's language, briefly. Then stop and wait for their go-ahead:
   running.
 - Already signed in → move on without comment.
 
-## 2. Daily routine
+## 2. Routine
 
-Schedule [agent-routine.md](references/agent-routine.md) for 08:00 local time
-every day, then run it once right now with the user present. That first run is
-the initial memory and thesis sync.
+Schedule [agent-routine.md](references/agent-routine.md) at the time and
+frequency the user chose (08:00 local time every day unless they said
+otherwise), then run it once right now with the user present. That first run is
+the initial memory and thesis sync. The examples below use the default
+`0 8 * * *`; change the schedule to match their choice.
 
-- **OpenClaw**: `openclaw cron add --name "Alva daily" --cron "0 8 * * *" --message "Run the Alva daily routine: follow references/agent-routine.md in the Alva skill." --announce`
-- **Hermes**: `hermes cron create "0 8 * * *" "Run the Alva daily routine: follow references/agent-routine.md in the Alva skill." --skill alva --name "Alva daily" --deliver origin`
-- **Grok bot**: create a Routine named "Alva daily", every day at 08:00, with
+- **OpenClaw**: `openclaw cron add --name "Alva routine" --cron "0 8 * * *" --message "Run the Alva routine: follow references/agent-routine.md in the Alva skill." --announce`
+- **Hermes**: `hermes cron create "0 8 * * *" "Run the Alva routine: follow references/agent-routine.md in the Alva skill." --skill alva --name "Alva routine" --deliver origin`
+- **Grok bot**: create a Routine named "Alva routine" on that schedule, with
   the same prompt. Its note shows up in your chat.
 - **A desktop app with scheduled tasks (Claude, Codex)**: create one named
-  "Alva daily" with the app's scheduled-task or automation tool, daily at
-  08:00, with the same prompt. Its note shows up in the app. No such tool in
+  "Alva routine" with the app's scheduled-task or automation tool, on that
+  schedule, with the same prompt. Its note shows up in the app. No such tool in
   this session → tell the user where the app adds one, and give them the
   prompt.
 - **A terminal session (Claude Code, Codex CLI) and agents whose scheduler
   cannot reach the user**: do not schedule. A headless run has nowhere to
   deliver the note.
-- A job named "Alva daily" already exists → keep it; do not add another.
+- A job named "Alva routine" already exists → keep it, changing only its
+  schedule if the user chose a new one; do not add another. The same applies whenever the user later asks for another
+  time or frequency.
 - Not scheduled (no scheduler, the user declines, or it fails) → say why in
   one line, and tell them to ask "what's new on Alva" any time; that runs the
   routine with them present.
@@ -81,7 +87,7 @@ the initial memory and thesis sync.
 
 Tell the user what was saved (how many memory items, which theses, all
 private), that they can see it in the Alva app under Me, that saying "undo"
-removes any of it (see Undo in agent-routine.md), and when the next daily note arrives (or that none is scheduled).
+removes any of it (see Undo in agent-routine.md), and when the next note arrives (or that none is scheduled).
 
 Then record in your own memory:
 "Alva bootstrap v1 done <date>; Alva routine last ran <until from step 2>.

@@ -635,6 +635,13 @@ const MUTATIONS = [
     expectFailedCases: ["target.agent-bootstrap"],
   },
   {
+    id: "bootstrap-fixed-daily-schedule",
+    file: "BOOTSTRAP.md",
+    remove: "frequency the user chose (08:00 local time every day unless they said",
+    replacement: "frequency of 08:00 local time every day (whatever they said",
+    expectFailedCases: ["target.agent-bootstrap"],
+  },
+  {
     id: "skill-sandbox-runs-bootstrap",
     file: "SKILL.md",
     remove: " A Sandbox runs neither: it only gives BOOTSTRAP's \"If you are Alva itself\" reply.",

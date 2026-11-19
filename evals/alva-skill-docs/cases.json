@@ -2797,9 +2797,9 @@
       "id": "target.agent-bootstrap",
       "group": "target",
       "target": "corpus",
-      "description": "External agents connect through a self-contained, versioned BOOTSTRAP.md and a daily routine that only reads when unattended.",
+      "description": "External agents connect through a self-contained, versioned BOOTSTRAP.md and a scheduled routine that only reads when unattended.",
       "includes": [
-        "to connect an agent to Alva, [BOOTSTRAP.md](BOOTSTRAP.md); for the Alva daily routine, [agent-routine.md](references/agent-routine.md). A Sandbox runs neither: it only gives BOOTSTRAP's \"If you are Alva itself\" reply.",
+        "to connect an agent to Alva, [BOOTSTRAP.md](BOOTSTRAP.md); for the Alva routine, [agent-routine.md](references/agent-routine.md). A Sandbox runs neither: it only gives BOOTSTRAP's \"If you are Alva itself\" reply.",
         "people follows activity"
       ],
       "file_includes": [
@@ -2815,10 +2815,12 @@
             "**If you cannot run shell commands** (a chat app with no computer of its own),",
             "this setup needs an AI agent that can run commands, such as Claude or Codex on",
             "use `alva auth login --no-browser` instead: send them the",
-            "- **Grok bot**: create a Routine named \"Alva daily\", every day at 08:00, with",
+            "- **Grok bot**: create a Routine named \"Alva routine\" on that schedule, with",
+            "frequency the user chose (08:00 local time every day unless they said",
+            "exists → keep it, changing only its",
             "Never add crontab entries or launch agents.",
             "A headless run has nowhere to deliver the note.",
-            "Run the Alva daily routine: follow references/agent-routine.md in the Alva skill.",
+            "Run the Alva routine: follow references/agent-routine.md in the Alva skill.",
             "'What's new on Alva' means: run references/agent-routine.md in the Alva skill.",
             "Alva bootstrap v1 done"
           ]
@@ -2838,7 +2840,8 @@
             "your own suggestions, your inferences and their repeated",
             "--entity-ids '<id,id>' --no-discovery",
             "Any `UNKNOWN`, or the call fails → do",
-            "each body in full,"
+            "each body in full,",
+            "31 days: when the last run is older, say the note covers only the last 31 days."
           ]
         },
         {
