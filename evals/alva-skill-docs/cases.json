@@ -2818,6 +2818,7 @@
             "- **Grok bot**: create a Routine named \"Alva routine\" on that schedule, with",
             "frequency the user chose (08:00 local time every day unless they said",
             "exists → keep it, changing only its",
+            "To change how often it runs, change the schedule of the 'Alva routine' job;",
             "Never add crontab entries or launch agents.",
             "A headless run has nowhere to deliver the note.",
             "Run the Alva routine: follow references/agent-routine.md in the Alva skill.",

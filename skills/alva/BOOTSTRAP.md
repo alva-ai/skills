@@ -76,8 +76,7 @@ the initial memory and thesis sync. The examples below use the default
   cannot reach the user**: do not schedule. A headless run has nowhere to
   deliver the note.
 - A job named "Alva routine" already exists → keep it, changing only its
-  schedule if the user chose a new one; do not add another. The same applies whenever the user later asks for another
-  time or frequency.
+  schedule if the user chose a new one; do not add another.
 - Not scheduled (no scheduler, the user declines, or it fails) → say why in
   one line, and tell them to ask "what's new on Alva" any time; that runs the
   routine with them present.
@@ -91,4 +90,6 @@ removes any of it (see Undo in agent-routine.md), and when the next note arrives
 
 Then record in your own memory:
 "Alva bootstrap v1 done <date>; Alva routine last ran <until from step 2>.
-'What's new on Alva' means: run references/agent-routine.md in the Alva skill."
+'What's new on Alva' means: run references/agent-routine.md in the Alva skill.
+To change how often it runs, change the schedule of the 'Alva routine' job;
+never add a second one."
