@@ -291,8 +291,8 @@ another verified ID, clarify that point before publishing.
 #### Directions and the Thesis return
 
 Directions come from Alva's direction judgment of the body, the same one the
-Thesis editor uses; the Agent does not choose them. Once the IDs are verified,
-call:
+Thesis editor uses, unless the author corrects one (below); the Agent never
+chooses one on its own. Once the IDs are verified, call:
 
 ```sh
 alva thesis asset-candidates --text '<exact body>' --entity-ids '<id,id>' --no-discovery [--thesis-id '<thesis id>']
@@ -304,7 +304,8 @@ Pass `--thesis-id` for an Update, even when no ticker remains. Read only
 - `directions`: the direction each ticker will be stored with. Publish exactly
   these, lowercased, in `--entity-stances`. If any is `UNKNOWN`, or the call
   fails or is rate limited, do not publish: say the directions could not be
-  judged just now and offer to try again.
+  judged just now and offer to try again. A direction the author corrected
+  (below) replaces the one returned for that ticker, including an `UNKNOWN`.
 - `askSwitch`: show the Thesis return line and the turn-off action (below).
 - `lastLegRemoved`: after this Update the Thesis has no long or short ticker,
   so its return holds at its current value until a later Update adds one. It
@@ -312,12 +313,31 @@ Pass `--thesis-id` for an Update, even when no ticker remains. Read only
   explain it unless asked.
 - `tracking`: `UNSET`, `ON` or `OFF`. `ON` and `OFF` are permanent.
 
-When the author disagrees with a direction, do not change it: suggest stating
-the direction explicitly in the body, then preview again. To keep a ticker
-with no direction, the body says so (for example that there is no current
-call on it); the preview then gives `none`, which publishes as an exit, also
-for the last long or short. Never send `unknown` to clear a direction: it
-keeps the previous one. Never treat a direction as publication consent.
+The author can correct a direction. When the author says in this conversation
+that a ticker should be long, short or have no direction, use that direction
+for the ticker and preview again, marking it “（按你的指定）” / "(as you set
+it)"; the body need not change. Only the author's explicit words about that
+ticker count: the Agent never changes a direction on its own, and never infers
+one from research or general discussion. If the body states the opposite call explicitly, add one
+Notes line that readers see the body and the label disagree, and offer a
+one-line body addition; do not block publication. A correction applies to the
+Update being previewed. A later Update is judged again from the stored
+directions; when that would change a direction the author did not ask to
+change, name the change in the preview.
+
+To keep a ticker with no direction, the author can say so or the body can
+(for example that there is no current call on it); either way publish `none`,
+which publishes as an exit, also for the last long or short. Never send
+`unknown` to clear a direction: it keeps the previous one. Never treat a
+direction as publication consent.
+
+Flag in Notes, once per preview, two judgments the author may not expect:
+
+- A relative call (“NVDA stronger than AMD”) is a long and a short: name the
+  ticker that will count as short.
+- A conditional, event-triggered or “avoid” call has no direction and no
+  return: say so in one line, so a later move in the stated direction does
+  not look uncounted.
 
 Preserve the selected body exactly, including wording, language, whitespace and
 line breaks. Do not summarize, rewrite, translate, correct, expand, generate a
@@ -414,7 +434,8 @@ files first. Quote input without changing it. Body is limited to 65536 UTF-8
 bytes and title to 500 bytes; reject invalid, empty, or oversized input without
 truncation. Treat all returned IDs as decimal strings.
 Send `--entity-stances` as JSON with decimal-string `entity_id` values and the
-`returnPreview` directions (`bullish`, `bearish` or `none`), paired with
+confirmed directions (`bullish`, `bearish` or `none`: `returnPreview` plus
+any author correction), paired with
 `--entity-ids` in the confirmed order. Do not pass a stance for an
 entity absent from the confirmed ID list. When the user supplied ticker symbols,
 preserve their order, but do not send a resolved asset again via
@@ -425,7 +446,7 @@ same request ID only while the full confirmed payload is unchanged.
 ## Created Thesis preview
 
 After creation, verify the `direction` of each `response.thesis.entity_stances`
-entry against the confirmed `returnPreview` directions when the GET response
+entry against the confirmed directions when the GET response
 includes it; report any mismatch instead of claiming that direction was saved. After creation, `thesis get` is the sole source
 for the preview. Use:
 
@@ -524,7 +545,7 @@ that the update replaces the whole body of the selected Thesis. Every Update,
 including a wording-only edit, gets its directions from
 [Directions and the Thesis return](#directions-and-the-thesis-return) with
 `--thesis-id`: carried tickers keep their direction unless the new text
-reverses or exits them. Show the resulting assets and directions, send them,
+reverses or exits them or the author corrects them. Show the resulting assets and directions, send them,
 and end the preview the same way as a creation preview, with actions when
 `PresentActions` is available. When `thesis update` returns `unchanged: true`,
 nothing was stored: say the Update changed nothing, never that it was
@@ -554,6 +575,36 @@ into the body.
   them; never default an existing private Thesis to public. Report a
   published Update with the preview block from
   [Created Thesis preview](#created-thesis-preview).
+
+### What the author asks for
+
+An author publishes views, not positions. The directions in the preview are
+the only position-like thing they confirm, and the Thesis return follows from
+them. Map the author's words to a direction change, an added or removed
+ticker, archiving, unarchiving, or one of the controls below. Do not describe
+these with positions, weights or rebalancing unless the author asks how the
+return is measured.
+
+- “关闭 / 关掉 / 删掉 / 不要了”: follow
+  [Closing or deleting a Thesis](#closing-or-deleting-a-thesis). When the
+  context shows they mean notifications, such as a reply to a Signal, offer
+  pausing research instead.
+- “离场 / 止盈 / 止损 / 平仓 / 观望 / 没观点了”, for some or all tickers: an
+  Update giving those tickers no direction. Its preview is the one
+  confirmation; do not ask whether to archive instead.
+- “翻空 / 转多 / 方向不对”: an Update with the author's corrected direction.
+- “加上 / 去掉 <ticker>”: an Update adding or removing it.
+- “加仓 / 减仓 / 减一半 / 仓位比例”: a Thesis records direction, not size. Ask
+  one question in direction terms, such as “NVDA 还看多吗？”; do not explain
+  weighting unless asked, and never publish a size change as a direction.
+- “别人别看到 / 设成私密 / 公开”: `set-visibility`; no Update.
+- “别再推了 / 暂停研究”: `set-signal-enabled --id <id> --enabled false`,
+  which pauses research and new Signals; `true` resumes them. The return is
+  unaffected.
+- “不想算收益”: possible only while `tracking` is `UNSET`, through the
+  turn-off action in a preview; otherwise say the setting is permanent.
+- “恢复 / 取消归档”: an Update with `--archived false`, per
+  [Thesis maintenance controls](#thesis-maintenance-controls).
 
 ## Thesis return
 
@@ -607,7 +658,12 @@ through `update` as a new Update.
 Alva cannot close or delete a Thesis or remove a published Update; every
 published Update stays on the record. When asked, say so plainly in one or two sentences, then offer what
 remains: archiving hides the Thesis until an Update restores it, or a new Update
-can state the changed view. Do not run close or delete commands, even where an
+can state the changed view. Lead with archiving, as one action (“归档” /
+"Archive") when `PresentActions` is available, and say the record stays and
+its return holds where it is; archive only after the author accepts. Lead with
+the Update instead when the author says the view changed or wants the Thesis
+to stay visible. An explicit archive request needs no extra confirmation.
+Do not run close or delete commands, even where an
 older CLI still lists them. Abandoning an unpublished draft needs no call.
 Never imitate closing or deletion by rewriting the body or dropping assets or
 directions.

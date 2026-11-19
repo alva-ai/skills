@@ -1673,7 +1673,7 @@
             "Do not call `thesis rewrite` merely to make the first draft",
             "alva thesis asset-candidates --text",
             "--entity-stances",
-            "When the author disagrees with a direction, do not change it",
+            "The author can correct a direction.",
             "Do not summarize",
             "After creation, `thesis get` is the sole source for the preview",
             "author_version_id",
@@ -2591,7 +2591,7 @@
       "id": "target.thesis-return-preview",
       "group": "target",
       "target": "corpus",
-      "description": "Publication previews take directions and the return switch from Alva's direction judgment, offer the turn-off action only when asked, publish exactly the previewed directions, and explain returns from thesis return.",
+      "description": "Publication previews take directions and the return switch from Alva's direction judgment unless the author corrects one, offer the turn-off action only when asked, publish exactly the confirmed directions, flag relative and conditional calls, and explain returns from thesis return.",
       "file_includes": [
         {
           "file": "references/thesis.md",
@@ -2604,7 +2604,13 @@
             "do not publish",
             "only when `askSwitch` is\ntrue",
             "--track-return false",
-            "When the author disagrees with a direction, do not change it",
+            "The author can correct a direction.",
+            "the Agent never changes a direction on its own",
+            "（按你的指定）",
+            "do not block publication",
+            "name the change in the preview",
+            "A relative call",
+            "has no direction and no\n  return",
             "lastLegRemoved",
             "THESIS_RETURN_SWITCH_FINAL",
             "Never send `unknown` to clear a direction",
@@ -2620,8 +2626,6 @@
             "Answer only\nwhat the user asks about; do not volunteer how returns are measured."
           ],
           "excludes": [
-            "preserve\nexplicit author direction over a model suggestion",
-            "The user's explicit direction wins",
             "an edit that\nkeeps the view carries the current directions",
             "**Entry price**:",
             "**Refresh**:",
@@ -2633,6 +2637,32 @@
           "file": "SKILL.md",
           "includes": [
             "[Thesis return](references/thesis.md#thesis-return)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "target.thesis-author-intent",
+      "group": "target",
+      "target": "corpus",
+      "description": "Author requests about an existing Thesis map to a direction change, ticker change, archive, unarchive or a control, in direction terms rather than positions; close requests lead with one archive confirmation.",
+      "file_includes": [
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "### What the author asks for",
+            "An author publishes views, not positions.",
+            "Do not describe\nthese with positions, weights or rebalancing unless the author asks how the\nreturn is measured.",
+            "do not ask whether to archive instead",
+            "a Thesis records direction, not size",
+            "never publish a size change as a direction",
+            "`set-visibility`; no Update.",
+            "set-signal-enabled --id <id> --enabled false",
+            "The return is\n  unaffected.",
+            "possible only while `tracking` is `UNSET`",
+            "Lead with archiving",
+            "archive only after the author accepts",
+            "An explicit archive request needs no extra confirmation."
           ]
         }
       ]
