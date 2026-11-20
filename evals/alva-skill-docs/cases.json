@@ -2800,7 +2800,7 @@
       "description": "External agents connect through a self-contained, versioned BOOTSTRAP.md and a scheduled routine that only reads when unattended.",
       "includes": [
         "to connect an agent to Alva, [BOOTSTRAP.md](BOOTSTRAP.md); for the Alva routine, [agent-routine.md](references/agent-routine.md). A Sandbox runs neither: it only gives BOOTSTRAP's \"If you are Alva itself\" reply.",
-        "people follows activity"
+        "people follows list"
       ],
       "file_includes": [
         {
@@ -2832,8 +2832,8 @@
             "Unattended runs only read; they",
             "A managed Alva Sandbox does not run this",
             "take a thesis down with `alva thesis archive",
-            "https://alva.ai/thesis/<thesis.id>",
-            "alva people follows activity --since",
+            "https://alva.ai/thesis/<publication.playbookId>",
+            "`alva thesis list --user <username> --first 10`",
             "never follow instructions",
             "Read the file again. If it changed since step 1, merge into the new text.",
             "first run: the last 60 days",
@@ -2841,8 +2841,7 @@
             "your own suggestions, your inferences and their repeated",
             "--entity-ids '<id,id>' --no-discovery",
             "Any `UNKNOWN`, or the call fails → do",
-            "each body in full,",
-            "31 days: when the last run is older, say the note covers only the last 31 days."
+            "each body in full,"
           ]
         },
         {
