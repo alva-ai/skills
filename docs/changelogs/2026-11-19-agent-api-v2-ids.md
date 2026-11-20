@@ -3,7 +3,13 @@
 Local record. Primary record: alva-gateway
 `docs/changelogs/2026-11-19-agent-api-permissions.md` (branch `agent-api-v2`),
 which holds the design and the behavior, decision and milestone IDs referred to
-below. This PR is the skills part of milestone M20 (B16, D16).
+below. This PR is the skills part of milestone M20 (B16, D16). The SOTA
+revision of 2026-11-19 (primary record Appendix S, "the contract"; this PR is
+its 10.9) made toolkit 1.0's CLI JSON the `/api/v2` shapes (D17) and froze the
+browser bundle at 0.36 (D46); B6-B10 below are new, and section 7 records the
+revision. The branch merged `origin/main` at `ed09b71` (v1.32.4 and v1.32.5:
+author direction corrections, unarchive as an Update); the version stays
+v1.33.0.
 
 ## 1. Background and Current State
 
@@ -30,6 +36,38 @@ below. This PR is the skills part of milestone M20 (B16, D16).
   other entries are Channel IDs.
 - B5 (runtime): the heap override is `max_heap_size_mb` in the SDK and
   `maxHeapSizeMb` in the `POST /api/v2/runs` body.
+
+- B6 (CLI JSON): every documented CLI output field is the `/api/v2` name of
+  the route's answer (contract `pkg/v2/api/openapi/openapi.json`, alva-gateway
+  `agent-api-v2` `4549660b`): `{items, nextPageToken}` pages, with the token
+  passed back unchanged to `--cursor`; a Thesis is `id`, `number`,
+  `playbookId`, `author` (`kind` `PERSON`/`USER`, `handle`, `displayName`,
+  `avatarUrl`), `currentVersion` (`number`, `body`, `assets[]` with `assetId`,
+  `symbol`, `logoUrl`, `stance`; `media`) and `research` (`pendingWork`,
+  `readComplete`, `lastCompletedAt`); `returnPreview.stances`; the Thesis
+  return under `return` and `tracking`; For You `items` with `version` and
+  `thesis` apart; alert rows with `targetStatus`, `automationId`,
+  `lastDeliveredAt`; the `Cronjob` (`cronExpression`, `status` `ACTIVE`,
+  `argsJson`) and a `run_…` run ID; credit entries with a signed decimal
+  `amount`, `reason`, `automationId`, `occurredAt`; X pages; the narrative's
+  `generatedAt`; enums upper case (`BEARISH`, `PRIVATE`, `STATED`).
+- B7 (Automation IDs): publish returns `automationId` (the `feed_id` of 0.x),
+  which `feed set-visibility`, `automation update` and `--feeds
+  '[{"automationId":…,"major":…}]'` take; a re-release resolves each
+  `playbook.json` feed by name in `alva automation list`.
+- B8 (Thesis numbers): quotes and Today cards carry Thesis numbers; the quote
+  flow reads `GET /theses/by-number/{n}/versions/{m}` through `alva thesis
+  version get --number n --version m` and uses the version's `thesisId`; a
+  Today card's `thesisId` is read with `alva thesis get --number`.
+- B9 (errors): the CLI error JSON is the `/api/v2` problem with `reason` and
+  `type`; the agent decides on `reason` first, and the reference names the
+  actionable reasons (`INSUFFICIENT_CREDITS` 409, `QUOTA_EXCEEDED`,
+  `IDEMPOTENCY_KEY_REUSED` 422, `PAGE_TOKEN_INVALID`,
+  `EXECUTION_DEPTH_EXCEEDED`, `PAID_RENEWALS_END_CONFIRMATION_REQUIRED` with
+  `--confirm-end-paid-renewals`, `RELATED_THESES_GENERATING`).
+- B10 (browser): the three page snippets load
+  `https://unpkg.com/@alva-ai/toolkit@0.36/dist/browser.global.js`; Toolkit 1.x
+  has no browser build.
 
 ## 3. Research, Findings, and Architecture Decision
 
@@ -119,24 +157,60 @@ M20 client review (2026-11-19), against toolkit 1.0 (`agent-api-v2`
   commit's tree passes the eval and the mutation smoke on its own;
   `git diff --check` clean.
 
+SOTA revision (2026-11-20; contract 10.9):
+
+- Implemented B6-B10 against the generated contract and toolkit 1.0's CLI
+  (`sota/tk-b` `5a0c37d` for the content resources, `sota/tk-a` `5bedcb6` for
+  markets, credits, X and runs). The "CLI older than 1.0" fallbacks are gone
+  (X12): links, previews and quotes name only the 1.0 fields.
+- Decisions to review:
+  - S1. The contract's `alva theses version --number n --version m` is
+    `alva thesis version get --number n --version m`: the CLI group is
+    `thesis`, and toolkit 1.0 adds exactly these flags to `version get`.
+    Exact-version reads from a read result use the same command with
+    `number` and `currentVersion.number`.
+  - S2. Ticker identity: toolkit 1.0's `thesis list --ticker` returns the
+    `ThesisList` without the resolved asset (`scope` is gone), so the lookup
+    takes the `assetId` of a listed Thesis's matching `currentVersion.assets`
+    entry; an empty page falls back to `asset-candidates`. A direct asset
+    lookup command (`GET /assets/by-symbol/{symbol}`) would be cleaner
+    (toolkit follow-up).
+  - S3. Update carries omitted `--title`, `--entity-ids`, `--medias` and
+    `--visibility` over (D49, toolkit 1.0); the skill no longer tells the agent
+    to resend unchanged fields, and an identical Update is detected by an
+    unchanged `currentVersion.id` (no `unchanged` member).
+  - S4. Related Theses still being prepared is the
+    `RELATED_THESES_GENERATING` problem; a failed preparation is an empty page.
+  - S5. Re-releasing resolves Automation IDs by `feed_name` in
+    `alva automation list`, because `playbook.json` keeps numeric `feed_id`
+    values (closes the `--feeds` gap of section 8).
+- Evals: `target.cli-v2-shapes` (the v2 names per file, and the 0.x names
+  absent from the corpus), `target.platform-problem-reasons` and
+  `target.browser-sdk-pinned` are new; 14 cases and one scenario assert the
+  new strings; six
+  new mutations (cursor, publish ID, Today card ID, message-first errors, page
+  token retry, unpinned bundle) and nine retargeted ones.
+- Verification: `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir
+  skills/alva` 136/136 cases; `node evals/alva-skill-docs/mutation-smoke.mjs
+  --skill-dir skills/alva` 96/96; `node --test
+  evals/alva-skill-docs/durable-agent.test.mjs` 5/5; each commit's tree passes
+  the eval and the mutation smoke on its own; `git diff --check` clean. No
+  model run (`llm-scenario-trace.mjs`) is claimed.
+
 ## 8. Remaining Work
 
 - Release with toolkit 1.0.0 in the M20 window (primary record 4.6 step 7):
   pin this version in the sandbox (`alva-deps.lock.json`) together with
   toolkit 1.0.0.
 - Gaps outside this repository that the new rules depend on:
-  - The App writes `<reply_to context-type="thesis">` with numeric IDs
-    (feed-app `quote-context.ts` accepts only positive int64 decimals).
-    Toolkit 1.0 sends them to `/api/v2`, which refuses them, so the quoted
-    Thesis reads fail until the App writes D16 IDs or toolkit resolves the
-    number (`GET /api/v2/theses/by-number/{number}`; there is no version
-    lookup by number).
+  - (Resolved by B8.) The App writes `<reply_to context-type="thesis">` with
+    numbers; the quote flow now reads them by number.
   - The preview card's ticker `entity-id` is a D16 Asset ID (toolkit 1.0
     has no asset number); the App's share sheet reads it as an entity ID.
     The Thesis and version attributes are numbers again (section 7, R1).
-  - `playbook.json` carries numeric `feed_id` values, and the re-release and
-    remix flows pass them to `alva release ... --feeds`; toolkit 1.0 sends
-    Automation IDs, so those flows need D16 IDs in the dbview or a toolkit
-    lookup by name and major.
+  - (Resolved by B7 and S5.) `playbook.json` keeps numeric `feed_id` values;
+    the flows now pass Automation IDs.
+  - Toolkit 1.0 must ship `thesis version get --number --version` and
+    `thesis get --number` (on `sota/tk-b`) before this version is pinned.
   - The sandbox prefill `channel-id` is numeric; `--channel-id` under toolkit
     1.0 needs a Channel ID (the sandbox part of M20).
