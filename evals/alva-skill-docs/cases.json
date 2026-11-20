@@ -1604,7 +1604,7 @@
         }
       ],
       "includes": [
-        "version: v1.32.4",
+        "version: v1.32.5",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -1673,7 +1673,7 @@
             "Do not call `thesis rewrite` merely to make the first draft",
             "alva thesis asset-candidates --text",
             "--entity-stances",
-            "When the author disagrees with a direction, do not change it",
+            "The author can correct a direction.",
             "Do not summarize",
             "After creation, `thesis get` is the sole source for the preview",
             "author_version_id",
@@ -2322,7 +2322,9 @@
             "explain the limitation instead of inserting image links into the body",
             "Alva cannot close or delete a Thesis or remove a published Update",
             "say so plainly in one or two sentences",
-            "archiving hides the Thesis and can be restored, or a new Update can\nstate the changed view",
+            "archiving hides the Thesis until an Update restores it, or a new Update\ncan state the changed view",
+            "Unarchiving is publishing an Update; an archived Thesis takes no other Update.",
+            "`--archived false`",
             "Do not run close or delete commands, even where an\nolder CLI still lists them",
             "Abandoning an unpublished draft needs no call",
             "Never imitate closing or deletion by rewriting the body",
@@ -2589,7 +2591,7 @@
       "id": "target.thesis-return-preview",
       "group": "target",
       "target": "corpus",
-      "description": "Publication previews take directions and the return switch from Alva's direction judgment, offer the turn-off action only when asked, publish exactly the previewed directions, and explain returns from thesis return.",
+      "description": "Publication previews take directions and the return switch from Alva's direction judgment unless the author corrects one, offer the turn-off action only when asked, publish exactly the confirmed directions, flag relative and conditional calls, and explain returns from thesis return.",
       "file_includes": [
         {
           "file": "references/thesis.md",
@@ -2602,30 +2604,77 @@
             "do not publish",
             "only when `askSwitch` is\ntrue",
             "--track-return false",
-            "When the author disagrees with a direction, do not change it",
+            "The author can correct a direction.",
+            "the Agent never changes a direction on its own",
+            "（按你的指定）",
+            "do not block publication",
+            "name the change in the preview",
+            "A relative call",
+            "has no direction and no\n  return",
             "lastLegRemoved",
             "THESIS_RETURN_SWITCH_FINAL",
-            "THESIS_RETURN_LAST_LEG",
-            "至少要保留一个看多或看空的标的",
+            "Never send `unknown` to clear a direction",
+            "also\nfor the last long or short",
+            "`unchanged: true`",
+            "THESIS_ARCHIVED",
+            "发布这条 Update 会同时取消归档",
             "publishes like any other Update",
             "## Thesis return",
             "alva thesis return --id '<thesis id>' [--detail]",
             "the total cannot be added up from Update returns",
             "关闭后发布，这条 thesis 以后不能再开启",
-            "Answer only\nwhat the user asks about; do not volunteer how returns are measured."
+            "Answer only\nwhat the user asks about; do not volunteer how returns are measured.",
+            "“看多 / 看空 / 无方向”",
+            "“Bullish / Bearish / No direction”",
+            "never long/short or 看涨/看跌",
+            "这条 thesis\n的收益设置已经确定，不能再更改。"
           ],
           "excludes": [
-            "preserve\nexplicit author direction over a model suggestion",
-            "The user's explicit direction wins",
             "an edit that\nkeeps the view carries the current directions",
             "**Entry price**:",
-            "**Refresh**:"
+            "**Refresh**:",
+            "keptEntityIds",
+            "THESIS_RETURN_LAST_LEG",
+            "不计收益",
+            "Not tracked"
           ]
         },
         {
           "file": "SKILL.md",
           "includes": [
             "[Thesis return](references/thesis.md#thesis-return)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "target.thesis-author-intent",
+      "group": "target",
+      "target": "corpus",
+      "description": "Requests about an existing Thesis are routed by the author's goal, not by wording or body text, to archive, an Update with changed tickers and directions, an equal-split explanation and a direction question for weight, set-visibility, set-signal-enabled or unarchiving, described in view terms rather than positions; stopping a Thesis leads with one archive confirmation.",
+      "file_includes": [
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "### What the author asks for",
+            "An author publishes views, not positions.",
+            "Route each request about an existing Thesis by what the author wants to\nachieve, however they word it, and never by words inside a body being\npublished.",
+            "**Keep it running with a changed call**",
+            "keeping a ticker with no direction, for some or all tickers",
+            "do not ask whether to archive instead",
+            "a Thesis records direction,\n  not size",
+            "**Hide it from others, or show it again**: `set-visibility`; no Update.",
+            "set-signal-enabled --id <id> --enabled\n  false",
+            "The return is unaffected.",
+            "possible only while `tracking` is `UNSET`",
+            "**Bring back an archived Thesis**: an Update with `--archived false`",
+            "Lead with archiving",
+            "archive only after the author accepts",
+            "An explicit archive request needs no extra confirmation.",
+            "never\npositions, weights or rebalancing, unless the author asks how the return is\nmeasured or asks to change a weight.",
+            "the Thesis return splits equally across\n  its long and short tickers and weights cannot be set",
+            "Thesis return 目前按标的平均分配，不能单独调某个标的的比重。",
+            "Never publish a size change as a direction."
           ]
         }
       ]
