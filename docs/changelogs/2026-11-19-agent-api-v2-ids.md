@@ -214,3 +214,13 @@ SOTA revision (2026-11-20; contract 10.9):
     `thesis get --number` (on `sota/tk-b`) before this version is pinned.
   - The sandbox prefill `channel-id` is numeric; `--channel-id` under toolkit
     1.0 needs a Channel ID (the sandbox part of M20).
+
+## Review (Occam and review pass, 2026-11-20)
+
+- Occam: nothing removed.
+- Checked: every `/api/v2` path the skill documents exists in alva-gateway
+  P2 `pkg/v2/api/openapi/openapi.json`.
+- Verification: `node evals/alva-skill-docs/skill-doc-eval.mjs`: every check
+  passed (1,708 checked, 0 open); `node
+  evals/alva-skill-docs/mutation-smoke.mjs`: 96/96 mutations failed as
+  expected.
