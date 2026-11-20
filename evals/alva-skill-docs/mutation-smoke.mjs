@@ -222,6 +222,13 @@ const MUTATIONS = [
     expectFailedCases: ["target.platform-problem-reasons"],
   },
   {
+    id: "browser-sdk-unpinned",
+    file: "references/playbook-creation.md",
+    remove: "https://unpkg.com/@alva-ai/toolkit@0.36/dist/browser.global.js",
+    replacement: "https://unpkg.com/@alva-ai/toolkit/dist/browser.global.js",
+    expectFailedCases: ["target.browser-sdk-pinned"],
+  },
+  {
     id: "thesis-read-link-without-paragraph",
     file: "references/thesis.md",
     remove: "Put a blank line before and after each link, including between successive\nlinks, so every link is its own Markdown paragraph.",

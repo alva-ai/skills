@@ -2323,6 +2323,37 @@
       ]
     },
     {
+      "id": "target.browser-sdk-pinned",
+      "group": "target",
+      "target": "corpus",
+      "description": "Published pages load the frozen 0.36 browser bundle by a pinned unpkg URL; Toolkit 1.x has no browser build.",
+      "file_includes": [
+        {
+          "file": "references/playbook-creation.md",
+          "includes": [
+            "https://unpkg.com/@alva-ai/toolkit@0.36/dist/browser.global.js",
+            "Toolkit 1.x has no browser build; keep the pin"
+          ]
+        },
+        {
+          "file": "references/feed-sdk.md",
+          "includes": [
+            "https://unpkg.com/@alva-ai/toolkit@0.36/dist/browser.global.js"
+          ]
+        },
+        {
+          "file": "references/api/udf-runtime.md",
+          "includes": [
+            "https://unpkg.com/@alva-ai/toolkit@0.36/dist/browser.global.js"
+          ]
+        }
+      ],
+      "excludes": [
+        "unpkg.com/@alva-ai/toolkit/dist",
+        "unpkg.com/@alva-ai/toolkit@1"
+      ]
+    },
+    {
       "id": "target.for-you-context",
       "group": "target",
       "target": "corpus",

@@ -811,7 +811,7 @@ const points = JSON.parse(data);
 ### From a Web Page
 
 ```html
-<script src="https://unpkg.com/@alva-ai/toolkit/dist/browser.global.js"></script>
+<script src="https://unpkg.com/@alva-ai/toolkit@0.36/dist/browser.global.js"></script>
 <script>
   function createAlvaClientConfig() {
     const params = new URLSearchParams(window.location.search);

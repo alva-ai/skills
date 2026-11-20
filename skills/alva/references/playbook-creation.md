@@ -91,11 +91,12 @@ Do not rely on memory of prior sessions.
 
 Published HTML runs in the viewer's browser. It must not use `$ALVA_ENDPOINT`,
 hard-coded API origins, raw browser `fetch()` calls to Alva APIs, or
-hand-written auth headers for feed data. Load the browser SDK and use
+hand-written auth headers for feed data. Load the browser SDK pinned to
+`@0.36` (Toolkit 1.x has no browser build; keep the pin) and use
 `AlvaToolkit.AlvaClient`:
 
 ```html
-<script src="https://unpkg.com/@alva-ai/toolkit/dist/browser.global.js"></script>
+<script src="https://unpkg.com/@alva-ai/toolkit@0.36/dist/browser.global.js"></script>
 <script>
   function createAlvaClientConfig() {
     const params = new URLSearchParams(window.location.search);
