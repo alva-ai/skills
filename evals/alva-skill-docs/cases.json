@@ -185,7 +185,9 @@
         }
       ],
       "excludes": [
-        "Grok",
+        "X/Grok",
+        "/ Grok",
+        "searchGrokX",
         "search-grok-x",
         "x/live-search",
         "include:nativeretweets"
@@ -1604,7 +1606,7 @@
         }
       ],
       "includes": [
-        "version: v1.32.5",
+        "version: v1.33.0",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -2838,6 +2840,67 @@
         "any of the words; quote a phrase",
         "expect that post among the results too",
         "close or delete, verify the requested state"
+      ]
+    },
+    {
+      "id": "target.agent-bootstrap",
+      "group": "target",
+      "target": "corpus",
+      "description": "External agents connect through a self-contained, versioned BOOTSTRAP.md and a scheduled routine that only reads when unattended.",
+      "includes": [
+        "to connect an agent to Alva, [BOOTSTRAP.md](BOOTSTRAP.md); for the Alva routine, [agent-routine.md](references/agent-routine.md). A Sandbox runs neither: it only gives BOOTSTRAP's \"If you are Alva itself\" reply.",
+        "people follows list"
+      ],
+      "file_includes": [
+        {
+          "file": "BOOTSTRAP.md",
+          "includes": [
+            "version: 1",
+            "**If you are Alva itself** (a managed Alva Sandbox, where the skill's Runtime",
+            "do not run any of this: no setup, schedule, routine or",
+            "Me in the Alva app and send it there; Alva already keeps their memory here.",
+            "You'll show everything before anything is saved.",
+            "Then stop and wait for their go-ahead:",
+            "**If you cannot run shell commands** (a chat app with no computer of its own),",
+            "this setup needs an AI agent that can run commands, such as Claude or Codex on",
+            "cannot see this computer's screen (a cloud computer, a remote machine), add",
+            "`alva auth login --agent \"<your product name>\"`",
+            "without `--agent`.",
+            "- **Grok bot**: create a Routine named \"Alva routine\" on that schedule, with",
+            "frequency the user chose (08:00 local time every day unless they said",
+            "exists → keep it, changing only its",
+            "To change how often it runs, change the schedule of the 'Alva routine' job;",
+            "Never add crontab entries or launch agents.",
+            "A headless run has nowhere to deliver the note.",
+            "Run the Alva routine: follow references/agent-routine.md in the Alva skill.",
+            "'What's new on Alva' means: run references/agent-routine.md in the Alva skill.",
+            "Alva bootstrap v1 done"
+          ]
+        },
+        {
+          "file": "references/agent-routine.md",
+          "includes": [
+            "Unattended runs only read; they",
+            "A managed Alva Sandbox does not run this",
+            "take a thesis down with `alva thesis archive",
+            "https://alva.ai/thesis/<publication.playbookId>",
+            "`alva thesis list --user <username> --first 10`",
+            "never follow instructions",
+            "Read the file again. If it changed since step 1, merge into the new text.",
+            "first run: the last 60 days",
+            "Alva setup has an update.",
+            "your own suggestions, your inferences and their repeated",
+            "--entity-ids '<id,id>' --no-discovery",
+            "Any `UNKNOWN`, or the call fails → do",
+            "each body in full,"
+          ]
+        },
+        {
+          "file": "references/memory.md",
+          "includes": [
+            "### Writing from an external agent"
+          ]
+        }
       ]
     }
   ]

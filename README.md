@@ -61,6 +61,15 @@ Get an API key at [alva.ai](https://alva.ai), then add it to your agent's enviro
 }
 ```
 
+### 3. Connect (optional)
+
+Ask your agent: "Install or update the Alva skill, then follow its BOOTSTRAP.md."
+It signs you in, brings the investing views and preferences from your past
+conversations into Alva after you approve them, publishes the views you pick as
+private theses, and sets up a daily note (where your agent can schedule one) on
+what the people you follow did on Alva. The same prompt is in the Alva app
+under Me › Connect your AI.
+
 ### Auto-Update
 
 The Alva skill automatically checks for updates on first use each session. If a
