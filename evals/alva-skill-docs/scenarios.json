@@ -614,7 +614,7 @@
         "behaviors": [
           "Use Narrative as the default reader",
           "Do not read WILF in parallel for the same request",
-          "Report `asOf` and `generatedAtMs`",
+          "Report `asOf` and `generatedAt`",
           "current macro/cross-market event discovery",
           "supports_event: true",
           "not a company-by-company news feed",

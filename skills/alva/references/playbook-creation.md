@@ -32,8 +32,10 @@ A clear Playbook request needs no separate build confirmation.
   that release; respect an explicit draft-only stopping point. A local edit
   without `alva fs write` + `alva release` is not live.
 - Before re-releasing an existing playbook, read `playbook.json` for
-  `latest_release.feeds` and pass that exact array to `--feeds`. Never guess
-  `feed_id` values.
+  `latest_release.feeds` and pass the same feeds to `--feeds` as
+  `[{"automationId":"<id>","major":<feed_major>}]`: each Automation ID is the
+  `id` of the automation named `feed_name` in `alva automation list` (the
+  file's numeric `feed_id` is not one). Never guess Automation IDs.
 - If `alva fs grant`, `deploy`, or `release` fails on the core data path, stop
   and report the blocker instead of shipping a broken URL.
 

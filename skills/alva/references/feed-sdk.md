@@ -907,11 +907,11 @@ records if some timestamps have multiple items.
 ## Making Feeds Public
 
 First deploy and publish the automation. The publish response returns the
-`feed_id`; use that id to make the feed public so the feed record and ALFS
+`automationId`; use that ID to make the feed public so the feed record and ALFS
 permission projection change together:
 
 ```bash
-alva feed set-visibility --id <feed_id> --visibility public
+alva feed set-visibility --id <automationId> --visibility public
 ```
 
 Do not grant `special:user:*` directly on a feed path with `alva fs grant`.
@@ -983,10 +983,10 @@ alva deploy create --name btc-ema-update --path '~/feeds/btc-ema/v1/src/index.js
 alva automation publish --name btc-ema --version 1.0.0 --cronjob-id <cronjob_id>
 ```
 
-Record the `feed_id` returned by publish. If the feed must be public:
+Record the `automationId` returned by publish. If the feed must be public:
 
 ```bash
-alva feed set-visibility --id <feed_id> --visibility public
+alva feed set-visibility --id <automationId> --visibility public
 ```
 
 ### Step 4: Read from any client

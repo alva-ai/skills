@@ -161,7 +161,7 @@ For every broad ticker read, check the Direct-read lane before generic search:
    it bears on the requested judgment.
 3. Read Markets Narrative when the question needs current investor priorities,
    debate, competitive context, or recent changes. Report `asOf` and
-   `generatedAtMs`.
+   `generatedAt`.
 4. Query Breaking News when the user asks about recent catalysts, today's
    context, or a move that may be market- or sector-driven.
 5. Use Data Skills for live price, returns, fundamentals, valuation, estimates,
@@ -220,7 +220,7 @@ If the user declined that kind of offer earlier, pick the next that fits.
 ### What are investors watching?
 
 Use Markets Narrative for current focus and its history only when the user asks
-how focus changed. Report `asOf` and `generatedAtMs`. If the compatibility
+how focus changed. Report `asOf` and `generatedAt`. If the compatibility
 fallback reaches WILF, report its `date` / `as_of` and `gaps`; never generate
 missing WILF coverage for a read-only request.
 
@@ -251,7 +251,7 @@ where they affect the conclusion.
 | Layer | Preferred evidence | What to check |
 | --- | --- | --- |
 | Performance now | Data Skills | Price/return basis, as-of time, fundamentals or valuation periods. |
-| Investor focus | Markets Narrative; WILF only as compatibility fallback | Narrative `asOf` / `generatedAtMs`; on WILF fallback, weekly `date` / `as_of` and `gaps`. |
+| Investor focus | Markets Narrative; WILF only as compatibility fallback | Narrative `asOf` / `generatedAt`; on WILF fallback, weekly `date` / `as_of` and `gaps`. |
 | Anomaly state | Company Anomaly | Current timeline timestamp, active/quiet state, episode identity, and attribution timestamp. |
 | Current catalysts | Breaking News plus supporting sources | Observation/update time, whether a source supports the event, and coverage limits. |
 | Custom move explanation | Aggregate + Move Attribution | Records run time, supplied move basis, decomposition, dated evidence, and confidence. |

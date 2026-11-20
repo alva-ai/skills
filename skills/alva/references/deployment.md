@@ -86,15 +86,19 @@ the cronjob.
 {
   "id": "cronjob_000n0",
   "name": "btc-ema-update",
-  "path": "/feeds/btc-ema/v1/src/index.js",
-  "cron_expression": "0 */4 * * *",
-  "status": "active",
-  "args": { "symbol": "BTC" },
-  "push_notify": true,
-  "created_at": "2026-03-04T12:00:00Z",
-  "updated_at": "2026-03-04T12:00:00Z"
+  "entryPath": "/feeds/btc-ema/v1/src/index.js",
+  "cronExpression": "0 */4 * * *",
+  "timezone": "UTC",
+  "status": "ACTIVE",
+  "argsJson": "{\"symbol\":\"BTC\"}",
+  "pushNotify": true,
+  "createdAt": "2026-03-04T12:00:00Z",
+  "updatedAt": "2026-03-04T12:00:00Z"
 }
 ```
+
+The response is the `Cronjob`; the example omits its other members
+(`runCount`, `maxRuns`, `startsAt`, `endsAt`, ...).
 
 ### List Cronjobs
 
@@ -105,7 +109,7 @@ alva deploy list [--limit 10] [--cursor CURSOR]
 | Flag     | Type   | Default | Description                              |
 | -------- | ------ | ------- | ---------------------------------------- |
 | --limit  | int    | 20      | Max results per page                     |
-| --cursor | string |         | Pagination cursor from previous response |
+| --cursor | string |         | `nextPageToken` of the previous page     |
 
 ### Get Cronjob
 
@@ -156,7 +160,7 @@ alva deploy runs --id cronjob_000n0 --first 10     # paginate
 execution, useful for tracing errors or verifying output.
 
 ```bash
-alva deploy run-logs --id cronjob_000n0 --run-id cronjob_run_000n00yr
+alva deploy run-logs --id cronjob_000n0 --run-id run_000n00yr
 ```
 
 ---
@@ -172,7 +176,7 @@ deletion gotcha — the help text is authoritative on flags.
 - `alva deploy` — the **cronjob** (schedule + entry script + args). Lives in the
   `cronjobs` table and belongs to a feed.
 - `alva automation` — the product-facing lifecycle CLI for the same underlying
-  feed object; ids are feed ids, and `stop` / `resume` delegate to the feed's
+  feed object; ids are Automation IDs, and `stop` / `resume` delegate to the feed's
   producer cronjob. Feed publication state lives in `feeds` / `feed_majors`.
 - `alva playbooks` / `alva release playbook` — the **published playbook** (rendered HTML + display_name +
   visibility + ACL). Lives in `playbooks` and is surfaced at
@@ -339,8 +343,8 @@ alva deploy create --name btc-hourly-price-feed --path '~/feeds/btc-hourly/v1/sr
 ### 4. Publish the automation and visibility
 
 ```bash
-alva automation publish --name btc-hourly --version 1.0.0 --cronjob-id <cronjob_id>
-alva feed set-visibility --id <feed_id_from_publish> --visibility public
+alva automation publish --name btc-hourly --version 1.0.0 --cronjob-id <cronjob id>
+alva feed set-visibility --id <automationId from publish> --visibility public
 ```
 
 Do not use `alva fs grant` to publish a feed. `feed set-visibility` keeps the

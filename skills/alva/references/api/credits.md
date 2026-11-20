@@ -32,7 +32,7 @@ Filter to a single chat/session when the user asks what one conversation cost:
 alva credits items --last 7d --session-id <session_id> --first 50
 ```
 
-For pagination, pass the previous response's `items.pageInfo.endCursor`:
+For pagination, pass the previous page's `nextPageToken`, with the same window:
 
 ```bash
 alva credits items --last 30d --first 50 --after '<cursor>'
@@ -40,13 +40,14 @@ alva credits items --last 30d --first 50 --after '<cursor>'
 
 ## Interpreting results
 
-- `balance` / `totalRemaining`: current spendable credit balance.
-- `todayUsed`: UTC-today aggregate usage.
-- `items.edges[].node.amount`: credits consumed by that row.
-- `source`: where the usage came from, such as `ask` or `playbook`.
-- `sessionId`, `playbookId`, and `feedId`: attribution fields when available.
-- `createdAtMs`: Unix milliseconds.
+- `credits wallet`: `balance` is the current spendable credit balance and
+  `todayUsed` the UTC-today aggregate usage, both decimal strings; `balances`
+  splits the balance by grant.
+- `credits items`: each of `items` has a signed decimal `amount` (negative for
+  credits consumed), `reason` (where it came from, such as `CHAT` or
+  `PLAYBOOK`) and `occurredAt` (RFC 3339).
+- `sessionId`, `playbookId`, and `automationId`: attribution fields when available.
 
 When summarizing usage, state the time window and whether pagination indicates
-more rows (`items.pageInfo.hasNextPage`). If `hasNextPage` is true, do not call
-the subtotal a complete period total unless you paginate through all rows.
+more rows (a non-null `nextPageToken`). If there are more rows, do not call the
+subtotal a complete period total unless you paginate through all rows.
