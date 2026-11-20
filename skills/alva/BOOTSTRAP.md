@@ -47,12 +47,15 @@ and the user's language, briefly. Then stop and wait for their go-ahead:
 - `alva --help` fails → `npm install -g @alva-ai/toolkit` (needs Node.js 18+).
   If that fails, say in one line how to install Node.js, and that they can say
   "continue Alva setup" afterwards. Stop here.
-- `alva whoami` shows no user → `alva auth login` (a browser opens on this
-  computer). When the user cannot see this computer's screen (a cloud computer,
-  a remote machine), use `alva auth login --no-browser` instead: send them the
+- `alva whoami` shows no user → `alva auth login --agent "<your product name>"`,
+  such as `--agent "Codex"` or `--agent "Grok bot"`; the user sees the new key by
+  that name in the Alva app. A browser opens on this computer. When the user
+  cannot see this computer's screen (a cloud computer, a remote machine), add
+  `--no-browser`: send them the
   link it prints, ask them to sign in on their own device and send back the
   code the page shows, and enter it at the prompt while the command keeps
-  running.
+  running. An older CLI says `--agent is not supported` → run the same command
+  without `--agent`.
 - Already signed in → move on without comment.
 
 ## 2. Routine

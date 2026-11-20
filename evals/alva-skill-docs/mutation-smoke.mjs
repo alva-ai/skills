@@ -623,8 +623,22 @@ const MUTATIONS = [
   {
     id: "bootstrap-cloud-login",
     file: "BOOTSTRAP.md",
-    remove: "use `alva auth login --no-browser` instead: send them the",
+    remove: "cannot see this computer's screen (a cloud computer, a remote machine), add",
     replacement: "open a browser on this computer anyway and send them the",
+    expectFailedCases: ["target.agent-bootstrap"],
+  },
+  {
+    id: "bootstrap-login-without-agent-name",
+    file: "BOOTSTRAP.md",
+    remove: '`alva auth login --agent "<your product name>"`',
+    replacement: "`alva auth login`",
+    expectFailedCases: ["target.agent-bootstrap"],
+  },
+  {
+    id: "bootstrap-old-cli-agent-flag",
+    file: "BOOTSTRAP.md",
+    remove: "without `--agent`.",
+    replacement: "after updating the CLI.",
     expectFailedCases: ["target.agent-bootstrap"],
   },
   {
