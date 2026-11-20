@@ -208,6 +208,20 @@ const MUTATIONS = [
     expectFailedCases: ["target.cli-v2-shapes"],
   },
   {
+    id: "platform-problem-message-first",
+    file: "references/api/error-responses.md",
+    remove: "Decide on `reason` first, then `code`; never on\n`message` or `type`.",
+    replacement: "Decide on `message`.",
+    expectFailedCases: ["target.platform-problem-reasons"],
+  },
+  {
+    id: "platform-problem-page-token-retry",
+    file: "references/api/error-responses.md",
+    remove: "Restart the list from its first page.",
+    replacement: "Retry with the same page token.",
+    expectFailedCases: ["target.platform-problem-reasons"],
+  },
+  {
     id: "thesis-read-link-without-paragraph",
     file: "references/thesis.md",
     remove: "Put a blank line before and after each link, including between successive\nlinks, so every link is its own Markdown paragraph.",

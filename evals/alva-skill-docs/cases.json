@@ -2294,6 +2294,35 @@
       ]
     },
     {
+      "id": "target.platform-problem-reasons",
+      "group": "target",
+      "target": "corpus",
+      "description": "CLI errors carry the /api/v2 problem with its reason; the agent decides on reason first and handles the actionable reasons without blind retries.",
+      "file_includes": [
+        {
+          "file": "references/api/error-responses.md",
+          "includes": [
+            "\"reason\":\"...\"",
+            "`detail` (the CLI's `message`)",
+            "Decide on `reason` first, then `code`; never on `message` or `type`.",
+            "`INSUFFICIENT_CREDITS` (409)",
+            "`IDEMPOTENCY_KEY_REUSED` (422)",
+            "`PAGE_TOKEN_INVALID` (400)",
+            "Restart the list from its first page.",
+            "`EXECUTION_DEPTH_EXCEEDED` (403)",
+            "only with their confirmation repeat it with `--confirm-end-paid-renewals`",
+            "with the same request ID; do not loop on them"
+          ]
+        },
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "`RELATED_THESES_GENERATING`"
+          ]
+        }
+      ]
+    },
+    {
       "id": "target.for-you-context",
       "group": "target",
       "target": "corpus",
