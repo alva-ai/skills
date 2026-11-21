@@ -20,12 +20,12 @@ Every feed follows the same path:
 3. Test with `alva run --entry-path '~/feeds/<name>/v1/src/index.js'`.
 4. Deploy the script with `alva deploy create`.
 5. Publish the automation with `alva automation publish` using the cronjob id
-   from deploy, and record the returned `feed_id`. Publish creates an ACTIVE
+   from deploy, and record the returned `automationId`. Publish creates an ACTIVE
    owner alert binding and, by default, starts the producer once.
 6. A Playbook that bundles the feed delivers it to the Playbook's audience while
    it stays private ([bundled Feeds](playbook-creation.md#visibility-and-bundled-feeds)).
    When direct public reads are needed, publish its visibility with
-   `alva feed set-visibility --id <feed_id> --visibility public`.
+   `alva feed set-visibility --id <automationId> --visibility public`.
 7. Verify an unauthenticated read of a public feed path returns HTTP 200.
 
 `automation publish` is create-only. Run it once to register a new automation;
@@ -56,8 +56,8 @@ update only when the registered semantic version, producer cronjob,
 description, changelog, or agent type must change:
 
 ```bash
-alva automation inspect --id <feed_id>
-alva automation update --id <feed_id> --description "..."
+alva automation inspect --id <automationId>
+alva automation update --id <automationId> --description "..."
 ```
 
 Run `alva automation update --help` before choosing flags. Omitted fields keep
@@ -72,7 +72,7 @@ before updating.
 <HARD-GATE id="before-automation-update">
 Before `alva automation update`, verify:
 
-1. The target numeric ID belongs to the intended owned automation.
+1. The target automation ID belongs to the intended owned automation.
 2. The requested flags describe only the fields the user intends to change.
 3. If changing the producer, the replacement cronjob exists, belongs to the
    same user, and its id is known.
@@ -149,8 +149,8 @@ re-enter the gate.
 
 After publish, when public access is required, verify:
 
-1. `alva feed set-visibility --id <feed_id> --visibility public` succeeded for
-   the `feed_id` returned by publish.
+1. `alva feed set-visibility --id <automationId> --visibility public` succeeded for
+   the `automationId` returned by publish.
 2. An unauthenticated public read returns HTTP 200.
 3. Before building or releasing dependent HTML, at least one public `@last`
    path used by the HTML is non-empty.

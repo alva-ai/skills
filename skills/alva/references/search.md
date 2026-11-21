@@ -193,8 +193,8 @@ documentation already read; never call an endpoint the catalog does not list.
 
 **The user's own connected X account.** For who they follow or what they
 posted, use `alva x following` or `alva x posts`. Each call reads one live page
-(`--limit 5-100`, default 20); continue with `--cursor <pageInfo.endCursor>`
-while `hasNextPage` is true, and do not call a list complete before paging
+(`--limit 5-100`, default 20); continue with `--cursor <nextPageToken>`
+while `nextPageToken` is non-null, and do not call a list complete before paging
 ends. Following returns `id`, `username` and `name`. Posts return `id`, `text`,
 `authorId` and `createdAt`, mixing the user's replies, reposts (`RT @…`) and
 quotes without a type label. Neither returns their profile, bio, follower
