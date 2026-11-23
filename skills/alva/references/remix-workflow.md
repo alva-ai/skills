@@ -114,6 +114,14 @@ This is the full HTML source of the playbook dashboard — the ECharts charts,
 metric cards, layout, and data-fetching logic. Edit this source directly in Step
 5; do not rewrite it from scratch.
 
+The served page also carries what Alva adds at serve time: one
+`<script src="…" async defer></script>` tag inserted before `</head>`, a
+watermark block inserted before the last `</body>`, and, for viewer-token
+requests, a viewer bootstrap script. Delete these additions from `./index.html`
+before editing; they are added again when the remix is served, so leaving them
+in duplicates them. A private source returns 404 without a viewer token, so
+`curl -f` fails; explain that blocker instead of reconstructing the HTML.
+
 ---
 
 ## Step 3 — Read Code Layer (Feed Scripts)
@@ -233,15 +241,15 @@ request). Do not write fresh files from scratch.
    tool in agent tool mode; shell-only fallback:
    `alva fs write --path '~/playbooks/{new-name}/README.md' --file ./README.md --mkdir-parents`.
    See [release.md → Playbook README](api/release.md#playbook-readme).
-9. **Draft playbook**:
+10. **Draft playbook**:
    `alva release playbook-draft --name {new-name} --display-name "..." --feeds '[{"automationId":"<automationId>","major":1}]'`
-10. **Register inherited UDFs when present**: after the draft command returns
+11. **Register inherited UDFs when present**: after the draft command returns
     the remixed playbook ID, use `alva functions register` for each copied
     method with the same `function_name` and `params_schema`, with
     `entry_script_path` pointing at the new absolute ALFS path. Do not leave
     inherited `window.alva.udf` UI controls pointing at an unregistered
     function.
-11. **Release playbook**:
+12. **Release playbook**:
     `alva release playbook --name {new-name} --version v1.0.0 --feeds '[{"automationId":"<automationId>","major":1}]' --changelog "..." --readme-url '/alva/home/<username>/playbooks/{new-name}/README.md'`
     (absolute ALFS path; resolve `<username>` via `alva whoami` — the relative
     shorthand is no longer accepted)

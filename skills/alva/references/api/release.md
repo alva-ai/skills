@@ -9,7 +9,7 @@ lifecycle guidance for:
 2. Playbook README content shape (the big one — referenced by SKILL.md and the
    `--readme-url` flag)
 3. `--trading-symbols` and `--tags` semantics, person-name discovery tags, and
-   the required overlap between trading symbols and tags
+   the ticker-in-tags discovery convention
 4. `--skill-id` — when it is required
 5. `--agent-type` — marking a feed as a prompt-editable agent
 
@@ -49,10 +49,13 @@ Bad: `"BTC EMA"`
 - `--tags` — discovery tags. Drives `/explore` surfacing. Re-running
   `playbook-draft` with `--tags` replaces the prior set (no merge).
 
-**Required overlap.** Every entity in `--trading-symbols` must appear in
-`--tags` **verbatim, uppercase**, alongside lowercase topical themes. Omit the
-entities and the playbook is invisible to `/explore` searches for that asset —
-asset-routing and discovery read different fields.
+**Tickers in tags (convention).** Also put every entity in `--trading-symbols`
+into `--tags` **verbatim, uppercase**, alongside lowercase topical themes. The
+server does not enforce this (it only trims and dedupes tags, at most 100 of at
+most 32 characters each), but the `/explore` tag filter is an exact,
+case-sensitive match and ignores `--trading-symbols`, so a playbook without its
+ticker tags is missed by that filter. Keyword search still matches its name and
+description.
 
 **Related people.** If the playbook's thesis, screen, or catalyst logic depends
 on named people, include those names in `--tags` using the most recognizable

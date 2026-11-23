@@ -15,7 +15,8 @@ the runtime contract changes. Do not save these constraints for debugging.
 
 ## Runtime
 
-- No `process`, Node.js builtins, shell, or local files in jagent runtime.
+- No `process`, shell, local files, or Node.js builtins other than `path`,
+  `url`, `crypto`, and `buffer` in jagent runtime.
   Top-level `await`, timers, and global `fetch` are available. Use
   [jagent-runtime.md](jagent-runtime.md).
 - On `ReferenceError: <X> is not defined`, rewrite for the jagent runtime

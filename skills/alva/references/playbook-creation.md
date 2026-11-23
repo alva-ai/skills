@@ -32,10 +32,11 @@ A clear Playbook request needs no separate build confirmation.
   that release; respect an explicit draft-only stopping point. A local edit
   without `alva fs write` + `alva release` is not live.
 - Before re-releasing an existing playbook, read `playbook.json` for
-  `latest_release.feeds` and pass the same feeds to `--feeds` as
-  `[{"automationId":"<id>","major":<feed_major>}]`: each Automation ID is the
-  `id` of the automation named `feed_name` in `alva automation list` (the
-  file's numeric `feed_id` is not one). Never guess Automation IDs.
+  `releases[0].feeds` (newest release first) and pass the same feeds to
+  `--feeds` as `[{"automationId":"<id>","major":<feed_major>}]`: each
+  Automation ID is the `id` of the automation named `feed_name` in
+  `alva automation list` (the file's numeric `feed_id` is not one). Never
+  guess Automation IDs.
 - If `alva fs grant`, `deploy`, or `release` fails on the core data path, stop
   and report the blocker instead of shipping a broken URL.
 
@@ -191,8 +192,9 @@ Before `alva release playbook-draft`, verify:
   authenticated SDK/PBSV read instead and do not make the feed public solely to
   pass this gate.
 - Draft metadata matches the approved plan.
-- `--tags` includes required asset overlap plus material related people:
-  investors, company figures, officials/policymakers, Twitter/X KOLs.
+- `--tags` includes each traded ticker (the discovery convention in
+  [release.md](api/release.md#trading-symbols-and-tags)) plus material related
+  people: investors, company figures, officials/policymakers, Twitter/X KOLs.
 - If Skillhub informed the build, `--skill-id <username>/<name>` is set.
 
 If any item is missing, do not create the draft.
@@ -254,6 +256,11 @@ are needed. Widening a released Playbook with `alva playbooks set-visibility`
 automatically, so bundled non-public Feeds reach the new audience at once.
 Before widening a Playbook that bundles your non-public Feeds, tell the user
 which Feeds become readable to the wider audience and get their consent first.
+
+Narrowing a **paid** Playbook (paid to public or private) also does not ask:
+the change goes through at once and its subscribers' renewals stop. Before
+narrowing a paid Playbook, tell the user that existing subscriptions will not
+renew and get their consent first.
 
 <HARD-GATE id="before-playbook-release">
 Before `alva release playbook`, verify:

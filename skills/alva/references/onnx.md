@@ -12,9 +12,11 @@ the smallest faithful version in the sandbox or local R&D environment. Use real
 Alva data where coverage exists, state source gaps clearly, and avoid treating a
 paper result as a live signal until it passes a point-in-time split or
 walk-forward check. Keep sandbox reproduction CPU-friendly: break the workflow
-into small stages and simplify training before scaling fidelity. If reproduction
-needs packages such as PyTorch, scikit-learn, or ONNX exporters, install them in
-the sandbox and proceed.
+into small stages and simplify training before scaling fidelity. In the managed
+Alva Sandbox there is no package manager: use only the Python libraries already
+installed, and if reproduction needs packages such as PyTorch, scikit-learn, or
+ONNX exporters, tell the user it needs a local R&D environment instead of trying
+to install them.
 
 Before writing inference code, freeze this handoff:
 
