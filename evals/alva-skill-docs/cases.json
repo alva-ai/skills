@@ -295,7 +295,7 @@
       "description": "Jagent runtime constraints, supported async globals, and heap override remain discoverable.",
       "includes": [
         "JavaScript inside a V8 isolate",
-        "no Node built-ins, `process`, shell, or local",
+        "no `process`, shell, local files, or Node\n  built-ins other than `path`, `url`, `crypto`, and `buffer`",
         "Top-level `await` is supported",
         "global `fetch`",
         "--max-heap-size-mb",
@@ -1604,7 +1604,7 @@
         }
       ],
       "includes": [
-        "version: v1.32.6",
+        "version: v1.32.8",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -2142,7 +2142,7 @@
             "completion time is not the date of the evidence",
             "Empty or unfinished research does not establish that nothing changed",
             "obtain publication consent through Create",
-            "Paused, closed, archived or deleted Theses",
+            "Paused or archived Theses stop that research",
             "alva thesis watchpoints --id '<id>'",
             "using the same Thesis id",
             "every entry of the current set",
@@ -2840,6 +2840,106 @@
         "any of the words; quote a phrase",
         "expect that post among the results too",
         "close or delete, verify the requested state"
+      ]
+    },
+    {
+      "id": "target.runtime-audit-2026-11-23",
+      "group": "target",
+      "target": "corpus",
+      "description": "Equity execution symbols, re-release Feed refs, paid narrowing consent, the active Thesis limit, remix serve-time additions, tag convention, jagent built-ins, sandbox packages, alert and cronjob limits match the runtime.",
+      "file_includes": [
+        {
+          "file": "references/api/trading.md",
+          "includes": [
+            "`trading execute` accepts only a listing-venue\nprefix",
+            "A `US_SPOT_*` or `US_ETF_*` symbol fails in\n`trading execute`"
+          ]
+        },
+        {
+          "file": "references/playbook-creation.md",
+          "includes": [
+            "`releases[0].feeds` (newest release first)",
+            "Narrowing a **paid** Playbook",
+            "existing subscriptions will not\nrenew"
+          ]
+        },
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "`THESIS_ACTIVE_LIMIT_EXCEEDED`",
+            "Paused or archived Theses stop that research"
+          ]
+        },
+        {
+          "file": "references/remix-workflow.md",
+          "includes": [
+            "Delete these additions from `./index.html`\nbefore editing",
+            "12. **Release playbook**"
+          ]
+        },
+        {
+          "file": "references/api/release.md",
+          "includes": [
+            "**Tickers in tags (convention).**",
+            "The\nserver does not enforce this"
+          ]
+        },
+        {
+          "file": "references/jagent-runtime.md",
+          "includes": [
+            "Only `path`, `url`, `crypto`, `buffer`"
+          ]
+        },
+        {
+          "file": "references/onnx.md",
+          "includes": [
+            "there is no package manager"
+          ]
+        },
+        {
+          "file": "references/feed-sdk.md",
+          "includes": [
+            "at most 256 alert records in total"
+          ]
+        },
+        {
+          "file": "references/deployment.md",
+          "includes": [
+            "1800 s default, up to 3600 s"
+          ]
+        }
+      ],
+      "excludes": [
+        "latest_release.feeds",
+        "includes required asset overlap",
+        "**Required overlap.**",
+        "install them in\nthe sandbox",
+        "at most 16 alert records",
+        "Paused, closed, archived or deleted",
+        "`XNAS_SPOT_AAPL_USD`, `US_ETF_SPY_USD`, lowercase variants",
+        "US equities + crypto + options"
+      ]
+    },
+    {
+      "id": "target.auto-trade-consent-creation",
+      "group": "target",
+      "target": "corpus",
+      "description": "Auto-trading Schedule creation follows the host consent contract: one-time per-user consent, recited risk disclaimer, closed five-field record without per-Schedule data.",
+      "file_includes": [
+        {
+          "file": "references/agent-schedules.md",
+          "includes": [
+            "### Creating an auto-trading Schedule",
+            "Consent is per user, one-time, and permanent until revoked",
+            "including the loss of all principal and the\n  possibility of incurring liabilities",
+            "write the record with exactly these five fields",
+            "Never add an expiry, account, venue,\n  symbol, size, or other per-Schedule data"
+          ]
+        }
+      ],
+      "excludes": [
+        "the Schedule name, the\n   account, and the scope in the user's own words",
+        "A\nnew Schedule needs the user's explicit consent-bearing message"
       ]
     }
   ]

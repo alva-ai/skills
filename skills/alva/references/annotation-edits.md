@@ -102,5 +102,5 @@ An annotation is not permission to publish or re-release. Annotating a session
 preview or an unreleased draft keeps that state, and a draft-only request
 still stops at draft. For a released playbook the user asked to change, write
 the HTML back to ALFS and re-release: a version bump through `alva release
-playbook-draft` then `alva release playbook` with the new version (Step 7),
+playbook-draft` then `alva release playbook` with the new version,
 keeping its visibility and Feed refs. Report only the state actually reached.

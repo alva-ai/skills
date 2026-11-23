@@ -1,4 +1,4 @@
-# fix(alva): a Today reply without its own thesisId changes no Thesis (v1.32.6)
+# fix(alva): a Today reply without its own thesisId changes no Thesis (v1.32.8)
 
 Primary record: alva-ai/alva-backend
 `docs/changelogs/2026-11-23-today-research-reply-no-publish.md`.
@@ -37,7 +37,7 @@ the instruction do not disagree.
 ## 4. Implementation Design
 
 `references/thesis.md`, "Replies from Alva Today": one paragraph after the
-existing-Thesis rule. `SKILL.md` v1.32.6; eval cases pin the two new
+existing-Thesis rule. `SKILL.md` v1.32.8 (after #694 and #696 took v1.32.6 and v1.32.7 on `main`); eval cases pin the two new
 sentences and the version.
 
 ## 5. Verification and E2E Design
@@ -56,6 +56,9 @@ sentences and the version.
 Docs only. 2026-11-23: `node evals/alva-skill-docs/skill-doc-eval.mjs
 --skill-dir skills/alva` exit 0; mutation smoke 83/83; durable agent 5/5.
 
+After merging `main` (#694, #696) and bumping to v1.32.8: doc eval exit 0;
+mutation smoke 83/83; durable agent 5/5.
+
 ## 8. Remaining Work
 
-Takes effect with the next skill release that includes v1.32.6.
+Takes effect with the next skill release that includes v1.32.8.
