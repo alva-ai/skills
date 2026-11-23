@@ -19,8 +19,9 @@ via `alva run` (inline code or filesystem entry path) or triggered by cronjobs.
 - **Heap**: 256 MB per execution by default, overridable per run via
   `max_heap_size_mb` (1–2048 MB) — `--max-heap-size-mb <mb>` on `alva run`,
   `max_heap_size_mb` in the `/api/v1/run` body / SDK
-- **Native API boundary**: no Node built-ins, `process`, shell, or local
-  files. Top-level `await`, timers (`setTimeout` / `setInterval`), and a
+- **Native API boundary**: no `process`, shell, local files, or Node
+  built-ins other than `path`, `url`, `crypto`, and `buffer` (also as
+  `node:path` etc.). Top-level `await`, timers (`setTimeout` / `setInterval`), and a
   global `fetch` are available
 - **No persistent state between executions**: each `alva run` call starts
   fresh (use `alfs` for persistence)
@@ -326,7 +327,7 @@ loaded via `require()`.
 | Constraint          | Details                                                 |
 | ------------------- | ------------------------------------------------------- |
 | Max require depth   | 64                                                      |
-| No Node.js builtins | `fs`, `path`, `http`, `crypto` etc. are NOT available   |
+| Node.js builtins    | Only `path`, `url`, `crypto`, `buffer` (or `node:` form); no `fs`, `http`, `child_process` |
 | Strict mode         | V8 runs in strict mode (`"use strict"` implicit)        |
 | Frozen exports      | Module exports are Object.freeze'd -- cannot be mutated |
 | No circular deps    | Circular require() is detected and rejected             |

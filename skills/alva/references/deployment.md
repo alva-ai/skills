@@ -122,7 +122,9 @@ alva deploy update --id 42 --cron "0 */2 * * *" --args '{"symbol":"ETH"}'
 ```
 
 Updatable fields: `--name`, `--cron`, `--args`, `--push-notify` /
-`--no-push-notify`.
+`--no-push-notify`, `--max-heap-size-mb`, `--execution-timeout-seconds`,
+`--run-as-service-account` / `--clear-run-as`. Omitted fields keep their
+current values.
 
 ### Delete Cronjob
 
@@ -246,8 +248,8 @@ The script has full access to:
 | Limit              | Value              |
 | ------------------ | ------------------ |
 | Min cron interval  | 1 minute           |
-| Execution timeout  | Same as `alva run` |
-| Heap per execution | 2 GB               |
+| Execution timeout  | 1800 s default, up to 3600 s (`--execution-timeout-seconds`) |
+| Heap per execution | server default, up to 2046 MB (`--max-heap-size-mb`) |
 
 ---
 

@@ -166,9 +166,9 @@ New push-capable feeds wrap the TypeDoc of each push-worthy output with
 `group/output`; its root `body` field is required and `title` is optional.
 Other declared fields remain available as ordinary ALFS data.
 
-A top-level script execution may return at most one alert record per declared
-source and at most 16 alert records in total, including when it calls multiple
-successful `Feed.run()` callbacks. A quiet run appends nothing to the alert
+A top-level script execution may return at most 256 alert records in total,
+including when it calls multiple successful `Feed.run()` callbacks; several
+records for one source need distinct `publicationKey` values. A quiet run appends nothing to the alert
 output. `--push-notify` marks the cronjob publisher as capable of delivering
 those records; that deploy flag alone does not create an alert binding or bypass
 notification preferences. Creating a new automation with `alva automation
