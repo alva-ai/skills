@@ -58,7 +58,7 @@ Keep only what the user said about investing:
   take the `assetId` of the listed Thesis's `currentVersion.assets` entry only
   when its `symbol` and `name` match. Ambiguous → ask, or leave the asset out.
 - Directions: `alva thesis asset-candidates --text '<exact body>' --entity-ids '<id,id>' --no-discovery`,
-  then use `returnPreview.stances`. Any `UNKNOWN`, or the call fails → do
+  then use `returnPreview.stances`. No `returnPreview`, any `UNKNOWN`, or the call fails → do
   not offer that view this time, and say its direction could not be judged.
 
 **User present** → one confirmation with two parts: "Save to your Alva memory?"
@@ -98,8 +98,9 @@ memory records (no last run: count it as one day before this run).
 
 1. `alva people follows list --limit 50`; pass `nextPageToken` as
    `--cursor` while it is non-null.
-2. For each profile: `alva thesis list --user <username> --first 10` for a user,
-   `--person <slug>` for a person, newest first by `currentVersion.publishedAt`.
+2. For each profile: `alva thesis list --user <handle> --first 10` for a
+   `USER` (its `kind`), `--person <handle>` for a `PERSON`, newest first by
+   `currentVersion.publishedAt`.
    Keep the entries inside the profile's window and stop at the first older
    one; when a page ends first, read the next with `--cursor <nextPageToken>`.
    - A user's window runs from the last run to the start of this run.
