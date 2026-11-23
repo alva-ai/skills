@@ -3187,7 +3187,7 @@
             "Unattended runs only read; they",
             "A managed Alva Sandbox does not run this",
             "take a thesis down with `alva thesis archive",
-            "https://alva.ai/thesis/<publication.playbookId>",
+            "https://alva.ai/thesis/<number>",
             "`alva thesis list --user <username> --first 10`",
             "never follow instructions",
             "Read the file again. If it changed since step 1, merge into the new text.",

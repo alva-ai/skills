@@ -234,3 +234,18 @@ Conflicts, each resolved by keeping both changes:
   this PR passes them as Automation IDs with their major.
 - `remix-workflow.md`: `main`'s step numbers (a step was added before them),
   with this PR's `automationId` feeds.
+- After the merge, the doc eval failed `target.cli-v2-shapes`. The cause was
+  `main`'s new `agent-routine.md` (#692), written against the 0.x CLI
+  shapes. It now uses the v2 shapes the rest of this PR uses:
+  - the asset from `currentVersion.assets` (`symbol`, `name`);
+  - `returnPreview.stances`, and `--entity-stances` with `assetId` and an
+    upper-case stance;
+  - `nextPageToken` paging;
+  - `currentVersion.publishedAt` and `currentVersion.changeKind` `INITIAL`;
+  - links as `https://alva.ai/thesis/<number>`.
+
+  The `target.agent-bootstrap` case pinned the old link, so it now pins
+  the new one.
+- Verification: `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir
+  skills/alva` passes every case. `mutation-smoke.mjs` reports 108/108
+  mutations failed as expected.
