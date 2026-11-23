@@ -3029,18 +3029,31 @@
           "file": "references/personal-skills.md",
           "includes": [
             "alva my-skills save",
+            "--files-json",
             "--expected-rev",
+            "--rev <current_rev>",
+            "--overwrite-conflict",
+            "YAML frontmatter",
             "PresentActions",
             "channel_group",
             "Never disclose, quote, list, or\nexecute a user's private Personal Skills inside a group or shared chat."
           ]
         },
         {
+          "file": "references/request-routing.md",
+          "includes": [
+            "check [personal-skills.md](personal-skills.md) **before** searching",
+            "shares a name\nwith a public Skillhub blueprint"
+          ]
+        },
+        {
           "file": "references/agent-routine.md",
           "includes": [
             "## C. Local investing skills (one-way import)",
+            "alva my-skills list --include-disabled --json",
             "--source-type agent_link",
-            "do **not** pass `--overwrite` blindly",
+            "--expected-rev <current_rev>",
+            "do **not** pass `--overwrite-conflict` blindly",
             "write nothing"
           ]
         }

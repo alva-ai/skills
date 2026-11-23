@@ -133,24 +133,34 @@ files):
 - **Sanitize and reject unsafe content**:
   - Strip local filesystem paths and machine-specific wrapper assumptions where
     plain wording suffices; keep only UTF-8 text/Markdown files within Alva's
-    size limits.
+    size limits. Skip dotfiles (`.git`, `.env*`, `.DS_Store`), `node_modules`,
+    and symbolic links.
+  - Ensure `SKILL.md` starts with YAML frontmatter whose top-level `name:` matches
+    the target `--slug`.
   - Reject any skill containing API keys, tokens, passwords, private keys,
     cookie strings, account numbers, or holdings; tell the user why it was
     skipped.
-- Run `alva my-skills list --include-disabled` and compare `source_ref`
-  (`agent_link:<agent>:<dir_name>`) and `source_content_hash` (SHA-256 of the
-  sanitized files). Skip skills already imported with the same hash.
+- List all existing cloud personal skills by paginating
+  `alva my-skills list --include-disabled --json` (pass `--after <end_cursor>`
+  while `has_next_page` is `true`). Compare `source_ref`
+  (`agent_link:<agent>:<dir_name>`) and `source_content_hash` (SHA-256 over the
+  sorted sanitized relative paths and contents), and capture `current_rev` for
+  any already-imported skill. Skip skills already imported with the same hash.
 
 **User present** → include a checklist ("Import into your private Alva Personal
 Skills?") naming each skill's display name, short description, source path, and
 whether it is new or an update. On yes:
 
 1. For each checked skill, run:
-   `alva my-skills save --slug <slug> --display-name "<name>" --description "<desc>" --source-type agent_link --source-ref "agent_link:<agent>:<dir_name>" --source-hash "<sha256>" --request-id <new UUID> --dir <sanitized-dir>`
+   - New skill:
+     `alva my-skills save --slug <slug> --display-name "<name>" --description "<desc>" --source-type agent_link --source-ref "agent_link:<agent>:<dir_name>" --source-hash "<sha256>" --request-id <new UUID> --dir <sanitized-dir>`
+   - Update of an existing skill: include `--expected-rev <current_rev>` from
+     the listing so concurrent cloud edits are detected.
 2. If Alva returns a conflict (HTTP 409: the skill was edited in Alva Cloud
-   after the last import), do **not** pass `--overwrite` blindly. Show the user
-   the conflict and ask whether to keep the Alva Cloud version, overwrite it
-   (`--overwrite`), or import under a new slug.
+   after the last import), do **not** pass `--overwrite-conflict` blindly. Show
+   the user the conflict and ask whether to keep the Alva Cloud version,
+   overwrite it (`--expected-rev <current_rev> --overwrite-conflict`), or import
+   under a new slug.
 3. Say which personal skills were imported or skipped.
 
 **User absent** → write nothing. Add one line to the note, for example:

@@ -240,13 +240,16 @@ In the suggestion, lead with the durable user outcome.
 
 ## Skillhub Blueprint
 
-If the user's message contains `/use-skill:personal:<public_id>`, follow
-[personal-skills.md](personal-skills.md) rather than the public Skillhub catalog.
+In private chats, check [personal-skills.md](personal-skills.md) **before** searching
+public Skillhub whenever the message contains `/use-skill:personal:<public_id>`,
+asks to "use my <name> skill/method/framework", or clearly matches an enabled entry
+in `<session-prefill-personal-skills>` (including when a private skill shares a name
+with a public Skillhub blueprint).
 
 If the user's message contains `/use-skill:<username>/<name>`, the Skillhub path
-is mandatory before analysis, Guided Planning, or build work. The path is also
-mandatory when the user references or asks to use a skill/method that may live
-in Skillhub.
+is mandatory before analysis, Guided Planning, or build work. Otherwise, when no
+private Personal Skill takes precedence and the user references or asks to use a
+skill/method that may live in Skillhub, follow the Skillhub path below.
 
 Describe Skillhub to users as a catalog of methodologies. Keep gateway/file
 listing details internal unless the user is debugging blueprint retrieval.

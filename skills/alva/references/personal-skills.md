@@ -11,10 +11,12 @@ facts or investment thoughts.
 
 Use the `alva my-skills` command family (run `alva my-skills --help` if uncertain):
 
-- `alva my-skills list [--include-disabled]`: list the current user's personal skills.
-- `alva my-skills get <ref>`: inspect metadata and file inventory (`<ref>` accepts `personal:<public_id>`, `<public_id>`, or `<slug>`).
-- `alva my-skills file <ref> <path> [--rev <n>]`: read a skill file (`SKILL.md` or supporting `references/*`).
-- `alva my-skills save --slug <slug> --display-name <name> --description <desc> (--dir <path> | --skill-md <path> | --files-json <path>) [--source-type chat|url|upload|agent_link|skillhub_fork] [--source-ref <ref>] [--source-hash <hash>] [--expected-rev <n>] [--overwrite] --request-id <uuid>`
+- `alva my-skills list [--first <n>] [--after <cursor>] [--include-disabled] [--json]`: list the current user's personal skills.
+- `alva my-skills get <ref> [--json]`: inspect metadata, `current_rev`, and file inventory (`<ref>` accepts `personal:<public_id>`, `<public_id>`, or `<slug>`).
+- `alva my-skills file <ref> <path> [--rev <n>] [--json]`: read a skill file (`SKILL.md` or supporting `references/*`).
+- `alva my-skills save --slug <slug> --display-name <name> --description <desc> (--files-json '<json array>' | --dir <folder> | --skill-md <path>) [--source-type chat|url|upload|agent_link|skillhub_fork] [--source-ref <ref>] [--source-hash <hash>] [--expected-rev <n>] [--expected-source-hash <hash>] [--overwrite-conflict] --request-id <uuid> [--json]`
+  - In managed Alva Sandbox / embedded agent runs, pass inline `--files-json '[{"path":"SKILL.md","content":"..."}]'` (`--dir` and `--skill-md` are terminal-only).
+  - `SKILL.md` must begin with YAML frontmatter whose top-level `name` equals `--slug` (e.g. `---\nname: earnings-review\n---`).
 - `alva my-skills enable <ref>` / `alva my-skills disable <ref>`
 - `alva my-skills delete <ref>`
 - `alva my-skills reindex <ref>`
@@ -30,16 +32,17 @@ In private chats, apply methodology routing in this order:
 
 Before following a matched personal skill:
 
-- Read its current `SKILL.md` with `alva my-skills file <ref> SKILL.md`; fetch supporting files only on demand.
+- First inspect its current metadata with `alva my-skills get <ref> --json` to confirm `enabled: true` and capture `current_rev`.
+- Pin every file read in that execution to that revision: `alva my-skills file <ref> SKILL.md --rev <current_rev>`, and fetch supporting files on demand with the same `--rev <current_rev>`.
 - Treat `<session-prefill-personal-skills>` as an index only, never as a substitute for reading `SKILL.md` or fetching live market data.
 - **Disabled skills**: never apply organically. If explicitly requested via `personal:<public_id>`, explain that the skill is disabled and offer to re-enable it (`alva my-skills enable <ref>`).
 - **Missing runtime or credentials**: if a personal skill references local machine tools, private brokers, or external credentials unavailable in Alva Cloud, keep those steps inert and explain clearly what cannot run rather than fabricating data or bypassing controls.
 
 ## Creating and Updating Personal Skills
 
-- **Explicit requests**: when the user asks to save a reusable method from the conversation, a public URL snapshot, or an uploaded file, draft clean Markdown (`SKILL.md` plus optional `references/*`), strip local machine paths and any secrets/credentials/account numbers, and save via `alva my-skills save --source-type <chat|url|upload> --request-id <new UUID>`.
+- **Explicit requests**: when the user asks to save a reusable method from the conversation, a public URL snapshot, or an uploaded file, draft clean Markdown (`SKILL.md` with matching YAML frontmatter `name: <slug>`, plus optional `references/*`), strip local machine paths and any secrets/credentials/account numbers, and save via `alva my-skills save --source-type <chat|url|upload> --files-json '<json array>' --request-id <new UUID>`.
 - **Ordinary chat boundary**: uploaded documents or pasted URLs stay ordinary chat evidence unless the user asks to save them as a Personal Skill.
-- **Targeted edits**: before updating an existing Personal Skill, read its current `SKILL.md` and `current_rev`, apply minimal targeted edits, and pass `--expected-rev <current_rev> --request-id <new UUID>` so concurrent edits are never silently overwritten.
+- **Targeted edits (preserve untouched files)**: `save` replaces the entire revision bundle. Before updating an existing Personal Skill, run `alva my-skills get <ref> --json` to read `current_rev` and the full file list, read every file pinned with `--rev <current_rev>`, apply minimal targeted edits while retaining all untouched files verbatim, and pass `--expected-rev <current_rev> --request-id <new UUID>` so concurrent edits are never silently overwritten.
 - **Never store secrets**: never write API keys, passwords, tokens, holdings, or account numbers into a Personal Skill.
 
 ## Semi-Automatic Capture From Chat
