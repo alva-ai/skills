@@ -1604,7 +1604,7 @@
         }
       ],
       "includes": [
-        "version: v1.32.5",
+        "version: v1.32.6",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -1703,6 +1703,8 @@
             "authorizes exactly the displayed body and publication details",
             "create without asking again",
             "Research or rewriting alone never authorizes publication",
+            "Only the selected reply's own `thesisId` is that target",
+            "confirms no change to an existing one",
             "as must text taken from a file, attachment, link, or other extraction (show its content, not its filename)",
             "Use verified catalog IDs only in tool calls",
             "a wording-only edit reuses unchanged verified IDs",

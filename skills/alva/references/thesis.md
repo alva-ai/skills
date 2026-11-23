@@ -34,6 +34,14 @@ card concerns, and publish that scoped Update directly: the user's selection
 is confirmation. Preserve their other claims; do not edit the anchor author's
 Thesis when the selected target is different.
 
+Only the selected reply's own `thesisId` is that target. The card's anchor and
+sources often name the reader's Thesis too, and a reply may mention it in
+words, such as "against my NVDA Thesis"; neither is a target. A selected
+reply without a `thesisId` asks for research, an answer, or a new Thesis, and
+confirms no change to an existing one: do that work and report it. When the
+result bears on one of the reader's Theses, say what you would change and
+publish that Update only after they ask for it, through the normal preview.
+
 For a new Thesis, bring the draft back to the main conversation and get the
 user's confirmation before publishing it under their name. A QUESTION selection
 is the user's answer; interpret that answer in context rather than inventing a
