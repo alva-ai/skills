@@ -27,7 +27,7 @@ In private chats, apply methodology routing in this order:
 
 1. **Explicit directive**: `/use-skill:personal:<public_id>` (or `personal:<public_id>`) targets that exact personal skill.
 2. **Explicit user request**: the user asks to "use my <name> skill/method/framework".
-3. **Prefill match**: `<session-prefill-personal-skills>` lists an enabled personal skill whose description clearly matches the user's task.
+3. **Prefill match**: `<session-prefill-personal-skills>` lists enabled personal skills as bullet lines (`- personal:<public_id> | <slug> | <display_name>: <description>`) whose description clearly matches the user's task.
 4. **Skillhub**: public [Skillhub blueprints](request-routing.md#skillhub-blueprint).
 
 Before following a matched personal skill:
@@ -40,7 +40,7 @@ Before following a matched personal skill:
 
 ## Creating and Updating Personal Skills
 
-- **Explicit requests**: when the user asks to save a reusable method from the conversation, a public URL snapshot, or an uploaded file, draft clean Markdown (`SKILL.md` with matching YAML frontmatter `name: <slug>`, plus optional `references/*`), strip local machine paths and any secrets/credentials/account numbers, and save via `alva my-skills save --source-type <chat|url|upload> --files-json '<json array>' --request-id <new UUID>`.
+- **Explicit requests**: when the user asks to save a reusable method from the conversation, a public URL snapshot, or an uploaded file, draft clean Markdown (`SKILL.md` with matching YAML frontmatter `name: <slug>`, plus optional `references/*`), strip local machine paths and any secrets/credentials/account numbers, and save via `alva my-skills save --slug <slug> --display-name "<name>" --description "<desc>" --source-type <chat|url|upload> --files-json '<json array>' --request-id <new UUID>`.
 - **Ordinary chat boundary**: uploaded documents or pasted URLs stay ordinary chat evidence unless the user asks to save them as a Personal Skill.
 - **Targeted edits (preserve untouched files)**: `save` replaces the entire revision bundle. Before updating an existing Personal Skill, run `alva my-skills get <ref> --json` to read `current_rev` and the full file list, read every file pinned with `--rev <current_rev>`, apply minimal targeted edits while retaining all untouched files verbatim, and pass `--expected-rev <current_rev> --request-id <new UUID>` so concurrent edits are never silently overwritten.
 - **Never store secrets**: never write API keys, passwords, tokens, holdings, or account numbers into a Personal Skill.
@@ -101,9 +101,10 @@ only (never write cloud edits back to local files).
 - **Check existing cloud skills**: fetch
   `alva my-skills list --first 200 --include-disabled --json` (continue with
   `--after <end_cursor>` if `has_next_page` is `true`). Compare `source_ref`
-  (`agent_link:<agent>:<dir_name>`) and `source_content_hash` (SHA-256 over the
-  sorted sanitized relative paths and contents), and capture `current_rev` for
-  any already-imported skill. Skip skills already imported with the same hash.
+  (`agent_link:<agent>:<dir_name>`) and `source_content_hash` (canonical SHA-256
+  over sorted sanitized files serialized as `<rel_path>\0<file_sha256_hex>\0`),
+  and capture `current_rev` for any already-imported skill. Skip skills already
+  imported with the same hash.
 - **Confirm before saving**: present a shortlist ("Import into your private Alva
   Personal Skills?") showing each skill's display name, short description,
   source path, and whether it is new or an update. Wait for explicit user

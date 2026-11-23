@@ -6,7 +6,7 @@ first run during bootstrap, or when they ask). Unattended runs only read; they
 write nothing to Alva. Never scan or upload local skills in this routine or any
 scheduled automation — local skill import is strictly one-time and
 user-initiated (see [personal-skills.md](personal-skills.md)). A managed Alva
-Sandbox does not run this; see BOOTSTRAP.md.
+Sandbox does not run this; see [BOOTSTRAP.md](../BOOTSTRAP.md).
 
 ## A. What's new in our conversations
 
