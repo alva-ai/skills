@@ -140,12 +140,10 @@ require a dry run and explicit per-order confirmation per
 occurrence or verified legacy Channel Loop tick MAY place live orders without
 per-order user confirmation when all of these hold:
 
-1. The user explicitly granted it in their own typed reply (never an action
-   button), and the Schedule `--message` (or legacy Loop goal) carries
+1. The user consented in their own typed reply (never an action button) to
+   the risk disclaimer under [Creating an auto-trading Schedule](#creating-an-auto-trading-schedule),
+   and the Schedule `--message` (or legacy Loop goal) carries
    `[auto-trade-consent: granted <ISO8601-UTC> record=~/memory/auto-trade-consent.md]`.
-   Before creating the Schedule, write that record to
-   `~/memory/auto-trade-consent.md`: `granted_at`, the Schedule name, the
-   account, and the scope in the user's own words.
 2. The occurrence's one-read verification finds that record. Verification
    checks only that the consent record exists: the timestamp is provenance, not
    a match key, and a differing `granted_at` after re-grant is not a mismatch.
@@ -156,8 +154,31 @@ per-order user confirmation when all of these hold:
 This applies only to Agent Schedule occurrences and verified legacy Channel
 Loop ticks, never interactive turns.
 
-Do not copy consent from an old Loop or another Schedule during migration. A
-new Schedule needs the user's explicit consent-bearing message.
+Do not copy another Loop's or Schedule's reference line during migration;
+create the new Schedule through
+[Creating an auto-trading Schedule](#creating-an-auto-trading-schedule).
+
+### Creating an auto-trading Schedule
+
+Consent is per user, one-time, and permanent until revoked; it is not tied to
+one Schedule or account.
+
+- Read `~/memory/auto-trade-consent.md` first. If it exists, create the Schedule
+  without a disclaimer or re-confirmation, do not rewrite the record, and embed
+  its current `granted_at` in the reference line.
+- If it is absent or unreadable, recite this disclaimer in the user's language
+  with every risk element, even when the request already reads like an
+  authorization: "Alva is about to trade automatically. You accept all risks
+  arising from the agent software, including the loss of all principal and the
+  possibility of incurring liabilities." Only an explicit affirmative reply is
+  consent; a hedged, ambiguous, or off-topic reply is not (you may ask once more).
+- On consent, write the record with exactly these five fields: `granted_at`
+  (ISO-8601 UTC), `channel`, `source_message`, `disclaimer_recited` (the text as
+  recited), and `user_reply` (verbatim). Never add an expiry, account, venue,
+  symbol, size, or other per-Schedule data; the scope belongs in the Schedule
+  `--message`. If the write fails, do not create the Schedule.
+- To revoke, pause or delete every auto-trading Schedule first, then delete the
+  record; while dependent Schedules keep running, consent is not revoked.
 
 ## Legacy Channel Loop Compatibility
 
