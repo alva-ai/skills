@@ -14,14 +14,22 @@ exchange field. Mismatching symbol type to account exchange errors.
 | `binance_spot` | Spot        | `BINANCE_SPOT_BTC_USDT`          |
 | `okx`          | Unified     | `OKX_PERP_*` / `OKX_SPOT_*`      |
 | `hyperliquid`  | Unified     | `HYPERLIQUID_PERP_*` / `_SPOT_*` |
-| `alpaca`       | US Equities | `US_SPOT_AAPL_USD`               |
+| `alpaca` / `ibkr` / `robinhood` | US Equities | `XNAS_SPOT_AAPL_USD` / `XNYS_SPOT_*` / `XASE_SPOT_*` |
 
-Symbols are canonical Arrays identities, not exchange aliases. Resolve them
-with `alva trading-pairs search` and then verify the selected complete pair
+Crypto symbols are canonical Arrays identities, not exchange aliases. Resolve
+them with `alva trading-pairs search` and then verify the selected complete pair
 with `alva trading-pairs resolve --pair <tradingPair> --json`. Use the returned
-`tradingPair` unchanged;
-`XNAS_SPOT_AAPL_USD`, `US_ETF_SPY_USD`, lowercase variants, and
-`BINANCE_FUTURES_BTC_USDT` are invalid inputs.
+`tradingPair` unchanged; lowercase variants and `BINANCE_FUTURES_BTC_USDT` are
+invalid inputs.
+
+US equities are the exception. `trading-pairs` and altra2 name a stock
+`US_SPOT_<TICKER>_USD`, but `trading execute` accepts only a listing-venue
+prefix: `XNAS_SPOT_<TICKER>_USD`, `XNYS_SPOT_<TICKER>_USD` or
+`XASE_SPOT_<TICKER>_USD`. All three route to the account's configured equity
+broker (ibkr, alpaca or robinhood) and trade the plain ticker, so take the
+ticker from the resolved `US_SPOT_<TICKER>_USD` pair and send
+`XNAS_SPOT_<TICKER>_USD`. A `US_SPOT_*` or `US_ETF_*` symbol fails in
+`trading execute`.
 
 ## `--signal` JSON schema for `alva trading execute`
 

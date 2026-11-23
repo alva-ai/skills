@@ -53,8 +53,8 @@ describe` each time; do not assume from this table. Venues currently wired:
 
 | Venue | Assets | Paper (`testnet`) | Idempotency | Notes |
 | ----- | ------ | ----------------- | ----------- | ----- |
-| `alpaca` | US equities + crypto + options | yes | coid wired | |
-| `robinhood` | US equities (long only) | **no** | **`noCoidLookup`** | a paper-provisioned account is rejected; a lost order id can't be reconciled — treat writes conservatively |
+| `alpaca` | US equities + crypto (quantity orders only; no options, no notional) | yes | coid wired | |
+| `robinhood` | US equities (long only) + single-leg options | **no** | **`noCoidLookup`** | a paper-provisioned account is rejected; a lost order id can't be reconciled — treat writes conservatively |
 | `binance` `okx` `bybit` `gate` `bitget` `coinbase` `hyperliquid` | crypto | per venue testnet | coid wired | ccxt-served |
 | `webull` | US equities | yes | coid wired | |
 | `ibkr_mcp` | IBKR (incl. options) | yes | — | `createOrder: false`: reads only; an order becomes an instruction the user submits in IBKR |
