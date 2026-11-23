@@ -7,7 +7,7 @@ description: >-
   explicit Thesis publication or maintenance, and requested Thesis rewriting.
 metadata:
   author: alva
-  version: v1.33.0
+  version: v1.34.0
 ---
 
 # Alva
@@ -160,7 +160,7 @@ for "NVDA today" or "does the latest earnings report support this thesis?".
 | How a Thesis has performed, or how its return is computed | [Thesis return](references/thesis.md#thesis-return): read `thesis return` and explain with its definitions; never recompute the total |
 | Check an existing Thesis, new evidence, or follow an investment viewpoint | [Thesis tracking](references/thesis.md#thesis-tracking): use platform research and Signals; publishing a new viewpoint requires consent |
 | What's worth reading in For You, or discuss a recommended card | [For You](references/request-routing.md#for-you): read the relevant stream, preserve the card's version, and discuss within the retrieved scope |
-| Explicit Thesis publication, guided drafting, update, maintenance, polishing, or a request to close or delete one | [thesis.md](references/thesis.md): Alva cannot close or delete a Thesis or Update; decline per [Closing or deleting](references/thesis.md#closing-or-deleting-a-thesis) and offer archive or a new Update; preserve selected original text and author claims, put your assessment and optional additions in Notes, draft only when needed, rewrite only when requested, resolve assets and directions, and after creation return the GET-backed `<thesis-preview>` |
+| Explicit Thesis publication, guided drafting, update, maintenance (including which Signals it shows), polishing, or a request to close or delete one | [thesis.md](references/thesis.md): Alva cannot close or delete a Thesis or Update; decline per [Closing or deleting](references/thesis.md#closing-or-deleting-a-thesis) and offer archive or a new Update; preserve selected original text and author claims, put your assessment and optional additions in Notes, draft only when needed, rewrite only when requested, resolve assets and directions, and after creation return the GET-backed `<thesis-preview>` |
 | Company analysis, earnings interpretation, move attribution, past-hour tracking, investor focus, or catalysts | Use the smallest sufficient source set; read [ticker-read.md](references/ticker-read.md) before source selection. Start with `alva/company-anomaly-read` for intraday/hourly tracking, not a simple latest-price lookup |
 | GEX, dealer gamma, gamma flip, call/put walls, vanna, or charm | Fetch the current `alva/gex` Skillhub blueprint and follow its methodology rather than hand-computing from raw chains |
 | FinTwit / KOL social posts, profiles, rankings, or track record (published Thesis lists use the reading route above) | [fintwit.md](references/fintwit.md): structured Platform Data, snapshot date, read-only account and ticker queries |
