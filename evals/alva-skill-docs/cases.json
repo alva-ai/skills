@@ -3015,7 +3015,7 @@
       "id": "target.personal-skills",
       "group": "target",
       "target": "corpus",
-      "description": "Personal Skills enforce private routing precedence, explicit confirmation before saving, one-way Agent Link import with conflict surfacing, and group/shared non-disclosure.",
+      "description": "Personal Skills enforce private routing precedence, explicit confirmation before saving, strictly one-time opt-in local investing-skill import (never scheduled/automated), and group/shared non-disclosure.",
       "file_includes": [
         {
           "file": "SKILL.md",
@@ -3023,6 +3023,14 @@
             "<session-prefill-personal-skills>",
             "`my-skills`",
             "[personal-skills.md](references/personal-skills.md)"
+          ]
+        },
+        {
+          "file": "BOOTSTRAP.md",
+          "includes": [
+            "one-time",
+            "do **not** scan local skill directories unless they explicitly opt in",
+            "never add skill syncing to the scheduled routine or\nany automation"
           ]
         },
         {
@@ -3036,7 +3044,15 @@
             "YAML frontmatter",
             "PresentActions",
             "channel_group",
-            "Never disclose, quote, list, or\nexecute a user's private Personal Skills inside a group or shared chat."
+            "Never disclose, quote, list, or\nexecute a user's private Personal Skills inside a group or shared chat.",
+            "## Optional One-Time Import From Local Agent Skills",
+            "only as a one-time,\nuser-initiated action",
+            "Strict domain constraint",
+            "investing, trading, financial analysis",
+            "alva my-skills list --first 200 --include-disabled --json",
+            "--source-type agent_link",
+            "--expected-rev <current_rev>",
+            "do **not** pass `--overwrite-conflict` blindly"
           ]
         },
         {
@@ -3049,12 +3065,7 @@
         {
           "file": "references/agent-routine.md",
           "includes": [
-            "## C. Local investing skills (one-way import)",
-            "alva my-skills list --include-disabled --json",
-            "--source-type agent_link",
-            "--expected-rev <current_rev>",
-            "do **not** pass `--overwrite-conflict` blindly",
-            "write nothing"
+            "Never scan or upload local skills in this routine or any\nscheduled automation"
           ]
         }
       ]
