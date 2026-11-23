@@ -58,7 +58,8 @@ Keep only what the user said about investing:
   take the `assetId` of the listed Thesis's `currentVersion.assets` entry only
   when its `symbol` and `name` match. Ambiguous → ask, or leave the asset out.
 - Directions: `alva thesis asset-candidates --text '<exact body>' --entity-ids '<id,id>' --no-discovery`,
-  then use `returnPreview.stances`. No `returnPreview`, any `UNKNOWN`, or the call fails → do
+  then use `returnPreview.stances` (no `returnPreview` counts as a failed call).
+  Any `UNKNOWN`, or the call fails → do
   not offer that view this time, and say its direction could not be judged.
 
 **User present** → one confirmation with two parts: "Save to your Alva memory?"
