@@ -224,3 +224,13 @@ SOTA revision (2026-11-20; contract 10.9):
   passed (1,708 checked, 0 open); `node
   evals/alva-skill-docs/mutation-smoke.mjs`: 96/96 mutations failed as
   expected.
+
+## 2026-11-22: merge of `main`
+
+Conflicts, each resolved by keeping both changes:
+- `jagent-runtime.md`: the `POST /api/v2/runs` heap field (this PR), plus
+  `main`'s list of the Node built-ins a script may import.
+- `playbook-creation.md`: `main` reads `releases[0].feeds` (newest first);
+  this PR passes them as Automation IDs with their major.
+- `remix-workflow.md`: `main`'s step numbers (a step was added before them),
+  with this PR's `automationId` feeds.
