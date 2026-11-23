@@ -178,7 +178,8 @@ one Schedule or account.
   symbol, size, or other per-Schedule data; the scope belongs in the Schedule
   `--message`. If the write fails, do not create the Schedule.
 - To revoke, pause or delete every auto-trading Schedule first, then delete the
-  record; while dependent Schedules keep running, consent is not revoked.
+  record. Never delete the record while a dependent Schedule is still active;
+  if the user declines to stop those Schedules, consent stays in place.
 
 ## Legacy Channel Loop Compatibility
 
