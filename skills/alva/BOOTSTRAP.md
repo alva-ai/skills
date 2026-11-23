@@ -1,5 +1,5 @@
 ---
-version: 1
+version: 2
 ---
 
 # Alva bootstrap
@@ -35,6 +35,9 @@ and the user's language, briefly. Then stop and wait for their go-ahead:
 - You'll read your memory and, where you have them, your past conversations
   with them, only to pick out investing views and preferences. You may ask to
   allow reading those files.
+- Where you have local agent skills, you can also scan for reusable investing
+  and research skills to import into their private Alva Personal Skills (never
+  credentials, local engineering skills, or built-in skills).
 - You'll show everything before anything is saved.
 - Holdings, balances and account details are never sent to Alva.
 - Where you can schedule it, you'll then check Alva for them every day at
@@ -88,12 +91,13 @@ the initial memory and thesis sync. The examples below use the default
 
 ## Wrap up
 
-Tell the user what was saved (how many memory items, which theses, all
-private), that they can see it in the Alva app under Me, that saying "undo"
-removes any of it (see Undo in agent-routine.md), and when the next note arrives (or that none is scheduled).
+Tell the user what was saved (how many memory items, which theses, which
+personal skills, all private), that they can see it in the Alva app under Me,
+that saying "undo" removes any of it (see Undo in agent-routine.md), and when
+the next note arrives (or that none is scheduled).
 
 Then record in your own memory:
-"Alva bootstrap v1 done <date>.
+"Alva bootstrap v2 done <date>.
 'What's new on Alva' means: run references/agent-routine.md in the Alva skill.
 To change how often it runs, change the schedule of the 'Alva routine' job;
 never add a second one."

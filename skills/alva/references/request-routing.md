@@ -129,6 +129,10 @@ moves the discussion forward, leaving the choice to the user. Choose what fits:
 - **Automation** when changing inputs can be reevaluated by the same method and
   cadence, a trigger, or notification creates ongoing value. Push ideas also
   need a meaningful-change and quiet-run boundary.
+- **Personal Skill** when the user corrected a reusable methodology or finished
+  a repeatable investing workflow worth reusing in future private chats. Offer
+  at most once per session (via `PresentActions` when available); never silently
+  save without confirmation. See [personal-skills.md](personal-skills.md).
 - **No suggestion** when there is no useful next step or the user is closing
   the conversation. End naturally rather than adding a routine question.
 
@@ -235,6 +239,9 @@ delivery-path verification.
 In the suggestion, lead with the durable user outcome.
 
 ## Skillhub Blueprint
+
+If the user's message contains `/use-skill:personal:<public_id>`, follow
+[personal-skills.md](personal-skills.md) rather than the public Skillhub catalog.
 
 If the user's message contains `/use-skill:<username>/<name>`, the Skillhub path
 is mandatory before analysis, Guided Planning, or build work. The path is also

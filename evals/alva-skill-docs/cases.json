@@ -2960,7 +2960,7 @@
         {
           "file": "BOOTSTRAP.md",
           "includes": [
-            "version: 1",
+            "version: 2",
             "**If you are Alva itself** (a managed Alva Sandbox, where the skill's Runtime",
             "do not run any of this: no setup, schedule, routine or",
             "Me in the Alva app and send it there; Alva already keeps their memory here.",
@@ -2979,7 +2979,7 @@
             "A headless run has nowhere to deliver the note.",
             "Run the Alva routine: follow references/agent-routine.md in the Alva skill.",
             "'What's new on Alva' means: run references/agent-routine.md in the Alva skill.",
-            "Alva bootstrap v1 done"
+            "Alva bootstrap v2 done"
           ]
         },
         {
@@ -3007,6 +3007,41 @@
           "file": "references/memory.md",
           "includes": [
             "### Writing from an external agent"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "target.personal-skills",
+      "group": "target",
+      "target": "corpus",
+      "description": "Personal Skills enforce private routing precedence, explicit confirmation before saving, one-way Agent Link import with conflict surfacing, and group/shared non-disclosure.",
+      "file_includes": [
+        {
+          "file": "SKILL.md",
+          "includes": [
+            "<session-prefill-personal-skills>",
+            "`my-skills`",
+            "[personal-skills.md](references/personal-skills.md)"
+          ]
+        },
+        {
+          "file": "references/personal-skills.md",
+          "includes": [
+            "alva my-skills save",
+            "--expected-rev",
+            "PresentActions",
+            "channel_group",
+            "Never disclose, quote, list, or\nexecute a user's private Personal Skills inside a group or shared chat."
+          ]
+        },
+        {
+          "file": "references/agent-routine.md",
+          "includes": [
+            "## C. Local investing skills (one-way import)",
+            "--source-type agent_link",
+            "do **not** pass `--overwrite` blindly",
+            "write nothing"
           ]
         }
       ]

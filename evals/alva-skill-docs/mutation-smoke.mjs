@@ -714,8 +714,8 @@ const MUTATIONS = [
   {
     id: "bootstrap-records-last-run",
     file: "BOOTSTRAP.md",
-    remove: "\"Alva bootstrap v1 done <date>.\n",
-    replacement: "\"Alva bootstrap v1 done <date>; Alva routine last ran <until from step 2>.\n",
+    remove: "\"Alva bootstrap v2 done <date>.\n",
+    replacement: "\"Alva bootstrap v2 done <date>; Alva routine last ran <until from step 2>.\n",
     expectFailedCases: ["target.agent-bootstrap"],
   },
 ];

@@ -21,12 +21,8 @@ an investment thesis, and act on their ideas at the scale they need.
 
 Use the tools exposed by the current runtime. In a managed Sandbox:
 
-- The `alva` CLI and authentication are already configured. Do not install,
-  upgrade, sign in, check versions, or change configuration just to start.
-- Reuse `<session-prefill-whoami>`, `<session-prefill-memory>`, and
-  `<session-prefill-channel-memory>` independently. Fetch only missing or stale
-  state needed for this task, within the session's permitted scope. For memory
-  use, layout and writes, see [memory.md](references/memory.md).
+- The `alva` CLI and authentication are already configured. Do not install, upgrade, sign in, check versions, or change configuration just to start.
+- Reuse `<session-prefill-whoami>`, `<session-prefill-memory>`, `<session-prefill-channel-memory>`, and `<session-prefill-personal-skills>` independently. Fetch only missing or stale state needed for this task, within the session's permitted scope. See [memory.md](references/memory.md) for memory and [personal-skills.md](references/personal-skills.md) for private Personal Skills.
 - Use the command index below and applicable documentation already read. Consult
   the relevant command help when its syntax or contract is uncertain; use
   top-level `--help` when the needed command family is not listed. Current help
@@ -59,7 +55,8 @@ operating requirements; this index is for navigation.
 | `data-skills` | Discover structured financial endpoints and their contracts |
 | `sdk` | Discover runtime libraries, including search |
 | `run` / `fs` | Execute cloud JavaScript / access persistent ALFS files |
-| `skillhub` | Find and read methodology blueprints |
+| `skillhub` | Find and read public methodology blueprints |
+| `my-skills` | List, read, save, enable/disable, and delete the user's private Personal Skills |
 | `markets` / `people` | Company narrative, earnings, watchlist / find and follow people |
 | `thesis` | Create, read, and maintain published Theses |
 | `for-you` | Read personalized publications or ranked Thesis recommendations |
@@ -172,6 +169,7 @@ for "NVDA today" or "does the latest earnings report support this thesis?".
 | Manage an existing Automation, Playbook, alert, or subscription | [request-routing.md](references/request-routing.md#existing-resource-management): identify the existing resource, change only the requested state, and verify it |
 | Backtest, portfolio simulation, signal, rebalance, or execute an order | [altra-trading.md](references/altra-trading.md) (`@alva/altra2`); also [api/trading.md](references/api/trading.md) or [api/broker.md](references/api/broker.md) for execution. Read [altra-v1-legacy.md](references/altra-v1-legacy.md) only to maintain an existing v1 `FeedAltra` script; never for a new strategy |
 | `/use-skill:<username>/<name>`, a named method, or template-like research | [request-routing.md](references/request-routing.md#skillhub-blueprint): read or reuse the current blueprint, choose the requested deliverable, and set `--skill-id` for a resulting Playbook |
+| `/use-skill:personal:<id>`, "use my … skill", or saving/editing/managing the user's own reusable methodology | [personal-skills.md](references/personal-skills.md): apply private routing precedence, read `SKILL.md` before executing, require explicit confirmation before saving, and never disclose in group/shared chats |
 | Remix, annotation, or an existing Playbook change | [remix-workflow.md](references/remix-workflow.md) or [annotation-edits.md](references/annotation-edits.md): preserve lineage and edit the generator |
 | Remember, forget, inspect, or correct user context | [memory.md](references/memory.md): reuse supplied context, respect global/channel scope, read before writing, and honor corrections |
 | What can Alva do, or does it support a capability? | [request-routing.md](references/request-routing.md): capability help and current-catalog verification |
