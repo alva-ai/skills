@@ -1604,7 +1604,7 @@
         }
       ],
       "includes": [
-        "version: v1.32.6",
+        "version: v1.32.7",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -2916,6 +2916,28 @@
         "Paused, closed, archived or deleted",
         "`XNAS_SPOT_AAPL_USD`, `US_ETF_SPY_USD`, lowercase variants",
         "US equities + crypto + options"
+      ]
+    },
+    {
+      "id": "target.auto-trade-consent-creation",
+      "group": "target",
+      "target": "corpus",
+      "description": "Auto-trading Schedule creation follows the host consent contract: one-time per-user consent, recited risk disclaimer, closed five-field record without per-Schedule data.",
+      "file_includes": [
+        {
+          "file": "references/agent-schedules.md",
+          "includes": [
+            "### Creating an auto-trading Schedule",
+            "Consent is per user, one-time, and permanent until revoked",
+            "including the loss of all principal and the\n  possibility of incurring liabilities",
+            "write the record with exactly these five fields",
+            "Never add an expiry, account, venue,\n  symbol, size, or other per-Schedule data"
+          ]
+        }
+      ],
+      "excludes": [
+        "the Schedule name, the\n   account, and the scope in the user's own words",
+        "A\nnew Schedule needs the user's explicit consent-bearing message"
       ]
     }
   ]
