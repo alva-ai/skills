@@ -216,10 +216,12 @@ Alert-output rules:
   opt into portable buttons and card rendering.
 - Use any descriptive, valid `group/output` except the reserved legacy sources
   `signal/targets` and `notify/message`.
-- A top-level script execution may return at most one alert record for a given
-  source and at most 16 alert records across all sources. If a script calls
-  multiple successful `Feed.run()` callbacks, do not emit the same alert source
-  from more than one callback.
+- A top-level script execution may return at most 256 alert records in total
+  (at most 32 KiB per body, 1 MiB across all records). Several records for one
+  source need distinct `publicationKey` values; when a single call emits several
+  records without keys the SDK numbers them, and a repeated key fails the run.
+  If a script calls multiple successful `Feed.run()` callbacks, do not emit the
+  same alert source from more than one callback.
 - Declare outputs before `feed.run()`. Do not call `feed.def()` conditionally or
   from inside the callback.
 - A callback failure reports no V2 alerts. Successful ALFS writes and delivery
