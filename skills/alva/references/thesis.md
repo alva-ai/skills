@@ -36,7 +36,7 @@ Thesis when the selected target is different.
 
 Only the selected reply's own `thesisId` is that target. The card's anchor and
 sources often name the reader's Thesis too, and a reply may mention it in
-words, such as "against my NVDA Thesis"; neither is a target. A selected
+words, such as "against my NVDA Thesis"; none of these is a target. A selected
 reply without a `thesisId` asks for research, an answer, or a new Thesis, and
 confirms no change to an existing one: do that work and report it. When the
 result bears on one of the reader's Theses, say what you would change and
