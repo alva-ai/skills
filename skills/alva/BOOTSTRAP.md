@@ -37,8 +37,9 @@ and the user's language, briefly. Then stop and wait for their go-ahead:
   allow reading those files.
 - You'll show everything before anything is saved.
 - Holdings, balances and account details are never sent to Alva.
-- Afterwards you'll check Alva for them every day at 08:00, unless they name
-  another time or how often (weekdays, weekly, …) in their reply.
+- Where you can schedule it, you'll then check Alva for them every day at
+  08:00, unless they name another time or how often (weekdays, weekly, …) in
+  their reply.
 - They can say stop at any time.
 - Ask whether to start.
 
@@ -92,7 +93,7 @@ private), that they can see it in the Alva app under Me, that saying "undo"
 removes any of it (see Undo in agent-routine.md), and when the next note arrives (or that none is scheduled).
 
 Then record in your own memory:
-"Alva bootstrap v1 done <date>; Alva routine last ran <until from step 2>.
+"Alva bootstrap v1 done <date>.
 'What's new on Alva' means: run references/agent-routine.md in the Alva skill.
 To change how often it runs, change the schedule of the 'Alva routine' job;
 never add a second one."

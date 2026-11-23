@@ -339,11 +339,10 @@ feature memory, then link it from that scope's `MEMORY.md`.
 
 ### Writing from an external agent
 
-An agent outside a managed runtime (connected through `BOOTSTRAP.md`) follows
-[agent-routine.md](agent-routine.md), which carries the rules above it needs, and writes `'~/memory/user.md'` with `alva fs`. Read the file, merge,
-then read it once more right before writing: if it changed, merge into the new
-text instead of overwriting it. Only content the user saw and approved, or said
-themselves, becomes durable memory.
+An agent outside a managed runtime (connected through `BOOTSTRAP.md`) writes
+`~/memory/user.md` with `alva fs` by the steps in
+[agent-routine.md](agent-routine.md), which carries the rules above that it
+needs.
 
 ## Using context in conversation
 
