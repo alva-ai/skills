@@ -311,10 +311,6 @@ Clients without card support retain `title` + `body`, and delivery remains
 useful even when presentation is unavailable. `PresentActions` is a
 conversation-reply tool, not a Feed API; never call it from a Feed script.
 
-`@alva/alvaask` is retired and no longer loads. For a bounded LLM reasoning
-step inside a Feed, use `Agent.ask()` from `@alva/pi` ([alpi.md](alpi.md)) and
-store its push-worthy result in a declared alert output (Pattern D).
-
 ### Legacy Compatibility
 
 Existing `signal/targets` and `notify/message` feeds continue to work through
@@ -325,6 +321,10 @@ Altra-owned `signal/targets` unchanged. Do not wrap either reserved source in
 The `<|SKIP_NOTIFICATION|>` body sentinel and legacy `text` fallback apply only
 to `notify/message`. New V2 alert outputs require `body` and express a quiet run
 by not appending.
+
+`@alva/alvaask` is retired and no longer loads. For a bounded LLM reasoning
+step inside a Feed, use `Agent.ask()` from `@alva/pi` ([alpi.md](alpi.md)) and
+store its push-worthy result in a declared alert output (Pattern D).
 
 ### Deduplication
 

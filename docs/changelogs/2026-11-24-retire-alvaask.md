@@ -5,10 +5,10 @@ Local record. Primary record: sdkhub
 
 The gateway no longer serves the `AlvaAsk` relay operation and the runtime no
 longer loads `@alva/alvaask`, so `references/feed-sdk.md` no longer teaches
-"Pattern E: AlvaAsk + Declared Alert Output". A short note in its place says
-the module is retired and points bounded LLM reasoning inside a Feed at
-`Agent.ask()` from `@alva/pi` (`alpi.md`), with the result in a declared alert
-output (Pattern D).
+"Pattern E: AlvaAsk + Declared Alert Output". A short note under "Legacy
+Compatibility" says the module is retired and points bounded LLM reasoning
+inside a Feed at `Agent.ask()` from `@alva/pi` (`alpi.md`), with the result in
+a declared alert output (Pattern D).
 
 Version: v1.33.0 → v1.33.1 (`skills/alva/SKILL.md`, the literal assertion in
 `evals/alva-skill-docs/cases.json`).
