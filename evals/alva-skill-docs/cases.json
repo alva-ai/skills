@@ -3040,7 +3040,6 @@
             "--files-json",
             "--expected-rev",
             "--rev <current_rev>",
-            "--overwrite-conflict",
             "YAML frontmatter",
             "PresentActions",
             "channel_group",
@@ -3049,10 +3048,8 @@
             "only as a one-time,\nuser-initiated action",
             "Strict domain constraint",
             "investing, trading, financial analysis",
-            "alva my-skills list --first 200 --include-disabled --json",
-            "--source-type agent_link",
-            "--expected-rev <current_rev>",
-            "do **not** pass `--overwrite-conflict` blindly"
+            "alva my-skills list --include-disabled --json",
+            "--expected-rev <current_rev>"
           ]
         },
         {

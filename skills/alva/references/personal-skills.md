@@ -1,7 +1,7 @@
 # Personal Skills
 
 Personal Skills are private, user-owned methodology blueprints stored in Alva Cloud
-under `~/.agents/skills/<slug>/` and indexed through `alva my-skills`. Unlike
+and managed through `alva my-skills`. Unlike
 [Skillhub blueprints](request-routing.md#skillhub-blueprint), they are visible only
 to their owner. Unlike [memory.md](memory.md) (`~/memory/user.md`), they hold
 reusable step-by-step analysis or workflow instructions rather than user profile
@@ -11,10 +11,10 @@ facts or investment thoughts.
 
 Use the `alva my-skills` command family (run `alva my-skills --help` if uncertain):
 
-- `alva my-skills list [--first <n>] [--after <cursor>] [--include-disabled] [--json]`: list the current user's personal skills (`first` accepts 1–200; default 50).
+- `alva my-skills list [--include-disabled] [--json]`: list the current user's personal skills (up to 200, newest updated first).
 - `alva my-skills get <ref> [--json]`: inspect metadata, `current_rev`, and file inventory (`<ref>` accepts `personal:<public_id>`, `<public_id>`, or `<slug>`).
 - `alva my-skills file <ref> <path> [--rev <n>] [--json]`: read a skill file (`SKILL.md` or supporting `references/*`).
-- `alva my-skills save --slug <slug> --display-name <name> --description <desc> (--files-json '<json array>' | --dir <folder> | --skill-md <path>) [--source-type chat|url|upload|agent_link|skillhub_fork] [--source-ref <ref>] [--source-hash <hash>] [--expected-rev <n>] [--overwrite-conflict] --request-id <uuid> [--json]`
+- `alva my-skills save --slug <slug> --display-name <name> --description <desc> (--files-json '<json array>' | --dir <folder> | --skill-md <path>) [--expected-rev <n>] [--json]`
   - In managed Alva Sandbox / embedded agent runs, pass inline `--files-json '[{"path":"SKILL.md","content":"..."}]'` (`--dir` and `--skill-md` are terminal-only).
   - Bundles accept UTF-8 text files only (no binary files or NUL bytes).
   - `SKILL.md` must begin with YAML frontmatter whose top-level `name` equals `--slug` (e.g. `---\nname: earnings-review\n---`).
@@ -40,9 +40,9 @@ Before following a matched personal skill:
 
 ## Creating and Updating Personal Skills
 
-- **Explicit requests**: when the user asks to save a reusable method from the conversation, a public URL snapshot, or an uploaded file, draft clean Markdown (`SKILL.md` with matching YAML frontmatter `name: <slug>`, plus optional `references/*`), strip local machine paths and any secrets/credentials/account numbers, and save via `alva my-skills save --slug <slug> --display-name "<name>" --description "<desc>" --source-type <chat|url|upload> --files-json '<json array>' --request-id <new UUID>`.
+- **Explicit requests**: when the user asks to save a reusable method from the conversation, a public URL snapshot, or an uploaded file, draft clean Markdown (`SKILL.md` with matching YAML frontmatter `name: <slug>`, plus optional `references/*`), strip local machine paths and any secrets/credentials/account numbers, and save via `alva my-skills save --slug <slug> --display-name "<name>" --description "<desc>" --files-json '<json array>'`.
 - **Ordinary chat boundary**: uploaded documents or pasted URLs stay ordinary chat evidence unless the user asks to save them as a Personal Skill.
-- **Targeted edits (preserve untouched files)**: `save` replaces the entire revision bundle. Before updating an existing Personal Skill, run `alva my-skills get <ref> --json` to read `current_rev` and the full file list, read every file pinned with `--rev <current_rev>`, apply minimal targeted edits while retaining all untouched files verbatim, and pass `--expected-rev <current_rev> --request-id <new UUID>` so concurrent edits are never silently overwritten.
+- **Targeted edits (preserve untouched files)**: `save` replaces the entire bundle. Before updating an existing Personal Skill, run `alva my-skills get <ref> --json` to read `current_rev` and the full file list, read every file with `--rev <current_rev>`, apply minimal targeted edits while retaining all untouched files verbatim, and pass `--expected-rev <current_rev>` so concurrent edits are never silently overwritten.
 - **Never store secrets**: never write API keys, passwords, tokens, holdings, or account numbers into a Personal Skill.
 
 ## Semi-Automatic Capture From Chat
@@ -99,25 +99,17 @@ only (never write cloud edits back to local files).
     cookie strings, account numbers, or holdings; tell the user why it was
     skipped.
 - **Check existing cloud skills**: fetch
-  `alva my-skills list --first 200 --include-disabled --json` (continue with
-  `--after <end_cursor>` if `has_next_page` is `true`). Compare `source_ref`
-  (`agent_link:<agent>:<dir_name>`) and `source_content_hash` (canonical SHA-256
-  over sorted sanitized files serialized as `<rel_path>\0<file_sha256_hex>\0`),
-  and capture `current_rev` for any already-imported skill. Skip skills already
-  imported with the same hash.
+  `alva my-skills list --include-disabled --json`. Check whether any candidate
+  slug already exists in Alva Cloud and capture its `current_rev`.
 - **Confirm before saving**: present a shortlist ("Import into your private Alva
   Personal Skills?") showing each skill's display name, short description,
-  source path, and whether it is new or an update. Wait for explicit user
-  confirmation. On yes:
+  source path, and whether it is new or would overwrite an existing cloud skill.
+  Wait for explicit user confirmation. On yes:
   1. New skill:
-     `alva my-skills save --slug <slug> --display-name "<name>" --description "<desc>" --source-type agent_link --source-ref "agent_link:<agent>:<dir_name>" --source-hash "<sha256>" --request-id <new UUID> --dir <sanitized-dir>`
-  2. Update of an existing skill: include `--expected-rev <current_rev>` from
-     the listing so concurrent cloud edits are detected.
-  3. On HTTP 409 conflict (the skill was modified in Alva Cloud after the last
-     import), do **not** pass `--overwrite-conflict` blindly. Show the conflict
-     and ask whether to keep the Alva Cloud version, overwrite it
-     (`--expected-rev <current_rev> --overwrite-conflict`), or save under a new
-     slug.
-  4. Report which skills were imported or skipped.
+     `alva my-skills save --slug <slug> --display-name "<name>" --description "<desc>" --dir <sanitized-dir>`
+  2. Overwriting an existing slug (only if the user explicitly confirmed
+     overwriting that cloud skill): pass `--expected-rev <current_rev>` from
+     the listing; otherwise save under a new slug or skip.
+  3. Report which skills were imported or skipped.
 - **Undo**: remove an imported skill with `alva my-skills delete <ref>` or pause
   it with `alva my-skills disable <ref>`.
