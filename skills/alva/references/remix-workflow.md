@@ -76,8 +76,8 @@ Returns JSON with structure:
 `releases` is ordered newest-first, so `releases[0]` is the latest release. Pin
 to it: record its `version`, `layout_html`, and feed refs. From
 `releases[0].feeds`, collect the feed refs you need to inspect — each entry
-carries `feed_name` and `feed_major` (for ALFS paths) and `feed_id` (for API
-calls).
+carries `feed_name` and `feed_major` (for ALFS paths) and `feed_id` (a numeric
+Backend ID; CLI calls take Automation IDs instead).
 
 If the source playbook has registered UDFs, collect each function's
 `function_name`, `entry_script_path`, and `params_schema` before editing. Read
@@ -218,14 +218,14 @@ request). Do not write fresh files from scratch.
 2. **Test** via `alva run --entry-path '~/feeds/{new-name}/v1/src/index.js'`
 3. **Deploy cronjob**:
    `alva deploy create --name {new-name} --path '~/feeds/{new-name}/v1/src/index.js' --cron "..."`
-4. **Publish automation** and record the returned `feed_id`:
+4. **Publish automation** and record the returned `automationId`:
    `alva automation publish --name {new-name} --version 1.0.0 --cronjob-id ID --description "..."`
 5. **Feed visibility**: a released Playbook delivers its bundled Feeds to its
    audience while they stay private; release a public or paid remix with
    `--confirm-bundled-feed-exposure` after telling the user
    ([bundled Feeds](playbook-creation.md#visibility-and-bundled-feeds)). Make
    the feed public only when direct public reads are needed:
-   `alva feed set-visibility --id <feed_id> --visibility public`
+   `alva feed set-visibility --id <automationId> --visibility public`
 6. **Verify data** before the HTML depends on it: an authenticated SDK read,
    plus an unauthenticated absolute-path read for a public feed.
 7. **Write the edited HTML** to ALFS after updating data paths to point to your
@@ -242,7 +242,7 @@ request). Do not write fresh files from scratch.
    `alva fs write --path '~/playbooks/{new-name}/README.md' --file ./README.md --mkdir-parents`.
    See [release.md → Playbook README](api/release.md#playbook-readme).
 10. **Draft playbook**:
-   `alva release playbook-draft --name {new-name} --display-name "..." --feeds '[{"feed_id":ID}]'`
+   `alva release playbook-draft --name {new-name} --display-name "..." --feeds '[{"automationId":"<automationId>","major":1}]'`
 11. **Register inherited UDFs when present**: after the draft command returns
     the remixed playbook ID, use `alva functions register` for each copied
     method with the same `function_name` and `params_schema`, with
@@ -250,7 +250,7 @@ request). Do not write fresh files from scratch.
     inherited `window.alva.udf` UI controls pointing at an unregistered
     function.
 12. **Release playbook**:
-    `alva release playbook --name {new-name} --version v1.0.0 --feeds '[{"feed_id":ID}]' --changelog "..." --readme-url '/alva/home/<username>/playbooks/{new-name}/README.md'`
+    `alva release playbook --name {new-name} --version v1.0.0 --feeds '[{"automationId":"<automationId>","major":1}]' --changelog "..." --readme-url '/alva/home/<username>/playbooks/{new-name}/README.md'`
     (absolute ALFS path; resolve `<username>` via `alva whoami` — the relative
     shorthand is no longer accepted)
 

@@ -32,8 +32,11 @@ A clear Playbook request needs no separate build confirmation.
   that release; respect an explicit draft-only stopping point. A local edit
   without `alva fs write` + `alva release` is not live.
 - Before re-releasing an existing playbook, read `playbook.json` for
-  `releases[0].feeds` (newest release first) and pass that exact array, with
-  each `feed_id` and `feed_major`, to `--feeds`. Never guess `feed_id` values.
+  `releases[0].feeds` (newest release first) and pass the same feeds to
+  `--feeds` as `[{"automationId":"<id>","major":<feed_major>}]`: each
+  Automation ID is the `id` of the automation named `feed_name` in
+  `alva automation list` (the file's numeric `feed_id` is not one). Never
+  guess Automation IDs.
 - If `alva fs grant`, `deploy`, or `release` fails on the core data path, stop
   and report the blocker instead of shipping a broken URL.
 
@@ -89,11 +92,12 @@ Do not rely on memory of prior sessions.
 
 Published HTML runs in the viewer's browser. It must not use `$ALVA_ENDPOINT`,
 hard-coded API origins, raw browser `fetch()` calls to Alva APIs, or
-hand-written auth headers for feed data. Load the browser SDK and use
+hand-written auth headers for feed data. Load the browser SDK pinned to
+`@0.36` (Toolkit 1.x has no browser build; keep the pin) and use
 `AlvaToolkit.AlvaClient`:
 
 ```html
-<script src="https://unpkg.com/@alva-ai/toolkit/dist/browser.global.js"></script>
+<script src="https://unpkg.com/@alva-ai/toolkit@0.36/dist/browser.global.js"></script>
 <script>
   function createAlvaClientConfig() {
     const params = new URLSearchParams(window.location.search);

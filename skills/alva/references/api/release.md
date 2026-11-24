@@ -14,7 +14,7 @@ lifecycle guidance for:
 5. `--agent-type` — marking a feed as a prompt-editable agent
 
 `alva automation publish` registers a new automation and is create-only. For an
-existing automation, use `alva automation update --id <feed_id>` for registered
+existing automation, use `alva automation update --id <automationId>` for registered
 metadata, version, or producer changes; ALFS source edits themselves need no
 republish. See [feed-lifecycle.md](../feed-lifecycle.md).
 
@@ -101,7 +101,7 @@ source of truth — the README — not a separate per-template copy.
 Every `alva release playbook` call needs a freshly reviewed README for the
 version being released. Initial releases, version bumps, and re-releases all
 follow the same rule: regenerate the README from the current HTML, feed scripts,
-feed ids, cron cadences, metadata, and known blind spots, then write it again to
+Automation IDs, cron cadences, metadata, and known blind spots, then write it again to
 `~/playbooks/<name>/README.md` before release.
 
 Do not point `--readme-url` at a README copied from a prior version. A README

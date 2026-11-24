@@ -40,7 +40,7 @@ alva automation delivery update --id <automation_id> --email-enabled
 alva automation delivery update --id <automation_id> --no-email-enabled
 
 # Replace only Alva destinations. 0 is the default Agent destination.
-alva automation delivery update --id <automation_id> --alva-channel-ids 0,123
+alva automation delivery update --id <automation_id> --alva-channel-ids 0,channel_001xg
 
 # Clear only Alva destinations.
 alva automation delivery update --id <automation_id> --alva-channel-ids=
@@ -63,7 +63,7 @@ first producer run; the flag skips the run, not the binding.
   `channel_id=0`; web delivery is available immediately, and external DM
   delivery uses `active_im_provider` plus its matching username from
   `alva whoami`.
-- **Alva topic channel:** resolve the feed id and run
+- **Alva topic channel:** resolve the Automation ID and run
   `alva alert enable --automation-ids <id,id> --channel-id <channel_id>`. This
   binds the alert to that in-product web channel. Its channel id is not a
   channel-session id. Topic-channel delivery is web-only. In a channel turn,
@@ -151,8 +151,8 @@ monitors, say quiet runs skip notifications.
 
 There is no playbook alert target. Following or unfollowing a playbook never
 changes alerts. If the user explicitly asks to enable every current automation
-behind a playbook, resolve the feed ids from that playbook's latest release and
-submit those ids with `alva alert enable --automation-ids <id,id>`. Treat this
+behind a playbook, resolve the Automation IDs of that playbook's latest release and
+submit those IDs with `alva alert enable --automation-ids <id,id>`. Treat this
 as a snapshot: feeds added by a later release are not subscribed automatically.
 
 ## Legacy Compatibility
@@ -172,16 +172,17 @@ execution carries the current declarations and writes.
 
 ## Inventory And Unsubscribe
 
-- `alva alert list --first 200` — rows carry `kind`, `target_status`, feed
-  identity, `feed_status`, and `last_pushed_at_ms` when available. If `items` <
-  `total_count`, keep paginating; never report a truncated page as the full
-  inventory. Alert enablement is an active `FEED_ALERT`. Social playbook follows
-  are separate and must not be used as delivery state.
+- `alva alert list --first 200` — `items` carry `medium`, `targetStatus`, the
+  Automation (`automationId`, `automationName`), `automationStatus`, and
+  `lastDeliveredAt` when available. While `nextPageToken` is non-null, keep
+  paginating with `--cursor`; never report a truncated page as the full
+  inventory. Alert enablement is an item with `targetStatus` `ACTIVE`. Social
+  playbook follows are separate and must not be used as delivery state.
 - `alva alert follows --limit 100` — the playbook follow list. Keep paginating
-  with `--cursor` when `has_next` is true.
+  with `--cursor` while `nextPageToken` is non-null.
 - Disable by name (`alva alert disable --automation owner/name`) for live
   targets; use `alva alert disable --automation-ids a,b` for bulk and for
   `TARGET_DELETED` feed ghosts (name-addressed calls 404 on deleted targets).
-- Use the `target.id` returned by `alva alert list` for a deleted feed row.
+- Use the `automationId` returned by `alva alert list` for a deleted feed row.
 - Never probe with mutating calls — the read surface answers all identity
   questions.

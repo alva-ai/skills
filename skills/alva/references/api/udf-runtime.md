@@ -125,7 +125,7 @@ The browser API is the viewer-side use surface. It assumes the function has
 already been registered for the playbook.
 
 ```html
-<script src="https://unpkg.com/@alva-ai/toolkit/dist/browser.global.js"></script>
+<script src="https://unpkg.com/@alva-ai/toolkit@0.36/dist/browser.global.js"></script>
 <script>
   const functions = await window.alva.udf.list();
   const result = await window.alva.udf.call('analyze', { ticker: 'AAPL' });
