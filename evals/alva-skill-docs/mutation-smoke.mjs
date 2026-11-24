@@ -90,10 +90,24 @@ const MUTATIONS = [
     expectFailedCases: ["target.thesis-author-intent"],
   },
   {
-    id: "thesis-weight-request-no-equal-split",
+    id: "thesis-partial-weights",
     file: "references/thesis.md",
-    remove: "Say in one sentence that the Thesis return splits equally across\n  its long and short tickers and weights cannot be set",
-    replacement: "Do not mention how the return splits",
+    remove: "never to only some; the rest\n  is cash and the total is at most 1",
+    replacement: "to the tickers the author sized",
+    expectFailedCases: ["target.thesis-return-preview"],
+  },
+  {
+    id: "thesis-body-sizing-ignored",
+    file: "references/thesis.md",
+    remove: "Sizing the author states, in the conversation or in the body being\n  published, is sizing",
+    replacement: "Sizing the author states in the conversation is sizing",
+    expectFailedCases: ["target.thesis-return-preview"],
+  },
+  {
+    id: "thesis-unasked-sizing",
+    file: "references/thesis.md",
+    remove: "never\nsuggest sizing or rebalancing the author did not ask for.",
+    replacement: "suggest a sizing when it helps.",
     expectFailedCases: ["target.thesis-author-intent"],
   },
   {
