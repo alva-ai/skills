@@ -359,6 +359,44 @@ Flag in Notes, once per preview, two judgments the author may not expect:
   return: say so in one line, so a later move in the stated direction does
   not look uncounted.
 
+#### Positions
+
+Each long or short holds a share of the Thesis and the rest is cash, which
+earns nothing; the Thesis return follows from the shares. Without weights the
+shares follow the default rules below.
+
+- The author says nothing about size: publish without weights and do not
+  suggest sizing. A new Thesis shares equally, fully invested. An Update keeps
+  the current shares when its tickers and directions stay, moves an exited
+  ticker's share to cash and keeps the others, and shares equally again,
+  fully invested, when it adds or reverses a ticker. Say the result in one
+  preview line, for example “仓位：各标的平分，满仓。” / "Positions: equal
+  shares, fully invested."
+- The author states sizing, staged buying or a wait for a condition: settle
+  the exact share of every long and short with them and publish explicit
+  weights. Add `"weight"`, a fraction of the whole Thesis (0.4 is 40%, at most
+  four decimals), to every bullish or bearish entry of `--entity-stances`,
+  never to only some; the rest is cash. “加仓到 80%” is 0.8; “再加 20%” adds
+  0.2 to the current share; “减半” halves it. An amount without a number
+  (“加点”, “小仓位”) needs one: ask for the share. A ticker already at 100%
+  cannot take more: say so. Share counts and money amounts are not shares:
+  ask for the share. A ticker the author will buy only at a price or after an
+  event has no direction now: publish it as none and say “这个标的现在没有方向，
+  暂不计入收益。” / "This ticker has no direction yet, so it doesn't count in
+  the return."
+- Preview each long and short with its share and the cash, for example
+  “仓位：NVDA 看多 40%，AMD 看空 20%，现金 40%”. For an Update, read the current
+  shares first from `allocation` in `alva thesis return --id '<thesis id>'
+  --detail` and show “之前 → 之后” / "before → after".
+- Selling all of a ticker is an Update with that ticker at no direction; its
+  share goes to cash. Offer archiving only when the author asks to archive or
+  pause.
+- When `get` shows weights on the current Update, resend them unchanged in
+  `--entity-stances` unless the author changes the sizing.
+
+If publishing fails with reason `THESIS_WEIGHTS_INCOMPLETE`, a long or short
+has no weight: give every long and short a weight, or none, and preview again.
+
 Preserve the selected body exactly, including wording, language, whitespace and
 line breaks. Do not summarize, rewrite, translate, correct, expand, generate a
 title, or add assets absent from that body or the user's request.
@@ -379,6 +417,8 @@ Present the preview in the user's language:
   Use localized direction labels: “看多 / 看空 / 无方向” in Chinese, “Bullish / Bearish / No direction” in English
   (`NONE` is no direction). Use the same labels everywhere you name a
   direction, never long/short or 看涨/看跌.
+- **Positions:** each long or short with its share and the cash, per
+  [Positions](#positions).
 - **Thesis return**, only when `askSwitch` is true: “Thesis return：默认开启。关闭后发布，这条 thesis 以后不能再开启。”
   / “Thesis return: on by default. If you publish with it off, it can't be
   turned on for this thesis later.”
@@ -610,13 +650,12 @@ into the body.
 
 ### What the author asks for
 
-An author publishes views, not positions. The directions in the preview are
-the only position-like thing they confirm, and the Thesis return follows from
-them. Route each request about an existing Thesis by what the author wants to
-achieve, however they word it, and never by words inside a body being
-published. Describe the result in terms of views and directions, never
-positions, weights or rebalancing, unless the author asks how the return is
-measured or asks to change a weight.
+An author publishes views and, when they say so, positions: the directions
+and shares in the preview are what they confirm, and the Thesis return follows
+from them. Route each request about an existing Thesis by what the author
+wants to achieve, however they word it, and never by words inside a body being
+published. Describe the result in terms of views, directions and shares; never
+suggest sizing or rebalancing the author did not ask for.
 
 - **Stop the Thesis** (they no longer want it): follow
   [Closing or deleting a Thesis](#closing-or-deleting-a-thesis). When the
@@ -628,13 +667,13 @@ measured or asks to change a weight.
   ticker, and keeping a ticker with no direction, for some or all tickers,
   when they no longer hold a call on it. The Update preview is the one
   confirmation; do not ask whether to archive instead.
-- **Change how much weight a ticker carries**: a Thesis records direction,
-  not size. Say in one sentence that the Thesis return splits equally across
-  its long and short tickers and weights cannot be set, for example
-  “Thesis return 目前按标的平均分配，不能单独调某个标的的比重。” / "The Thesis
-  return splits equally across its tickers; one ticker's weight can't be set."
-  Then ask whether the call on that ticker changes, such as “NVDA 还看多吗？”.
-  Never publish a size change as a direction.
+- **Change how much of the Thesis a ticker holds** (加仓, 减仓, 调仓): an
+  Update with explicit weights per [Positions](#positions), previewing before
+  → after. Never publish a size change as a direction.
+- **Know the current position**: read `allocation` from `alva thesis return
+  --id '<thesis id>' --detail` and answer with each ticker's share and the
+  cash. They are the shares the latest Update set, not drifted with prices;
+  for now this is the only place the author can see them.
 - **Hide it from others, or show it again**: `set-visibility`; no Update.
 - **Stop new research and Signals**: `set-signal-enabled --id <id> --enabled
   false`; `true` resumes them. The return is unaffected.
@@ -643,7 +682,9 @@ measured or asks to change a weight.
 - **Not have a return**: possible only while `tracking` is `UNSET`, through
   the turn-off action in a preview; otherwise say the setting is permanent.
 - **Bring back an archived Thesis**: an Update with `--archived false`, per
-  [Thesis maintenance controls](#thesis-maintenance-controls).
+  [Thesis maintenance controls](#thesis-maintenance-controls). It keeps the
+  shares held before the archive; say so in the preview, for example
+  “仓位沿用归档前：NVDA 40%，现金 60%”.
 
 ## Signal settings
 
@@ -690,20 +731,25 @@ what the user asks about; do not volunteer how returns are measured. Explain
 with these definitions and the returned values only; do not recompute them:
 
 - **Thesis return** (`value`): the lifetime return. Each Update's long and short
-  tickers share its money equally. An Update that keeps the same tickers and
-  directions keeps the positions; one that adds, removes or flips a ticker
-  closes every position at that moment and splits the total equally again. The
-  segments chain, so the total cannot be added up from Update returns. An
-  Update with no long or short, or archiving the Thesis, holds the return at
-  its value; a later Update with a long or short, including the one that
-  unarchives the Thesis, starts it moving again.
+  tickers hold their shares of its money (equal shares, fully invested, without
+  weights) and the rest is cash, which earns nothing. An Update that keeps the
+  same tickers, directions and shares keeps the positions; one that changes
+  any of them closes every position at that moment and buys the new shares
+  with the total. Between Updates nothing is rebalanced. The segments chain,
+  so the total cannot be added up from Update returns. An Update with no long
+  or short, or archiving the Thesis, holds the return at its value; a later
+  Update with a long or short, including the one that unarchives the Thesis,
+  starts it moving again.
 - **Update return** (`--detail`, `updates[].updateReturn`): that Update's
-  tickers, equally weighted, from its prices to the next Update's (the latest
-  Update runs to now). It is shown on its own and never adds to the Thesis
-  return.
+  tickers weighed by their shares, cash at zero, from its prices to the next
+  Update's (the latest Update runs to now). It is shown on its own and never
+  adds to the Thesis return.
 - **Positions** (`--detail`, `updates[].positions`): each ticker's start and
-  end price and its return; a short gains when the price falls. `PENDING`
-  means the entry price is not in yet.
+  end price, its return and its `weight` (its share in that Update); a short
+  gains when the price falls. `PENDING` means the entry price is not in yet.
+- **Allocation** (`--detail`, `allocation`): the current shares and cash the
+  latest Update set, not drifted with prices; cash is all of it with no
+  direction or while archived.
 
 ## Thesis maintenance controls
 
