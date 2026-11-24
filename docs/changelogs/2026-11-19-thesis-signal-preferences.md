@@ -16,6 +16,8 @@ and behavior B13.
   lists Signals ("all" by default) and a changed setting voids the confirmation.
 - "What the author asks for" routes "show only some kinds of Signals" to the new section.
 - `SKILL.md`: the Thesis maintenance routing row names the setting; version v1.34.0.
+- `evals/alva-skill-docs/cases.json`: the `target.mainline-updates` version pin follows to
+  `v1.34.0` (main was v1.33.1 when merged in).
 
 ## Dependencies and release
 

@@ -318,10 +318,10 @@ jobs:
 
       - name: GCP Auth
         id: auth
-        uses: google-github-actions/auth@v1
+        uses: google-github-actions/auth@v3
         with:
-          credentials_json:
-            ${{ secrets.GCS_ALVA_AI_INTERNAL_ARTIFACTS_SA_JSON }}
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SKILLS_DEPLOYER_SERVICE_ACCOUNT }}
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
