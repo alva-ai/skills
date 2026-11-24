@@ -382,6 +382,9 @@ Present the preview in the user's language:
 - **Thesis return**, only when `askSwitch` is true: “Thesis return：默认开启。关闭后发布，这条 thesis 以后不能再开启。”
   / “Thesis return: on by default. If you publish with it off, it can't be
   turned on for this thesis later.”
+- **Signals**: all by default, or the kinds and minimum importance the author
+  chose, in plain words, for example “Signals：只显示基本面和宏观，重要及以上” /
+  "Signals: fundamentals and macro only, notable and above".
 - **Images**, when selected: follow
   [Images in a new public Thesis](#images-in-a-new-public-thesis).
 - **Notes**, when any.
@@ -411,8 +414,8 @@ considered, that confirmation is their decision to publish despite them.
 Previously discussed Notes and ordinary editorial suggestions need no new
 approval. Research or rewriting alone never authorizes publication.
 
-Any change to the body, title, visibility, assets, or stances voids the
-confirmation: show the new preview. Recheck asset identities and directions
+Any change to the body, title, visibility, assets, stances, or Signals voids
+the confirmation: show the new preview. Recheck asset identities and directions
 when they change; a wording-only edit reuses unchanged verified IDs and does
 not require extraction.
 Stop if declined.
@@ -449,7 +452,7 @@ with the exact payload as `--request-id`; a changed intent requires a new UUID.
 Use confirmed catalog IDs and directions directly:
 
 ```sh
-alva thesis create --request-id '<uuid>' --body '<exact body>' [--entity-ids '<id,id>' --entity-stances '[{"entity_id":"745337","stance":"bearish"}]'] [--track-return false]
+alva thesis create --request-id '<uuid>' --body '<exact body>' [--entity-ids '<id,id>' --entity-stances '[{"entity_id":"745337","stance":"bearish"}]'] [--track-return false] [--signal-kinds '<kinds>'] [--signal-min-importance <level>]
 alva thesis get --id '<returned thesis id>'
 ```
 
@@ -467,6 +470,10 @@ preserve their order, but do not send a resolved asset again via
 `--tickers`. If a supplied ticker remains unresolved, clarify it before
 creation; do not silently create an asset with `unknown` direction. Reuse the
 same request ID only while the full confirmed payload is unchanged.
+
+A new Thesis shows every Signal. Pass `--signal-kinds` and/or
+`--signal-min-importance` only when the author asked to limit them, mapped as
+in [Signal settings](#signal-settings).
 
 ## Created Thesis preview
 
@@ -614,7 +621,8 @@ measured or asks to change a weight.
 - **Stop the Thesis** (they no longer want it): follow
   [Closing or deleting a Thesis](#closing-or-deleting-a-thesis). When the
   context shows they only want fewer notifications, such as a reply to a
-  Signal, offer pausing research instead.
+  Signal, offer [Signal settings](#signal-settings) or pausing research
+  instead.
 - **Keep it running with a changed call**: an Update with the changed tickers
   and directions. That covers reversing a direction, adding or removing a
   ticker, and keeping a ticker with no direction, for some or all tickers,
@@ -630,10 +638,41 @@ measured or asks to change a weight.
 - **Hide it from others, or show it again**: `set-visibility`; no Update.
 - **Stop new research and Signals**: `set-signal-enabled --id <id> --enabled
   false`; `true` resumes them. The return is unaffected.
+- **Show only some kinds of Signals** ("no technicals", "only major"):
+  follow [Signal settings](#signal-settings); research continues.
 - **Not have a return**: possible only while `tracking` is `UNSET`, through
   the turn-off action in a preview; otherwise say the setting is permanent.
 - **Bring back an archived Thesis**: an Update with `--archived false`, per
   [Thesis maintenance controls](#thesis-maintenance-controls).
+
+## Signal settings
+
+The author of a Thesis chooses which Signals it shows: kinds
+(`fundamentals`, `macro`, `technicals`, `commentary`, comma-separated, at
+least one) and a minimum importance (`all`, `notable` for notable and major,
+or `major`). The setting changes what every reader sees, which Signals are
+pushed and, from its next daily run, what the Overview is written from;
+hidden Signals are still found and come back when the setting widens.
+
+1. Read the current setting with
+   `alva thesis signal-preferences get --id '<thesis id>'`.
+2. Map the request onto it: "no technicals" removes that kind, "only major
+   news" sets `major`. Commentary is anyone's own view or forecast; the other
+   kinds are reported facts. A request to hide every kind is
+   [Stop new research and Signals](#what-the-author-asks-for) instead.
+3. Say the result and its reach in one or two sentences, for example
+   “之后所有人看这条 thesis 时都不会再看到技术面的 Signal，推送也一样，
+   下次生成的 Overview 起也按这个来。” / "From now on, no one reading this
+   thesis will see technicals Signals, in pushes too, and in the Overview
+   from its next daily run." Wait for
+   confirmation.
+4. Write it with `alva thesis signal-preferences set --id '<thesis id>'
+   [--kinds '<kinds>'] [--min-importance <level>]`, passing only what
+   changes.
+
+If the read is refused because the user is not the author, say that only the
+author decides which Signals that Thesis shows; in the app, Not interested on
+a Signal hides it for the user alone.
 
 ## Thesis return
 
