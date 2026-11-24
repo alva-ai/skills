@@ -362,40 +362,53 @@ Flag in Notes, once per preview, two judgments the author may not expect:
 #### Positions
 
 Each long or short holds a share of the Thesis and the rest is cash, which
-earns nothing; the Thesis return follows from the shares. Without weights the
-shares follow the default rules below.
+earns nothing; the Thesis return follows from the shares. Publishing with
+weights sets the shares exactly. Publishing without weights leaves them to the
+default rules below, and Alva then also reads the published body for sizing
+(“30%”, “减半”, “再加 20%”) and applies what it finds to the previous shares.
 
-- The author says nothing about size: publish without weights and do not
-  suggest sizing. A new Thesis shares equally, fully invested. An Update keeps
-  the current shares when its tickers and directions stay, moves an exited
-  ticker's share to cash and keeps the others, and shares equally again,
-  fully invested, when it adds or reverses a ticker. Say the result in one
-  preview line, for example “仓位：各标的平分，满仓。” / "Positions: equal
-  shares, fully invested."
-- The author states sizing, staged buying or a wait for a condition: settle
-  the exact share of every long and short with them and publish explicit
-  weights. Add `"weight"`, a fraction of the whole Thesis (0.4 is 40%, at most
-  four decimals), to every bullish or bearish entry of `--entity-stances`,
-  never to only some; the rest is cash. “加仓到 80%” is 0.8; “再加 20%” adds
-  0.2 to the current share; “减半” halves it. An amount without a number
-  (“加点”, “小仓位”) needs one: ask for the share. A ticker already at 100%
-  cannot take more: say so. Share counts and money amounts are not shares:
-  ask for the share. A ticker the author will buy only at a price or after an
-  event has no direction now: publish it as none and say “这个标的现在没有方向，
-  暂不计入收益。” / "This ticker has no direction yet, so it doesn't count in
-  the return."
+- Sizing the author states, in the conversation or in the body being
+  published, is sizing: settle the exact share of every long and short with
+  them and publish explicit weights. Add `"weight"`, a fraction of the whole
+  Thesis with at most four decimals (0.4 is 40%; a third is 0.3333), to every
+  bullish or bearish entry of `--entity-stances`, never to only some; the rest
+  is cash and the total is at most 1. “加仓到 80%” is 0.8; “再加 20%” adds 0.2
+  to the current share; “减半” halves it. When a change would pass 100%, say so
+  and ask which ticker gives up share. An amount without a number (“加点”,
+  “小仓位”) needs one: ask for the share. A ticker already at 100% cannot take
+  more: say so. Share counts and money amounts are not shares: ask for the
+  share. A ticker the author will buy only at a price or after an event gets
+  no direction from `returnPreview`; say “这个标的现在没有方向，暂不计入收益。” /
+  "This ticker has no direction yet, so it doesn't count in the return."
+- Neither the author nor the body says anything about size: publish without
+  weights and do not suggest sizing. A new Thesis shares equally, fully
+  invested. An Update keeps the current shares when its tickers and directions
+  stay, moves an exited ticker's share to cash and keeps the others, and
+  shares equally again, fully invested, when it adds or reverses a ticker.
+- A body that repeats an earlier Update's size words the author does not mean
+  to apply again, such as a wording fix of an Update that said “NVDA 减半”, is
+  published with the current shares as explicit weights, so they are not
+  applied twice.
+- A size change alone is a new Update; its body is the author's own words for
+  the change (their request, as shown in the preview), not the previous body.
 - Preview each long and short with its share and the cash, for example
-  “仓位：NVDA 看多 40%，AMD 看空 20%，现金 40%”. For an Update, read the current
-  shares first from `allocation` in `alva thesis return --id '<thesis id>'
-  --detail` and show “之前 → 之后” / "before → after".
+  “仓位：NVDA 看多 40%，AMD 看空 20%，现金 40%”, or in one line “仓位：各标的平分，
+  满仓。” / "Positions: equal shares, fully invested." For an Update, read the
+  current shares first from `allocation` in `alva thesis return --id
+  '<thesis id>' --detail` and show “之前 → 之后” / "before → after". While the
+  Thesis is archived, `allocation` is all cash; the shares before the archive
+  are the last Update's `positions[].weight` in the same read. When the read
+  has no `allocation`, say the current shares cannot be read just now.
 - Selling all of a ticker is an Update with that ticker at no direction; its
   share goes to cash. Offer archiving only when the author asks to archive or
   pause.
-- When `get` shows weights on the current Update, resend them unchanged in
-  `--entity-stances` unless the author changes the sizing.
 
-If publishing fails with reason `THESIS_WEIGHTS_INCOMPLETE`, a long or short
-has no weight: give every long and short a weight, or none, and preview again.
+After publishing with weights, check that `thesis get` returns them; if the
+CLI reports that the server did not keep them, say the Update was published
+without its shares and do not retry it. If publishing fails with reason
+`THESIS_WEIGHTS_INCOMPLETE`, the tickers named in `entity_ids` have no weight:
+give every long and short a weight, or none, and preview again; a total above
+1 fails as invalid: fix the shares and preview again.
 
 Preserve the selected body exactly, including wording, language, whitespace and
 line breaks. Do not summarize, rewrite, translate, correct, expand, generate a
@@ -683,8 +696,8 @@ suggest sizing or rebalancing the author did not ask for.
   the turn-off action in a preview; otherwise say the setting is permanent.
 - **Bring back an archived Thesis**: an Update with `--archived false`, per
   [Thesis maintenance controls](#thesis-maintenance-controls). It keeps the
-  shares held before the archive; say so in the preview, for example
-  “仓位沿用归档前：NVDA 40%，现金 60%”.
+  shares held before the archive (see [Positions](#positions)); say so in the
+  preview, for example “仓位沿用归档前：NVDA 40%，现金 60%”.
 
 ## Signal settings
 

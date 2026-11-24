@@ -92,8 +92,15 @@ const MUTATIONS = [
   {
     id: "thesis-partial-weights",
     file: "references/thesis.md",
-    remove: "never to only some; the rest is cash",
+    remove: "never to only some; the rest\n  is cash and the total is at most 1",
     replacement: "to the tickers the author sized",
+    expectFailedCases: ["target.thesis-return-preview"],
+  },
+  {
+    id: "thesis-body-sizing-ignored",
+    file: "references/thesis.md",
+    remove: "Sizing the author states, in the conversation or in the body being\n  published, is sizing",
+    replacement: "Sizing the author states in the conversation is sizing",
     expectFailedCases: ["target.thesis-return-preview"],
   },
   {

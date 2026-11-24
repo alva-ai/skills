@@ -130,7 +130,7 @@ available with one plain sentence, rather than a routine closing question.
    unless a legitimate cross-user operation is requested.
 4. **Use Altra for trading.** Backtests, simulations, positions, targets,
    signals, order logic, and rebalancing use Altra (`@alva/altra2`) with
-   canonical trading pairs; v1 `FeedAltra` is deprecated. Interactive live orders
+   canonical trading pairs; v1 `FeedAltra` is deprecated (a Thesis's shares: [Positions](references/thesis.md#positions)). Interactive live orders
    require a dry run and explicit per-order confirmation. Scheduled execution
    has a narrowly scoped consent exception in
    [agent-schedules.md](references/agent-schedules.md); never apply it to chat.
