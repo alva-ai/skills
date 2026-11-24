@@ -311,59 +311,6 @@ Clients without card support retain `title` + `body`, and delivery remains
 useful even when presentation is unavailable. `PresentActions` is a
 conversation-reply tool, not a Feed API; never call it from a Feed script.
 
-### Pattern E: AlvaAsk + Declared Alert Output
-
-Use `@alva/alvaask` when a scheduled Feed needs Alva's full agent behavior.
-Store its push-worthy result in a descriptive alert output rather than the
-legacy `notify/message` path.
-
-```javascript
-const { ask } = require("@alva/alvaask");
-const {
-  Feed,
-  feedPath,
-  makeDoc,
-  str,
-  alertOutput,
-} = require("@alva/feed");
-
-const feed = new Feed({ path: feedPath("daily-briefing") });
-feed.def("reports", {
-  briefing: alertOutput(
-    makeDoc("Daily Briefing", "Agent-generated market briefing", [
-      str("title"),
-      str("body"),
-    ]),
-  ),
-});
-
-(async () => {
-  const result = ask(`Give a brief crypto market update with key levels.
-If there is no material update worth notifying about, output only
-NO_MATERIAL_UPDATE.`);
-
-  await feed.run(async (ctx) => {
-    const body = result.text.trim();
-    if (!body || body === "NO_MATERIAL_UPDATE") return;
-
-    await ctx.self.ts("reports", "briefing").append([
-      {
-        date: Date.now(),
-        title: "Daily Crypto Briefing",
-        body,
-      },
-    ]);
-  });
-})();
-```
-
-Deploy still requires a cronjob with `--push-notify` and an active
-`alva automation publish` binding. Initial publish creates the owner's FEED
-alert binding automatically; use `alva alert enable` to move it to a different
-destination or to bind another viewer. Publishing also starts the producer once
-unless `--skip-auto-trigger` is present. Adding or changing an alert output
-later does not require another publish.
-
 ### Legacy Compatibility
 
 Existing `signal/targets` and `notify/message` feeds continue to work through
@@ -374,6 +321,10 @@ Altra-owned `signal/targets` unchanged. Do not wrap either reserved source in
 The `<|SKIP_NOTIFICATION|>` body sentinel and legacy `text` fallback apply only
 to `notify/message`. New V2 alert outputs require `body` and express a quiet run
 by not appending.
+
+`@alva/alvaask` is retired and no longer loads. For a bounded LLM reasoning
+step inside a Feed, use `Agent.ask()` from `@alva/pi` ([alpi.md](alpi.md)) and
+store its push-worthy result in a declared alert output (Pattern D).
 
 ### Deduplication
 

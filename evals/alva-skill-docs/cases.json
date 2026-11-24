@@ -1606,7 +1606,7 @@
         }
       ],
       "includes": [
-        "version: v1.33.0",
+        "version: v1.33.1",
         "Capability Help",
         "feedback",
         "api/feedback.md",
