@@ -21,8 +21,8 @@ Read all of these; do not stop once you have a few items:
   your memory records (first run: the last 90 days), archived ones included.
   Only the files of the agent you are; another agent's are not yours to read:
   - Claude Code: `~/.claude/projects/*/*.jsonl`
-  - Codex: `~/.codex/sessions/YYYY/MM/DD/*.jsonl` and
-    `~/.codex/archived_sessions/*.jsonl.zst` (zstd)
+  - Codex: `~/.codex/sessions/YYYY/MM/DD/` and `~/.codex/archived_sessions/`,
+    each both `*.jsonl` and `*.jsonl.zst` (zstd; most sessions are compressed)
   - Hermes: `~/.hermes/state.db`, `~/.hermes/memories/USER.md` and `MEMORY.md`
   - OpenClaw: the workspace `MEMORY.md` and `memory/*.md`,
     `~/.openclaw/memory/main.sqlite`
@@ -32,9 +32,11 @@ Read all of these; do not stop once you have a few items:
 
 Read every message the user wrote in that window and judge each one yourself.
 No keyword or pattern filters, and no skipping long messages: in a long one,
-set aside pasted text, logs and tool output and read what the user wrote. The
-user names a project or an older period → read back that far and date what you
-find.
+set aside pasted text, logs and tool output and read what the user wrote. A
+script may pull out the user's own messages (by who wrote them, never by what
+they say). Go from newest to oldest; when the window is more than one run can
+read, say how far back you got. The user names a project or an older period →
+read back that far and date what you find.
 
 Nothing found, or a source could not be read → say which sources you read and
 over what dates, and which you could not read and why, so "nothing there" and
@@ -82,12 +84,13 @@ must not contain them.
   use `scope.id` only when `scope.__typename` is `Entity` and its name and
   ticker match. Ambiguous → ask, or leave the asset out.
 - Directions: `alva thesis asset-candidates --text '<exact body>' --entity-ids '<id,id>' --no-discovery`,
-  then use `returnPreview.directions`. `UNRESOLVED` or `UNKNOWN` is an answer,
-  not a failure: leave out an `UNRESOLVED` mention's asset and each asset whose
-  direction is `UNKNOWN`, keep the others with their directions, and say which
-  were left out. No asset keeps a direction, or the call fails → still offer
-  the view, saying its direction could not be judged, so it would be published
-  with no assets and no directions; ask whether to publish it that way.
+  then use `returnPreview.directions`; a failed call → try once more.
+  `UNKNOWN` is an answer, not a failure: show that asset as "direction not
+  judged" and let the user pick Long, Short or Not tracked, or leave it out;
+  never pick one yourself. Keep the others with their directions. No asset
+  keeps a direction, or the call fails again → still offer the view, saying it
+  would be published with no assets and no directions; ask whether to publish
+  it that way.
 
 **User present** → one confirmation with two parts: "Save to your Alva memory?"
 (bullets) and "Publish as theses?" (a checklist: each body in full, each asset

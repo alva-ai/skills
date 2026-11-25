@@ -7,9 +7,9 @@ version: 2
 Connects this agent to the user's Alva account. Run it when the user asks you to
 follow BOOTSTRAP.md or to update Alva setup. The routine tells them when
 `version` above is newer than the "Alva bootstrap vN done" in your memory; an
-update skips the steps already done. Everything you need is in this file
-and [agent-routine.md](references/agent-routine.md); you do not need the rest of
-the skill.
+update runs step 1 again and skips the other steps already done. Everything
+you need is in this file and [agent-routine.md](references/agent-routine.md);
+you do not need the rest of the skill.
 
 **If you are Alva itself** (a managed Alva Sandbox, where the skill's Runtime
 Contract applies), do not run any of this: no setup, schedule, routine or
@@ -53,15 +53,16 @@ and the user's language, briefly. Then stop and wait for their go-ahead:
   and that they can say "continue Alva setup" afterwards. Stop here.
 - Sign this agent in with `alva auth login --agent "<your product name>"`,
   such as `--agent "Codex"` or `--agent "Grok bot"`, even when `alva whoami`
-  already shows a user, and on an update unless you remember doing it: the
-  new key, named after you, is how the Alva app knows this agent is connected,
-  and an older sign-in does not count. A browser opens on this computer. When the user
+  already shows a user, and on an update unless your memory says you signed
+  in by name: the new key, named after you, is how the Alva app knows this
+  agent is connected, and an older sign-in does not count. A browser opens on this computer. When the user
   cannot see this computer's screen (a cloud computer, a remote machine), add
   `--no-browser`: send them the
   link it prints, ask them to sign in on their own device and send back the
   code the page shows, and enter it at the prompt while the command keeps
-  running. An older CLI says `--agent is not supported` → run the same command
-  without `--agent`.
+  running. An older CLI says `--agent is not supported` → already signed in:
+  keep that sign-in, since another unnamed key would not count either; not
+  signed in: run the same command without `--agent`.
 - `ALVA_API_KEY` is set in your environment → it overrides the sign-in, so the
   new key goes unused: ask the user to remove it from your settings and start
   a new session, then continue.
@@ -104,6 +105,7 @@ removes any of it (see Undo in agent-routine.md), and when the next note arrives
 Then record in your own memory:
 "Alva bootstrap v2 done <date>.
 'What's new on Alva' means: run references/agent-routine.md in the Alva skill.
-The Alva CLI is <the command you used: alva, or ~/.npm-global/bin/alva>.
+The Alva CLI is <the command you used: alva, or ~/.npm-global/bin/alva>,
+signed in <by name, or without a name (older CLI)>.
 To change how often it runs, change the schedule of the 'Alva routine' job;
 never add a second one."

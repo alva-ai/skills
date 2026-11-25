@@ -665,8 +665,8 @@ const MUTATIONS = [
   {
     id: "routine-thesis-unknown-direction",
     file: "references/agent-routine.md",
-    remove: "No asset keeps a direction, or the call fails → still offer",
-    replacement: "Any `UNKNOWN` → publish it with the direction you judge, still offer",
+    remove: "keeps a direction, or the call fails again → still offer the view, saying it",
+    replacement: "keeps a direction → publish it with the direction you judge, saying it",
     expectFailedCases: ["target.agent-bootstrap"],
   },
   {
@@ -784,8 +784,8 @@ const MUTATIONS = [
   {
     id: "routine-drops-known-directions",
     file: "references/agent-routine.md",
-    remove: "direction is `UNKNOWN`, keep the others with their directions, and say which",
-    replacement: "direction is `UNKNOWN`, and drop the others too, and say which",
+    remove: "never pick one yourself. Keep the others with their directions. No asset",
+    replacement: "never pick one yourself. Drop the others too. No asset",
     expectFailedCases: ["target.agent-bootstrap"],
   },
   {
@@ -798,7 +798,7 @@ const MUTATIONS = [
   {
     id: "bootstrap-skips-login-when-signed-in",
     file: "BOOTSTRAP.md",
-    remove: "already shows a user, and on an update unless you remember doing it: the",
+    remove: "already shows a user, and on an update unless your memory says you signed",
     replacement: "shows no user, and on an update only when signed out: the",
     expectFailedCases: ["target.agent-bootstrap"],
   },
@@ -814,6 +814,48 @@ const MUTATIONS = [
     file: "references/agent-routine.md",
     remove: "always passing the visibility the user confirmed",
     replacement: "leaving the visibility to the CLI default",
+    expectFailedCases: ["target.agent-bootstrap"],
+  },
+  {
+    id: "routine-codex-plain-sessions-only",
+    file: "references/agent-routine.md",
+    remove: "each both `*.jsonl` and `*.jsonl.zst` (zstd; most sessions are compressed)",
+    replacement: "`*.jsonl`",
+    expectFailedCases: ["target.agent-bootstrap"],
+  },
+  {
+    id: "routine-picks-unknown-direction",
+    file: "references/agent-routine.md",
+    remove: "never pick one yourself. Keep the others",
+    replacement: "or pick the likeliest one yourself. Keep the others",
+    expectFailedCases: ["target.agent-bootstrap"],
+  },
+  {
+    id: "routine-no-retry-before-undirected",
+    file: "references/agent-routine.md",
+    remove: "then use `returnPreview.directions`; a failed call → try once more.",
+    replacement: "then use `returnPreview.directions`.",
+    expectFailedCases: ["target.agent-bootstrap"],
+  },
+  {
+    id: "routine-hides-partial-read",
+    file: "references/agent-routine.md",
+    remove: "read, say how far back you got.",
+    replacement: "read, stop where you are.",
+    expectFailedCases: ["target.agent-bootstrap"],
+  },
+  {
+    id: "bootstrap-update-skips-install",
+    file: "BOOTSTRAP.md",
+    remove: "update runs step 1 again and skips the other steps already done.",
+    replacement: "update skips the steps already done.",
+    expectFailedCases: ["target.agent-bootstrap"],
+  },
+  {
+    id: "bootstrap-old-cli-mints-unnamed-key",
+    file: "BOOTSTRAP.md",
+    remove: "keep that sign-in, since another unnamed key would not count either; not",
+    replacement: "sign in again anyway; and when not",
     expectFailedCases: ["target.agent-bootstrap"],
   },
 ];

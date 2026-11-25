@@ -74,13 +74,16 @@ fi
 echo "last_check=$now" >> "$tmp_config"
 mv "$tmp_config" "$CONFIG_FILE" 2>/dev/null || rm -f "$tmp_config"
 
-# A global install lives in a dot folder of the home directory
-# (~/.agents/skills/alva, ~/.claude/skills/alva, ...); updating it needs -g,
-# or the update lands in whatever project the agent runs in.
-global_flag=""
-case "$SKILL_DIR" in
-  "$HOME"/.*/skills/*) global_flag=" -g" ;;
-esac
+# `npx skills add` without -g installs into the project the agent runs in, so
+# only a copy inside that project is a project install; any other copy
+# (~/.agents/skills/alva, ~/.claude/skills/alva, ...) is global and needs -g.
+# Run from the home directory, both forms write the same folders: keep -g.
+global_flag=" -g"
+if [ "$PWD" != "$HOME" ]; then
+  case "$SKILL_DIR/" in
+    "$PWD"/*) global_flag="" ;;
+  esac
+fi
 
 # Notify only when the published release is newer than the installed one
 if [ "$update_available" -eq 1 ]; then

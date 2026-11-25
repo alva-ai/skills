@@ -43,6 +43,15 @@
 
 - `scripts/version_check.sh`（哥定）：更新提示里的 `npx skills add …` 原来没带 `-g`，全局安装的用户照做，会装进 agent 当前所在的项目目录，全局那份不更新。现在按安装位置决定：skill 在家目录的点目录下（`~/.agents/skills/alva`、`~/.claude/skills/alva` 等）就加 `-g`，项目内安装不加。实测：临时 HOME 下全局副本提示带 `-g`、项目副本不带；照提示的 `-g` 命令装到 `~/.agents/skills/alva`，工作目录没有写入。README 的示例同步。
 
+## Review 修复（PR review，11-25）
+
+- Codex 历史仍大多漏读（阻塞）：`~/.codex/sessions/` 里也是 zstd 压缩，不只归档目录。一台真实 Codex 机器上 `sessions/` 有 434 个 `*.jsonl.zst`、9 个 `*.jsonl`，近 90 天约 370 个是压缩的；原写法只匹配 `*.jsonl`，漏掉约 97%，很可能才是 Codex 实跑零结果的原因。现在两个目录都列 `*.jsonl` 和 `*.jsonl.zst`。
+- 「全部读完」没有量的说法：一台真实 Claude Code 机器 90 天 193 个会话（2.1 GB），用户消息约 9,000 条、1,290 万字符，读不进一个上下文。现在允许用脚本按「谁写的」抽出用户自己的话（不是关键词过滤），从新往旧读，一次读不完就说读到了哪天。
+- 方向与 `references/thesis.md` 对齐：`UNKNOWN` 的标的不再直接去掉，标成「方向判不了」，由用户选 Long、Short、Not tracked 或去掉，agent 不替用户选（thesis.md 的「作者可指定方向」）；调用失败先重试一次，再失败才按原决定「无标的、无方向，问用户要不要这样发」。
+- 更新会跳过升级 CLI：开头「an update skips the steps already done」会让 v1 用户把第 1 步当成已做（`alva` 能用、已登录），正是缺 `people` 的那批人。改为更新时第 1 步照跑，其余已做的步骤跳过。
+- 旧 CLI 每跑一次多一把 `cli` key：npm `latest` 仍是 0.37.0，不认 `--agent`，兜底去掉参数重登会再铸一把未命名的 `cli` key、旧的不吊销。改为：旧 CLI 且已登录 → 保留现有登录；未登录才不带 `--agent` 登录。收尾记忆里记下是否按名字登录，更新时据此决定要不要重登。
+- `version_check.sh` 把点目录下的项目当成全局：`case` 里 `*` 会匹配 `/`，`~/.superset/worktrees/<项目>/.claude/skills/alva` 也会被判成全局、提示 `-g`。`skills` CLI 的全局目录有几十种（`~/.gemini/config/skills`、`~/.config/agents/skills`、`CLAUDE_CONFIG_DIR` 等），路径形状判断不准；改为按 `skills` 自己的定义：在 agent 当前项目目录里的副本才是项目安装，其余都加 `-g`；在家目录里运行时两种写法落到同一批目录，保留 `-g`。实测（临时 HOME）：`~/.agents/skills`、`~/.claude/skills`（在家目录运行）、`~/.config/opencode/skills` 带 `-g`；项目内副本和 `~/.superset/worktrees/<项目>` 里的副本不带；原写法对后者错给了 `-g`。
+
 ## 不在本次
 
 - 跨 agent 读取、按来源记录进度、草稿与私密 thesis 的区分：二期。
@@ -52,4 +61,4 @@
 
 ## 验证
 
-`node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva`（135/135 cases，1735/1735 checks）；`node evals/alva-skill-docs/mutation-smoke.mjs --skill-dir skills/alva`（109/109，新增 `bootstrap-skips-cli-update`、`routine-stops-early`、`routine-reads-other-agents`、`routine-keyword-filter`、`routine-shows-unredacted`、`routine-creates-unseen-body`、`routine-omits-visibility`、`routine-hides-private-default`、`thesis-create-omits-visibility`、`routine-drops-known-directions`、`routine-forgets-cli-path`、`bootstrap-skips-login-when-signed-in`；`routine-thesis-unknown-direction` 改锚到新句子）；`node --test evals/alva-skill-docs/durable-agent.test.mjs`（5/5）；SKILL.md 240 行，版本 v1.36.0。未在真实 agent 上重跑。
+`node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva`（135/135 cases，1741/1741 checks）；`node evals/alva-skill-docs/mutation-smoke.mjs --skill-dir skills/alva`（115/115，新增 `bootstrap-skips-cli-update`、`routine-stops-early`、`routine-reads-other-agents`、`routine-keyword-filter`、`routine-shows-unredacted`、`routine-creates-unseen-body`、`routine-omits-visibility`、`routine-hides-private-default`、`thesis-create-omits-visibility`、`routine-drops-known-directions`、`routine-forgets-cli-path`、`bootstrap-skips-login-when-signed-in`、`routine-codex-plain-sessions-only`、`routine-picks-unknown-direction`、`routine-no-retry-before-undirected`、`routine-hides-partial-read`、`bootstrap-update-skips-install`、`bootstrap-old-cli-mints-unnamed-key`；`routine-thesis-unknown-direction`、`routine-drops-known-directions` 改锚到新句子）；`node --test evals/alva-skill-docs/durable-agent.test.mjs`（5/5）；`version_check.sh` 在临时 HOME 下按上面五种安装位置实测；SKILL.md 240 行，版本 v1.36.0。未在真实 agent 上重跑。
