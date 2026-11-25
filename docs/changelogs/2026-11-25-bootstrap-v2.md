@@ -20,8 +20,8 @@
   - 零结果或某来源读不到：说清读了哪些来源、覆盖哪些日期，哪些没读到、为什么。
   - 原始对话只留在本机，写入 Alva 的只有用户确认过的条目；展示候选前先去掉 Never 清单里的内容。
 - Thesis（Muse 复盘）：
-  - `asset-candidates` 返回 `UNRESOLVED`/`UNKNOWN` 是正常结果。方向判不了仍不主动提议；用户坚持要发，就不带标的和方向发（决定：允许）。
-  - 确认里的「Publish as private theses?」改为「Publish as theses?」：默认私密，问一句是否有要公开的（决定：默认私密，可问用户）。
+  - `asset-candidates` 返回 `UNRESOLVED`/`UNKNOWN` 是正常结果。方向判不了（或调用失败）也照样提出这条观点，说明方向判不了、发出去不带标的和方向，问用户要不要这样发（决定：主动提、问用户）。原规则是这次不提。
+  - 确认里的「Publish as private theses?」改为「Publish as theses?」，并明确告诉用户：默认都是私密；现在就可以改成公开；发出去以后也能在 Alva App 里改，或让 agent 用 `alva thesis set-visibility` 改（决定）。
   - 硬规则：用户在本次对话里没看过逐字正文的 thesis 一律不创建，口头同意过也不行。Muse 曾在用户同意后用自己改写的正文直接创建。
   - `thesis create` 总是显式传用户确认的 `--visibility`：CLI 的 create 默认是 public。
 - README 的 Connect 一节同步「默认私密，可选公开」。
@@ -30,9 +30,9 @@
 
 - 跨 agent 读取、按来源记录进度、草稿与私密 thesis 的区分：二期。
 - 关注动态批量接口：另有开发在做，B 节暂不改。
-- CLI：`thesis create` 改为必须显式传 `--visibility`、`asset-candidates` 进 `thesis --help` 的子命令列表，交给 toolkit 单独处理。
+- CLI：`thesis create` 改为必须显式传 `--visibility`、`asset-candidates` 进 `thesis --help` 的子命令列表，在 toolkit-ts 单独改。
 - SKILL.md 自动更新提示里的 `npx skills update` 对 lock 里没登记的旧安装无效，同 App 提示词的问题，未改。
 
 ## 验证
 
-`node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva`（135/135 cases，1726/1726 checks）；`node evals/alva-skill-docs/mutation-smoke.mjs --skill-dir skills/alva`（104/104，新增 `bootstrap-skips-cli-update`、`routine-stops-early`、`routine-reads-other-agents`、`routine-keyword-filter`、`routine-shows-unredacted`、`routine-creates-unseen-body`、`routine-omits-visibility`）；`node --test evals/alva-skill-docs/durable-agent.test.mjs`（5/5）；SKILL.md 240 行，版本 v1.36.0。未在真实 agent 上重跑。
+`node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva`（135/135 cases，1728/1728 checks）；`node evals/alva-skill-docs/mutation-smoke.mjs --skill-dir skills/alva`（105/105，新增 `bootstrap-skips-cli-update`、`routine-stops-early`、`routine-reads-other-agents`、`routine-keyword-filter`、`routine-shows-unredacted`、`routine-creates-unseen-body`、`routine-omits-visibility`、`routine-hides-private-default`；`routine-thesis-unknown-direction` 改锚到新句子）；`node --test evals/alva-skill-docs/durable-agent.test.mjs`（5/5）；SKILL.md 240 行，版本 v1.36.0。未在真实 agent 上重跑。
