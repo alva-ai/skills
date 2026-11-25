@@ -665,8 +665,8 @@ const MUTATIONS = [
   {
     id: "routine-thesis-unknown-direction",
     file: "references/agent-routine.md",
-    remove: "Any `UNKNOWN`, or the call fails → still offer the view, saying",
-    replacement: "Any `UNKNOWN` → publish it with the direction you judge, saying",
+    remove: "No asset keeps a direction, or the call fails → still offer",
+    replacement: "Any `UNKNOWN` → publish it with the direction you judge, still offer",
     expectFailedCases: ["target.agent-bootstrap"],
   },
   {
@@ -780,6 +780,20 @@ const MUTATIONS = [
     remove: "--body '<exact body>' --visibility <public|private> [--entity-ids",
     replacement: "--body '<exact body>' [--entity-ids",
     expectFailedCases: ["target.thesis-author-intent"],
+  },
+  {
+    id: "routine-drops-known-directions",
+    file: "references/agent-routine.md",
+    remove: "direction is `UNKNOWN`, keep the others with their directions, and say which",
+    replacement: "direction is `UNKNOWN`, and drop the others too, and say which",
+    expectFailedCases: ["target.agent-bootstrap"],
+  },
+  {
+    id: "routine-forgets-cli-path",
+    file: "references/agent-routine.md",
+    remove: "Use the Alva CLI your memory records. `alva` is not found → try",
+    replacement: "`alva` is not found → try",
+    expectFailedCases: ["target.agent-bootstrap"],
   },
   {
     id: "routine-hides-private-default",

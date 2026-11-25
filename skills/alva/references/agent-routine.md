@@ -6,8 +6,10 @@ first run during bootstrap, or when they ask). Unattended runs only read; they
 write nothing to Alva. A managed Alva Sandbox does not run this; see
 BOOTSTRAP.md.
 
-`alva` is not found (a cloud computer that was replaced, for example) →
-`npm install -g @alva-ai/toolkit@latest` first.
+Use the Alva CLI your memory records. `alva` is not found → try
+`~/.npm-global/bin/alva`; neither exists (a cloud computer that was replaced,
+for example) → `npm install -g @alva-ai/toolkit@latest` first, adding
+`--prefix ~/.npm-global` when the global folder needs a permission you lack.
 
 ## A. What's new in our conversations
 
@@ -81,9 +83,11 @@ must not contain them.
   ticker match. Ambiguous → ask, or leave the asset out.
 - Directions: `alva thesis asset-candidates --text '<exact body>' --entity-ids '<id,id>' --no-discovery`,
   then use `returnPreview.directions`. `UNRESOLVED` or `UNKNOWN` is an answer,
-  not a failure. Any `UNKNOWN`, or the call fails → still offer the view, saying
-  its direction could not be judged, so it would be published with no assets
-  and no directions; ask whether to publish it that way.
+  not a failure: leave out an `UNRESOLVED` mention's asset and each asset whose
+  direction is `UNKNOWN`, keep the others with their directions, and say which
+  were left out. No asset keeps a direction, or the call fails → still offer
+  the view, saying its direction could not be judged, so it would be published
+  with no assets and no directions; ask whether to publish it that way.
 
 **User present** → one confirmation with two parts: "Save to your Alva memory?"
 (bullets) and "Publish as theses?" (a checklist: each body in full, each asset

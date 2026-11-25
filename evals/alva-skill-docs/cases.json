@@ -3003,6 +3003,7 @@
             "Run the Alva routine: follow references/agent-routine.md in the Alva skill.",
             "'What's new on Alva' means: run references/agent-routine.md in the Alva skill.",
             "Alva bootstrap v2 done",
+            "The Alva CLI is <the command you used: alva, or ~/.npm-global/bin/alva>.",
             "`npm install -g @alva-ai/toolkit@latest` (needs Node.js 18+), even when",
             "- **Any other agent whose scheduler delivers to the user**: the same name,"
           ]
@@ -3033,7 +3034,9 @@
             "Alva setup has an update.",
             "your own suggestions, your inferences and their repeated",
             "--entity-ids '<id,id>' --no-discovery",
-            "Any `UNKNOWN`, or the call fails → still offer the view, saying",
+            "No asset keeps a direction, or the call fails → still offer",
+            "direction is `UNKNOWN`, keep the others with their directions, and say which",
+            "Use the Alva CLI your memory records. `alva` is not found → try",
             "every thesis is published private by default;",
             "or by asking you (`alva thesis set-visibility --id <id> --visibility public|private`).",
             "each body in full,"

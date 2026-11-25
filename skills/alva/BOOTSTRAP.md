@@ -100,5 +100,6 @@ removes any of it (see Undo in agent-routine.md), and when the next note arrives
 Then record in your own memory:
 "Alva bootstrap v2 done <date>.
 'What's new on Alva' means: run references/agent-routine.md in the Alva skill.
+The Alva CLI is <the command you used: alva, or ~/.npm-global/bin/alva>.
 To change how often it runs, change the schedule of the 'Alva routine' job;
 never add a second one."

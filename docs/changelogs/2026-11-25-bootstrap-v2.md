@@ -27,6 +27,11 @@
 - `references/thesis.md` 的发布命令显式带 `--visibility <public|private>`（预览里默认 public，按确认的传）：toolkit-ts 将要求 create 必须传 `--visibility`，本仓的 release 同步到平台（sdk-monorepo `skills/skill`）之后 toolkit 才能发版。
 - README 的 Connect 一节同步「默认私密，可选公开」。
 
+## Code review 后
+
+- CLI 装到 `~/.npm-global` 时，定时 routine 找不到 `alva`、按兜底全局重装又因权限失败，每次都发不出提醒。现在 BOOTSTRAP 收尾在记忆里记下所用的 CLI（`alva` 或 `~/.npm-global/bin/alva`）；routine 先用记忆里的 CLI，`alva` 找不到就试 `~/.npm-global/bin/alva`，都没有才重装，没权限同样加 `--prefix ~/.npm-global`。
+- 多个标的里只要有一个方向 `UNKNOWN`，整条观点就被当成「无标的、无方向」，判得出的方向也丢了（如「看多 NVDA，AMD 拿不准」）。现在只去掉方向为 `UNKNOWN` 的标的和 `UNRESOLVED` 的提及，其余保留方向，并告诉用户去掉了哪些；一个都不剩或调用失败，才按无方向提出、问用户。
+
 ## 不在本次
 
 - 跨 agent 读取、按来源记录进度、草稿与私密 thesis 的区分：二期。
@@ -36,4 +41,4 @@
 
 ## 验证
 
-`node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva`（135/135 cases，1730/1730 checks）；`node evals/alva-skill-docs/mutation-smoke.mjs --skill-dir skills/alva`（106/106，新增 `bootstrap-skips-cli-update`、`routine-stops-early`、`routine-reads-other-agents`、`routine-keyword-filter`、`routine-shows-unredacted`、`routine-creates-unseen-body`、`routine-omits-visibility`、`routine-hides-private-default`、`thesis-create-omits-visibility`；`routine-thesis-unknown-direction` 改锚到新句子）；`node --test evals/alva-skill-docs/durable-agent.test.mjs`（5/5）；SKILL.md 240 行，版本 v1.36.0。未在真实 agent 上重跑。
+`node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva`（135/135 cases，1733/1733 checks）；`node evals/alva-skill-docs/mutation-smoke.mjs --skill-dir skills/alva`（108/108，新增 `bootstrap-skips-cli-update`、`routine-stops-early`、`routine-reads-other-agents`、`routine-keyword-filter`、`routine-shows-unredacted`、`routine-creates-unseen-body`、`routine-omits-visibility`、`routine-hides-private-default`、`thesis-create-omits-visibility`、`routine-drops-known-directions`、`routine-forgets-cli-path`；`routine-thesis-unknown-direction` 改锚到新句子）；`node --test evals/alva-skill-docs/durable-agent.test.mjs`（5/5）；SKILL.md 240 行，版本 v1.36.0。未在真实 agent 上重跑。
