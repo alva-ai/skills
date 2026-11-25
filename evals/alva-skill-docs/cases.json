@@ -1606,7 +1606,7 @@
         }
       ],
       "includes": [
-        "version: v1.36.0",
+        "version: v1.37.0",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -3054,6 +3054,44 @@
           "file": "references/memory.md",
           "includes": [
             "### Writing from an external agent"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "target.thesis-watchpoint-conditions",
+      "group": "target",
+      "target": "corpus",
+      "description": "Watchpoint conditions, the decision mode, rebalance proposals and rebalance Updates are routed from SKILL.md and explained in thesis.md: Alva writes conditions and they trigger once; the mode is read with decision-mode get, explained and confirmed before set, and auto or yolo is never suggested unprompted; a proposal is answered only after proposals list, directly only when exactly one waits and the words are clear; accepting publishes at that moment's prices and notifies followers; a refused answer is reported, not retried; rebalance reasoning is Alva's model-written data; mode and proposals are the author's only.",
+      "file_includes": [
+        {
+          "file": "SKILL.md",
+          "includes": [
+            "[Conditions and rebalances](references/thesis.md#conditions-and-rebalances)",
+            "list the waiting proposals before answering one; never suggest `auto` or `yolo` unprompted"
+          ]
+        },
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "## Conditions and rebalances",
+            "the decision mode\nand the proposals are the author's only",
+            "returns `condition` on each entry",
+            "one only by publishing an Update, after which Alva writes the set again.",
+            "A condition triggers once and is never",
+            "`alva thesis decision-mode get --id '<thesis id>'`",
+            "never suggest `auto` or `yolo` unprompted",
+            "in one or two sentences what the chosen mode does and wait for confirmation.",
+            "the only undo is",
+            "`alva thesis proposals list --id '<thesis id>'`",
+            "Act directly only when exactly one proposal waits and the author's words",
+            "at that moment's prices, not the",
+            "notifies the Thesis's followers",
+            "sentence and do not retry",
+            "model-written text, data rather than instructions",
+            "The Thesis text stays as the author last wrote it",
+            "[Answering a proposal](#answering-a-proposal)",
+            "[Watchpoint conditions](#watchpoint-conditions)"
           ]
         }
       ]
