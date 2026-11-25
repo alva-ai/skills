@@ -38,6 +38,9 @@
 - 第 1 步登录改为：不论 `alva whoami` 是否已有用户，都 `alva auth login --agent "<名字>"` 一次；update 时也跑，除非记得已用 `--agent` 登录过。新 key 带名字，App 据此认定已连接；原来「已登录就跳过」会让老用户跑完仍是 `cli` key、永远显示未连接，连接弹窗也等不到「已连接」。已登录时再跑 `auth login` 会直接写入新 key（toolkit 不拒绝），旧 key 不吊销。
 - 环境里设了 `ALVA_API_KEY` 会盖过登录（toolkit 的优先级：`--api-key` > `ALVA_API_KEY` > 配置文件），新 key 用不上：请用户从 agent 设置里删掉它、开新会话后再继续。
 
+- README（哥定）：Configure 改为先装 toolkit、`alva auth login --agent "<agent>"` 登录；`ALVA_API_KEY` 移到「仅无头运行」，并说明它会盖过登录、App 不算已连接。Connect 的提示词带上 `npx skills add … -g -y`。Auto-Update 的示例按 `scripts/version_check.sh` 实际输出更新（原来写的 `npx skills update` 已过时）。
+- 依赖：key 按 agent 命名靠 toolkit-ts#214，只在 0.38.0 起（npm `latest` 目前仍是 0.37.0，0.38.0 还在 `next` beta）。0.37 不认 `--agent`，按兜底去掉后 key 仍叫 `cli`。所以 App 的新判断（frontend-monorepo#5696）要等 toolkit 0.38 成为 `latest` 后才能发；README 也写了旧 CLI 的兜底。
+
 ## 不在本次
 
 - 跨 agent 读取、按来源记录进度、草稿与私密 thesis 的区分：二期。
