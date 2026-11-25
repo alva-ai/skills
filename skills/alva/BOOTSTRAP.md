@@ -1,5 +1,5 @@
 ---
-version: 1
+version: 2
 ---
 
 # Alva bootstrap
@@ -31,7 +31,7 @@ memory of the user instead.
 Before step 1 and before any command, reply with only this, in your own words
 and the user's language, briefly. Then stop and wait for their go-ahead:
 
-- You'll connect them to Alva. It takes about 3 minutes.
+- You'll connect them to Alva. It takes a few minutes.
 - You'll read your memory and, where you have them, your past conversations
   with them, only to pick out investing views and preferences. You may ask to
   allow reading those files.
@@ -45,9 +45,12 @@ and the user's language, briefly. Then stop and wait for their go-ahead:
 
 ## 1. Get ready
 
-- `alva --help` fails → `npm install -g @alva-ai/toolkit` (needs Node.js 18+).
-  If that fails, say in one line how to install Node.js, and that they can say
-  "continue Alva setup" afterwards. Stop here.
+- Run `npm install -g @alva-ai/toolkit@latest` (needs Node.js 18+), even when
+  `alva` already works: an older CLI lacks commands the routine uses. No
+  permission for the global folder → add `--prefix ~/.npm-global` and use
+  `~/.npm-global/bin/alva`. It fails and `alva --help` works → go on with that
+  CLI. It fails and there is no `alva` → say in one line how to install Node.js,
+  and that they can say "continue Alva setup" afterwards. Stop here.
 - `alva whoami` shows no user → `alva auth login --agent "<your product name>"`,
   such as `--agent "Codex"` or `--agent "Grok bot"`; the user sees the new key by
   that name in the Alva app. A browser opens on this computer. When the user
@@ -76,6 +79,8 @@ the initial memory and thesis sync. The examples below use the default
   schedule, with the same prompt. Its note shows up in the app. No such tool in
   this session → tell the user where the app adds one, and give them the
   prompt.
+- **Any other agent whose scheduler delivers to the user**: the same name,
+  schedule and prompt in that scheduler.
 - **A terminal session (Claude Code, Codex CLI) and agents whose scheduler
   cannot reach the user**: do not schedule. A headless run has nowhere to
   deliver the note.
@@ -88,12 +93,12 @@ the initial memory and thesis sync. The examples below use the default
 
 ## Wrap up
 
-Tell the user what was saved (how many memory items, which theses, all
-private), that they can see it in the Alva app under Me, that saying "undo"
+Tell the user what was saved (how many memory items, which theses, each
+private or public), that they can see it in the Alva app under Me, that saying "undo"
 removes any of it (see Undo in agent-routine.md), and when the next note arrives (or that none is scheduled).
 
 Then record in your own memory:
-"Alva bootstrap v1 done <date>.
+"Alva bootstrap v2 done <date>.
 'What's new on Alva' means: run references/agent-routine.md in the Alva skill.
 To change how often it runs, change the schedule of the 'Alva routine' job;
 never add a second one."

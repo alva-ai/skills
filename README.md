@@ -66,7 +66,7 @@ Get an API key at [alva.ai](https://alva.ai), then add it to your agent's enviro
 Ask your agent: "Install or update the Alva skill, then follow its BOOTSTRAP.md."
 It signs you in, brings the investing views and preferences from your past
 conversations into Alva after you approve them, publishes the views you pick as
-private theses, and, where your agent can schedule it, sends you a note on
+theses (private unless you choose public), and, where your agent can schedule it, sends you a note on
 what the people you follow published, as often as you choose. The same prompt
 is in the Alva app under Me › Let Alva know you better and Settings › Your AI
 agent.
