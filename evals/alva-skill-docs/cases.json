@@ -955,7 +955,7 @@
           "label": "Thesis deliverable for the user's own view",
           "includes": [
             "The user's own investment view to research, publish, track, and update",
-            "Publishing still needs an explicit request or accepted offer"
+            "Publishing still needs the user's confirmation of its preview; a request or an accepted offer opens that preview"
           ]
         }
       ]
@@ -1606,7 +1606,7 @@
         }
       ],
       "includes": [
-        "version: v1.36.0",
+        "version: v1.36.1",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -1713,7 +1713,7 @@
             "Stop if declined",
             "A body already shown in full in this conversation, or typed by the user and asked to publish unchanged, may be referenced instead",
             "New or changed candidates must be shown in full",
-            "A natural confirmation, typed or by action click, authorizes exactly the displayed body and publication details",
+            "An explicit confirmation, typed or by action click, authorizes exactly the displayed body and publication details",
             "When `PresentActions` is available, always end the preview with localized `send_prompt` actions",
             "Do not repeat them in prose",
             "also offer it as an `open_url` action",
@@ -2320,7 +2320,7 @@
           "includes": [
             "Show newly drafted, translated, or rewritten updates before publishing",
             "the update replaces the whole body of the selected Thesis",
-            "If the author has already seen and selected that exact version, proceed without asking again",
+            "has already seen that exact version as a full Update preview and selected it,\nproceed without asking again",
             "pass `--medias` unchanged only when the current Thesis has media",
             "If media must be preserved and the tool lacks this flag, stop rather than dropping media",
             "explain the limitation instead of inserting image links into the body",
@@ -2659,6 +2659,48 @@
           "file": "SKILL.md",
           "includes": [
             "[Thesis return](references/thesis.md#thesis-return)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "target.thesis-write-needs-confirmed-preview",
+      "group": "target",
+      "target": "corpus",
+      "description": "A Thesis is created or updated only in a turn that confirms a full preview shown earlier: discussion, a status check, an accepted drafting offer, a question after a preview and an Alva Today edit reply all stop at a draft or an answer.",
+      "file_includes": [
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "Create or update a Thesis only in a turn where the user's message confirms a\nfull preview shown earlier in the conversation.",
+            "A turn never publishes text\nit is showing for the first time.",
+            "An explicit create/update request selecting that exact\ncandidate opens its publication preview; publish only after that preview is\nconfirmed.",
+            "discussion: answer it, and offer at most once to draft an Update.",
+            "The selection asks for that draft; it does not confirm text the reader\nhas not seen.",
+            "Bring the draft back to the main conversation as the normal\nUpdate preview and publish only after they confirm it there.",
+            "A reply that asks a question,\ncomments on the preview, or agrees with the analysis is not confirmation:\nanswer it and leave the preview unpublished.",
+            "a short version attached to an offer is not a\npreview, and accepting the offer asks for the preview.",
+            "The change operations below apply only when the author asks to change the\nThesis.",
+            "is\ndiscussion until they ask for the Thesis to change.",
+            "A check ends with findings and leaves the Thesis as it is."
+          ],
+          "excludes": [
+            "the user's selection\nis confirmation",
+            "publish that scoped Update directly",
+            "A natural confirmation"
+          ]
+        },
+        {
+          "file": "references/request-routing.md",
+          "includes": [
+            "Writing a Thesis is never part of that work: creating or updating one is\noffered, and happens only through its preview and confirmation."
+          ]
+        },
+        {
+          "file": "references/agent-routine.md",
+          "includes": [
+            "Reply 'review' to see it as a private thesis draft.",
+            "show those items as above and wait for that confirmation\nbefore steps 1-5."
           ]
         }
       ]
