@@ -51,16 +51,20 @@ and the user's language, briefly. Then stop and wait for their go-ahead:
   `~/.npm-global/bin/alva`. It fails and `alva --help` works → go on with that
   CLI. It fails and there is no `alva` → say in one line how to install Node.js,
   and that they can say "continue Alva setup" afterwards. Stop here.
-- `alva whoami` shows no user → `alva auth login --agent "<your product name>"`,
-  such as `--agent "Codex"` or `--agent "Grok bot"`; the user sees the new key by
-  that name in the Alva app. A browser opens on this computer. When the user
+- Sign this agent in with `alva auth login --agent "<your product name>"`,
+  such as `--agent "Codex"` or `--agent "Grok bot"`, even when `alva whoami`
+  already shows a user, and on an update unless you remember doing it: the
+  new key, named after you, is how the Alva app knows this agent is connected,
+  and an older sign-in does not count. A browser opens on this computer. When the user
   cannot see this computer's screen (a cloud computer, a remote machine), add
   `--no-browser`: send them the
   link it prints, ask them to sign in on their own device and send back the
   code the page shows, and enter it at the prompt while the command keeps
   running. An older CLI says `--agent is not supported` → run the same command
   without `--agent`.
-- Already signed in → move on without comment.
+- `ALVA_API_KEY` is set in your environment → it overrides the sign-in, so the
+  new key goes unused: ask the user to remove it from your settings and start
+  a new session, then continue.
 
 ## 2. Routine
 

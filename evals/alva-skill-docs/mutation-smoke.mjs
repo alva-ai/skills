@@ -796,6 +796,13 @@ const MUTATIONS = [
     expectFailedCases: ["target.agent-bootstrap"],
   },
   {
+    id: "bootstrap-skips-login-when-signed-in",
+    file: "BOOTSTRAP.md",
+    remove: "already shows a user, and on an update unless you remember doing it: the",
+    replacement: "shows no user, and on an update only when signed out: the",
+    expectFailedCases: ["target.agent-bootstrap"],
+  },
+  {
     id: "routine-hides-private-default",
     file: "references/agent-routine.md",
     remove: "every thesis is published private by default;",

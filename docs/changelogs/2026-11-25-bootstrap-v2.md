@@ -32,6 +32,12 @@
 - CLI 装到 `~/.npm-global` 时，定时 routine 找不到 `alva`、按兜底全局重装又因权限失败，每次都发不出提醒。现在 BOOTSTRAP 收尾在记忆里记下所用的 CLI（`alva` 或 `~/.npm-global/bin/alva`）；routine 先用记忆里的 CLI，`alva` 找不到就试 `~/.npm-global/bin/alva`，都没有才重装，没权限同样加 `--prefix ~/.npm-global`。
 - 多个标的里只要有一个方向 `UNKNOWN`，整条观点就被当成「无标的、无方向」，判得出的方向也丢了（如「看多 NVDA，AMD 拿不准」）。现在只去掉方向为 `UNKNOWN` 的标的和 `UNRESOLVED` 的提及，其余保留方向，并告诉用户去掉了哪些；一个都不剩或调用失败，才按无方向提出、问用户。
 
+## QA 反馈：没跑过 BOOTSTRAP 的不算已连接（哥定方案 B）
+
+- STG 有 13 个老用户（15 把 key）在 BOOTSTRAP 之前用 CLI 登录过，key 叫网关默认名 `cli`，App 把他们全算成已连接。App 改为只认 scope 含 `cli`、名字不是 `cli` 的 key（frontend-monorepo#5696）。
+- 第 1 步登录改为：不论 `alva whoami` 是否已有用户，都 `alva auth login --agent "<名字>"` 一次；update 时也跑，除非记得已用 `--agent` 登录过。新 key 带名字，App 据此认定已连接；原来「已登录就跳过」会让老用户跑完仍是 `cli` key、永远显示未连接，连接弹窗也等不到「已连接」。已登录时再跑 `auth login` 会直接写入新 key（toolkit 不拒绝），旧 key 不吊销。
+- 环境里设了 `ALVA_API_KEY` 会盖过登录（toolkit 的优先级：`--api-key` > `ALVA_API_KEY` > 配置文件），新 key 用不上：请用户从 agent 设置里删掉它、开新会话后再继续。
+
 ## 不在本次
 
 - 跨 agent 读取、按来源记录进度、草稿与私密 thesis 的区分：二期。
@@ -41,4 +47,4 @@
 
 ## 验证
 
-`node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva`（135/135 cases，1733/1733 checks）；`node evals/alva-skill-docs/mutation-smoke.mjs --skill-dir skills/alva`（108/108，新增 `bootstrap-skips-cli-update`、`routine-stops-early`、`routine-reads-other-agents`、`routine-keyword-filter`、`routine-shows-unredacted`、`routine-creates-unseen-body`、`routine-omits-visibility`、`routine-hides-private-default`、`thesis-create-omits-visibility`、`routine-drops-known-directions`、`routine-forgets-cli-path`；`routine-thesis-unknown-direction` 改锚到新句子）；`node --test evals/alva-skill-docs/durable-agent.test.mjs`（5/5）；SKILL.md 240 行，版本 v1.36.0。未在真实 agent 上重跑。
+`node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva`（135/135 cases，1735/1735 checks）；`node evals/alva-skill-docs/mutation-smoke.mjs --skill-dir skills/alva`（109/109，新增 `bootstrap-skips-cli-update`、`routine-stops-early`、`routine-reads-other-agents`、`routine-keyword-filter`、`routine-shows-unredacted`、`routine-creates-unseen-body`、`routine-omits-visibility`、`routine-hides-private-default`、`thesis-create-omits-visibility`、`routine-drops-known-directions`、`routine-forgets-cli-path`、`bootstrap-skips-login-when-signed-in`；`routine-thesis-unknown-direction` 改锚到新句子）；`node --test evals/alva-skill-docs/durable-agent.test.mjs`（5/5）；SKILL.md 240 行，版本 v1.36.0。未在真实 agent 上重跑。

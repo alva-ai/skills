@@ -2993,6 +2993,8 @@
             "this setup needs an AI agent that can run commands, such as Claude or Codex on",
             "cannot see this computer's screen (a cloud computer, a remote machine), add",
             "`alva auth login --agent \"<your product name>\"`",
+            "already shows a user, and on an update unless you remember doing it: the",
+            "`ALVA_API_KEY` is set in your environment → it overrides the sign-in, so the",
             "without `--agent`.",
             "- **Grok bot**: create a Routine named \"Alva routine\" on that schedule, with",
             "frequency the user chose (08:00 local time every day unless they said",
