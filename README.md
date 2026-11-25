@@ -32,9 +32,29 @@ This skill uses the [AgentSkills](https://github.com/anthropics/agent-skills) fo
 
 ### 2. Configure
 
-Get an API key at [alva.ai](https://alva.ai), then add it to your agent's environment:
+Sign your agent in through the Alva CLI, naming the agent:
 
-#### Claude Code
+```bash
+npm install -g @alva-ai/toolkit@latest
+alva auth login --agent "Claude Code"
+```
+
+A browser opens to approve it. The key it creates is named after your agent
+and computer and shows in the Alva app, which then counts the agent as
+connected. On a machine whose screen you cannot see, add `--no-browser` and
+sign in on your own device with the code it prints. A CLI older than 0.38 says
+`--agent is not supported`: run it without `--agent`; that key keeps the name
+`cli` and does not count as connected until you sign in again with 0.38 or
+later.
+
+#### Headless runs only
+
+For CI or other runs that cannot sign in, get an API key at
+[alva.ai](https://alva.ai) and set it as `ALVA_API_KEY`. It overrides
+`alva auth login`, and the Alva app does not count it as a connected agent,
+so leave it unset on an agent you have signed in.
+
+Claude Code:
 
 ```json
 // ~/.claude/settings.json
@@ -45,7 +65,7 @@ Get an API key at [alva.ai](https://alva.ai), then add it to your agent's enviro
 }
 ```
 
-#### OpenClaw
+OpenClaw:
 
 ```json
 // openclaw.json
@@ -63,10 +83,11 @@ Get an API key at [alva.ai](https://alva.ai), then add it to your agent's enviro
 
 ### 3. Connect (optional)
 
-Ask your agent: "Install or update the Alva skill, then follow its BOOTSTRAP.md."
-It signs you in, brings the investing views and preferences from your past
+Ask your agent: "Install or update the Alva skill with
+`npx skills add https://github.com/alva-ai/skills -g -y`, then follow its
+BOOTSTRAP.md." It signs the agent in by name, brings the investing views and preferences from your past
 conversations into Alva after you approve them, publishes the views you pick as
-private theses, and, where your agent can schedule it, sends you a note on
+theses (private unless you choose public), and, where your agent can schedule it, sends you a note on
 what the people you follow published, as often as you choose. The same prompt
 is in the Alva app under Me › Let Alva know you better and Settings › Your AI
 agent.
@@ -81,9 +102,9 @@ Alva skill update available.
   Installed: v1.0.0
   Latest:    v1.2.0
 Update with one of:
-  npx skills update
+  npx skills add https://github.com/alva-ai/skills/tree/v1.2.0/skills/alva --skill alva -g -y
   clawhub update alva
-  git clone https://github.com/alva-ai/skills ./tmp/alva-skills && cp -r ./tmp/alva-skills/skills/alva/* "<skill-dir>/" && rm -rf ./tmp/alva-skills
+  git clone --branch v1.2.0 --depth 1 https://github.com/alva-ai/skills ./tmp/alva-skills && cp -r ./tmp/alva-skills/skills/alva/* "<skill-dir>/" && rm -rf ./tmp/alva-skills
 ```
 
 The check is silent when your skill is up to date. It runs at most once every 8 hours and fails gracefully offline.

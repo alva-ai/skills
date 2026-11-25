@@ -499,13 +499,14 @@ an already completed creation must not create another Thesis; verify its
 existing ID.
 
 One sentence is valid. Title, tickers, and entity IDs are optional. Visibility
-defaults to public. Generate one nonzero UUID per creation intent and keep it
+defaults to public in the preview; always pass the confirmed one as
+`--visibility`, which create requires. Generate one nonzero UUID per creation intent and keep it
 with the exact payload as `--request-id`; a changed intent requires a new UUID.
 
 Use confirmed catalog IDs and directions directly:
 
 ```sh
-alva thesis create --request-id '<uuid>' --body '<exact body>' [--entity-ids '<id,id>' --entity-stances '[{"entity_id":"745337","stance":"bearish"}]'] [--track-return false] [--signal-kinds '<kinds>'] [--signal-min-importance <level>]
+alva thesis create --request-id '<uuid>' --body '<exact body>' --visibility <public|private> [--entity-ids '<id,id>' --entity-stances '[{"entity_id":"745337","stance":"bearish"}]'] [--track-return false] [--signal-kinds '<kinds>'] [--signal-min-importance <level>]
 alva thesis get --id '<returned thesis id>'
 ```
 
