@@ -24,15 +24,16 @@
   - 确认里的「Publish as private theses?」改为「Publish as theses?」，并明确告诉用户：默认都是私密；现在就可以改成公开；发出去以后也能在 Alva App 里改，或让 agent 用 `alva thesis set-visibility` 改（决定）。
   - 硬规则：用户在本次对话里没看过逐字正文的 thesis 一律不创建，口头同意过也不行。Muse 曾在用户同意后用自己改写的正文直接创建。
   - `thesis create` 总是显式传用户确认的 `--visibility`：CLI 的 create 默认是 public。
+- `references/thesis.md` 的发布命令显式带 `--visibility <public|private>`（预览里默认 public，按确认的传）：toolkit-ts 将要求 create 必须传 `--visibility`，本仓的 release 同步到平台（sdk-monorepo `skills/skill`）之后 toolkit 才能发版。
 - README 的 Connect 一节同步「默认私密，可选公开」。
 
 ## 不在本次
 
 - 跨 agent 读取、按来源记录进度、草稿与私密 thesis 的区分：二期。
 - 关注动态批量接口：另有开发在做，B 节暂不改。
-- CLI：`thesis create` 改为必须显式传 `--visibility`、`asset-candidates` 进 `thesis --help` 的子命令列表，在 toolkit-ts 单独改。
+- CLI：`thesis create` 必须显式传 `--visibility`、`asset-candidates` 进 `thesis --help` 子命令列表、create 返回网页链接，在 toolkit-ts 单独的 PR。
 - SKILL.md 自动更新提示里的 `npx skills update` 对 lock 里没登记的旧安装无效，同 App 提示词的问题，未改。
 
 ## 验证
 
-`node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva`（135/135 cases，1728/1728 checks）；`node evals/alva-skill-docs/mutation-smoke.mjs --skill-dir skills/alva`（105/105，新增 `bootstrap-skips-cli-update`、`routine-stops-early`、`routine-reads-other-agents`、`routine-keyword-filter`、`routine-shows-unredacted`、`routine-creates-unseen-body`、`routine-omits-visibility`、`routine-hides-private-default`；`routine-thesis-unknown-direction` 改锚到新句子）；`node --test evals/alva-skill-docs/durable-agent.test.mjs`（5/5）；SKILL.md 240 行，版本 v1.36.0。未在真实 agent 上重跑。
+`node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva`（135/135 cases，1730/1730 checks）；`node evals/alva-skill-docs/mutation-smoke.mjs --skill-dir skills/alva`（106/106，新增 `bootstrap-skips-cli-update`、`routine-stops-early`、`routine-reads-other-agents`、`routine-keyword-filter`、`routine-shows-unredacted`、`routine-creates-unseen-body`、`routine-omits-visibility`、`routine-hides-private-default`、`thesis-create-omits-visibility`；`routine-thesis-unknown-direction` 改锚到新句子）；`node --test evals/alva-skill-docs/durable-agent.test.mjs`（5/5）；SKILL.md 240 行，版本 v1.36.0。未在真实 agent 上重跑。

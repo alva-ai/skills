@@ -775,6 +775,13 @@ const MUTATIONS = [
     expectFailedCases: ["target.agent-bootstrap"],
   },
   {
+    id: "thesis-create-omits-visibility",
+    file: "references/thesis.md",
+    remove: "--body '<exact body>' --visibility <public|private> [--entity-ids",
+    replacement: "--body '<exact body>' [--entity-ids",
+    expectFailedCases: ["target.thesis-author-intent"],
+  },
+  {
     id: "routine-hides-private-default",
     file: "references/agent-routine.md",
     remove: "every thesis is published private by default;",
