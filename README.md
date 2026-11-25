@@ -102,7 +102,7 @@ Alva skill update available.
   Installed: v1.0.0
   Latest:    v1.2.0
 Update with one of:
-  npx skills add https://github.com/alva-ai/skills/tree/v1.2.0/skills/alva --skill alva -y
+  npx skills add https://github.com/alva-ai/skills/tree/v1.2.0/skills/alva --skill alva -g -y
   clawhub update alva
   git clone --branch v1.2.0 --depth 1 https://github.com/alva-ai/skills ./tmp/alva-skills && cp -r ./tmp/alva-skills/skills/alva/* "<skill-dir>/" && rm -rf ./tmp/alva-skills
 ```

@@ -41,6 +41,8 @@
 - README（哥定）：Configure 改为先装 toolkit、`alva auth login --agent "<agent>"` 登录；`ALVA_API_KEY` 移到「仅无头运行」，并说明它会盖过登录、App 不算已连接。Connect 的提示词带上 `npx skills add … -g -y`。Auto-Update 的示例按 `scripts/version_check.sh` 实际输出更新（原来写的 `npx skills update` 已过时）。
 - 依赖：key 按 agent 命名靠 toolkit-ts#214，只在 0.38.0 起（npm `latest` 目前仍是 0.37.0，0.38.0 还在 `next` beta）。0.37 不认 `--agent`，按兜底去掉后 key 仍叫 `cli`。所以 App 的新判断（frontend-monorepo#5696）要等 toolkit 0.38 成为 `latest` 后才能发；README 也写了旧 CLI 的兜底。
 
+- `scripts/version_check.sh`（哥定）：更新提示里的 `npx skills add …` 原来没带 `-g`，全局安装的用户照做，会装进 agent 当前所在的项目目录，全局那份不更新。现在按安装位置决定：skill 在家目录的点目录下（`~/.agents/skills/alva`、`~/.claude/skills/alva` 等）就加 `-g`，项目内安装不加。实测：临时 HOME 下全局副本提示带 `-g`、项目副本不带；照提示的 `-g` 命令装到 `~/.agents/skills/alva`，工作目录没有写入。README 的示例同步。
+
 ## 不在本次
 
 - 跨 agent 读取、按来源记录进度、草稿与私密 thesis 的区分：二期。
