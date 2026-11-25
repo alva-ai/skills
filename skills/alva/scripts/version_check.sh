@@ -74,6 +74,17 @@ fi
 echo "last_check=$now" >> "$tmp_config"
 mv "$tmp_config" "$CONFIG_FILE" 2>/dev/null || rm -f "$tmp_config"
 
+# `npx skills add` without -g installs into the project the agent runs in, so
+# only a copy inside that project is a project install; any other copy
+# (~/.agents/skills/alva, ~/.claude/skills/alva, ...) is global and needs -g.
+# Run from the home directory, both forms write the same folders: keep -g.
+global_flag=" -g"
+if [ "$PWD" != "$HOME" ]; then
+  case "$SKILL_DIR/" in
+    "$PWD"/*) global_flag="" ;;
+  esac
+fi
+
 # Notify only when the published release is newer than the installed one
 if [ "$update_available" -eq 1 ]; then
   cat <<EOF
@@ -81,7 +92,7 @@ Alva skill update available.
   Installed: $local_tag
   Latest:    $remote_tag
 Update with one of:
-  npx skills add https://github.com/alva-ai/skills/tree/${remote_tag}/skills/alva --skill alva -y
+  npx skills add https://github.com/alva-ai/skills/tree/${remote_tag}/skills/alva --skill alva${global_flag} -y
   clawhub update alva
   git clone --branch ${remote_tag} --depth 1 https://github.com/alva-ai/skills ./tmp/alva-skills && cp -r ./tmp/alva-skills/skills/alva/* "${SKILL_DIR}/" && rm -rf ./tmp/alva-skills
 EOF

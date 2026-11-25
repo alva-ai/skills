@@ -7,9 +7,9 @@ version: 2
 Connects this agent to the user's Alva account. Run it when the user asks you to
 follow BOOTSTRAP.md or to update Alva setup. The routine tells them when
 `version` above is newer than the "Alva bootstrap vN done" in your memory; an
-update skips the steps already done. Everything you need is in this file
-and [agent-routine.md](references/agent-routine.md); you do not need the rest of
-the skill.
+update runs step 1 again and skips the other steps already done. Everything
+you need is in this file and [agent-routine.md](references/agent-routine.md);
+you do not need the rest of the skill.
 
 **If you are Alva itself** (a managed Alva Sandbox, where the skill's Runtime
 Contract applies), do not run any of this: no setup, schedule, routine or
@@ -31,7 +31,7 @@ memory of the user instead.
 Before step 1 and before any command, reply with only this, in your own words
 and the user's language, briefly. Then stop and wait for their go-ahead:
 
-- You'll connect them to Alva. It takes about 3 minutes.
+- You'll connect them to Alva. It takes a few minutes.
 - You'll read your memory and, where you have them, your past conversations
   with them, only to pick out investing views and preferences. You may ask to
   allow reading those files.
@@ -45,19 +45,27 @@ and the user's language, briefly. Then stop and wait for their go-ahead:
 
 ## 1. Get ready
 
-- `alva --help` fails → `npm install -g @alva-ai/toolkit` (needs Node.js 18+).
-  If that fails, say in one line how to install Node.js, and that they can say
-  "continue Alva setup" afterwards. Stop here.
-- `alva whoami` shows no user → `alva auth login --agent "<your product name>"`,
-  such as `--agent "Codex"` or `--agent "Grok bot"`; the user sees the new key by
-  that name in the Alva app. A browser opens on this computer. When the user
+- Run `npm install -g @alva-ai/toolkit@latest` (needs Node.js 18+), even when
+  `alva` already works: an older CLI lacks commands the routine uses. No
+  permission for the global folder → add `--prefix ~/.npm-global` and use
+  `~/.npm-global/bin/alva`. It fails and `alva --help` works → go on with that
+  CLI. It fails and there is no `alva` → say in one line how to install Node.js,
+  and that they can say "continue Alva setup" afterwards. Stop here.
+- Sign this agent in with `alva auth login --agent "<your product name>"`,
+  such as `--agent "Codex"` or `--agent "Grok bot"`, even when `alva whoami`
+  already shows a user, and on an update unless your memory says you signed
+  in by name: the new key, named after you, is how the Alva app knows this
+  agent is connected, and an older sign-in does not count. A browser opens on this computer. When the user
   cannot see this computer's screen (a cloud computer, a remote machine), add
   `--no-browser`: send them the
   link it prints, ask them to sign in on their own device and send back the
   code the page shows, and enter it at the prompt while the command keeps
-  running. An older CLI says `--agent is not supported` → run the same command
-  without `--agent`.
-- Already signed in → move on without comment.
+  running. An older CLI says `--agent is not supported` → already signed in:
+  keep that sign-in, since another unnamed key would not count either; not
+  signed in: run the same command without `--agent`.
+- `ALVA_API_KEY` is set in your environment → it overrides the sign-in, so the
+  new key goes unused: ask the user to remove it from your settings and start
+  a new session, then continue.
 
 ## 2. Routine
 
@@ -76,6 +84,8 @@ the initial memory and thesis sync. The examples below use the default
   schedule, with the same prompt. Its note shows up in the app. No such tool in
   this session → tell the user where the app adds one, and give them the
   prompt.
+- **Any other agent whose scheduler delivers to the user**: the same name,
+  schedule and prompt in that scheduler.
 - **A terminal session (Claude Code, Codex CLI) and agents whose scheduler
   cannot reach the user**: do not schedule. A headless run has nowhere to
   deliver the note.
@@ -88,10 +98,9 @@ the initial memory and thesis sync. The examples below use the default
 
 ## Wrap up
 
-Tell the user what was saved (how many memory items, which theses, all private),
-that they can see it in the Alva app under Me, that saying "undo" removes any of
-it (see Undo in agent-routine.md), and when the next note arrives (or that none
-is scheduled).
+Tell the user what was saved (how many memory items, which theses, each
+private or public), that they can see it in the Alva app under Me, that saying "undo"
+removes any of it (see Undo in agent-routine.md), and when the next note arrives (or that none is scheduled).
 
 Separately, where you have local agent skills, offer once in one short sentence:
 if they also want a **one-time** import of their local investing, trading, or
@@ -105,5 +114,7 @@ any automation.
 Then record in your own memory:
 "Alva bootstrap v2 done <date>.
 'What's new on Alva' means: run references/agent-routine.md in the Alva skill.
+The Alva CLI is <the command you used: alva, or ~/.npm-global/bin/alva>,
+signed in <by name, or without a name (older CLI)>.
 To change how often it runs, change the schedule of the 'Alva routine' job;
 never add a second one."
