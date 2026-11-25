@@ -665,8 +665,8 @@ const MUTATIONS = [
   {
     id: "routine-thesis-unknown-direction",
     file: "references/agent-routine.md",
-    remove: "Any `UNKNOWN`, or the call fails → do",
-    replacement: "Any `UNKNOWN` → publish it anyway, and do",
+    remove: "Any `UNKNOWN`, or the call fails → still offer the view, saying",
+    replacement: "Any `UNKNOWN` → publish it with the direction you judge, saying",
     expectFailedCases: ["target.agent-bootstrap"],
   },
   {
@@ -772,6 +772,13 @@ const MUTATIONS = [
     file: "references/agent-routine.md",
     remove: " Never create a thesis whose exact body the user has not seen in\nthis conversation, even after a yes.",
     replacement: "",
+    expectFailedCases: ["target.agent-bootstrap"],
+  },
+  {
+    id: "routine-hides-private-default",
+    file: "references/agent-routine.md",
+    remove: "every thesis is published private by default;",
+    replacement: "every thesis is published;",
     expectFailedCases: ["target.agent-bootstrap"],
   },
   {

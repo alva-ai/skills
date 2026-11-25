@@ -81,15 +81,17 @@ must not contain them.
   ticker match. Ambiguous → ask, or leave the asset out.
 - Directions: `alva thesis asset-candidates --text '<exact body>' --entity-ids '<id,id>' --no-discovery`,
   then use `returnPreview.directions`. `UNRESOLVED` or `UNKNOWN` is an answer,
-  not a failure. Any `UNKNOWN`, or the call fails → do not offer that view as a
-  thesis this time, and say its direction could not be judged. The user still
-  asks to publish it → offer it with no assets and no directions.
+  not a failure. Any `UNKNOWN`, or the call fails → still offer the view, saying
+  its direction could not be judged, so it would be published with no assets
+  and no directions; ask whether to publish it that way.
 
 **User present** → one confirmation with two parts: "Save to your Alva memory?"
 (bullets) and "Publish as theses?" (a checklist: each body in full, each asset
 with its direction as Long, Short or Not tracked in the user's language, and
-any Notes). Each thesis is private unless the user asks for it to be public;
-ask once whether any should be. A changed body or asset is a new candidate:
+any Notes). Tell them plainly: every thesis is published private by default;
+they can make any of them public now, and can change it later in the Alva app
+or by asking you (`alva thesis set-visibility --id <id> --visibility public|private`).
+A changed body or asset is a new candidate:
 show it again. Never create a thesis whose exact body the user has not seen in
 this conversation, even after a yes. On yes:
 
