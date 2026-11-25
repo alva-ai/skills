@@ -62,6 +62,22 @@ and B22's conversation path. The CLI it documents is alva-ai/toolkit-ts#227.
 - A matching-text Update sends the current shares from `allocation` as
   explicit weights so the position stays as the rebalance set it.
 
+## Cold-read audit (alva-skill-standard step 5)
+
+A subagent ran the judgment pass on the first commit without this record's
+rationale. Applied: the "model-written data" rule said once in the section
+intro instead of twice; the mode explanation tightened; rebalance changes shown
+with the direction labels; "What the author asks for" now says positions are
+also what a rebalance the author accepted or let Alva publish set; "Answering a
+proposal" covers no waiting proposal and says the answer is the confirmation
+(no publication preview or `asset-candidates`); a mode change leaves waiting
+proposals waiting; the matching-text Update no longer names an undefined
+"Alva asks"; Positions notes that a condition may later rebalance a ticker
+with no direction in. Not changed: `SKILL.md` Completion Criteria says an
+Update emits no "creation preview" while `thesis.md` emits the preview block
+for every published Update; that wording predates this change and is left for
+its own fix.
+
 ## Rollout
 
 Merge and release only after the toolkit-ts release that contains
@@ -71,8 +87,13 @@ rollout" step 5).
 
 ## Verification
 
-See the pull request for the exact results of
-`node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva`,
-`node evals/alva-skill-docs/mutation-smoke.mjs --skill-dir skills/alva`,
-`node --test evals/alva-skill-docs/durable-agent.test.mjs` and the
-alva-skill-standard `scripts/audit.sh`. Not run against a live agent.
+- `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva`:
+  exit 0; SKILL.md lines 240; Cases 136/136; Checks 1762/1762 (100.00%).
+- `node evals/alva-skill-docs/mutation-smoke.mjs --skill-dir skills/alva`:
+  exit 0; "Mutation smoke passed: 119/119 mutations failed as expected."
+- `node --test evals/alva-skill-docs/durable-agent.test.mjs`: exit 0; tests 5,
+  pass 5, fail 0.
+- alva-skill-standard `scripts/audit.sh skills/alva`: exit 0; broken links
+  none; orphan references none; SKILL.md 240 lines.
+- Not run against a live agent; the CLI commands do not exist in a released
+  toolkit yet.
