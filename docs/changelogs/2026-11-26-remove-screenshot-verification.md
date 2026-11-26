@@ -69,3 +69,16 @@
 - 2026-11-26: the human retired the screenshot endpoint and asked to drop the
   verification step, the eval expectations, the `SKILL.md` mentions, the
   scenario and the reports.
+
+## 7. Outcome and Evidence
+
+- B1-B3 and D1-D4 done as designed; no deviations.
+- Evidence is section 5 (doc eval 136/136, baseline 133/136 with the three
+  expected failures, mutation smoke 123/123, durable tests 5/5, the
+  exclusion falsified by re-adding the command). CI `eval`: pass.
+
+## 8. Remaining Work
+
+- Release v1.36.2 after the Toolkit release that removes the command; the
+  release then syncs to the packaged skill copy.
+- An open docs PR about WebP screenshot validation (#464) is superseded.
