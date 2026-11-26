@@ -315,4 +315,4 @@ not present estimates from memory as live facts.
 
 For multi-step builds, give short milestone updates. For final answers, include
 the canonical share URL for released playbooks and use `published_url` only for
-verification evidence such as screenshots.
+verification.

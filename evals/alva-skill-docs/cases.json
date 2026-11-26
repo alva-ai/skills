@@ -341,7 +341,7 @@
       "id": "retained.playbook-release",
       "group": "retained",
       "target": "corpus",
-      "description": "Playbook release, README, screenshot, lint, pro/free, and visibility rules remain intact.",
+      "description": "Playbook release, README, lint, pro/free, and visibility rules remain intact; the retired screenshot command is not taught.",
       "includes": [
         "before-build-html",
         "before-playbook-draft",
@@ -349,8 +349,11 @@
         "alva lint playbook",
         "readme-url",
         "related people",
-        "alva screenshot",
         "set-visibility"
+      ],
+      "excludes": [
+        "alva screenshot",
+        "playbooks screenshot"
       ]
     },
     {
@@ -1098,7 +1101,7 @@
       "id": "issue592.playbook-release-behavior",
       "group": "issue592",
       "target": "corpus",
-      "description": "Playbook draft and release remain protected by behavior-level gates for visibility-aware reads, feed freshness, README, lint, and screenshot verification.",
+      "description": "Playbook draft and release remain protected by behavior-level gates for visibility-aware reads, feed freshness, README, and lint.",
       "hard_gate_includes": [
         {
           "file": "references/playbook-creation.md",
@@ -1127,19 +1130,6 @@
             "New feeds declare push-worthy outputs with",
             "existing Altra `signal/targets` or legacy",
             "alva lint playbook ./index.html"
-          ]
-        }
-      ],
-      "section_includes": [
-        {
-          "file": "references/playbook-creation.md",
-          "heading": "Screenshot",
-          "label": "visual verification",
-          "includes": [
-            "A PNG or page shell is not enough",
-            "real feed-backed chart marks",
-            "headers-only tables",
-            "fetch failures are data-rendering failures"
           ]
         }
       ]
@@ -1285,7 +1275,7 @@
           "includes": [
             "Dashboard, screener app, hosted report, or other shareable investing app",
             "[playbook-creation.md](references/playbook-creation.md)",
-            "live feeds, design, draft, lint, release, and screenshot"
+            "live feeds, design, draft, lint, and release"
           ]
         },
         {
@@ -1296,8 +1286,7 @@
             "Build feeds through",
             "HTML that reads feed outputs at runtime",
             "Write HTML and README to ALFS",
-            "screenshot",
-            "stop at draft"
+            "then publish unless the user explicitly asks to stop at draft"
           ]
         }
       ]
@@ -1606,7 +1595,7 @@
         }
       ],
       "includes": [
-        "version: v1.36.1",
+        "version: v1.36.2",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -1624,10 +1613,7 @@
         "Browser request rule",
         "AlvaToolkit.AlvaClient",
         "api_origin",
-        "public and private playbooks",
-        "real feed-backed chart marks",
-        "headers-only tables",
-        "fetch failures"
+        "public and private playbooks"
       ],
       "file_includes": [
         {
