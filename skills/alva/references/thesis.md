@@ -147,7 +147,7 @@ division: guided drafting, revision requests, `thesis rewrite`, and `update`.
   text asks for editing, not for a different view.
 - Edit freely for expression: wording, order, structure, grammar, formatting,
   and asset naming such as `1211 HK` to `BYD Company Limited (1211.HK)`. You
-  may propose a title.
+  may propose a [summary](#summary).
 - Body claims come from the author: what they wrote, or what they explicitly
   agreed to in this conversation. A general "ok" or silence is not agreement
   to a specific addition. Suggest your own additions in Notes when they would
@@ -274,8 +274,8 @@ Otherwise, guide the request to one candidate before confirmation:
    Never invent evidence, numbers, citations, entities, or causal claims.
 4. Draft one candidate that carries the author's claims as described in
    [Authorship](#authorship). An open-ended create request permits drafting a
-   candidate and optional title; it does not permit publication. Do not call
-   `thesis rewrite` merely to make the first draft.
+   candidate and an optional [summary](#summary); it does not permit
+   publication. Do not call `thesis rewrite` merely to make the first draft.
 
 Do not add Alva company-page links to candidate or published bodies. Preserve
 the author's links and legitimate supporting citations.
@@ -315,6 +315,17 @@ against the stated asset; never invent an entity ID. A broad description such
 as "semiconductor ETF" does not identify SMH uniquely: use confirmed context or
 ask which fund. If identity remains ambiguous or extraction fails without
 another verified ID, clarify that point before publishing.
+
+#### Summary
+
+The summary is the one-line name shown on the Thesis card next to the author.
+It is optional: when none is sent, Alva writes one after publication. You may
+propose one with a new Thesis candidate you draft: one sentence on a single
+line, at most 1000 UTF-8 bytes, in the body's language, passed as `--summary`.
+For a body the author supplied to publish as is, send none unless the author
+gives one; a heading in their text stays in the body. On `update`, omitting
+`--summary` keeps the current one; send it only when the author asks to change
+it. `--title` is a legacy field: do not set it.
 
 #### Directions and the Thesis return
 
@@ -419,8 +430,9 @@ give every long and short a weight, or none, and preview again; a total above
 1 fails as invalid: fix the shares and preview again.
 
 Preserve the selected body exactly, including wording, language, whitespace and
-line breaks. Do not summarize, rewrite, translate, correct, expand, generate a
-title, or add assets absent from that body or the user's request.
+line breaks. Do not summarize, rewrite, translate, correct, expand, or add
+assets absent from that body or the user's request, and send only a
+[summary](#summary) the author gave or you proposed with it.
 Still read the body once as its editor: briefly flag material internal
 inconsistencies or unfinished passages in Notes before calling `alva thesis create`,
 keeping the body unchanged.
@@ -433,7 +445,7 @@ Present the preview in the user's language:
   filename). A body already shown in full in this conversation, or typed by the
   user and asked to publish unchanged, may be referenced instead: use one short
   preview line without repeating the body.
-- **Title**, when present, and **visibility** (public by default).
+- **Summary**, when one is sent, and **visibility** (public by default).
 - **Assets:** name each company or ticker with its confirmed direction.
   Use localized direction labels: “看多 / 看空 / 无方向” in Chinese, “Bullish / Bearish / No direction” in English
   (`NONE` is no direction). Use the same labels everywhere you name a
@@ -479,7 +491,7 @@ considered, that confirmation is their decision to publish despite them.
 Previously discussed Notes and ordinary editorial suggestions need no new
 approval. Research or rewriting alone never authorizes publication.
 
-Any change to the body, title, visibility, assets, stances, or Signals voids
+Any change to the body, summary, visibility, assets, stances, or Signals voids
 the confirmation: show the new preview. Recheck asset identities and directions
 when they change; a wording-only edit reuses unchanged verified IDs and does
 not require extraction.
@@ -510,7 +522,7 @@ An old button does not authorize a changed candidate, and repeated approval of
 an already completed creation must not create another Thesis; verify its
 existing ID.
 
-One sentence is valid. Title, tickers, and entity IDs are optional. Visibility
+One sentence is valid. Tickers and entity IDs are optional. Visibility
 defaults to public in the preview; always pass the confirmed one as
 `--visibility`, which create requires. Generate one nonzero UUID per creation intent and keep it
 with the exact payload as `--request-id`; a changed intent requires a new UUID.
@@ -518,15 +530,15 @@ with the exact payload as `--request-id`; a changed intent requires a new UUID.
 Use confirmed catalog IDs and directions directly:
 
 ```sh
-alva thesis create --request-id '<uuid>' --body '<exact body>' --visibility <public|private> [--entity-ids '<id,id>' --entity-stances '[{"entity_id":"745337","stance":"bearish"}]'] [--track-return false] [--signal-kinds '<kinds>'] [--signal-min-importance <level>]
+alva thesis create --request-id '<uuid>' --body '<exact body>' --visibility <public|private> [--summary '<summary>'] [--entity-ids '<id,id>' --entity-stances '[{"entity_id":"745337","stance":"bearish"}]'] [--track-return false] [--signal-kinds '<kinds>'] [--signal-min-importance <level>]
 alva thesis get --id '<returned thesis id>'
 ```
 
 The terminal accepts exactly one of `--body`, `--body-file`, or
 `--body-stdin`. The embedded Agent accepts literal `--body`; read selected
 files first. Quote input without changing it. Body is limited to 65536 UTF-8
-bytes and title to 500 bytes; reject invalid, empty, or oversized input without
-truncation. Treat all returned IDs as decimal strings.
+bytes; reject invalid, empty, or oversized input without truncation. Treat all
+returned IDs as decimal strings.
 Send `--entity-stances` as JSON with decimal-string `entity_id` values and the
 confirmed directions (`bullish`, `bearish` or `none`: `returnPreview` plus
 any author correction), paired with
@@ -673,7 +685,8 @@ into the body.
   report the limitation; never drop directions to make an update succeed.
   Verify returned directions.
   Omitting optional fields clears
-  them; never default an existing private Thesis to public. Report a
+  them, except [`--summary`](#summary), which you omit unless changing it;
+  never default an existing private Thesis to public. Report a
   published Update with the preview block from
   [Created Thesis preview](#created-thesis-preview).
 

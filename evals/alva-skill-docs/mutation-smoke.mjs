@@ -777,8 +777,8 @@ const MUTATIONS = [
   {
     id: "thesis-create-omits-visibility",
     file: "references/thesis.md",
-    remove: "--body '<exact body>' --visibility <public|private> [--entity-ids",
-    replacement: "--body '<exact body>' [--entity-ids",
+    remove: "--body '<exact body>' --visibility <public|private> [--summary",
+    replacement: "--body '<exact body>' [--summary",
     expectFailedCases: ["target.thesis-author-intent"],
   },
   {
@@ -857,6 +857,20 @@ const MUTATIONS = [
     remove: "keep that sign-in, since another unnamed key would not count either; not",
     replacement: "sign in again anyway; and when not",
     expectFailedCases: ["target.agent-bootstrap"],
+  },
+  {
+    id: "thesis-summary-invented-for-verbatim-body",
+    file: "references/thesis.md",
+    remove: "For a body the author supplied to publish as is, send none unless the author\ngives one;",
+    replacement: "Always write one, also for a body published as is;",
+    expectFailedCases: ["target.thesis-summary"],
+  },
+  {
+    id: "thesis-summary-cleared-on-update",
+    file: "references/thesis.md",
+    remove: "On `update`, omitting\n`--summary` keeps the current one",
+    replacement: "On `update`, omitting\n`--summary` clears it",
+    expectFailedCases: ["target.thesis-summary"],
   },
   {
     id: "thesis-write-same-turn",
