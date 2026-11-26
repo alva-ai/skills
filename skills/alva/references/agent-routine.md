@@ -121,8 +121,9 @@ this conversation, even after a yes. On yes:
 
 **User absent** → write nothing. Add to the note, for example:
 "Noticed 2 new preferences. Reply 'save' to add them to Alva." and
-"New view: '<claim>'. Reply 'publish' to make it a private thesis."
-When they reply, show those items as above, then do steps 1-5.
+"New view: '<claim>'. Reply 'review' to see it as a private thesis draft."
+When they reply, show those items as above and wait for that confirmation
+before steps 1-5.
 
 **Undo** → remove those entries from `user.md` the same way (steps 1-3), and
 take a thesis down with `alva thesis archive --id <id> --request-id <new UUID>`.

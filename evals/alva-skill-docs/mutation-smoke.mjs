@@ -858,6 +858,62 @@ const MUTATIONS = [
     replacement: "sign in again anyway; and when not",
     expectFailedCases: ["target.agent-bootstrap"],
   },
+  {
+    id: "thesis-write-same-turn",
+    file: "references/thesis.md",
+    remove: "A turn never publishes text\nit is showing for the first time.",
+    replacement: "A turn may publish text it is showing for the first time.",
+    expectFailedCases: ["target.thesis-write-needs-confirmed-preview"],
+  },
+  {
+    id: "thesis-today-edit-publishes-directly",
+    file: "references/thesis.md",
+    remove: "The selection asks for that draft; it does not confirm text the reader\nhas not seen.",
+    replacement: "Publish that scoped Update directly: the user's selection\nis confirmation.",
+    expectFailedCases: ["target.thesis-write-needs-confirmed-preview"],
+  },
+  {
+    id: "thesis-question-counts-as-confirmation",
+    file: "references/thesis.md",
+    remove: "comments on the preview, or agrees with the analysis is not confirmation:",
+    replacement: "comments on the preview, or agrees with the analysis is confirmation:",
+    expectFailedCases: ["target.thesis-write-needs-confirmed-preview"],
+  },
+  {
+    id: "thesis-offer-counts-as-preview",
+    file: "references/thesis.md",
+    remove: "a short version attached to an offer is not a\npreview, and accepting the offer asks for the preview.",
+    replacement: "a short version attached to an offer counts as that preview.",
+    expectFailedCases: ["target.thesis-write-needs-confirmed-preview"],
+  },
+  {
+    id: "thesis-check-updates",
+    file: "references/thesis.md",
+    remove: "A check ends with findings and leaves the Thesis as it is.",
+    replacement: "A check may end by publishing the Update the evidence supports.",
+    expectFailedCases: ["target.thesis-write-needs-confirmed-preview"],
+  },
+  {
+    id: "thesis-write-as-necessary-work",
+    file: "references/request-routing.md",
+    remove: "Writing a Thesis is never part of that work: creating or updating one is\noffered, and happens only through its preview and confirmation.",
+    replacement: "Updating the user's Thesis can be part of that work.",
+    expectFailedCases: ["target.thesis-write-needs-confirmed-preview"],
+  },
+  {
+    id: "thesis-rewrite-selection-publishes",
+    file: "references/thesis.md",
+    remove: "candidate opens its publication preview; publish only after that preview is\nconfirmed.",
+    replacement: "candidate publishes it.",
+    expectFailedCases: ["target.thesis-write-needs-confirmed-preview"],
+  },
+  {
+    id: "routine-absent-reply-publishes",
+    file: "references/agent-routine.md",
+    remove: "show those items as above and wait for that confirmation\nbefore steps 1-5.",
+    replacement: "show those items as above, then do steps 1-5.",
+    expectFailedCases: ["target.thesis-write-needs-confirmed-preview"],
+  },
 ];
 
 function parseArgs(argv) {
