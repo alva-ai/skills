@@ -13,6 +13,26 @@ language is the point; do not drift into synonyms or technical equivalents.
 
 ### Terms
 
+**Thesis**
+The user's own investment view published or tracked on Alva (public or private),
+which platform research and Signals follow over time.
+_Avoid_: thesis record, author version, publication row.
+
+**Channel**
+An in-product Alva conversation space: either the user's **main chat** (the
+default Alva Agent chat) or a **topic channel** dedicated to one ongoing
+subject. Keep in-product Channels distinct from external IM providers.
+_Avoid_: channel session, channel slug, channel_id.
+
+**For You / Alva Today**
+**For You** is the user's personalized feed of published Theses and research
+updates; **Alva Today** is the daily digest summarizing material developments
+around their views and watchlist.
+
+**Worldline**
+Alva's curated stream of X posts, interviews, podcasts, news, and market events
+used as research context.
+
 **Automation**
 A recurring Alva task that refreshes data, checks market conditions, or sends
 updates on a schedule. This is the default user-facing label for the thing that
@@ -31,9 +51,9 @@ the user cares that something was sent or will be sent.
 _Avoid_: push payload, fanout, notification event, dispatch event.
 
 **Agent**
-The user's ongoing Alva assistant relationship across Web, Telegram, and
-Discord. Use this for conversation continuity, memory, persona, and proactive
-follow-up.
+The user's ongoing Alva assistant relationship across the Alva App/Web and
+connected external IM providers (Telegram, Discord, Slack, WhatsApp, iMessage).
+Use this for conversation continuity, memory, persona, and proactive follow-up.
 _Avoid_: bot runtime, channel session, worker.
 
 **Feed**

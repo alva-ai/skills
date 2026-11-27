@@ -264,13 +264,15 @@
       "id": "target.thesis-write-card-preview",
       "group": "target",
       "target": "corpus",
-      "description": "Every created or updated Thesis, including one from a background task, is reported with the thesis-preview block on lines of its own, falling back to a standalone link without query parameters, and never only as a link inside a sentence.",
+      "description": "Every created or updated Thesis in the main chat is reported with the thesis-preview block on lines of its own, falling back to a standalone link without query parameters, and never only as a link inside a sentence.",
+      "excludes": [
+        "every Thesis the task created or updated"
+      ],
       "file_includes": [
         {
           "file": "references/thesis.md",
           "includes": [
             "A published Update ends the same way: after `update` succeeds, read it with\n`thesis get` and emit this block for the new `author_version_id`.",
-            "In a background task, the task's final result must contain the block for\n  every Thesis the task created or updated",
             "Put each block on lines of its own after the sentence that reports the\n  result",
             "Never report a created or updated Thesis only as a link inside a sentence",
             "Keep each link in its own Markdown paragraph, with a blank line before\n  and after each link, including between successive links."
@@ -897,14 +899,14 @@
       "id": "platform-data.ticker-read-trade-setup-follow-up",
       "group": "platform-data",
       "target": "corpus",
-      "description": "A named single-instrument ticker read always offers one next step, chosen in order: a Thesis for the user's own view, Trade Setup for setup-like asks or concrete levels, otherwise a specific follow-up question; declined kinds are not repeated, and accepting Trade Setup routes through the official setup skill.",
+      "description": "A named single-instrument ticker read picks a fitting next step in order: a Thesis for the user's own view, Trade Setup for explicit setup-like asks, or an optional specific follow-up question when it moves discussion forward; unasked levels in an analysis do not self-trigger Trade Setup, declined kinds are not repeated, and accepting Trade Setup routes through the official setup skill.",
       "section_includes": [
         {
           "file": "references/request-routing.md",
           "heading": "Useful Next Step After Ask",
           "label": "post-answer pointer and order",
           "includes": [
-            "always offer one next step in the order set by [Next step after a ticker read]",
+            "choose the next step in the order set by [Next step after a ticker read]",
             "ticker-read.md#next-step-after-a-ticker-read",
             "Preferred Automation Setup Skills"
           ]
@@ -914,17 +916,17 @@
           "heading": "Next step after a ticker read",
           "label": "ticker-read next-step rule",
           "includes": [
-            "always offer one next step after the normal answer",
+            "offer one fitting next step after the normal answer",
             "simple fact lookups, broad multi-ticker discovery, portfolio monitoring",
             "Pick the first that fits",
             "1. **Thesis.** The user has voiced a view of their own on the instrument or\n   already has a Thesis on it, and did not ask a setup-like question",
             "or to check or update the existing one",
             "is usually the most valuable step for\n   them, so prefer it whenever it fits",
-            "2. **Trade Setup.** The user asked a setup-like question",
+            "2. **Trade Setup.** The user explicitly asked a setup-like question",
             "can I go",
-            "or the answer gives concrete price levels",
             "the answer is incomplete without this",
-            "3. **Follow-up question.** Otherwise, ask one specific question",
+            "Do not trigger this offer merely\n   because an analysis answer mentioned support/resistance levels unasked",
+            "3. **Follow-up question (optional).**",
             "Offer it in the form set by [Useful Next Step After Ask]",
             "If the user declined that kind of offer earlier, pick the next that fits"
           ]
@@ -1196,7 +1198,8 @@
         "External IM group",
         "alva alert group",
         "group-subscriptions",
-        "active_channel"
+        "active_channel",
+        "has no destination flag"
       ],
       "section_includes": [
         {
@@ -1206,6 +1209,7 @@
           "includes": [
             "Default personal destination",
             "Alva topic channel",
+            "--automation <owner>/<feed> --channel-id <channel_id>",
             "--automation-ids <id,id> --channel-id <channel_id>",
             "<session-prefill-channel-memory channel-id=\"…\">",
             "a non-`alva` slug denotes a topic channel",
@@ -1394,8 +1398,11 @@
         "current multiple/FCF/EPS",
         "multiple/earnings sensitivity",
         "impact of missing evidence",
-        "required calculation not done caps at B-/C",
-        "hard cap"
+        "do not present a high-confidence quantitative\nverdict when a required calculation has not been done",
+        "cap confidence accordingly"
+      ],
+      "excludes": [
+        "caps at B-/C"
       ]
     },
     {

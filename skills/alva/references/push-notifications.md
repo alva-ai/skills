@@ -63,7 +63,8 @@ first producer run; the flag skips the run, not the binding.
   `channel_id=0`; web delivery is available immediately, and external DM
   delivery uses `active_im_provider` plus its matching username from
   `alva whoami`.
-- **Alva topic channel:** resolve the feed id and run
+- **Alva topic channel:** pass `--channel-id <channel_id>` with either
+  `alva alert enable --automation <owner>/<feed> --channel-id <channel_id>` or
   `alva alert enable --automation-ids <id,id> --channel-id <channel_id>`. This
   binds the alert to that in-product web channel. Its channel id is not a
   channel-session id. Topic-channel delivery is web-only. In a channel turn,
@@ -71,9 +72,9 @@ first producer run; the flag skips the run, not the binding.
   `<session-prefill-channel-memory channel-id="…">`; a non-`alva` slug denotes
   a topic channel. If the user says "this channel" or "current channel" there,
   this is the required destination.
-The name-addressed `alva alert enable --automation <owner>/<feed>` command has
-no destination flag. When the user says "this channel", use the id-addressed
-form with `--channel-id`; do not silently fall back to the default destination.
+Omitting `--channel-id` targets the default personal destination (`channel_id=0`).
+When the user says "this channel", always include `--channel-id <channel_id>`;
+do not silently fall back to the default destination.
 Do not infer Telegram, Discord, Slack, or another transport from the generic
 `channel` session profile. Only name an external transport when current context
 explicitly identifies it; otherwise describe a topic destination as the
@@ -117,11 +118,13 @@ A push is set up only after all of these succeed:
    missing or wrong, fix it when alert delivery was requested; when optional,
    explain the benefit and offer one `send_prompt` action to enable the named
    Automation's alert. If already correct, do not re-enable it. To select the
-   default personal destination, use
-   `alva alert enable --automation <owner>/<feed>` or `alva alert enable --automation-ids
-   <id,id>`. For the current Alva topic channel, use `alva alert enable --automation-ids
-   <id,id> --channel-id <current_channel_id>`; never replace this with the
-   name-addressed default-personal command.
+   default personal destination, omit `--channel-id` with
+   `alva alert enable --automation <owner>/<feed>` or
+   `alva alert enable --automation-ids <id,id>`. For the current Alva topic
+   channel, pass `--channel-id <current_channel_id>` with either
+   `alva alert enable --automation <owner>/<feed> --channel-id <current_channel_id>`
+   or `alva alert enable --automation-ids <id,id> --channel-id <current_channel_id>`;
+   never omit `--channel-id` and silently fall back to the default personal destination.
 
 Do not trigger the cronjob or wait for its next scheduled run solely to verify
 setup. A default publish already admitted the first producer run; triggering it
