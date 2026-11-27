@@ -4,9 +4,9 @@ Source: `skills/alva`
 
 SKILL.md lines: 240
 
-Cases: 136/136
+Cases: 137/137
 
-Checks: 1746/1746 (100.00%)
+Checks: 1751/1751 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -19,7 +19,17 @@ No failed cases. Keep the eval in place as a regression mechanism.
 
 ## target
 
-55/55 cases, 898/898 checks
+56/56 cases, 903/903 checks
+
+### PASS target.personal-skill-files
+
+Personal methods use the owner ALFS directory and stay out of shared conversations.
+
+- [x] SKILL.md includes (references/personal-skills.md)
+- [x] references/personal-skills.md includes ~/skills/<slug>/SKILL.md
+- [x] references/personal-skills.md includes enabled: false
+- [x] references/personal-skills.md includes explicitly asks
+- [x] references/personal-skills.md includes group or shared conversation
 
 ### PASS target.thesis-quote-context
 
@@ -309,7 +319,7 @@ Operational constraints apply before first use and remain reusable within the se
 
 Latest mainline Alva skill updates remain integrated after rebasing the refactor.
 
-- [x] version: v1.36.2
+- [x] version: v1.37.0
 - [x] Capability Help
 - [x] feedback
 - [x] api/feedback.md

@@ -4,6 +4,16 @@
   "description": "Deterministic documentation capability checks for the Alva skill refactor. Retained cases describe behavior already present on main; pr353 cases encode the alva-ai/skills#353 chat-as-artifact standard; target cases describe this refactor's structure goals.",
   "cases": [
     {
+      "id": "target.personal-skill-files",
+      "group": "target",
+      "target": "corpus",
+      "description": "Personal methods use the owner ALFS directory and stay out of shared conversations.",
+      "file_includes": [
+        { "file": "SKILL.md", "includes": ["(references/personal-skills.md)"] },
+        { "file": "references/personal-skills.md", "includes": ["~/skills/<slug>/SKILL.md", "enabled: false", "explicitly asks", "group or shared conversation"] }
+      ]
+    },
+    {
       "id": "target.thesis-quote-context",
       "group": "target",
       "target": "corpus",

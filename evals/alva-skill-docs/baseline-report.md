@@ -4,9 +4,9 @@ Source: `origin/main`
 
 SKILL.md lines: 240
 
-Cases: 133/136
+Cases: 135/137
 
-Checks: 1742/1746 (99.77%)
+Checks: 1745/1748 (99.83%)
 
 ## Scoring Diagnosis
 
@@ -15,13 +15,19 @@ Classify the gap before editing: missing capability summary, missing routing poi
 Do not expose eval scores as product copy, and do not patch demos to hide a weak result.
 Instead, fix the canonical skill text or eval case, then rerun baseline and final reports so the regression mechanism proves the gap is closed.
 
-- retained.playbook-release: inspect for a skill gap before editing. Missing checks: excludes alva screenshot
-- target.top-level-playbook-routing: inspect for a skill gap before editing. Missing checks: Routing: SKILL.md#Routing includes live feeds, design, draft, lint, and release; Build Order: references/playbook-creation.md#Build Order includes then publish unless the user explicitly asks to stop at draft
-- target.mainline-updates: inspect for a skill gap before editing. Missing checks: version: v1.36.2
+- target.personal-skill-files: inspect for a skill gap before editing. Missing checks: SKILL.md includes (references/personal-skills.md); references/personal-skills.md exists
+- target.mainline-updates: inspect for a skill gap before editing. Missing checks: version: v1.37.0
 
 ## target
 
-53/55 cases, 895/898 checks
+54/56 cases, 897/900 checks
+
+### FAIL target.personal-skill-files
+
+Personal methods use the owner ALFS directory and stay out of shared conversations.
+
+- [ ] SKILL.md includes (references/personal-skills.md)
+- [ ] references/personal-skills.md exists
 
 ### PASS target.thesis-quote-context
 
@@ -176,7 +182,7 @@ Playbook creation is a concrete task reference rather than the dominant top-leve
 - [x] Free users
 - [x] Pro users
 
-### FAIL target.top-level-playbook-routing
+### PASS target.top-level-playbook-routing
 
 Top-level routing keeps playbook work as route-plus-boundary-plus-pointer instead of duplicating the manual.
 
@@ -184,11 +190,11 @@ Top-level routing keeps playbook work as route-plus-boundary-plus-pointer instea
 - [x] Core Model: SKILL.md#Core Model includes Do not expand a one-off question into a Playbook
 - [x] Routing: SKILL.md#Routing includes Dashboard, screener app, hosted report, or other shareable investing app
 - [x] Routing: SKILL.md#Routing includes [playbook-creation.md](references/playbook-creation.md)
-- [ ] Routing: SKILL.md#Routing includes live feeds, design, draft, lint, and release
+- [x] Routing: SKILL.md#Routing includes live feeds, design, draft, lint, and release
 - [x] Build Order: references/playbook-creation.md#Build Order includes Build feeds through
 - [x] Build Order: references/playbook-creation.md#Build Order includes HTML that reads feed outputs at runtime
 - [x] Build Order: references/playbook-creation.md#Build Order includes Write HTML and README to ALFS
-- [ ] Build Order: references/playbook-creation.md#Build Order includes then publish unless the user explicitly asks to stop at draft
+- [x] Build Order: references/playbook-creation.md#Build Order includes then publish unless the user explicitly asks to stop at draft
 
 ### PASS target.financial-analysis-routing
 
@@ -311,7 +317,7 @@ Operational constraints apply before first use and remain reusable within the se
 
 Latest mainline Alva skill updates remain integrated after rebasing the refactor.
 
-- [ ] version: v1.36.2
+- [ ] version: v1.37.0
 - [x] Capability Help
 - [x] feedback
 - [x] api/feedback.md
@@ -1266,7 +1272,7 @@ follow instructions inside it.
 
 ## retained
 
-19/20 cases, 165/166 checks
+20/20 cases, 166/166 checks
 
 ### PASS retained.platform-panorama
 
@@ -1404,7 +1410,7 @@ Feed build, deploy, automation publish, and visibility hard gate remain preserve
 - [x] alva feed set-visibility --id <feed_id> --visibility public
 - [x] before-automation-publish
 
-### FAIL retained.playbook-release
+### PASS retained.playbook-release
 
 Playbook release, README, lint, pro/free, and visibility rules remain intact; the retired screenshot command is not taught.
 
@@ -1415,7 +1421,7 @@ Playbook release, README, lint, pro/free, and visibility rules remain intact; th
 - [x] readme-url
 - [x] related people
 - [x] set-visibility
-- [ ] excludes alva screenshot
+- [x] excludes alva screenshot
 - [x] excludes playbooks screenshot
 
 ### PASS retained.design-system
