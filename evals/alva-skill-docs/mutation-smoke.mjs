@@ -866,6 +866,13 @@ const MUTATIONS = [
     expectFailedCases: ["target.thesis-summary"],
   },
   {
+    id: "thesis-create-sends-title",
+    file: "references/thesis.md",
+    remove: "--visibility <public|private> [--summary '<summary>']",
+    replacement: "--visibility <public|private> [--title '<title>'] [--summary '<summary>']",
+    expectFailedCases: ["target.thesis-summary"],
+  },
+  {
     id: "thesis-summary-cleared-on-update",
     file: "references/thesis.md",
     remove: "On `update`, omitting\n`--summary` keeps the current one",

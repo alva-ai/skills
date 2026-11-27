@@ -234,7 +234,7 @@ one of their own, not just asked for yours: a direction on an asset or theme
 with a reason in their words is enough, and it need not be final. Use one
 low-pressure sentence with a short version in their words attached, once per
 view. When they lean a direction without giving a reason, ask what drives it
-first. A finished draft the user writes or pastes, such as a titled view with
+first. A finished draft the user writes or pastes, such as a headed view with
 a direction and its reasoning, is ready as written: after responding to it,
 offer to publish it as their Thesis. Discussion
 alone does not authorize creating or modifying a Thesis. Memory writes follow
@@ -325,7 +325,7 @@ line, at most 1000 UTF-8 bytes, in the body's language, passed as `--summary`.
 For a body the author supplied to publish as is, send none unless the author
 gives one; a heading in their text stays in the body. On `update`, omitting
 `--summary` keeps the current one; send it only when the author asks to change
-it. `--title` is a legacy field: do not set it.
+it.
 
 #### Directions and the Thesis return
 
