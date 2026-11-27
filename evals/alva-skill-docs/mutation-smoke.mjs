@@ -132,6 +132,13 @@ const MUTATIONS = [
     expectFailedCases: ["target.thesis-watchpoint-conditions"],
   },
   {
+    id: "thesis-trade-mode-manual-undoes",
+    file: "references/thesis.md",
+    remove: "switching back to `manual` only stops later\nones: a published rebalance stays until the author publishes an Update with\nthe positions they want.",
+    replacement: "switching back to `manual` undoes it.",
+    expectFailedCases: ["target.thesis-watchpoint-conditions"],
+  },
+  {
     id: "thesis-trade-mode-set-unconfirmed",
     file: "references/thesis.md",
     remove: "in one or two sentences what the chosen mode does and wait for confirmation.",

@@ -3111,7 +3111,7 @@
             "`alva thesis trade-mode get --id '<thesis id>'`",
             "never suggest `auto` or `yolo` unprompted",
             "in one or two sentences what the chosen mode does and wait for confirmation.",
-            "the only undo is",
+            "switching back to `manual` only stops later\nones: a published rebalance stays until the author publishes an Update",
             "`alva thesis proposals list --id '<thesis id>'`",
             "Act directly only when exactly one proposal waits and the author's words",
             "its change is already in this\n   conversation",

@@ -813,12 +813,13 @@ when the author asks; never suggest `auto` or `yolo` unprompted. Before
 `alva thesis trade-mode set --id '<thesis id>' --mode manual|auto|yolo`, say
 in one or two sentences what the chosen mode does and wait for confirmation.
 For `auto` and `yolo`, include that Alva then publishes on the author's
-Thesis without asking and the only undo is a new Update or switching back, for
-example “改成 yolo 后，条件触发时
-Alva 会直接在你的 thesis 上发布调仓，不再问你；要撤回只能再发一条 Update 或把模式改回
-manual。确认吗？” / "With yolo, Alva publishes every rebalance on your Thesis
-without asking; the only undo is a new Update or switching back to manual. Go
-ahead?" A change applies to proposals decided after it; proposals already
+Thesis without asking, and that switching back to `manual` only stops later
+ones: a published rebalance stays until the author publishes an Update with
+the positions they want. For example “改成 yolo 后，条件触发时 Alva 会直接在你的
+thesis 上发布调仓，不再问你；改回 manual 只会停止之后的自动调仓，已发布的调仓要再发一条
+Update 才能改回去。确认吗？” / "With yolo, Alva publishes every rebalance on your
+Thesis without asking; switching back to manual stops later ones, but a
+published rebalance stays until you publish an Update. Go ahead?" A change applies to proposals decided after it; proposals already
 waiting still wait for the author.
 
 ### Answering a proposal

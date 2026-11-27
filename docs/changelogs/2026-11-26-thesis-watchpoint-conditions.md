@@ -21,7 +21,9 @@ and B22's conversation path. The CLI it documents is alva-ai/toolkit-ts#227.
     the author with buttons Alva carries out itself, and its 24 hours;
   - "Trade mode": read with `trade-mode get`; before `set`, say what
     the mode does (for `auto`/`yolo`: rebalances published on the author's
-    Thesis without asking, undone only by a new Update or switching back)
+    Thesis without asking; switching back to `manual` stops later ones
+    but reverts nothing, so a published rebalance is changed only by a new
+    Update)
     and wait for confirmation; never suggest `auto` or `yolo` unprompted;
   - "Answering a proposal": list with `proposals list`, act directly only
     when exactly one proposal waits, the author's words are a clear
@@ -51,10 +53,11 @@ and B22's conversation path. The CLI it documents is alva-ai/toolkit-ts#227.
   the trade mode; version v1.37.0. The durable-agent sentence in Runtime
   Contract is rewrapped from three lines to two (no wording change) to keep
   `SKILL.md` at the 240-line budget.
-- Evals: `target.thesis-watchpoint-conditions`; five mutations
+- Evals: `target.thesis-watchpoint-conditions`; six mutations
   (`thesis-proposal-answered-without-listing`,
   `thesis-proposal-accepted-unseen`, `thesis-trade-mode-suggested`,
-  `thesis-trade-mode-set-unconfirmed`, `thesis-refused-answer-retried`);
+  `thesis-trade-mode-manual-undoes`, `thesis-trade-mode-set-unconfirmed`,
+  `thesis-refused-answer-retried`);
   `target.thesis-write-needs-confirmed-preview` also checks the proposal
   sentence; version pin v1.37.0 (after `main`'s v1.36.2).
 
@@ -101,7 +104,7 @@ rollout" step 5).
 - `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva`:
   exit 0; SKILL.md lines 240; Cases 137/137; Checks 1769/1769 (100.00%).
 - `node evals/alva-skill-docs/mutation-smoke.mjs --skill-dir skills/alva`:
-  exit 0; "Mutation smoke passed: 128/128 mutations failed as expected."
+  exit 0; "Mutation smoke passed: 129/129 mutations failed as expected."
 - `node --test evals/alva-skill-docs/durable-agent.test.mjs`: exit 0; tests 5,
   pass 5, fail 0.
 - alva-skill-standard `scripts/audit.sh skills/alva`: exit 0; broken links
