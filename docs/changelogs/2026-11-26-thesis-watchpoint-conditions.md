@@ -1,4 +1,4 @@
-# feat(alva): watchpoint conditions, decision mode, rebalance proposals and rebalance Updates (v1.37.0)
+# feat(alva): watchpoint conditions, trade mode, rebalance proposals and rebalance Updates (v1.37.0)
 
 Local record. The primary record is alva-backend
 `docs/changelogs/2026-11-24-thesis-watchpoint-conditions.md`
@@ -10,7 +10,7 @@ and B22's conversation path. The CLI it documents is alva-ai/toolkit-ts#227.
 - `references/thesis.md` gains "Conditions and rebalances", after "Signal
   settings":
   - who reads what: conditions and rebalance Updates are readable by every
-    reader; the decision mode and proposals are the author's only, and a
+    reader; the trade mode and proposals are the author's only, and a
     refusal is explained that way;
   - "Watchpoint conditions": the `condition` on `thesis watchpoints` entries
     (`numeric` with metric, comparison and threshold; `informational` with a
@@ -19,7 +19,7 @@ and B22's conversation path. The CLI it documents is alva-ai/toolkit-ts#227.
     once;
   - "What a trigger does": the three modes, that a waiting proposal reaches
     the author with buttons Alva carries out itself, and its 24 hours;
-  - "Decision mode": read with `decision-mode get`; before `set`, say what
+  - "Trade mode": read with `trade-mode get`; before `set`, say what
     the mode does (for `auto`/`yolo`: rebalances published on the author's
     Thesis without asking, undone only by a new Update or switching back)
     and wait for confirmation; never suggest `auto` or `yolo` unprompted;
@@ -35,16 +35,16 @@ and B22's conversation path. The CLI it documents is alva-ai/toolkit-ts#227.
     unchanged, so offer an Update when the author wants the text to match,
     keeping the current shares as explicit weights.
 - "What the author asks for" routes answering a proposal, choosing the
-  decision mode and matching the text to a rebalance; "Know the current
+  trade mode and matching the text to a rebalance; "Know the current
   position" says the shares include a rebalance Alva published. "Thesis
   tracking" points from watchpoints to the conditions.
 - `SKILL.md`: one routing row for conditions, proposals, rebalance Updates and
-  the decision mode; version v1.37.0. The durable-agent sentence in Runtime
+  the trade mode; version v1.37.0. The durable-agent sentence in Runtime
   Contract is rewrapped from three lines to two (no wording change) to keep
   `SKILL.md` at the 240-line budget.
 - Evals: `target.thesis-watchpoint-conditions`; four mutations
   (`thesis-proposal-answered-without-listing`,
-  `thesis-decision-mode-suggested`, `thesis-decision-mode-set-unconfirmed`,
+  `thesis-trade-mode-suggested`, `thesis-trade-mode-set-unconfirmed`,
   `thesis-refused-answer-retried`); version pin v1.37.0.
 
 ## Decisions made here (for the owner's review)

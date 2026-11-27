@@ -3062,7 +3062,7 @@
       "id": "target.thesis-watchpoint-conditions",
       "group": "target",
       "target": "corpus",
-      "description": "Watchpoint conditions, the decision mode, rebalance proposals and rebalance Updates are routed from SKILL.md and explained in thesis.md: Alva writes conditions and they trigger once; the mode is read with decision-mode get, explained and confirmed before set, and auto or yolo is never suggested unprompted; a proposal is answered only after proposals list, directly only when exactly one waits and the words are clear; accepting publishes at that moment's prices and notifies followers; a refused answer is reported, not retried; rebalance reasoning is Alva's model-written data; mode and proposals are the author's only.",
+      "description": "Watchpoint conditions, the trade mode, rebalance proposals and rebalance Updates are routed from SKILL.md and explained in thesis.md: Alva writes conditions and they trigger once; the mode is read with trade-mode get, explained and confirmed before set, and auto or yolo is never suggested unprompted; a proposal is answered only after proposals list, directly only when exactly one waits and the words are clear; accepting publishes at that moment's prices and notifies followers; a refused answer is reported, not retried; rebalance reasoning is Alva's model-written data; mode and proposals are the author's only.",
       "file_includes": [
         {
           "file": "SKILL.md",
@@ -3075,11 +3075,11 @@
           "file": "references/thesis.md",
           "includes": [
             "## Conditions and rebalances",
-            "the decision mode\nand the proposals are the author's only",
+            "the trade mode\nand the proposals are the author's only",
             "returns `condition` on each entry",
             "one only by publishing an Update, after which Alva writes the set again.",
             "A condition triggers once and is never",
-            "`alva thesis decision-mode get --id '<thesis id>'`",
+            "`alva thesis trade-mode get --id '<thesis id>'`",
             "never suggest `auto` or `yolo` unprompted",
             "in one or two sentences what the chosen mode does and wait for confirmation.",
             "the only undo is",

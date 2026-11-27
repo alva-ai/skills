@@ -118,14 +118,14 @@ const MUTATIONS = [
     expectFailedCases: ["target.thesis-watchpoint-conditions"],
   },
   {
-    id: "thesis-decision-mode-suggested",
+    id: "thesis-trade-mode-suggested",
     file: "references/thesis.md",
     remove: "never suggest `auto` or `yolo` unprompted",
     replacement: "suggest `auto` or `yolo` when it saves the author time",
     expectFailedCases: ["target.thesis-watchpoint-conditions"],
   },
   {
-    id: "thesis-decision-mode-set-unconfirmed",
+    id: "thesis-trade-mode-set-unconfirmed",
     file: "references/thesis.md",
     remove: "in one or two sentences what the chosen mode does and wait for confirmation.",
     replacement: "set the mode the author named.",
