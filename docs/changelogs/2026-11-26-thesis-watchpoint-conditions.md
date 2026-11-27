@@ -1,4 +1,4 @@
-# feat(alva): watchpoint conditions, trade mode, rebalance proposals and rebalance Updates (v1.38.0)
+# feat(alva): watchpoint conditions, trade mode, rebalance proposals and rebalance Updates (v1.37.1)
 
 Local record. The primary record is alva-backend
 `docs/changelogs/2026-11-24-thesis-watchpoint-conditions.md`
@@ -43,7 +43,7 @@ and B22's conversation path. The CLI it documents is alva-ai/toolkit-ts#227.
   "Answering a proposal". Without it the two rules contradicted each other:
   an accept publishes a rebalance Update.
 - `SKILL.md`: one routing row for conditions, proposals, rebalance Updates and
-  the trade mode; version v1.38.0 (`main` reached v1.37.0 with
+  the trade mode; version v1.37.1 (`main` reached v1.37.0 with
   alva-ai/skills#707). The durable-agent sentence in Runtime Contract is
   rewrapped from three lines to two (no wording change) to keep `SKILL.md`
   at the 240-line budget.
@@ -52,7 +52,7 @@ and B22's conversation path. The CLI it documents is alva-ai/toolkit-ts#227.
   `thesis-proposal-accepted-unseen`, `thesis-trade-mode-suggested`,
   `thesis-trade-mode-manual-undoes`, `thesis-trade-mode-set-unconfirmed`);
   `target.thesis-write-needs-confirmed-preview` also checks the proposal
-  sentence; version pin v1.38.0.
+  sentence; version pin v1.37.1.
 
 ## Decisions made here (for the owner's review)
 
