@@ -66,7 +66,7 @@ operating requirements; this index is for navigation.
 | `schedule` | Schedule future or recurring Agent turns |
 | `alert` / `subscriptions` | Manage FEED alerts / Playbook follows |
 | `playbooks` / `remix` / `release` | Discover, remix, and publish Playbooks |
-| `lint playbook` / `screenshot` | Validate and inspect Playbook delivery |
+| `lint playbook` | Validate Playbook HTML before release |
 | `portfolio` / `x` | Connected brokerage holdings and activity / the user's connected X following and posts ([Twitter/X](references/search.md#twitterx)) |
 | `trading` / `broker` | Portfolio and trading operations / venue order execution |
 | `functions` / `secrets` | Interactive UDFs / managed credentials |
@@ -84,7 +84,7 @@ Understand intent -> choose deliverable -> obtain needed evidence -> execute -> 
 | --- | --- |
 | Answer | Facts, explanations, comparisons, valuations, rankings, research, or thesis discussion |
 | Chat chart | A one-off visualization in the answer; follow [design.md](references/design.md#one-off-chat-chart-artifacts), without creating a Playbook |
-| Thesis | The user's own investment view to research, publish, track, and update; platform research and Signals follow it. Publishing still needs an explicit request or accepted offer |
+| Thesis | The user's own investment view to research, publish, track, and update; platform research and Signals follow it. Publishing still needs the user's confirmation of its preview; a request or an accepted offer opens that preview |
 | Automation | Continuous refresh, history, reusable data, monitoring, alerts, or signals |
 | Agent Schedule | The Agent should resume reasoning later or repeatedly in the current Channel or an existing Session Inbox |
 | Playbook | A hosted or shareable dashboard, screener, report, or interactive app |
@@ -158,7 +158,7 @@ for "NVDA today" or "does the latest earnings report support this thesis?".
 | Discuss the user's own investment view, a pasted Thesis draft, or a quoted Thesis | Own view or draft: [Thesis discussion](references/thesis.md#thesis-discussion), respond first and offer a Thesis only when eligible. Quoted: [Quoted Thesis context](references/thesis.md#quoted-thesis-context), preserve the selected author version. Discussion does not authorize publication |
 | How a Thesis has performed, its current position, or how its return is computed | [Thesis return](references/thesis.md#thesis-return): read `thesis return` and explain with its definitions; never recompute the total |
 | A watchpoint's condition, a rebalance Alva proposed or published, or who decides rebalances | [Conditions and rebalances](references/thesis.md#conditions-and-rebalances): list the waiting proposals before answering one; never suggest `auto` or `yolo` unprompted |
-| Check an existing Thesis, new evidence, or follow an investment viewpoint | [Thesis tracking](references/thesis.md#thesis-tracking): use platform research and Signals; publishing a new viewpoint requires consent |
+| Check an existing Thesis, new evidence, or follow an investment viewpoint | [Thesis tracking](references/thesis.md#thesis-tracking): use platform research and Signals; a check changes no Thesis, and publishing a new viewpoint or an Update requires consent |
 | What's worth reading in For You, or discuss a recommended card | [For You](references/request-routing.md#for-you): read the relevant stream, preserve the card's version, and discuss within the retrieved scope |
 | Explicit Thesis publication, guided drafting, update, maintenance (including which Signals it shows), polishing, or a request to close or delete one | [thesis.md](references/thesis.md): Alva cannot close or delete a Thesis or Update; decline per [Closing or deleting](references/thesis.md#closing-or-deleting-a-thesis) and offer archive or a new Update; preserve selected original text and author claims, put your assessment and optional additions in Notes, draft only when needed, rewrite only when requested, resolve assets and directions, and after creation return the GET-backed `<thesis-preview>` |
 | Company analysis, earnings interpretation, move attribution, past-hour tracking, investor focus, or catalysts | Use the smallest sufficient source set; read [ticker-read.md](references/ticker-read.md) before source selection. Start with `alva/company-anomaly-read` for intraday/hourly tracking, not a simple latest-price lookup |
@@ -167,7 +167,7 @@ for "NVDA today" or "does the latest earnings report support this thesis?".
 | Track, continuously evaluate, refresh, or alert beyond platform Thesis tracking | Read [alva-knowledge.md](references/alva-knowledge.md) when designing or changing automation reasoning, history, or notification logic, then [feed-lifecycle.md](references/feed-lifecycle.md) and [push-notifications.md](references/push-notifications.md). Apply the [Preferred Automation Setup Skills](references/request-routing.md#preferred-automation-setup-skills) when choosing a setup |
 | Ask this Agent to return later or recur | [agent-schedules.md](references/agent-schedules.md): prefer the current Channel's `PutSchedule` / `ListSchedules` / `ManageSchedule` tools when exposed; the reference covers CLI/Inbox targets and authorization |
 | Create an Agent that keeps its coding Session across runs | [durable-agent.md](references/durable-agent.md): one cwd, one saved `agent.js` using `runAlvaAgent`, launch through `alva run --entry-path` |
-| Dashboard, screener app, hosted report, or other shareable investing app | [playbook-creation.md](references/playbook-creation.md): reuse before a new build, live feeds, design, draft, lint, release, and screenshot |
+| Dashboard, screener app, hosted report, or other shareable investing app | [playbook-creation.md](references/playbook-creation.md): reuse before a new build, live feeds, design, draft, lint, and release |
 | Add tickers to or remove them from the watchlist, or follow or unfollow people | [Watchlist and people follows](references/request-routing.md#watchlist-and-people-follows): act only on the user's request, write every requested ticker in one call, and report changed, unchanged, and unresolved items |
 | Manage an existing Automation, Playbook, alert, or subscription | [request-routing.md](references/request-routing.md#existing-resource-management): identify the existing resource, change only the requested state, and verify it |
 | Backtest, portfolio simulation, signal, rebalance, or execute an order | [altra-trading.md](references/altra-trading.md) (`@alva/altra2`); also [api/trading.md](references/api/trading.md) or [api/broker.md](references/api/broker.md) for execution. Read [altra-v1-legacy.md](references/altra-v1-legacy.md) only to maintain an existing v1 `FeedAltra` script; never for a new strategy |
@@ -227,9 +227,9 @@ Exceptions are in [Company Page Links](references/user-facing-prose.md#company-p
   visibility, alert binding, and delivery path match the goal. A setup run
   alone does not complete an Automation.
 - **Playbook:** Live browser data reads declared feeds; an explicitly requested
-  static snapshot uses sourced, dated values. README, lint, release, and
-  screenshot verification are complete. Return the canonical share URL, or
-  stop at draft when explicitly requested.
+  static snapshot uses sourced, dated values. README, lint, and release are
+  complete. Return the canonical share URL, or stop at draft when explicitly
+  requested.
 - **Strategy and trading:** Altra results pass bias checks. Live execution
   requires dry-run validation, the applicable consent, and final-state checks.
 

@@ -41,7 +41,7 @@ source/as-of time, mark user-supplied values as user-provided, and never claim
 to be live, official, or automatically refreshed.
 
 Verification claims must reflect real tool calls. Do not say a dashboard looks
-good unless you actually rendered or screenshotted it. Copy `published_url`,
+good unless you actually saw it rendered. Copy `published_url`,
 `feed_id`, job ids, and ALFS paths verbatim from tool responses.
 
 ## Prohibited Sources

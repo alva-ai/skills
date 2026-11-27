@@ -44,8 +44,7 @@ npm install -g @alva-ai/toolkit@latest
 When this skill is running in a PI/jagent-style agent environment with an
 `alva` model tool plus ALFS-native `read`/`write`/`edit` tools, use those tools
 for file preparation. Do not route through local-file upload flags such as
-`alva fs write --file`, `alva run --local-file`, `--params-schema-file`, or
-screenshot `--out`.
+`alva fs write --file`, `alva run --local-file`, or `--params-schema-file`.
 
 In that mode, prepare or edit content directly in ALFS, then call Alva commands
 with ALFS paths or inline JSON/data:
