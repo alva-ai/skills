@@ -119,9 +119,10 @@ A push is set up only after all of these succeed:
    explain the benefit and offer one `send_prompt` action to enable the named
    Automation's alert. If already correct, do not re-enable it. To select the
    default personal destination, omit `--channel-id` with
-   `alva alert enable --automation <owner>/<feed>` or `alva alert enable --automation-ids
-   <id,id>`. For the current Alva topic channel, pass `--channel-id <current_channel_id>`
-   with either `alva alert enable --automation <owner>/<feed> --channel-id <current_channel_id>`
+   `alva alert enable --automation <owner>/<feed>` or
+   `alva alert enable --automation-ids <id,id>`. For the current Alva topic
+   channel, pass `--channel-id <current_channel_id>` with either
+   `alva alert enable --automation <owner>/<feed> --channel-id <current_channel_id>`
    or `alva alert enable --automation-ids <id,id> --channel-id <current_channel_id>`;
    never omit `--channel-id` and silently fall back to the default personal destination.
 
