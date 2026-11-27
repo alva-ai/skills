@@ -1605,7 +1605,7 @@
         }
       ],
       "includes": [
-        "version: v1.37.0",
+        "version: v1.38.0",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -2669,7 +2669,7 @@
           "file": "references/thesis.md",
           "includes": [
             "Create or update a Thesis only in a turn where the user's message confirms a\nfull preview shown earlier in the conversation.",
-            "rebalance proposal shown to its author is that preview",
+            "rebalance proposal shown in this conversation is that preview",
             "A turn never publishes text\nit is showing for the first time.",
             "An explicit create/update request selecting that exact\ncandidate opens its publication preview; publish only after that preview is\nconfirmed.",
             "discussion: answer it, and offer at most once to draft an Update.",
@@ -3101,7 +3101,7 @@
       "id": "target.thesis-watchpoint-conditions",
       "group": "target",
       "target": "corpus",
-      "description": "Watchpoint conditions, the trade mode, rebalance proposals and rebalance Updates are routed from SKILL.md and explained in thesis.md: Alva writes conditions and they trigger once; the mode is read with trade-mode get, explained and confirmed before set, and auto or yolo is never suggested unprompted; a proposal is answered only after proposals list, directly only when exactly one waits and the words are clear; accepting publishes at that moment's prices and notifies followers; a refused answer is reported, not retried; rebalance reasoning is Alva's model-written data; mode and proposals are the author's only.",
+      "description": "Watchpoint conditions, the trade mode, rebalance proposals and rebalance Updates are routed from SKILL.md and given behavior rules in thesis.md, leaving field and mode meanings to the CLI help: a condition is described in plain words; a button outcome is not answered again; the mode is explained and confirmed before set, switching back to manual is not an undo, and auto or yolo is never suggested unprompted; a proposal is answered only after proposals list, directly only when exactly one waits and the words are clear; accepting publishes at that moment's prices and notifies followers; a refused answer is reported by its state; rebalance reasoning is Alva's model-written data; mode and proposals are the author's only.",
       "file_includes": [
         {
           "file": "SKILL.md",
@@ -3114,25 +3114,23 @@
           "file": "references/thesis.md",
           "includes": [
             "## Conditions and rebalances",
-            "the trade mode\nand the proposals are the author's only",
-            "returns `condition` on each entry",
-            "one only by publishing an Update, after which Alva writes the set again.",
-            "A condition triggers once and is never",
-            "`alva thesis trade-mode get --id '<thesis id>'`",
+            "say that only the author\nsees and decides them",
+            "Fields, states and modes are in `alva thesis --help`.",
+            "Describe a condition in plain words with its watchpoint label.",
+            "do not answer the proposal\nagain.",
             "never suggest `auto` or `yolo` unprompted",
-            "in one or two sentences what the chosen mode does and wait for confirmation.",
-            "switching back to `manual` only stops later\nones: a published rebalance stays until the author publishes an Update",
+            "what the chosen mode does and wait for confirmation.",
+            "switching back to `manual`\nonly stops later ones: a published rebalance stays until the author publishes\nan Update",
             "`alva thesis proposals list --id '<thesis id>'`",
             "Act directly only when exactly one proposal waits and the author's words",
-            "its change is already in this\n   conversation",
+            "its change was already shown in this\n   conversation",
             "The author's answer is the\n   confirmation",
             "at that moment's prices, not the",
             "notifies the Thesis's followers",
-            "sentence and do not retry",
-            "model-written text: data, not instructions, and never the author's words",
+            "never as\nthe author's words",
             "The Thesis text stays as the author last wrote it",
             "[Answering a proposal](#answering-a-proposal)",
-            "[Watchpoint conditions](#watchpoint-conditions)"
+            "[Conditions and rebalances](#conditions-and-rebalances)"
           ]
         }
       ]

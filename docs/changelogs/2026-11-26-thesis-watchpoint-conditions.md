@@ -1,4 +1,4 @@
-# feat(alva): watchpoint conditions, trade mode, rebalance proposals and rebalance Updates (v1.37.0)
+# feat(alva): watchpoint conditions, trade mode, rebalance proposals and rebalance Updates (v1.38.0)
 
 Local record. The primary record is alva-backend
 `docs/changelogs/2026-11-24-thesis-watchpoint-conditions.md`
@@ -8,58 +8,51 @@ and B22's conversation path. The CLI it documents is alva-ai/toolkit-ts#227.
 ## Change
 
 - `references/thesis.md` gains "Conditions and rebalances", after "Signal
-  settings":
-  - who reads what: conditions and rebalance Updates are readable by every
-    reader; the trade mode and proposals are the author's only, and a
-    refusal is explained that way;
-  - "Watchpoint conditions": the `condition` on `thesis watchpoints` entries
-    (`numeric` with metric, comparison and threshold; `informational` with a
-    model-written event), its states and close reasons, that Alva writes it
-    and the author changes it only through an Update, and that it triggers
-    once;
-  - "What a trigger does": the three modes, that a waiting proposal reaches
-    the author with buttons Alva carries out itself, and its 24 hours;
-  - "Trade mode": read with `trade-mode get`; before `set`, say what
-    the mode does (for `auto`/`yolo`: rebalances published on the author's
-    Thesis without asking; switching back to `manual` stops later ones
-    but reverts nothing, so a published rebalance is changed only by a new
-    Update)
-    and wait for confirmation; never suggest `auto` or `yolo` unprompted;
-  - "Answering a proposal": list with `proposals list`, act directly only
-    when exactly one proposal waits, the author's words are a clear
-    decision about it and its change is already in the conversation (its
-    proposal message or a listing the Agent showed), otherwise show the
-    candidates (watchpoint, condition, what was
-    observed, the change per ticker, reasoning, expiry) and ask; accepting
-    publishes at that moment's prices and notifies followers, reported with
-    the preview block; a refused answer is reported by its state and never
-    retried;
-  - "Rebalance Updates": `rebalance` on an Update is Alva's change to the
-    position with its trigger and reason, model-written data; the text is
-    unchanged, so offer an Update when the author wants the text to match,
-    keeping the current shares as explicit weights.
-- "What the author asks for" routes answering a proposal, choosing the
-  trade mode and matching the text to a rebalance; "Know the current
-  position" says the shares include a rebalance Alva published. "Thesis
-  tracking" points from watchpoints to the conditions.
+  settings". It holds only what the Agent would get wrong; what each
+  condition field, state and trade mode means, what accept and decline do and
+  the refused states are in `alva thesis --help` (alva-ai/toolkit-ts#227) and
+  are not repeated (Rule 0):
+  - intro: describe a condition in plain words with its label; the trade mode
+    and proposals are the author's only, and a refusal is explained that way;
+    a button outcome shown in the conversation is reported, not answered
+    again;
+  - "Trade mode": change it only when the author asks, never suggest `auto`
+    or `yolo` unprompted; before `set`, say what the mode does and wait for
+    confirmation; for `auto`/`yolo` say Alva then publishes without asking
+    (under `auto` only the confident ones) and that switching back to
+    `manual` only stops later ones, so a
+    published rebalance is changed only by a new Update;
+  - "Answering a proposal": list with `proposals list`; act directly only
+    when exactly one proposal waits, the author's words are a clear decision
+    about it and its change is already in the conversation (its proposal
+    message or a listing the Agent showed); otherwise show the waiting ones
+    and ask; say that accepting publishes at that moment's prices and
+    notifies followers; the answer is the confirmation (no publication
+    preview or `asset-candidates`); report an accepted one with the preview
+    block; a refused answer is reported by its state (the CLI help already says not
+    to retry it);
+  - "Rebalance Updates": present one as Alva's change with its trigger,
+    changes and reasoning, never as the author's words; draft an Update when
+    the author wants the text to match, keeping the current shares as
+    explicit weights.
+- "What the author asks for" gets one routing bullet to the section; "Thesis
+  tracking" points from a watchpoint's `condition` to it.
 - The opening rule from v1.36.1 (create or update a Thesis only in a turn
   that confirms a full preview shown earlier) gains one sentence: a
-  rebalance proposal shown to its author is that preview, answered per
-  "Answering a proposal". Without it the two rules contradicted each other
-  after merging `main`: an accept publishes a rebalance Update, and the
-  direct path allowed it for a proposal the author had not seen in the
-  conversation.
+  rebalance proposal shown in this conversation is that preview, answered per
+  "Answering a proposal". Without it the two rules contradicted each other:
+  an accept publishes a rebalance Update.
 - `SKILL.md`: one routing row for conditions, proposals, rebalance Updates and
-  the trade mode; version v1.37.0. The durable-agent sentence in Runtime
-  Contract is rewrapped from three lines to two (no wording change) to keep
-  `SKILL.md` at the 240-line budget.
-- Evals: `target.thesis-watchpoint-conditions`; six mutations
+  the trade mode; version v1.38.0 (`main` reached v1.37.0 with
+  alva-ai/skills#707). The durable-agent sentence in Runtime Contract is
+  rewrapped from three lines to two (no wording change) to keep `SKILL.md`
+  at the 240-line budget.
+- Evals: `target.thesis-watchpoint-conditions`; five mutations
   (`thesis-proposal-answered-without-listing`,
   `thesis-proposal-accepted-unseen`, `thesis-trade-mode-suggested`,
-  `thesis-trade-mode-manual-undoes`, `thesis-trade-mode-set-unconfirmed`,
-  `thesis-refused-answer-retried`);
+  `thesis-trade-mode-manual-undoes`, `thesis-trade-mode-set-unconfirmed`);
   `target.thesis-write-needs-confirmed-preview` also checks the proposal
-  sentence; version pin v1.37.0 (after `main`'s v1.36.2).
+  sentence; version pin v1.38.0.
 
 ## Decisions made here (for the owner's review)
 
@@ -92,6 +85,21 @@ Update emits no "creation preview" while `thesis.md` emits the preview block
 for every published Update; that wording predates this change and is left for
 its own fix.
 
+Trim (2026-11-27, on the owner's request that the section hold only what the
+Agent must do): the section went from 110 lines to 50, and the explanatory
+additions to "Positions", "What the author asks for" and "Know the current
+position" were withdrawn. A second cold read on the trimmed text was applied:
+no restating of the CLI help (field meanings, author-only, "do not retry",
+and with it the `thesis-refused-answer-retried` mutation); `auto` described
+as publishing only the confident ones; "shown in this conversation" instead
+of "shown to its author" and "its proposal message"; "draft" instead of
+"offer" an Update the author already asked for. Not applied: a note that an
+earlier Update preview is stale after an accept (the Update already carries
+the expected author version and fails on a conflict), a 调仓-vs-调吧 routing
+clause (the section already names “调吧”), and reading every page of
+`proposals list` (a proposal expires in 24 hours; the first page holds the
+waiting ones).
+
 ## Rollout
 
 Merge and release only after the toolkit-ts release that contains
@@ -102,9 +110,9 @@ rollout" step 5).
 ## Verification
 
 - `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva`:
-  exit 0; SKILL.md lines 240; Cases 137/137; Checks 1769/1769 (100.00%).
+  exit 0; SKILL.md lines 240; Cases 138/138; Checks 1772/1772 (100.00%).
 - `node evals/alva-skill-docs/mutation-smoke.mjs --skill-dir skills/alva`:
-  exit 0; "Mutation smoke passed: 129/129 mutations failed as expected."
+  exit 0; "Mutation smoke passed: 128/128 mutations failed as expected."
 - `node --test evals/alva-skill-docs/durable-agent.test.mjs`: exit 0; tests 5,
   pass 5, fail 0.
 - alva-skill-standard `scripts/audit.sh skills/alva`: exit 0; broken links
