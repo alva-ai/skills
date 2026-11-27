@@ -7,7 +7,7 @@ description: >-
   explicit Thesis publication or maintenance, and requested Thesis rewriting.
 metadata:
   author: alva
-  version: v1.36.2
+  version: v1.37.0
 ---
 
 # Alva
@@ -172,7 +172,7 @@ for "NVDA today" or "does the latest earnings report support this thesis?".
 | Backtest, portfolio simulation, signal, rebalance, or execute an order | [altra-trading.md](references/altra-trading.md) (`@alva/altra2`); also [api/trading.md](references/api/trading.md) or [api/broker.md](references/api/broker.md) for execution. Read [altra-v1-legacy.md](references/altra-v1-legacy.md) only to maintain an existing v1 `FeedAltra` script; never for a new strategy |
 | `/use-skill:<username>/<name>`, a named method, or template-like research | [request-routing.md](references/request-routing.md#skillhub-blueprint): read or reuse the current blueprint, choose the requested deliverable, and set `--skill-id` for a resulting Playbook |
 | Remix, annotation, or an existing Playbook change | [remix-workflow.md](references/remix-workflow.md) or [annotation-edits.md](references/annotation-edits.md): preserve lineage and edit the generator |
-| Use or save a private personal method in an owner DM or Topic | [Personal skills](references/personal-skills.md) |
+| Use or save a private personal method in an owner DM or Topic | [personal-skills.md](references/personal-skills.md) |
 | Remember, forget, inspect, or correct user context | [memory.md](references/memory.md): reuse supplied context, respect global/channel scope, read before writing, and honor corrections |
 | What can Alva do, or does it support a capability? | [request-routing.md](references/request-routing.md): capability help and current-catalog verification |
 
