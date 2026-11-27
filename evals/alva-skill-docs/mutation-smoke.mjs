@@ -187,10 +187,11 @@ const MUTATIONS = [
     expectFailedCases: ["target.thesis-write-card-preview"],
   },
   {
-    id: "thesis-task-result-without-preview",
+    id: "thesis-task-result-reintroduces-task-writes",
     file: "references/thesis.md",
-    remove: "In a background task, the task's final result must contain the block for\n  every Thesis the task created or updated",
-    replacement: "In a background task, the task's final result may summarize each Thesis\n  the task created or updated",
+    remove: "Put each block on lines of its own after the sentence that reports the\n  result",
+    replacement:
+      "Put each block on lines of its own after the sentence that reports the\n  result\n- In a background task, the task's final result must contain the block for\n  every Thesis the task created or updated",
     expectFailedCases: ["target.thesis-write-card-preview"],
   },
   {
@@ -242,7 +243,7 @@ const MUTATIONS = [
   {
     id: "ticker-next-step-drops-follow-up-question",
     file: "references/ticker-read.md",
-    remove: "3. **Follow-up question.** Otherwise",
+    remove: "3. **Follow-up question (optional).** Otherwise",
     replacement: "3. **No suggestion.** Otherwise",
     expectFailedCases: ["platform-data.ticker-read-trade-setup-follow-up"],
   },
@@ -263,7 +264,7 @@ const MUTATIONS = [
   {
     id: "ticker-next-step-setup-ask-optional",
     file: "references/ticker-read.md",
-    remove: "For a setup-like ask, the answer is incomplete without this\n   offer.",
+    remove: "For a setup-like ask, the\n   answer is incomplete without this offer.",
     replacement: "For a setup-like ask, this offer is optional.",
     expectFailedCases: ["platform-data.ticker-read-trade-setup-follow-up"],
   },

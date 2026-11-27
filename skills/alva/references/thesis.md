@@ -593,9 +593,6 @@ updated Thesis must be reported with it:
 - Put each block on lines of its own after the sentence that reports the
   result, one block per Thesis, never inside a sentence, list item, quote, or
   code fence.
-- In a background task, the task's final result must contain the block for
-  every Thesis the task created or updated, in addition to the summary of
-  what it did. The main chat relays that block as written.
 - Only when the block cannot be emitted (incomplete GET data), put
   `[short label](https://alva.ai/thesis/<response.thesis.id>)` on a line of
   its own instead, with no query parameters.

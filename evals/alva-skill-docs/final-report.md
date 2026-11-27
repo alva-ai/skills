@@ -6,7 +6,7 @@ SKILL.md lines: 240
 
 Cases: 137/137
 
-Checks: 1751/1751 (100.00%)
+Checks: 1754/1754 (100.00%)
 
 ## Scoring Diagnosis
 
@@ -19,7 +19,7 @@ No failed cases. Keep the eval in place as a regression mechanism.
 
 ## target
 
-56/56 cases, 903/903 checks
+56/56 cases, 904/904 checks
 
 ### PASS target.personal-skill-files
 
@@ -83,12 +83,11 @@ links, so every link is its own Markdown paragraph.
 
 ### PASS target.thesis-write-card-preview
 
-Every created or updated Thesis, including one from a background task, is reported with the thesis-preview block on lines of its own, falling back to a standalone link without query parameters, and never only as a link inside a sentence.
+Every created or updated Thesis in the main chat is reported with the thesis-preview block on lines of its own, falling back to a standalone link without query parameters, and never only as a link inside a sentence.
 
+- [x] excludes every Thesis the task created or updated
 - [x] references/thesis.md includes A published Update ends the same way: after `update` succeeds, read it with
 `thesis get` and emit this block for the new `author_version_id`.
-- [x] references/thesis.md includes In a background task, the task's final result must contain the block for
-  every Thesis the task created or updated
 - [x] references/thesis.md includes Put each block on lines of its own after the sentence that reports the
   result
 - [x] references/thesis.md includes Never report a created or updated Thesis only as a link inside a sentence
@@ -276,8 +275,10 @@ Complex financial asks classify the problem type and apply source, methodology, 
 - [x] current multiple/FCF/EPS
 - [x] multiple/earnings sensitivity
 - [x] impact of missing evidence
-- [x] required calculation not done caps at B-/C
-- [x] hard cap
+- [x] do not present a high-confidence quantitative
+verdict when a required calculation has not been done
+- [x] cap confidence accordingly
+- [x] excludes caps at B-/C
 
 ### PASS target.no-generic-investment-disclaimer
 
@@ -319,7 +320,7 @@ Operational constraints apply before first use and remain reusable within the se
 
 Latest mainline Alva skill updates remain integrated after rebasing the refactor.
 
-- [x] version: v1.37.0
+- [x] version: v1.37.1
 - [x] Capability Help
 - [x] feedback
 - [x] api/feedback.md
@@ -1726,12 +1727,12 @@ Named-ticker narrative and earnings questions route through one compact Markets 
 
 ### PASS platform-data.ticker-read-trade-setup-follow-up
 
-A named single-instrument ticker read always offers one next step, chosen in order: a Thesis for the user's own view, Trade Setup for setup-like asks or concrete levels, otherwise a specific follow-up question; declined kinds are not repeated, and accepting Trade Setup routes through the official setup skill.
+A named single-instrument ticker read picks a fitting next step in order: a Thesis for the user's own view, Trade Setup for explicit setup-like asks, or an optional specific follow-up question when it moves discussion forward; unasked levels in an analysis do not self-trigger Trade Setup, declined kinds are not repeated, and accepting Trade Setup routes through the official setup skill.
 
-- [x] post-answer pointer and order: references/request-routing.md#Useful Next Step After Ask includes always offer one next step in the order set by [Next step after a ticker read]
+- [x] post-answer pointer and order: references/request-routing.md#Useful Next Step After Ask includes choose the next step in the order set by [Next step after a ticker read]
 - [x] post-answer pointer and order: references/request-routing.md#Useful Next Step After Ask includes ticker-read.md#next-step-after-a-ticker-read
 - [x] post-answer pointer and order: references/request-routing.md#Useful Next Step After Ask includes Preferred Automation Setup Skills
-- [x] ticker-read next-step rule: references/ticker-read.md#Next step after a ticker read includes always offer one next step after the normal answer
+- [x] ticker-read next-step rule: references/ticker-read.md#Next step after a ticker read includes offer one fitting next step after the normal answer
 - [x] ticker-read next-step rule: references/ticker-read.md#Next step after a ticker read includes simple fact lookups, broad multi-ticker discovery, portfolio monitoring
 - [x] ticker-read next-step rule: references/ticker-read.md#Next step after a ticker read includes Pick the first that fits
 - [x] ticker-read next-step rule: references/ticker-read.md#Next step after a ticker read includes 1. **Thesis.** The user has voiced a view of their own on the instrument or
@@ -1739,11 +1740,12 @@ A named single-instrument ticker read always offers one next step, chosen in ord
 - [x] ticker-read next-step rule: references/ticker-read.md#Next step after a ticker read includes or to check or update the existing one
 - [x] ticker-read next-step rule: references/ticker-read.md#Next step after a ticker read includes is usually the most valuable step for
    them, so prefer it whenever it fits
-- [x] ticker-read next-step rule: references/ticker-read.md#Next step after a ticker read includes 2. **Trade Setup.** The user asked a setup-like question
+- [x] ticker-read next-step rule: references/ticker-read.md#Next step after a ticker read includes 2. **Trade Setup.** The user explicitly asked a setup-like question
 - [x] ticker-read next-step rule: references/ticker-read.md#Next step after a ticker read includes can I go
-- [x] ticker-read next-step rule: references/ticker-read.md#Next step after a ticker read includes or the answer gives concrete price levels
 - [x] ticker-read next-step rule: references/ticker-read.md#Next step after a ticker read includes the answer is incomplete without this
-- [x] ticker-read next-step rule: references/ticker-read.md#Next step after a ticker read includes 3. **Follow-up question.** Otherwise, ask one specific question
+- [x] ticker-read next-step rule: references/ticker-read.md#Next step after a ticker read includes Do not trigger this offer merely
+   because an analysis answer mentioned support/resistance levels unasked
+- [x] ticker-read next-step rule: references/ticker-read.md#Next step after a ticker read includes 3. **Follow-up question (optional).**
 - [x] ticker-read next-step rule: references/ticker-read.md#Next step after a ticker read includes Offer it in the form set by [Useful Next Step After Ask]
 - [x] ticker-read next-step rule: references/ticker-read.md#Next step after a ticker read includes If the user declined that kind of offer earlier, pick the next that fits
 - [x] own view prefers Thesis: references/request-routing.md#Useful Next Step After Ask includes When they already have a
@@ -1884,7 +1886,7 @@ Push setup is evaluated as a full delivery path instead of a single publisher fl
 
 ## subscriptions
 
-1/1 cases, 28/28 checks
+1/1 cases, 30/30 checks
 
 ### PASS subscriptions.delivery-destination
 
@@ -1894,8 +1896,10 @@ The skill models concurrent Alva and email destinations, distinguishes the defau
 - [x] excludes alva alert group
 - [x] excludes group-subscriptions
 - [x] excludes active_channel
+- [x] excludes has no destination flag
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes Default personal destination
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes Alva topic channel
+- [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes --automation <owner>/<feed> --channel-id <channel_id>
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes --automation-ids <id,id> --channel-id <channel_id>
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes <session-prefill-channel-memory channel-id="…">
 - [x] alert destination: references/push-notifications.md#Choose The Delivery Destination includes a non-`alva` slug denotes a topic channel
