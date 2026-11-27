@@ -118,6 +118,13 @@ const MUTATIONS = [
     expectFailedCases: ["target.thesis-watchpoint-conditions"],
   },
   {
+    id: "thesis-proposal-accepted-unseen",
+    file: "references/thesis.md",
+    remove: "about it, and its change is already in this\n   conversation (its proposal message or a listing you showed):",
+    replacement: "about it:",
+    expectFailedCases: ["target.thesis-watchpoint-conditions"],
+  },
+  {
     id: "thesis-trade-mode-suggested",
     file: "references/thesis.md",
     remove: "never suggest `auto` or `yolo` unprompted",

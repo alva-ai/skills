@@ -14,7 +14,9 @@ Create or update a Thesis only in a turn where the user's message confirms a
 full preview shown earlier in the conversation. A turn never publishes text
 it is showing for the first time. Asking about their Thesis, discussing new
 evidence, saying their view has changed, or mentioning a trade they made is
-discussion: answer it, and offer at most once to draft an Update.
+discussion: answer it, and offer at most once to draft an Update. A
+rebalance proposal shown to its author is that preview: answer it per
+[Answering a proposal](#answering-a-proposal).
 
 For that workflow, read the relevant subcommand help once per session before its
 first write, such as `alva thesis create --help`; reuse help already read and
@@ -761,7 +763,7 @@ a Signal hides it for the user alone.
 ## Conditions and rebalances
 
 A watchpoint can carry a condition at which the Thesis's position should
-change. When it triggers, Alva proposes a rebalance, and the Thesis's decision
+change. When it triggers, Alva proposes a rebalance, and the Thesis's trade
 mode settles whether Alva publishes it or asks the author. Anyone who can read
 the Thesis can read its conditions and its rebalance Updates; the trade mode
 and the proposals are the author's only. When `trade-mode` or `proposals` is
@@ -828,7 +830,9 @@ unclear, then:
 1. Read `alva thesis proposals list --id '<thesis id>'` and take the
    `waiting` entries.
 2. Act directly only when exactly one proposal waits and the author's words
-   are a clear decision: `alva thesis proposals accept --id '<thesis id>'
+   are a clear decision about it, and its change is already in this
+   conversation (its proposal message or a listing you showed):
+   `alva thesis proposals accept --id '<thesis id>'
    --proposal '<proposal id>'`, or `decline`. Otherwise show each waiting one:
    its watchpoint and condition, what was observed, the change per ticker with
    the preview's direction labels, such as “NVDA 无方向 → 看多 25%” / "NVDA No

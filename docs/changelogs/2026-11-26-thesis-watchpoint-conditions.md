@@ -24,8 +24,10 @@ and B22's conversation path. The CLI it documents is alva-ai/toolkit-ts#227.
     Thesis without asking, undone only by a new Update or switching back)
     and wait for confirmation; never suggest `auto` or `yolo` unprompted;
   - "Answering a proposal": list with `proposals list`, act directly only
-    when exactly one proposal waits and the author's words are a clear
-    decision, otherwise show the candidates (watchpoint, condition, what was
+    when exactly one proposal waits, the author's words are a clear
+    decision about it and its change is already in the conversation (its
+    proposal message or a listing the Agent showed), otherwise show the
+    candidates (watchpoint, condition, what was
     observed, the change per ticker, reasoning, expiry) and ask; accepting
     publishes at that moment's prices and notifies followers, reported with
     the preview block; a refused answer is reported by its state and never
@@ -38,14 +40,23 @@ and B22's conversation path. The CLI it documents is alva-ai/toolkit-ts#227.
   trade mode and matching the text to a rebalance; "Know the current
   position" says the shares include a rebalance Alva published. "Thesis
   tracking" points from watchpoints to the conditions.
+- The opening rule from v1.36.1 (create or update a Thesis only in a turn
+  that confirms a full preview shown earlier) gains one sentence: a
+  rebalance proposal shown to its author is that preview, answered per
+  "Answering a proposal". Without it the two rules contradicted each other
+  after merging `main`: an accept publishes a rebalance Update, and the
+  direct path allowed it for a proposal the author had not seen in the
+  conversation.
 - `SKILL.md`: one routing row for conditions, proposals, rebalance Updates and
   the trade mode; version v1.37.0. The durable-agent sentence in Runtime
   Contract is rewrapped from three lines to two (no wording change) to keep
   `SKILL.md` at the 240-line budget.
-- Evals: `target.thesis-watchpoint-conditions`; four mutations
+- Evals: `target.thesis-watchpoint-conditions`; five mutations
   (`thesis-proposal-answered-without-listing`,
-  `thesis-trade-mode-suggested`, `thesis-trade-mode-set-unconfirmed`,
-  `thesis-refused-answer-retried`); version pin v1.37.0.
+  `thesis-proposal-accepted-unseen`, `thesis-trade-mode-suggested`,
+  `thesis-trade-mode-set-unconfirmed`, `thesis-refused-answer-retried`);
+  `target.thesis-write-needs-confirmed-preview` also checks the proposal
+  sentence; version pin v1.37.0 (after `main`'s v1.36.2).
 
 ## Decisions made here (for the owner's review)
 
@@ -88,9 +99,9 @@ rollout" step 5).
 ## Verification
 
 - `node evals/alva-skill-docs/skill-doc-eval.mjs --skill-dir skills/alva`:
-  exit 0; SKILL.md lines 240; Cases 136/136; Checks 1762/1762 (100.00%).
+  exit 0; SKILL.md lines 240; Cases 137/137; Checks 1769/1769 (100.00%).
 - `node evals/alva-skill-docs/mutation-smoke.mjs --skill-dir skills/alva`:
-  exit 0; "Mutation smoke passed: 119/119 mutations failed as expected."
+  exit 0; "Mutation smoke passed: 128/128 mutations failed as expected."
 - `node --test evals/alva-skill-docs/durable-agent.test.mjs`: exit 0; tests 5,
   pass 5, fail 0.
 - alva-skill-standard `scripts/audit.sh skills/alva`: exit 0; broken links

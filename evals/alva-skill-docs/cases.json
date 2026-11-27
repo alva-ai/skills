@@ -2659,6 +2659,7 @@
           "file": "references/thesis.md",
           "includes": [
             "Create or update a Thesis only in a turn where the user's message confirms a\nfull preview shown earlier in the conversation.",
+            "rebalance proposal shown to its author is that preview",
             "A turn never publishes text\nit is showing for the first time.",
             "An explicit create/update request selecting that exact\ncandidate opens its publication preview; publish only after that preview is\nconfirmed.",
             "discussion: answer it, and offer at most once to draft an Update.",
@@ -3113,6 +3114,7 @@
             "the only undo is",
             "`alva thesis proposals list --id '<thesis id>'`",
             "Act directly only when exactly one proposal waits and the author's words",
+            "its change is already in this\n   conversation",
             "The author's answer is the\n   confirmation",
             "at that moment's prices, not the",
             "notifies the Thesis's followers",
