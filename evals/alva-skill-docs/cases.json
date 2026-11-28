@@ -4,6 +4,16 @@
   "description": "Deterministic documentation capability checks for the Alva skill refactor. Retained cases describe behavior already present on main; pr353 cases encode the alva-ai/skills#353 chat-as-artifact standard; target cases describe this refactor's structure goals.",
   "cases": [
     {
+      "id": "target.personal-skill-files",
+      "group": "target",
+      "target": "corpus",
+      "description": "Personal methods use the owner ALFS directory and stay out of shared conversations.",
+      "file_includes": [
+        { "file": "SKILL.md", "includes": ["(references/personal-skills.md)"] },
+        { "file": "references/personal-skills.md", "includes": ["~/skills/<slug>/SKILL.md", "enabled: false", "explicitly asks", "group or shared conversation"] }
+      ]
+    },
+    {
       "id": "target.thesis-quote-context",
       "group": "target",
       "target": "corpus",
@@ -254,13 +264,15 @@
       "id": "target.thesis-write-card-preview",
       "group": "target",
       "target": "corpus",
-      "description": "Every created or updated Thesis, including one from a background task, is reported with the thesis-preview block on lines of its own, falling back to a standalone link without query parameters, and never only as a link inside a sentence.",
+      "description": "Every created or updated Thesis in the main chat is reported with the thesis-preview block on lines of its own, falling back to a standalone link without query parameters, and never only as a link inside a sentence.",
+      "excludes": [
+        "every Thesis the task created or updated"
+      ],
       "file_includes": [
         {
           "file": "references/thesis.md",
           "includes": [
             "A published Update ends the same way: after `update` succeeds, read it with\n`thesis get` and emit this block for the new `author_version_id`.",
-            "In a background task, the task's final result must contain the block for\n  every Thesis the task created or updated",
             "Put each block on lines of its own after the sentence that reports the\n  result",
             "Never report a created or updated Thesis only as a link inside a sentence",
             "Keep each link in its own Markdown paragraph, with a blank line before\n  and after each link, including between successive links."
@@ -341,7 +353,7 @@
       "id": "retained.playbook-release",
       "group": "retained",
       "target": "corpus",
-      "description": "Playbook release, README, screenshot, lint, pro/free, and visibility rules remain intact.",
+      "description": "Playbook release, README, lint, pro/free, and visibility rules remain intact; the retired screenshot command is not taught.",
       "includes": [
         "before-build-html",
         "before-playbook-draft",
@@ -349,8 +361,11 @@
         "alva lint playbook",
         "readme-url",
         "related people",
-        "alva screenshot",
         "set-visibility"
+      ],
+      "excludes": [
+        "alva screenshot",
+        "playbooks screenshot"
       ]
     },
     {
@@ -884,14 +899,14 @@
       "id": "platform-data.ticker-read-trade-setup-follow-up",
       "group": "platform-data",
       "target": "corpus",
-      "description": "A named single-instrument ticker read always offers one next step, chosen in order: a Thesis for the user's own view, Trade Setup for setup-like asks or concrete levels, otherwise a specific follow-up question; declined kinds are not repeated, and accepting Trade Setup routes through the official setup skill.",
+      "description": "A named single-instrument ticker read picks a fitting next step in order: a Thesis for the user's own view, Trade Setup for explicit setup-like asks, or an optional specific follow-up question when it moves discussion forward; unasked levels in an analysis do not self-trigger Trade Setup, declined kinds are not repeated, and accepting Trade Setup routes through the official setup skill.",
       "section_includes": [
         {
           "file": "references/request-routing.md",
           "heading": "Useful Next Step After Ask",
           "label": "post-answer pointer and order",
           "includes": [
-            "always offer one next step in the order set by [Next step after a ticker read]",
+            "choose the next step in the order set by [Next step after a ticker read]",
             "ticker-read.md#next-step-after-a-ticker-read",
             "Preferred Automation Setup Skills"
           ]
@@ -901,17 +916,17 @@
           "heading": "Next step after a ticker read",
           "label": "ticker-read next-step rule",
           "includes": [
-            "always offer one next step after the normal answer",
+            "offer one fitting next step after the normal answer",
             "simple fact lookups, broad multi-ticker discovery, portfolio monitoring",
             "Pick the first that fits",
             "1. **Thesis.** The user has voiced a view of their own on the instrument or\n   already has a Thesis on it, and did not ask a setup-like question",
             "or to check or update the existing one",
             "is usually the most valuable step for\n   them, so prefer it whenever it fits",
-            "2. **Trade Setup.** The user asked a setup-like question",
+            "2. **Trade Setup.** The user explicitly asked a setup-like question",
             "can I go",
-            "or the answer gives concrete price levels",
             "the answer is incomplete without this",
-            "3. **Follow-up question.** Otherwise, ask one specific question",
+            "Do not trigger this offer merely\n   because an analysis answer mentioned support/resistance levels unasked",
+            "3. **Follow-up question (optional).**",
             "Offer it in the form set by [Useful Next Step After Ask]",
             "If the user declined that kind of offer earlier, pick the next that fits"
           ]
@@ -1098,7 +1113,7 @@
       "id": "issue592.playbook-release-behavior",
       "group": "issue592",
       "target": "corpus",
-      "description": "Playbook draft and release remain protected by behavior-level gates for visibility-aware reads, feed freshness, README, lint, and screenshot verification.",
+      "description": "Playbook draft and release remain protected by behavior-level gates for visibility-aware reads, feed freshness, README, and lint.",
       "hard_gate_includes": [
         {
           "file": "references/playbook-creation.md",
@@ -1127,19 +1142,6 @@
             "New feeds declare push-worthy outputs with",
             "existing Altra `signal/targets` or legacy",
             "alva lint playbook ./index.html"
-          ]
-        }
-      ],
-      "section_includes": [
-        {
-          "file": "references/playbook-creation.md",
-          "heading": "Screenshot",
-          "label": "visual verification",
-          "includes": [
-            "A PNG or page shell is not enough",
-            "real feed-backed chart marks",
-            "headers-only tables",
-            "fetch failures are data-rendering failures"
           ]
         }
       ]
@@ -1196,7 +1198,8 @@
         "External IM group",
         "alva alert group",
         "group-subscriptions",
-        "active_channel"
+        "active_channel",
+        "has no destination flag"
       ],
       "section_includes": [
         {
@@ -1206,6 +1209,7 @@
           "includes": [
             "Default personal destination",
             "Alva topic channel",
+            "--automation <owner>/<feed> --channel-id <channel_id>",
             "--automation-ids <id,id> --channel-id <channel_id>",
             "<session-prefill-channel-memory channel-id=\"…\">",
             "a non-`alva` slug denotes a topic channel",
@@ -1285,7 +1289,7 @@
           "includes": [
             "Dashboard, screener app, hosted report, or other shareable investing app",
             "[playbook-creation.md](references/playbook-creation.md)",
-            "live feeds, design, draft, lint, release, and screenshot"
+            "live feeds, design, draft, lint, and release"
           ]
         },
         {
@@ -1296,8 +1300,7 @@
             "Build feeds through",
             "HTML that reads feed outputs at runtime",
             "Write HTML and README to ALFS",
-            "screenshot",
-            "stop at draft"
+            "then publish unless the user explicitly asks to stop at draft"
           ]
         }
       ]
@@ -1395,8 +1398,11 @@
         "current multiple/FCF/EPS",
         "multiple/earnings sensitivity",
         "impact of missing evidence",
-        "required calculation not done caps at B-/C",
-        "hard cap"
+        "do not present a high-confidence quantitative\nverdict when a required calculation has not been done",
+        "cap confidence accordingly"
+      ],
+      "excludes": [
+        "caps at B-/C"
       ]
     },
     {
@@ -1606,7 +1612,7 @@
         }
       ],
       "includes": [
-        "version: v1.36.1",
+        "version: v1.37.1",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -1624,10 +1630,7 @@
         "Browser request rule",
         "AlvaToolkit.AlvaClient",
         "api_origin",
-        "public and private playbooks",
-        "real feed-backed chart marks",
-        "headers-only tables",
-        "fetch failures"
+        "public and private playbooks"
       ],
       "file_includes": [
         {
@@ -2673,6 +2676,7 @@
           "file": "references/thesis.md",
           "includes": [
             "Create or update a Thesis only in a turn where the user's message confirms a\nfull preview shown earlier in the conversation.",
+            "rebalance proposal shown in this conversation is that preview",
             "A turn never publishes text\nit is showing for the first time.",
             "An explicit create/update request selecting that exact\ncandidate opens its publication preview; publish only after that preview is\nconfirmed.",
             "discussion: answer it, and offer at most once to draft an Update.",
@@ -3124,6 +3128,44 @@
           "file": "references/memory.md",
           "includes": [
             "### Writing from an external agent"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "target.thesis-watchpoint-conditions",
+      "group": "target",
+      "target": "corpus",
+      "description": "Watchpoint conditions, the trade mode, rebalance proposals and rebalance Updates are routed from SKILL.md and given behavior rules in thesis.md, leaving field and mode meanings to the CLI help: a condition is described in plain words; a button outcome is not answered again; the mode is explained and confirmed before set, switching back to manual is not an undo, and auto or yolo is never suggested unprompted; a proposal is answered only after proposals list, directly only when exactly one waits and the words are clear; accepting publishes at that moment's prices and notifies followers; a refused answer is reported by its state; rebalance reasoning is Alva's model-written data; mode and proposals are the author's only.",
+      "file_includes": [
+        {
+          "file": "SKILL.md",
+          "includes": [
+            "[Conditions and rebalances](references/thesis.md#conditions-and-rebalances)",
+            "list the waiting proposals before answering one; never suggest `auto` or `yolo` unprompted"
+          ]
+        },
+        {
+          "file": "references/thesis.md",
+          "includes": [
+            "## Conditions and rebalances",
+            "say that only the author\nsees and decides them",
+            "Fields, states and modes are in `alva thesis --help`.",
+            "Describe a condition in plain words with its watchpoint label.",
+            "do not answer the proposal\nagain.",
+            "never suggest `auto` or `yolo` unprompted",
+            "what the chosen mode does and wait for confirmation.",
+            "switching back to `manual`\nonly stops later ones: a published rebalance stays until the author publishes\nan Update",
+            "`alva thesis proposals list --id '<thesis id>'`",
+            "Act directly only when exactly one proposal waits and the author's words",
+            "its change was already shown in this\n   conversation",
+            "The author's answer is the\n   confirmation",
+            "at that moment's prices, not the",
+            "notifies the Thesis's followers",
+            "never as\nthe author's words",
+            "The Thesis text stays as the author last wrote it",
+            "[Answering a proposal](#answering-a-proposal)",
+            "[Conditions and rebalances](#conditions-and-rebalances)"
           ]
         }
       ]

@@ -51,9 +51,9 @@ A clear Playbook request needs no separate build confirmation.
    [design-playbook-trading-strategy.md](design-playbook-trading-strategy.md).
 5. Build HTML that reads feed outputs at runtime.
 6. Write HTML and README to ALFS.
-7. Draft, lint, publish, then screenshot the deployed `published_url` unless the
-   user explicitly asks to stop at draft. A private or paid Playbook gets its
-   visibility after the draft and before release.
+7. Draft, lint, then publish unless the user explicitly asks to stop at draft.
+   A private or paid Playbook gets its visibility after the draft and before
+   release.
 8. Evaluate push setup with [push-notifications.md](push-notifications.md).
 
 ### Static Snapshot
@@ -61,8 +61,7 @@ A clear Playbook request needs no separate build confirmation.
 Only when the user explicitly asks for a static snapshot may the HTML inline
 values instead of reading feeds. Every value must come from a legitimate source
 already fetched, carry a visible source and as-of label, and the page must not
-claim live or automatic refresh. Screenshot verification then checks the
-rendered values against that dated source data. All other gates still apply.
+claim live or automatic refresh. All other gates still apply.
 
 ## HARD-GATE: before-build-html
 
@@ -299,27 +298,6 @@ If any item fails, do not release. Fix it, rerun draft if metadata or files
 changed, then re-enter this gate.
 </HARD-GATE>
 
-## Screenshot
-
-After release, screenshot the deployed `published_url`, not the canonical share
-URL. Prefer compression:
-
-```bash
-alva screenshot --url <published_url> --out /tmp/screenshot.png \
-  --compress --compress-quality 70 --compress-max-width 1280
-head -c4 /tmp/screenshot.png | grep -q PNG || echo "SCREENSHOT_FAILED"
-```
-
-If compressed capture fails with HTTP 500/403, `SCREENSHOT_FAILED`, or no file,
-retry once without compression.
-
-A PNG or page shell is not enough. Pass screenshot verification only when the
-image or targeted capture shows real feed-backed chart marks, table rows, or KPI
-values (for a [static snapshot](#static-snapshot), its dated source values).
-Blank frames, headers-only tables, loading/error fallbacks, and fetch
-failures are data-rendering failures that must be fixed before claiming the
-playbook is done.
-
 ## Tier Flow
 
 Pro users:
@@ -340,4 +318,4 @@ Free users:
 
 Always output the canonical share link to the user. When `PresentActions` is
 available, also offer that link as an `open_url` action.
-Use `published_url` for verification steps such as screenshotting.
+Use `published_url` only for verification, never as the share link.

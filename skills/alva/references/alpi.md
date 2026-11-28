@@ -84,7 +84,9 @@ platform provider credentials host-side. Do **not** hardcode a key.
 
 **Bring your own key (BYOK).** To bill an LLM call to your *own* provider
 account instead of Alva's, return your key from `getApiKey` — but **load it
-from secret-manager, never inline it in the script**:
+from secret-manager, never inline it in the script**. For user-facing Alva
+agents and scripts, only OpenAI models/keys are allowed — do not configure
+Claude models, Anthropic keys/SDKs, or relay routes:
 
 ```javascript
 const agent = new Agent({

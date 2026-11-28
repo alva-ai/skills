@@ -113,7 +113,7 @@
       "id": "scenario.dashboard-playbook-build",
       "group": "scenarios.playbook",
       "prompt": "Build and publish a live dashboard for BTC dominance breakouts.",
-      "description": "A hosted dashboard enters the Playbook Creation route and preserves feed-first, live-read, README, lint, release, and screenshot gates.",
+      "description": "A hosted dashboard enters the Playbook Creation route and preserves feed-first, live-read, README, lint, and release gates.",
       "expect": {
         "route": "Playbook Creation",
         "top_level_route": "Dashboard, screener app, hosted report, or other shareable investing app",
@@ -138,15 +138,6 @@
               "regenerate the README",
               "`~/playbooks/<name>/README.md`",
               "before release"
-            ]
-          },
-          {
-            "file": "references/playbook-creation.md",
-            "heading": "Screenshot",
-            "label": "visual verification",
-            "includes": [
-              "Pass screenshot verification only when",
-              "real feed-backed chart marks"
             ]
           }
         ],

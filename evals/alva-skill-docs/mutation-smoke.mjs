@@ -111,6 +111,41 @@ const MUTATIONS = [
     expectFailedCases: ["target.thesis-author-intent"],
   },
   {
+    id: "thesis-proposal-answered-without-listing",
+    file: "references/thesis.md",
+    remove: "Act directly only when exactly one proposal waits and the author's words",
+    replacement: "Accept or decline the newest proposal whatever the author's words",
+    expectFailedCases: ["target.thesis-watchpoint-conditions"],
+  },
+  {
+    id: "thesis-proposal-accepted-unseen",
+    file: "references/thesis.md",
+    remove: "about it, and its change was already shown in this\n   conversation: `proposals accept` or `decline`.",
+    replacement: "about it: `proposals accept` or `decline`.",
+    expectFailedCases: ["target.thesis-watchpoint-conditions"],
+  },
+  {
+    id: "thesis-trade-mode-suggested",
+    file: "references/thesis.md",
+    remove: "never suggest `auto` or `yolo`\nunprompted",
+    replacement: "suggest `auto` or `yolo` when it saves the author time",
+    expectFailedCases: ["target.thesis-watchpoint-conditions"],
+  },
+  {
+    id: "thesis-trade-mode-manual-undoes",
+    file: "references/thesis.md",
+    remove: "switching back to `manual`\nonly stops later ones: a published rebalance stays until the author publishes\nan Update with the positions they want.",
+    replacement: "switching back to `manual` undoes it.",
+    expectFailedCases: ["target.thesis-watchpoint-conditions"],
+  },
+  {
+    id: "thesis-trade-mode-set-unconfirmed",
+    file: "references/thesis.md",
+    remove: "what the chosen mode does and wait for confirmation.",
+    replacement: "set the mode the author named.",
+    expectFailedCases: ["target.thesis-watchpoint-conditions"],
+  },
+  {
     id: "thesis-close-archives-without-asking",
     file: "references/thesis.md",
     remove: "archive only after the author accepts",
@@ -187,10 +222,11 @@ const MUTATIONS = [
     expectFailedCases: ["target.thesis-write-card-preview"],
   },
   {
-    id: "thesis-task-result-without-preview",
+    id: "thesis-task-result-reintroduces-task-writes",
     file: "references/thesis.md",
-    remove: "In a background task, the task's final result must contain the block for\n  every Thesis the task created or updated",
-    replacement: "In a background task, the task's final result may summarize each Thesis\n  the task created or updated",
+    remove: "Put each block on lines of its own after the sentence that reports the\n  result",
+    replacement:
+      "Put each block on lines of its own after the sentence that reports the\n  result\n- In a background task, the task's final result must contain the block for\n  every Thesis the task created or updated",
     expectFailedCases: ["target.thesis-write-card-preview"],
   },
   {
@@ -242,7 +278,7 @@ const MUTATIONS = [
   {
     id: "ticker-next-step-drops-follow-up-question",
     file: "references/ticker-read.md",
-    remove: "3. **Follow-up question.** Otherwise",
+    remove: "3. **Follow-up question (optional).** Otherwise",
     replacement: "3. **No suggestion.** Otherwise",
     expectFailedCases: ["platform-data.ticker-read-trade-setup-follow-up"],
   },
@@ -263,7 +299,7 @@ const MUTATIONS = [
   {
     id: "ticker-next-step-setup-ask-optional",
     file: "references/ticker-read.md",
-    remove: "For a setup-like ask, the answer is incomplete without this\n   offer.",
+    remove: "For a setup-like ask, the\n   answer is incomplete without this offer.",
     replacement: "For a setup-like ask, this offer is optional.",
     expectFailedCases: ["platform-data.ticker-read-trade-setup-follow-up"],
   },

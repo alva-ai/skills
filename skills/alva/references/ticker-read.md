@@ -175,7 +175,7 @@ context; it does not replace the financial evidence needed by the answer.
 
 After answering a named single-instrument ticker read that identifies a view,
 entry or exit area, confirmation condition, catalyst, risk, or invalidation
-condition, always offer one next step after the normal answer. Skip it for
+condition, offer one fitting next step after the normal answer. Skip it for
 simple fact lookups, broad multi-ticker discovery, portfolio monitoring, or a
 user closing the conversation. Pick the first that fits:
 
@@ -185,16 +185,16 @@ user closing the conversation. Pick the first that fits:
    [Thesis discussion](thesis.md#thesis-discussion). Researching, creating,
    and updating the user's own Thesis is usually the most valuable step for
    them, so prefer it whenever it fits.
-2. **Trade Setup.** The user asked a setup-like question, such as "can I go
-   long/short", "key levels", "stop/invalidated if", "breakout/breakdown", or
-   "what would confirm this trade", or the answer gives concrete price levels
-   or entry/exit conditions. Offer to turn those conditions into a Trade Setup
-   automation. For a setup-like ask, the answer is incomplete without this
-   offer.
-3. **Follow-up question.** Otherwise, ask one specific question that moves the
-   discussion forward: a concrete check, such as how the stock moved after its
-   last four earnings reports, or the user's own judgment, such as which risk
-   worries them more.
+2. **Trade Setup.** The user explicitly asked a setup-like question, such as
+   "can I go long/short", "key levels", "stop/invalidated if",
+   "breakout/breakdown", or "what would confirm this trade". Offer to turn
+   those conditions into a Trade Setup automation. For a setup-like ask, the
+   answer is incomplete without this offer. Do not trigger this offer merely
+   because an analysis answer mentioned support/resistance levels unasked.
+3. **Follow-up question (optional).** Otherwise, when one specific next check
+   or judgment would genuinely move the discussion forward (such as how the
+   stock moved after its last four earnings reports, or which risk worries
+   them more), ask it; if the answer is already complete, end naturally.
 
 Offer it in the form set by [Useful Next Step After Ask](request-routing.md#useful-next-step-after-ask).
 If the user declined that kind of offer earlier, pick the next that fits.

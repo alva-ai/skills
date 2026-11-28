@@ -156,7 +156,7 @@ buttons. A question needed before any substantive reply uses
 `AskUserQuestion`; Thesis publication
 follows its own preview-and-confirmation flow. Order or trade confirmation and
 auto-trading risk acknowledgment need the user's typed reply, never a button.
-For named single-instrument ticker reads, always offer one next step in the order set by [Next step after a ticker read](ticker-read.md#next-step-after-a-ticker-read).
+For named single-instrument ticker reads, choose the next step in the order set by [Next step after a ticker read](ticker-read.md#next-step-after-a-ticker-read).
 If Automation clears this bar or is already requested, apply [Preferred Automation Setup Skills](request-routing.md#preferred-automation-setup-skills) before suggesting or building it.
 
 ## Capability Help
@@ -320,10 +320,11 @@ supply, payer, pipeline, gross margin; semis segment AI revenue, backlog,
 order, capex read-through, gross margin; energy upstream/downstream, WTI beta,
 shareholder yield, debt.
 
-Cap / Confidence rules: required calculation not done caps at B-/C; only news
-without structured data downgrades source/data coverage; social/KOL without
-denoising downgrades source quality; missing key KPIs with strong conclusion
-requires confidence downgrade or a hard cap.
+Confidence and evidence boundaries: do not present a high-confidence quantitative
+verdict when a required calculation has not been done; relying only on news
+without structured data limits coverage; unverified social/KOL claims must be
+denoised and separated from primary evidence; when key KPIs are missing, state
+the gap and cap confidence accordingly rather than asserting a strong conclusion.
 
 For Thesis drafting, follow [Guided creation](thesis.md#guided-creation).
 For build routes, present a plan once before building.
