@@ -813,8 +813,8 @@ const MUTATIONS = [
   {
     id: "thesis-create-omits-visibility",
     file: "references/thesis.md",
-    remove: "--body '<exact body>' --visibility <public|private> [--entity-ids",
-    replacement: "--body '<exact body>' [--entity-ids",
+    remove: "--body '<exact body>' --visibility <public|private> [--summary",
+    replacement: "--body '<exact body>' [--summary",
     expectFailedCases: ["target.thesis-author-intent"],
   },
   {
@@ -893,6 +893,41 @@ const MUTATIONS = [
     remove: "keep that sign-in, since another unnamed key would not count either; not",
     replacement: "sign in again anyway; and when not",
     expectFailedCases: ["target.agent-bootstrap"],
+  },
+  {
+    id: "thesis-summary-invented-for-verbatim-body",
+    file: "references/thesis.md",
+    remove: "For a body the author supplied to publish as is, send none unless the author\ngives one;",
+    replacement: "Always write one, also for a body published as is;",
+    expectFailedCases: ["target.thesis-summary"],
+  },
+  {
+    id: "thesis-create-sends-title",
+    file: "references/thesis.md",
+    remove: "--visibility <public|private> [--summary '<summary>']",
+    replacement: "--visibility <public|private> [--title '<title>'] [--summary '<summary>']",
+    expectFailedCases: ["target.thesis-summary"],
+  },
+  {
+    id: "thesis-summary-always-kept-on-update",
+    file: "references/thesis.md",
+    remove: "Omitted, the current summary is\nkept only if the body is unchanged: a body change without `--summary` clears\nit and Alva writes a new one.",
+    replacement: "Omitted, the current summary is\nalways kept.",
+    expectFailedCases: ["target.thesis-summary"],
+  },
+  {
+    id: "thesis-summary-not-resent-on-body-change",
+    file: "references/thesis.md",
+    remove: "So with a body change, resend the current summary\n(from `alva thesis get`) when the author gave or approved it; otherwise omit it\nand do not say it is kept.",
+    replacement: "Otherwise omit it.",
+    expectFailedCases: ["target.thesis-summary"],
+  },
+  {
+    id: "thesis-update-carve-out-keeps-summary",
+    file: "references/thesis.md",
+    remove: "except [`--summary`](#summary): omitted, it is kept only while the\n  body is unchanged;",
+    replacement: "except [`--summary`](#summary), which you omit unless changing it;",
+    expectFailedCases: ["target.thesis-summary"],
   },
   {
     id: "thesis-write-same-turn",
