@@ -325,9 +325,12 @@ It is optional: when none is sent, Alva writes one after publication. You may
 propose one with a new Thesis candidate you draft: one sentence on a single
 line, at most 1000 UTF-8 bytes, in the body's language, passed as `--summary`.
 For a body the author supplied to publish as is, send none unless the author
-gives one; a heading in their text stays in the body. On `update`, omitting
-`--summary` keeps the current one; send it only when the author asks to change
-it.
+gives one; a heading in their text stays in the body. On `update`, send
+`--summary` when the author asks to change it. Omitted, the current summary is
+kept only if the body is unchanged: a body change without `--summary` clears
+it and Alva writes a new one. So with a body change, resend the current summary
+(from `alva thesis get`) when the author gave or approved it; otherwise omit it
+and do not say it is kept.
 
 #### Directions and the Thesis return
 
@@ -433,7 +436,7 @@ give every long and short a weight, or none, and preview again; a total above
 
 Preserve the selected body exactly, including wording, language, whitespace and
 line breaks. Do not summarize, rewrite, translate, correct, expand, or add
-assets absent from that body or the user's request, and send only a
+assets absent from that body or the user's request. Send only a
 [summary](#summary) the author gave or you proposed with it.
 Still read the body once as its editor: briefly flag material internal
 inconsistencies or unfinished passages in Notes before calling `alva thesis create`,
@@ -524,7 +527,7 @@ An old button does not authorize a changed candidate, and repeated approval of
 an already completed creation must not create another Thesis; verify its
 existing ID.
 
-One sentence is valid. Tickers and entity IDs are optional. Visibility
+One sentence is valid. Summary, tickers, and entity IDs are optional. Visibility
 defaults to public in the preview; always pass the confirmed one as
 `--visibility`, which create requires. Generate one nonzero UUID per creation intent and keep it
 with the exact payload as `--request-id`; a changed intent requires a new UUID.
@@ -684,7 +687,8 @@ into the body.
   report the limitation; never drop directions to make an update succeed.
   Verify returned directions.
   Omitting optional fields clears
-  them, except [`--summary`](#summary), which you omit unless changing it;
+  them, except [`--summary`](#summary): omitted, it is kept only while the
+  body is unchanged;
   never default an existing private Thesis to public. Report a
   published Update with the preview block from
   [Created Thesis preview](#created-thesis-preview).

@@ -909,10 +909,24 @@ const MUTATIONS = [
     expectFailedCases: ["target.thesis-summary"],
   },
   {
-    id: "thesis-summary-cleared-on-update",
+    id: "thesis-summary-always-kept-on-update",
     file: "references/thesis.md",
-    remove: "On `update`, omitting\n`--summary` keeps the current one",
-    replacement: "On `update`, omitting\n`--summary` clears it",
+    remove: "Omitted, the current summary is\nkept only if the body is unchanged: a body change without `--summary` clears\nit and Alva writes a new one.",
+    replacement: "Omitted, the current summary is\nalways kept.",
+    expectFailedCases: ["target.thesis-summary"],
+  },
+  {
+    id: "thesis-summary-not-resent-on-body-change",
+    file: "references/thesis.md",
+    remove: "So with a body change, resend the current summary\n(from `alva thesis get`) when the author gave or approved it; otherwise omit it\nand do not say it is kept.",
+    replacement: "Otherwise omit it.",
+    expectFailedCases: ["target.thesis-summary"],
+  },
+  {
+    id: "thesis-update-carve-out-keeps-summary",
+    file: "references/thesis.md",
+    remove: "except [`--summary`](#summary): omitted, it is kept only while the\n  body is unchanged;",
+    replacement: "except [`--summary`](#summary), which you omit unless changing it;",
     expectFailedCases: ["target.thesis-summary"],
   },
   {
