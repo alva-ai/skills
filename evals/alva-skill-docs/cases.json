@@ -1612,7 +1612,7 @@
         }
       ],
       "includes": [
-        "version: v1.37.1",
+        "version: v1.38.0",
         "Capability Help",
         "feedback",
         "api/feedback.md",
@@ -3141,6 +3141,26 @@
           ]
         }
       ]
+    },
+    {
+      "id": "target.worldline-match-items-reads",
+      "group": "target",
+      "target": "corpus",
+      "description": "Worldline reads use matchItems: a question is a ranked read graded against rerankQuery, words are keywordQueries, a company is an entity listing and a party an attribution read; pages are followed to an empty token; searchItems, which the SDK drops, is gone.",
+      "file_includes": [
+        {
+          "file": "references/search.md",
+          "includes": [
+            "A ranked read: `matchItems({rerankQuery, queries: [rerankQuery], minSimilarity, rankWindowSize",
+            "`matchItems({keywordQueries, updateTime: {startTime}})`",
+            "then `matchItems` with `entities: [\"entities/\" + entityId]`",
+            "`matchItems` with `attribution: {parties:",
+            "follow `nextPageToken` with the same request until it is empty",
+            "keep the window to days, not weeks"
+          ]
+        }
+      ],
+      "excludes": ["searchItems"]
     }
   ]
 }
