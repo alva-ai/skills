@@ -90,7 +90,7 @@ Run with `alva run --code` (or an existing script):
       category: item.sourceContent.sourceCategory, title: item.sourceContent.title,
       by: (item.resolvedAuthors ?? []).map(a => a.displayName),
       speaker: turn?.speaker, offsetSeconds: turn?.offsetSeconds,
-      useful: grade.usefulProbability, similarity,
+      useful: grade?.usefulProbability, similarity,
       kind: passage.kind, passage: resolvePassageText(item, passage),
     };
   };
