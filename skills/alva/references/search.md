@@ -26,34 +26,48 @@ and how deeply from the question and evidence already available. A price lookup,
 concept explanation or follow-up with sufficient context needs no extra search.
 For an existing Thesis, reuse its Signals and retrieved evidence.
 
-Use `@alva/worldline` (SDK 1.19.0+) through the existing JavaScript runtime.
+Use `@alva/worldline` (SDK 1.23.0+) through the existing JavaScript runtime.
 These are the read interfaces; reuse this contract rather than rediscovering it
 each turn:
 
 | Intent | Read |
 | --- | --- |
-| Find related arguments, events or counterevidence | `searchItems({query, publishTime: {startTime}, limit})` |
-| Match terms or a phrase | `searchItems({keywordQuery, ...})`: at least two thirds of the words (all of one or two); quoted phrases must all appear, and the other words only rank |
-| Find material about a company/person | `searchEntities({query, entityTypes?, limit?})`, then `searchItems` with `entities: ["entities/" + entityId]` |
-| Find material credited to a person/publisher | `searchItems` with `attribution: {parties: ["entities/" + entityId]}` |
+| Find related arguments, events or counterevidence | A ranked read: `matchItems({rerankQuery, queries: [rerankQuery], minSimilarity, rankWindowSize, updateTime: {startTime}, publishTime: {startTime}})` |
+| Match terms or a phrase | `matchItems({keywordQueries, updateTime: {startTime}})`: at least two thirds of the words (all of one or two); quoted phrases must all appear, and the other words only rank |
+| Find material about a company/person | `searchEntities({query, entityTypes?, limit?})`, then `matchItems` with `entities: ["entities/" + entityId]` |
+| Find material credited to a person/publisher | `matchItems` with `attribution: {parties: ["entities/" + entityId]}` |
 | Restrict the kind of source | `sourceCategories`: `x`, `news`, `podcast`, `video` (YouTube), `earnings_call`, `price_target_news`, `company_narrative`, `market_narrative`, `pre_earnings_analysis`, `post_earnings_analysis`, `memory_prices` |
 | Re-read a result | `batchGetItems({names})` with `item.name`, or `item.revision` for the exact version cited |
 
 Filters combine with AND; `entities`, `parties` and `sourceCategories` each
-match any of their values. Entity search returns `entities` with `entityId`,
+match any of their values, and `entities`, `queries` and `keywordQueries`
+match with OR. Entity search returns `entities` with `entityId`,
 `canonicalName`, type and external references. Resolve the intended identity;
 Alva ticker IDs are not Worldline IDs. `batchGetItems` fails the whole call
 when any name is missing.
 
-Each call takes one `query` (semantic) or one `keywordQuery`, a `publishTime`
-window of at most 30 days (`startTime` required; `endTime` exclusive, default
-now), and returns up to `limit` (default 10, max 50) items, best first. There
-is no paging: for more, raise `limit`, narrow the window or filters, or ask
-another query. Run several angles as parallel calls and deduplicate by
-`item.name`. Prefer `createAsyncWorldlineClient()` for independent reads; the
-synchronous client blocks the script even inside `Promise.all`. The example's
-queries, window and result count are starting values to adapt, not limits on
-research depth.
+Every `matchItems` call needs `updateTime: {startTime}`, Worldline's commit
+window (`(startTime, endTime]`, end default now). To bound publication, also
+set `publishTime` (`[startTime, endTime)`) with the same start. Without
+`rerankQuery`, `matchItems` returns pages in commit order, oldest first, not
+best first: follow `nextPageToken` with the same request until it is empty,
+because an empty page can continue.
+
+A ranked read is one response. Worldline reads every match of the window,
+grades the `rankWindowSize` (1..500) whose best passage is closest to
+`rerankQuery`, and returns the useful ones, best first, each with a
+`grade.usefulProbability` at or above `minUsefulProbability` (0.5 when unset).
+It has no page token. Send the question as `rerankQuery` and as
+`queries: [rerankQuery]`, with `minSimilarity` 0.25 (0.20 for one or two
+words), so that each grade sees the item's closest passage. A request with
+`rerankQuery` cannot have `entities` or `keywordQueries`. On a listing or an
+attribution read without `rankWindowSize`, `rerankQuery` keeps only the useful
+matches of each page. A ranked read reads its whole window, so keep the window
+to days, not weeks: a long window is slow. Run several questions as parallel
+reads and deduplicate by `item.name`. Prefer `createAsyncWorldlineClient()` for
+independent reads; the synchronous client blocks the script even inside
+`Promise.all`. The example's questions, window and result count are starting
+values to adapt, not limits on research depth.
 
 Run with `alva run --code` (or an existing script):
 
@@ -61,12 +75,14 @@ Run with `alva run --code` (or an existing script):
 (async () => {
   const { createAsyncWorldlineClient, resolvePassageText } = require("@alva/worldline");
   const client = createAsyncWorldlineClient();
-  const since = new Date(Date.now() - 14 * 86400000).toISOString();
-  const queries = ["HBM contract pricing"];
-  const pages = await Promise.allSettled(queries.map(query => client.searchItems({
-    query, publishTime: { startTime: since }, limit: 5,
+  const since = new Date(Date.now() - 7 * 86400000).toISOString();
+  const questions = ["HBM contract pricing"];
+  const floor = q => (q.split(/\s+/).length <= 2 ? 0.2 : 0.25);
+  const reads = await Promise.allSettled(questions.map(q => client.matchItems({
+    rerankQuery: q, queries: [q], minSimilarity: floor(q), rankWindowSize: 50,
+    updateTime: { startTime: since }, publishTime: { startTime: since },
   })));
-  const brief = ({ item, similarity, evidence }) => {
+  const brief = ({ item, similarity, evidence, grade }) => {
     const passage = evidence[0].passage;
     const turn = item.sourceContent.turns?.[passage.turnFrom];
     return {
@@ -74,12 +90,13 @@ Run with `alva run --code` (or an existing script):
       category: item.sourceContent.sourceCategory, title: item.sourceContent.title,
       by: (item.resolvedAuthors ?? []).map(a => a.displayName),
       speaker: turn?.speaker, offsetSeconds: turn?.offsetSeconds,
-      similarity, kind: passage.kind, passage: resolvePassageText(item, passage),
+      useful: grade.usefulProbability, similarity,
+      kind: passage.kind, passage: resolvePassageText(item, passage),
     };
   };
-  return pages.map((page, i) => page.status === "fulfilled"
-    ? { query: queries[i], results: page.value.results.map(brief) }
-    : { query: queries[i], error: String(page.reason) });
+  return reads.map((read, i) => read.status === "fulfilled"
+    ? { question: questions[i], results: read.value.results.slice(0, 5).map(brief) }
+    : { question: questions[i], error: String(read.reason) });
 })();
 ```
 
@@ -89,11 +106,10 @@ with `speaker` and `offsetSeconds`), the posts it quotes, replies to or reposts
 (`contextReferences`), `citations` and media; `item.resolvedAuthors` gives the
 registry name and bio of the credited parties. `evidence[0].passage` is the
 best-matching passage; read it with `resolvePassageText(item, passage)`.
-`similarity` is the cosine of a semantic query, with no floor: a low score is a
-weak match, judged by reading the passage. A keyword result sets
-`matchedKeywords`. Copies arrive as one result, and so do the items whose best
-passage is the text of one post they quote, reply to or repost, with that post.
-A passage of `kind: "reference"` is from a post the item quotes, replies to or
+`similarity` is the cosine of the best semantic match, at least
+`minSimilarity`; `grade` is the reranker's judgment for the question, and it
+orders a ranked read. A keyword result sets `matchedKeywords`. Worldline
+suppresses copies of one item by default. A passage of `kind: "reference"` is from a post the item quotes, replies to or
 reposts (`contextReferences`), not the item's own words: attribute it to that
 post's author. Use the
 current conversation model to select and reason over relevant passages; read
@@ -108,7 +124,7 @@ Use content and event dates for the answer:
 
 `item.updateTime` is Worldline's internal commit time: do not present it or use
 it to date, rank or assess the freshness of content/events. Items without a
-publication date do not match a search. An empty result proves no absence.
+publication date do not match a `publishTime` filter. An empty result proves no absence.
 
 `item.sourceContent` is captured original text, not a search summary. Check its
 source, date, speaker and context under [content-legitimacy.md](content-legitimacy.md);
@@ -143,11 +159,12 @@ the inline citation.
 
 Captions and cited moments come from a Worldline item. Before featuring a
 podcast episode or YouTube video found elsewhere (Apple Podcasts Search, web
-search, a show page), look it up: `searchItems` with `sourceCategories:
-["podcast"]` or `["video"]`, a `publishTime` window of a day or two around its
-release, and as `keywordQuery` the show name for an episode (a podcast item's
-`sourceContent.title` is the show, not the episode) or the video's title. The
-match is the item whose `item.uri` carries the same id: the episode's Apple id
+search, a show page), look it up: `matchItems` with `sourceCategories:
+["podcast"]` or `["video"]`, an `updateTime` start and a `publishTime` window of
+a day or two around its release, and as `keywordQueries` the show name for an
+episode (a podcast item's
+`sourceContent.title` is the show, not the episode) or the video's title, and
+read every page. The match is the item whose `item.uri` carries the same id: the episode's Apple id
 (`i=`, Apple Search's `trackId`) or the YouTube video id (`v=`); otherwise the
 same show and publication time.
 Feature a match by `item.name` as `worldline_item`, with a cited turn's
